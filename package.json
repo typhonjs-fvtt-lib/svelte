@@ -1,7 +1,6 @@
 {
   "name": "@typhonjs-fvtt/svelte",
   "version": "0.0.0",
-  "homepage": "https://github.com/typhonjs-fvtt/svelte",
   "description": "Provides resources to integrate Svelte w/ Foundry VTT.",
   "type": "module",
   "author": "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)",
@@ -38,6 +37,7 @@
   "engines": {
     "node": ">=12"
   },
+  "homepage": "https://github.com/typhonjs-fvtt/svelte#readme",
   "keywords": [
     "foundry vtt",
     "fvtt",
@@ -46,7 +46,9 @@
   "scripts": {
     "build": "rollup --config"
   },
-  "files": [],
+  "files": [
+    "/dist"
+  ],
   "directories": {},
   "license": "MPL-2.0",
   "repository": "github:typhonjs-fvtt/svelte",
