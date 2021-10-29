@@ -32,7 +32,13 @@
   "dependencies": {
   },
   "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@rollup/plugin-babel": "^5",
     "@rollup/plugin-node-resolve": "^13",
+    "@typhonjs-config/eslint-config": "^0.3.0",
+    "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
+    "eslint": "^8",
     "rollup": "^2",
     "rollup-plugin-sourcemaps": "^0.6.0",
     "rollup-plugin-svelte": "^7",
@@ -50,7 +56,8 @@
     "svelte"
   ],
   "scripts": {
-    "build": "rollup --config"
+    "build": "rollup --config",
+    "eslint": "eslint ."
   },
   "files": [
     "/dist",

@@ -4,6 +4,14 @@
 export default class SvelteApplication extends Application
 {
    /**
+    * Stores instantiated Svelte components.
+    *
+    * @type {object[]}
+    * @private
+    */
+   #svelteComponents = [];
+
+   /**
     * @inheritDoc
     */
    constructor(options)
@@ -16,7 +24,7 @@ export default class SvelteApplication extends Application
        * @type {object[]}
        * @private
        */
-      this._svelteComponents = [];
+      this.#svelteComponents = [];
    }
 
    /**
@@ -77,12 +85,12 @@ export default class SvelteApplication extends Application
          el.slideUp(200, () =>
          {
             // Manually invoke the destroy callbacks for all Svelte components.
-            for (const entry of this._svelteComponents)
+            for (const entry of this.#svelteComponents)
             {
                entry.component?.$destroy();
             }
 
-            this._svelteComponents = [];
+            this.#svelteComponents = [];
 
             el.remove();
 
@@ -117,12 +125,12 @@ export default class SvelteApplication extends Application
       {
          for (const svelteConfig of this.options.svelte)
          {
-            this._svelteComponents.push(s_LOAD_CONFIG(this, html, svelteConfig));
+            this.#svelteComponents.push(s_LOAD_CONFIG(this, html, svelteConfig));
          }
       }
       else if (typeof this.options.svelte === 'object')
       {
-         this._svelteComponents.push(s_LOAD_CONFIG(this, html, this.options.svelte));
+         this.#svelteComponents.push(s_LOAD_CONFIG(this, html, this.options.svelte));
       }
       else
       {

@@ -1,3 +1,4 @@
+import { babel }     from '@rollup/plugin-babel';        // Babel is used for private class fields for browser usage.
 import svelte        from 'rollup-plugin-svelte';
 import resolve       from '@rollup/plugin-node-resolve';
 import sourcemaps    from 'rollup-plugin-sourcemaps';
@@ -42,7 +43,17 @@ export default () =>
             }
          }),
          resolve(),
-         sourcemaps()
+         sourcemaps(),
+         babel({
+            babelHelpers: 'bundled',
+            presets: [
+               ['@babel/preset-env', {
+                  bugfixes: true,
+                  shippedProposals: true,
+                  targets: { esmodules: true }
+               }]
+            ]
+         })
       ]
    },
    {
@@ -108,5 +119,5 @@ export default () =>
          resolve(),
          sourcemaps()
       ]
-   }]
+   }];
 };
