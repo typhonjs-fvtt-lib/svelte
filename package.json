@@ -10,16 +10,22 @@
   "svelte": "src/index.js",
   "exports": {
     ".": {
-      "import": "./dist/index.js"
+      "import": "./dist/modules/index.js"
     },
     "./gsap": {
-      "import": "./dist/gsap.js"
+      "import": "./dist/modules/gsap.js"
     },
     "./helpers": {
-      "import": "./dist/helpers.js"
+      "import": "./dist/modules/helpers.js"
     },
     "./store": {
-      "import": "./dist/store.js"
+      "import": "./dist/modules/store.js"
+    },
+    "./plugins/data": {
+      "import": "./dist/plugins/data.js"
+    },
+    "./plugins/system": {
+      "import": "./dist/plugins/system.js"
     },
     "./package.json": "./package.json"
   },
