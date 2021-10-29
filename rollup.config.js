@@ -22,9 +22,9 @@ export default () =>
    const sourcemap = s_SOURCEMAPS;
 
    return [{
-      input: 'src/index.js',
+      input: 'src/modules/index.js',
       output: {
-         file: 'dist/index.js',
+         file: 'dist/modules/index.js',
          format: 'es',
          plugins: outputPlugins,
          sourcemap,
@@ -46,12 +46,12 @@ export default () =>
       ]
    },
    {
-      input: 'src/gsap/index.js',
+      input: 'src/modules/gsap/index.js',
       external: [                                  // Suppresses the warning and excludes ansi-colors from the
          `gsap`
       ],
       output: {
-         file: 'dist/gsap.js',
+         file: 'dist/modules/gsap.js',
          format: 'es',
          paths: {
             gsap: '/scripts/greensock/esm/all.js'
@@ -62,9 +62,9 @@ export default () =>
       }
    },
    {
-      input: 'src/helpers/index.js',
+      input: 'src/modules/helpers/index.js',
       output: {
-         file: 'dist/helpers.js',
+         file: 'dist/modules/helpers.js',
          format: 'es',
          plugins: outputPlugins,
          sourcemap,
@@ -72,9 +72,33 @@ export default () =>
       }
    },
    {
-      input: 'src/store/index.js',
+      input: 'src/modules/store/index.js',
       output: {
-         file: 'dist/store.js',
+         file: 'dist/modules/store.js',
+         format: 'es',
+         plugins: outputPlugins,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+      },
+      plugins: [
+         resolve(),
+         sourcemaps()
+      ]
+   },
+   {
+      input: 'src/plugins/data/index.js',
+      output: {
+         file: 'dist/plugins/data.js',
+         format: 'es',
+         plugins: outputPlugins,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+      }
+   },
+   {
+      input: 'src/plugins/system/index.js',
+      output: {
+         file: 'dist/plugins/system.js',
          format: 'es',
          plugins: outputPlugins,
          sourcemap,
