@@ -48,7 +48,7 @@ function s_GET_STORE(storage, itemId, defaultValue = void 0)
    return store;
 }
 
-function s_CREATE_STORE(storage, itemId, defaultValue = void 0)
+function s_CREATE_STORE(itemId, defaultValue = void 0)
 {
    try
    {

@@ -214,7 +214,7 @@ function s_GET_STORE$1(storage, itemId, defaultValue = void 0)
    return store;
 }
 
-function s_CREATE_STORE$1(storage, itemId, defaultValue = void 0)
+function s_CREATE_STORE$1(itemId, defaultValue = void 0)
 {
    try
    {
@@ -283,7 +283,7 @@ function s_GET_STORE(storage, itemId, defaultValue = void 0)
    return store;
 }
 
-function s_CREATE_STORE(storage, itemId, defaultValue = void 0)
+function s_CREATE_STORE(itemId, defaultValue = void 0)
 {
    try
    {
