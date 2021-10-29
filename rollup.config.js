@@ -5,7 +5,7 @@ import { terser }    from 'rollup-plugin-terser';
 
 import terserConfig  from './terser.config.js';
 
-const s_COMPRESS = true;
+const s_COMPRESS = false;
 const s_SOURCEMAPS = true;
 
 export default () =>
@@ -48,11 +48,14 @@ export default () =>
    {
       input: 'src/gsap/index.js',
       external: [                                  // Suppresses the warning and excludes ansi-colors from the
-         `/scripts/greensock/esm/all.js`
+         `gsap`
       ],
       output: {
          file: 'dist/gsap.js',
          format: 'es',
+         paths: {
+            gsap: '/scripts/greensock/esm/all.js'
+         },
          plugins: outputPlugins,
          sourcemap,
          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)

@@ -1,2 +1,304 @@
-function noop(){}function run(t){return t()}function get_store_value(t){let e;return function(t,...e){if(null==t)return noop;const n=t.subscribe(...e);return n.unsubscribe?()=>n.unsubscribe():n}(t,(t=>e=t))(),e}Promise.resolve();const t=[];function generator(e){function readable(t,e,n){return{subscribe:writable(t,e,n).subscribe}}function writable(n,o,r=noop){e&&(e.getItem(n)&&(o=JSON.parse(e.getItem(n))),e.setItem(n,JSON.stringify(o)));const s=function(e,n=noop){let o;const r=new Set;function set(n){if(i=n,((s=e)!=s?i==i:s!==i||s&&"object"==typeof s||"function"==typeof s)&&(e=n,o)){const n=!t.length;for(const n of r)n[1](),t.push(n,e);if(n){for(let e=0;e<t.length;e+=2)t[e][0](t[e+1]);t.length=0}}var s,i}return{set,update:function(t){set(t(e))},subscribe:function(t,s=noop){const i=[t,s];return r.add(i),1===r.size&&(o=n(set)||noop),t(e),()=>{r.delete(i),0===r.size&&(o(),o=null)}}}}(o,r?function(t){return r((function(o){return e&&e.setItem(n,JSON.stringify(o)),t(o)}))}:void 0);function set(t){e&&e.setItem(n,JSON.stringify(t)),s.set(t)}return{set,update:function(t){set(t(get_store_value(s)))},subscribe:function(t,e=noop){return s.subscribe(t,e)}}}return{readable,writable,derived:function(t,n,o,r){const s=!Array.isArray(n),i=s?[n]:n;return e&&e.getItem(t)&&(r=JSON.parse(e.getItem(t))),readable(t,r,(t=>{let e=0;const n=[];let r=0,u=noop;const sync=()=>{if(r)return;u();const e=s?n[0]:n;if(o.length<2)t(o(e));else{const n=o(e,t);u="function"==typeof n?n:noop}},c=i.map(((t,o)=>t.subscribe((t=>{n[o]=t,r&=~(1<<o),e&&sync()}),(()=>{r|=1<<o}))));return e=1,sync(),function(){c.forEach(run),u()}}))},get:get_store_value}}var e=generator("undefined"!=typeof window?window.localStorage:void 0).writable;class LocalStorage{constructor(){this._stores=new Map}getItem(t,e){return s_GET_STORE$1(this,t,e).get()}getStore(t){return s_GET_STORE$1(this,t)}setItem(t,e){s_GET_STORE$1(this,t).set(e)}swapItemBoolean(t){const e=s_GET_STORE$1(this,t),n=e.get(),o="boolean"==typeof n?!n:0;return e.set(o),o}}function s_GET_STORE$1(t,n,o){let r=t._stores.get(n);return void 0===r&&(r=function(t,n,o){try{localStorage.getItem(n)&&(o=JSON.parse(localStorage.getItem(n)))}catch(t){}const r=e(n,o);return r.get=()=>get_store_value(r),r}(0,o),t._stores.set(n,r)),r}var n=generator("undefined"!=typeof window?window.sessionStorage:void 0).writable;class SessionStorage{constructor(){this._stores=new Map}getItem(t,e){return s_GET_STORE(this,t,e).get()}getStore(t){return s_GET_STORE(this,t)}setItem(t,e){s_GET_STORE(this,t).set(e)}swapItemBoolean(t){const e=s_GET_STORE(this,t),n=e.get(),o="boolean"==typeof n?!n:0;return e.set(o),o}}function s_GET_STORE(t,e,o){let r=t._stores.get(e);return void 0===r&&(r=function(t,e,o){try{sessionStorage.getItem(e)&&(o=JSON.parse(sessionStorage.getItem(e)))}catch(t){}const r=n(e,o);return r.get=()=>get_store_value(r),r}(0,o),t._stores.set(e,r)),r}export{LocalStorage,SessionStorage};
+function noop() { }
+function run(fn) {
+    return fn();
+}
+function run_all(fns) {
+    fns.forEach(run);
+}
+function is_function(thing) {
+    return typeof thing === 'function';
+}
+function safe_not_equal(a, b) {
+    return a != a ? b == b : a !== b || ((a && typeof a === 'object') || typeof a === 'function');
+}
+function subscribe(store, ...callbacks) {
+    if (store == null) {
+        return noop;
+    }
+    const unsub = store.subscribe(...callbacks);
+    return unsub.unsubscribe ? () => unsub.unsubscribe() : unsub;
+}
+function get_store_value(store) {
+    let value;
+    subscribe(store, _ => value = _)();
+    return value;
+}
+Promise.resolve();
+
+const subscriber_queue = [];
+/**
+ * Create a `Writable` store that allows both updating and reading by subscription.
+ * @param {*=}value initial value
+ * @param {StartStopNotifier=}start start and stop notifications for subscriptions
+ */
+function writable$2(value, start = noop) {
+    let stop;
+    const subscribers = new Set();
+    function set(new_value) {
+        if (safe_not_equal(value, new_value)) {
+            value = new_value;
+            if (stop) { // store is ready
+                const run_queue = !subscriber_queue.length;
+                for (const subscriber of subscribers) {
+                    subscriber[1]();
+                    subscriber_queue.push(subscriber, value);
+                }
+                if (run_queue) {
+                    for (let i = 0; i < subscriber_queue.length; i += 2) {
+                        subscriber_queue[i][0](subscriber_queue[i + 1]);
+                    }
+                    subscriber_queue.length = 0;
+                }
+            }
+        }
+    }
+    function update(fn) {
+        set(fn(value));
+    }
+    function subscribe(run, invalidate = noop) {
+        const subscriber = [run, invalidate];
+        subscribers.add(subscriber);
+        if (subscribers.size === 1) {
+            stop = start(set) || noop;
+        }
+        run(value);
+        return () => {
+            subscribers.delete(subscriber);
+            if (subscribers.size === 0) {
+                stop();
+                stop = null;
+            }
+        };
+    }
+    return { set, update, subscribe };
+}
+
+// src/generator.ts
+function isSimpleDeriver(deriver) {
+  return deriver.length < 2;
+}
+function generator(storage) {
+  function readable(key, value, start) {
+    return {
+      subscribe: writable(key, value, start).subscribe
+    };
+  }
+  function writable(key, value, start = noop) {
+    function wrap_start(ogSet) {
+      return start(function wrap_set(new_value) {
+        if (storage) {
+          storage.setItem(key, JSON.stringify(new_value));
+        }
+        return ogSet(new_value);
+      });
+    }
+    if (storage) {
+      if (storage.getItem(key)) {
+        value = JSON.parse(storage.getItem(key));
+      }
+      storage.setItem(key, JSON.stringify(value));
+    }
+    const ogStore = writable$2(value, start ? wrap_start : void 0);
+    function set(new_value) {
+      if (storage) {
+        storage.setItem(key, JSON.stringify(new_value));
+      }
+      ogStore.set(new_value);
+    }
+    function update(fn) {
+      set(fn(get_store_value(ogStore)));
+    }
+    function subscribe(run, invalidate = noop) {
+      return ogStore.subscribe(run, invalidate);
+    }
+    return {set, update, subscribe};
+  }
+  function derived(key, stores, fn, initial_value) {
+    const single = !Array.isArray(stores);
+    const stores_array = single ? [stores] : stores;
+    if (storage && storage.getItem(key)) {
+      initial_value = JSON.parse(storage.getItem(key));
+    }
+    return readable(key, initial_value, (set) => {
+      let inited = false;
+      const values = [];
+      let pending = 0;
+      let cleanup = noop;
+      const sync = () => {
+        if (pending) {
+          return;
+        }
+        cleanup();
+        const input = single ? values[0] : values;
+        if (isSimpleDeriver(fn)) {
+          set(fn(input));
+        } else {
+          const result = fn(input, set);
+          cleanup = is_function(result) ? result : noop;
+        }
+      };
+      const unsubscribers = stores_array.map((store, i) => store.subscribe((value) => {
+        values[i] = value;
+        pending &= ~(1 << i);
+        if (inited) {
+          sync();
+        }
+      }, () => {
+        pending |= 1 << i;
+      }));
+      inited = true;
+      sync();
+      return function stop() {
+        run_all(unsubscribers);
+        cleanup();
+      };
+    });
+  }
+  return {
+    readable,
+    writable,
+    derived,
+    get: get_store_value
+  };
+}
+
+// src/local.ts
+var storage$1 = typeof window !== "undefined" ? window.localStorage : void 0;
+var g$1 = generator(storage$1);
+var writable$1 = g$1.writable;
+
+class LocalStorage
+{
+   constructor()
+   {
+      this._stores = new Map();
+   }
+
+   getItem(itemId, defaultValue)
+   {
+      const store = s_GET_STORE$1(this, itemId, defaultValue);
+      return store.get();
+   }
+
+   getStore(itemId)
+   {
+      return s_GET_STORE$1(this, itemId);
+   }
+
+   setItem(itemId, value)
+   {
+      const store = s_GET_STORE$1(this, itemId);
+      store.set(value);
+   }
+
+   swapItemBoolean(itemId)
+   {
+      const store = s_GET_STORE$1(this, itemId);
+      const value = store.get();
+      const newValue = typeof value === 'boolean' ? !value : false;
+
+      store.set(newValue);
+      return newValue;
+   }
+}
+
+function s_GET_STORE$1(storage, itemId, defaultValue = void 0)
+{
+   let store = storage._stores.get(itemId);
+   if (store === void 0)
+   {
+      store = s_CREATE_STORE$1(itemId, defaultValue);
+      storage._stores.set(itemId, store);
+   }
+
+   return store;
+}
+
+function s_CREATE_STORE$1(storage, itemId, defaultValue = void 0)
+{
+   try
+   {
+      if (localStorage.getItem(itemId))
+      {
+         defaultValue = JSON.parse(localStorage.getItem(itemId));
+      }
+   }
+   catch (err) { /**/ }
+
+   const store = writable$1(itemId, defaultValue);
+   store.get = () => get_store_value(store);
+
+   return store;
+}
+
+// src/session.ts
+var storage = typeof window !== "undefined" ? window.sessionStorage : void 0;
+var g = generator(storage);
+var writable = g.writable;
+
+class SessionStorage
+{
+   constructor()
+   {
+      this._stores = new Map();
+   }
+
+   getItem(itemId, defaultValue)
+   {
+      const store = s_GET_STORE(this, itemId, defaultValue);
+      return store.get();
+   }
+
+   getStore(itemId)
+   {
+      return s_GET_STORE(this, itemId);
+   }
+
+   setItem(itemId, value)
+   {
+      const store = s_GET_STORE(this, itemId);
+      store.set(value);
+   }
+
+   swapItemBoolean(itemId)
+   {
+      const store = s_GET_STORE(this, itemId);
+      const value = store.get();
+      const newValue = typeof value === 'boolean' ? !value : false;
+
+      store.set(newValue);
+      return newValue;
+   }
+}
+
+function s_GET_STORE(storage, itemId, defaultValue = void 0)
+{
+   let store = storage._stores.get(itemId);
+   if (store === void 0)
+   {
+      store = s_CREATE_STORE(itemId, defaultValue);
+      storage._stores.set(itemId, store);
+   }
+
+   return store;
+}
+
+function s_CREATE_STORE(storage, itemId, defaultValue = void 0)
+{
+   try
+   {
+      if (sessionStorage.getItem(itemId))
+      {
+         defaultValue = JSON.parse(sessionStorage.getItem(itemId));
+      }
+   }
+   catch (err) { /**/ }
+
+   const store = writable(itemId, defaultValue);
+   store.get = () => get_store_value(store);
+
+   return store;
+}
+
+export { LocalStorage, SessionStorage };
 //# sourceMappingURL=store.js.map

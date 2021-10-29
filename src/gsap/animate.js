@@ -1,4 +1,4 @@
-import { gsap } from '/scripts/greensock/esm/all.js';
+import { gsap } from 'gsap';
 
 export function animate(node, { type, ...args })
 {
