@@ -1,0 +1,54 @@
+{
+  "name": "@typhonjs-fvtt/svelte",
+  "version": "0.0.0",
+  "homepage": "https://github.com/typhonjs-fvtt/svelte",
+  "description": "Provides resources to integrate Svelte w/ Foundry VTT.",
+  "type": "module",
+  "author": "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)",
+  "contributors": [
+    "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)"
+  ],
+  "svelte": "src/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./gsap": {
+      "import": "./dist/gsap.js"
+    },
+    "./helpers": {
+      "import": "./dist/helpers.js"
+    },
+    "./store": {
+      "import": "./dist/store.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13",
+    "rollup": "^2",
+    "rollup-plugin-sourcemaps": "^0.6.0",
+    "rollup-plugin-svelte": "^7",
+    "rollup-plugin-terser": "^7",
+    "svelte": "^3",
+    "svelte-persistent-store": "github:typhonjs-svelte/svelte-persistent-store"
+  },
+  "engines": {
+    "node": ">=12"
+  },
+  "keywords": [
+    "foundry vtt",
+    "fvtt",
+    "svelte"
+  ],
+  "scripts": {
+    "build": "rollup --config"
+  },
+  "files": [],
+  "directories": {},
+  "license": "MPL-2.0",
+  "repository": "github:typhonjs-fvtt/svelte",
+  "bugs": "https://github.com/typhonjs-fvtt/svelte/issues"
+}

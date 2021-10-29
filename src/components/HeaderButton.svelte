@@ -1,0 +1,29 @@
+<script>
+   import { onDestroy } from 'svelte';
+
+   /**
+    * Provides an app header button conforming to the Foundry {@link ApplicationHeaderButton} type. Additionally a
+    * `title` field is supported to give a tool tip for the button. The `onclick` function if defined is invoked when
+    * the button is clicked and state is updated accordingly.
+    */
+   import { localize }  from '../helpers/index.js';
+
+   export let button;
+
+   onDestroy(() =>
+   {
+      console.log(`HeaderButton.svelte - onDestroy`);
+   });
+
+   function onClick()
+   {
+      if (typeof button.onclick === 'function')
+      {
+         button.onclick.call(button);
+         button = button;
+      }
+   }
+</script>
+<a on:click={onClick} class=header-button>
+    <i class={button.icon} title={localize(button.title)}></i>{localize(button.label)}
+</a>

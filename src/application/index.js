@@ -1,0 +1,1 @@
+export { default as SvelteApplication } from './SvelteApplication.js';
