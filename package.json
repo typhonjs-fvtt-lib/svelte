@@ -47,7 +47,8 @@
     "build": "rollup --config"
   },
   "files": [
-    "/dist"
+    "/dist",
+    "/src"
   ],
   "directories": {},
   "license": "MPL-2.0",
