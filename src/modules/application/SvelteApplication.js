@@ -247,23 +247,37 @@ function s_LOAD_CONFIG(app, html, config)
 
    const svelteConfig = { ...config, target  };
 
+   const mainContext = {};
+
+   if (Array.isArray(svelteConfig.children))
+   {
+      mainContext.children = svelteConfig.children;
+   }
+   else if (typeof svelteConfig.children === 'object')
+   {
+      mainContext.children = [svelteConfig.children];
+   }
+
    // Potentially inject the Foundry application instance as a Svelte prop.
    if (injectApp)
    {
-      // Add props object if not defined.
-      if (typeof svelteConfig.props !== 'object') { svelteConfig.props = {}; }
-
-      svelteConfig.props._foundryApp = app;
+      mainContext.foundryApp = app;
    }
 
    // Potentially inject any TyphonJS eventbus.
    // TODO: Verify TyphonJS eventbus and create a proxy for the component. Listen to onDestroy to cleanup resources.
    if (injectEventbus)
    {
+      mainContext.eventbus = app._eventbus;
+   }
+
+   // If there is a context object then set it to props.
+   if (Object.keys(mainContext).length > 0)
+   {
       // Add props object if not defined.
       if (typeof svelteConfig.props !== 'object') { svelteConfig.props = {}; }
 
-      svelteConfig.props._eventbus = app._eventbus;
+      svelteConfig.props.context = mainContext;
    }
 
    const result = { config: svelteConfig, component: new SvelteComponent(svelteConfig) };

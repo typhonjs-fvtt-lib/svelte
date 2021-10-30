@@ -1,18 +1,20 @@
 <script>
-   import { setContext }    from "svelte";
-   import ApplicationHeader from './ApplicationHeader.svelte';
+   import { getContext, setContext }   from "svelte";
 
-   setContext('foundryApp', () => _foundryApp);
-   setContext('eventbus', () => _eventbus);
+   import ApplicationHeader            from './ApplicationHeader.svelte';
+   import Container                    from "../Container.svelte";
 
-   export let _eventbus;
-   export let _foundryApp;
-   export let component;
+   setContext('main', () => context);
+
+   export let context;
+
+   let children = getContext('main')().children;
+   let foundryApp = getContext('main')().foundryApp;
 </script>
 
-<div id="{_foundryApp.id}" class="typhonjs-app typhonjs-window-app" data-appid="{_foundryApp.appId}">
-    <ApplicationHeader title = {_foundryApp.title} headerButtons= {_foundryApp._getHeaderButtons()} />
+<div id="{foundryApp.id}" class="typhonjs-app typhonjs-window-app" data-appid="{foundryApp.appId}">
+    <ApplicationHeader title = {foundryApp.title} headerButtons= {foundryApp._getHeaderButtons()} />
     <section class="window-content">
-        <svelte:component this={component} />
+        <Container {children} />
     </section>
 </div>
