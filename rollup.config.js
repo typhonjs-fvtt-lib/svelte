@@ -30,17 +30,17 @@ export default () =>
 
    return [{
       input: 'src/modules/index.js',
-      external: [
-         '#stylesAppShell',
-         '#stylesIndex'
-      ],
+      // external: [
+      //    '#stylesAppShell',
+      //    '#stylesIndex'
+      // ],
       output: {
          file: 'dist/modules/index.js',
          format: 'es',
-         paths: {
-            '#stylesAppShell': './dist/styles/application-shell.css',
-            '#stylesIndex': './dist/modules/styles/index.css'
-         },
+         // paths: {
+         //    '#stylesAppShell': './dist/styles/application-shell.css',
+         //    '#stylesIndex': './dist/modules/styles/index.css'
+         // },
          plugins: outputPlugins,
          preferConst: true,
          sourcemap,

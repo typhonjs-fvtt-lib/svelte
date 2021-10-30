@@ -1,6 +1,3 @@
-import './dist/modules/styles/index.css';
-import './dist/styles/application-shell.css';
-
 function noop() {}
 
 function assign(tar, src) {
