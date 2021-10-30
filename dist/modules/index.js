@@ -1396,6 +1396,7 @@ class SvelteApplication extends Application {
 
 function s_LOAD_CONFIG(app, html, config) {
   const svelteOptions = typeof config.options === 'object' ? config.options : {};
+  delete config.options;
   const injectApp = typeof svelteOptions.injectApp === 'boolean' ? svelteOptions.injectApp : false;
   const injectEventbus = typeof svelteOptions.injectEventbus === 'boolean' ? svelteOptions.injectEventbus : false;
   const hasTemplate = typeof app.template === 'string';
@@ -1418,26 +1419,50 @@ function s_LOAD_CONFIG(app, html, config) {
 
   const SvelteComponent = config.class;
 
+  if (typeof SvelteComponent !== 'function') {
+    throw new Error(`SvelteApplication - s_LOAD_CONFIG - class is not defined for config:\n${JSON.stringify(config)}`);
+  }
+
   const svelteConfig = _objectSpread2(_objectSpread2({}, config), {}, {
     target
   });
 
-  const externalContext = {}; // If a context callback function is provided then invoke it with `this` being the Foundry app.
+  let externalContext = {}; // If a context callback function is provided then invoke it with `this` being the Foundry app.
   // If an object is returned it adds the entries to external context.
 
   if (typeof svelteConfig.context === 'function') {
-    const _result = svelteConfig.context.call(app);
+    const context = svelteConfig.context;
+    delete svelteConfig.context;
+
+    const _result = context.call(app);
 
     if (typeof _result === 'object') {
-      Object.assign(externalContext, _result);
+      externalContext = _objectSpread2(_objectSpread2({}, externalContext), _result);
     }
   } // Process children components attaching to external context.
 
 
   if (Array.isArray(svelteConfig.children)) {
-    externalContext.children = svelteConfig.children;
+    externalContext.children = [];
+
+    for (let cntr = 0; cntr < svelteConfig.children.length; cntr++) {
+      const child = svelteConfig.children[cntr];
+
+      if (typeof child.class !== 'function') {
+        throw new Error(`SvelteApplication - s_LOAD_CONFIG - class is not defined for child[${cntr}] for config:\n${JSON.stringify(config)}`);
+      }
+
+      externalContext.children.push(child);
+    }
+
+    delete svelteConfig.children;
   } else if (typeof svelteConfig.children === 'object') {
+    if (typeof svelteConfig.children.class !== 'function') {
+      throw new Error(`SvelteApplication - s_LOAD_CONFIG - class is not defined for children object for config:\n${JSON.stringify(config)}`);
+    }
+
     externalContext.children = [svelteConfig.children];
+    delete svelteConfig.children;
   } // Potentially inject the Foundry application instance as a Svelte prop.
 
 

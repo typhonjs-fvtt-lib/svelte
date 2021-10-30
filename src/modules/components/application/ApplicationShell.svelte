@@ -4,7 +4,7 @@
    import ApplicationHeader            from './ApplicationHeader.svelte';
    import Container                    from "../Container.svelte";
 
-   // import '#stylesAppShell';
+   import '#stylesAppShell';
 
    setContext('external', () => context);
 
