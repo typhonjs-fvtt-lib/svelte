@@ -1,5 +1,5 @@
 <script>
-   import '#stylesIndex';
+   // import '#stylesIndex';
 
    export let children;
 </script>
