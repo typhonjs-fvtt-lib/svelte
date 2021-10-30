@@ -27,7 +27,7 @@
     "./plugins/system": {
       "import": "./dist/plugins/system.js"
     },
-    "./styles/*": "./styles/*",
+    "./styles/*": "./dist/styles/*",
     "./package.json": "./package.json"
   },
   "dependencies": {
