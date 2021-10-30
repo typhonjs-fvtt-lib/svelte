@@ -9,7 +9,8 @@ import virtual       from '@rollup/plugin-virtual';
 import postcssConfig from './postcss.config.mjs';
 import terserConfig  from './terser.config.js';
 
-const postcssAppShell = Object.assign({}, postcssConfig, { extract: 'dist/styles/application-shell.css'})
+const postcssMain = postcssConfig('styles/main.css');
+const postcssAppShell = postcssConfig('dist/styles/application-shell.css');
 
 const s_COMPRESS = false;
 const s_SOURCEMAPS = true;
@@ -29,9 +30,17 @@ export default () =>
 
    return [{
       input: 'src/modules/index.js',
+      external: [
+         '#stylesAppShell',
+         '#stylesIndex'
+      ],
       output: {
          file: 'dist/modules/index.js',
          format: 'es',
+         paths: {
+            '#stylesAppShell': './dist/styles/application-shell.css',
+            '#stylesIndex': './dist/modules/styles/index.css'
+         },
          plugins: outputPlugins,
          preferConst: true,
          sourcemap,
@@ -49,6 +58,7 @@ export default () =>
             }
          }),
          resolve(),
+         postcss(postcssMain),
          sourcemaps(),
          babel({
             babelHelpers: 'bundled',

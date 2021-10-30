@@ -4,12 +4,14 @@
    import ApplicationHeader            from './ApplicationHeader.svelte';
    import Container                    from "../Container.svelte";
 
-   setContext('main', () => context);
+   import '#stylesAppShell';
+
+   setContext('external', () => context);
 
    export let context;
 
-   let children = getContext('main')().children;
-   let foundryApp = getContext('main')().foundryApp;
+   let children = getContext('external')().children;
+   let foundryApp = getContext('external')().foundryApp;
 </script>
 
 <div id="{foundryApp.id}" class="typhonjs-app typhonjs-window-app" data-appid="{foundryApp.appId}">

@@ -247,37 +247,49 @@ function s_LOAD_CONFIG(app, html, config)
 
    const svelteConfig = { ...config, target  };
 
-   const mainContext = {};
+   const externalContext = {};
 
+   // If a context callback function is provided then invoke it with `this` being the Foundry app.
+   // If an object is returned it adds the entries to external context.
+   if (typeof svelteConfig.context === 'function')
+   {
+      const result = svelteConfig.context.call(app);
+      if (typeof result === 'object')
+      {
+         Object.assign(externalContext, result);
+      }
+   }
+
+   // Process children components attaching to external context.
    if (Array.isArray(svelteConfig.children))
    {
-      mainContext.children = svelteConfig.children;
+      externalContext.children = svelteConfig.children;
    }
    else if (typeof svelteConfig.children === 'object')
    {
-      mainContext.children = [svelteConfig.children];
+      externalContext.children = [svelteConfig.children];
    }
 
    // Potentially inject the Foundry application instance as a Svelte prop.
    if (injectApp)
    {
-      mainContext.foundryApp = app;
+      externalContext.foundryApp = app;
    }
 
    // Potentially inject any TyphonJS eventbus.
    // TODO: Verify TyphonJS eventbus and create a proxy for the component. Listen to onDestroy to cleanup resources.
    if (injectEventbus)
    {
-      mainContext.eventbus = app._eventbus;
+      externalContext.eventbus = app._eventbus;
    }
 
    // If there is a context object then set it to props.
-   if (Object.keys(mainContext).length > 0)
+   if (Object.keys(externalContext).length > 0)
    {
       // Add props object if not defined.
       if (typeof svelteConfig.props !== 'object') { svelteConfig.props = {}; }
 
-      svelteConfig.props.context = mainContext;
+      svelteConfig.props.context = externalContext;
    }
 
    const result = { config: svelteConfig, component: new SvelteComponent(svelteConfig) };

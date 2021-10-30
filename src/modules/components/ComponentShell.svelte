@@ -3,10 +3,10 @@
 
    import Container                    from "./Container.svelte";
 
-   setContext('main', () => context);
+   setContext('external', () => context);
 
    export let context;
 
-   let children = getContext('main')().children;
+   let children = getContext('external')().children;
 </script>
 <Container {children} />
