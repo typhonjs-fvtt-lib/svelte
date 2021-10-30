@@ -48,6 +48,7 @@ export default () =>
       },
       plugins: [
          svelte({
+            emitCss: false,
             onwarn: (warning, handler) =>
             {
                // Suppress `a11y-missing-attribute` for missing href in <a> links.
