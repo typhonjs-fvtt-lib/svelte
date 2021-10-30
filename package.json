@@ -30,6 +30,10 @@
     "./styles/*": "./dist/styles/*",
     "./package.json": "./package.json"
   },
+  "imports": {
+    "#stylesAppShell": "./dist/styles/application-shell.css",
+    "#stylesIndex": "./dist/modules/styles/index.css"
+  },
   "dependencies": {
   },
   "devDependencies": {
