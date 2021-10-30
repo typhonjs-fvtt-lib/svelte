@@ -1,10 +1,14 @@
 import { babel }     from '@rollup/plugin-babel';        // Babel is used for private class fields for browser usage.
-import svelte        from 'rollup-plugin-svelte';
+import postcss       from 'rollup-plugin-postcss';       // Process Sass / CSS w/ PostCSS
 import resolve       from '@rollup/plugin-node-resolve';
 import sourcemaps    from 'rollup-plugin-sourcemaps';
+import svelte        from 'rollup-plugin-svelte';
 import { terser }    from 'rollup-plugin-terser';
 
+import postcssConfig from './postcss.config.mjs';
 import terserConfig  from './terser.config.js';
+
+const postcssAppShell = Object.assign({}, postcssConfig, { extract: 'dist/styles/application-shell.css'})
 
 const s_COMPRESS = false;
 const s_SOURCEMAPS = true;
@@ -59,7 +63,7 @@ export default () =>
    {
       input: 'src/modules/gsap/index.js',
       external: [                                  // Suppresses the warning and excludes ansi-colors from the
-         `gsap`
+         `foundry-gsap`
       ],
       output: {
          file: 'dist/modules/gsap.js',
@@ -105,6 +109,16 @@ export default () =>
          sourcemap,
          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
+   },
+   {
+      input: 'src/styles/application-shell.js',
+      output: {
+         file: 'empty.js',
+         plugins: outputPlugins,
+      },
+      plugins: [
+         postcss(postcssAppShell),                            // Engages PostCSS for Sass / CSS processing
+      ]
    },
    {
       input: 'src/plugins/system/index.js',

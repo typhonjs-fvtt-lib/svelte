@@ -1,4 +1,4 @@
-import { gsap } from 'gsap';
+import { gsap } from 'foundry-gsap';
 
 /**
  * @param {HTMLElement} node -

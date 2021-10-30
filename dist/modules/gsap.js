@@ -1,4 +1,4 @@
-import { gsap } from '/scripts/greensock/esm/all.js';
+import { gsap } from 'foundry-gsap';
 
 /**
  * @param {HTMLElement} node -

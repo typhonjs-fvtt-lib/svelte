@@ -17,14 +17,6 @@ export default class SvelteApplication extends Application
    constructor(options)
    {
       super(options);
-
-      /**
-       * Stores instantiated Svelte components.
-       *
-       * @type {object[]}
-       * @private
-       */
-      this.#svelteComponents = [];
    }
 
    /**
@@ -103,6 +95,17 @@ export default class SvelteApplication extends Application
             resolve();
          });
       });
+   }
+
+   /**
+    * Returns the indexed Svelte component
+    * @param {number}   index -
+    *
+    * @returns {object}
+    */
+   getSvelteComponent(index)
+   {
+      return this.#svelteComponents[index];
    }
 
    /**
@@ -214,6 +217,7 @@ function s_LOAD_CONFIG(app, html, config)
 {
    const svelteOptions = typeof config.options === 'object' ? config.options : {};
    const injectApp = typeof svelteOptions.injectApp === 'boolean' ? svelteOptions.injectApp : false;
+   const injectEventbus = typeof svelteOptions.injectEventbus === 'boolean' ? svelteOptions.injectEventbus : false;
    const hasTemplate = typeof app.template === 'string';
    const hasTarget = typeof config.target === 'string';
 
@@ -243,13 +247,23 @@ function s_LOAD_CONFIG(app, html, config)
 
    const svelteConfig = { ...config, target  };
 
-   // potentially inject the Foundry application instance as a Svelte prop.
+   // Potentially inject the Foundry application instance as a Svelte prop.
    if (injectApp)
    {
       // Add props object if not defined.
       if (typeof svelteConfig.props !== 'object') { svelteConfig.props = {}; }
 
       svelteConfig.props._foundryApp = app;
+   }
+
+   // Potentially inject any TyphonJS eventbus.
+   // TODO: Verify TyphonJS eventbus and create a proxy for the component. Listen to onDestroy to cleanup resources.
+   if (injectEventbus)
+   {
+      // Add props object if not defined.
+      if (typeof svelteConfig.props !== 'object') { svelteConfig.props = {}; }
+
+      svelteConfig.props._eventbus = app._eventbus;
    }
 
    const result = { config: svelteConfig, component: new SvelteComponent(svelteConfig) };
