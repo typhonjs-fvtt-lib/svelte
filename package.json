@@ -37,12 +37,12 @@
     "@babel/preset-env": "^7.0.0",
     "@rollup/plugin-babel": "^5",
     "@rollup/plugin-node-resolve": "^13",
+    "@rollup/plugin-virtual": "^2",
     "@typhonjs-config/eslint-config": "^0.3.0",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "autoprefixer": "^10",
     "eslint": "^8",
     "postcss": "^8",
-    "postcss-cli": "^8",
     "postcss-preset-env": "^6",
     "rollup": "^2",
     "rollup-plugin-postcss": "^4",
@@ -64,7 +64,6 @@
   ],
   "scripts": {
     "build": "rollup --config",
-    "build-css": "sass ./styles/application-shell.scss ./dist/styles/application-shell.css & postcss ./dist/styles/application-shell.css -p sass -u autoprefixer postcss-preset-env cssnano -m -o ./dist/styles/application-shell.css",
     "eslint": "eslint ."
   },
   "files": [

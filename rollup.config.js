@@ -4,6 +4,7 @@ import resolve       from '@rollup/plugin-node-resolve';
 import sourcemaps    from 'rollup-plugin-sourcemaps';
 import svelte        from 'rollup-plugin-svelte';
 import { terser }    from 'rollup-plugin-terser';
+import virtual       from '@rollup/plugin-virtual';
 
 import postcssConfig from './postcss.config.mjs';
 import terserConfig  from './terser.config.js';
@@ -32,6 +33,7 @@ export default () =>
          file: 'dist/modules/index.js',
          format: 'es',
          plugins: outputPlugins,
+         preferConst: true,
          sourcemap,
          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       },
@@ -72,6 +74,7 @@ export default () =>
             gsap: '/scripts/greensock/esm/all.js'
          },
          plugins: outputPlugins,
+         preferConst: true,
          sourcemap,
          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
@@ -82,6 +85,7 @@ export default () =>
          file: 'dist/modules/helpers.js',
          format: 'es',
          plugins: outputPlugins,
+         preferConst: true,
          sourcemap,
          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
@@ -92,6 +96,7 @@ export default () =>
          file: 'dist/modules/store.js',
          format: 'es',
          plugins: outputPlugins,
+         preferConst: true,
          sourcemap,
          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       },
@@ -106,17 +111,23 @@ export default () =>
          file: 'dist/plugins/data.js',
          format: 'es',
          plugins: outputPlugins,
+         preferConst: true,
          sourcemap,
          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
    },
    {
-      input: 'src/styles/application-shell.js',
+      input: 'pack',
       output: {
+         format: 'es',
          file: 'empty.js',
          plugins: outputPlugins,
+         sourcemap,
       },
       plugins: [
+         virtual({
+            pack: `import './styles/application-shell.scss';`
+         }),
          postcss(postcssAppShell),                            // Engages PostCSS for Sass / CSS processing
       ]
    },
@@ -126,6 +137,7 @@ export default () =>
          file: 'dist/plugins/system.js',
          format: 'es',
          plugins: outputPlugins,
+         preferConst: true,
          sourcemap,
          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       },
