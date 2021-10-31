@@ -3,8 +3,10 @@ import postcss       from 'rollup-plugin-postcss';       // Process Sass / CSS w
 import resolve       from '@rollup/plugin-node-resolve';
 import sourcemaps    from 'rollup-plugin-sourcemaps';
 import svelte        from 'rollup-plugin-svelte';
+import preprocess    from 'svelte-preprocess';
 import { terser }    from 'rollup-plugin-terser';
-import virtual       from '@rollup/plugin-virtual';
+
+// import virtual       from '@rollup/plugin-virtual';
 
 import postcssConfig from './postcss.config.mjs';
 import terserConfig  from './terser.config.js';
@@ -49,6 +51,7 @@ export default () =>
       plugins: [
          svelte({
             emitCss: false,
+            preprocess: preprocess(),
             onwarn: (warning, handler) =>
             {
                // Suppress `a11y-missing-attribute` for missing href in <a> links.
@@ -127,21 +130,21 @@ export default () =>
          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
    },
-   {
-      input: 'pack',
-      output: {
-         format: 'es',
-         file: 'empty.js',
-         plugins: outputPlugins,
-         sourcemap,
-      },
-      plugins: [
-         virtual({
-            pack: `import './styles/application-shell.scss';`
-         }),
-         postcss(postcssAppShell),                            // Engages PostCSS for Sass / CSS processing
-      ]
-   },
+   // {
+   //    input: 'pack',
+   //    output: {
+   //       format: 'es',
+   //       file: 'empty.js',
+   //       plugins: outputPlugins,
+   //       sourcemap,
+   //    },
+   //    plugins: [
+   //       virtual({
+   //          pack: `import './styles/application-shell.scss';`
+   //       }),
+   //       postcss(postcssAppShell),                            // Engages PostCSS for Sass / CSS processing
+   //    ]
+   // },
    {
       input: 'src/plugins/system/index.js',
       output: {
