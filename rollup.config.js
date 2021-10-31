@@ -2,7 +2,6 @@ import { babel }     from '@rollup/plugin-babel';        // Babel is used for pr
 import resolve       from '@rollup/plugin-node-resolve';
 import sourcemaps    from 'rollup-plugin-sourcemaps';
 import svelte        from 'rollup-plugin-svelte';
-import preprocess    from 'svelte-preprocess';
 import { terser }    from 'rollup-plugin-terser';
 
 import terserConfig  from './terser.config.js';
@@ -36,7 +35,6 @@ export default () =>
       plugins: [
          svelte({
             emitCss: false,
-            preprocess: preprocess(),
             onwarn: (warning, handler) =>
             {
                // Suppress `a11y-missing-attribute` for missing href in <a> links.
