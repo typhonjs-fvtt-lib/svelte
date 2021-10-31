@@ -4,8 +4,6 @@
    import ApplicationHeader            from './ApplicationHeader.svelte';
    import Container                    from "../Container.svelte";
 
-   // import '#stylesAppShell';
-
    setContext('external', () => context);
 
    export let context;
@@ -22,8 +20,7 @@
 </div>
 
 <style lang="scss">
-  // Defines the styles for that mimics a popout Application. Used by QuestTracker to appear like a
-  // popout app, but be managed directly.
+  // Defines the styles for that mimics a popout Application.
   :global(.typhonjs-app) {
     max-height: 100%;
     background: url(/ui/denim075.png) repeat;
@@ -91,7 +88,7 @@
       border: 1px solid #111;
       border-radius: 4px 0 0 0;
 
-      i.fas {
+      :global(i.fas) {
         transform: rotate(45deg);
       }
     }

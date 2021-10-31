@@ -1,18 +1,11 @@
 import { babel }     from '@rollup/plugin-babel';        // Babel is used for private class fields for browser usage.
-import postcss       from 'rollup-plugin-postcss';       // Process Sass / CSS w/ PostCSS
 import resolve       from '@rollup/plugin-node-resolve';
 import sourcemaps    from 'rollup-plugin-sourcemaps';
 import svelte        from 'rollup-plugin-svelte';
 import preprocess    from 'svelte-preprocess';
 import { terser }    from 'rollup-plugin-terser';
 
-// import virtual       from '@rollup/plugin-virtual';
-
-import postcssConfig from './postcss.config.mjs';
 import terserConfig  from './terser.config.js';
-
-const postcssMain = postcssConfig('styles/main.css');
-const postcssAppShell = postcssConfig('dist/styles/application-shell.css');
 
 const s_COMPRESS = false;
 const s_SOURCEMAPS = true;
@@ -32,17 +25,9 @@ export default () =>
 
    return [{
       input: 'src/modules/index.js',
-      // external: [
-      //    '#stylesAppShell',
-      //    '#stylesIndex'
-      // ],
       output: {
          file: 'dist/modules/index.js',
          format: 'es',
-         // paths: {
-         //    '#stylesAppShell': './dist/styles/application-shell.css',
-         //    '#stylesIndex': './dist/modules/styles/index.css'
-         // },
          plugins: outputPlugins,
          preferConst: true,
          sourcemap,
@@ -62,7 +47,6 @@ export default () =>
             }
          }),
          resolve(),
-         postcss(postcssMain),
          sourcemaps(),
          babel({
             babelHelpers: 'bundled',
@@ -130,21 +114,6 @@ export default () =>
          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
    },
-   // {
-   //    input: 'pack',
-   //    output: {
-   //       format: 'es',
-   //       file: 'empty.js',
-   //       plugins: outputPlugins,
-   //       sourcemap,
-   //    },
-   //    plugins: [
-   //       virtual({
-   //          pack: `import './styles/application-shell.scss';`
-   //       }),
-   //       postcss(postcssAppShell),                            // Engages PostCSS for Sass / CSS processing
-   //    ]
-   // },
    {
       input: 'src/plugins/system/index.js',
       output: {

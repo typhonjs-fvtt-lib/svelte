@@ -1,6 +1,4 @@
 <script>
-   // import '#stylesIndex';
-
    export let children;
 </script>
 
