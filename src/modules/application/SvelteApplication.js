@@ -80,6 +80,13 @@ export default class SvelteApplication extends Application
             for (const entry of this.#svelteComponents)
             {
                entry.component?.$destroy();
+
+               const eventbus = entry.config.eventbus;
+               if (typeof eventbus === 'object' && typeof eventbus.off === 'function')
+               {
+                  eventbus.off();
+                  entry.config.eventbus = void 0;
+               }
             }
 
             this.#svelteComponents = [];
@@ -311,11 +318,13 @@ function s_LOAD_CONFIG(app, html, config)
       externalContext.foundryApp = app;
    }
 
-   // Potentially inject any TyphonJS eventbus.
-   // TODO: Verify TyphonJS eventbus and create a proxy for the component. Listen to onDestroy to cleanup resources.
-   if (injectEventbus)
+   let eventbus;
+
+   // Potentially inject any TyphonJS eventbus and track the proxy in the options.
+   if (injectEventbus && typeof app._eventbus === 'object' && typeof app._eventbus.createProxy === 'function')
    {
-      externalContext.eventbus = app._eventbus;
+      eventbus = app._eventbus.createProxy();
+      externalContext.eventbus = eventbus;
    }
 
    // If there is a context object then set it to props.
@@ -327,7 +336,13 @@ function s_LOAD_CONFIG(app, html, config)
       svelteConfig.props.context = externalContext;
    }
 
-   const result = { config: svelteConfig, component: new SvelteComponent(svelteConfig) };
+   // Create the Svelte component.
+   const component = new SvelteComponent(svelteConfig);
+
+   // Set any eventbus to the config.
+   svelteConfig.eventbus = eventbus;
+
+   const result = { config: svelteConfig, component };
 
    if (!hasTarget)
    {
