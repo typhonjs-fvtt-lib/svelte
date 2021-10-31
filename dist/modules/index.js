@@ -1430,7 +1430,6 @@ class SvelteApplication extends Application {
 
 function s_LOAD_CONFIG(app, html, config) {
   const svelteOptions = typeof config.options === 'object' ? config.options : {};
-  delete config.options;
   const injectApp = typeof svelteOptions.injectApp === 'boolean' ? svelteOptions.injectApp : false;
   const injectEventbus = typeof svelteOptions.injectEventbus === 'boolean' ? svelteOptions.injectEventbus : false;
   const hasTemplate = typeof app.template === 'string';
@@ -1461,6 +1460,7 @@ function s_LOAD_CONFIG(app, html, config) {
     target
   });
 
+  delete svelteConfig.options;
   let externalContext = {}; // If a context callback function is provided then invoke it with `this` being the Foundry app.
   // If an object is returned it adds the entries to external context.
 
