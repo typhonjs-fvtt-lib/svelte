@@ -216,7 +216,6 @@ export default class SvelteApplication extends Application
 function s_LOAD_CONFIG(app, html, config)
 {
    const svelteOptions = typeof config.options === 'object' ? config.options : {};
-   delete config.options;
 
    const injectApp = typeof svelteOptions.injectApp === 'boolean' ? svelteOptions.injectApp : false;
    const injectEventbus = typeof svelteOptions.injectEventbus === 'boolean' ? svelteOptions.injectEventbus : false;
@@ -254,6 +253,8 @@ function s_LOAD_CONFIG(app, html, config)
    }
 
    const svelteConfig = { ...config, target  };
+
+   delete svelteConfig.options;
 
    let externalContext = {};
 
