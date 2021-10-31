@@ -42,7 +42,7 @@
     padding: 0;
     z-index: 99;
 
-    .window-content {
+    :global(.window-content) {
       display: flex;
       flex-direction: column;
       flex-wrap: nowrap;
@@ -53,7 +53,7 @@
       overflow-x: hidden;
     }
 
-    .window-header {
+    :global(.window-header) {
       flex: 0 0 30px;
       overflow: hidden;
       padding: 0 8px;
@@ -61,26 +61,26 @@
       border-bottom: 1px solid #000;
       pointer-events: auto;
 
-      a {
+      :global(a) {
         flex: none;
         margin: 0 0 0 8px;
       }
 
-      h4 {
+      :global(h4) {
         font-family: Signika, sans-serif;
       }
 
-      i[class^=fa] {
+      :global(i[class^=fa]) {
         margin-right: 3px;
       }
 
-      .window-title {
+      :global(.window-title) {
         margin: 0;
         word-break: break-all;
       }
     }
 
-    .window-resizable-handle {
+    :global(.window-resizable-handle) {
       width: 20px;
       height: 20px;
       position: absolute;
@@ -96,12 +96,12 @@
       }
     }
 
-    &.minimized {
-      .window-header {
+    :global(&.minimized) {
+      :global(.window-header) {
         border: 1px solid #000;
       }
 
-      .window-resizable-handle {
+      :global(.window-resizable-handle) {
         display: none;
       }
     }
