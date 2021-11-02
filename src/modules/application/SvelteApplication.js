@@ -1,5 +1,10 @@
 /**
- * Provides a Svelte aware extension to Application to control the app lifecycle appropriately.
+ * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
+ * load one or more components from `defaultOptions`. For the time being please refer to this temporary demo code
+ * in `typhonjs-quest-log` for examples of how to declare Svelte components.
+ *
+ *
+ *
  */
 export default class SvelteApplication extends Application
 {
@@ -116,7 +121,9 @@ export default class SvelteApplication extends Application
    }
 
    /**
-    * Inject the Svelte components defined in `this.options.svelte`.
+    * Inject the Svelte components defined in `this.options.svelte`. The Svelte component can attach to the existing
+    * pop-out of Application or provide no template and render into a document fragment which is then attached to the
+    * DOM.
     *
     * @param {JQuery} html -
     *
@@ -173,7 +180,7 @@ export default class SvelteApplication extends Application
 
    /**
     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
-    * application frame / title for popout applications.
+    * application frame / title for pop-out applications.
     *
     * @override
     * @inheritDoc
