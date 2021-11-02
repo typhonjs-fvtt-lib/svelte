@@ -1038,12 +1038,12 @@ function create_fragment(ctx) {
 
 	applicationheader = new ApplicationHeader({
 			props: {
-				title: /*foundryApp*/ ctx[1].title,
-				headerButtons: /*foundryApp*/ ctx[1]._getHeaderButtons()
+				title: /*foundryApp*/ ctx[3].title,
+				headerButtons: /*foundryApp*/ ctx[3]._getHeaderButtons()
 			}
 		});
 
-	container = new Container({ props: { children: /*children*/ ctx[0] } });
+	container = new Container({ props: { children: /*children*/ ctx[2] } });
 
 	return {
 		c() {
@@ -1053,9 +1053,9 @@ function create_fragment(ctx) {
 			section = element("section");
 			create_component(container.$$.fragment);
 			attr(section, "class", "window-content");
-			attr(div, "id", /*foundryApp*/ ctx[1].id);
+			attr(div, "id", /*foundryApp*/ ctx[3].id);
 			attr(div, "class", "typhonjs-app typhonjs-window-app");
-			attr(div, "data-appid", /*foundryApp*/ ctx[1].appId);
+			attr(div, "data-appid", /*foundryApp*/ ctx[3].appId);
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
@@ -1063,6 +1063,8 @@ function create_fragment(ctx) {
 			append(div, t);
 			append(div, section);
 			mount_component(container, section, null);
+			/*section_binding*/ ctx[5](section);
+			/*div_binding*/ ctx[6](div);
 			current = true;
 		},
 		p: noop,
@@ -1081,27 +1083,46 @@ function create_fragment(ctx) {
 			if (detaching) detach(div);
 			destroy_component(applicationheader);
 			destroy_component(container);
+			/*section_binding*/ ctx[5](null);
+			/*div_binding*/ ctx[6](null);
 		}
 	};
 }
 
 function instance($$self, $$props, $$invalidate) {
-	setContext('external', () => context);
 	let { context } = $$props;
+	let content, root;
+	setContext('external', () => context);
+	setContext('getElementContent', () => content);
+	setContext('getElementRoot', () => root);
 	let children = getContext('external')().children;
 	let foundryApp = getContext('external')().foundryApp;
 
+	function section_binding($$value) {
+		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
+			content = $$value;
+			$$invalidate(0, content);
+		});
+	}
+
+	function div_binding($$value) {
+		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
+			root = $$value;
+			$$invalidate(1, root);
+		});
+	}
+
 	$$self.$$set = $$props => {
-		if ('context' in $$props) $$invalidate(2, context = $$props.context);
+		if ('context' in $$props) $$invalidate(4, context = $$props.context);
 	};
 
-	return [children, foundryApp, context];
+	return [content, root, children, foundryApp, context, section_binding, div_binding];
 }
 
 class ApplicationShell extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance, create_fragment, safe_not_equal, { context: 2 }, add_css);
+		init(this, options, instance, create_fragment, safe_not_equal, { context: 4 }, add_css);
 	}
 }
 
@@ -1218,9 +1239,6 @@ var _svelteComponents = /*#__PURE__*/new WeakMap();
  * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
  * load one or more components from `defaultOptions`. For the time being please refer to this temporary demo code
  * in `typhonjs-quest-log` for examples of how to declare Svelte components.
- *
- *
- *
  */
 class SvelteApplication extends Application {
   /**

@@ -4,17 +4,21 @@
    import ApplicationHeader            from './ApplicationHeader.svelte';
    import Container                    from "../Container.svelte";
 
-   setContext('external', () => context);
-
    export let context;
+
+   let content, root;
+
+   setContext('external', () => context);
+   setContext('getElementContent', () => content);
+   setContext('getElementRoot', () => root);
 
    let children = getContext('external')().children;
    let foundryApp = getContext('external')().foundryApp;
 </script>
 
-<div id="{foundryApp.id}" class="typhonjs-app typhonjs-window-app" data-appid="{foundryApp.appId}">
+<div id={foundryApp.id} class="typhonjs-app typhonjs-window-app" data-appid={foundryApp.appId} bind:this={root}>
     <ApplicationHeader title = {foundryApp.title} headerButtons= {foundryApp._getHeaderButtons()} />
-    <section class="window-content">
+    <section class=window-content bind:this={content}>
         <Container {children} />
     </section>
 </div>

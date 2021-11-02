@@ -2,9 +2,6 @@
  * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
  * load one or more components from `defaultOptions`. For the time being please refer to this temporary demo code
  * in `typhonjs-quest-log` for examples of how to declare Svelte components.
- *
- *
- *
  */
 export default class SvelteApplication extends Application
 {

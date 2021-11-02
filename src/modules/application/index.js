@@ -1,1 +1,1 @@
-export { default as SvelteApplication } from './SvelteApplication.js';
+export { default as SvelteApplication } from './SvelteApplication';
