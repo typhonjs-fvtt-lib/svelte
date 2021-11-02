@@ -1215,7 +1215,12 @@ function _classPrivateFieldInitSpec(obj, privateMap, value) {
 var _svelteComponents = /*#__PURE__*/new WeakMap();
 
 /**
- * Provides a Svelte aware extension to Application to control the app lifecycle appropriately.
+ * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
+ * load one or more components from `defaultOptions`. For the time being please refer to this temporary demo code
+ * in `typhonjs-quest-log` for examples of how to declare Svelte components.
+ *
+ *
+ *
  */
 class SvelteApplication extends Application {
   /**
@@ -1303,6 +1308,12 @@ class SvelteApplication extends Application {
           var _entry$component;
 
           (_entry$component = entry.component) === null || _entry$component === void 0 ? void 0 : _entry$component.$destroy();
+          const eventbus = entry.config.eventbus;
+
+          if (typeof eventbus === 'object' && typeof eventbus.off === 'function') {
+            eventbus.off();
+            entry.config.eventbus = void 0;
+          }
         }
 
         _classPrivateFieldSet(this, _svelteComponents, []);
@@ -1330,7 +1341,9 @@ class SvelteApplication extends Application {
     return _classPrivateFieldGet(this, _svelteComponents)[index];
   }
   /**
-   * Inject the Svelte components defined in `this.options.svelte`.
+   * Inject the Svelte components defined in `this.options.svelte`. The Svelte component can attach to the existing
+   * pop-out of Application or provide no template and render into a document fragment which is then attached to the
+   * DOM.
    *
    * @param {JQuery} html -
    *
@@ -1379,7 +1392,7 @@ class SvelteApplication extends Application {
 
   /**
    * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
-   * application frame / title for popout applications.
+   * application frame / title for pop-out applications.
    *
    * @override
    * @inheritDoc
@@ -1502,12 +1515,13 @@ function s_LOAD_CONFIG(app, html, config) {
 
   if (injectApp) {
     externalContext.foundryApp = app;
-  } // Potentially inject any TyphonJS eventbus.
-  // TODO: Verify TyphonJS eventbus and create a proxy for the component. Listen to onDestroy to cleanup resources.
+  }
 
+  let eventbus; // Potentially inject any TyphonJS eventbus and track the proxy in the options.
 
-  if (injectEventbus) {
-    externalContext.eventbus = app._eventbus;
+  if (injectEventbus && typeof app._eventbus === 'object' && typeof app._eventbus.createProxy === 'function') {
+    eventbus = app._eventbus.createProxy();
+    externalContext.eventbus = eventbus;
   } // If there is a context object then set it to props.
 
 
@@ -1518,11 +1532,15 @@ function s_LOAD_CONFIG(app, html, config) {
     }
 
     svelteConfig.props.context = externalContext;
-  }
+  } // Create the Svelte component.
 
+
+  const component = new SvelteComponent(svelteConfig); // Set any eventbus to the config.
+
+  svelteConfig.eventbus = eventbus;
   const result = {
     config: svelteConfig,
-    component: new SvelteComponent(svelteConfig)
+    component
   };
 
   if (!hasTarget) {

@@ -21,6 +21,9 @@
     "./store": {
       "import": "./dist/modules/store.js"
     },
+    "./transition": {
+      "import": "./dist/modules/transition.js"
+    },
     "./plugins/data": {
       "import": "./dist/plugins/data.js"
     },
