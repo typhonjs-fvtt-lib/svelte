@@ -15,8 +15,11 @@
     "./gsap": {
       "import": "./dist/modules/gsap.js"
     },
-    "./helpers": {
-      "import": "./dist/modules/helpers.js"
+    "./handler": {
+      "import": "./dist/modules/handler.js"
+    },
+    "./helper": {
+      "import": "./dist/modules/helper.js"
     },
     "./store": {
       "import": "./dist/modules/store.js"
@@ -41,6 +44,7 @@
     "@rollup/plugin-node-resolve": "^13",
     "@typhonjs-config/eslint-config": "^0.3.0",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
+    "@typhonjs-svelte/lib": "github:typhonjs-svelte/lib",
     "eslint": "^8",
     "rollup": "^2",
     "rollup-plugin-sourcemaps": "^0.6.0",

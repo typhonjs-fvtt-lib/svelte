@@ -1,1 +1,1 @@
-export { default as slideFade } from './slideFade';
+export * from '@typhonjs-svelte/lib/transition';

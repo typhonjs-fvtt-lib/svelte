@@ -76,9 +76,24 @@ export default () =>
       }
    },
    {
-      input: 'src/modules/helpers/index.js',
+      input: 'src/modules/handler/index.js',
       output: {
-         file: 'dist/modules/helpers.js',
+         file: 'dist/modules/handler.js',
+         format: 'es',
+         plugins: outputPlugins,
+         preferConst: true,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+      },
+      plugins: [
+         resolve(),
+         sourcemaps()
+      ]
+   },
+   {
+      input: 'src/modules/helper/index.js',
+      output: {
+         file: 'dist/modules/helper.js',
          format: 'es',
          plugins: outputPlugins,
          preferConst: true,
