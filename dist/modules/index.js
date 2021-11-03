@@ -752,22 +752,15 @@ function create_fragment$3(ctx) {
 	};
 }
 
-function instance$3($$self, $$props, $$invalidate) {
-	setContext('external', () => context);
-	let { context } = $$props;
-	let children = getContext('external')().children;
-
-	$$self.$$set = $$props => {
-		if ('context' in $$props) $$invalidate(1, context = $$props.context);
-	};
-
-	return [children, context];
+function instance$3($$self) {
+	let children = getContext('external').children;
+	return [children];
 }
 
 class ComponentShell extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance$3, create_fragment$3, safe_not_equal, { context: 1 });
+		init(this, options, instance$3, create_fragment$3, safe_not_equal, {});
 	}
 }
 
@@ -1063,8 +1056,8 @@ function create_fragment(ctx) {
 			append(div, t);
 			append(div, section);
 			mount_component(container, section, null);
-			/*section_binding*/ ctx[5](section);
-			/*div_binding*/ ctx[6](div);
+			/*section_binding*/ ctx[4](section);
+			/*div_binding*/ ctx[5](div);
 			current = true;
 		},
 		p: noop,
@@ -1083,20 +1076,18 @@ function create_fragment(ctx) {
 			if (detaching) detach(div);
 			destroy_component(applicationheader);
 			destroy_component(container);
-			/*section_binding*/ ctx[5](null);
-			/*div_binding*/ ctx[6](null);
+			/*section_binding*/ ctx[4](null);
+			/*div_binding*/ ctx[5](null);
 		}
 	};
 }
 
 function instance($$self, $$props, $$invalidate) {
-	let { context } = $$props;
 	let content, root;
-	setContext('external', () => context);
 	setContext('getElementContent', () => content);
 	setContext('getElementRoot', () => root);
-	let children = getContext('external')().children;
-	let foundryApp = getContext('external')().foundryApp;
+	let children = getContext('external').children;
+	let foundryApp = getContext('external').foundryApp;
 
 	function section_binding($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
@@ -1112,17 +1103,13 @@ function instance($$self, $$props, $$invalidate) {
 		});
 	}
 
-	$$self.$$set = $$props => {
-		if ('context' in $$props) $$invalidate(4, context = $$props.context);
-	};
-
-	return [content, root, children, foundryApp, context, section_binding, div_binding];
+	return [content, root, children, foundryApp, section_binding, div_binding];
 }
 
 class ApplicationShell extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance, create_fragment, safe_not_equal, { context: 4 }, add_css);
+		init(this, options, instance, create_fragment, safe_not_equal, {}, add_css);
 	}
 }
 
@@ -1239,6 +1226,9 @@ var _svelteComponents = /*#__PURE__*/new WeakMap();
  * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
  * load one or more components from `defaultOptions`. For the time being please refer to this temporary demo code
  * in `typhonjs-quest-log` for examples of how to declare Svelte components.
+ * {@link https://github.com/typhonjs-fvtt/typhonjs-quest-log/tree/master/src/view/demo}
+ *
+ * A repository of demos will be available soon.
  */
 class SvelteApplication extends Application {
   /**
@@ -1544,12 +1534,8 @@ function s_LOAD_CONFIG(app, html, config) {
 
 
   if (Object.keys(externalContext).length > 0) {
-    // Add props object if not defined.
-    if (typeof svelteConfig.props !== 'object') {
-      svelteConfig.props = {};
-    }
-
-    svelteConfig.props.context = externalContext;
+    // If there is an existing context Map then merge with external context.
+    svelteConfig.context = svelteConfig.context instanceof Map ? new Map([['external', externalContext], ...svelteConfig.context]) : new Map([['external', externalContext]]);
   } // Create the Svelte component.
 
 
