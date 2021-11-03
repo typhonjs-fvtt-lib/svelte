@@ -9,8 +9,10 @@
    setContext('getElementContent', () => content);
    setContext('getElementRoot', () => root);
 
-   let children = getContext('external').children;
-   let foundryApp = getContext('external').foundryApp;
+   const context = getContext('external');
+   const children = typeof context === 'object' ? context.children : void 0;
+
+   const foundryApp = getContext('external').foundryApp;
 </script>
 
 <div id={foundryApp.id} class="typhonjs-app typhonjs-window-app" data-appid={foundryApp.appId} bind:this={root}>
