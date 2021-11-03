@@ -1392,9 +1392,11 @@ class TJSMenu {
     items = []
   } = {}) {
     if (_classStaticPrivateFieldSpecGet(this, TJSMenu, _contextMenu) !== void 0) {
-      outroAndDestroy(_classStaticPrivateFieldSpecGet(this, TJSMenu, _contextMenu));
+      const menu = _classStaticPrivateFieldSpecGet(this, TJSMenu, _contextMenu);
 
       _classStaticPrivateFieldSpecSet(this, TJSMenu, _contextMenu, void 0);
+
+      outroAndDestroy(menu);
     }
 
     _classStaticPrivateFieldSpecSet(this, TJSMenu, _contextMenu, new TJSContextMenu({
@@ -1406,6 +1408,14 @@ class TJSMenu {
         items
       }
     }));
+
+    _classStaticPrivateFieldSpecGet(this, TJSMenu, _contextMenu).$on('close', () => {
+      if (_classStaticPrivateFieldSpecGet(this, TJSMenu, _contextMenu) !== void 0) {
+        outroAndDestroy(_classStaticPrivateFieldSpecGet(this, TJSMenu, _contextMenu));
+
+        _classStaticPrivateFieldSpecSet(this, TJSMenu, _contextMenu, void 0);
+      }
+    });
   }
 
 }

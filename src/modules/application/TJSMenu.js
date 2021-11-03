@@ -13,14 +13,24 @@ export default class TJSMenu
    {
       if (this.#contextMenu !== void 0)
       {
-         outroAndDestroy(this.#contextMenu);
+         const menu = this.#contextMenu;
          this.#contextMenu = void 0;
+         outroAndDestroy(menu);
       }
 
       this.#contextMenu = new TJSContextMenu({
          target: document.body,
          intro: true,
          props: { x, y, items }
+      })
+
+      this.#contextMenu.$on('close', () =>
+      {
+         if (this.#contextMenu !== void 0)
+         {
+            outroAndDestroy(this.#contextMenu);
+            this.#contextMenu = void 0;
+         }
       })
    }
 }
