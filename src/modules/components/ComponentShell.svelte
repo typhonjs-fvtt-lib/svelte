@@ -1,12 +1,8 @@
 <script>
-   import { getContext, setContext }   from "svelte";
+   import { getContext }    from 'svelte';
 
-   import Container                    from "./Container.svelte";
+   import Container         from './Container.svelte';
 
-   setContext('external', () => context);
-
-   export let context;
-
-   let children = getContext('external')().children;
+   let children = getContext('external').children;
 </script>
 <Container {children} />
