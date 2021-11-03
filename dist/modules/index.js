@@ -723,7 +723,7 @@ function create_fragment$4(ctx) {
 
 function instance$4($$self, $$props, $$invalidate) {
 	let { warn = false } = $$props;
-	let { children } = $$props;
+	let { children = void 0 } = $$props;
 
 	$$self.$$set = $$props => {
 		if ('warn' in $$props) $$invalidate(0, warn = $$props.warn);

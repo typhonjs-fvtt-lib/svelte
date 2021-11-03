@@ -1,6 +1,6 @@
 <script>
    export let warn = false;
-   export let children;
+   export let children = void 0;
 </script>
 
 {#if Array.isArray(children)}
