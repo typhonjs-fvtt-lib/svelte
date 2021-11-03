@@ -26,7 +26,9 @@ export default () =>
       input: 'src/modules/index.js',
       external: [
          'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
-          'svelte/types'
+          'svelte/types',
+
+         '@typhonjs-fvtt/svelte/transition', '@typhonjs-fvtt/svelte/util'
       ],
       output: {
          file: 'dist/modules/index.js',
