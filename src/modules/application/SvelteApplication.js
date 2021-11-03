@@ -337,10 +337,10 @@ function s_LOAD_CONFIG(app, html, config)
    // If there is a context object then set it to props.
    if (Object.keys(externalContext).length > 0)
    {
-      // Add props object if not defined.
-      if (typeof svelteConfig.props !== 'object') { svelteConfig.props = {}; }
-
-      svelteConfig.props.context = externalContext;
+      // If there is an existing context Map then merge with external context.
+      svelteConfig.context = svelteConfig.context instanceof Map ?
+       new Map([['external', externalContext], ...svelteConfig.context]) :
+        new Map([['external', externalContext]]);
    }
 
    // Create the Svelte component.
