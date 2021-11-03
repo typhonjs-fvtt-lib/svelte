@@ -133,6 +133,9 @@ export default () =>
    },
    {
       input: 'src/modules/util/index.js',
+      external: [                                  // Suppresses the warning and excludes ansi-colors from the
+         `svelte/internal`
+      ],
       output: {
          file: 'dist/modules/util.js',
          format: 'es',

@@ -1,41 +1,4 @@
-function run(fn) {
-    return fn();
-}
-function run_all(fns) {
-    fns.forEach(run);
-}
-Promise.resolve();
-const outroing = new Set();
-let outros;
-function group_outros() {
-    outros = {
-        r: 0,
-        c: [],
-        p: outros // parent group
-    };
-}
-function check_outros() {
-    if (!outros.r) {
-        run_all(outros.c);
-    }
-    outros = outros.p;
-}
-function transition_out(block, local, detach, callback) {
-    if (block && block.o) {
-        if (outroing.has(block))
-            return;
-        outroing.add(block);
-        outros.c.push(() => {
-            outroing.delete(block);
-            if (callback) {
-                if (detach)
-                    block.d(1);
-                callback();
-            }
-        });
-        block.o(local);
-    }
-}
+import { group_outros, transition_out, check_outros } from 'svelte/internal';
 
 /**
  * Runs outro transition then destroys Svelte component.

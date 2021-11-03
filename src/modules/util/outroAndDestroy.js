@@ -22,4 +22,4 @@ export default function outroAndDestroy(instance)
    {
       instance.$destroy();
    }
-};
+}
