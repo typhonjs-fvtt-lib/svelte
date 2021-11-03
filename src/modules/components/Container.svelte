@@ -1,5 +1,5 @@
 <script>
-   export let warn = false;
+   export let warn = true;
    export let children;
 </script>
 
