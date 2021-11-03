@@ -24,6 +24,10 @@ export default () =>
 
    return [{
       input: 'src/modules/index.js',
+      external: [
+         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
+          'svelte/types'
+      ],
       output: {
          file: 'dist/modules/index.js',
          format: 'es',
@@ -61,7 +65,10 @@ export default () =>
    {
       input: 'src/modules/gsap/index.js',
       external: [                                  // Suppresses the warning and excludes ansi-colors from the
-         `foundry-gsap`
+         `foundry-gsap`,
+
+         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
+          'svelte/types'
       ],
       output: {
          file: 'dist/modules/gsap.js',
@@ -77,6 +84,10 @@ export default () =>
    },
    {
       input: 'src/modules/handler/index.js',
+      external: [
+         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
+          'svelte/types'
+      ],
       output: {
          file: 'dist/modules/handler.js',
          format: 'es',
@@ -92,6 +103,10 @@ export default () =>
    },
    {
       input: 'src/modules/helper/index.js',
+      external: [
+         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
+          'svelte/types'
+      ],
       output: {
          file: 'dist/modules/helper.js',
          format: 'es',
@@ -103,6 +118,10 @@ export default () =>
    },
    {
       input: 'src/modules/store/index.js',
+      external: [
+         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
+          'svelte/types'
+      ],
       output: {
          file: 'dist/modules/store.js',
          format: 'es',
@@ -118,6 +137,10 @@ export default () =>
    },
    {
       input: 'src/modules/transition/index.js',
+      external: [
+         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
+          'svelte/types'
+      ],
       output: {
          file: 'dist/modules/transition.js',
          format: 'es',
@@ -133,8 +156,9 @@ export default () =>
    },
    {
       input: 'src/modules/util/index.js',
-      external: [                                  // Suppresses the warning and excludes ansi-colors from the
-         `svelte/internal`
+      external: [
+         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
+          'svelte/types'
       ],
       output: {
          file: 'dist/modules/util.js',
@@ -151,6 +175,10 @@ export default () =>
    },
    {
       input: 'src/plugins/data/index.js',
+      external: [
+         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
+          'svelte/types'
+      ],
       output: {
          file: 'dist/plugins/data.js',
          format: 'es',
@@ -162,6 +190,10 @@ export default () =>
    },
    {
       input: 'src/plugins/system/index.js',
+      external: [
+         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
+          'svelte/types'
+      ],
       output: {
          file: 'dist/plugins/system.js',
          format: 'es',

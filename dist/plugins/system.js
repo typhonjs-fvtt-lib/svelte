@@ -1,77 +1,5 @@
-function noop() { }
-function run(fn) {
-    return fn();
-}
-function run_all(fns) {
-    fns.forEach(run);
-}
-function is_function(thing) {
-    return typeof thing === 'function';
-}
-function safe_not_equal(a, b) {
-    return a != a ? b == b : a !== b || ((a && typeof a === 'object') || typeof a === 'function');
-}
-function subscribe(store, ...callbacks) {
-    if (store == null) {
-        return noop;
-    }
-    const unsub = store.subscribe(...callbacks);
-    return unsub.unsubscribe ? () => unsub.unsubscribe() : unsub;
-}
-function get_store_value(store) {
-    let value;
-    subscribe(store, _ => value = _)();
-    return value;
-}
-Promise.resolve();
-
-const subscriber_queue = [];
-/**
- * Create a `Writable` store that allows both updating and reading by subscription.
- * @param {*=}value initial value
- * @param {StartStopNotifier=}start start and stop notifications for subscriptions
- */
-function writable$2(value, start = noop) {
-    let stop;
-    const subscribers = new Set();
-    function set(new_value) {
-        if (safe_not_equal(value, new_value)) {
-            value = new_value;
-            if (stop) { // store is ready
-                const run_queue = !subscriber_queue.length;
-                for (const subscriber of subscribers) {
-                    subscriber[1]();
-                    subscriber_queue.push(subscriber, value);
-                }
-                if (run_queue) {
-                    for (let i = 0; i < subscriber_queue.length; i += 2) {
-                        subscriber_queue[i][0](subscriber_queue[i + 1]);
-                    }
-                    subscriber_queue.length = 0;
-                }
-            }
-        }
-    }
-    function update(fn) {
-        set(fn(value));
-    }
-    function subscribe(run, invalidate = noop) {
-        const subscriber = [run, invalidate];
-        subscribers.add(subscriber);
-        if (subscribers.size === 1) {
-            stop = start(set) || noop;
-        }
-        run(value);
-        return () => {
-            subscribers.delete(subscriber);
-            if (subscribers.size === 0) {
-                stop();
-                stop = null;
-            }
-        };
-    }
-    return { set, update, subscribe };
-}
+import { get, writable as writable$2 } from 'svelte/store';
+import { noop, run_all, is_function } from 'svelte/internal';
 
 // src/generator.ts
 function isSimpleDeriver(deriver) {
@@ -106,7 +34,7 @@ function generator(storage) {
       ogStore.set(new_value);
     }
     function update(fn) {
-      set(fn(get_store_value(ogStore)));
+      set(fn(get(ogStore)));
     }
     function subscribe(run, invalidate = noop) {
       return ogStore.subscribe(run, invalidate);
@@ -158,7 +86,7 @@ function generator(storage) {
     readable,
     writable,
     derived,
-    get: get_store_value
+    get: get
   };
 }
 
@@ -234,7 +162,7 @@ function s_CREATE_STORE$1(itemId, defaultValue = void 0)
    catch (err) { /**/ }
 
    const store = writable$1(itemId, defaultValue);
-   store.get = () => get_store_value(store);
+   store.get = () => get(store);
 
    return store;
 }
@@ -326,7 +254,7 @@ function s_CREATE_STORE(itemId, defaultValue = void 0)
    catch (err) { /**/ }
 
    const store = writable(itemId, defaultValue);
-   store.get = () => get_store_value(store);
+   store.get = () => get(store);
 
    return store;
 }

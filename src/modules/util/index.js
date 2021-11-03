@@ -1,1 +1,1 @@
-export { default as outroAndDestroy } from './outroAndDestroy.js';
+export * from '@typhonjs-svelte/lib/util';
