@@ -132,6 +132,21 @@ export default () =>
       ]
    },
    {
+      input: 'src/modules/util/index.js',
+      output: {
+         file: 'dist/modules/util.js',
+         format: 'es',
+         plugins: outputPlugins,
+         preferConst: true,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+      },
+      plugins: [
+         resolve(),
+         sourcemaps()
+      ]
+   },
+   {
       input: 'src/plugins/data/index.js',
       output: {
          file: 'dist/plugins/data.js',

@@ -27,6 +27,9 @@
     "./transition": {
       "import": "./dist/modules/transition.js"
     },
+    "./util": {
+      "import": "./dist/modules/util.js"
+    },
     "./plugins/data": {
       "import": "./dist/plugins/data.js"
     },

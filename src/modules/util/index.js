@@ -1,0 +1,1 @@
+export { default as outroAndDestroy } from './outroAndDestroy.js';
