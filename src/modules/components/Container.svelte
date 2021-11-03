@@ -1,8 +1,7 @@
 <script>
-   export let warn = true;
+   export let warn = false;
    export let children;
 </script>
-
 
 {#if Array.isArray(children)}
     {#each children as child}

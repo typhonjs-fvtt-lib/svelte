@@ -16,7 +16,7 @@
 <div id={foundryApp.id} class="typhonjs-app typhonjs-window-app" data-appid={foundryApp.appId} bind:this={root}>
     <ApplicationHeader title = {foundryApp.title} headerButtons= {foundryApp._getHeaderButtons()} />
     <section class=window-content bind:this={content}>
-        <Container {children} />
+        <Container {children} warn={true} />
     </section>
 </div>
 

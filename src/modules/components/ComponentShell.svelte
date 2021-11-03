@@ -3,6 +3,7 @@
 
    import Container         from './Container.svelte';
 
-   let children = getContext('external').children;
+   const context = getContext('external');
+   const children = typeof context === 'object' ? context.children : void 0;
 </script>
-<Container {children} />
+<Container {children} warn={true} />
