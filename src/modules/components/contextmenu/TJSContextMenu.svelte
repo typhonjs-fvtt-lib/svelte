@@ -1,17 +1,22 @@
 <script>
-   import { onDestroy }          from 'svelte';
-   import { current_component }  from 'svelte/internal';
-   import { slideFade }          from '@typhonjs-fvtt/svelte/transition';
-   import { outroAndDestroy }    from '@typhonjs-fvtt/svelte/util';
+   import { createEventDispatcher, onDestroy }  from 'svelte';
+   import { current_component }                 from 'svelte/internal';
+   import { slideFade }                         from '@typhonjs-fvtt/svelte/transition';
+   import { outroAndDestroy }                   from '@typhonjs-fvtt/svelte/util';
 
-   export let x;
-   export let y;
+   export let x = 0;
+   export let y = 0;
+   export let items = [];
 
    const local = current_component;
+
+   const dispatch = createEventDispatcher();
 
    const onClose = (event) =>
    {
       if (event.target === menuEl || menuEl.contains(event.target)) return;
+
+      dispatch('close');
       console.log(`TJSContextMenu - onClose`)
       outroAndDestroy(local);
    }
@@ -29,6 +34,9 @@
         <li>SOME TEXT</li>
         <li>SOME TEXT</li>
         <li>SOME TEXT</li>
+        {#each items as item}
+            <li>SOME TEXT</li>
+        {/each}
     </ol>
 </div>
 
