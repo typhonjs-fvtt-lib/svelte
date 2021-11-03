@@ -443,12 +443,12 @@ function add_css$1(target) {
 
 function get_each_context$1(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[1] = list[i];
+	child_ctx[2] = list[i];
 	return child_ctx;
 }
 
-// (9:0) {:else}
-function create_else_block(ctx) {
+// (10:15) 
+function create_if_block_1(ctx) {
 	let p;
 
 	return {
@@ -469,11 +469,11 @@ function create_else_block(ctx) {
 	};
 }
 
-// (5:0) {#if Array.isArray(children)}
+// (6:0) {#if Array.isArray(children)}
 function create_if_block(ctx) {
 	let each_1_anchor;
 	let current;
-	let each_value = /*children*/ ctx[0];
+	let each_value = /*children*/ ctx[1];
 	let each_blocks = [];
 
 	for (let i = 0; i < each_value.length; i += 1) {
@@ -501,8 +501,8 @@ function create_if_block(ctx) {
 			current = true;
 		},
 		p(ctx, dirty) {
-			if (dirty & /*children*/ 1) {
-				each_value = /*children*/ ctx[0];
+			if (dirty & /*children*/ 2) {
+				each_value = /*children*/ ctx[1];
 				let i;
 
 				for (i = 0; i < each_value.length; i += 1) {
@@ -553,13 +553,13 @@ function create_if_block(ctx) {
 	};
 }
 
-// (6:4) {#each children as child}
+// (7:4) {#each children as child}
 function create_each_block$1(ctx) {
 	let switch_instance;
 	let switch_instance_anchor;
 	let current;
-	const switch_instance_spread_levels = [/*child*/ ctx[1].props];
-	var switch_value = /*child*/ ctx[1].class;
+	const switch_instance_spread_levels = [/*child*/ ctx[2].props];
+	var switch_value = /*child*/ ctx[2].class;
 
 	function switch_props(ctx) {
 		let switch_instance_props = {};
@@ -589,11 +589,11 @@ function create_each_block$1(ctx) {
 			current = true;
 		},
 		p(ctx, dirty) {
-			const switch_instance_changes = (dirty & /*children*/ 1)
-			? get_spread_update(switch_instance_spread_levels, [get_spread_object(/*child*/ ctx[1].props)])
+			const switch_instance_changes = (dirty & /*children*/ 2)
+			? get_spread_update(switch_instance_spread_levels, [get_spread_object(/*child*/ ctx[2].props)])
 			: {};
 
-			if (switch_value !== (switch_value = /*child*/ ctx[1].class)) {
+			if (switch_value !== (switch_value = /*child*/ ctx[2].class)) {
 				if (switch_instance) {
 					group_outros();
 					const old_component = switch_instance;
@@ -639,25 +639,30 @@ function create_fragment$4(ctx) {
 	let if_block;
 	let if_block_anchor;
 	let current;
-	const if_block_creators = [create_if_block, create_else_block];
+	const if_block_creators = [create_if_block, create_if_block_1];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
-		if (show_if == null || dirty & /*children*/ 1) show_if = !!Array.isArray(/*children*/ ctx[0]);
+		if (show_if == null || dirty & /*children*/ 2) show_if = !!Array.isArray(/*children*/ ctx[1]);
 		if (show_if) return 0;
-		return 1;
+		if (/*warn*/ ctx[0]) return 1;
+		return -1;
 	}
 
-	current_block_type_index = select_block_type(ctx, -1);
-	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+	if (~(current_block_type_index = select_block_type(ctx, -1))) {
+		if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+	}
 
 	return {
 		c() {
-			if_block.c();
+			if (if_block) if_block.c();
 			if_block_anchor = empty();
 		},
 		m(target, anchor) {
-			if_blocks[current_block_type_index].m(target, anchor);
+			if (~current_block_type_index) {
+				if_blocks[current_block_type_index].m(target, anchor);
+			}
+
 			insert(target, if_block_anchor, anchor);
 			current = true;
 		},
@@ -666,26 +671,35 @@ function create_fragment$4(ctx) {
 			current_block_type_index = select_block_type(ctx, dirty);
 
 			if (current_block_type_index === previous_block_index) {
-				if_blocks[current_block_type_index].p(ctx, dirty);
+				if (~current_block_type_index) {
+					if_blocks[current_block_type_index].p(ctx, dirty);
+				}
 			} else {
-				group_outros();
+				if (if_block) {
+					group_outros();
 
-				transition_out(if_blocks[previous_block_index], 1, 1, () => {
-					if_blocks[previous_block_index] = null;
-				});
+					transition_out(if_blocks[previous_block_index], 1, 1, () => {
+						if_blocks[previous_block_index] = null;
+					});
 
-				check_outros();
-				if_block = if_blocks[current_block_type_index];
-
-				if (!if_block) {
-					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-					if_block.c();
-				} else {
-					if_block.p(ctx, dirty);
+					check_outros();
 				}
 
-				transition_in(if_block, 1);
-				if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				if (~current_block_type_index) {
+					if_block = if_blocks[current_block_type_index];
+
+					if (!if_block) {
+						if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+						if_block.c();
+					} else {
+						if_block.p(ctx, dirty);
+					}
+
+					transition_in(if_block, 1);
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				} else {
+					if_block = null;
+				}
 			}
 		},
 		i(local) {
@@ -698,26 +712,31 @@ function create_fragment$4(ctx) {
 			current = false;
 		},
 		d(detaching) {
-			if_blocks[current_block_type_index].d(detaching);
+			if (~current_block_type_index) {
+				if_blocks[current_block_type_index].d(detaching);
+			}
+
 			if (detaching) detach(if_block_anchor);
 		}
 	};
 }
 
 function instance$4($$self, $$props, $$invalidate) {
+	let { warn = false } = $$props;
 	let { children } = $$props;
 
 	$$self.$$set = $$props => {
-		if ('children' in $$props) $$invalidate(0, children = $$props.children);
+		if ('warn' in $$props) $$invalidate(0, warn = $$props.warn);
+		if ('children' in $$props) $$invalidate(1, children = $$props.children);
 	};
 
-	return [children];
+	return [warn, children];
 }
 
 class Container extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance$4, create_fragment$4, safe_not_equal, { children: 0 }, add_css$1);
+		init(this, options, instance$4, create_fragment$4, safe_not_equal, { warn: 0, children: 1 }, add_css$1);
 	}
 }
 
@@ -726,7 +745,13 @@ class Container extends SvelteComponent {
 function create_fragment$3(ctx) {
 	let container;
 	let current;
-	container = new Container({ props: { children: /*children*/ ctx[0] } });
+
+	container = new Container({
+			props: {
+				children: /*children*/ ctx[0],
+				warn: true
+			}
+		});
 
 	return {
 		c() {
@@ -753,7 +778,8 @@ function create_fragment$3(ctx) {
 }
 
 function instance$3($$self) {
-	let children = getContext('external').children;
+	const context = getContext('external');
+	const children = typeof context === 'object' ? context.children : void 0;
 	return [children];
 }
 
@@ -1036,7 +1062,12 @@ function create_fragment(ctx) {
 			}
 		});
 
-	container = new Container({ props: { children: /*children*/ ctx[2] } });
+	container = new Container({
+			props: {
+				children: /*children*/ ctx[2],
+				warn: true
+			}
+		});
 
 	return {
 		c() {
@@ -1086,8 +1117,9 @@ function instance($$self, $$props, $$invalidate) {
 	let content, root;
 	setContext('getElementContent', () => content);
 	setContext('getElementRoot', () => root);
-	let children = getContext('external').children;
-	let foundryApp = getContext('external').foundryApp;
+	const context = getContext('external');
+	const children = typeof context === 'object' ? context.children : void 0;
+	const foundryApp = getContext('external').foundryApp;
 
 	function section_binding($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
