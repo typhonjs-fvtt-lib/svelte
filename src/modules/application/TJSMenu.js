@@ -9,13 +9,14 @@ export default class TJSMenu
     */
    static #contextMenu = void 0;
 
-   static createContext({ id = '', x = 0, y = 0, items = [], duration = 400 } = {})
+   static async createContext({ async = false, id = '', x = 0, y = 0, items = [], duration = 400 } = {})
    {
       if (this.#contextMenu !== void 0)
       {
          const menu = this.#contextMenu;
          this.#contextMenu = void 0;
-         outroAndDestroy(menu);
+         if (async) { await outroAndDestroy(menu); }
+         else { outroAndDestroy(menu); }
       }
 
       this.#contextMenu = new TJSContextMenu({
@@ -30,7 +31,8 @@ export default class TJSMenu
          {
             const menu = this.#contextMenu;
             this.#contextMenu = void 0;
-            outroAndDestroy(menu);
+            if (async) { outroAndDestroy(menu); }
+            else { outroAndDestroy(menu); }
          }
       });
    }

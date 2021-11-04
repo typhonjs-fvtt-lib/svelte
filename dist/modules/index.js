@@ -1431,7 +1431,8 @@ class TJSMenu {
   /**
    * Stores any active context menu.
    */
-  static createContext({
+  static async createContext({
+    async = false,
     id = '',
     x = 0,
     y = 0,
@@ -1443,7 +1444,11 @@ class TJSMenu {
 
       _classStaticPrivateFieldSpecSet(this, TJSMenu, _contextMenu, void 0);
 
-      outroAndDestroy(menu);
+      if (async) {
+        await outroAndDestroy(menu);
+      } else {
+        outroAndDestroy(menu);
+      }
     }
 
     _classStaticPrivateFieldSpecSet(this, TJSMenu, _contextMenu, new TJSContextMenu({
@@ -1464,7 +1469,11 @@ class TJSMenu {
 
         _classStaticPrivateFieldSpecSet(this, TJSMenu, _contextMenu, void 0);
 
-        outroAndDestroy(menu);
+        if (async) {
+          outroAndDestroy(menu);
+        } else {
+          outroAndDestroy(menu);
+        }
       }
     });
   }
