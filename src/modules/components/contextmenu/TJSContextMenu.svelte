@@ -1,50 +1,54 @@
 <script>
-   import { createEventDispatcher, onDestroy }  from 'svelte';
-   import { current_component }                 from 'svelte/internal';
-   import { slideFade }                         from '@typhonjs-fvtt/svelte/transition';
-   import { outroAndDestroy }                   from '@typhonjs-fvtt/svelte/util';
+   import { createEventDispatcher } from 'svelte';
+   import { current_component }     from 'svelte/internal';
+   import { slideFade }             from '@typhonjs-fvtt/svelte/transition';
+   import { outroAndDestroy }       from '@typhonjs-fvtt/svelte/util';
 
+   export let id = '';
    export let x = 0;
    export let y = 0;
    export let items = [];
+   export let duration = 400;
 
+   let menuEl;
+
+   // Store this component reference.
    const local = current_component;
 
    const dispatch = createEventDispatcher();
 
-   const onClose = (event) =>
+   function onClick(callback)
    {
-      if (event.target === menuEl || menuEl.contains(event.target)) return;
+      if (typeof callback === 'function')
+      { callback(); }
 
       dispatch('close');
-      console.log(`TJSContextMenu - onClose`)
       outroAndDestroy(local);
    }
 
-   onDestroy(() =>
+   function onClose(event)
    {
-      console.log('DESTROYED');
-   })
+      if (event.target === menuEl || menuEl.contains(event.target))
+      { return; }
 
-   let menuEl;
+      dispatch('close');
+      outroAndDestroy(local);
+   }
 </script>
-<svelte:body on:click={onClose} />
-<div class=menu transition:slideFade={{duration: 400}} bind:this={menuEl} style="top: {y}px; left: {x}px;">
-    <ol>
-        <li>SOME TEXT</li>
-        <li>SOME TEXT</li>
-        <li>SOME TEXT</li>
+<svelte:body on:click={onClose}/>
+<nav id={id} class=tjs-context-menu transition:slideFade={{duration}} bind:this={menuEl}
+     style="top: {y}px; left: {x}px;">
+    <ol class=tjs-context-items>
         {#each items as item}
-            <li>SOME TEXT</li>
+            <li class=tjs-context-item on:click={() => onClick(item.onclick)}><i class={item.icon}></i>{item.label}</li>
         {/each}
     </ol>
-</div>
+</nav>
 
 <style>
-    .menu {
+    .tjs-context-menu {
         position: fixed;
         width: fit-content;
-        font-family: Signika sans-serif;
         font-size: 14px;
         box-shadow: 0 0 10px #000;
         height: max-content;
@@ -55,5 +59,33 @@
         border-radius: 5px;
         color: #EEE;
         z-index: 10000;
+    }
+
+    .tjs-context-menu.expand-down {
+        top: calc(100% + 2px);
+    }
+
+    .tjs-context-menu.expand-up {
+        bottom: calc(100% + 2px);
+    }
+
+    .tjs-context-menu ol.tjs-context-items {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .tjs-context-menu li.tjs-context-item {
+        padding: 0 5px;
+        line-height: 32px;
+    }
+
+    .tjs-context-menu li.tjs-context-item:hover {
+        color: #FFF;
+        text-shadow: 0 0 4px red;
+    }
+
+    .tjs-context-menu li.tjs-context-item > i {
+        margin-right: 5px;
     }
 </style>
