@@ -725,7 +725,7 @@ function get_each_context(ctx, list, i) {
 	return child_ctx;
 }
 
-// (44:8) {#each items as item}
+// (42:8) {#each items as item}
 function create_each_block(ctx) {
 	let li;
 	let i;

@@ -1,3 +1,6 @@
+#temporary / remove when published
+package-lock.json
+
 .idea
 .DS_Store
 empty.js
