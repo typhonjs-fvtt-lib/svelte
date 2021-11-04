@@ -725,12 +725,12 @@ function get_each_context(ctx, list, i) {
 	return child_ctx;
 }
 
-// (42:8) {#each items as item}
+// (44:8) {#each items as item}
 function create_each_block(ctx) {
 	let li;
 	let i;
 	let i_class_value;
-	let t_value = /*item*/ ctx[12].label + "";
+	let t_value = localize(/*item*/ ctx[12].label) + "";
 	let t;
 	let mounted;
 	let dispose;
@@ -764,7 +764,7 @@ function create_each_block(ctx) {
 				attr(i, "class", i_class_value);
 			}
 
-			if (dirty & /*items*/ 8 && t_value !== (t_value = /*item*/ ctx[12].label + "")) set_data(t, t_value);
+			if (dirty & /*items*/ 8 && t_value !== (t_value = localize(/*item*/ ctx[12].label) + "")) set_data(t, t_value);
 		},
 		d(detaching) {
 			if (detaching) detach(li);
@@ -825,7 +825,7 @@ function create_fragment(ctx) {
 		p(new_ctx, [dirty]) {
 			ctx = new_ctx;
 
-			if (dirty & /*onClick, items*/ 72) {
+			if (dirty & /*onClick, items, localize*/ 72) {
 				each_value = /*items*/ ctx[3];
 				let i;
 
