@@ -4,6 +4,8 @@
    import { slideFade }             from '@typhonjs-fvtt/svelte/transition';
    import { outroAndDestroy }       from '@typhonjs-fvtt/svelte/util';
 
+   import { localize }              from '../../helper';
+
    export let id = '';
    export let x = 0;
    export let y = 0;
@@ -40,7 +42,7 @@
      style="top: {y}px; left: {x}px;">
     <ol class=tjs-context-items>
         {#each items as item}
-            <li class=tjs-context-item on:click={() => onClick(item.onclick)}><i class={item.icon}></i>{item.label}</li>
+            <li class=tjs-context-item on:click={() => onClick(item.onclick)}><i class={item.icon}></i>{localize(item.label)}</li>
         {/each}
     </ol>
 </nav>
