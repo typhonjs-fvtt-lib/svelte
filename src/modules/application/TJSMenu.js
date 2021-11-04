@@ -31,8 +31,7 @@ export default class TJSMenu
          {
             const menu = this.#contextMenu;
             this.#contextMenu = void 0;
-            if (async) { outroAndDestroy(menu); }
-            else { outroAndDestroy(menu); }
+            outroAndDestroy(menu);
          }
       });
    }

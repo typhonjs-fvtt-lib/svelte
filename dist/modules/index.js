@@ -1469,11 +1469,7 @@ class TJSMenu {
 
         _classStaticPrivateFieldSpecSet(this, TJSMenu, _contextMenu, void 0);
 
-        if (async) {
-          outroAndDestroy(menu);
-        } else {
-          outroAndDestroy(menu);
-        }
+        outroAndDestroy(menu);
       }
     });
   }
