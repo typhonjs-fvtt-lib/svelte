@@ -21,8 +21,7 @@
 
    function onClick(callback)
    {
-      if (typeof callback === 'function')
-      { callback(); }
+      if (typeof callback === 'function') { callback(); }
 
       dispatch('close');
       outroAndDestroy(local);
@@ -30,8 +29,7 @@
 
    function onClose(event)
    {
-      if (event.target === menuEl || menuEl.contains(event.target))
-      { return; }
+      if (event.target === menuEl || menuEl.contains(event.target)) { return; }
 
       dispatch('close');
       outroAndDestroy(local);
