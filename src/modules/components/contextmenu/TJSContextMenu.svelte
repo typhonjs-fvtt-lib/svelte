@@ -1,10 +1,10 @@
 <script>
    import { createEventDispatcher } from 'svelte';
    import { current_component }     from 'svelte/internal';
+
+   import { localize }              from '@typhonjs-fvtt/svelte/helper';
    import { slideFade }             from '@typhonjs-fvtt/svelte/transition';
    import { outroAndDestroy }       from '@typhonjs-fvtt/svelte/util';
-
-   import { localize }              from '../../helper';
 
    export let id = '';
    export let x = 0;
@@ -18,6 +18,7 @@
    // Store this component reference.
    const local = current_component;
 
+   // Dispatches `close` event.
    const dispatch = createEventDispatcher();
 
    /**
@@ -51,30 +52,28 @@
     */
    function onClick(callback)
    {
-      if (typeof callback === 'function')
-      { callback(); }
+      if (typeof callback === 'function') { callback(); }
 
       dispatch('close');
       outroAndDestroy(local);
    }
 
    /**
-    * Determines if a click to the document body closes the context menu. If the click occurs outside the context menu
-    * then fire the `close` event and automatically run the outro transition and destroy the component.
+    * Determines if a pointer pressed to the document body closes the context menu. If the click occurs outside the
+    * context menu then fire the `close` event and run the outro transition then destroy the component.
     *
     * @param {PointerEvent}   event - Pointer event from document body click.
     */
    function onClose(event)
    {
-      if (event.target === menuEl || menuEl.contains(event.target))
-      { return; }
+      if (event.target === menuEl || menuEl.contains(event.target)) { return; }
 
       dispatch('close');
       outroAndDestroy(local);
    }
 </script>
-<!-- bind to `document.body` to receive clicks to close the context menu. -->
-<svelte:body on:click={onClose}/>
+<!-- bind to `document.body` to receive pointer down events to close the context menu. -->
+<svelte:body on:pointerdown={onClose}/>
 
 <nav id={id} class=tjs-context-menu transition:animate bind:this={menuEl}>
     <ol class=tjs-context-items>

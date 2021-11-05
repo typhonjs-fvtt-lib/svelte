@@ -1,5 +1,6 @@
 import { SvelteComponent, init, safe_not_equal, append_styles, empty, insert, group_outros, transition_out, check_outros, transition_in, detach, element, attr, noop, create_component, mount_component, get_spread_update, get_spread_object, destroy_component, destroy_each, assign, text, append, listen, set_data, space, binding_callbacks, null_to_empty, add_render_callback, create_bidirectional_transition, globals, current_component } from 'svelte/internal';
 import { getContext, setContext, createEventDispatcher } from 'svelte';
+import { localize as localize$1 } from '@typhonjs-fvtt/svelte/helper';
 import { slideFade } from '@typhonjs-fvtt/svelte/transition';
 import { outroAndDestroy } from '@typhonjs-fvtt/svelte/util';
 
@@ -727,12 +728,12 @@ function get_each_context(ctx, list, i) {
 	return child_ctx;
 }
 
-// (81:8) {#each items as item}
+// (80:8) {#each items as item}
 function create_each_block(ctx) {
 	let li;
 	let i;
 	let i_class_value;
-	let t_value = localize(/*item*/ ctx[13].label) + "";
+	let t_value = localize$1(/*item*/ ctx[13].label) + "";
 	let t;
 	let mounted;
 	let dispose;
@@ -766,7 +767,7 @@ function create_each_block(ctx) {
 				attr(i, "class", i_class_value);
 			}
 
-			if (dirty & /*items*/ 2 && t_value !== (t_value = localize(/*item*/ ctx[13].label) + "")) set_data(t, t_value);
+			if (dirty & /*items*/ 2 && t_value !== (t_value = localize$1(/*item*/ ctx[13].label) + "")) set_data(t, t_value);
 		},
 		d(detaching) {
 			if (detaching) detach(li);
@@ -818,7 +819,7 @@ function create_fragment(ctx) {
 			current = true;
 
 			if (!mounted) {
-				dispose = listen(document_1.body, "click", /*onClose*/ ctx[5]);
+				dispose = listen(document_1.body, "pointerdown", /*onClose*/ ctx[5]);
 				mounted = true;
 			}
 		},
@@ -890,6 +891,7 @@ function instance($$self, $$props, $$invalidate) {
 	// Store this component reference.
 	const local = current_component;
 
+	// Dispatches `close` event.
 	const dispatch = createEventDispatcher();
 
 	/**
@@ -927,8 +929,8 @@ function instance($$self, $$props, $$invalidate) {
 	}
 
 	/**
- * Determines if a click to the document body closes the context menu. If the click occurs outside the context menu
- * then fire the `close` event and automatically run the outro transition and destroy the component.
+ * Determines if a pointer pressed to the document body closes the context menu. If the click occurs outside the
+ * context menu then fire the `close` event and run the outro transition then destroy the component.
  *
  * @param {PointerEvent}   event - Pointer event from document body click.
  */
@@ -1547,9 +1549,14 @@ class TJSMenu {
     } = _ref,
         transitionOptions = _objectWithoutProperties(_ref, _excluded);
 
-    // Always set the last context menu click point. When async is enabled this allows the last click to be the
+    // Gates multiple repeat context clicks when a context menu already exists w/ same x & y.
+    if (_classStaticPrivateFieldSpecGet(this, TJSMenu, _contextMenu) !== void 0 && x === _classStaticPrivateFieldSpecGet(this, TJSMenu, _contextMenuData).x && y === _classStaticPrivateFieldSpecGet(this, TJSMenu, _contextMenuData).y) {
+      return;
+    } // Always set the last context menu click point. When async is enabled this allows the last click to be the
     // position where the new context menu will display if multiple context clicks occur before the existing menu
     // outro transition is completed.
+
+
     _classStaticPrivateFieldSpecGet(this, TJSMenu, _contextMenuData).x = x;
     _classStaticPrivateFieldSpecGet(this, TJSMenu, _contextMenuData).y = y; // A latch to return if a previous menu is being destroyed and outro transition is still playing when async is
     // enabled.
@@ -1610,8 +1617,8 @@ var _contextMenuData = {
   writable: true,
   value: {
     active: false,
-    x: 0,
-    y: 0
+    x: -1,
+    y: -1
   }
 };
 

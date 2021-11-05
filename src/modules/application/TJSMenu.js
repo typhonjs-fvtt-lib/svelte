@@ -17,7 +17,7 @@ export default class TJSMenu
     *
     * @type {{x: number, active: boolean, y: number}}
     */
-   static #contextMenuData = { active: false, x: 0, y: 0 };
+   static #contextMenuData = { active: false, x: -1, y: -1 };
 
    /**
     * Creates and manages a game wide context menu.
@@ -40,6 +40,9 @@ export default class TJSMenu
     */
    static async createContext({ async = false, id = '', x = 0, y = 0, items = [], ...transitionOptions } = {})
    {
+      // Gates multiple repeat context clicks when a context menu already exists w/ same x & y.
+      if (this.#contextMenu !== void 0 && x === this.#contextMenuData.x && y === this.#contextMenuData.y) { return; }
+
       // Always set the last context menu click point. When async is enabled this allows the last click to be the
       // position where the new context menu will display if multiple context clicks occur before the existing menu
       // outro transition is completed.
