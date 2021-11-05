@@ -23,9 +23,11 @@ export default class TJSMenu
     *
     * @param {object[]} opts.items - Menu items to display.
     *
+    * @param {number}   [opts.zIndex=10000] - Z-index for context menu.
+    *
     * @param {...*}     [opts.transitionOptions] - The rest of opts defined the slideFade transition options.
     */
-   static createContext({id = '', x = 0, y = 0, items = [], ...transitionOptions} = {})
+   static createContext({id = '', x = 0, y = 0, items = [], zIndex = 10000, ...transitionOptions} = {})
    {
       if (this.#contextMenu !== void 0) { return; }
 
@@ -33,7 +35,7 @@ export default class TJSMenu
       this.#contextMenu = new TJSContextMenu({
          target: document.body,
          intro: true,
-         props: {id, x, y, items, transitionOptions}
+         props: { id, x, y, items, zIndex, transitionOptions }
       });
 
       // Register an event listener to remove any active context menu if closed from a menu selection or pointer

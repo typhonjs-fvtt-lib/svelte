@@ -507,7 +507,7 @@ function s_LOAD_CONFIG(app, html, config) {
   return result;
 }
 
-const _excluded = ["id", "x", "y", "items"];
+const _excluded = ["id", "x", "y", "items", "zIndex"];
 /**
  * Provides game wide menu functionality.
  */
@@ -530,6 +530,8 @@ class TJSMenu {
    *
    * @param {object[]} opts.items - Menu items to display.
    *
+   * @param {number}   [opts.zIndex=10000] - Z-index for context menu.
+   *
    * @param {...*}     [opts.transitionOptions] - The rest of opts defined the slideFade transition options.
    */
   static createContext(_ref = {}) {
@@ -537,7 +539,8 @@ class TJSMenu {
       id = '',
       x = 0,
       y = 0,
-      items = []
+      items = [],
+      zIndex = 10000
     } = _ref,
         transitionOptions = _objectWithoutProperties(_ref, _excluded);
 
@@ -554,6 +557,7 @@ class TJSMenu {
         x,
         y,
         items,
+        zIndex,
         transitionOptions
       }
     })); // Register an event listener to remove any active context menu if closed from a menu selection or pointer
