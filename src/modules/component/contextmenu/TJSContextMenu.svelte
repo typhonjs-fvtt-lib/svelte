@@ -10,6 +10,7 @@
    export let x = 0;
    export let y = 0;
    export let items = [];
+   export let zIndex = 10000;
    export let transitionOptions = void 0;
 
    // Bound to the nav element / menu.
@@ -20,6 +21,9 @@
 
    // Dispatches `close` event.
    const dispatch = createEventDispatcher();
+
+   // Stores if this context menu is closed.
+   let closed = false;
 
    /**
     * Provides a custom animate callback allowing inspection of the element to change positioning styles based on the
@@ -54,8 +58,12 @@
    {
       if (typeof callback === 'function') { callback(); }
 
-      dispatch('close');
-      outroAndDestroy(local);
+      if (!closed)
+      {
+         dispatch('close');
+         closed = true;
+         outroAndDestroy(local);
+      }
    }
 
    /**
@@ -64,18 +72,26 @@
     *
     * @param {PointerEvent}   event - Pointer event from document body click.
     */
-   function onClose(event)
+   async function onClose(event)
    {
+      // Early out if the pointer down is inside the menu element.
       if (event.target === menuEl || menuEl.contains(event.target)) { return; }
 
-      dispatch('close');
-      outroAndDestroy(local);
+      // Early out if the event page X / Y is the same as this context menu.
+      if (Math.floor(event.pageX) === x && Math.floor(event.pageY) === y) { return; }
+
+      if (!closed)
+      {
+         dispatch('close');
+         closed = true;
+         outroAndDestroy(local);
+      }
    }
 </script>
 <!-- bind to `document.body` to receive pointer down events to close the context menu. -->
 <svelte:body on:pointerdown={onClose}/>
 
-<nav id={id} class=tjs-context-menu transition:animate bind:this={menuEl}>
+<nav id={id} class=tjs-context-menu transition:animate bind:this={menuEl} style="z-index: {zIndex}">
     <ol class=tjs-context-items>
         {#each items as item}
             <li class=tjs-context-item on:click={() => onClick(item.onclick)}><i class={item.icon}></i>{localize(item.label)}</li>
@@ -96,7 +112,6 @@
         border: 1px solid #000;
         border-radius: 5px;
         color: #EEE;
-        z-index: 10000;
     }
 
     .tjs-context-menu ol.tjs-context-items {

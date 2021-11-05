@@ -9,6 +9,18 @@ import terserConfig  from './terser.config.js';
 const s_COMPRESS = false;
 const s_SOURCEMAPS = true;
 
+// Defines Svelte and all local exports as external.
+const s_LOCAL_EXTERNAL = [
+   'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
+   'svelte/types',
+
+   '@typhonjs-fvtt/svelte/component', '@typhonjs-fvtt/svelte/gsap', '@typhonjs-fvtt/svelte/handler',
+   '@typhonjs-fvtt/svelte/helper', '@typhonjs-fvtt/svelte/store', '@typhonjs-fvtt/svelte/transition',
+   '@typhonjs-fvtt/svelte/util', '@typhonjs-fvtt/svelte/plugins/data', '@typhonjs-fvtt/svelte/plugins/system',
+
+   `foundry-gsap`  // Replaced by consumer for Foundry GSAP path.
+]
+
 export default () =>
 {
    // Defines potential output plugins to use conditionally if the .env file indicates the bundles should be
@@ -22,16 +34,38 @@ export default () =>
    // Defines whether source maps are generated / loaded from the .env file.
    const sourcemap = s_SOURCEMAPS;
 
-   return [{
+   return [
+   {
       input: 'src/modules/index.js',
-      external: [
-         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
-          'svelte/types',
-
-         '@typhonjs-fvtt/svelte/helper', '@typhonjs-fvtt/svelte/transition', '@typhonjs-fvtt/svelte/util'
-      ],
+      external: s_LOCAL_EXTERNAL,
       output: {
          file: 'dist/modules/index.js',
+         format: 'es',
+         plugins: outputPlugins,
+         preferConst: true,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+      },
+      plugins: [
+         resolve(),
+         sourcemaps(),
+         babel({
+            babelHelpers: 'bundled',
+            presets: [
+               ['@babel/preset-env', {
+                  bugfixes: true,
+                  shippedProposals: true,
+                  targets: { esmodules: true }
+               }]
+            ]
+         })
+      ]
+   },
+   {
+      input: 'src/modules/component/index.js',
+      external: s_LOCAL_EXTERNAL,
+      output: {
+         file: 'dist/modules/component.js',
          format: 'es',
          plugins: outputPlugins,
          preferConst: true,
@@ -50,28 +84,12 @@ export default () =>
                handler(warning);
             }
          }),
-         resolve(),
-         sourcemaps(),
-         babel({
-            babelHelpers: 'bundled',
-            presets: [
-               ['@babel/preset-env', {
-                  bugfixes: true,
-                  shippedProposals: true,
-                  targets: { esmodules: true }
-               }]
-            ]
-         })
+         resolve()
       ]
    },
    {
       input: 'src/modules/gsap/index.js',
-      external: [                                  // Suppresses the warning and excludes ansi-colors from the
-         `foundry-gsap`,
-
-         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
-          'svelte/types'
-      ],
+      external: s_LOCAL_EXTERNAL,
       output: {
          file: 'dist/modules/gsap.js',
          format: 'es',
@@ -86,10 +104,7 @@ export default () =>
    },
    {
       input: 'src/modules/handler/index.js',
-      external: [
-         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
-          'svelte/types'
-      ],
+      external: s_LOCAL_EXTERNAL,
       output: {
          file: 'dist/modules/handler.js',
          format: 'es',
@@ -105,10 +120,7 @@ export default () =>
    },
    {
       input: 'src/modules/helper/index.js',
-      external: [
-         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
-          'svelte/types'
-      ],
+      external: s_LOCAL_EXTERNAL,
       output: {
          file: 'dist/modules/helper.js',
          format: 'es',
@@ -120,10 +132,7 @@ export default () =>
    },
    {
       input: 'src/modules/store/index.js',
-      external: [
-         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
-          'svelte/types'
-      ],
+      external: s_LOCAL_EXTERNAL,
       output: {
          file: 'dist/modules/store.js',
          format: 'es',
@@ -139,10 +148,7 @@ export default () =>
    },
    {
       input: 'src/modules/transition/index.js',
-      external: [
-         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
-          'svelte/types'
-      ],
+      external: s_LOCAL_EXTERNAL,
       output: {
          file: 'dist/modules/transition.js',
          format: 'es',
@@ -158,10 +164,7 @@ export default () =>
    },
    {
       input: 'src/modules/util/index.js',
-      external: [
-         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
-          'svelte/types'
-      ],
+      external: s_LOCAL_EXTERNAL,
       output: {
          file: 'dist/modules/util.js',
          format: 'es',
@@ -177,10 +180,7 @@ export default () =>
    },
    {
       input: 'src/plugins/data/index.js',
-      external: [
-         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
-          'svelte/types'
-      ],
+      external: s_LOCAL_EXTERNAL,
       output: {
          file: 'dist/plugins/data.js',
          format: 'es',
@@ -192,10 +192,7 @@ export default () =>
    },
    {
       input: 'src/plugins/system/index.js',
-      external: [
-         'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
-          'svelte/types'
-      ],
+      external: s_LOCAL_EXTERNAL,
       output: {
          file: 'dist/plugins/system.js',
          format: 'es',

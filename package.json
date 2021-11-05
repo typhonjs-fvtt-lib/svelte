@@ -12,6 +12,9 @@
     ".": {
       "import": "./dist/modules/index.js"
     },
+    "./component": {
+      "import": "./dist/modules/component.js"
+    },
     "./gsap": {
       "import": "./dist/modules/gsap.js"
     },
