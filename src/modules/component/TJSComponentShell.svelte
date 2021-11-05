@@ -1,9 +1,9 @@
 <script>
    import { getContext }    from 'svelte';
 
-   import Container         from './Container.svelte';
+   import TJSContainer         from './TJSContainer.svelte';
 
    const context = getContext('external');
    const children = typeof context === 'object' ? context.children : void 0;
 </script>
-<Container {children} warn={true} />
+<TJSContainer {children} warn={true} />

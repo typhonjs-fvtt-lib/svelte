@@ -3,7 +3,7 @@ import { TJSContextMenu }  from '@typhonjs-fvtt/svelte/component';
 /**
  * Provides game wide menu functionality.
  */
-export default class TJSMenu
+export class TJSMenu
 {
    /**
     * Stores any active context menu.

@@ -6,7 +6,7 @@
  *
  * A repository of demos will be available soon.
  */
-export default class SvelteApplication extends Application
+export class SvelteApplication extends Application
 {
    /**
     * Stores instantiated Svelte components.

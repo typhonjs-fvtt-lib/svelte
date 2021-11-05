@@ -1,2 +1,2 @@
-export { default as SvelteApplication } from './SvelteApplication';
-export { default as TJSMenu }           from './TJSMenu';
+export * from './SvelteApplication';
+export * from './TJSMenu';
