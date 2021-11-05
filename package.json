@@ -33,11 +33,11 @@
     "./util": {
       "import": "./dist/modules/util.js"
     },
-    "./plugins/data": {
-      "import": "./dist/plugins/data.js"
+    "./plugin/data": {
+      "import": "./dist/plugin/data.js"
     },
-    "./plugins/system": {
-      "import": "./dist/plugins/system.js"
+    "./plugin/system": {
+      "import": "./dist/plugin/system.js"
     },
     "./package.json": "./package.json"
   },
