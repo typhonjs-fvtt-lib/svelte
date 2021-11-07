@@ -1,24 +1,40 @@
 <script>
    import { getContext, setContext }   from 'svelte';
 
-   import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
-   import TJSContainer                 from '../TJSContainer.svelte';
+   import { TJSApplicationHeader }     from '@typhonjs-fvtt/svelte/component';
+   import { TJSContainer }             from '@typhonjs-fvtt/svelte/component';
 
+   export let title = void 0;
+   export let zIndex = void 0
+
+   let appTitle;
    let content, root;
 
    setContext('getElementContent', () => content);
    setContext('getElementRoot', () => root);
 
    const context = getContext('external');
+
+   const foundryApp = context.foundryApp;
    const children = typeof context === 'object' ? context.children : void 0;
 
-   const foundryApp = getContext('external').foundryApp;
+   $: appTitle = typeof title === 'string' ? title : foundryApp.title;
 </script>
 
-<div id={foundryApp.id} class="typhonjs-app typhonjs-window-app" data-appid={foundryApp.appId} bind:this={root}>
-    <TJSApplicationHeader title = {foundryApp.title} headerButtons= {foundryApp._getHeaderButtons()} />
+<svelte:options accessors={true}/>
+
+<div id={foundryApp.id}
+     class="typhonjs-app typhonjs-window-app {foundryApp.options.classes.join(' ')}"
+     data-appid={foundryApp.appId}
+     style="{Number.isInteger(zIndex) ? `z-index: ${zIndex}` : ''}"
+     bind:this={root}>
+    <TJSApplicationHeader title={appTitle} headerButtons={foundryApp._getHeaderButtons()} />
     <section class=window-content bind:this={content}>
-        <TJSContainer {children} warn={true} />
+        {#if Array.isArray(children)}
+            <TJSContainer {children} />
+        {:else}
+            <slot />
+        {/if}
     </section>
 </div>
 

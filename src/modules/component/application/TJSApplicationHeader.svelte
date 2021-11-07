@@ -1,9 +1,11 @@
 <script>
-   import TJSHeaderButton   from './TJSHeaderButton.svelte';
+   import { TJSHeaderButton }   from '@typhonjs-fvtt/svelte/component';
 
    export let title = '';
    export let headerButtons = [];
 </script>
+
+<svelte:options accessors={true}/>
 
 <header class="window-header flexrow">
     <h4 class=window-title>{title}</h4>

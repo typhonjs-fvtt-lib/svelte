@@ -7,7 +7,7 @@
   "contributors": [
     "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)"
   ],
-  "svelte": "src/modules/index.js",
+  "svelte": "src/modules/index-svelte.js",
   "exports": {
     ".": {
       "import": "./dist/modules/index.js"
