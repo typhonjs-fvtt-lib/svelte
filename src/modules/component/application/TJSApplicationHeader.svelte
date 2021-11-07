@@ -1,5 +1,5 @@
 <script>
-   import { TJSHeaderButton }   from '@typhonjs-fvtt/svelte/component';
+   import TJSHeaderButton   from './TJSHeaderButton.svelte';
 
    export let title = '';
    export let headerButtons = [];

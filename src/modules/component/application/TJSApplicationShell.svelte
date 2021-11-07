@@ -1,8 +1,8 @@
 <script>
    import { getContext, setContext }   from 'svelte';
 
-   import { TJSApplicationHeader }     from '@typhonjs-fvtt/svelte/component';
-   import { TJSContainer }             from '@typhonjs-fvtt/svelte/component';
+   import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
+   import TJSContainer                 from '../TJSContainer.svelte';
 
    export let title = void 0;
    export let zIndex = void 0
