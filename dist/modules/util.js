@@ -1,6 +1,66 @@
 import { group_outros, transition_out, check_outros } from 'svelte/internal';
 
 /**
+ * Provides a method to determine if the passed in Svelte component has a getter accessor.
+ *
+ * @param {*}        component - Svelte component.
+ *
+ * @param {string}   accessor - Accessor to test.
+ *
+ * @returns {boolean} Whether the component has the getter for accessor.
+ */
+function hasGetter(component, accessor)
+{
+   if (component === null || component === void 0) { return false; }
+
+   // Get the prototype which is the parent SvelteComponent that has any getter / setters.
+   const prototype = Object.getPrototypeOf(component);
+   const descriptor = Object.getOwnPropertyDescriptor(prototype, accessor);
+
+   return !(descriptor === void 0 || descriptor.get === void 0);
+}
+
+/**
+ * Provides a method to determine if the passed in Svelte component has a getter & setter accessor.
+ *
+ * @param {*}        component - Svelte component.
+ *
+ * @param {string}   accessor - Accessor to test.
+ *
+ * @returns {boolean} Whether the component has the getter and setter for accessor.
+ */
+function hasAccessor(component, accessor)
+{
+   if (component === null || component === void 0) { return false; }
+
+   // Get the prototype which is the parent SvelteComponent that has any getter / setters.
+   const prototype = Object.getPrototypeOf(component);
+   const descriptor = Object.getOwnPropertyDescriptor(prototype, accessor);
+
+   return !(descriptor === void 0 || descriptor.get === void 0 || descriptor.set === void 0);
+}
+
+/**
+ * Provides a method to determine if the passed in Svelte component has a setter accessor.
+ *
+ * @param {*}        component - Svelte component.
+ *
+ * @param {string}   accessor - Accessor to test.
+ *
+ * @returns {boolean} Whether the component has the setter for accessor.
+ */
+function hasSetter(component, accessor)
+{
+   if (component === null || component === void 0) { return false; }
+
+   // Get the prototype which is the parent SvelteComponent that has any getter / setters.
+   const prototype = Object.getPrototypeOf(component);
+   const descriptor = Object.getOwnPropertyDescriptor(prototype, accessor);
+
+   return !(descriptor === void 0 || descriptor.set === void 0);
+}
+
+/**
  * Provides basic duck typing to determine if the provided function is a constructor function for a Svelte component.
  *
  * @param {*}  comp - Data to check as a Svelte component.
@@ -274,5 +334,5 @@ function s_PROCESS_PROPS(props, thisArg, config)
    return {};
 }
 
-export { isSvelteComponent, outroAndDestroy, parseSvelteConfig };
+export { hasAccessor, hasGetter, hasSetter, isSvelteComponent, outroAndDestroy, parseSvelteConfig };
 //# sourceMappingURL=util.js.map

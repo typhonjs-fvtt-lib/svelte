@@ -14,9 +14,10 @@ const s_LOCAL_EXTERNAL = [
    'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
    'svelte/types',
 
-   '@typhonjs-fvtt/svelte/component', '@typhonjs-fvtt/svelte/gsap', '@typhonjs-fvtt/svelte/handler',
-   '@typhonjs-fvtt/svelte/helper', '@typhonjs-fvtt/svelte/store', '@typhonjs-fvtt/svelte/transition',
-   '@typhonjs-fvtt/svelte/util', '@typhonjs-fvtt/svelte/plugin/data', '@typhonjs-fvtt/svelte/plugin/system',
+   '@typhonjs-fvtt/svelte, @typhonjs-fvtt/svelte/component', '@typhonjs-fvtt/svelte/gsap',
+   '@typhonjs-fvtt/svelte/handler', '@typhonjs-fvtt/svelte/helper', '@typhonjs-fvtt/svelte/store',
+   '@typhonjs-fvtt/svelte/transition', '@typhonjs-fvtt/svelte/util', '@typhonjs-fvtt/svelte/plugin/data',
+   '@typhonjs-fvtt/svelte/plugin/system',
 
    `foundry-gsap`  // Replaced by consumer for Foundry GSAP path.
 ]
