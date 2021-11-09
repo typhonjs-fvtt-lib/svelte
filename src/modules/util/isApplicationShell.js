@@ -1,4 +1,4 @@
-import { applicationShellContract } from '@typhonjs-fvtt/svelte';
+import { applicationShellContract } from './applicationShellContract';
 
 /**
  * Provides a method to determine if the passed in object is ApplicationShell or TJSApplicationShell.

@@ -4,15 +4,6 @@ import { createEventDispatcher } from 'svelte';
 import { localize } from '@typhonjs-fvtt/svelte/helper';
 import { slideFade } from '@typhonjs-fvtt/svelte/transition';
 
-/**
- * Defines the application shell contract. If Svelte components export getter / setters for the following properties
- * then that component is considered an application shell.
- *
- * @type {string[]}
- */
-const applicationShellContract = ['elementRoot'];
-Object.freeze(applicationShellContract);
-
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
 
@@ -1093,5 +1084,5 @@ var _contextMenu = {
   value: void 0
 };
 
-export { SvelteApplication, TJSMenu, applicationShellContract };
+export { SvelteApplication, TJSMenu };
 //# sourceMappingURL=index.js.map
