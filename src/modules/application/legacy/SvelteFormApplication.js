@@ -7,17 +7,16 @@ import {
    outroAndDestroy,
    parseSvelteConfig }           from '@typhonjs-fvtt/svelte/util';
 
-import { GetSvelteData }         from './GetSvelteData.js';
+import { GetSvelteData }         from '../GetSvelteData.js';
 
 /**
- * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
- * load one or more components from `defaultOptions`. For the time being please refer to this temporary demo code
- * in `typhonjs-quest-log` for examples of how to declare Svelte components.
- * {@link https://github.com/typhonjs-fvtt/typhonjs-quest-log/tree/master/src/view/demo}
+ * Provides a Svelte aware extension to FormApplication to control the app lifecycle appropriately.
  *
- * A repository of demos will be available soon.
+ * NOTE: THIS IS ONLY TO BE USED FOR {@link HandlebarsFormApplication}.
+ *
+ * @see SvelteApplication
  */
-export class SvelteApplication extends Application
+export class SvelteFormApplication extends FormApplication
 {
    /**
     * Stores the first mounted component which follows the application shell contract.
@@ -100,9 +99,9 @@ export class SvelteApplication extends Application
    /**
     * @inheritDoc
     */
-   constructor(options)
+   constructor(object, options)
    {
-      super(options);
+      super(object, options);
 
       this.#storesInitialize();
    }
@@ -197,7 +196,7 @@ export class SvelteApplication extends Application
    {
       if (!(content instanceof HTMLElement))
       {
-         throw new TypeError(`SvelteApplication - set elementContent error: 'content' is not an HTMLElement.`);
+         throw new TypeError(`SvelteFormApplication - set elementContent error: 'content' is not an HTMLElement.`);
       }
       this.#elementContent = content;
    }
@@ -211,7 +210,7 @@ export class SvelteApplication extends Application
    {
       if (!(target instanceof HTMLElement))
       {
-         throw new TypeError(`SvelteApplication - set elementTarget error: 'target' is not an HTMLElement.`);
+         throw new TypeError(`SvelteFormApplication - set elementTarget error: 'target' is not an HTMLElement.`);
       }
       this.#elementTarget = target;
    }
@@ -504,7 +503,7 @@ export class SvelteApplication extends Application
       setTimeout(() => this.#storesSubscribe(), 0);
 
       this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent, elementTarget:
-       this.#elementTarget });
+         this.#elementTarget });
    }
 
    /**
@@ -578,7 +577,6 @@ export class SvelteApplication extends Application
       if (!element.length) { return; }
 
       this.updateHeaderButtons();
-
    }
 
    /**

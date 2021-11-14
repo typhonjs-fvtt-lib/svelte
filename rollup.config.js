@@ -14,10 +14,12 @@ const s_LOCAL_EXTERNAL = [
    'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
    'svelte/types',
 
-   '@typhonjs-fvtt/svelte, @typhonjs-fvtt/svelte/component', '@typhonjs-fvtt/svelte/gsap',
-   '@typhonjs-fvtt/svelte/handler', '@typhonjs-fvtt/svelte/helper', '@typhonjs-fvtt/svelte/store',
-   '@typhonjs-fvtt/svelte/transition', '@typhonjs-fvtt/svelte/util', '@typhonjs-fvtt/svelte/plugin/data',
-   '@typhonjs-fvtt/svelte/plugin/system',
+   '@typhonjs-fvtt/svelte, @typhonjs-fvtt/svelte/action, @typhonjs-fvtt/svelte/component', '@typhonjs-fvtt/svelte/gsap',
+   '@typhonjs-fvtt/svelte/handler', '@typhonjs-fvtt/svelte/helper', '@typhonjs-fvtt/svelte/legacy',
+   '@typhonjs-fvtt/svelte/store', '@typhonjs-fvtt/svelte/transition', '@typhonjs-fvtt/svelte/util',
+   '@typhonjs-fvtt/svelte/plugin/data', '@typhonjs-fvtt/svelte/plugin/system',
+
+   '@typhonjs-utils/object',
 
    `foundry-gsap`  // Replaced by consumer for Foundry GSAP path.
 ]
@@ -41,6 +43,44 @@ export default () =>
       external: s_LOCAL_EXTERNAL,
       output: {
          file: 'dist/modules/index.js',
+         format: 'es',
+         plugins: outputPlugins,
+         preferConst: true,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+      },
+      plugins: [
+         resolve(),
+         sourcemaps(),
+         babel({
+            babelHelpers: 'bundled',
+            presets: [
+               ['@babel/preset-env', {
+                  bugfixes: true,
+                  shippedProposals: true,
+                  targets: { esmodules: true }
+               }]
+            ]
+         })
+      ]
+   },
+   {
+      input: 'src/modules/action/index.js',
+      external: s_LOCAL_EXTERNAL,
+      output: {
+         file: 'dist/modules/action.js',
+         format: 'es',
+         plugins: outputPlugins,
+         preferConst: true,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+      }
+   },
+   {
+      input: 'src/modules/application/legacy/index.js',
+      external: s_LOCAL_EXTERNAL,
+      output: {
+         file: 'dist/modules/application-legacy.js',
          format: 'es',
          plugins: outputPlugins,
          preferConst: true,

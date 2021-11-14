@@ -12,6 +12,9 @@
     ".": {
       "import": "./dist/modules/index.js"
     },
+    "./action": {
+      "import": "./dist/modules/action.js"
+    },
     "./component": {
       "import": "./dist/modules/component.js"
     },
@@ -23,6 +26,9 @@
     },
     "./helper": {
       "import": "./dist/modules/helper.js"
+    },
+    "./legacy": {
+      "import": "./dist/modules/application-legacy.js"
     },
     "./store": {
       "import": "./dist/modules/store.js"
@@ -42,6 +48,7 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
+    "@typhonjs-utils/object": "^0.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
