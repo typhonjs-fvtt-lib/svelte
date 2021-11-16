@@ -14,7 +14,7 @@ const s_LOCAL_EXTERNAL = [
    'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
    'svelte/types',
 
-   '@typhonjs-fvtt/svelte', '@typhonjs-fvtt/svelte/action', '@typhonjs-fvtt/svelte/component',
+   '@typhonjs-fvtt/svelte', '@typhonjs-fvtt/svelte/action', '@typhonjs-fvtt/svelte/component/core',
    '@typhonjs-fvtt/svelte/gsap', '@typhonjs-fvtt/svelte/handler', '@typhonjs-fvtt/svelte/helper',
    '@typhonjs-fvtt/svelte/legacy', '@typhonjs-fvtt/svelte/store', '@typhonjs-fvtt/svelte/transition',
    '@typhonjs-fvtt/svelte/util', '@typhonjs-fvtt/svelte/plugin/data', '@typhonjs-fvtt/svelte/plugin/system',
