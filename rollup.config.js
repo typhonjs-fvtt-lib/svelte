@@ -19,10 +19,10 @@ const s_LOCAL_EXTERNAL = [
    '@typhonjs-fvtt/svelte/legacy', '@typhonjs-fvtt/svelte/store', '@typhonjs-fvtt/svelte/transition',
    '@typhonjs-fvtt/svelte/util', '@typhonjs-fvtt/svelte/plugin/data', '@typhonjs-fvtt/svelte/plugin/system',
 
-   '@typhonjs-utils/object',
+   // '@typhonjs-utils/object',
 
    `foundry-gsap`  // Replaced by consumer for Foundry GSAP path.
-]
+];
 
 export default () =>
 {
@@ -103,10 +103,10 @@ export default () =>
       ]
    },
    {
-      input: 'src/modules/component/index.js',
+      input: 'src/modules/component/core/index.js',
       external: s_LOCAL_EXTERNAL,
       output: {
-         file: 'dist/modules/component.js',
+         file: 'dist/modules/component-core.js',
          format: 'es',
          plugins: outputPlugins,
          preferConst: true,

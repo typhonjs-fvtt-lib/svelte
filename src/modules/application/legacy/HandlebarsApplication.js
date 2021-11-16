@@ -1,4 +1,4 @@
-import { ApplicationShell }   from '@typhonjs-fvtt/svelte/component';
+import { ApplicationShell }   from '@typhonjs-fvtt/svelte/component/core';
 
 import { SvelteApplication }  from '@typhonjs-fvtt/svelte';
 

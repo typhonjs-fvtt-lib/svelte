@@ -15,8 +15,8 @@
     "./action": {
       "import": "./dist/modules/action.js"
     },
-    "./component": {
-      "import": "./dist/modules/component.js"
+    "./component/core": {
+      "import": "./dist/modules/component-core.js"
     },
     "./gsap": {
       "import": "./dist/modules/gsap.js"
