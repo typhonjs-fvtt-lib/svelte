@@ -4,7 +4,7 @@ import sourcemaps    from 'rollup-plugin-sourcemaps';
 import svelte        from 'rollup-plugin-svelte';
 import { terser }    from 'rollup-plugin-terser';
 
-import terserConfig  from './terser.config.js';
+import terserConfig  from './terser.config.mjs';
 
 const s_COMPRESS = false;
 const s_SOURCEMAPS = true;
@@ -18,8 +18,6 @@ const s_LOCAL_EXTERNAL = [
    '@typhonjs-fvtt/svelte/gsap', '@typhonjs-fvtt/svelte/handler', '@typhonjs-fvtt/svelte/helper',
    '@typhonjs-fvtt/svelte/legacy', '@typhonjs-fvtt/svelte/store', '@typhonjs-fvtt/svelte/transition',
    '@typhonjs-fvtt/svelte/util', '@typhonjs-fvtt/svelte/plugin/data', '@typhonjs-fvtt/svelte/plugin/system',
-
-   // '@typhonjs-utils/object',
 
    `foundry-gsap`  // Replaced by consumer for Foundry GSAP path.
 ];

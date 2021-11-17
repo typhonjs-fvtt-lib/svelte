@@ -1,4 +1,4 @@
-import { applicationShellContract } from './applicationShellContract';
+import { applicationShellContract } from './applicationShellContract.js';
 
 /**
  * Provides a method to determine if the passed in object is ApplicationShell or TJSApplicationShell.

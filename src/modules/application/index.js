@@ -1,3 +1,3 @@
-export * from './SvelteApplication';
-export * from './TJSDialog';
-export * from './TJSMenu';
+export * from './SvelteApplication.js';
+export * from './TJSDialog.js';
+export * from './TJSMenu.js';

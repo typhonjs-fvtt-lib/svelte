@@ -1,1 +1,1 @@
-export * from './localize';
+export * from './localize.js';
