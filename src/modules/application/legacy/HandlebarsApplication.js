@@ -1,6 +1,5 @@
+import { SvelteApplication }  from '@typhonjs-fvtt/svelte/application';
 import { ApplicationShell }   from '@typhonjs-fvtt/svelte/component/core';
-
-import { SvelteApplication }  from '@typhonjs-fvtt/svelte';
 
 export class HandlebarsApplication extends SvelteApplication
 {

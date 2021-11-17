@@ -14,9 +14,9 @@ const s_LOCAL_EXTERNAL = [
    'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
    'svelte/types',
 
-   '@typhonjs-fvtt/svelte', '@typhonjs-fvtt/svelte/action', '@typhonjs-fvtt/svelte/component/core',
-   '@typhonjs-fvtt/svelte/gsap', '@typhonjs-fvtt/svelte/handler', '@typhonjs-fvtt/svelte/helper',
-   '@typhonjs-fvtt/svelte/legacy', '@typhonjs-fvtt/svelte/store', '@typhonjs-fvtt/svelte/transition',
+   '@typhonjs-fvtt/svelte/action', '@typhonjs-fvtt/svelte/application', '@typhonjs-fvtt/svelte/application/legacy',
+   '@typhonjs-fvtt/svelte/component/core', '@typhonjs-fvtt/svelte/gsap', '@typhonjs-fvtt/svelte/handler',
+   '@typhonjs-fvtt/svelte/helper', '@typhonjs-fvtt/svelte/store', '@typhonjs-fvtt/svelte/transition',
    '@typhonjs-fvtt/svelte/util', '@typhonjs-fvtt/svelte/plugin/data', '@typhonjs-fvtt/svelte/plugin/system',
 
    `foundry-gsap`  // Replaced by consumer for Foundry GSAP path.
@@ -37,10 +37,22 @@ export default () =>
 
    return [
    {
-      input: 'src/modules/index.js',
+      input: 'src/modules/action/index.js',
       external: s_LOCAL_EXTERNAL,
       output: {
-         file: 'dist/modules/index.js',
+         file: 'dist/modules/action.js',
+         format: 'es',
+         plugins: outputPlugins,
+         preferConst: true,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+      }
+   },
+   {
+      input: 'src/modules/application/index.js',
+      external: s_LOCAL_EXTERNAL,
+      output: {
+         file: 'dist/modules/application.js',
          format: 'es',
          plugins: outputPlugins,
          preferConst: true,
@@ -61,18 +73,6 @@ export default () =>
             ]
          })
       ]
-   },
-   {
-      input: 'src/modules/action/index.js',
-      external: s_LOCAL_EXTERNAL,
-      output: {
-         file: 'dist/modules/action.js',
-         format: 'es',
-         plugins: outputPlugins,
-         preferConst: true,
-         sourcemap,
-         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-      }
    },
    {
       input: 'src/modules/application/legacy/index.js',

@@ -883,7 +883,7 @@ function s_LOAD_CONFIG(app, html, config, storeAppOptions, storeUIOptions)
         JSON.stringify(config)}`);
    }
 
-   const SvelteComponent = config.class;
+   const NewSvelteComponent = config.class;
 
    const svelteConfig = parseSvelteConfig({ ...config, target }, app);
 
@@ -906,7 +906,7 @@ function s_LOAD_CONFIG(app, html, config, storeAppOptions, storeUIOptions)
    }
 
    // Create the Svelte component.
-   const component = new SvelteComponent(svelteConfig);
+   const component = new NewSvelteComponent(svelteConfig);
 
    // Set any eventbus to the config.
    svelteConfig.eventbus = eventbus;

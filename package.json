@@ -9,11 +9,14 @@
   ],
   "svelte": "src/modules/index-svelte.js",
   "exports": {
-    ".": {
-      "import": "./dist/modules/index.js"
-    },
     "./action": {
       "import": "./dist/modules/action.js"
+    },
+    "./application": {
+      "import": "./dist/modules/application.js"
+    },
+    "./application/legacy": {
+      "import": "./dist/modules/application-legacy.js"
     },
     "./component/core": {
       "import": "./dist/modules/component-core.js"
@@ -26,9 +29,6 @@
     },
     "./helper": {
       "import": "./dist/modules/helper.js"
-    },
-    "./legacy": {
-      "import": "./dist/modules/application-legacy.js"
     },
     "./store": {
       "import": "./dist/modules/store.js"
