@@ -10,40 +10,40 @@
   "svelte": "src/modules/index-svelte.js",
   "exports": {
     "./action": {
-      "import": "./dist/modules/action.js"
+      "import": "./dist/action/index.js"
     },
     "./application": {
-      "import": "./dist/modules/application.js"
+      "import": "./dist/application/index.js"
     },
     "./application/legacy": {
-      "import": "./dist/modules/application-legacy.js"
+      "import": "./dist/application/legacy/index.js"
     },
     "./component/core": {
-      "import": "./dist/modules/component-core.js"
+      "import": "./dist/component/core/index.js"
     },
     "./gsap": {
-      "import": "./dist/modules/gsap.js"
+      "import": "./dist/gsap/index.js"
     },
     "./handler": {
-      "import": "./dist/modules/handler.js"
+      "import": "./dist/handler/index.js"
     },
     "./helper": {
-      "import": "./dist/modules/helper.js"
+      "import": "./dist/helper/index.js"
     },
     "./store": {
-      "import": "./dist/modules/store.js"
+      "import": "./dist/store/index.js"
     },
     "./transition": {
-      "import": "./dist/modules/transition.js"
+      "import": "./dist/transition/index.js"
     },
     "./util": {
-      "import": "./dist/modules/util.js"
+      "import": "./dist/util/index.js"
     },
     "./plugin/data": {
-      "import": "./dist/plugin/data.js"
+      "import": "./dist/plugin/data/index.js"
     },
     "./plugin/system": {
-      "import": "./dist/plugin/system.js"
+      "import": "./dist/plugin/system/index.js"
     },
     "./package.json": "./package.json"
   },

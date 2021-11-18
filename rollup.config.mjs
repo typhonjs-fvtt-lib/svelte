@@ -37,10 +37,10 @@ export default () =>
 
    return [
    {
-      input: 'src/modules/action/index.js',
+      input: 'src/action/index.js',
       external: s_LOCAL_EXTERNAL,
       output: {
-         file: 'dist/modules/action.js',
+         file: 'dist/action/index.js',
          format: 'es',
          plugins: outputPlugins,
          preferConst: true,
@@ -49,10 +49,10 @@ export default () =>
       }
    },
    {
-      input: 'src/modules/application/index.js',
+      input: 'src/application/index.js',
       external: s_LOCAL_EXTERNAL,
       output: {
-         file: 'dist/modules/application.js',
+         file: 'dist/application/index.js',
          format: 'es',
          plugins: outputPlugins,
          preferConst: true,
@@ -75,10 +75,10 @@ export default () =>
       ]
    },
    {
-      input: 'src/modules/application/legacy/index.js',
+      input: 'src/application/legacy/index.js',
       external: s_LOCAL_EXTERNAL,
       output: {
-         file: 'dist/modules/application-legacy.js',
+         file: 'dist/application/legacy/index.js',
          format: 'es',
          plugins: outputPlugins,
          preferConst: true,
@@ -101,10 +101,10 @@ export default () =>
       ]
    },
    {
-      input: 'src/modules/component/core/index.js',
+      input: 'src/component/core/index.js',
       external: s_LOCAL_EXTERNAL,
       output: {
-         file: 'dist/modules/component-core.js',
+         file: 'dist/component/core/index.js',
          format: 'es',
          plugins: outputPlugins,
          preferConst: true,
@@ -127,10 +127,10 @@ export default () =>
       ]
    },
    {
-      input: 'src/modules/gsap/index.js',
+      input: 'src/gsap/index.js',
       external: s_LOCAL_EXTERNAL,
       output: {
-         file: 'dist/modules/gsap.js',
+         file: 'dist/gsap/index.js',
          format: 'es',
          paths: {
             gsap: '/scripts/greensock/esm/all.js'
@@ -142,10 +142,10 @@ export default () =>
       }
    },
    {
-      input: 'src/modules/handler/index.js',
+      input: 'src/handler/index.js',
       external: s_LOCAL_EXTERNAL,
       output: {
-         file: 'dist/modules/handler.js',
+         file: 'dist/handler/index.js',
          format: 'es',
          plugins: outputPlugins,
          preferConst: true,
@@ -158,10 +158,10 @@ export default () =>
       ]
    },
    {
-      input: 'src/modules/helper/index.js',
+      input: 'src/helper/index.js',
       external: s_LOCAL_EXTERNAL,
       output: {
-         file: 'dist/modules/helper.js',
+         file: 'dist/helper/index.js',
          format: 'es',
          plugins: outputPlugins,
          preferConst: true,
@@ -170,10 +170,10 @@ export default () =>
       }
    },
    {
-      input: 'src/modules/store/index.js',
+      input: 'src/store/index.js',
       external: s_LOCAL_EXTERNAL,
       output: {
-         file: 'dist/modules/store.js',
+         file: 'dist/store/index.js',
          format: 'es',
          plugins: outputPlugins,
          preferConst: true,
@@ -186,10 +186,10 @@ export default () =>
       ]
    },
    {
-      input: 'src/modules/transition/index.js',
+      input: 'src/transition/index.js',
       external: s_LOCAL_EXTERNAL,
       output: {
-         file: 'dist/modules/transition.js',
+         file: 'dist/transition/index.js',
          format: 'es',
          plugins: outputPlugins,
          preferConst: true,
@@ -202,10 +202,10 @@ export default () =>
       ]
    },
    {
-      input: 'src/modules/util/index.js',
+      input: 'src/util/index.js',
       external: s_LOCAL_EXTERNAL,
       output: {
-         file: 'dist/modules/util.js',
+         file: 'dist/util/index.js',
          format: 'es',
          plugins: outputPlugins,
          preferConst: true,
@@ -221,7 +221,7 @@ export default () =>
       input: 'src/plugin/data/index.js',
       external: s_LOCAL_EXTERNAL,
       output: {
-         file: 'dist/plugin/data.js',
+         file: 'dist/plugin/data/index.js',
          format: 'es',
          plugins: outputPlugins,
          preferConst: true,
@@ -233,7 +233,7 @@ export default () =>
       input: 'src/plugin/system/index.js',
       external: s_LOCAL_EXTERNAL,
       output: {
-         file: 'dist/plugin/system.js',
+         file: 'dist/plugin/system/index.js',
          format: 'es',
          plugins: outputPlugins,
          preferConst: true,
