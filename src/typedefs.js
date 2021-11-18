@@ -9,6 +9,16 @@
  */
 
 /**
+ * @typedef {object} GameSetting - Defines a game setting.
+ *
+ * @property {string} moduleId - The ID of the module / system.
+ *
+ * @property {string} key - The setting key to register.
+ *
+ * @property {object} options - Configuration for setting data.
+ */
+
+/**
  * @typedef {object} StoreAppOptions - Provides a custom readable Svelte store for Application options state.
  *
  * @property {import('svelte/store').Readable.subscribe} subscribe - Subscribe to all app options updates.
