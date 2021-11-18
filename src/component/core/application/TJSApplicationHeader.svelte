@@ -9,7 +9,15 @@
    const context = getContext('external');
    const foundryApp = context.foundryApp;
 
-   const bringToTop = typeof foundryApp.options.popOut === 'boolean' && foundryApp.options.popOut ?
+   const bringToTop = () =>
+   {
+      if (typeof foundryApp.options.popOut === 'boolean' && foundryApp.options.popOut)
+      {
+         foundryApp.bringToTop.call(foundryApp);
+      }
+   }
+
+    typeof foundryApp.options.popOut === 'boolean' && foundryApp.options.popOut ?
     () => foundryApp.bringToTop.call(foundryApp) : () => void 0;
 
    const storeTitle = context.storeAppOptions.title;
