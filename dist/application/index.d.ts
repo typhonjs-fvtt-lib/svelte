@@ -16,7 +16,6 @@ type SvelteData = {
      */
     eventbus: any;
 };
-
 declare class SvelteApplication {
     /**
      * Specifies the default options that SvelteApplication supports.
