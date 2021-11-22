@@ -75,7 +75,6 @@ export class HandlebarsFormApplication extends SvelteFormApplication
     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
     * application frame / title for pop-out applications.
     *
-    * @override
     * @inheritDoc
     */
    _replaceHTML(element, html)  // eslint-disable-line no-unused-vars

@@ -38,10 +38,9 @@ declare class HandlebarsApplication {
      * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
      * application frame / title for pop-out applications.
      *
-     * @override
      * @inheritDoc
      */
-    override _replaceHTML(element: any, html: any): void;
+    _replaceHTML(element: any, html: any): void;
     title: any;
     _element: any;
     elementTarget: any;

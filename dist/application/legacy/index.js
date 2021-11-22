@@ -183,7 +183,6 @@ class HandlebarsApplication extends SvelteApplication {
    * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
    * application frame / title for pop-out applications.
    *
-   * @override
    * @inheritDoc
    */
 
@@ -1598,7 +1597,6 @@ class HandlebarsFormApplication extends SvelteFormApplication {
    * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
    * application frame / title for pop-out applications.
    *
-   * @override
    * @inheritDoc
    */
 
