@@ -5,7 +5,7 @@
 class GetSvelteData
 {
    /**
-    * @type {ApplicationShell|null[]}
+    * @type {ApplicationShell[]|null[]}
     */
    #applicationShellHolder;
 
@@ -17,7 +17,7 @@ class GetSvelteData
    /**
     * Keep a direct reference to the SvelteData array in an associated {@link SvelteApplication}.
     *
-    * @param {ApplicationShell|null[]}  applicationShellHolder - A reference to the ApplicationShell array.
+    * @param {ApplicationShell[]|null[]}  applicationShellHolder - A reference to the ApplicationShell array.
     *
     * @param {SvelteData[]}  svelteData - A reference to the SvelteData array of mounted components.
     */

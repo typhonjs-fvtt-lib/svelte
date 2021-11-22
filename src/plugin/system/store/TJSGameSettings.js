@@ -2,6 +2,16 @@ import { TJSGameSettings as GS } from '@typhonjs-fvtt/svelte/store';
 import { isIterable }            from '@typhonjs-utils/object';
 
 /**
+ * @typedef {object} GameSetting - Defines a game setting.
+ *
+ * @property {string} moduleId - The ID of the module / system.
+ *
+ * @property {string} key - The setting key to register.
+ *
+ * @property {object} options - Configuration for setting data.
+ */
+
+/**
  * Provides a TyphonJS plugin to add TJSGameSettings to the plugin eventbus.
  *
  * The following events are available for registration:

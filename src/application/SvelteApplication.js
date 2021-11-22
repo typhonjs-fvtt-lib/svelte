@@ -22,7 +22,7 @@ export class SvelteApplication extends Application
    /**
     * Stores the first mounted component which follows the application shell contract.
     *
-    * @type {ApplicationShell|null[]} Application shell.
+    * @type {ApplicationShell[]|null[]} Application shell.
     */
    #applicationShellHolder = [null];
 
@@ -389,7 +389,6 @@ export class SvelteApplication extends Application
     *
     * @param {JQuery} html -
     *
-    * @override
     * @inheritDoc
     */
    _injectHTML(html)
@@ -570,7 +569,6 @@ export class SvelteApplication extends Application
     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
     * application frame / title for pop-out applications.
     *
-    * @override
     * @inheritDoc
     */
    _replaceHTML(element, html)  // eslint-disable-line no-unused-vars
@@ -589,7 +587,6 @@ export class SvelteApplication extends Application
     *
     * @returns {Promise.<JQuery>}   A promise resolving to the constructed jQuery object
     *
-    * @override
     * @private
     */
    async _renderInner(data)

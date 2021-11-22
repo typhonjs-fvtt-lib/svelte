@@ -4,8 +4,8 @@ package-lock.json
 .idea
 .DS_Store
 empty.js
-empty.js.map
 npm-debug.log
+.dts/
 coverage/
 debug/
 docs/

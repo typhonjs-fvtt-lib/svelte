@@ -2,6 +2,16 @@ import { isIterable }      from '@typhonjs-utils/object';
 import { get, writable }   from 'svelte/store';
 
 /**
+ * @typedef {object} GameSetting - Defines a game setting.
+ *
+ * @property {string} moduleId - The ID of the module / system.
+ *
+ * @property {string} key - The setting key to register.
+ *
+ * @property {object} options - Configuration for setting data.
+ */
+
+/**
  * Registers game settings and creates a backing Svelte store for each setting. It is possible to add multiple
  * `onChange` callbacks on registration.
  */

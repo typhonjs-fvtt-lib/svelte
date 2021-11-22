@@ -7,42 +7,54 @@
   "contributors": [
     "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)"
   ],
-  "svelte": "src/modules/index-svelte.js",
+  "svelte": "src/index-svelte.js",
   "exports": {
     "./action": {
+      "types": "./dist/action/index.d.ts",
       "import": "./dist/action/index.js"
     },
     "./application": {
+      "types": "./dist/application/index.d.ts",
       "import": "./dist/application/index.js"
     },
     "./application/legacy": {
+      "types": "./dist/application/legacy/index.d.ts",
       "import": "./dist/application/legacy/index.js"
     },
     "./component/core": {
+      "types": "./dist/component/core/index.d.ts",
       "import": "./dist/component/core/index.js"
     },
     "./gsap": {
+      "types": "./dist/gsap/index.d.ts",
       "import": "./dist/gsap/index.js"
     },
     "./handler": {
+      "types": "./dist/handler/index.d.ts",
       "import": "./dist/handler/index.js"
     },
     "./helper": {
+      "types": "./dist/helper/index.d.ts",
       "import": "./dist/helper/index.js"
     },
     "./store": {
+      "types": "./dist/store/index.d.ts",
       "import": "./dist/store/index.js"
     },
     "./transition": {
+      "types": "./dist/transition/index.d.ts",
       "import": "./dist/transition/index.js"
     },
     "./util": {
+      "types": "./dist/util/index.d.ts",
       "import": "./dist/util/index.js"
     },
     "./plugin/data": {
+      "types": "./dist/plugin/data/index.d.ts",
       "import": "./dist/plugin/data/index.js"
     },
     "./plugin/system": {
+      "types": "./dist/plugin/system/index.d.ts",
       "import": "./dist/plugin/system/index.js"
     },
     "./package.json": "./package.json"
@@ -55,6 +67,7 @@
     "@babel/preset-env": "^7.0.0",
     "@rollup/plugin-babel": "^5",
     "@rollup/plugin-node-resolve": "^13",
+    "@typhonjs-build-test/esm-d-ts": "^0.0.1",
     "@typhonjs-config/eslint-config": "^0.3.0",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "@typhonjs-svelte/lib": "github:typhonjs-svelte/lib",
@@ -75,7 +88,7 @@
     "svelte"
   ],
   "scripts": {
-    "build": "rollup --config",
+    "build": "node rollupAll.js",
     "eslint": "eslint ."
   },
   "files": [

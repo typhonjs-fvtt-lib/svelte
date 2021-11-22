@@ -354,7 +354,7 @@ var _svelteData$1 = /*#__PURE__*/new WeakMap();
  */
 class GetSvelteData {
   /**
-   * @type {ApplicationShell|null[]}
+   * @type {ApplicationShell[]|null[]}
    */
 
   /**
@@ -364,7 +364,7 @@ class GetSvelteData {
   /**
    * Keep a direct reference to the SvelteData array in an associated {@link SvelteApplication}.
    *
-   * @param {ApplicationShell|null[]}  applicationShellHolder - A reference to the ApplicationShell array.
+   * @param {ApplicationShell[]|null[]}  applicationShellHolder - A reference to the ApplicationShell array.
    *
    * @param {SvelteData[]}  svelteData - A reference to the SvelteData array of mounted components.
    */
@@ -979,7 +979,6 @@ class SvelteFormApplication extends FormApplication {
    *
    * @param {JQuery} html -
    *
-   * @override
    * @inheritDoc
    */
 
@@ -1159,7 +1158,6 @@ class SvelteFormApplication extends FormApplication {
    * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
    * application frame / title for pop-out applications.
    *
-   * @override
    * @inheritDoc
    */
 
@@ -1180,7 +1178,6 @@ class SvelteFormApplication extends FormApplication {
    *
    * @returns {Promise.<JQuery>}   A promise resolving to the constructed jQuery object
    *
-   * @override
    * @private
    */
 

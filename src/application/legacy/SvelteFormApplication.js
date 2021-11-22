@@ -388,7 +388,6 @@ export class SvelteFormApplication extends FormApplication
     *
     * @param {JQuery} html -
     *
-    * @override
     * @inheritDoc
     */
    _injectHTML(html)
@@ -569,7 +568,6 @@ export class SvelteFormApplication extends FormApplication
     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
     * application frame / title for pop-out applications.
     *
-    * @override
     * @inheritDoc
     */
    _replaceHTML(element, html)  // eslint-disable-line no-unused-vars
@@ -587,7 +585,6 @@ export class SvelteFormApplication extends FormApplication
     *
     * @returns {Promise.<JQuery>}   A promise resolving to the constructed jQuery object
     *
-    * @override
     * @private
     */
    async _renderInner(data)
