@@ -1,6 +1,5 @@
 import path                from 'path';
 
-import { babel }           from '@rollup/plugin-babel';        // Babel is used for private class fields for browser usage.
 import resolve             from '@rollup/plugin-node-resolve';
 import { generateTSDef }   from '@typhonjs-build-test/esm-d-ts';
 import fs                  from 'fs-extra';
@@ -43,67 +42,7 @@ const rollupConfigs = [
       },
       output: {
          output: {
-            file: 'dist/action/index.js',
-            format: 'es',
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
-      }
-   },
-   {
-      input: {
-         input: 'src/application/index.js',
-         external: s_LOCAL_EXTERNAL,
-         plugins: [
-            resolve(),
-            sourcemaps(),
-            babel({
-               babelHelpers: 'bundled',
-               presets: [
-                  ['@babel/preset-env', {
-                     bugfixes: true,
-                     shippedProposals: true,
-                     targets: { esmodules: true }
-                  }]
-               ]
-            })
-         ]
-      },
-      output: {
-         output: {
-            file: 'dist/application/index.js',
-            format: 'es',
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
-      }
-   },
-   {
-      input: {
-         input: 'src/application/legacy/index.js',
-         external: s_LOCAL_EXTERNAL,
-         plugins: [
-            resolve(),
-            sourcemaps(),
-            babel({
-               babelHelpers: 'bundled',
-               presets: [
-                  ['@babel/preset-env', {
-                     bugfixes: true,
-                     shippedProposals: true,
-                     targets: { esmodules: true }
-                  }]
-               ]
-            })
-         ]
-      },
-      output: {
-         output: {
-            file: 'dist/application/legacy/index.js',
+            file: '_dist/action/index.js',
             format: 'es',
             plugins: outputPlugins,
             preferConst: true,
@@ -133,7 +72,7 @@ const rollupConfigs = [
       },
       output: {
          output: {
-            file: 'dist/component/core/index.js',
+            file: '_dist/component/core/index.js',
             format: 'es',
             plugins: outputPlugins,
             preferConst: true,
@@ -149,7 +88,7 @@ const rollupConfigs = [
       },
       output: {
          output: {
-            file: 'dist/gsap/index.js',
+            file: '_dist/gsap/index.js',
             format: 'es',
             paths: {
                gsap: '/scripts/greensock/esm/all.js'
@@ -172,7 +111,7 @@ const rollupConfigs = [
       },
       output: {
          output: {
-            file: 'dist/handler/index.js',
+            file: '_dist/handler/index.js',
             format: 'es',
             plugins: outputPlugins,
             preferConst: true,
@@ -188,7 +127,7 @@ const rollupConfigs = [
       },
       output: {
          output: {
-            file: 'dist/helper/index.js',
+            file: '_dist/helper/index.js',
             format: 'es',
             plugins: outputPlugins,
             preferConst: true,
@@ -208,7 +147,7 @@ const rollupConfigs = [
       },
       output: {
          output: {
-            file: 'dist/store/index.js',
+            file: '_dist/store/index.js',
             format: 'es',
             plugins: outputPlugins,
             preferConst: true,
@@ -228,7 +167,7 @@ const rollupConfigs = [
       },
       output: {
          output: {
-            file: 'dist/transition/index.js',
+            file: '_dist/transition/index.js',
             format: 'es',
             plugins: outputPlugins,
             preferConst: true,
@@ -248,7 +187,7 @@ const rollupConfigs = [
       },
       output: {
          output: {
-            file: 'dist/util/index.js',
+            file: '_dist/util/index.js',
             format: 'es',
             plugins: outputPlugins,
             preferConst: true,
@@ -264,7 +203,7 @@ const rollupConfigs = [
       },
       output: {
          output: {
-            file: 'dist/plugin/data/index.js',
+            file: '_dist/plugin/data/index.js',
             format: 'es',
             plugins: outputPlugins,
             preferConst: true,
@@ -284,7 +223,7 @@ const rollupConfigs = [
       },
       output: {
          output: {
-            file: 'dist/plugin/system/index.js',
+            file: '_dist/plugin/system/index.js',
             format: 'es',
             plugins: outputPlugins,
             preferConst: true,
