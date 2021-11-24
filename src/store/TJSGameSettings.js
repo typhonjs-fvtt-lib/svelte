@@ -12,13 +12,17 @@ import { get, writable }   from 'svelte/store';
  */
 
 /**
+ * @typedef {writable & get} GSStore - The backing Svelte store; a writable w/ get method attached.
+ */
+
+/**
  * Registers game settings and creates a backing Svelte store for each setting. It is possible to add multiple
  * `onChange` callbacks on registration.
  */
 export class TJSGameSettings
 {
    /**
-    * @type {*}
+    * @type {Map<string, GSStore>}
     */
    #stores = new Map();
 
@@ -108,7 +112,15 @@ export class TJSGameSettings
    }
 }
 
-
+/**
+ * Gets a store from the GSStore Map or creates a new store for the key.
+ *
+ * @param {Map<string, GSStore>} stores - Map containing Svelte stores.
+ *
+ * @param {string}               key - Key to lookup in stores map.
+ *
+ * @returns {GSStore} The store for the given key.
+ */
 function s_GET_STORE(stores, key)
 {
    let store = stores.get(key);
@@ -121,6 +133,11 @@ function s_GET_STORE(stores, key)
    return store;
 }
 
+/**
+ * Creates a new GSStore for the given key.
+ *
+ * @returns {GSStore} The new LSStore.
+ */
 function s_CREATE_STORE()
 {
    const store = writable(void 0);
