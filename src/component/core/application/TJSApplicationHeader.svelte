@@ -17,9 +17,6 @@
       }
    }
 
-    typeof foundryApp.options.popOut === 'boolean' && foundryApp.options.popOut ?
-    () => foundryApp.bringToTop.call(foundryApp) : () => void 0;
-
    const storeTitle = context.storeAppOptions.title;
    const storeDraggable = context.storeAppOptions.draggable;
    const storeHeaderButtons = context.storeUIOptions.headerButtons;
@@ -35,7 +32,7 @@
       if (booleanStore) { activateListeners(); }
 
       return {
-         update: ({ booleanStore }) =>  // eslint-disable-line no-shadow
+         update: (booleanStore) =>  // eslint-disable-line no-shadow
          {
             if (booleanStore) { activateListeners(); }
             else { removeListeners(); }
