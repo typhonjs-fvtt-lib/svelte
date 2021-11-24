@@ -61,9 +61,6 @@
     "@typhonjs-utils/object": "^0.0.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
-    "@rollup/plugin-babel": "^5",
     "@rollup/plugin-node-resolve": "^13",
     "@typhonjs-build-test/esm-d-ts": "^0.0.1",
     "@typhonjs-config/eslint-config": "^0.3.0",
