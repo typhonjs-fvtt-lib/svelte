@@ -259,27 +259,27 @@ for (const config of rollupConfigs)
 fs.emptyDirSync('./_dist/application');
 fs.copySync('./src/application', './_dist/application');
 
-// await generateTSDef({
-//    main: './_dist/application/index.js',
-//    output: './_dist/application/index.d.ts'
-// });
-//
-// await generateTSDef({
-//    main: './_dist/application/legacy/index.js',
-//    output: './_dist/application/legacy/index.d.ts'
-// });
-//
-// fs.writeJSONSync(`./_dist/application/package.json`, {
-//    main: './index.js',
-//    module: './index.js',
-//    type: 'module',
-//    types: './index.d.ts'
-// });
-//
-// fs.writeJSONSync(`./_dist/application/legacy/package.json`, {
-//    main: './index.js',
-//    module: './index.js',
-//    type: 'module',
-//    types: './index.d.ts'
-// });
+await generateTSDef({
+   main: './_dist/application/index.js',
+   output: './_dist/application/index.d.ts'
+});
+
+await generateTSDef({
+   main: './_dist/application/legacy/index.js',
+   output: './_dist/application/legacy/index.d.ts'
+});
+
+fs.writeJSONSync(`./_dist/application/package.json`, {
+   main: './index.js',
+   module: './index.js',
+   type: 'module',
+   types: './index.d.ts'
+});
+
+fs.writeJSONSync(`./_dist/application/legacy/package.json`, {
+   main: './index.js',
+   module: './index.js',
+   type: 'module',
+   types: './index.d.ts'
+});
 
