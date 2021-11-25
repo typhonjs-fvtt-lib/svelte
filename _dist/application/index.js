@@ -1,5 +1,6 @@
-export * from './HandlebarsApplication.js';
-export * from './HandlebarsFormApplication.js';
+export * from './SvelteApplication.js';
+export * from './TJSDialog.js';
+export * from './TJSMenu.js';
 
 /**
  * @typedef {object} ApplicationShell - Application shell contract for Svelte components.

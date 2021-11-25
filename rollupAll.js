@@ -1,7 +1,6 @@
-import path                from 'path';
-
 import resolve             from '@rollup/plugin-node-resolve';
 import { generateTSDef }   from '@typhonjs-build-test/esm-d-ts';
+import { getFileList }     from '@typhonjs-utils/file-util';
 import fs                  from 'fs-extra';
 import { rollup }          from 'rollup';
 import sourcemaps          from 'rollup-plugin-sourcemaps';
@@ -248,10 +247,39 @@ for (const config of rollupConfigs)
       output: upath.changeExt(config.output.output.file, '.d.ts')
    });
 
-   fs.writeJSONSync(`${path.dirname(config.output.output.file)}/package.json`, {
+   fs.writeJSONSync(`${upath.dirname(config.output.output.file)}/package.json`, {
       main: './index.js',
       module: './index.js',
       type: 'module',
       types: './index.d.ts'
    });
 }
+
+// Handle application & application/legacy by copying the source.
+fs.emptyDirSync('./_dist/application');
+fs.copySync('./src/application', './_dist/application');
+
+// await generateTSDef({
+//    main: './_dist/application/index.js',
+//    output: './_dist/application/index.d.ts'
+// });
+//
+// await generateTSDef({
+//    main: './_dist/application/legacy/index.js',
+//    output: './_dist/application/legacy/index.d.ts'
+// });
+//
+// fs.writeJSONSync(`./_dist/application/package.json`, {
+//    main: './index.js',
+//    module: './index.js',
+//    type: 'module',
+//    types: './index.d.ts'
+// });
+//
+// fs.writeJSONSync(`./_dist/application/legacy/package.json`, {
+//    main: './index.js',
+//    module: './index.js',
+//    type: 'module',
+//    types: './index.d.ts'
+// });
+
