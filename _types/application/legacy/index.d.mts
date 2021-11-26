@@ -1,6 +1,7 @@
 import '@league-of-foundry-developers/foundry-vtt-types';
 import * as svelte_store        from 'svelte/store';
 
+// @ts-ignore
 import { SvelteApplication }    from '@typhonjs-fvtt/svelte/application';
 
 declare class HandlebarsApplication<P extends Application.Options = Application.Options> extends SvelteApplication<P> {
