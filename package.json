@@ -92,6 +92,7 @@
   },
   "files": [
     "/_dist",
+    "/_types",
     "/src"
   ],
   "directories": {},
