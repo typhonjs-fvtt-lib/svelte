@@ -259,27 +259,25 @@ for (const config of rollupConfigs)
 fs.emptyDirSync('./_dist/application');
 fs.copySync('./src/application', './_dist/application');
 
-await generateTSDef({
-   main: './_dist/application/index.js',
-   output: './_dist/application/index.d.ts'
-});
-
-await generateTSDef({
-   main: './_dist/application/legacy/index.js',
-   output: './_dist/application/legacy/index.d.ts'
-});
-
 fs.writeJSONSync(`./_dist/application/package.json`, {
    main: './index.js',
    module: './index.js',
-   type: 'module',
-   types: './index.d.ts'
+   type: 'module'
 });
 
 fs.writeJSONSync(`./_dist/application/legacy/package.json`, {
    main: './index.js',
    module: './index.js',
-   type: 'module',
-   types: './index.d.ts'
+   type: 'module'
 });
 
+// TODO: DO NOT UNCOMMENT. These definitions are hand modified after initial generation.
+// await generateTSDef({
+//    main: './_dist/application/index.js',
+//    output: './_types/application/index.d.mts'
+// });
+//
+// await generateTSDef({
+//    main: './_dist/application/legacy/index.js',
+//    output: './_types/application/legacy/index.d.mts'
+// });
