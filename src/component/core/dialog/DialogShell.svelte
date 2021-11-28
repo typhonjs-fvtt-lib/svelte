@@ -68,19 +68,19 @@
 
       // Update the main foundry options when data changes. Perform explicit checks against existing data in `foundryApp`.
       const newDraggable = data.draggable ?? true;
-      if (foundryApp.draggable !== newDraggable) { foundryApp.draggable = newDraggable; }
+      if (foundryApp.reactive.draggable !== newDraggable) { foundryApp.reactive.draggable = newDraggable; }
 
       const newPopOut = data.popOut ?? true;
-      if (foundryApp.popOut !== newPopOut) { foundryApp.popOut = newPopOut; }
+      if (foundryApp.reactive.popOut !== newPopOut) { foundryApp.reactive.popOut = newPopOut; }
 
       const newResizable = data.resizable ?? false;
-      if (foundryApp.resizable !== newResizable) { foundryApp.resizable = newResizable; }
+      if (foundryApp.reactive.resizable !== newResizable) { foundryApp.reactive.resizable = newResizable; }
 
       // Note foundryApp.title from Application localizes `options.title`, so compare with `foundryApp.options.title`.
       const newTitle = data.title ?? 'Dialog';
-      if (newTitle !== foundryApp?.options?.title) { foundryApp.title = newTitle; }
+      if (newTitle !== foundryApp?.options?.title) { foundryApp.reactive.title = newTitle; }
 
-      if (foundryApp.zIndex !== zIndex) { foundryApp.zIndex = zIndex; }
+      if (foundryApp.reactive.zIndex !== zIndex) { foundryApp.reactive.zIndex = zIndex; }
    }
 
    // ApplicationShell transition options ----------------------------------------------------------------------------
