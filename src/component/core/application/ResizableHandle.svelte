@@ -1,18 +1,19 @@
-<script>
+<script lang="ts">
    import { getContext } from 'svelte';
+   import type {Readable, Writable} from "svelte/store";
 
-   export let isResizable = false;
+   export let isResizable: boolean = false;
 
    const context = getContext('external');
 
    // Allows retrieval of the element root at runtime.
-   const getElementRoot = getContext('getElementRoot');
+   const getElementRoot = getContext<() => HTMLElement>('getElementRoot');
 
    const foundryApp = context.foundryApp;
    const storeResizable = context.storeAppOptions.resizable;
    const storeMinimized = context.storeUIOptions.minimized;
 
-   let elementResize;
+   let elementResize: HTMLElement;
 
    $: if (elementResize)
    {
@@ -20,7 +21,7 @@
       elementResize.style.display = isResizable && !$storeMinimized ? 'block' : 'none';
 
       // Add / remove `resizable` class from element root.
-      const elementRoot = getElementRoot();
+      const elementRoot: HTMLElement = getElementRoot();
       if (elementRoot) { elementRoot.classList[isResizable ? 'add' : 'remove']('resizable'); }
    }
 
@@ -33,28 +34,28 @@
     *
     * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
     */
-   function resizable(node, booleanStore)
+   function resizable(node: HTMLElement, booleanStore: Writable<boolean>)
    {
       /**
        * Duplicate the app / Positionable starting position to track differences.
        *
        * @type {object}
        */
-      let position = null;
+      let position: Application.Position = null;
 
       /**
        * Stores the initial X / Y on drag down.
        *
        * @type {object}
        */
-      let initialPosition = {};
+      let initialPosition: Application.Position = {};
 
       /**
        * Throttle mousemove event handling to 60fps
        *
        * @type {number}
        */
-      let moveTime = 0;
+      let moveTime: number = 0;
 
       /**
        * Stores the active state and is used to cut off any active resizing when the store value changes.

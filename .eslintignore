@@ -3,3 +3,4 @@
 _dist/
 docs/
 src/**/*.svelte
+src/**/*.ts

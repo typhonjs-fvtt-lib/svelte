@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
    import { getContext }               from 'svelte';
    import { fade }                     from 'svelte/transition';
 
@@ -6,11 +6,13 @@
    import DialogContent                from './DialogContent.svelte';
    import TJSGlassPane                 from '../TJSGlassPane.svelte';
 
+   import type { TJSDialogData }       from '@typhonjs-fvtt/svelte/component/core/types';
+
    // Application shell contract.
-   export let elementRoot;
+   export let elementRoot: HTMLElement;
 
    // The dialog data.
-   export let data = {};
+   export let data = {} as TJSDialogData;
 
    const foundryApp = getContext('external').foundryApp;
 
@@ -148,11 +150,15 @@
    }
    else  // Provide a fallback / default glass pane transition when `data.modalOptions.transition` is not defined.
    {
+      // TODO TYPES - Remove @ts-ignore
+
+      // @ts-ignore
       const newModalTransition = typeof data?.modalOptions?.transition?.transition === 'function' ?
        data.modalOptions.transition.transition : s_MODAL_TRANSITION;
 
       if (newModalTransition !== modalProps.transition) { modalProps.transition = newModalTransition; }
 
+      // @ts-ignore
       const newModalTransitionOptions = typeof data?.modalOptions?.transitionOptions === 'object' ?
        data.modalOptions.transitionOptions : s_MODAL_TRANSITION_OPTIONS;
 

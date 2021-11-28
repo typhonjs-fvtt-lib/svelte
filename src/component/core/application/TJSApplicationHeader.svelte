@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
    import { getContext }   from 'svelte';
 
    import { draggable }    from '@typhonjs-fvtt/svelte/action';
@@ -6,7 +6,10 @@
 
    import TJSHeaderButton  from './TJSHeaderButton.svelte';
 
-   const context = getContext('external');
+   import type { Readable }         from 'svelte/store';
+   import type { ContextExternal }  from '@typhonjs-fvtt/svelte/component/core/types';
+
+   const context: ContextExternal = getContext<ContextExternal>('external');
    const foundryApp = context.foundryApp;
 
    const bringToTop = () =>
@@ -22,9 +25,9 @@
    const storeHeaderButtons = context.storeUIOptions.headerButtons;
    const storeMinimizable = context.storeAppOptions.minimizable;
 
-   function minimizable(node, booleanStore)
+   function minimizable(node: HTMLElement, booleanStore: Readable<boolean>)
    {
-      const callback = foundryApp._onToggleMinimize.bind(foundryApp);
+      const callback: Function = foundryApp._onToggleMinimize.bind(foundryApp);
 
       function activateListeners() { node.addEventListener('dblclick', callback); }
       function removeListeners() { node.removeEventListener('dblclick', callback); }

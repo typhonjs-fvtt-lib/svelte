@@ -1,12 +1,14 @@
-<script>
-   import { getContext }    from 'svelte';
+<script lang="ts">
+    import {getContext, SvelteComponent} from 'svelte';
 
    import TJSContainer      from './TJSContainer.svelte';
 
-   // The children array can be specified by a parent via prop or is read below from the external context.
-   export let children = void 0
+   import type { ContextExternal } from "@typhonjs-fvtt/svelte/component/core/types.js";
 
-   const context = getContext('external');
+   // The children array can be specified by a parent via prop or is read below from the external context.
+   export let children: SvelteComponent[] | void = void 0
+
+   const context = getContext<ContextExternal>('external');
 
    // This component can host multiple children defined via props or in the TyphonJS SvelteData configuration object
    // that are potentially mounted in the content area. If no children defined then this component mounts any slotted

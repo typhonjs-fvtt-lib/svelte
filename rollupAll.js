@@ -1,11 +1,14 @@
+import commonjs            from '@rollup/plugin-commonjs';
 import resolve             from '@rollup/plugin-node-resolve';
 import { generateTSDef }   from '@typhonjs-build-test/esm-d-ts';
-import { getFileList }     from '@typhonjs-utils/file-util';
+// import { getFileList }     from '@typhonjs-utils/file-util';
 import fs                  from 'fs-extra';
+import preprocess          from 'svelte-preprocess';
 import { rollup }          from 'rollup';
 import sourcemaps          from 'rollup-plugin-sourcemaps';
 import svelte              from 'rollup-plugin-svelte';
 import { terser }          from 'rollup-plugin-terser';
+import typescript          from '@rollup/plugin-typescript';
 import upath               from 'upath';
 
 import terserConfig  from './terser.config.mjs';
@@ -34,29 +37,62 @@ const outputPlugins = s_COMPRESS ? [terser(terserConfig)] : [];
 const sourcemap = s_SOURCEMAPS;
 
 const rollupConfigs = [
+   // {
+   //    input: {
+   //       input: 'src/action/index.js',
+   //       external: s_LOCAL_EXTERNAL
+   //    },
+   //    output: {
+   //       output: {
+   //          file: '_dist/action/index.js',
+   //          format: 'es',
+   //          plugins: outputPlugins,
+   //          preferConst: true,
+   //          sourcemap,
+   //          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+   //       }
+   //    }
+   // },
+
+   // TODO: old ESM bundle for component/core
+   // {
+   //    input: {
+   //       input: 'src/component/core/index.js',
+   //       external: s_LOCAL_EXTERNAL,
+   //       plugins: [
+   //          svelte({
+   //             emitCss: false,
+   //             onwarn: (warning, handler) =>
+   //             {
+   //                // Suppress `a11y-missing-attribute` for missing href in <a> links.
+   //                if (warning.message.includes(`<a> element should have an href attribute`)) { return; }
+   //
+   //                // Let Rollup handle all other warnings normally.
+   //                handler(warning);
+   //             }
+   //          }),
+   //          resolve()
+   //       ]
+   //    },
+   //    output: {
+   //       output: {
+   //          file: '_dist/component/core/index.js',
+   //          format: 'es',
+   //          plugins: outputPlugins,
+   //          preferConst: true,
+   //          sourcemap,
+   //          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+   //       }
+   //    }
+   // },
    {
       input: {
-         input: 'src/action/index.js',
-         external: s_LOCAL_EXTERNAL
-      },
-      output: {
-         output: {
-            file: '_dist/action/index.js',
-            format: 'es',
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
-      }
-   },
-   {
-      input: {
-         input: 'src/component/core/index.js',
+         input: 'src/component/core/index.ts',
          external: s_LOCAL_EXTERNAL,
          plugins: [
             svelte({
                emitCss: false,
+               preprocess: preprocess(),
                onwarn: (warning, handler) =>
                {
                   // Suppress `a11y-missing-attribute` for missing href in <a> links.
@@ -66,7 +102,16 @@ const rollupConfigs = [
                   handler(warning);
                }
             }),
-            resolve()
+            resolve({
+               browser: true,
+               dedupe: ['svelte']
+            }),
+            commonjs(),
+            typescript({
+               tsconfig: './src/component/core/tsconfig.json'
+               // sourceMap: s_SOURCEMAPS,
+               // inlineSources: !production
+            })
          ]
       },
       output: {
@@ -80,157 +125,157 @@ const rollupConfigs = [
          }
       }
    },
-   {
-      input: {
-         input: 'src/gsap/index.js',
-         external: s_LOCAL_EXTERNAL
-      },
-      output: {
-         output: {
-            file: '_dist/gsap/index.js',
-            format: 'es',
-            paths: {
-               gsap: '/scripts/greensock/esm/all.js'
-            },
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
-      }
-   },
-   {
-      input: {
-         input: 'src/handler/index.js',
-         external: s_LOCAL_EXTERNAL,
-         plugins: [
-            resolve(),
-            sourcemaps()
-         ]
-      },
-      output: {
-         output: {
-            file: '_dist/handler/index.js',
-            format: 'es',
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
-      }
-   },
-   {
-      input: {
-         input: 'src/helper/index.js',
-         external: s_LOCAL_EXTERNAL
-      },
-      output: {
-         output: {
-            file: '_dist/helper/index.js',
-            format: 'es',
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
-      }
-   },
-   {
-      input: {
-         input: 'src/store/index.js',
-         external: s_LOCAL_EXTERNAL,
-         plugins: [
-            resolve(),
-            sourcemaps()
-         ]
-      },
-      output: {
-         output: {
-            file: '_dist/store/index.js',
-            format: 'es',
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
-      }
-   },
-   {
-      input: {
-         input: 'src/transition/index.js',
-         external: s_LOCAL_EXTERNAL,
-         plugins: [
-            resolve(),
-            sourcemaps()
-         ]
-      },
-      output: {
-         output: {
-            file: '_dist/transition/index.js',
-            format: 'es',
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
-      }
-   },
-   {
-      input: {
-         input: 'src/util/index.js',
-         external: s_LOCAL_EXTERNAL,
-         plugins: [
-            resolve(),
-            sourcemaps()
-         ]
-      },
-      output: {
-         output: {
-            file: '_dist/util/index.js',
-            format: 'es',
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
-      }
-   },
-   {
-      input: {
-         input: 'src/plugin/data/index.js',
-         external: s_LOCAL_EXTERNAL
-      },
-      output: {
-         output: {
-            file: '_dist/plugin/data/index.js',
-            format: 'es',
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
-      }
-   },
-   {
-      input: {
-         input: 'src/plugin/system/index.js',
-         external: s_LOCAL_EXTERNAL,
-         plugins: [
-            resolve(),
-            sourcemaps()
-         ]
-      },
-      output: {
-         output: {
-            file: '_dist/plugin/system/index.js',
-            format: 'es',
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
-      }
-   }
+   // {
+   //    input: {
+   //       input: 'src/gsap/index.js',
+   //       external: s_LOCAL_EXTERNAL
+   //    },
+   //    output: {
+   //       output: {
+   //          file: '_dist/gsap/index.js',
+   //          format: 'es',
+   //          paths: {
+   //             gsap: '/scripts/greensock/esm/all.js'
+   //          },
+   //          plugins: outputPlugins,
+   //          preferConst: true,
+   //          sourcemap,
+   //          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+   //       }
+   //    }
+   // },
+   // {
+   //    input: {
+   //       input: 'src/handler/index.js',
+   //       external: s_LOCAL_EXTERNAL,
+   //       plugins: [
+   //          resolve(),
+   //          sourcemaps()
+   //       ]
+   //    },
+   //    output: {
+   //       output: {
+   //          file: '_dist/handler/index.js',
+   //          format: 'es',
+   //          plugins: outputPlugins,
+   //          preferConst: true,
+   //          sourcemap,
+   //          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+   //       }
+   //    }
+   // },
+   // {
+   //    input: {
+   //       input: 'src/helper/index.js',
+   //       external: s_LOCAL_EXTERNAL
+   //    },
+   //    output: {
+   //       output: {
+   //          file: '_dist/helper/index.js',
+   //          format: 'es',
+   //          plugins: outputPlugins,
+   //          preferConst: true,
+   //          sourcemap,
+   //          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+   //       }
+   //    }
+   // },
+   // {
+   //    input: {
+   //       input: 'src/store/index.js',
+   //       external: s_LOCAL_EXTERNAL,
+   //       plugins: [
+   //          resolve(),
+   //          sourcemaps()
+   //       ]
+   //    },
+   //    output: {
+   //       output: {
+   //          file: '_dist/store/index.js',
+   //          format: 'es',
+   //          plugins: outputPlugins,
+   //          preferConst: true,
+   //          sourcemap,
+   //          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+   //       }
+   //    }
+   // },
+   // {
+   //    input: {
+   //       input: 'src/transition/index.js',
+   //       external: s_LOCAL_EXTERNAL,
+   //       plugins: [
+   //          resolve(),
+   //          sourcemaps()
+   //       ]
+   //    },
+   //    output: {
+   //       output: {
+   //          file: '_dist/transition/index.js',
+   //          format: 'es',
+   //          plugins: outputPlugins,
+   //          preferConst: true,
+   //          sourcemap,
+   //          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+   //       }
+   //    }
+   // },
+   // {
+   //    input: {
+   //       input: 'src/util/index.js',
+   //       external: s_LOCAL_EXTERNAL,
+   //       plugins: [
+   //          resolve(),
+   //          sourcemaps()
+   //       ]
+   //    },
+   //    output: {
+   //       output: {
+   //          file: '_dist/util/index.js',
+   //          format: 'es',
+   //          plugins: outputPlugins,
+   //          preferConst: true,
+   //          sourcemap,
+   //          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+   //       }
+   //    }
+   // },
+   // {
+   //    input: {
+   //       input: 'src/plugin/data/index.js',
+   //       external: s_LOCAL_EXTERNAL
+   //    },
+   //    output: {
+   //       output: {
+   //          file: '_dist/plugin/data/index.js',
+   //          format: 'es',
+   //          plugins: outputPlugins,
+   //          preferConst: true,
+   //          sourcemap,
+   //          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+   //       }
+   //    }
+   // },
+   // {
+   //    input: {
+   //       input: 'src/plugin/system/index.js',
+   //       external: s_LOCAL_EXTERNAL,
+   //       plugins: [
+   //          resolve(),
+   //          sourcemaps()
+   //       ]
+   //    },
+   //    output: {
+   //       output: {
+   //          file: '_dist/plugin/system/index.js',
+   //          format: 'es',
+   //          plugins: outputPlugins,
+   //          preferConst: true,
+   //          sourcemap,
+   //          // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+   //       }
+   //    }
+   // }
 ];
 
 for (const config of rollupConfigs)

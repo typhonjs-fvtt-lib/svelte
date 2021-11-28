@@ -1,9 +1,16 @@
-<script>
-   import { getContext, setContext }   from 'svelte';
+<script lang="ts">
+   import {
+      getContext,
+      setContext,
+      SvelteComponent }          from 'svelte';
 
-   import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
-   import TJSContainer                 from '../TJSContainer.svelte';
-   import ResizableHandle              from './ResizableHandle.svelte';
+   import TJSApplicationHeader   from './TJSApplicationHeader.svelte';
+   import TJSContainer           from '../TJSContainer.svelte';
+   import ResizableHandle        from './ResizableHandle.svelte';
+
+   import type {
+      ContextExternal,
+      HTMLElementGet }           from '@typhonjs-fvtt/svelte/component/core/types';
 
    import {
       s_DEFAULT_TRANSITION,
@@ -12,24 +19,24 @@
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
    // use 'elementRoot' to set the element of the Application. You can also provide `elementContent` and
    // `elementTarget`. Please see SvelteApplication lifecycle documentation.
-   export let elementContent;
-   export let elementRoot;
+   export let elementContent: HTMLElement;
+   export let elementRoot: HTMLElement;
 
    // The children array can be specified by a parent via prop or is read below from the external context.
-   export let children = void 0
+   export let children: SvelteComponent[] | void = void 0
 
    // If a parent component binds and sets `heightChanged` to true then it is bound to the content & root element
    // `clientHeight`.
-   export let heightChanged = false;
+   export let heightChanged: boolean = false;
 
    // Store the initial `heightChanged` state. If it is truthy then `clientHeight` for the content & root elements
    // are bound to `heightChanged` to signal to any parent component of any change to the client & root.
-   const bindHeightChanged = !!heightChanged;
+   const bindHeightChanged: boolean = !!heightChanged;
 
-   setContext('getElementContent', () => elementContent);
-   setContext('getElementRoot', () => elementRoot);
+   setContext<HTMLElementGet>('getElementContent', () => elementContent);
+   setContext<HTMLElementGet>('getElementRoot', () => elementRoot);
 
-   const context = getContext('external');
+   const context = getContext<ContextExternal<{jqueryCloseAnimation: boolean}>>('external');
 
    // Store Foundry Application reference.
    const foundryApp = context.foundryApp;
@@ -46,26 +53,26 @@
    // runtime execution.
 
    // Exports properties to set a transition w/ in / out options.
-   export let transition = void 0;
-   export let inTransition = s_DEFAULT_TRANSITION;
-   export let outTransition = s_DEFAULT_TRANSITION;
+   export let transition: Function = void 0;
+   export let inTransition: Function = s_DEFAULT_TRANSITION;
+   export let outTransition: Function = s_DEFAULT_TRANSITION;
 
    // Exports properties to set options for any transitions.
-   export let transitionOptions = void 0;
-   export let inTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS;
-   export let outTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS;
+   export let transitionOptions: object = void 0;
+   export let inTransitionOptions: object = s_DEFAULT_TRANSITION_OPTIONS;
+   export let outTransitionOptions: object = s_DEFAULT_TRANSITION_OPTIONS;
 
    // Tracks last transition state.
-   let oldTransition = void 0;
-   let oldTransitionOptions = void 0
+   let oldTransition: Function = void 0;
+   let oldTransitionOptions: object = void 0
 
    // Run this reactive block when the last transition state is not equal to the current state.
    $: if (oldTransition !== transition)
    {
       // If transition is defined and not the default transition then set it to both in and out transition otherwise
       // set the default transition to both in & out transitions.
-      const newTransition = s_DEFAULT_TRANSITION !== transition && typeof transition === 'function' ? transition :
-       s_DEFAULT_TRANSITION;
+      const newTransition: Function = s_DEFAULT_TRANSITION !== transition && typeof transition === 'function' ?
+       transition : s_DEFAULT_TRANSITION;
 
       inTransition = newTransition;
       outTransition = newTransition;
@@ -76,8 +83,8 @@
    // Run this reactive block when the last transition options state is not equal to the current options state.
    $: if (oldTransitionOptions !== transitionOptions)
    {
-      const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && typeof transitionOptions === 'object' ?
-       transitionOptions : s_DEFAULT_TRANSITION_OPTIONS;
+      const newOptions: object = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS &&
+       typeof transitionOptions === 'object' ? transitionOptions : s_DEFAULT_TRANSITION_OPTIONS;
 
       inTransitionOptions = newOptions;
       outTransitionOptions = newOptions;
