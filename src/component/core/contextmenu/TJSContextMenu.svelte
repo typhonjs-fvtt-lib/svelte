@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
    import { createEventDispatcher } from 'svelte';
    import { current_component }     from 'svelte/internal';
 
@@ -6,17 +6,15 @@
    import { slideFade }             from '@typhonjs-fvtt/svelte/transition';
    import { outroAndDestroy }       from '@typhonjs-fvtt/svelte/util';
 
-   import type { MenuItemContext }  from '@typhonjs-fvtt/svelte/component/core/types';
-
-   export let id: string = '';
-   export let x: number = 0;
-   export let y: number = 0;
-   export let items: MenuItemContext[] = [];
-   export let zIndex: number = 10000;
-   export let transitionOptions: object = void 0;
+   export let id = '';
+   export let x = 0;
+   export let y = 0;
+   export let items = [];
+   export let zIndex = 10000;
+   export let transitionOptions = void 0;
 
    // Bound to the nav element / menu.
-   let menuEl: HTMLElement;
+   let menuEl;
 
    // Store this component reference.
    const local = current_component;
@@ -25,7 +23,7 @@
    const dispatch = createEventDispatcher();
 
    // Stores if this context menu is closed.
-   let closed: boolean = false;
+   let closed = false;
 
    /**
     * Provides a custom animate callback allowing inspection of the element to change positioning styles based on the
@@ -38,8 +36,8 @@
     */
    function animate(node)
    {
-      const expandUp: boolean = y + node.clientHeight > document.body.clientHeight
-      const expandLeft: boolean = x + node.clientWidth > document.body.clientWidth
+      const expandUp = y + node.clientHeight > document.body.clientHeight
+      const expandLeft = x + node.clientWidth > document.body.clientWidth
 
       node.style.top = expandUp ? null : `${y}px`;
       node.style.bottom = expandUp ? `${document.body.clientHeight - y}px` : null;
@@ -74,7 +72,7 @@
     *
     * @param {PointerEvent}   event - Pointer event from document body click.
     */
-   async function onClose(event) // TODO TYPES: PointerEvent
+   async function onClose(event)
    {
       // Early out if the pointer down is inside the menu element.
       if (event.target === menuEl || menuEl.contains(event.target)) { return; }

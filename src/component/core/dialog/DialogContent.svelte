@@ -1,17 +1,11 @@
-<script lang="ts">
+<script>
    import { getContext }   from 'svelte';
 
    import {
       isSvelteComponent,
       parseSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
 
-   import type { TJSDialogData } from '@typhonjs-fvtt/svelte/component/core/types';
-
-   export let data = {} as TJSDialogData
-
-   data.title = 'boo';
-   data.content = 'blah';
-   data.modal = true;
+   export let data = {};
 
    let buttons;
    let content;
@@ -26,8 +20,6 @@
       const b = data.buttons[key];
       if (b.condition !== false)
       {
-         // TODO TYPES: Not picking up the extension to Array in primitives.mjs.d.ts
-         // @ts-ignore
          obj.push({
             ...b,
             id: key,
@@ -58,12 +50,7 @@
             const children = svelteConfig?.context?.get('external')?.children;
 
             // If so add to dialogProps.
-            if (Array.isArray(children))
-            {
-               // TODO TYPES: Haven't typed dialogProps
-               // @ts-ignore
-               dialogProps.children = children;
-            }
+            if (Array.isArray(children)) { dialogProps.children = children; }
          }
          else
          {
@@ -95,8 +82,6 @@
       }
       catch(err)
       {
-         // TODO TYPES: Either redeclare ui or perhaps new "loose" version of types.
-         // @ts-ignore
          ui.notifications.error(err);
          throw new Error(err);
       }

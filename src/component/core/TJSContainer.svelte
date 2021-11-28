@@ -1,8 +1,6 @@
-<script lang="ts">
-   import { SvelteComponent } from 'svelte';
-
-   export let warn: boolean = false;
-   export let children: SvelteComponent[] | void = void 0;
+<script>
+   export let warn = false;
+   export let children = void 0;
 </script>
 
 <svelte:options accessors={true}/>
