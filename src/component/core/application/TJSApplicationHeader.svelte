@@ -6,8 +6,7 @@
 
    import TJSHeaderButton  from './TJSHeaderButton.svelte';
 
-   const context = getContext('external');
-   const foundryApp = context.foundryApp;
+   const foundryApp = getContext('external').foundryApp;
 
    const bringToTop = () =>
    {
@@ -17,10 +16,10 @@
       }
    }
 
-   const storeTitle = context.storeAppOptions.title;
-   const storeDraggable = context.storeAppOptions.draggable;
-   const storeHeaderButtons = context.storeUIOptions.headerButtons;
-   const storeMinimizable = context.storeAppOptions.minimizable;
+   const storeTitle = foundryApp.reactive.storeAppOptions.title;
+   const storeDraggable = foundryApp.reactive.storeAppOptions.draggable;
+   const storeHeaderButtons = foundryApp.reactive.storeUIOptions.headerButtons;
+   const storeMinimizable = foundryApp.reactive.storeAppOptions.minimizable;
 
    function minimizable(node, booleanStore)
    {

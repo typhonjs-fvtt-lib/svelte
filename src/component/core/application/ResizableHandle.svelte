@@ -3,14 +3,13 @@
 
    export let isResizable = false;
 
-   const context = getContext('external');
+   const foundryApp = getContext('external').foundryApp;
 
    // Allows retrieval of the element root at runtime.
    const getElementRoot = getContext('getElementRoot');
 
-   const foundryApp = context.foundryApp;
-   const storeResizable = context.storeAppOptions.resizable;
-   const storeMinimized = context.storeUIOptions.minimized;
+   const storeResizable = foundryApp.reactive.storeAppOptions.resizable;
+   const storeMinimized = foundryApp.reactive.storeUIOptions.minimized;
 
    let elementResize;
 
