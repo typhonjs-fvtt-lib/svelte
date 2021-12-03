@@ -62,6 +62,9 @@
   },
   "devDependencies": {
     "@league-of-foundry-developers/foundry-vtt-types": "^0.8.9-7",
+    "@itsjamie/esdoc-core": "^0.3",
+    "@itsjamie/esdoc-cli": "^0.3",
+    "@itsjamie/esdoc-standard-plugin": "^0.3",
     "@rollup/plugin-node-resolve": "^13",
     "@typhonjs-build-test/esm-d-ts": "^0.0.2",
     "@typhonjs-config/eslint-config": "^0.3.0",
@@ -88,7 +91,8 @@
   ],
   "scripts": {
     "build": "node rollupAll.js",
-    "eslint": "eslint ."
+    "eslint": "eslint .",
+    "esdoc": "esdoc"
   },
   "files": [
     "/_dist",

@@ -8,12 +8,8 @@ import {
    parseSvelteConfig }           from '@typhonjs-fvtt/svelte/util';
 
 /**
- * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
- * load one or more components from `defaultOptions`. For the time being please refer to this temporary demo code
- * in `typhonjs-quest-log` for examples of how to declare Svelte components.
- * {@link https://github.com/typhonjs-fvtt/typhonjs-quest-log/tree/master/src/view/demo}
- *
- * A repository of demos will be available soon.
+ * Provides a Svelte aware extension to FormApplication to control the app lifecycle appropriately. You can
+ * declaratively load one or more components from `defaultOptions`.
  */
 export class SvelteFormApplication extends FormApplication
 {
@@ -80,7 +76,7 @@ export class SvelteFormApplication extends FormApplication
    }
 
    /**
-    * Specifies the default options that SvelteApplication supports.
+    * Specifies the default options that SvelteFormApplication supports.
     *
     * @returns {object} options - Application options.
     * @see https://foundryvtt.com/api/Application.html#options
@@ -110,7 +106,7 @@ export class SvelteFormApplication extends FormApplication
    get elementTarget() { return this.#elementTarget; }
 
    /**
-    * Returns the reactive accessors & Svelte stores for SvelteApplication.
+    * Returns the reactive accessors & Svelte stores for SvelteFormApplication.
     *
     * @returns {SvelteReactive} The reactive accessors & Svelte stores.
     */
@@ -122,34 +118,6 @@ export class SvelteFormApplication extends FormApplication
     * @returns {GetSvelteData} GetSvelteData
     */
    get svelte() { return this.#getSvelteData; }
-
-   /**
-    * Sets the content element.
-    *
-    * @param {HTMLElement} content - Content element.
-    */
-   set elementContent(content)
-   {
-      if (!(content instanceof HTMLElement))
-      {
-         throw new TypeError(`SvelteFormApplication - set elementContent error: 'content' is not an HTMLElement.`);
-      }
-      this.#elementContent = content;
-   }
-
-   /**
-    * Sets the target element or main element if no target defined.
-    *
-    * @param {HTMLElement} target - Target element.
-    */
-   set elementTarget(target)
-   {
-      if (!(target instanceof HTMLElement))
-      {
-         throw new TypeError(`SvelteFormApplication - set elementTarget error: 'target' is not an HTMLElement.`);
-      }
-      this.#elementTarget = target;
-   }
 
    /**
     * Note: This method is fully overridden and duplicated as Svelte components need to be destroyed manually and the
@@ -167,7 +135,8 @@ export class SvelteFormApplication extends FormApplication
     *
     * @param {boolean}  options.force - Force close regardless of render state.
     *
-    * @returns {Promise<void>}    A Promise which resolves once the application is closed
+    * @returns {Promise<void>}    A Promise which resolves once the application is closed.
+    * @ignore
     */
    async close(options = {})
    {
@@ -177,6 +146,9 @@ export class SvelteFormApplication extends FormApplication
       // Unsubscribe from any local stores.
       this.#stores.unsubscribe();
 
+      /**
+       * @ignore
+       */
       this._state = states.CLOSING;
 
       /**
@@ -244,11 +216,20 @@ export class SvelteFormApplication extends FormApplication
 
       // Clean up data
       this.#applicationShellHolder[0] = null;
+      /**
+       * @ignore
+       */
       this._element = null;
       this.#elementContent = null;
       this.#elementTarget = null;
       delete ui.windows[this.appId];
+      /**
+       * @ignore
+       */
       this._minimized = false;
+      /**
+       * @ignore
+       */
       this._scrollPositions = null;
       this._state = states.CLOSED;
 
@@ -266,6 +247,7 @@ export class SvelteFormApplication extends FormApplication
     * @param {JQuery} html -
     *
     * @inheritDoc
+    * @ignore
     */
    _injectHTML(html)
    {
@@ -289,7 +271,7 @@ export class SvelteFormApplication extends FormApplication
                if (this.svelte.applicationShell !== null)
                {
                   throw new Error(
-                   `SvelteFormApplication - _injectHTML - An application shell is already mounted; offending config: 
+                   `SvelteFormApplication - _injectHTML - An application shell is already mounted; offending config:
                     ${JSON.stringify(svelteConfig)}`);
                }
 
@@ -309,7 +291,7 @@ export class SvelteFormApplication extends FormApplication
             if (this.svelte.applicationShell !== null)
             {
                throw new Error(
-                `SvelteFormApplication - _injectHTML - An application shell is already mounted; offending config: 
+                `SvelteFormApplication - _injectHTML - An application shell is already mounted; offending config:
                  ${JSON.stringify(this.options.svelte)}`);
             }
 
@@ -367,15 +349,14 @@ export class SvelteFormApplication extends FormApplication
       // TODO VERIFY THIS CHECK ESPECIALLY `this.#elementTarget.length === 0`.
       if (this.#elementTarget === null || this.#elementTarget === void 0 || this.#elementTarget.length === 0)
       {
-         throw new Error(
-          `SvelteFormApplication - _injectHTML: Target element '${this.options.selectorTarget}' not found.`);
+         throw new Error(`SvelteFormApplication - _injectHTML: Target element '${this.options.selectorTarget}' not found.`);
       }
 
       // Subscribe to local store handling. Defer to next clock tick for the render cycle to complete.
       setTimeout(() => this.#stores.subscribe(), 0);
 
       this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent, elementTarget:
-       this.#elementTarget });
+         this.#elementTarget });
    }
 
    /**
@@ -386,6 +367,7 @@ export class SvelteFormApplication extends FormApplication
     * correctly.
     *
     * @inheritDoc
+    * @ignore
     */
    async maximize()
    {
@@ -404,6 +386,7 @@ export class SvelteFormApplication extends FormApplication
     * correctly.
     *
     * @inheritDoc
+    * @ignore
     */
    async minimize()
    {
@@ -432,6 +415,7 @@ export class SvelteFormApplication extends FormApplication
     * application frame / title for pop-out applications.
     *
     * @inheritDoc
+    * @ignore
     */
    _replaceHTML(element, html)  // eslint-disable-line no-unused-vars
    {
@@ -449,6 +433,7 @@ export class SvelteFormApplication extends FormApplication
     * @returns {Promise.<JQuery>}   A promise resolving to the constructed jQuery object
     *
     * @protected
+    * @ignore
     */
    async _renderInner(data)
    {
@@ -547,7 +532,7 @@ export class SvelteFormApplication extends FormApplication
 /**
  * Instantiates and attaches a Svelte component to the main inserted HTML.
  *
- * @param {SvelteApplication} app - The application
+ * @param {SvelteFormApplication} app - The application
  *
  * @param {JQuery}            html - The inserted HTML.
  *
@@ -657,8 +642,8 @@ function s_LOAD_CONFIG(app, html, config)
 }
 
 /**
- * Provides a helper class for {@link SvelteApplication} by combining all methods that work on the {@link SvelteData[]}
- * of mounted components. This class is instantiated and can be retrieved by the getter `svelte` via SvelteApplication.
+ * Provides a helper class for {@link SvelteFormApplication} by combining all methods that work on the {@link SvelteData[]}
+ * of mounted components. This class is instantiated and can be retrieved by the getter `svelte` via SvelteFormApplication.
  */
 class GetSvelteData
 {
@@ -673,7 +658,7 @@ class GetSvelteData
    #svelteData;
 
    /**
-    * Keep a direct reference to the SvelteData array in an associated {@link SvelteApplication}.
+    * Keep a direct reference to the SvelteData array in an associated {@link SvelteFormApplication}.
     *
     * @param {MountedAppShell[]|null[]}  applicationShellHolder - A reference to the MountedAppShell array.
     *
@@ -710,7 +695,7 @@ class GetSvelteData
    /**
     * Returns the Svelte component entries iterator.
     *
-    * @returns {Generator<(number|*)[], void, *>} Svelte component entries iterator.
+    * @returns {Generator<Array<number|SvelteComponent>>} Svelte component entries iterator.
     * @yields
     */
    *componentEntries()
@@ -724,7 +709,7 @@ class GetSvelteData
    /**
     * Returns the Svelte component values iterator.
     *
-    * @returns {Generator<*, void, *>} Svelte component values iterator.
+    * @returns {Generator<SvelteComponent>} Svelte component values iterator.
     * @yields
     */
    *componentValues()
@@ -740,7 +725,7 @@ class GetSvelteData
     *
     * @param {number}   index -
     *
-    * @returns {object} The loaded Svelte config + component.
+    * @returns {SvelteData} The loaded Svelte config + component.
     */
    data(index)
    {
@@ -750,7 +735,7 @@ class GetSvelteData
    /**
     * Returns the SvelteData entries iterator.
     *
-    * @returns {IterableIterator<[number, Object]>} SvelteData entries iterator.
+    * @returns {IterableIterator<Array<number, SvelteData>>} SvelteData entries iterator.
     */
    dataEntries()
    {
@@ -760,7 +745,7 @@ class GetSvelteData
    /**
     * Returns the SvelteData values iterator.
     *
-    * @returns {IterableIterator<Object>} SvelteData values iterator.
+    * @returns {IterableIterator<SvelteData>} SvelteData values iterator.
     */
    dataValues()
    {
@@ -779,12 +764,12 @@ class GetSvelteData
 }
 
 /**
- * Contains the reactive functionality / Svelte stores associated with SvelteApplication.
+ * Contains the reactive functionality / Svelte stores associated with SvelteFormApplication.
  */
 class SvelteReactive
 {
    /**
-    * @type {SvelteApplication}
+    * @type {SvelteFormApplication}
     */
    #application;
 
@@ -829,7 +814,7 @@ class SvelteReactive
    #storeUnsubscribe = [];
 
    /**
-    * @param {SvelteApplication} application - The host Foundry application.
+    * @param {SvelteFormApplication} application - The host Foundry application.
     */
    constructor(application)
    {
@@ -1093,7 +1078,7 @@ class SvelteReactive
     * Registers local store subscriptions for app options. `popOut` controls registering this app with `ui.windows`.
     * `zIndex` controls the z-index style of the element root.
     *
-    * @see SvelteApplication._injectHTML
+    * @see SvelteFormApplication._injectHTML
     */
    #storesSubscribe()
    {
@@ -1120,7 +1105,7 @@ class SvelteReactive
    /**
     * Unsubscribes from any locally monitored stores.
     *
-    * @see SvelteApplication.close
+    * @see SvelteFormApplication.close
     */
    #storesUnsubscribe()
    {

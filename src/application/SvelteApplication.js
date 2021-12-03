@@ -9,11 +9,7 @@ import {
 
 /**
  * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
- * load one or more components from `defaultOptions`. For the time being please refer to this temporary demo code
- * in `typhonjs-quest-log` for examples of how to declare Svelte components.
- * {@link https://github.com/typhonjs-fvtt/typhonjs-quest-log/tree/master/src/view/demo}
- *
- * A repository of demos will be available soon.
+ * load one or more components from `defaultOptions`.
  */
 export class SvelteApplication extends Application
 {
@@ -124,34 +120,6 @@ export class SvelteApplication extends Application
    get svelte() { return this.#getSvelteData; }
 
    /**
-    * Sets the content element.
-    *
-    * @param {HTMLElement} content - Content element.
-    */
-   set elementContent(content)
-   {
-      if (!(content instanceof HTMLElement))
-      {
-         throw new TypeError(`SvelteApplication - set elementContent error: 'content' is not an HTMLElement.`);
-      }
-      this.#elementContent = content;
-   }
-
-   /**
-    * Sets the target element or main element if no target defined.
-    *
-    * @param {HTMLElement} target - Target element.
-    */
-   set elementTarget(target)
-   {
-      if (!(target instanceof HTMLElement))
-      {
-         throw new TypeError(`SvelteApplication - set elementTarget error: 'target' is not an HTMLElement.`);
-      }
-      this.#elementTarget = target;
-   }
-
-   /**
     * Note: This method is fully overridden and duplicated as Svelte components need to be destroyed manually and the
     * best visual result is to destroy them after the default JQuery slide up animation occurs, but before the element
     * is removed from the DOM.
@@ -167,7 +135,8 @@ export class SvelteApplication extends Application
     *
     * @param {boolean}  options.force - Force close regardless of render state.
     *
-    * @returns {Promise<void>}    A Promise which resolves once the application is closed
+    * @returns {Promise<void>}    A Promise which resolves once the application is closed.
+    * @ignore
     */
    async close(options = {})
    {
@@ -177,6 +146,9 @@ export class SvelteApplication extends Application
       // Unsubscribe from any local stores.
       this.#stores.unsubscribe();
 
+      /**
+       * @ignore
+       */
       this._state = states.CLOSING;
 
       /**
@@ -244,11 +216,20 @@ export class SvelteApplication extends Application
 
       // Clean up data
       this.#applicationShellHolder[0] = null;
+      /**
+       * @ignore
+       */
       this._element = null;
       this.#elementContent = null;
       this.#elementTarget = null;
       delete ui.windows[this.appId];
+      /**
+       * @ignore
+       */
       this._minimized = false;
+      /**
+       * @ignore
+       */
       this._scrollPositions = null;
       this._state = states.CLOSED;
 
@@ -266,6 +247,7 @@ export class SvelteApplication extends Application
     * @param {JQuery} html -
     *
     * @inheritDoc
+    * @ignore
     */
    _injectHTML(html)
    {
@@ -385,6 +367,7 @@ export class SvelteApplication extends Application
     * correctly.
     *
     * @inheritDoc
+    * @ignore
     */
    async maximize()
    {
@@ -403,6 +386,7 @@ export class SvelteApplication extends Application
     * correctly.
     *
     * @inheritDoc
+    * @ignore
     */
    async minimize()
    {
@@ -431,6 +415,7 @@ export class SvelteApplication extends Application
     * application frame / title for pop-out applications.
     *
     * @inheritDoc
+    * @ignore
     */
    _replaceHTML(element, html)  // eslint-disable-line no-unused-vars
    {
@@ -448,6 +433,7 @@ export class SvelteApplication extends Application
     * @returns {Promise.<JQuery>}   A promise resolving to the constructed jQuery object
     *
     * @protected
+    * @ignore
     */
    async _renderInner(data)
    {
@@ -709,7 +695,7 @@ class GetSvelteData
    /**
     * Returns the Svelte component entries iterator.
     *
-    * @returns {Generator<(number|*)[], void, *>} Svelte component entries iterator.
+    * @returns {Generator<Array<number|SvelteComponent>>} Svelte component entries iterator.
     * @yields
     */
    *componentEntries()
@@ -723,7 +709,7 @@ class GetSvelteData
    /**
     * Returns the Svelte component values iterator.
     *
-    * @returns {Generator<*, void, *>} Svelte component values iterator.
+    * @returns {Generator<SvelteComponent>} Svelte component values iterator.
     * @yields
     */
    *componentValues()
@@ -739,7 +725,7 @@ class GetSvelteData
     *
     * @param {number}   index -
     *
-    * @returns {object} The loaded Svelte config + component.
+    * @returns {SvelteData} The loaded Svelte config + component.
     */
    data(index)
    {
@@ -749,7 +735,7 @@ class GetSvelteData
    /**
     * Returns the SvelteData entries iterator.
     *
-    * @returns {IterableIterator<[number, Object]>} SvelteData entries iterator.
+    * @returns {IterableIterator<Array<number, SvelteData>>} SvelteData entries iterator.
     */
    dataEntries()
    {
@@ -759,7 +745,7 @@ class GetSvelteData
    /**
     * Returns the SvelteData values iterator.
     *
-    * @returns {IterableIterator<Object>} SvelteData values iterator.
+    * @returns {IterableIterator<SvelteData>} SvelteData values iterator.
     */
    dataValues()
    {
