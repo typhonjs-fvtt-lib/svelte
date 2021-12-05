@@ -66,9 +66,9 @@ export class SvelteFormApplication extends FormApplication
    /**
     * @inheritDoc
     */
-   constructor(options)
+   constructor(object, options)
    {
-      super(options);
+      super(object, options);
 
       this.#reactive = new SvelteReactive(this);
 
