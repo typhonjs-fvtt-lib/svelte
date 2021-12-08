@@ -444,8 +444,13 @@ export class SvelteApplication extends Application
    }
 
    /**
-    * Modified Application `setPosition` to support QuestTrackerApp for switchable resizable globalThis.
-    * Set the application position and store its new location.
+    * Modified Application `setPosition` which changes a few aspects from the default {@link Application.setPosition}.
+    * The gate on `popOut` is removed, so if manually called popOut applications can use `setPosition`. There are
+    * two new options `noHeight` and `noWidth` that respect `width` & `height` style options while still producing
+    * a correct position object in return.
+    *
+    * TODO: evaluate if the `noHeight` / `noWidth` options are necessary and if we can intuit this from the computed
+    * styles. I gather these extra options can be set automatically.
     *
     * @param {object}               [opts] - Optional parameters.
     *
