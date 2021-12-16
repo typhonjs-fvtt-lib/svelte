@@ -33,6 +33,7 @@ export class HandlebarsApplication extends SvelteApplication
     * of ApplicationShell if the original popOut value is true.
     *
     * @inheritDoc
+    * @ignore
     */
    async _render(force, options)
    {
@@ -42,6 +43,14 @@ export class HandlebarsApplication extends SvelteApplication
       this.options.popOut = this.#orignalPopOut;
    }
 
+   /**
+    * Append HTML to application shell content area.
+    *
+    * @param {JQuery}   html - new content.
+    *
+    * @private
+    * @ignore
+    */
    _injectHTML(html)
    {
       // Mounts any Svelte components.
@@ -59,6 +68,7 @@ export class HandlebarsApplication extends SvelteApplication
     * application frame / title for pop-out applications.
     *
     * @inheritDoc
+    * @ignore
     */
    _replaceHTML(element, html)  // eslint-disable-line no-unused-vars
    {
@@ -76,12 +86,15 @@ export class HandlebarsApplication extends SvelteApplication
          elementContent.appendChild(...html);
 
          // Use the setter from `SvelteFormApplication` to set the title store.
+         /** @ignore */
          this.title = this.title; // eslint-disable-line no-self-assign
       }
       else
       {
          element.replaceWith(html);
+         /** @ignore */
          this._element = html;
+         /** @ignore */
          this.elementTarget = html[0];
       }
    }
