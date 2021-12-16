@@ -445,12 +445,11 @@ export class SvelteApplication extends Application
 
    /**
     * Modified Application `setPosition` which changes a few aspects from the default {@link Application.setPosition}.
-    * The gate on `popOut` is removed, so if manually called popOut applications can use `setPosition`. There are
-    * two new options `noHeight` and `noWidth` that respect `width` & `height` style options while still producing
-    * a correct position object in return.
+    * The gate on `popOut` is removed, so if manually called popOut applications can use `setPosition`.
     *
-    * TODO: evaluate if the `noHeight` / `noWidth` options are necessary and if we can intuit this from the computed
-    * styles. I gather these extra options can be set automatically.
+    * There are two new options `noHeight` and `noWidth` that respect `width` & `height` style options while still
+    * producing a correct position object in return. You may set these options manually, but they are also automatically
+    * determined when not explicitly provided by checking if the target element style for `height` or `width` is `auto`.
     *
     * @param {object}               [opts] - Optional parameters.
     *
@@ -458,7 +457,7 @@ export class SvelteApplication extends Application
     *
     * @param {number|null}          [opts.top] - The top offset position in pixels
     *
-    * @param {number|null}          [opts.width] - The application width in pixels
+    * @param {number|string|null}   [opts.width] - The application width in pixels
     *
     * @param {number|string|null}   [opts.height] - The application height in pixels
     *
@@ -471,11 +470,17 @@ export class SvelteApplication extends Application
     * @returns {{left: number, top: number, width: number, height: number, scale:number}}
     * The updated position object for the application containing the new values
     */
-   setPosition({ left, top, width, height, scale, noHeight = false, noWidth = false } = {})
+   setPosition({ left, top, width, height, scale, noHeight, noWidth } = {})
    {
       const el = this.elementTarget;
       const currentPosition = this.position;
       const styles = globalThis.getComputedStyle(el);
+
+      // Automatically determine if noHeightActual from manual value or when `el.style.height` is `auto`.
+      const noHeightActual = typeof noHeight === 'boolean' ? noHeight : el.style.height === 'auto';
+
+      // Automatically determine if noWidthActual from manual value or when `el.style.width` is `auto`.
+      const noWidthActual = typeof noWidth === 'boolean' ? noWidth : el.style.width === 'auto';
 
       // Update width if an explicit value is passed, or if no width value is set on the element
       if (!el.style.width || width)
@@ -485,7 +490,7 @@ export class SvelteApplication extends Application
          const maxW = el.style.maxWidth || globalThis.innerWidth;
          currentPosition.width = width = Math.clamped(tarW, minW, maxW);
 
-         if (!noWidth) { el.style.width = `${width}px`; }
+         if (!noWidthActual) { el.style.width = `${width}px`; }
          if ((width + currentPosition.left) > globalThis.innerWidth) { left = currentPosition.left; }
       }
       width = el.offsetWidth;
@@ -498,7 +503,7 @@ export class SvelteApplication extends Application
          const maxH = el.style.maxHeight || globalThis.innerHeight;
          currentPosition.height = height = Math.clamped(tarH, minH, maxH);
 
-         if (!noHeight) { el.style.height = `${height}px`; }
+         if (!noHeightActual) { el.style.height = `${height}px`; }
          if ((height + currentPosition.top) > globalThis.innerHeight + 1) { top = currentPosition.top - 1; }
       }
       height = el.offsetHeight;
