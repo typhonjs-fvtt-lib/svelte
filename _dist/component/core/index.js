@@ -890,15 +890,15 @@ class TJSHeaderButton extends SvelteComponent {
 
 function get_each_context$2(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[11] = list[i];
+	child_ctx[10] = list[i];
 	return child_ctx;
 }
 
-// (50:4) {#each $storeHeaderButtons as button}
+// (41:4) {#each $storeHeaderButtons as button}
 function create_each_block$2(ctx) {
 	let tjsheaderbutton;
 	let current;
-	tjsheaderbutton = new TJSHeaderButton({ props: { button: /*button*/ ctx[11] } });
+	tjsheaderbutton = new TJSHeaderButton({ props: { button: /*button*/ ctx[10] } });
 
 	return {
 		c() {
@@ -910,7 +910,7 @@ function create_each_block$2(ctx) {
 		},
 		p(ctx, dirty) {
 			const tjsheaderbutton_changes = {};
-			if (dirty & /*$storeHeaderButtons*/ 8) tjsheaderbutton_changes.button = /*button*/ ctx[11];
+			if (dirty & /*$storeHeaderButtons*/ 8) tjsheaderbutton_changes.button = /*button*/ ctx[10];
 			tjsheaderbutton.$set(tjsheaderbutton_changes);
 		},
 		i(local) {
@@ -978,12 +978,11 @@ function create_fragment$6(ctx) {
 
 			if (!mounted) {
 				dispose = [
-					listen(header, "pointerdown", /*bringToTop*/ ctx[5]),
 					action_destroyer(draggable_action = draggable.call(null, header, {
 						positionable: /*foundryApp*/ ctx[4],
 						booleanStore: /*$storeDraggable*/ ctx[0]
 					})),
-					action_destroyer(minimizable_action = /*minimizable*/ ctx[10].call(null, header, /*$storeMinimizable*/ ctx[1]))
+					action_destroyer(minimizable_action = /*minimizable*/ ctx[9].call(null, header, /*$storeMinimizable*/ ctx[1]))
 				];
 
 				mounted = true;
@@ -1059,13 +1058,6 @@ function instance$6($$self, $$props, $$invalidate) {
 	let $storeTitle;
 	let $storeHeaderButtons;
 	const foundryApp = getContext('external').foundryApp;
-
-	const bringToTop = () => {
-		if (typeof foundryApp.options.popOut === 'boolean' && foundryApp.options.popOut) {
-			foundryApp.bringToTop.call(foundryApp);
-		}
-	};
-
 	const storeTitle = foundryApp.reactive.storeAppOptions.title;
 	component_subscribe($$self, storeTitle, value => $$invalidate(2, $storeTitle = value));
 	const storeDraggable = foundryApp.reactive.storeAppOptions.draggable;
@@ -1109,7 +1101,6 @@ function instance$6($$self, $$props, $$invalidate) {
 		$storeTitle,
 		$storeHeaderButtons,
 		foundryApp,
-		bringToTop,
 		storeTitle,
 		storeDraggable,
 		storeHeaderButtons,
@@ -1389,7 +1380,7 @@ function add_css$3(target) {
 	append_styles(target, "svelte-3vt5in", ".window-app.svelte-3vt5in{overflow:inherit}");
 }
 
-// (130:0) {:else}
+// (141:0) {:else}
 function create_else_block_1$1(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -1405,12 +1396,14 @@ function create_else_block_1$1(ctx) {
 	let div_intro;
 	let div_outro;
 	let current;
+	let mounted;
+	let dispose;
 	tjsapplicationheader = new TJSApplicationHeader({});
 	const if_block_creators = [create_if_block_2$1, create_else_block_2$1];
 	const if_blocks = [];
 
 	function select_block_type_2(ctx, dirty) {
-		if (Array.isArray(/*allChildren*/ ctx[9])) return 0;
+		if (Array.isArray(/*allChildren*/ ctx[10])) return 0;
 		return 1;
 	}
 
@@ -1438,11 +1431,16 @@ function create_else_block_1$1(ctx) {
 			append(div, t0);
 			append(div, section);
 			if_blocks[current_block_type_index].m(section, null);
-			/*section_binding_1*/ ctx[21](section);
+			/*section_binding_1*/ ctx[22](section);
 			append(div, t1);
 			mount_component(resizablehandle, div, null);
-			/*div_binding_1*/ ctx[22](div);
+			/*div_binding_1*/ ctx[23](div);
 			current = true;
+
+			if (!mounted) {
+				dispose = listen(div, "pointerdown", /*bringToTop*/ ctx[9], true);
+				mounted = true;
+			}
 		},
 		p(new_ctx, dirty) {
 			ctx = new_ctx;
@@ -1486,15 +1484,17 @@ function create_else_block_1$1(ctx) {
 			if (detaching) detach(div);
 			destroy_component(tjsapplicationheader);
 			if_blocks[current_block_type_index].d();
-			/*section_binding_1*/ ctx[21](null);
+			/*section_binding_1*/ ctx[22](null);
 			destroy_component(resizablehandle);
-			/*div_binding_1*/ ctx[22](null);
+			/*div_binding_1*/ ctx[23](null);
 			if (detaching && div_outro) div_outro.end();
+			mounted = false;
+			dispose();
 		}
 	};
 }
 
-// (112:0) {#if bindHeightChanged}
+// (122:0) {#if bindHeightChanged}
 function create_if_block$3(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -1512,12 +1512,14 @@ function create_if_block$3(ctx) {
 	let div_intro;
 	let div_outro;
 	let current;
+	let mounted;
+	let dispose;
 	tjsapplicationheader = new TJSApplicationHeader({});
 	const if_block_creators = [create_if_block_1$2, create_else_block$2];
 	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
-		if (Array.isArray(/*allChildren*/ ctx[9])) return 0;
+		if (Array.isArray(/*allChildren*/ ctx[10])) return 0;
 		return 1;
 	}
 
@@ -1535,11 +1537,11 @@ function create_if_block$3(ctx) {
 			t1 = space();
 			create_component(resizablehandle.$$.fragment);
 			attr(section, "class", "window-content");
-			add_render_callback(() => /*section_elementresize_handler*/ ctx[18].call(section));
+			add_render_callback(() => /*section_elementresize_handler*/ ctx[19].call(section));
 			attr(div, "id", div_id_value = /*foundryApp*/ ctx[7].id);
 			attr(div, "class", div_class_value = "app window-app " + /*foundryApp*/ ctx[7].options.classes.join(' ') + " svelte-3vt5in");
 			attr(div, "data-appid", div_data_appid_value = /*foundryApp*/ ctx[7].appId);
-			add_render_callback(() => /*div_elementresize_handler*/ ctx[19].call(div));
+			add_render_callback(() => /*div_elementresize_handler*/ ctx[20].call(div));
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
@@ -1547,13 +1549,18 @@ function create_if_block$3(ctx) {
 			append(div, t0);
 			append(div, section);
 			if_blocks[current_block_type_index].m(section, null);
-			/*section_binding*/ ctx[17](section);
-			section_resize_listener = add_resize_listener(section, /*section_elementresize_handler*/ ctx[18].bind(section));
+			/*section_binding*/ ctx[18](section);
+			section_resize_listener = add_resize_listener(section, /*section_elementresize_handler*/ ctx[19].bind(section));
 			append(div, t1);
 			mount_component(resizablehandle, div, null);
-			div_resize_listener = add_resize_listener(div, /*div_elementresize_handler*/ ctx[19].bind(div));
-			/*div_binding*/ ctx[20](div);
+			div_resize_listener = add_resize_listener(div, /*div_elementresize_handler*/ ctx[20].bind(div));
+			/*div_binding*/ ctx[21](div);
 			current = true;
+
+			if (!mounted) {
+				dispose = listen(div, "pointerdown", /*bringToTop*/ ctx[9], true);
+				mounted = true;
+			}
 		},
 		p(new_ctx, dirty) {
 			ctx = new_ctx;
@@ -1597,21 +1604,23 @@ function create_if_block$3(ctx) {
 			if (detaching) detach(div);
 			destroy_component(tjsapplicationheader);
 			if_blocks[current_block_type_index].d();
-			/*section_binding*/ ctx[17](null);
+			/*section_binding*/ ctx[18](null);
 			section_resize_listener();
 			destroy_component(resizablehandle);
 			div_resize_listener();
-			/*div_binding*/ ctx[20](null);
+			/*div_binding*/ ctx[21](null);
 			if (detaching && div_outro) div_outro.end();
+			mounted = false;
+			dispose();
 		}
 	};
 }
 
-// (141:9) {:else}
+// (153:9) {:else}
 function create_else_block_2$1(ctx) {
 	let current;
-	const default_slot_template = /*#slots*/ ctx[16].default;
-	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[15], null);
+	const default_slot_template = /*#slots*/ ctx[17].default;
+	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[16], null);
 
 	return {
 		c() {
@@ -1626,15 +1635,15 @@ function create_else_block_2$1(ctx) {
 		},
 		p(ctx, dirty) {
 			if (default_slot) {
-				if (default_slot.p && (!current || dirty & /*$$scope*/ 32768)) {
+				if (default_slot.p && (!current || dirty & /*$$scope*/ 65536)) {
 					update_slot_base(
 						default_slot,
 						default_slot_template,
 						ctx,
-						/*$$scope*/ ctx[15],
+						/*$$scope*/ ctx[16],
 						!current
-						? get_all_dirty_from_scope(/*$$scope*/ ctx[15])
-						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[15], dirty, null),
+						? get_all_dirty_from_scope(/*$$scope*/ ctx[16])
+						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[16], dirty, null),
 						null
 					);
 				}
@@ -1655,13 +1664,13 @@ function create_else_block_2$1(ctx) {
 	};
 }
 
-// (139:9) {#if Array.isArray(allChildren)}
+// (151:9) {#if Array.isArray(allChildren)}
 function create_if_block_2$1(ctx) {
 	let tjscontainer;
 	let current;
 
 	tjscontainer = new TJSContainer({
-			props: { children: /*allChildren*/ ctx[9] }
+			props: { children: /*allChildren*/ ctx[10] }
 		});
 
 	return {
@@ -1688,11 +1697,11 @@ function create_if_block_2$1(ctx) {
 	};
 }
 
-// (124:9) {:else}
+// (135:9) {:else}
 function create_else_block$2(ctx) {
 	let current;
-	const default_slot_template = /*#slots*/ ctx[16].default;
-	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[15], null);
+	const default_slot_template = /*#slots*/ ctx[17].default;
+	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[16], null);
 
 	return {
 		c() {
@@ -1707,15 +1716,15 @@ function create_else_block$2(ctx) {
 		},
 		p(ctx, dirty) {
 			if (default_slot) {
-				if (default_slot.p && (!current || dirty & /*$$scope*/ 32768)) {
+				if (default_slot.p && (!current || dirty & /*$$scope*/ 65536)) {
 					update_slot_base(
 						default_slot,
 						default_slot_template,
 						ctx,
-						/*$$scope*/ ctx[15],
+						/*$$scope*/ ctx[16],
 						!current
-						? get_all_dirty_from_scope(/*$$scope*/ ctx[15])
-						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[15], dirty, null),
+						? get_all_dirty_from_scope(/*$$scope*/ ctx[16])
+						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[16], dirty, null),
 						null
 					);
 				}
@@ -1736,13 +1745,13 @@ function create_else_block$2(ctx) {
 	};
 }
 
-// (122:9) {#if Array.isArray(allChildren)}
+// (133:9) {#if Array.isArray(allChildren)}
 function create_if_block_1$2(ctx) {
 	let tjscontainer;
 	let current;
 
 	tjscontainer = new TJSContainer({
-			props: { children: /*allChildren*/ ctx[9] }
+			props: { children: /*allChildren*/ ctx[10] }
 		});
 
 	return {
@@ -1825,6 +1834,13 @@ function instance$4($$self, $$props, $$invalidate) {
 	// are bound to `heightChanged` to signal to any parent component of any change to the client & root.
 	const bindHeightChanged = !!heightChanged;
 
+	// If the application is a popOut application then when clicked bring to top. Bound to on pointerdown.
+	const bringToTop = () => {
+		if (typeof foundryApp.options.popOut === 'boolean' && foundryApp.options.popOut && foundryApp !== ui?.activeWindow) {
+			foundryApp.bringToTop.call(foundryApp);
+		}
+	};
+
 	setContext('getElementContent', () => elementContent);
 	setContext('getElementRoot', () => elementRoot);
 	const context = getContext('external');
@@ -1892,19 +1908,19 @@ function instance$4($$self, $$props, $$invalidate) {
 	$$self.$$set = $$props => {
 		if ('elementContent' in $$props) $$invalidate(4, elementContent = $$props.elementContent);
 		if ('elementRoot' in $$props) $$invalidate(5, elementRoot = $$props.elementRoot);
-		if ('children' in $$props) $$invalidate(10, children = $$props.children);
+		if ('children' in $$props) $$invalidate(11, children = $$props.children);
 		if ('heightChanged' in $$props) $$invalidate(6, heightChanged = $$props.heightChanged);
-		if ('transition' in $$props) $$invalidate(11, transition = $$props.transition);
+		if ('transition' in $$props) $$invalidate(12, transition = $$props.transition);
 		if ('inTransition' in $$props) $$invalidate(0, inTransition = $$props.inTransition);
 		if ('outTransition' in $$props) $$invalidate(1, outTransition = $$props.outTransition);
-		if ('transitionOptions' in $$props) $$invalidate(12, transitionOptions = $$props.transitionOptions);
+		if ('transitionOptions' in $$props) $$invalidate(13, transitionOptions = $$props.transitionOptions);
 		if ('inTransitionOptions' in $$props) $$invalidate(2, inTransitionOptions = $$props.inTransitionOptions);
 		if ('outTransitionOptions' in $$props) $$invalidate(3, outTransitionOptions = $$props.outTransitionOptions);
-		if ('$$scope' in $$props) $$invalidate(15, $$scope = $$props.$$scope);
+		if ('$$scope' in $$props) $$invalidate(16, $$scope = $$props.$$scope);
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*oldTransition, transition*/ 10240) {
+		if ($$self.$$.dirty & /*oldTransition, transition*/ 20480) {
 			// Run this reactive block when the last transition state is not equal to the current state.
 			if (oldTransition !== transition) {
 				// If transition is defined and not the default transition then set it to both in and out transition otherwise
@@ -1915,11 +1931,11 @@ function instance$4($$self, $$props, $$invalidate) {
 
 				$$invalidate(0, inTransition = newTransition);
 				$$invalidate(1, outTransition = newTransition);
-				$$invalidate(13, oldTransition = newTransition);
+				$$invalidate(14, oldTransition = newTransition);
 			}
 		}
 
-		if ($$self.$$.dirty & /*oldTransitionOptions, transitionOptions*/ 20480) {
+		if ($$self.$$.dirty & /*oldTransitionOptions, transitionOptions*/ 40960) {
 			// Run this reactive block when the last transition options state is not equal to the current options state.
 			if (oldTransitionOptions !== transitionOptions) {
 				const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && typeof transitionOptions === 'object'
@@ -1928,7 +1944,7 @@ function instance$4($$self, $$props, $$invalidate) {
 
 				$$invalidate(2, inTransitionOptions = newOptions);
 				$$invalidate(3, outTransitionOptions = newOptions);
-				$$invalidate(14, oldTransitionOptions = newOptions);
+				$$invalidate(15, oldTransitionOptions = newOptions);
 			}
 		}
 
@@ -1978,6 +1994,7 @@ function instance$4($$self, $$props, $$invalidate) {
 		heightChanged,
 		foundryApp,
 		bindHeightChanged,
+		bringToTop,
 		allChildren,
 		children,
 		transition,
@@ -2008,12 +2025,12 @@ class ApplicationShell extends SvelteComponent {
 			{
 				elementContent: 4,
 				elementRoot: 5,
-				children: 10,
+				children: 11,
 				heightChanged: 6,
-				transition: 11,
+				transition: 12,
 				inTransition: 0,
 				outTransition: 1,
-				transitionOptions: 12,
+				transitionOptions: 13,
 				inTransitionOptions: 2,
 				outTransitionOptions: 3
 			},
@@ -2040,7 +2057,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get children() {
-		return this.$$.ctx[10];
+		return this.$$.ctx[11];
 	}
 
 	set children(children) {
@@ -2058,7 +2075,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get transition() {
-		return this.$$.ctx[11];
+		return this.$$.ctx[12];
 	}
 
 	set transition(transition) {
@@ -2085,7 +2102,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get transitionOptions() {
-		return this.$$.ctx[12];
+		return this.$$.ctx[13];
 	}
 
 	set transitionOptions(transitionOptions) {
@@ -2118,7 +2135,7 @@ function add_css$2(target) {
 	append_styles(target, "svelte-1l7or8i", ".tjs-app{max-height:100%;background:url(/ui/denim075.png) repeat;border-radius:5px;box-shadow:0 0 20px #000;margin:3px 0;color:#f0f0e0;position:absolute}.tjs-window-app{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;padding:0;z-index:99}.tjs-window-app .window-content{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;padding:8px;color:#191813;overflow-y:auto;overflow-x:hidden}.tjs-window-app .window-header{flex:0 0 30px;overflow:hidden;padding:0 8px;line-height:30px;border-bottom:1px solid #000;pointer-events:auto}.tjs-window-app .window-header a{flex:none;margin:0 0 0 8px}.tjs-window-app .window-header h4{font-family:Signika, sans-serif}.tjs-window-app .window-header i[class^=fa]{margin-right:3px}.tjs-window-app .window-header .window-title{margin:0;word-break:break-all}.tjs-window-app .window-resizable-handle{width:20px;height:20px;position:absolute;bottom:-1px;right:0;background:#444;padding:2px;border:1px solid #111;border-radius:4px 0 0 0}.tjs-window-app .window-resizable-handle i.fas{transform:rotate(45deg)}.tjs-window-app.minimized .window-header{border:1px solid #000}");
 }
 
-// (130:0) {:else}
+// (141:0) {:else}
 function create_else_block_1(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -2134,12 +2151,14 @@ function create_else_block_1(ctx) {
 	let div_intro;
 	let div_outro;
 	let current;
+	let mounted;
+	let dispose;
 	tjsapplicationheader = new TJSApplicationHeader({});
 	const if_block_creators = [create_if_block_2, create_else_block_2];
 	const if_blocks = [];
 
 	function select_block_type_2(ctx, dirty) {
-		if (Array.isArray(/*allChildren*/ ctx[9])) return 0;
+		if (Array.isArray(/*allChildren*/ ctx[10])) return 0;
 		return 1;
 	}
 
@@ -2167,11 +2186,16 @@ function create_else_block_1(ctx) {
 			append(div, t0);
 			append(div, section);
 			if_blocks[current_block_type_index].m(section, null);
-			/*section_binding_1*/ ctx[21](section);
+			/*section_binding_1*/ ctx[22](section);
 			append(div, t1);
 			mount_component(resizablehandle, div, null);
-			/*div_binding_1*/ ctx[22](div);
+			/*div_binding_1*/ ctx[23](div);
 			current = true;
+
+			if (!mounted) {
+				dispose = listen(div, "pointerdown", /*bringToTop*/ ctx[9], true);
+				mounted = true;
+			}
 		},
 		p(new_ctx, dirty) {
 			ctx = new_ctx;
@@ -2215,15 +2239,17 @@ function create_else_block_1(ctx) {
 			if (detaching) detach(div);
 			destroy_component(tjsapplicationheader);
 			if_blocks[current_block_type_index].d();
-			/*section_binding_1*/ ctx[21](null);
+			/*section_binding_1*/ ctx[22](null);
 			destroy_component(resizablehandle);
-			/*div_binding_1*/ ctx[22](null);
+			/*div_binding_1*/ ctx[23](null);
 			if (detaching && div_outro) div_outro.end();
+			mounted = false;
+			dispose();
 		}
 	};
 }
 
-// (112:0) {#if bindHeightChanged}
+// (122:0) {#if bindHeightChanged}
 function create_if_block$2(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -2241,12 +2267,14 @@ function create_if_block$2(ctx) {
 	let div_intro;
 	let div_outro;
 	let current;
+	let mounted;
+	let dispose;
 	tjsapplicationheader = new TJSApplicationHeader({});
 	const if_block_creators = [create_if_block_1$1, create_else_block$1];
 	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
-		if (Array.isArray(/*allChildren*/ ctx[9])) return 0;
+		if (Array.isArray(/*allChildren*/ ctx[10])) return 0;
 		return 1;
 	}
 
@@ -2264,11 +2292,11 @@ function create_if_block$2(ctx) {
 			t1 = space();
 			create_component(resizablehandle.$$.fragment);
 			attr(section, "class", "window-content");
-			add_render_callback(() => /*section_elementresize_handler*/ ctx[18].call(section));
+			add_render_callback(() => /*section_elementresize_handler*/ ctx[19].call(section));
 			attr(div, "id", div_id_value = /*foundryApp*/ ctx[7].id);
 			attr(div, "class", div_class_value = "tjs-app tjs-window-app " + /*foundryApp*/ ctx[7].options.classes.join(' '));
 			attr(div, "data-appid", div_data_appid_value = /*foundryApp*/ ctx[7].appId);
-			add_render_callback(() => /*div_elementresize_handler*/ ctx[19].call(div));
+			add_render_callback(() => /*div_elementresize_handler*/ ctx[20].call(div));
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
@@ -2276,13 +2304,18 @@ function create_if_block$2(ctx) {
 			append(div, t0);
 			append(div, section);
 			if_blocks[current_block_type_index].m(section, null);
-			/*section_binding*/ ctx[17](section);
-			section_resize_listener = add_resize_listener(section, /*section_elementresize_handler*/ ctx[18].bind(section));
+			/*section_binding*/ ctx[18](section);
+			section_resize_listener = add_resize_listener(section, /*section_elementresize_handler*/ ctx[19].bind(section));
 			append(div, t1);
 			mount_component(resizablehandle, div, null);
-			div_resize_listener = add_resize_listener(div, /*div_elementresize_handler*/ ctx[19].bind(div));
-			/*div_binding*/ ctx[20](div);
+			div_resize_listener = add_resize_listener(div, /*div_elementresize_handler*/ ctx[20].bind(div));
+			/*div_binding*/ ctx[21](div);
 			current = true;
+
+			if (!mounted) {
+				dispose = listen(div, "pointerdown", /*bringToTop*/ ctx[9], true);
+				mounted = true;
+			}
 		},
 		p(new_ctx, dirty) {
 			ctx = new_ctx;
@@ -2326,21 +2359,23 @@ function create_if_block$2(ctx) {
 			if (detaching) detach(div);
 			destroy_component(tjsapplicationheader);
 			if_blocks[current_block_type_index].d();
-			/*section_binding*/ ctx[17](null);
+			/*section_binding*/ ctx[18](null);
 			section_resize_listener();
 			destroy_component(resizablehandle);
 			div_resize_listener();
-			/*div_binding*/ ctx[20](null);
+			/*div_binding*/ ctx[21](null);
 			if (detaching && div_outro) div_outro.end();
+			mounted = false;
+			dispose();
 		}
 	};
 }
 
-// (141:11) {:else}
+// (153:11) {:else}
 function create_else_block_2(ctx) {
 	let current;
-	const default_slot_template = /*#slots*/ ctx[16].default;
-	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[15], null);
+	const default_slot_template = /*#slots*/ ctx[17].default;
+	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[16], null);
 
 	return {
 		c() {
@@ -2355,15 +2390,15 @@ function create_else_block_2(ctx) {
 		},
 		p(ctx, dirty) {
 			if (default_slot) {
-				if (default_slot.p && (!current || dirty & /*$$scope*/ 32768)) {
+				if (default_slot.p && (!current || dirty & /*$$scope*/ 65536)) {
 					update_slot_base(
 						default_slot,
 						default_slot_template,
 						ctx,
-						/*$$scope*/ ctx[15],
+						/*$$scope*/ ctx[16],
 						!current
-						? get_all_dirty_from_scope(/*$$scope*/ ctx[15])
-						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[15], dirty, null),
+						? get_all_dirty_from_scope(/*$$scope*/ ctx[16])
+						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[16], dirty, null),
 						null
 					);
 				}
@@ -2384,13 +2419,13 @@ function create_else_block_2(ctx) {
 	};
 }
 
-// (139:11) {#if Array.isArray(allChildren)}
+// (151:11) {#if Array.isArray(allChildren)}
 function create_if_block_2(ctx) {
 	let tjscontainer;
 	let current;
 
 	tjscontainer = new TJSContainer({
-			props: { children: /*allChildren*/ ctx[9] }
+			props: { children: /*allChildren*/ ctx[10] }
 		});
 
 	return {
@@ -2417,11 +2452,11 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (124:11) {:else}
+// (135:11) {:else}
 function create_else_block$1(ctx) {
 	let current;
-	const default_slot_template = /*#slots*/ ctx[16].default;
-	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[15], null);
+	const default_slot_template = /*#slots*/ ctx[17].default;
+	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[16], null);
 
 	return {
 		c() {
@@ -2436,15 +2471,15 @@ function create_else_block$1(ctx) {
 		},
 		p(ctx, dirty) {
 			if (default_slot) {
-				if (default_slot.p && (!current || dirty & /*$$scope*/ 32768)) {
+				if (default_slot.p && (!current || dirty & /*$$scope*/ 65536)) {
 					update_slot_base(
 						default_slot,
 						default_slot_template,
 						ctx,
-						/*$$scope*/ ctx[15],
+						/*$$scope*/ ctx[16],
 						!current
-						? get_all_dirty_from_scope(/*$$scope*/ ctx[15])
-						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[15], dirty, null),
+						? get_all_dirty_from_scope(/*$$scope*/ ctx[16])
+						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[16], dirty, null),
 						null
 					);
 				}
@@ -2465,13 +2500,13 @@ function create_else_block$1(ctx) {
 	};
 }
 
-// (122:11) {#if Array.isArray(allChildren)}
+// (133:11) {#if Array.isArray(allChildren)}
 function create_if_block_1$1(ctx) {
 	let tjscontainer;
 	let current;
 
 	tjscontainer = new TJSContainer({
-			props: { children: /*allChildren*/ ctx[9] }
+			props: { children: /*allChildren*/ ctx[10] }
 		});
 
 	return {
@@ -2554,6 +2589,13 @@ function instance$3($$self, $$props, $$invalidate) {
 	// are bound to `heightChanged` to signal to any parent component of any change to the client & root.
 	const bindHeightChanged = !!heightChanged;
 
+	// If the application is a popOut application then when clicked bring to top. Bound to on pointerdown.
+	const bringToTop = () => {
+		if (typeof foundryApp.options.popOut === 'boolean' && foundryApp.options.popOut && foundryApp !== ui?.activeWindow) {
+			foundryApp.bringToTop.call(foundryApp);
+		}
+	};
+
 	setContext('getElementContent', () => elementContent);
 	setContext('getElementRoot', () => elementRoot);
 	const context = getContext('external');
@@ -2621,19 +2663,19 @@ function instance$3($$self, $$props, $$invalidate) {
 	$$self.$$set = $$props => {
 		if ('elementContent' in $$props) $$invalidate(4, elementContent = $$props.elementContent);
 		if ('elementRoot' in $$props) $$invalidate(5, elementRoot = $$props.elementRoot);
-		if ('children' in $$props) $$invalidate(10, children = $$props.children);
+		if ('children' in $$props) $$invalidate(11, children = $$props.children);
 		if ('heightChanged' in $$props) $$invalidate(6, heightChanged = $$props.heightChanged);
-		if ('transition' in $$props) $$invalidate(11, transition = $$props.transition);
+		if ('transition' in $$props) $$invalidate(12, transition = $$props.transition);
 		if ('inTransition' in $$props) $$invalidate(0, inTransition = $$props.inTransition);
 		if ('outTransition' in $$props) $$invalidate(1, outTransition = $$props.outTransition);
-		if ('transitionOptions' in $$props) $$invalidate(12, transitionOptions = $$props.transitionOptions);
+		if ('transitionOptions' in $$props) $$invalidate(13, transitionOptions = $$props.transitionOptions);
 		if ('inTransitionOptions' in $$props) $$invalidate(2, inTransitionOptions = $$props.inTransitionOptions);
 		if ('outTransitionOptions' in $$props) $$invalidate(3, outTransitionOptions = $$props.outTransitionOptions);
-		if ('$$scope' in $$props) $$invalidate(15, $$scope = $$props.$$scope);
+		if ('$$scope' in $$props) $$invalidate(16, $$scope = $$props.$$scope);
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*oldTransition, transition*/ 10240) {
+		if ($$self.$$.dirty & /*oldTransition, transition*/ 20480) {
 			// Run this reactive block when the last transition state is not equal to the current state.
 			if (oldTransition !== transition) {
 				// If transition is defined and not the default transition then set it to both in and out transition otherwise
@@ -2644,11 +2686,11 @@ function instance$3($$self, $$props, $$invalidate) {
 
 				$$invalidate(0, inTransition = newTransition);
 				$$invalidate(1, outTransition = newTransition);
-				$$invalidate(13, oldTransition = newTransition);
+				$$invalidate(14, oldTransition = newTransition);
 			}
 		}
 
-		if ($$self.$$.dirty & /*oldTransitionOptions, transitionOptions*/ 20480) {
+		if ($$self.$$.dirty & /*oldTransitionOptions, transitionOptions*/ 40960) {
 			// Run this reactive block when the last transition options state is not equal to the current options state.
 			if (oldTransitionOptions !== transitionOptions) {
 				const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && typeof transitionOptions === 'object'
@@ -2657,7 +2699,7 @@ function instance$3($$self, $$props, $$invalidate) {
 
 				$$invalidate(2, inTransitionOptions = newOptions);
 				$$invalidate(3, outTransitionOptions = newOptions);
-				$$invalidate(14, oldTransitionOptions = newOptions);
+				$$invalidate(15, oldTransitionOptions = newOptions);
 			}
 		}
 
@@ -2707,6 +2749,7 @@ function instance$3($$self, $$props, $$invalidate) {
 		heightChanged,
 		foundryApp,
 		bindHeightChanged,
+		bringToTop,
 		allChildren,
 		children,
 		transition,
@@ -2737,12 +2780,12 @@ class TJSApplicationShell extends SvelteComponent {
 			{
 				elementContent: 4,
 				elementRoot: 5,
-				children: 10,
+				children: 11,
 				heightChanged: 6,
-				transition: 11,
+				transition: 12,
 				inTransition: 0,
 				outTransition: 1,
-				transitionOptions: 12,
+				transitionOptions: 13,
 				inTransitionOptions: 2,
 				outTransitionOptions: 3
 			},
@@ -2769,7 +2812,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get children() {
-		return this.$$.ctx[10];
+		return this.$$.ctx[11];
 	}
 
 	set children(children) {
@@ -2787,7 +2830,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get transition() {
-		return this.$$.ctx[11];
+		return this.$$.ctx[12];
 	}
 
 	set transition(transition) {
@@ -2814,7 +2857,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get transitionOptions() {
-		return this.$$.ctx[12];
+		return this.$$.ctx[13];
 	}
 
 	set transitionOptions(transitionOptions) {

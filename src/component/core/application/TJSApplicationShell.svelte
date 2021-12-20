@@ -127,7 +127,7 @@
         bind:this={elementRoot}
         in:inTransition={inTransitionOptions}
         out:outTransition={outTransitionOptions}
-        on:pointerdown|capture|passive={bringToTop}>
+        on:pointerdown|capture={bringToTop}>
        <TJSApplicationHeader />
        <section class=window-content bind:this={elementContent} bind:clientHeight={heightChanged}>
            {#if Array.isArray(allChildren)}
@@ -145,7 +145,7 @@
         bind:this={elementRoot}
         in:inTransition={inTransitionOptions}
         out:outTransition={outTransitionOptions}
-        on:pointerdown|capture|passive={bringToTop}>
+        on:pointerdown|capture={bringToTop}>
        <TJSApplicationHeader />
        <section class=window-content bind:this={elementContent}>
            {#if Array.isArray(allChildren)}
