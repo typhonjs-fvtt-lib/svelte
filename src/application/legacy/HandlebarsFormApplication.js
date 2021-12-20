@@ -1,4 +1,6 @@
-import { ApplicationShell }      from '@typhonjs-fvtt/svelte/component/core';
+import {
+   ApplicationShell,
+   EmptyApplicationShell }    from '@typhonjs-fvtt/svelte/component/core';
 
 import { SvelteFormApplication } from './SvelteFormApplication.js';
 
@@ -22,7 +24,7 @@ export class HandlebarsFormApplication extends SvelteFormApplication
       {
          this.options.svelte = foundry.utils.mergeObject(typeof this.options.svelte === 'object' ?
           this.options.svelte : {}, {
-            class: ApplicationShell,
+            class: this.popOut ? ApplicationShell : EmptyApplicationShell,
             intro: true,
             target: document.body
          });
@@ -103,17 +105,13 @@ export class HandlebarsFormApplication extends SvelteFormApplication
 
          elementContent.appendChild(...html);
 
-         // Use the setter from `SvelteFormApplication` to set the title store.
+         // Use the reactive setter from `SvelteFormApplication` to set the title store.
          /** @ignore */
-         this.title = this.title; // eslint-disable-line no-self-assign
+         this.reactive.title = this.reactive.title; // eslint-disable-line no-self-assign
       }
       else
       {
-         element.replaceWith(html);
-         /** @ignore */
-         this._element = html;
-         /** @ignore */
-         this.elementTarget = html[0];
+         console.warn(`HandlebarsFormApplication warning: No application shell mounted with 'elementContent' accessor`);
       }
    }
 }
