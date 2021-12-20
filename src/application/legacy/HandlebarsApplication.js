@@ -20,15 +20,12 @@ export class HandlebarsApplication extends SvelteApplication
    {
       super(options);
 
-      if (this.popOut)
-      {
-         this.options.svelte = foundry.utils.mergeObject(typeof this.options.svelte === 'object' ?
-          this.options.svelte : {}, {
-            class: this.popOut ? ApplicationShell : EmptyApplicationShell,
-            intro: true,
-            target: document.body
-         });
-      }
+      this.options.svelte = foundry.utils.mergeObject(typeof this.options.svelte === 'object' ?
+       this.options.svelte : {}, {
+         class: this.popOut ? ApplicationShell : EmptyApplicationShell,
+         intro: true,
+         target: document.body
+      });
    }
 
    /**

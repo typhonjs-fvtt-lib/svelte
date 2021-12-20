@@ -1,6 +1,6 @@
 import {
    ApplicationShell,
-   EmptyApplicationShell }    from '@typhonjs-fvtt/svelte/component/core';
+   EmptyApplicationShell }       from '@typhonjs-fvtt/svelte/component/core';
 
 import { SvelteFormApplication } from './SvelteFormApplication.js';
 
@@ -20,15 +20,12 @@ export class HandlebarsFormApplication extends SvelteFormApplication
    {
       super(object, options);
 
-      if (this.popOut)
-      {
-         this.options.svelte = foundry.utils.mergeObject(typeof this.options.svelte === 'object' ?
-          this.options.svelte : {}, {
-            class: this.popOut ? ApplicationShell : EmptyApplicationShell,
-            intro: true,
-            target: document.body
-         });
-      }
+      this.options.svelte = foundry.utils.mergeObject(typeof this.options.svelte === 'object' ?
+       this.options.svelte : {}, {
+         class: this.popOut ? ApplicationShell : EmptyApplicationShell,
+         intro: true,
+         target: document.body
+      });
    }
 
    /**
