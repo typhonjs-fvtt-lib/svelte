@@ -33,6 +33,27 @@ declare class DialogShell extends SvelteComponent {
     set data(arg: any);
     get data(): any;
 }
+declare class EmptyApplicationShell extends SvelteComponent {
+    constructor(options: any);
+    set elementContent(arg: any);
+    get elementContent(): any;
+    set elementRoot(arg: any);
+    get elementRoot(): any;
+    set heightChanged(arg: any);
+    get heightChanged(): any;
+    set transition(arg: any);
+    get transition(): any;
+    set inTransition(arg: any);
+    get inTransition(): any;
+    set outTransition(arg: any);
+    get outTransition(): any;
+    set transitionOptions(arg: any);
+    get transitionOptions(): any;
+    set inTransitionOptions(arg: any);
+    get inTransitionOptions(): any;
+    set outTransitionOptions(arg: any);
+    get outTransitionOptions(): any;
+}
 declare class TJSApplicationHeader extends SvelteComponent {
     constructor(options: any);
 }
@@ -107,4 +128,4 @@ declare class TJSHeaderButton extends SvelteComponent {
     get button(): any;
 }
 
-export { ApplicationShell, DialogContent, DialogShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSContextMenu, TJSGlassPane, TJSHeaderButton };
+export { ApplicationShell, DialogContent, DialogShell, EmptyApplicationShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSContextMenu, TJSGlassPane, TJSHeaderButton };

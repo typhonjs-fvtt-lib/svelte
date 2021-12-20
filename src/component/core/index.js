@@ -3,6 +3,7 @@ export { default as TJSContainer }           from './TJSContainer.svelte';
 export { default as TJSGlassPane }           from './TJSGlassPane.svelte';
 
 export { default as ApplicationShell }       from './application/ApplicationShell.svelte';
+export { default as EmptyApplicationShell }  from './application/EmptyApplicationShell.svelte';
 export { default as TJSApplicationHeader }   from './application/TJSApplicationHeader.svelte';
 export { default as TJSApplicationShell }    from './application/TJSApplicationShell.svelte';
 export { default as TJSHeaderButton }        from './application/TJSHeaderButton.svelte';
