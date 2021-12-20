@@ -8,14 +8,6 @@
 
    const foundryApp = getContext('external').foundryApp;
 
-   const bringToTop = () =>
-   {
-      if (typeof foundryApp.options.popOut === 'boolean' && foundryApp.options.popOut)
-      {
-         foundryApp.bringToTop.call(foundryApp);
-      }
-   }
-
    const storeTitle = foundryApp.reactive.storeAppOptions.title;
    const storeDraggable = foundryApp.reactive.storeAppOptions.draggable;
    const storeHeaderButtons = foundryApp.reactive.storeUIOptions.headerButtons;
@@ -43,7 +35,6 @@
 </script>
 
 <header class="window-header flexrow"
-        on:pointerdown={bringToTop}
         use:draggable={{ positionable: foundryApp, booleanStore: $storeDraggable }}
         use:minimizable={$storeMinimizable}>
     <h4 class=window-title>{localize($storeTitle)}</h4>

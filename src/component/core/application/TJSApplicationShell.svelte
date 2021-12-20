@@ -26,6 +26,16 @@
    // are bound to `heightChanged` to signal to any parent component of any change to the client & root.
    const bindHeightChanged = !!heightChanged;
 
+   // If the application is a popOut application then when clicked bring to top. Bound to on pointerdown.
+   const bringToTop = () =>
+   {
+      if (typeof foundryApp.options.popOut === 'boolean' && foundryApp.options.popOut &&
+       foundryApp !== ui?.activeWindow)
+      {
+         foundryApp.bringToTop.call(foundryApp);
+      }
+   }
+
    setContext('getElementContent', () => elementContent);
    setContext('getElementRoot', () => elementRoot);
 
@@ -116,7 +126,8 @@
         bind:clientHeight={heightChanged}
         bind:this={elementRoot}
         in:inTransition={inTransitionOptions}
-        out:outTransition={outTransitionOptions}>
+        out:outTransition={outTransitionOptions}
+        on:pointerdown|capture|passive={bringToTop}>
        <TJSApplicationHeader />
        <section class=window-content bind:this={elementContent} bind:clientHeight={heightChanged}>
            {#if Array.isArray(allChildren)}
@@ -133,7 +144,8 @@
         data-appid={foundryApp.appId}
         bind:this={elementRoot}
         in:inTransition={inTransitionOptions}
-        out:outTransition={outTransitionOptions}>
+        out:outTransition={outTransitionOptions}
+        on:pointerdown|capture|passive={bringToTop}>
        <TJSApplicationHeader />
        <section class=window-content bind:this={elementContent}>
            {#if Array.isArray(allChildren)}
