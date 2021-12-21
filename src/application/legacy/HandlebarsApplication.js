@@ -7,11 +7,11 @@ import {
 export class HandlebarsApplication extends SvelteApplication
 {
    /**
-    * Temporarily holds the original popOut value when rendering.
+    * Temporarily holds the inner HTML.
     *
-    * @type {boolean}
+    * @type {JQuery}
     */
-   #orignalPopOut;
+   #innerHTML;
 
    /**
     * @inheritDoc
@@ -29,38 +29,31 @@ export class HandlebarsApplication extends SvelteApplication
    }
 
    /**
-    * Temporarily set popOut to false to only render inner HTML. This inner HTML will be appended to the content area
-    * of ApplicationShell if the original popOut value is true.
-    *
-    * @inheritDoc
-    * @ignore
-    */
-   async _render(force, options)
-   {
-      this.#orignalPopOut = this.options.popOut;
-      this.options.popOut = false;
-      await super._render(force, options);
-      this.options.popOut = this.#orignalPopOut;
-   }
-
-   /**
     * Append HTML to application shell content area.
     *
-    * @param {JQuery}   html - new content.
+    * @param {JQuery}   html - new content; is ignored
     *
     * @private
     * @ignore
     */
-   _injectHTML(html)
+   _injectHTML(html) // eslint-disable-line no-unused-vars
    {
       // Mounts any Svelte components.
-      super._injectHTML(html);
+      super._injectHTML(this.#innerHTML);
 
       // Appends inner HTML content to application shell content element.
       if (this.svelte?.applicationShell?.elementContent)
       {
-         this.svelte.applicationShell.elementContent.appendChild(...html);
+         this.svelte.applicationShell.elementContent.appendChild(...this.#innerHTML);
       }
+
+      this.#innerHTML = void 0;
+   }
+
+   async _renderInner(data)
+   {
+      this.#innerHTML = await super._renderInner(data);
+      return this.#innerHTML;
    }
 
    /**
