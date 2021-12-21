@@ -36,15 +36,15 @@ export class HandlebarsFormApplication extends SvelteFormApplication
     * @private
     * @ignore
     */
-   _injectHTML(html)
+   _injectHTML(html) // eslint-disable-line no-unused-vars
    {
       // Mounts any Svelte components.
-      super._injectHTML(html);
+      super._injectHTML(this.#innerHTML);
 
       // Appends inner HTML content to application shell content element.
       if (this.svelte?.applicationShell?.elementContent)
       {
-         this.svelte.applicationShell.elementContent.appendChild(...html);
+         this.svelte.applicationShell.elementContent.appendChild(...this.#innerHTML);
       }
 
       this.#innerHTML = void 0;
