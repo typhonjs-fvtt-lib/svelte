@@ -87,6 +87,7 @@ export class SvelteApplication extends Application
          draggable: true,              // If true then application shells are draggable.
          headerButtonNoLabel: false,   // If true then header button labels are removed for application shells.
          jqueryCloseAnimation: true,   // If false the Foundry JQuery close animation is not run.
+         setPosition: true,            // If false then `setPosition` does not take effect.
          zIndex: null                  // When set the zIndex is manually controlled.
       });
    }
@@ -352,8 +353,16 @@ export class SvelteApplication extends Application
          throw new Error(`SvelteApplication - _injectHTML: Target element '${this.options.selectorTarget}' not found.`);
       }
 
-      // Subscribe to local store handling. Defer to next clock tick for the render cycle to complete.
-      setTimeout(() => this.#stores.subscribe(), 0);
+      // Subscribe to local store handling and set z-index. Defer to next clock tick for the render cycle to complete.
+      setTimeout(() =>
+      {
+         this.#stores.subscribe();
+
+         // It is important to set zIndex here after store subscriptions. It is not clear why zIndex changes do not
+         // take effect without this timeout. This utilizes the v9 `zIndex` and is set here on the target element
+         // as Foundry core in `_renderOuter` doesn't affect this Svelte component.
+         this.#elementTarget.style.zIndex = this.position.zIndex ?? 100;
+      }, 0);
 
       this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent, elementTarget:
        this.#elementTarget });
@@ -472,6 +481,9 @@ export class SvelteApplication extends Application
     */
    setPosition({ left, top, width, height, scale, noHeight, noWidth } = {})
    {
+      // An early out to prevent `setPosition` from taking effect.
+      if (typeof this.options.setPosition === 'boolean' && !this.options.setPosition) { return; }
+
       const el = this.elementTarget;
       const currentPosition = this.position;
       const styles = globalThis.getComputedStyle(el);
