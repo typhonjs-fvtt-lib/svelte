@@ -35,6 +35,13 @@ export class SvelteFormApplication extends FormApplication
    #elementContent = null;
 
    /**
+    * Stores initial z-index from `_renderOuter` to set to target element / Svelte component.
+    *
+    * @type {number}
+    */
+   #initialZIndex = 95;
+
+   /**
     * Contains the Svelte stores and reactive accessors.
     *
     * @type {SvelteReactive}
@@ -359,9 +366,11 @@ export class SvelteFormApplication extends FormApplication
          this.#stores.subscribe();
 
          // It is important to set zIndex here after store subscriptions. It is not clear why zIndex changes do not
-         // take effect without this timeout. This utilizes the v9 `zIndex` and is set here on the target element
-         // as Foundry core in `_renderOuter` doesn't affect this Svelte component.
-         this.#elementTarget.style.zIndex = this.position.zIndex ?? 100;
+         // take effect without this timeout. The initial zIndex for popOut applications is stored by `_renderOuter`.
+         if (this.options.setPosition === 'boolean' && this.options.setPosition)
+         {
+            this.#elementTarget.style.zIndex = this.#initialZIndex ?? 95;
+         }
       }, 0);
 
       this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent, elementTarget:
@@ -450,6 +459,21 @@ export class SvelteFormApplication extends FormApplication
        document.createDocumentFragment();
 
       return $(html);
+   }
+
+   /**
+    * Stores the initial z-index set in `_renderOuter` which is used in `_injectHTML` to set the target element
+    * z-index after the Svelte component is mounted.
+    *
+    * @returns {Promise<JQuery>} Outer frame / unused.
+    * @protected
+    * @ignore
+    */
+   async _renderOuter()
+   {
+      const html = await super._renderOuter();
+      this.#initialZIndex = html.css('zIndex');
+      return html;
    }
 
    /**
