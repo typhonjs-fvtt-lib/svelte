@@ -367,7 +367,7 @@ export class SvelteApplication extends Application
 
          // It is important to set zIndex here after store subscriptions. It is not clear why zIndex changes do not
          // take effect without this timeout. The initial zIndex for popOut applications is stored by `_renderOuter`.
-         if (this.options.setPosition === 'boolean' && this.options.setPosition)
+         if (typeof this.options.setPosition === 'boolean' && this.options.setPosition)
          {
             this.#elementTarget.style.zIndex = this.#initialZIndex ?? 95;
          }
