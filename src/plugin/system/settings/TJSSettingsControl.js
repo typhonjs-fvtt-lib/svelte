@@ -27,7 +27,7 @@ export class TJSSettingsControl
          console.log(`SettingsControl - handleDispatch - data:\n`, data);
       }
 
-      const dispatchFunction = this[`handle_${data.setting}`];
+      const dispatchFunction = this[data.setting];
 
       if (typeof dispatchFunction === 'function')
       {
