@@ -1,3 +1,4 @@
 export * from '@typhonjs-svelte/lib/plugin/system';
 
-export * from './store/TJSGameSettings.js';
+export * from './settings/SettingsControl.js';
+export * from './settings/store/TJSGameSettings.js';
