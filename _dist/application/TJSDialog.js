@@ -344,7 +344,7 @@ export class TJSDialog extends SvelteApplication
  *
  * @property {boolean}  [draggable=true] - The dialog is draggable when true.
  *
- * @property {string}   [icon='<i class="fas fa-check"></i>'] - Set another icon besides `fa-check` for button.
+ * @property {string}   [icon="<i class="fas fa-check"></i>"] - Set another icon besides `fa-check` for button.
  *
  * @property {boolean}  [modal=false] - When true a modal dialog is displayed.
  *

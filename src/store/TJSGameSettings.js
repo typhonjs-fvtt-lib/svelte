@@ -72,15 +72,14 @@ export class TJSGameSettings
       game.settings.register(moduleId, key, { ...options, onChange });
 
       // Set new store value with existing setting or default value.
-      const newStore = s_GET_STORE(this.#stores, key);
+      const newStore = s_GET_STORE(this.#stores, key, game.settings.get(moduleId, key));
 
       // Subscribe to self to set associated game setting on updates after verifying that the new value does not match
       // existing game setting.
-      newStore.subscribe((value) => {
+      newStore.subscribe((value) =>
+      {
          if (game.settings.get(moduleId, key) !== value) { game.settings.set(moduleId, key, value); }
       });
-
-      newStore.set(game.settings.get(moduleId, key));
    }
 
    /**
@@ -126,14 +125,16 @@ export class TJSGameSettings
  *
  * @param {string}               key - Key to lookup in stores map.
  *
+ * @param {string}               initialValue - An initial value to set to new stores.
+ *
  * @returns {GSStore} The store for the given key.
  */
-function s_GET_STORE(stores, key)
+function s_GET_STORE(stores, key, initialValue)
 {
    let store = stores.get(key);
    if (store === void 0)
    {
-      store = s_CREATE_STORE();
+      store = s_CREATE_STORE(initialValue);
       stores.set(key, store);
    }
 
@@ -143,11 +144,13 @@ function s_GET_STORE(stores, key)
 /**
  * Creates a new GSStore for the given key.
  *
+ * @param {string}   initialValue - An initial value to set to new stores.
+ *
  * @returns {GSStore} The new GSStore.
  */
-function s_CREATE_STORE()
+function s_CREATE_STORE(initialValue)
 {
-   const store = writable(void 0);
+   const store = writable(initialValue);
    store.get = () => get(store);
 
    return store;
