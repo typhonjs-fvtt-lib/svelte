@@ -95,6 +95,7 @@ export class SvelteFormApplication extends FormApplication
          headerButtonNoLabel: false,   // If true then header button labels are removed for application shells.
          jqueryCloseAnimation: true,   // If false the Foundry JQuery close animation is not run.
          setPosition: true,            // If false then `setPosition` does not take effect.
+         suppressFormInit: false,      // If true automatic suppression of core FormApplication methods is enabled.
          zIndex: null                  // When set the zIndex is manually controlled.
       });
    }
@@ -126,6 +127,40 @@ export class SvelteFormApplication extends FormApplication
     * @returns {GetSvelteData} GetSvelteData
     */
    get svelte() { return this.#getSvelteData; }
+
+   /**
+    * Potentially suppress form initialization. Useful when a Svelte application needs to use a FormApplication like
+    * when creating a game / config settings app.
+    *
+    * @inheritDoc
+    * @protected
+    * @ignore
+    */
+   _activateCoreListeners(html)
+   {
+      if (this.options.suppressFormInit) { return; }
+
+      return super._activateCoreListeners(html);
+   }
+
+   /**
+    * Potentially suppress form initialization. Useful when a Svelte application needs to use a FormApplication like
+    * when creating a game / config settings app.
+    *
+    * @inheritDoc
+    * @protected
+    * @ignore
+    */
+   async _updateObject(event, formData) // eslint-disable-line no-unused-vars
+   {
+      if (this.options.suppressFormInit)
+      {
+         event.preventDefault();
+         return;
+      }
+
+      return super._updateObject(event, formData);
+   }
 
    /**
     * Note: This method is fully overridden and duplicated as Svelte components need to be destroyed manually and the
