@@ -73,6 +73,13 @@ export class TJSGameSettings
 
       // Set new store value with existing setting or default value.
       const newStore = s_GET_STORE(this.#stores, key);
+
+      // Subscribe to self to set associated game setting on updates after verifying that the new value does not match
+      // existing game setting.
+      newStore.subscribe((value) => {
+         if (game.settings.get(moduleId, key) !== value) { game.settings.set(moduleId, key, value); }
+      });
+
       newStore.set(game.settings.get(moduleId, key));
    }
 
@@ -126,7 +133,7 @@ function s_GET_STORE(stores, key)
    let store = stores.get(key);
    if (store === void 0)
    {
-      store = s_CREATE_STORE(key);
+      store = s_CREATE_STORE();
       stores.set(key, store);
    }
 
@@ -136,7 +143,7 @@ function s_GET_STORE(stores, key)
 /**
  * Creates a new GSStore for the given key.
  *
- * @returns {GSStore} The new LSStore.
+ * @returns {GSStore} The new GSStore.
  */
 function s_CREATE_STORE()
 {
