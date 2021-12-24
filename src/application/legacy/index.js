@@ -1,5 +1,6 @@
 export * from './HandlebarsApplication.js';
 export * from './HandlebarsFormApplication.js';
+export * from './SvelteFormApplication.js';
 
 /**
  * @typedef {object} MountedAppShell - Application shell contract for Svelte components.
