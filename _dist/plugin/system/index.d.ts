@@ -78,5 +78,21 @@ declare class TJSGameSettings {
     _eventbus: any;
     #private;
 }
+/**
+ * Defines a base class for dispatch handling from events triggered from the TJSGameSettings plugin. This is a
+ * convenience mechanism and is not the only way to handle game settings related events. Use this for small to medium
+ * scoped apps that do not have a lot of cross-cutting concerns.
+ *
+ * SettingsControl listens for all setting change events and attempts to invoke a method with the same name as the
+ * setting located in the implementing child class.
+ *
+ * There is one additional event handled by SettingsControl:
+ * `tjs:system:settings:control:log:enable` - When passed a truthy value console logging of setting changes occurs.
+ */
+declare class TJSSettingsControl {
+    onPluginLoad(ev: any): void;
+    _eventbus: any;
+    #private;
+}
 
-export { GameSetting, LSStore, LocalStorage, SSStore, SessionStorage, TJSGameSettings };
+export { GameSetting, LSStore, LocalStorage, SSStore, SessionStorage, TJSGameSettings, TJSSettingsControl };

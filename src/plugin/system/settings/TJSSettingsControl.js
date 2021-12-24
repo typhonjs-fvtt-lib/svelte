@@ -16,7 +16,7 @@ let loggingEnabled = false;
  * There is one additional event handled by SettingsControl:
  * `tjs:system:settings:control:log:enable` - When passed a truthy value console logging of setting changes occurs.
  */
-export default class TJSSettingsControl
+export class TJSSettingsControl
 {
    #handleDispatch(data)
    {
