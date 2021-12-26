@@ -92,6 +92,7 @@ export class SvelteFormApplication extends FormApplication
    {
       return foundry.utils.mergeObject(super.defaultOptions, {
          draggable: true,              // If true then application shells are draggable.
+         headerButtonNoClose: false,   // If true then the close header button is removed.
          headerButtonNoLabel: false,   // If true then header button labels are removed for application shells.
          jqueryCloseAnimation: true,   // If false the Foundry JQuery close animation is not run.
          setPosition: true,            // If false then `setPosition` does not take effect.
@@ -934,6 +935,20 @@ class SvelteReactive
    get draggable() { return this.#application?.options?.draggable; }
 
    /**
+    * Returns the headerButtonNoClose app option.
+    *
+    * @returns {boolean} Remove the close the button in header app option.
+    */
+   get headerButtonNoClose() { return this.#application?.options?.headerButtonNoClose; }
+
+   /**
+    * Returns the headerButtonNoLabel app option.
+    *
+    * @returns {boolean} Remove the labels from buttons in header app option.
+    */
+   get headerButtonNoLabel() { return this.#application?.options?.headerButtonNoLabel; }
+
+   /**
     * Returns the minimizable app option.
     *
     * @returns {boolean} Minimizable app option.
@@ -989,6 +1004,26 @@ class SvelteReactive
    set draggable(draggable)
    {
       if (typeof draggable === 'boolean') { this.setOptions('draggable', draggable); }
+   }
+
+   /**
+    * Sets `this.options.headerButtonNoClose` which is reactive for application shells.
+    *
+    * @param {boolean}  headerButtonNoClose - Sets the headerButtonNoClose option.
+    */
+   set headerButtonNoClose(headerButtonNoClose)
+   {
+      if (typeof headerButtonNoClose === 'boolean') { this.setOptions('headerButtonNoClose', headerButtonNoClose); }
+   }
+
+   /**
+    * Sets `this.options.headerButtonNoLabel` which is reactive for application shells.
+    *
+    * @param {boolean}  headerButtonNoLabel - Sets the headerButtonNoLabel option.
+    */
+   set headerButtonNoLabel(headerButtonNoLabel)
+   {
+      if (typeof headerButtonNoLabel === 'boolean') { this.setOptions('headerButtonNoLabel', headerButtonNoLabel); }
    }
 
    /**
@@ -1118,6 +1153,8 @@ class SvelteReactive
          subscribe: writableAppOptions.subscribe,
 
          draggable: derived(writableAppOptions, ($options, set) => set($options.draggable)),
+         headerButtonNoClose: derived(writableAppOptions, ($options, set) => set($options.headerButtonNoClose)),
+         headerButtonNoLabel: derived(writableAppOptions, ($options, set) => set($options.headerButtonNoLabel)),
          minimizable: derived(writableAppOptions, ($options, set) => set($options.minimizable)),
          popOut: derived(writableAppOptions, ($options, set) => set($options.popOut)),
          resizable: derived(writableAppOptions, ($options, set) => set($options.resizable)),
@@ -1164,6 +1201,20 @@ class SvelteReactive
    #storesSubscribe()
    {
       // Register local subscriptions.
+
+      // Handles updating header buttons to add / remove the close button.
+      this.#storeUnsubscribe.push(this.#storeAppOptions.headerButtonNoClose.subscribe((value) =>
+      {
+         this.updateHeaderButtons();
+      }));
+
+      // Handles updating header buttons to add / remove button labels.
+      this.#storeUnsubscribe.push(this.#storeAppOptions.headerButtonNoLabel.subscribe((value) =>
+      {
+         this.updateHeaderButtons();
+      }));
+
+      // Handles adding / removing this application from `ui.windows` when popOut changes.
       this.#storeUnsubscribe.push(this.#storeAppOptions.popOut.subscribe((value) =>
       {
          if (value && this.#application.rendered)
@@ -1205,7 +1256,14 @@ class SvelteReactive
     */
    updateHeaderButtons()
    {
-      const buttons = this.#application._getHeaderButtons();
+      let buttons = this.#application._getHeaderButtons();
+
+      // Remove close button if this.options.headerButtonNoClose is true;
+      if (typeof this.#application.options.headerButtonNoClose === 'boolean' &&
+       this.#application.options.headerButtonNoClose)
+      {
+         buttons = buttons.filter((button) => button.class !== 'close');
+      }
 
       // Remove labels if this.options.headerButtonNoLabel is true;
       if (typeof this.#application.options.headerButtonNoLabel === 'boolean' &&

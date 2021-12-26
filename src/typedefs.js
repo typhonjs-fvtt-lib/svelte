@@ -25,6 +25,12 @@
  *
  * @property {import('svelte/store').Readable<boolean>} draggable - Derived store for `draggable` updates.
  *
+ * @property {import('svelte/store').Readable<boolean>} headerButtonNoClose - Derived store for `headerButtonNoClose`
+ *                                                                            updates.
+ *
+ * @property {import('svelte/store').Readable<boolean>} headerButtonNoLabel - Derived store for `headerButtonNoLabel`
+ *                                                                            updates.
+ *
  * @property {import('svelte/store').Readable<boolean>} minimizable - Derived store for `minimizable` updates.
  *
  * @property {import('svelte/store').Readable<boolean>} popOut - Derived store for `popOut` updates.
