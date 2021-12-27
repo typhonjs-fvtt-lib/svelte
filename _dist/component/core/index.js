@@ -1380,7 +1380,7 @@ function add_css$3(target) {
 	append_styles(target, "svelte-3vt5in", ".window-app.svelte-3vt5in{overflow:inherit}");
 }
 
-// (141:0) {:else}
+// (146:0) {:else}
 function create_else_block_1$1(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -1403,7 +1403,7 @@ function create_else_block_1$1(ctx) {
 	const if_blocks = [];
 
 	function select_block_type_2(ctx, dirty) {
-		if (Array.isArray(/*allChildren*/ ctx[10])) return 0;
+		if (Array.isArray(/*allChildren*/ ctx[12])) return 0;
 		return 1;
 	}
 
@@ -1421,9 +1421,11 @@ function create_else_block_1$1(ctx) {
 			t1 = space();
 			create_component(resizablehandle.$$.fragment);
 			attr(section, "class", "window-content");
-			attr(div, "id", div_id_value = /*foundryApp*/ ctx[7].id);
-			attr(div, "class", div_class_value = "app window-app " + /*foundryApp*/ ctx[7].options.classes.join(' ') + " svelte-3vt5in");
-			attr(div, "data-appid", div_data_appid_value = /*foundryApp*/ ctx[7].appId);
+			attr(section, "style", /*styleContent*/ ctx[8]);
+			attr(div, "id", div_id_value = /*foundryApp*/ ctx[9].id);
+			attr(div, "class", div_class_value = "app window-app " + /*foundryApp*/ ctx[9].options.classes.join(' ') + " svelte-3vt5in");
+			attr(div, "data-appid", div_data_appid_value = /*foundryApp*/ ctx[9].appId);
+			attr(div, "style", /*styleApp*/ ctx[7]);
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
@@ -1431,14 +1433,14 @@ function create_else_block_1$1(ctx) {
 			append(div, t0);
 			append(div, section);
 			if_blocks[current_block_type_index].m(section, null);
-			/*section_binding_1*/ ctx[22](section);
+			/*section_binding_1*/ ctx[24](section);
 			append(div, t1);
 			mount_component(resizablehandle, div, null);
-			/*div_binding_1*/ ctx[23](div);
+			/*div_binding_1*/ ctx[25](div);
 			current = true;
 
 			if (!mounted) {
-				dispose = listen(div, "pointerdown", /*bringToTop*/ ctx[9], true);
+				dispose = listen(div, "pointerdown", /*bringToTop*/ ctx[11], true);
 				mounted = true;
 			}
 		},
@@ -1446,16 +1448,24 @@ function create_else_block_1$1(ctx) {
 			ctx = new_ctx;
 			if_block.p(ctx, dirty);
 
-			if (!current || dirty & /*foundryApp*/ 128 && div_id_value !== (div_id_value = /*foundryApp*/ ctx[7].id)) {
+			if (!current || dirty & /*styleContent*/ 256) {
+				attr(section, "style", /*styleContent*/ ctx[8]);
+			}
+
+			if (!current || dirty & /*foundryApp*/ 512 && div_id_value !== (div_id_value = /*foundryApp*/ ctx[9].id)) {
 				attr(div, "id", div_id_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 128 && div_class_value !== (div_class_value = "app window-app " + /*foundryApp*/ ctx[7].options.classes.join(' ') + " svelte-3vt5in")) {
+			if (!current || dirty & /*foundryApp*/ 512 && div_class_value !== (div_class_value = "app window-app " + /*foundryApp*/ ctx[9].options.classes.join(' ') + " svelte-3vt5in")) {
 				attr(div, "class", div_class_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 128 && div_data_appid_value !== (div_data_appid_value = /*foundryApp*/ ctx[7].appId)) {
+			if (!current || dirty & /*foundryApp*/ 512 && div_data_appid_value !== (div_data_appid_value = /*foundryApp*/ ctx[9].appId)) {
 				attr(div, "data-appid", div_data_appid_value);
+			}
+
+			if (!current || dirty & /*styleApp*/ 128) {
+				attr(div, "style", /*styleApp*/ ctx[7]);
 			}
 		},
 		i(local) {
@@ -1484,9 +1494,9 @@ function create_else_block_1$1(ctx) {
 			if (detaching) detach(div);
 			destroy_component(tjsapplicationheader);
 			if_blocks[current_block_type_index].d();
-			/*section_binding_1*/ ctx[22](null);
+			/*section_binding_1*/ ctx[24](null);
 			destroy_component(resizablehandle);
-			/*div_binding_1*/ ctx[23](null);
+			/*div_binding_1*/ ctx[25](null);
 			if (detaching && div_outro) div_outro.end();
 			mounted = false;
 			dispose();
@@ -1494,7 +1504,7 @@ function create_else_block_1$1(ctx) {
 	};
 }
 
-// (122:0) {#if bindHeightChanged}
+// (126:0) {#if bindHeightChanged}
 function create_if_block$4(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -1519,7 +1529,7 @@ function create_if_block$4(ctx) {
 	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
-		if (Array.isArray(/*allChildren*/ ctx[10])) return 0;
+		if (Array.isArray(/*allChildren*/ ctx[12])) return 0;
 		return 1;
 	}
 
@@ -1537,11 +1547,13 @@ function create_if_block$4(ctx) {
 			t1 = space();
 			create_component(resizablehandle.$$.fragment);
 			attr(section, "class", "window-content");
-			add_render_callback(() => /*section_elementresize_handler*/ ctx[19].call(section));
-			attr(div, "id", div_id_value = /*foundryApp*/ ctx[7].id);
-			attr(div, "class", div_class_value = "app window-app " + /*foundryApp*/ ctx[7].options.classes.join(' ') + " svelte-3vt5in");
-			attr(div, "data-appid", div_data_appid_value = /*foundryApp*/ ctx[7].appId);
-			add_render_callback(() => /*div_elementresize_handler*/ ctx[20].call(div));
+			attr(section, "style", /*styleContent*/ ctx[8]);
+			add_render_callback(() => /*section_elementresize_handler*/ ctx[21].call(section));
+			attr(div, "id", div_id_value = /*foundryApp*/ ctx[9].id);
+			attr(div, "class", div_class_value = "app window-app " + /*foundryApp*/ ctx[9].options.classes.join(' ') + " svelte-3vt5in");
+			attr(div, "data-appid", div_data_appid_value = /*foundryApp*/ ctx[9].appId);
+			attr(div, "style", /*styleApp*/ ctx[7]);
+			add_render_callback(() => /*div_elementresize_handler*/ ctx[22].call(div));
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
@@ -1549,16 +1561,16 @@ function create_if_block$4(ctx) {
 			append(div, t0);
 			append(div, section);
 			if_blocks[current_block_type_index].m(section, null);
-			/*section_binding*/ ctx[18](section);
-			section_resize_listener = add_resize_listener(section, /*section_elementresize_handler*/ ctx[19].bind(section));
+			/*section_binding*/ ctx[20](section);
+			section_resize_listener = add_resize_listener(section, /*section_elementresize_handler*/ ctx[21].bind(section));
 			append(div, t1);
 			mount_component(resizablehandle, div, null);
-			div_resize_listener = add_resize_listener(div, /*div_elementresize_handler*/ ctx[20].bind(div));
-			/*div_binding*/ ctx[21](div);
+			div_resize_listener = add_resize_listener(div, /*div_elementresize_handler*/ ctx[22].bind(div));
+			/*div_binding*/ ctx[23](div);
 			current = true;
 
 			if (!mounted) {
-				dispose = listen(div, "pointerdown", /*bringToTop*/ ctx[9], true);
+				dispose = listen(div, "pointerdown", /*bringToTop*/ ctx[11], true);
 				mounted = true;
 			}
 		},
@@ -1566,16 +1578,24 @@ function create_if_block$4(ctx) {
 			ctx = new_ctx;
 			if_block.p(ctx, dirty);
 
-			if (!current || dirty & /*foundryApp*/ 128 && div_id_value !== (div_id_value = /*foundryApp*/ ctx[7].id)) {
+			if (!current || dirty & /*styleContent*/ 256) {
+				attr(section, "style", /*styleContent*/ ctx[8]);
+			}
+
+			if (!current || dirty & /*foundryApp*/ 512 && div_id_value !== (div_id_value = /*foundryApp*/ ctx[9].id)) {
 				attr(div, "id", div_id_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 128 && div_class_value !== (div_class_value = "app window-app " + /*foundryApp*/ ctx[7].options.classes.join(' ') + " svelte-3vt5in")) {
+			if (!current || dirty & /*foundryApp*/ 512 && div_class_value !== (div_class_value = "app window-app " + /*foundryApp*/ ctx[9].options.classes.join(' ') + " svelte-3vt5in")) {
 				attr(div, "class", div_class_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 128 && div_data_appid_value !== (div_data_appid_value = /*foundryApp*/ ctx[7].appId)) {
+			if (!current || dirty & /*foundryApp*/ 512 && div_data_appid_value !== (div_data_appid_value = /*foundryApp*/ ctx[9].appId)) {
 				attr(div, "data-appid", div_data_appid_value);
+			}
+
+			if (!current || dirty & /*styleApp*/ 128) {
+				attr(div, "style", /*styleApp*/ ctx[7]);
 			}
 		},
 		i(local) {
@@ -1604,11 +1624,11 @@ function create_if_block$4(ctx) {
 			if (detaching) detach(div);
 			destroy_component(tjsapplicationheader);
 			if_blocks[current_block_type_index].d();
-			/*section_binding*/ ctx[18](null);
+			/*section_binding*/ ctx[20](null);
 			section_resize_listener();
 			destroy_component(resizablehandle);
 			div_resize_listener();
-			/*div_binding*/ ctx[21](null);
+			/*div_binding*/ ctx[23](null);
 			if (detaching && div_outro) div_outro.end();
 			mounted = false;
 			dispose();
@@ -1616,11 +1636,11 @@ function create_if_block$4(ctx) {
 	};
 }
 
-// (153:9) {:else}
+// (159:9) {:else}
 function create_else_block_2$1(ctx) {
 	let current;
-	const default_slot_template = /*#slots*/ ctx[17].default;
-	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[16], null);
+	const default_slot_template = /*#slots*/ ctx[19].default;
+	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[18], null);
 
 	return {
 		c() {
@@ -1635,15 +1655,15 @@ function create_else_block_2$1(ctx) {
 		},
 		p(ctx, dirty) {
 			if (default_slot) {
-				if (default_slot.p && (!current || dirty & /*$$scope*/ 65536)) {
+				if (default_slot.p && (!current || dirty & /*$$scope*/ 262144)) {
 					update_slot_base(
 						default_slot,
 						default_slot_template,
 						ctx,
-						/*$$scope*/ ctx[16],
+						/*$$scope*/ ctx[18],
 						!current
-						? get_all_dirty_from_scope(/*$$scope*/ ctx[16])
-						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[16], dirty, null),
+						? get_all_dirty_from_scope(/*$$scope*/ ctx[18])
+						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[18], dirty, null),
 						null
 					);
 				}
@@ -1664,13 +1684,13 @@ function create_else_block_2$1(ctx) {
 	};
 }
 
-// (151:9) {#if Array.isArray(allChildren)}
+// (157:9) {#if Array.isArray(allChildren)}
 function create_if_block_2$1(ctx) {
 	let tjscontainer;
 	let current;
 
 	tjscontainer = new TJSContainer({
-			props: { children: /*allChildren*/ ctx[10] }
+			props: { children: /*allChildren*/ ctx[12] }
 		});
 
 	return {
@@ -1697,11 +1717,11 @@ function create_if_block_2$1(ctx) {
 	};
 }
 
-// (135:9) {:else}
+// (140:9) {:else}
 function create_else_block$3(ctx) {
 	let current;
-	const default_slot_template = /*#slots*/ ctx[17].default;
-	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[16], null);
+	const default_slot_template = /*#slots*/ ctx[19].default;
+	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[18], null);
 
 	return {
 		c() {
@@ -1716,15 +1736,15 @@ function create_else_block$3(ctx) {
 		},
 		p(ctx, dirty) {
 			if (default_slot) {
-				if (default_slot.p && (!current || dirty & /*$$scope*/ 65536)) {
+				if (default_slot.p && (!current || dirty & /*$$scope*/ 262144)) {
 					update_slot_base(
 						default_slot,
 						default_slot_template,
 						ctx,
-						/*$$scope*/ ctx[16],
+						/*$$scope*/ ctx[18],
 						!current
-						? get_all_dirty_from_scope(/*$$scope*/ ctx[16])
-						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[16], dirty, null),
+						? get_all_dirty_from_scope(/*$$scope*/ ctx[18])
+						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[18], dirty, null),
 						null
 					);
 				}
@@ -1745,13 +1765,13 @@ function create_else_block$3(ctx) {
 	};
 }
 
-// (133:9) {#if Array.isArray(allChildren)}
+// (138:9) {#if Array.isArray(allChildren)}
 function create_if_block_1$2(ctx) {
 	let tjscontainer;
 	let current;
 
 	tjscontainer = new TJSContainer({
-			props: { children: /*allChildren*/ ctx[10] }
+			props: { children: /*allChildren*/ ctx[12] }
 		});
 
 	return {
@@ -1787,7 +1807,7 @@ function create_fragment$5(ctx) {
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
-		if (/*bindHeightChanged*/ ctx[8]) return 0;
+		if (/*bindHeightChanged*/ ctx[10]) return 0;
 		return 1;
 	}
 
@@ -1829,6 +1849,8 @@ function instance$5($$self, $$props, $$invalidate) {
 	let { elementRoot } = $$props;
 	let { children = void 0 } = $$props;
 	let { heightChanged = false } = $$props;
+	let { styleApp = void 0 } = $$props;
+	let { styleContent = void 0 } = $$props;
 
 	// Store the initial `heightChanged` state. If it is truthy then `clientHeight` for the content & root elements
 	// are bound to `heightChanged` to signal to any parent component of any change to the client & root.
@@ -1908,19 +1930,21 @@ function instance$5($$self, $$props, $$invalidate) {
 	$$self.$$set = $$props => {
 		if ('elementContent' in $$props) $$invalidate(4, elementContent = $$props.elementContent);
 		if ('elementRoot' in $$props) $$invalidate(5, elementRoot = $$props.elementRoot);
-		if ('children' in $$props) $$invalidate(11, children = $$props.children);
+		if ('children' in $$props) $$invalidate(13, children = $$props.children);
 		if ('heightChanged' in $$props) $$invalidate(6, heightChanged = $$props.heightChanged);
-		if ('transition' in $$props) $$invalidate(12, transition = $$props.transition);
+		if ('styleApp' in $$props) $$invalidate(7, styleApp = $$props.styleApp);
+		if ('styleContent' in $$props) $$invalidate(8, styleContent = $$props.styleContent);
+		if ('transition' in $$props) $$invalidate(14, transition = $$props.transition);
 		if ('inTransition' in $$props) $$invalidate(0, inTransition = $$props.inTransition);
 		if ('outTransition' in $$props) $$invalidate(1, outTransition = $$props.outTransition);
-		if ('transitionOptions' in $$props) $$invalidate(13, transitionOptions = $$props.transitionOptions);
+		if ('transitionOptions' in $$props) $$invalidate(15, transitionOptions = $$props.transitionOptions);
 		if ('inTransitionOptions' in $$props) $$invalidate(2, inTransitionOptions = $$props.inTransitionOptions);
 		if ('outTransitionOptions' in $$props) $$invalidate(3, outTransitionOptions = $$props.outTransitionOptions);
-		if ('$$scope' in $$props) $$invalidate(16, $$scope = $$props.$$scope);
+		if ('$$scope' in $$props) $$invalidate(18, $$scope = $$props.$$scope);
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*oldTransition, transition*/ 20480) {
+		if ($$self.$$.dirty & /*oldTransition, transition*/ 81920) {
 			// Run this reactive block when the last transition state is not equal to the current state.
 			if (oldTransition !== transition) {
 				// If transition is defined and not the default transition then set it to both in and out transition otherwise
@@ -1931,11 +1955,11 @@ function instance$5($$self, $$props, $$invalidate) {
 
 				$$invalidate(0, inTransition = newTransition);
 				$$invalidate(1, outTransition = newTransition);
-				$$invalidate(14, oldTransition = newTransition);
+				$$invalidate(16, oldTransition = newTransition);
 			}
 		}
 
-		if ($$self.$$.dirty & /*oldTransitionOptions, transitionOptions*/ 40960) {
+		if ($$self.$$.dirty & /*oldTransitionOptions, transitionOptions*/ 163840) {
 			// Run this reactive block when the last transition options state is not equal to the current options state.
 			if (oldTransitionOptions !== transitionOptions) {
 				const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && typeof transitionOptions === 'object'
@@ -1944,7 +1968,7 @@ function instance$5($$self, $$props, $$invalidate) {
 
 				$$invalidate(2, inTransitionOptions = newOptions);
 				$$invalidate(3, outTransitionOptions = newOptions);
-				$$invalidate(15, oldTransitionOptions = newOptions);
+				$$invalidate(17, oldTransitionOptions = newOptions);
 			}
 		}
 
@@ -1955,7 +1979,7 @@ function instance$5($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*outTransition, foundryApp*/ 130) {
+		if ($$self.$$.dirty & /*outTransition, foundryApp*/ 514) {
 			{
 				// Handle cases if outTransition is unset; assign noop default transition function.
 				if (typeof outTransition !== 'function') {
@@ -1964,7 +1988,7 @@ function instance$5($$self, $$props, $$invalidate) {
 
 				// Set jquery close animation to either run or not when an out transition is changed.
 				if (foundryApp && typeof foundryApp?.options?.jqueryCloseAnimation === 'boolean') {
-					$$invalidate(7, foundryApp.options.jqueryCloseAnimation = outTransition === s_DEFAULT_TRANSITION, foundryApp);
+					$$invalidate(9, foundryApp.options.jqueryCloseAnimation = outTransition === s_DEFAULT_TRANSITION, foundryApp);
 				}
 			}
 		}
@@ -1992,6 +2016,8 @@ function instance$5($$self, $$props, $$invalidate) {
 		elementContent,
 		elementRoot,
 		heightChanged,
+		styleApp,
+		styleContent,
 		foundryApp,
 		bindHeightChanged,
 		bringToTop,
@@ -2025,12 +2051,14 @@ class ApplicationShell extends SvelteComponent {
 			{
 				elementContent: 4,
 				elementRoot: 5,
-				children: 11,
+				children: 13,
 				heightChanged: 6,
-				transition: 12,
+				styleApp: 7,
+				styleContent: 8,
+				transition: 14,
 				inTransition: 0,
 				outTransition: 1,
-				transitionOptions: 13,
+				transitionOptions: 15,
 				inTransitionOptions: 2,
 				outTransitionOptions: 3
 			},
@@ -2057,7 +2085,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get children() {
-		return this.$$.ctx[11];
+		return this.$$.ctx[13];
 	}
 
 	set children(children) {
@@ -2074,8 +2102,26 @@ class ApplicationShell extends SvelteComponent {
 		flush();
 	}
 
+	get styleApp() {
+		return this.$$.ctx[7];
+	}
+
+	set styleApp(styleApp) {
+		this.$$set({ styleApp });
+		flush();
+	}
+
+	get styleContent() {
+		return this.$$.ctx[8];
+	}
+
+	set styleContent(styleContent) {
+		this.$$set({ styleContent });
+		flush();
+	}
+
 	get transition() {
-		return this.$$.ctx[12];
+		return this.$$.ctx[14];
 	}
 
 	set transition(transition) {
@@ -2102,7 +2148,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get transitionOptions() {
-		return this.$$.ctx[13];
+		return this.$$.ctx[15];
 	}
 
 	set transitionOptions(transitionOptions) {
@@ -2556,7 +2602,7 @@ function add_css$2(target) {
 	append_styles(target, "svelte-1l7or8i", ".tjs-app{max-height:100%;background:url(/ui/denim075.png) repeat;border-radius:5px;box-shadow:0 0 20px #000;margin:3px 0;color:#f0f0e0;position:absolute}.tjs-window-app{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;padding:0;z-index:99}.tjs-window-app .window-content{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;padding:8px;color:#191813;overflow-y:auto;overflow-x:hidden}.tjs-window-app .window-header{flex:0 0 30px;overflow:hidden;padding:0 8px;line-height:30px;border-bottom:1px solid #000;pointer-events:auto}.tjs-window-app .window-header a{flex:none;margin:0 0 0 8px}.tjs-window-app .window-header h4{font-family:Signika, sans-serif}.tjs-window-app .window-header i[class^=fa]{margin-right:3px}.tjs-window-app .window-header .window-title{margin:0;word-break:break-all}.tjs-window-app .window-resizable-handle{width:20px;height:20px;position:absolute;bottom:-1px;right:0;background:#444;padding:2px;border:1px solid #111;border-radius:4px 0 0 0}.tjs-window-app .window-resizable-handle i.fas{transform:rotate(45deg)}.tjs-window-app.minimized .window-header{border:1px solid #000}");
 }
 
-// (141:0) {:else}
+// (146:0) {:else}
 function create_else_block_1(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -2579,7 +2625,7 @@ function create_else_block_1(ctx) {
 	const if_blocks = [];
 
 	function select_block_type_2(ctx, dirty) {
-		if (Array.isArray(/*allChildren*/ ctx[10])) return 0;
+		if (Array.isArray(/*allChildren*/ ctx[12])) return 0;
 		return 1;
 	}
 
@@ -2597,9 +2643,11 @@ function create_else_block_1(ctx) {
 			t1 = space();
 			create_component(resizablehandle.$$.fragment);
 			attr(section, "class", "window-content");
-			attr(div, "id", div_id_value = /*foundryApp*/ ctx[7].id);
-			attr(div, "class", div_class_value = "tjs-app tjs-window-app " + /*foundryApp*/ ctx[7].options.classes.join(' '));
-			attr(div, "data-appid", div_data_appid_value = /*foundryApp*/ ctx[7].appId);
+			attr(section, "style", /*styleContent*/ ctx[8]);
+			attr(div, "id", div_id_value = /*foundryApp*/ ctx[9].id);
+			attr(div, "class", div_class_value = "tjs-app tjs-window-app " + /*foundryApp*/ ctx[9].options.classes.join(' '));
+			attr(div, "data-appid", div_data_appid_value = /*foundryApp*/ ctx[9].appId);
+			attr(div, "style", /*styleApp*/ ctx[7]);
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
@@ -2607,14 +2655,14 @@ function create_else_block_1(ctx) {
 			append(div, t0);
 			append(div, section);
 			if_blocks[current_block_type_index].m(section, null);
-			/*section_binding_1*/ ctx[22](section);
+			/*section_binding_1*/ ctx[24](section);
 			append(div, t1);
 			mount_component(resizablehandle, div, null);
-			/*div_binding_1*/ ctx[23](div);
+			/*div_binding_1*/ ctx[25](div);
 			current = true;
 
 			if (!mounted) {
-				dispose = listen(div, "pointerdown", /*bringToTop*/ ctx[9], true);
+				dispose = listen(div, "pointerdown", /*bringToTop*/ ctx[11], true);
 				mounted = true;
 			}
 		},
@@ -2622,16 +2670,24 @@ function create_else_block_1(ctx) {
 			ctx = new_ctx;
 			if_block.p(ctx, dirty);
 
-			if (!current || dirty & /*foundryApp*/ 128 && div_id_value !== (div_id_value = /*foundryApp*/ ctx[7].id)) {
+			if (!current || dirty & /*styleContent*/ 256) {
+				attr(section, "style", /*styleContent*/ ctx[8]);
+			}
+
+			if (!current || dirty & /*foundryApp*/ 512 && div_id_value !== (div_id_value = /*foundryApp*/ ctx[9].id)) {
 				attr(div, "id", div_id_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 128 && div_class_value !== (div_class_value = "tjs-app tjs-window-app " + /*foundryApp*/ ctx[7].options.classes.join(' '))) {
+			if (!current || dirty & /*foundryApp*/ 512 && div_class_value !== (div_class_value = "tjs-app tjs-window-app " + /*foundryApp*/ ctx[9].options.classes.join(' '))) {
 				attr(div, "class", div_class_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 128 && div_data_appid_value !== (div_data_appid_value = /*foundryApp*/ ctx[7].appId)) {
+			if (!current || dirty & /*foundryApp*/ 512 && div_data_appid_value !== (div_data_appid_value = /*foundryApp*/ ctx[9].appId)) {
 				attr(div, "data-appid", div_data_appid_value);
+			}
+
+			if (!current || dirty & /*styleApp*/ 128) {
+				attr(div, "style", /*styleApp*/ ctx[7]);
 			}
 		},
 		i(local) {
@@ -2660,9 +2716,9 @@ function create_else_block_1(ctx) {
 			if (detaching) detach(div);
 			destroy_component(tjsapplicationheader);
 			if_blocks[current_block_type_index].d();
-			/*section_binding_1*/ ctx[22](null);
+			/*section_binding_1*/ ctx[24](null);
 			destroy_component(resizablehandle);
-			/*div_binding_1*/ ctx[23](null);
+			/*div_binding_1*/ ctx[25](null);
 			if (detaching && div_outro) div_outro.end();
 			mounted = false;
 			dispose();
@@ -2670,7 +2726,7 @@ function create_else_block_1(ctx) {
 	};
 }
 
-// (122:0) {#if bindHeightChanged}
+// (126:0) {#if bindHeightChanged}
 function create_if_block$2(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -2695,7 +2751,7 @@ function create_if_block$2(ctx) {
 	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
-		if (Array.isArray(/*allChildren*/ ctx[10])) return 0;
+		if (Array.isArray(/*allChildren*/ ctx[12])) return 0;
 		return 1;
 	}
 
@@ -2713,11 +2769,13 @@ function create_if_block$2(ctx) {
 			t1 = space();
 			create_component(resizablehandle.$$.fragment);
 			attr(section, "class", "window-content");
-			add_render_callback(() => /*section_elementresize_handler*/ ctx[19].call(section));
-			attr(div, "id", div_id_value = /*foundryApp*/ ctx[7].id);
-			attr(div, "class", div_class_value = "tjs-app tjs-window-app " + /*foundryApp*/ ctx[7].options.classes.join(' '));
-			attr(div, "data-appid", div_data_appid_value = /*foundryApp*/ ctx[7].appId);
-			add_render_callback(() => /*div_elementresize_handler*/ ctx[20].call(div));
+			attr(section, "style", /*styleContent*/ ctx[8]);
+			add_render_callback(() => /*section_elementresize_handler*/ ctx[21].call(section));
+			attr(div, "id", div_id_value = /*foundryApp*/ ctx[9].id);
+			attr(div, "class", div_class_value = "tjs-app tjs-window-app " + /*foundryApp*/ ctx[9].options.classes.join(' '));
+			attr(div, "data-appid", div_data_appid_value = /*foundryApp*/ ctx[9].appId);
+			attr(div, "style", /*styleApp*/ ctx[7]);
+			add_render_callback(() => /*div_elementresize_handler*/ ctx[22].call(div));
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
@@ -2725,16 +2783,16 @@ function create_if_block$2(ctx) {
 			append(div, t0);
 			append(div, section);
 			if_blocks[current_block_type_index].m(section, null);
-			/*section_binding*/ ctx[18](section);
-			section_resize_listener = add_resize_listener(section, /*section_elementresize_handler*/ ctx[19].bind(section));
+			/*section_binding*/ ctx[20](section);
+			section_resize_listener = add_resize_listener(section, /*section_elementresize_handler*/ ctx[21].bind(section));
 			append(div, t1);
 			mount_component(resizablehandle, div, null);
-			div_resize_listener = add_resize_listener(div, /*div_elementresize_handler*/ ctx[20].bind(div));
-			/*div_binding*/ ctx[21](div);
+			div_resize_listener = add_resize_listener(div, /*div_elementresize_handler*/ ctx[22].bind(div));
+			/*div_binding*/ ctx[23](div);
 			current = true;
 
 			if (!mounted) {
-				dispose = listen(div, "pointerdown", /*bringToTop*/ ctx[9], true);
+				dispose = listen(div, "pointerdown", /*bringToTop*/ ctx[11], true);
 				mounted = true;
 			}
 		},
@@ -2742,16 +2800,24 @@ function create_if_block$2(ctx) {
 			ctx = new_ctx;
 			if_block.p(ctx, dirty);
 
-			if (!current || dirty & /*foundryApp*/ 128 && div_id_value !== (div_id_value = /*foundryApp*/ ctx[7].id)) {
+			if (!current || dirty & /*styleContent*/ 256) {
+				attr(section, "style", /*styleContent*/ ctx[8]);
+			}
+
+			if (!current || dirty & /*foundryApp*/ 512 && div_id_value !== (div_id_value = /*foundryApp*/ ctx[9].id)) {
 				attr(div, "id", div_id_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 128 && div_class_value !== (div_class_value = "tjs-app tjs-window-app " + /*foundryApp*/ ctx[7].options.classes.join(' '))) {
+			if (!current || dirty & /*foundryApp*/ 512 && div_class_value !== (div_class_value = "tjs-app tjs-window-app " + /*foundryApp*/ ctx[9].options.classes.join(' '))) {
 				attr(div, "class", div_class_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 128 && div_data_appid_value !== (div_data_appid_value = /*foundryApp*/ ctx[7].appId)) {
+			if (!current || dirty & /*foundryApp*/ 512 && div_data_appid_value !== (div_data_appid_value = /*foundryApp*/ ctx[9].appId)) {
 				attr(div, "data-appid", div_data_appid_value);
+			}
+
+			if (!current || dirty & /*styleApp*/ 128) {
+				attr(div, "style", /*styleApp*/ ctx[7]);
 			}
 		},
 		i(local) {
@@ -2780,11 +2846,11 @@ function create_if_block$2(ctx) {
 			if (detaching) detach(div);
 			destroy_component(tjsapplicationheader);
 			if_blocks[current_block_type_index].d();
-			/*section_binding*/ ctx[18](null);
+			/*section_binding*/ ctx[20](null);
 			section_resize_listener();
 			destroy_component(resizablehandle);
 			div_resize_listener();
-			/*div_binding*/ ctx[21](null);
+			/*div_binding*/ ctx[23](null);
 			if (detaching && div_outro) div_outro.end();
 			mounted = false;
 			dispose();
@@ -2792,11 +2858,11 @@ function create_if_block$2(ctx) {
 	};
 }
 
-// (153:11) {:else}
+// (159:11) {:else}
 function create_else_block_2(ctx) {
 	let current;
-	const default_slot_template = /*#slots*/ ctx[17].default;
-	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[16], null);
+	const default_slot_template = /*#slots*/ ctx[19].default;
+	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[18], null);
 
 	return {
 		c() {
@@ -2811,15 +2877,15 @@ function create_else_block_2(ctx) {
 		},
 		p(ctx, dirty) {
 			if (default_slot) {
-				if (default_slot.p && (!current || dirty & /*$$scope*/ 65536)) {
+				if (default_slot.p && (!current || dirty & /*$$scope*/ 262144)) {
 					update_slot_base(
 						default_slot,
 						default_slot_template,
 						ctx,
-						/*$$scope*/ ctx[16],
+						/*$$scope*/ ctx[18],
 						!current
-						? get_all_dirty_from_scope(/*$$scope*/ ctx[16])
-						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[16], dirty, null),
+						? get_all_dirty_from_scope(/*$$scope*/ ctx[18])
+						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[18], dirty, null),
 						null
 					);
 				}
@@ -2840,13 +2906,13 @@ function create_else_block_2(ctx) {
 	};
 }
 
-// (151:11) {#if Array.isArray(allChildren)}
+// (157:11) {#if Array.isArray(allChildren)}
 function create_if_block_2(ctx) {
 	let tjscontainer;
 	let current;
 
 	tjscontainer = new TJSContainer({
-			props: { children: /*allChildren*/ ctx[10] }
+			props: { children: /*allChildren*/ ctx[12] }
 		});
 
 	return {
@@ -2873,11 +2939,11 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (135:11) {:else}
+// (140:11) {:else}
 function create_else_block$1(ctx) {
 	let current;
-	const default_slot_template = /*#slots*/ ctx[17].default;
-	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[16], null);
+	const default_slot_template = /*#slots*/ ctx[19].default;
+	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[18], null);
 
 	return {
 		c() {
@@ -2892,15 +2958,15 @@ function create_else_block$1(ctx) {
 		},
 		p(ctx, dirty) {
 			if (default_slot) {
-				if (default_slot.p && (!current || dirty & /*$$scope*/ 65536)) {
+				if (default_slot.p && (!current || dirty & /*$$scope*/ 262144)) {
 					update_slot_base(
 						default_slot,
 						default_slot_template,
 						ctx,
-						/*$$scope*/ ctx[16],
+						/*$$scope*/ ctx[18],
 						!current
-						? get_all_dirty_from_scope(/*$$scope*/ ctx[16])
-						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[16], dirty, null),
+						? get_all_dirty_from_scope(/*$$scope*/ ctx[18])
+						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[18], dirty, null),
 						null
 					);
 				}
@@ -2921,13 +2987,13 @@ function create_else_block$1(ctx) {
 	};
 }
 
-// (133:11) {#if Array.isArray(allChildren)}
+// (138:11) {#if Array.isArray(allChildren)}
 function create_if_block_1$1(ctx) {
 	let tjscontainer;
 	let current;
 
 	tjscontainer = new TJSContainer({
-			props: { children: /*allChildren*/ ctx[10] }
+			props: { children: /*allChildren*/ ctx[12] }
 		});
 
 	return {
@@ -2963,7 +3029,7 @@ function create_fragment$3(ctx) {
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
-		if (/*bindHeightChanged*/ ctx[8]) return 0;
+		if (/*bindHeightChanged*/ ctx[10]) return 0;
 		return 1;
 	}
 
@@ -3005,6 +3071,8 @@ function instance$3($$self, $$props, $$invalidate) {
 	let { elementRoot } = $$props;
 	let { children = void 0 } = $$props;
 	let { heightChanged = false } = $$props;
+	let { styleApp = void 0 } = $$props;
+	let { styleContent = void 0 } = $$props;
 
 	// Store the initial `heightChanged` state. If it is truthy then `clientHeight` for the content & root elements
 	// are bound to `heightChanged` to signal to any parent component of any change to the client & root.
@@ -3084,19 +3152,21 @@ function instance$3($$self, $$props, $$invalidate) {
 	$$self.$$set = $$props => {
 		if ('elementContent' in $$props) $$invalidate(4, elementContent = $$props.elementContent);
 		if ('elementRoot' in $$props) $$invalidate(5, elementRoot = $$props.elementRoot);
-		if ('children' in $$props) $$invalidate(11, children = $$props.children);
+		if ('children' in $$props) $$invalidate(13, children = $$props.children);
 		if ('heightChanged' in $$props) $$invalidate(6, heightChanged = $$props.heightChanged);
-		if ('transition' in $$props) $$invalidate(12, transition = $$props.transition);
+		if ('styleApp' in $$props) $$invalidate(7, styleApp = $$props.styleApp);
+		if ('styleContent' in $$props) $$invalidate(8, styleContent = $$props.styleContent);
+		if ('transition' in $$props) $$invalidate(14, transition = $$props.transition);
 		if ('inTransition' in $$props) $$invalidate(0, inTransition = $$props.inTransition);
 		if ('outTransition' in $$props) $$invalidate(1, outTransition = $$props.outTransition);
-		if ('transitionOptions' in $$props) $$invalidate(13, transitionOptions = $$props.transitionOptions);
+		if ('transitionOptions' in $$props) $$invalidate(15, transitionOptions = $$props.transitionOptions);
 		if ('inTransitionOptions' in $$props) $$invalidate(2, inTransitionOptions = $$props.inTransitionOptions);
 		if ('outTransitionOptions' in $$props) $$invalidate(3, outTransitionOptions = $$props.outTransitionOptions);
-		if ('$$scope' in $$props) $$invalidate(16, $$scope = $$props.$$scope);
+		if ('$$scope' in $$props) $$invalidate(18, $$scope = $$props.$$scope);
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*oldTransition, transition*/ 20480) {
+		if ($$self.$$.dirty & /*oldTransition, transition*/ 81920) {
 			// Run this reactive block when the last transition state is not equal to the current state.
 			if (oldTransition !== transition) {
 				// If transition is defined and not the default transition then set it to both in and out transition otherwise
@@ -3107,11 +3177,11 @@ function instance$3($$self, $$props, $$invalidate) {
 
 				$$invalidate(0, inTransition = newTransition);
 				$$invalidate(1, outTransition = newTransition);
-				$$invalidate(14, oldTransition = newTransition);
+				$$invalidate(16, oldTransition = newTransition);
 			}
 		}
 
-		if ($$self.$$.dirty & /*oldTransitionOptions, transitionOptions*/ 40960) {
+		if ($$self.$$.dirty & /*oldTransitionOptions, transitionOptions*/ 163840) {
 			// Run this reactive block when the last transition options state is not equal to the current options state.
 			if (oldTransitionOptions !== transitionOptions) {
 				const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && typeof transitionOptions === 'object'
@@ -3120,7 +3190,7 @@ function instance$3($$self, $$props, $$invalidate) {
 
 				$$invalidate(2, inTransitionOptions = newOptions);
 				$$invalidate(3, outTransitionOptions = newOptions);
-				$$invalidate(15, oldTransitionOptions = newOptions);
+				$$invalidate(17, oldTransitionOptions = newOptions);
 			}
 		}
 
@@ -3131,7 +3201,7 @@ function instance$3($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*outTransition, foundryApp*/ 130) {
+		if ($$self.$$.dirty & /*outTransition, foundryApp*/ 514) {
 			{
 				// Handle cases if outTransition is unset; assign noop default transition function.
 				if (typeof outTransition !== 'function') {
@@ -3140,7 +3210,7 @@ function instance$3($$self, $$props, $$invalidate) {
 
 				// Set jquery close animation to either run or not when an out transition is changed.
 				if (foundryApp && typeof foundryApp?.options?.jqueryCloseAnimation === 'boolean') {
-					$$invalidate(7, foundryApp.options.jqueryCloseAnimation = outTransition === s_DEFAULT_TRANSITION, foundryApp);
+					$$invalidate(9, foundryApp.options.jqueryCloseAnimation = outTransition === s_DEFAULT_TRANSITION, foundryApp);
 				}
 			}
 		}
@@ -3168,6 +3238,8 @@ function instance$3($$self, $$props, $$invalidate) {
 		elementContent,
 		elementRoot,
 		heightChanged,
+		styleApp,
+		styleContent,
 		foundryApp,
 		bindHeightChanged,
 		bringToTop,
@@ -3201,12 +3273,14 @@ class TJSApplicationShell extends SvelteComponent {
 			{
 				elementContent: 4,
 				elementRoot: 5,
-				children: 11,
+				children: 13,
 				heightChanged: 6,
-				transition: 12,
+				styleApp: 7,
+				styleContent: 8,
+				transition: 14,
 				inTransition: 0,
 				outTransition: 1,
-				transitionOptions: 13,
+				transitionOptions: 15,
 				inTransitionOptions: 2,
 				outTransitionOptions: 3
 			},
@@ -3233,7 +3307,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get children() {
-		return this.$$.ctx[11];
+		return this.$$.ctx[13];
 	}
 
 	set children(children) {
@@ -3250,8 +3324,26 @@ class TJSApplicationShell extends SvelteComponent {
 		flush();
 	}
 
+	get styleApp() {
+		return this.$$.ctx[7];
+	}
+
+	set styleApp(styleApp) {
+		this.$$set({ styleApp });
+		flush();
+	}
+
+	get styleContent() {
+		return this.$$.ctx[8];
+	}
+
+	set styleContent(styleContent) {
+		this.$$set({ styleContent });
+		flush();
+	}
+
 	get transition() {
-		return this.$$.ctx[12];
+		return this.$$.ctx[14];
 	}
 
 	set transition(transition) {
@@ -3278,7 +3370,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get transitionOptions() {
-		return this.$$.ctx[13];
+		return this.$$.ctx[15];
 	}
 
 	set transitionOptions(transitionOptions) {
@@ -4117,7 +4209,7 @@ function create_else_block(ctx) {
 	};
 }
 
-// (168:0) {#if modal}
+// (172:0) {#if modal}
 function create_if_block(ctx) {
 	let tjsglasspane;
 	let current;
@@ -4179,7 +4271,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (175:3) <ApplicationShell bind:elementRoot {...appProps}>
+// (179:3) <ApplicationShell bind:elementRoot {...appProps}>
 function create_default_slot_2(ctx) {
 	let dialogcontent;
 	let current;
@@ -4213,7 +4305,7 @@ function create_default_slot_2(ctx) {
 	};
 }
 
-// (170:6) <ApplicationShell bind:elementRoot {...appProps}>
+// (174:6) <ApplicationShell bind:elementRoot {...appProps}>
 function create_default_slot_1(ctx) {
 	let dialogcontent;
 	let current;
@@ -4247,7 +4339,7 @@ function create_default_slot_1(ctx) {
 	};
 }
 
-// (169:3) <TJSGlassPane id={foundryApp.id} stopPropagation={false} {...modalProps} {zIndex}>
+// (173:3) <TJSGlassPane id={foundryApp.id} stopPropagation={false} {...modalProps} {zIndex}>
 function create_default_slot(ctx) {
 	let applicationshell;
 	let updating_elementRoot;
@@ -4402,7 +4494,10 @@ function instance($$self, $$props, $$invalidate) {
 		// Stores properties to set for options for any transitions.
 		transitionOptions: void 0,
 		inTransitionOptions: void 0,
-		outTransitionOptions: void 0
+		outTransitionOptions: void 0,
+		// Stores any style overrides for application shell.
+		styleApp: void 0,
+		styleContent: void 0
 	};
 
 	const modalProps = {

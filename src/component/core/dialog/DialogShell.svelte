@@ -31,6 +31,10 @@
       transitionOptions: void 0,
       inTransitionOptions: void 0,
       outTransitionOptions: void 0,
+
+      // Stores any style overrides for application shell.
+      styleApp: void 0,
+      styleContent: void 0
    }
 
    const modalProps = {

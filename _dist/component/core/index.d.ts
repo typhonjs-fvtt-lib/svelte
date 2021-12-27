@@ -10,6 +10,10 @@ declare class ApplicationShell extends SvelteComponent {
     get children(): any;
     set heightChanged(arg: any);
     get heightChanged(): any;
+    set styleApp(arg: any);
+    get styleApp(): any;
+    set styleContent(arg: any);
+    get styleContent(): any;
     set transition(arg: any);
     get transition(): any;
     set inTransition(arg: any);
@@ -67,6 +71,10 @@ declare class TJSApplicationShell extends SvelteComponent {
     get children(): any;
     set heightChanged(arg: any);
     get heightChanged(): any;
+    set styleApp(arg: any);
+    get styleApp(): any;
+    set styleContent(arg: any);
+    get styleContent(): any;
     set transition(arg: any);
     get transition(): any;
     set inTransition(arg: any);

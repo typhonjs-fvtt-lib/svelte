@@ -16,11 +16,15 @@
    export let elementRoot;
 
    // The children array can be specified by a parent via prop or is read below from the external context.
-   export let children = void 0
+   export let children = void 0;
 
    // If a parent component binds and sets `heightChanged` to true then it is bound to the content & root element
    // `clientHeight`.
    export let heightChanged = false;
+
+   // Explicit style overrides for the main app and content elements.
+   export let styleApp = void 0;
+   export let styleContent = void 0;
 
    // Store the initial `heightChanged` state. If it is truthy then `clientHeight` for the content & root elements
    // are bound to `heightChanged` to signal to any parent component of any change to the client & root.
@@ -127,9 +131,10 @@
         bind:this={elementRoot}
         in:inTransition={inTransitionOptions}
         out:outTransition={outTransitionOptions}
-        on:pointerdown|capture={bringToTop}>
+        on:pointerdown|capture={bringToTop}
+        style={styleApp}>
        <TJSApplicationHeader />
-       <section class=window-content bind:this={elementContent} bind:clientHeight={heightChanged}>
+       <section class=window-content bind:this={elementContent} bind:clientHeight={heightChanged} style={styleContent}>
            {#if Array.isArray(allChildren)}
                <TJSContainer children={allChildren} />
            {:else}
@@ -145,9 +150,10 @@
         bind:this={elementRoot}
         in:inTransition={inTransitionOptions}
         out:outTransition={outTransitionOptions}
-        on:pointerdown|capture={bringToTop}>
+        on:pointerdown|capture={bringToTop}
+        style={styleApp}>
        <TJSApplicationHeader />
-       <section class=window-content bind:this={elementContent}>
+       <section class=window-content bind:this={elementContent} style={styleContent}>
            {#if Array.isArray(allChildren)}
                <TJSContainer children={allChildren} />
            {:else}
