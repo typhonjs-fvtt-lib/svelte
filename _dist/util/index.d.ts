@@ -37,6 +37,26 @@ declare function hasSetter(component: any, accessor: string): boolean;
  */
 declare function isApplicationShell(component: any): boolean;
 /**
+ * Provides common object manipulation utilities including depth traversal, obtaining accessors, safely setting values /
+ * equality tests, and validation.
+ */
+/**
+ * Tests for whether an object is iterable.
+ *
+ * @param {object} object - An object.
+ *
+ * @returns {boolean} Whether object is iterable.
+ */
+declare function isIterable(object: object): boolean;
+/**
+ * Tests for whether an object is async iterable.
+ *
+ * @param {object} object - An object.
+ *
+ * @returns {boolean} Whether object is async iterable.
+ */
+declare function isIterableAsync(object: object): boolean;
+/**
  * Provides basic duck typing to determine if the provided function is a constructor function for a Svelte component.
  *
  * @param {*}  comp - Data to check as a Svelte component.
@@ -63,10 +83,6 @@ declare function outroAndDestroy(instance: any): Promise<any>;
  * @returns {object} The processed Svelte config object.
  */
 declare function parseSvelteConfig(config: object, thisArg?: any): object;
-/**
- * Provides common object manipulation utilities including depth traversal, obtaining accessors, safely setting values /
- * equality tests, and validation.
- */
 /**
  * Provides a way to safely access an objects data / entries given an accessor string which describes the
  * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
@@ -102,4 +118,4 @@ declare function safeAccess(data: object, accessor: string, defaultValue?: any):
  */
 declare function safeSet(data: object, accessor: string, value: any, operation?: string, createMissing?: boolean): boolean;
 
-export { hasAccessor, hasGetter, hasSetter, isApplicationShell, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet };
+export { hasAccessor, hasGetter, hasSetter, isApplicationShell, isIterable, isIterableAsync, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet };

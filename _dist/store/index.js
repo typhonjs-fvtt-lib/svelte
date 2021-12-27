@@ -1,5 +1,6 @@
 import { get, derived, writable as writable$2 } from 'svelte/store';
 import { noop, run_all, is_function } from 'svelte/internal';
+import { isIterable } from '@typhonjs-fvtt/svelte/util';
 
 function _classPrivateFieldGet(receiver, privateMap) {
   var descriptor = _classExtractFieldDescriptor(receiver, privateMap, "get");
@@ -619,25 +620,6 @@ function subscribeIgnoreFirst(store, update) {
       update(value);
     }
   });
-}
-
-/**
- * Provides common object manipulation utilities including depth traversal, obtaining accessors, safely setting values /
- * equality tests, and validation.
- */
-
-/**
- * Tests for whether an object is iterable.
- *
- * @param {object} object - An object.
- *
- * @returns {boolean} Whether object is iterable.
- */
-function isIterable(object)
-{
-   if (object === null || object === void 0 || typeof object !== 'object') { return false; }
-
-   return typeof object[Symbol.iterator] === 'function';
 }
 
 /**

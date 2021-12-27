@@ -1,5 +1,5 @@
 import { DialogShell }           from '@typhonjs-fvtt/svelte/component/core';
-import { safeAccess, safeSet }   from '@typhonjs-utils/object';
+import { safeAccess, safeSet }   from '@typhonjs-fvtt/svelte/util';
 
 import { SvelteApplication }     from './SvelteApplication.js';
 

@@ -1,4 +1,4 @@
-import { isIterable }      from '@typhonjs-utils/object';
+import { isIterable }      from '@typhonjs-fvtt/svelte/util';
 import { get, writable }   from 'svelte/store';
 
 /**

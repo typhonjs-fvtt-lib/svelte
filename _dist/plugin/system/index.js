@@ -1,6 +1,7 @@
 import { get, writable as writable$2 } from 'svelte/store';
 import { noop, run_all, is_function } from 'svelte/internal';
 import { TJSGameSettings as TJSGameSettings$1 } from '@typhonjs-fvtt/svelte/store';
+import { isIterable } from '@typhonjs-fvtt/svelte/util';
 
 function _classPrivateFieldGet(receiver, privateMap) {
   var descriptor = _classExtractFieldDescriptor(receiver, privateMap, "get");
@@ -498,25 +499,6 @@ class TJSSettingsControl
       // Enables local logging of setting changes.
       ev.eventbus.on('tjs:system:settings:control:log:enable', (enabled) => loggingEnabled = enabled, void 0, opts);
    }
-}
-
-/**
- * Provides common object manipulation utilities including depth traversal, obtaining accessors, safely setting values /
- * equality tests, and validation.
- */
-
-/**
- * Tests for whether an object is iterable.
- *
- * @param {object} object - An object.
- *
- * @returns {boolean} Whether object is iterable.
- */
-function isIterable(object)
-{
-   if (object === null || object === void 0 || typeof object !== 'object') { return false; }
-
-   return typeof object[Symbol.iterator] === 'function';
 }
 
 /**

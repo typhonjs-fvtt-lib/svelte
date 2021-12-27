@@ -1,5 +1,5 @@
 import { TJSGameSettings as GS } from '@typhonjs-fvtt/svelte/store';
-import { isIterable }            from '@typhonjs-utils/object';
+import { isIterable }            from '@typhonjs-fvtt/svelte/util';
 
 /**
  * @typedef {object} GameSetting - Defines a game setting.

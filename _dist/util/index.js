@@ -375,6 +375,34 @@ function isApplicationShell(component)
  */
 
 /**
+ * Tests for whether an object is iterable.
+ *
+ * @param {object} object - An object.
+ *
+ * @returns {boolean} Whether object is iterable.
+ */
+function isIterable(object)
+{
+   if (object === null || object === void 0 || typeof object !== 'object') { return false; }
+
+   return typeof object[Symbol.iterator] === 'function';
+}
+
+/**
+ * Tests for whether an object is async iterable.
+ *
+ * @param {object} object - An object.
+ *
+ * @returns {boolean} Whether object is async iterable.
+ */
+function isIterableAsync(object)
+{
+   if (object === null || object === void 0 || typeof object !== 'object') { return false; }
+
+   return typeof object[Symbol.asyncIterator] === 'function';
+}
+
+/**
  * Provides a way to safely access an objects data / entries given an accessor string which describes the
  * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
  * to walk.
@@ -487,5 +515,5 @@ function safeSet(data, accessor, value, operation = 'set', createMissing = true)
    return true;
 }
 
-export { hasAccessor, hasGetter, hasSetter, isApplicationShell, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet };
+export { hasAccessor, hasGetter, hasSetter, isApplicationShell, isIterable, isIterableAsync, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet };
 //# sourceMappingURL=index.js.map
