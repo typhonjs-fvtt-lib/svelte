@@ -494,6 +494,33 @@ export class SvelteFormApplication extends FormApplication
    }
 
    /**
+    * Provides an override verifying that a new Application being rendered for the first time doesn't have a
+    * corresponding DOM element already loaded. This is a check that only occurs when `this._state` is
+    * `Application.RENDER_STATES.NONE`. It is useful in particular when SvelteFormApplication has a static ID
+    * explicitly set in `this.options.id` and long intro / outro transitions are assigned. If a new application
+    * sharing this static ID attempts to open / render for the first time while an existing DOM element sharing
+    * this static ID exists then the initial render is cancelled below rather than crashing later in the render
+    * cycle (at setPosition).
+    *
+    * @inheritDoc
+    * @protected
+    * @ignore
+    */
+   async _render(force = false, options = {})
+   {
+      if (this._state === Application.RENDER_STATES.NONE &&
+       document.querySelector(`#${this.id}`) instanceof HTMLElement)
+      {
+         console.warn(`SvelteFormApplication - _render: A DOM element already exists for CSS ID '${this.id
+         }'. Cancelling initial render for new application with appId '${this.appId}'.`);
+
+         return;
+      }
+
+      return super._render(force, options);
+   }
+
+   /**
     * Render the inner application content. Only render a template if one is defined otherwise provide an empty
     * JQuery element.
     *
