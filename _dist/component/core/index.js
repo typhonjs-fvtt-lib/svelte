@@ -3402,7 +3402,7 @@ class TJSApplicationShell extends SvelteComponent {
 const { document: document_1 } = globals;
 
 function add_css$1(target) {
-	append_styles(target, "svelte-thdn97", ".tjs-context-menu.svelte-thdn97.svelte-thdn97.svelte-thdn97{position:fixed;width:fit-content;font-size:14px;box-shadow:0 0 10px #000;height:max-content;min-width:150px;max-width:360px;background:#23221d;border:1px solid #000;border-radius:5px;color:#EEE}.tjs-context-menu.svelte-thdn97 ol.tjs-context-items.svelte-thdn97.svelte-thdn97{list-style:none;margin:0;padding:0}.tjs-context-menu.svelte-thdn97 li.tjs-context-item.svelte-thdn97.svelte-thdn97{padding:0 5px;line-height:32px}.tjs-context-menu.svelte-thdn97 li.tjs-context-item.svelte-thdn97.svelte-thdn97:hover{color:#FFF;text-shadow:0 0 4px red}.tjs-context-menu.svelte-thdn97 li.tjs-context-item.svelte-thdn97>i.svelte-thdn97{margin-right:5px}");
+	append_styles(target, "svelte-1ykoenx", ".tjs-context-menu.svelte-1ykoenx.svelte-1ykoenx.svelte-1ykoenx{position:fixed;width:fit-content;font-size:14px;box-shadow:0 0 10px var(--color-shadow-dark, var(--typhonjs-color-shadow, #000));height:max-content;min-width:150px;max-width:360px;background:var(--typhonjs-color-content-window, #23221d);border:1px solid var(--color-border-dark, var(--typhonjs-color-border, #000));border-radius:5px;color:var(--color-text-light-primary, var(--typhonjs-color-text-secondary, #EEE))}.tjs-context-menu.svelte-1ykoenx ol.tjs-context-items.svelte-1ykoenx.svelte-1ykoenx{list-style:none;margin:0;padding:0}.tjs-context-menu.svelte-1ykoenx li.tjs-context-item.svelte-1ykoenx.svelte-1ykoenx{padding:0 5px;line-height:32px}.tjs-context-menu.svelte-1ykoenx li.tjs-context-item.svelte-1ykoenx.svelte-1ykoenx:hover{color:var(--typhonjs-color-text-primary, #FFF);text-shadow:0 0 4px var(--color-text-hyperlink, var(--typhonjs-color-accent-tertiary, red))}.tjs-context-menu.svelte-1ykoenx li.tjs-context-item.svelte-1ykoenx>i.svelte-1ykoenx{margin-right:5px}");
 }
 
 function get_each_context$1(ctx, list, i) {
@@ -3430,8 +3430,8 @@ function create_each_block$1(ctx) {
 			li = element("li");
 			i = element("i");
 			t = text(t_value);
-			attr(i, "class", i_class_value = "" + (null_to_empty(/*item*/ ctx[15].icon) + " svelte-thdn97"));
-			attr(li, "class", "tjs-context-item svelte-thdn97");
+			attr(i, "class", i_class_value = "" + (null_to_empty(/*item*/ ctx[15].icon) + " svelte-1ykoenx"));
+			attr(li, "class", "tjs-context-item svelte-1ykoenx");
 		},
 		m(target, anchor) {
 			insert(target, li, anchor);
@@ -3446,7 +3446,7 @@ function create_each_block$1(ctx) {
 		p(new_ctx, dirty) {
 			ctx = new_ctx;
 
-			if (dirty & /*items*/ 2 && i_class_value !== (i_class_value = "" + (null_to_empty(/*item*/ ctx[15].icon) + " svelte-thdn97"))) {
+			if (dirty & /*items*/ 2 && i_class_value !== (i_class_value = "" + (null_to_empty(/*item*/ ctx[15].icon) + " svelte-1ykoenx"))) {
 				attr(i, "class", i_class_value);
 			}
 
@@ -3485,9 +3485,9 @@ function create_fragment$2(ctx) {
 				each_blocks[i].c();
 			}
 
-			attr(ol, "class", "tjs-context-items svelte-thdn97");
+			attr(ol, "class", "tjs-context-items svelte-1ykoenx");
 			attr(nav, "id", /*id*/ ctx[0]);
-			attr(nav, "class", "tjs-context-menu svelte-thdn97");
+			attr(nav, "class", "tjs-context-menu svelte-1ykoenx");
 			set_style(nav, "z-index", /*zIndex*/ ctx[2]);
 		},
 		m(target, anchor) {
