@@ -58,7 +58,6 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "@typhonjs-utils/object": "^0.0.3"
   },
   "devDependencies": {
     "@league-of-foundry-developers/foundry-vtt-types": "^0.8.9-7",
@@ -71,13 +70,14 @@
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "@typhonjs-svelte/lib": "github:typhonjs-svelte/lib",
     "@typhonjs-utils/file-util": "^0.0.3",
+    "@typhonjs-utils/object": "^0.0.3",
     "eslint": "^8",
     "fs-extra": "^10",
     "rollup": "^2",
     "rollup-plugin-sourcemaps": "^0.6.0",
     "rollup-plugin-svelte": "^7",
     "rollup-plugin-terser": "^7",
-    "svelte": "3.44.2",
+    "svelte": "3.44.3",
     "upath": "^2"
   },
   "engines": {

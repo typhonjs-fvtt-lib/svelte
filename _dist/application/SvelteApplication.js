@@ -1,11 +1,16 @@
-import { safeAccess, safeSet }   from "@typhonjs-utils/object";
-import { derived, writable }     from "svelte/store";
+import { derived, writable }  from "svelte/store";
+
+import {
+   propertyStore,
+   subscribeIgnoreFirst }     from '@typhonjs-fvtt/svelte/store';
 
 import {
    hasGetter,
    isApplicationShell,
    outroAndDestroy,
-   parseSvelteConfig }           from '@typhonjs-fvtt/svelte/util';
+   parseSvelteConfig,
+   safeAccess,
+   safeSet }                  from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
@@ -127,6 +132,18 @@ export class SvelteApplication extends Application
     * @returns {GetSvelteData} GetSvelteData
     */
    get svelte() { return this.#getSvelteData; }
+
+   /**
+    * Provide an override to set reactive z-index after calling super method.
+    */
+   bringToTop()
+   {
+      super.bringToTop();
+
+      const z = document.defaultView.getComputedStyle(this.element[0]).zIndex;
+
+      this.reactive.zIndex = z === 'null' || z === null ? null : parseInt(z, 10);
+   }
 
    /**
     * Note: This method is fully overridden and duplicated as Svelte components need to be destroyed manually and the
@@ -361,18 +378,16 @@ export class SvelteApplication extends Application
          throw new Error(`SvelteApplication - _injectHTML: Target element '${this.options.selectorTarget}' not found.`);
       }
 
-      // Subscribe to local store handling and set z-index. Defer to next clock tick for the render cycle to complete.
-      setTimeout(() =>
+      // The initial zIndex may be set in application options or for popOut applications is stored by `_renderOuter`
+      // in `this.#initialZIndex`.
+      if (typeof this.options.setPosition === 'boolean' && this.options.setPosition)
       {
-         this.#stores.subscribe();
+         this.#elementTarget.style.zIndex = typeof this.options.zIndex === 'number' ? this.options.zIndex :
+          this.#initialZIndex ?? 95;
+      }
 
-         // It is important to set zIndex here after store subscriptions. It is not clear why zIndex changes do not
-         // take effect without this timeout. The initial zIndex for popOut applications is stored by `_renderOuter`.
-         if (typeof this.options.setPosition === 'boolean' && this.options.setPosition)
-         {
-            this.#elementTarget.style.zIndex = this.#initialZIndex ?? 95;
-         }
-      }, 0);
+      // Subscribe to local store handling.
+      this.#stores.subscribe();
 
       this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent, elementTarget:
        this.#elementTarget });
@@ -1112,20 +1127,22 @@ class SvelteReactive
       this.#storeAppOptionsUpdate = writableAppOptions.update;
 
       /**
+       * Create custom store. The main subscribe method for all app options changes is provided along with derived
+       * writable stores for all reactive options.
+       *
        * @type {StoreAppOptions}
        */
       const storeAppOptions = {
          subscribe: writableAppOptions.subscribe,
 
-         draggable: derived(writableAppOptions, ($options, set) => set($options.draggable)),
-         headerButtonNoClose: derived(writableAppOptions, ($options, set) => set($options.headerButtonNoClose)),
-         headerButtonNoLabel: derived(writableAppOptions, ($options, set) => set($options.headerButtonNoLabel)),
-         minimizable: derived(writableAppOptions, ($options, set) => set($options.minimizable)),
-         popOut: derived(writableAppOptions, ($options, set) => set($options.popOut)),
-         resizable: derived(writableAppOptions, ($options, set) => set($options.resizable)),
-         title: derived(writableAppOptions, ($options, set) => set($options.title)),
-         zIndex: derived(writableAppOptions,
-          ($options, set) => set(Number.isInteger($options.zIndex) ? $options.zIndex : null))
+         draggable: propertyStore(writableAppOptions, 'draggable'),
+         headerButtonNoClose: propertyStore(writableAppOptions, 'headerButtonNoClose'),
+         headerButtonNoLabel: propertyStore(writableAppOptions, 'headerButtonNoLabel'),
+         minimizable: propertyStore(writableAppOptions, 'minimizable'),
+         popOut: propertyStore(writableAppOptions, 'popOut'),
+         resizable: propertyStore(writableAppOptions, 'resizable'),
+         title: propertyStore(writableAppOptions, 'title'),
+         zIndex: propertyStore(writableAppOptions, 'zIndex'),
       };
 
       Object.freeze(storeAppOptions);
@@ -1168,19 +1185,19 @@ class SvelteReactive
       // Register local subscriptions.
 
       // Handles updating header buttons to add / remove the close button.
-      this.#storeUnsubscribe.push(this.#storeAppOptions.headerButtonNoClose.subscribe((value) =>
+      this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.headerButtonNoClose, (value) =>
       {
-         this.updateHeaderButtons();
+         this.updateHeaderButtons({ headerButtonNoClose: value });
       }));
 
       // Handles updating header buttons to add / remove button labels.
-      this.#storeUnsubscribe.push(this.#storeAppOptions.headerButtonNoLabel.subscribe((value) =>
+      this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.headerButtonNoLabel, (value) =>
       {
-         this.updateHeaderButtons();
+         this.updateHeaderButtons({ headerButtonNoLabel: value });
       }));
 
       // Handles adding / removing this application from `ui.windows` when popOut changes.
-      this.#storeUnsubscribe.push(this.#storeAppOptions.popOut.subscribe((value) =>
+      this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.popOut, (value) =>
       {
          if (value && this.#application.rendered)
          {
@@ -1193,7 +1210,7 @@ class SvelteReactive
       }));
 
       // Handles directly updating the element root `z-index` style when `zIndex` changes.
-      this.#storeUnsubscribe.push(this.#storeAppOptions.zIndex.subscribe((value) =>
+      this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.zIndex, (value) =>
       {
          if (this.#application._element !== null) { this.#application._element[0].style.zIndex = value; }
       }));
@@ -1216,23 +1233,28 @@ class SvelteReactive
     * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
     * the new buttons.
     *
-    * Optionally you can set in the Foundry app options `headerButtonNoLabel` to true and labels will be removed from
-    * the header buttons.
+    * Optionally you can set in the Foundry app options `headerButtonNoClose` to remove the close button and
+    * `headerButtonNoLabel` to true and labels will be removed from the header buttons.
+    *
+    * @param {object} opts - Optional parameters (for internal use)
+    *
+    * @param {boolean} opts.headerButtonNoClose - The value for `headerButtonNoClose`.
+    *
+    * @param {boolean} opts.headerButtonNoLabel - The value for `headerButtonNoLabel`.
     */
-   updateHeaderButtons()
+   updateHeaderButtons({ headerButtonNoClose = this.#application.options.headerButtonNoClose,
+    headerButtonNoLabel = this.#application.options.headerButtonNoLabel } = {})
    {
       let buttons = this.#application._getHeaderButtons();
 
       // Remove close button if this.options.headerButtonNoClose is true;
-      if (typeof this.#application.options.headerButtonNoClose === 'boolean' &&
-       this.#application.options.headerButtonNoClose)
+      if (typeof headerButtonNoClose === 'boolean' && headerButtonNoClose)
       {
          buttons = buttons.filter((button) => button.class !== 'close');
       }
 
       // Remove labels if this.options.headerButtonNoLabel is true;
-      if (typeof this.#application.options.headerButtonNoLabel === 'boolean' &&
-       this.#application.options.headerButtonNoLabel)
+      if (typeof headerButtonNoLabel === 'boolean' && headerButtonNoLabel)
       {
          for (const button of buttons) { button.label = void 0; }
       }

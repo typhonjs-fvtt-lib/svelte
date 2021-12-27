@@ -152,5 +152,52 @@ declare class TJSGameSettings {
     registerAll(settings: Iterable<GameSetting>): void;
     #private;
 }
+/**
+ * Create a store for a property value in an object contained in another store.
+ * [Read more...](https://github.com/PixievoltNo1/svelte-writable-derived#named-export-propertystore)
+ *
+ * @param {Store} origin The store containing the object to get/set from.
+ * @param {string|number|symbol|Array<string|number|symbol>} propName The property to get/set, or a path of
+ * properties in nested objects.
+ *
+ * @returns {Store} A writable store.
+ */
+declare function propertyStore(origin: any, propName: string | number | symbol | Array<string | number | symbol>): any;
+/**
+ * Subscribes to the given store with the update function provided and ignores the first automatic
+ * update. All future updates are dispatched to the update function.
+ *
+ * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
+ *  Store to subscribe to...
+ *
+ * @param {function} update - function to receive future updates.
+ *
+ * @returns {function} Store unsubscribe function.
+ */
+declare function subscribeIgnoreFirst(store: svelte_store.Readable<any> | svelte_store.Writable<any>, update: Function): Function;
+/**
+ * @external Store
+ * @see [Svelte stores](https://svelte.dev/docs#Store_contract)
+ */
+/**
+ * Create a store similar to [Svelte's `derived`](https://svelte.dev/docs#derived), but which
+ * has its own `set` and `update` methods and can send values back to the origin stores.
+ * [Read more...](https://github.com/PixievoltNo1/svelte-writable-derived#default-export-writablederived)
+ *
+ * @param {Store|Store[]} origins One or more stores to derive from. Same as
+ * [`derived`](https://svelte.dev/docs#derived)'s 1st parameter.
+ * @param {!Function} derive The callback to determine the derived value. Same as
+ * [`derived`](https://svelte.dev/docs#derived)'s 2nd parameter.
+ * @param {!Function|{withOld: !Function}} reflect Called when the
+ * derived store gets a new value via its `set` or `update` methods, and determines new values for
+ * the origin stores. [Read more...](https://github.com/PixievoltNo1/svelte-writable-derived#new-parameter-reflect)
+ * @param [initial] The new store's initial value. Same as
+ * [`derived`](https://svelte.dev/docs#derived)'s 3rd parameter.
+ *
+ * @returns {Store} A writable store.
+ */
+declare function writableDerived(origins: any | any[], derive: Function, reflect: Function | {
+    withOld: Function;
+}, initial?: any): any;
 
-export { GSStore, GameSetting, LSStore, LocalStorage, SSStore, SessionStorage, TJSGameSettings };
+export { GSStore, GameSetting, LSStore, LocalStorage, SSStore, SessionStorage, TJSGameSettings, propertyStore, subscribeIgnoreFirst, writableDerived };

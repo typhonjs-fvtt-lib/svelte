@@ -23,23 +23,23 @@
  *
  * @property {import('svelte/store').Readable.subscribe} subscribe - Subscribe to all app options updates.
  *
- * @property {import('svelte/store').Readable<boolean>} draggable - Derived store for `draggable` updates.
+ * @property {import('svelte/store').Writable<boolean>} draggable - Derived store for `draggable` updates.
  *
- * @property {import('svelte/store').Readable<boolean>} headerButtonNoClose - Derived store for `headerButtonNoClose`
+ * @property {import('svelte/store').Writable<boolean>} headerButtonNoClose - Derived store for `headerButtonNoClose`
  *                                                                            updates.
  *
- * @property {import('svelte/store').Readable<boolean>} headerButtonNoLabel - Derived store for `headerButtonNoLabel`
+ * @property {import('svelte/store').Writable<boolean>} headerButtonNoLabel - Derived store for `headerButtonNoLabel`
  *                                                                            updates.
  *
- * @property {import('svelte/store').Readable<boolean>} minimizable - Derived store for `minimizable` updates.
+ * @property {import('svelte/store').Writable<boolean>} minimizable - Derived store for `minimizable` updates.
  *
- * @property {import('svelte/store').Readable<boolean>} popOut - Derived store for `popOut` updates.
+ * @property {import('svelte/store').Writable<boolean>} popOut - Derived store for `popOut` updates.
  *
- * @property {import('svelte/store').Readable<boolean>} resizable - Derived store for `resizable` updates.
+ * @property {import('svelte/store').Writable<boolean>} resizable - Derived store for `resizable` updates.
  *
- * @property {import('svelte/store').Readable<string>} title - Derived store for `title` updates.
+ * @property {import('svelte/store').Writable<string>} title - Derived store for `title` updates.
  *
- * @property {import('svelte/store').Readable<number>} zIndex - Derived store for `zIndex` updates.
+ * @property {import('svelte/store').Writable<number>} zIndex - Derived store for `zIndex` updates.
  */
 
 /**
