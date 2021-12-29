@@ -135,20 +135,12 @@ export class SvelteFormApplication extends FormApplication
    get svelte() { return this.#getSvelteData; }
 
    /**
-    * Provide an override to set reactive z-index after calling super method.
-    */
-   bringToTop()
-   {
-      super.bringToTop();
-
-      const z = document.defaultView.getComputedStyle(this.element[0]).zIndex;
-
-      this.reactive.zIndex = z === 'null' || z === null ? null : parseInt(z, 10);
-   }
-
-   /**
-    * Potentially suppress form initialization. Useful when a Svelte application needs to use a FormApplication like
-    * when creating a game / config settings app.
+    * In this case of when a template is defined in app options `html` references the inner HTML / template. However,
+    * to activate classic v1 tabs for a Svelte component the element target is passed as an array simulating JQuery as
+    * the element is retrieved immediately and the core listeners use standard DOM queries.
+    *
+    * Note: App options `suppressFormInit` prevents activating core listeners. Potentially suppress form initialization.
+    * Useful when a Svelte application needs to use a FormApplication like when creating a game / config settings app.
     *
     * @inheritDoc
     * @protected
@@ -158,7 +150,19 @@ export class SvelteFormApplication extends FormApplication
    {
       if (this.options.suppressFormInit) { return; }
 
-      return super._activateCoreListeners(html);
+      super._activateCoreListeners(typeof this.options.template === 'string' ? html : [this.#elementTarget]);
+   }
+
+   /**
+    * Provide an override to set reactive z-index after calling super method.
+    */
+   bringToTop()
+   {
+      super.bringToTop();
+
+      const z = document.defaultView.getComputedStyle(this.element[0]).zIndex;
+
+      this.reactive.zIndex = z === 'null' || z === null ? null : parseInt(z, 10);
    }
 
    /**

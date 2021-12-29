@@ -134,6 +134,20 @@ export class SvelteApplication extends Application
    get svelte() { return this.#getSvelteData; }
 
    /**
+    * In this case of when a template is defined in app options `html` references the inner HTML / template. However,
+    * to activate classic v1 tabs for a Svelte component the element target is passed as an array simulating JQuery as
+    * the element is retrieved immediately and the core listeners use standard DOM queries.
+    *
+    * @inheritDoc
+    * @protected
+    * @ignore
+    */
+   _activateCoreListeners(html)
+   {
+      super._activateCoreListeners(typeof this.options.template === 'string' ? html : [this.#elementTarget]);
+   }
+
+   /**
     * Provide an override to set reactive z-index after calling super method.
     */
    bringToTop()
