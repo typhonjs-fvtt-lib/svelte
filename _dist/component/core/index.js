@@ -1,4 +1,4 @@
-import { SvelteComponent, init, safe_not_equal, flush, append_styles, empty, insert, group_outros, transition_out, check_outros, transition_in, detach, element, attr, noop, create_component, mount_component, get_spread_update, get_spread_object, destroy_component, destroy_each, assign, create_slot, listen, update_slot_base, get_all_dirty_from_scope, get_slot_changes, add_render_callback, create_in_transition, create_out_transition, binding_callbacks, text, append, set_data, space, action_destroyer, is_function, run_all, component_subscribe, add_resize_listener, null_to_empty, set_style, create_bidirectional_transition, globals, current_component, HtmlTag, stop_propagation, prevent_default, update_keyed_each, destroy_block, bind, add_flush_callback } from 'svelte/internal';
+import { SvelteComponent, init, safe_not_equal, flush, append_styles, empty, insert, group_outros, transition_out, check_outros, transition_in, detach, element, attr, noop, create_component, mount_component, get_spread_update, get_spread_object, destroy_component, destroy_each, assign, create_slot, listen, update_slot_base, get_all_dirty_from_scope, get_slot_changes, add_render_callback, create_in_transition, create_out_transition, binding_callbacks, text, append, prevent_default, set_data, space, action_destroyer, is_function, run_all, component_subscribe, add_resize_listener, null_to_empty, set_style, create_bidirectional_transition, globals, current_component, HtmlTag, stop_propagation, update_keyed_each, destroy_block, bind, add_flush_callback } from 'svelte/internal';
 import { getContext, setContext, createEventDispatcher } from 'svelte';
 import { s_DEFAULT_TRANSITION, s_DEFAULT_TRANSITION_OPTIONS, slideFade } from '@typhonjs-fvtt/svelte/transition';
 import { draggable, applyStyles } from '@typhonjs-fvtt/svelte/action';
@@ -824,7 +824,7 @@ function create_fragment$8(ctx) {
 			append(a, t);
 
 			if (!mounted) {
-				dispose = listen(a, "click", /*onClick*/ ctx[1]);
+				dispose = listen(a, "click", prevent_default(/*onClick*/ ctx[1]));
 				mounted = true;
 			}
 		},
