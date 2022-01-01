@@ -1,5 +1,3 @@
-export * from '@typhonjs-svelte/lib/component/core';
-
 export { default as TJSComponentShell }      from './TJSComponentShell.svelte';
 export { default as TJSContainer }           from './TJSContainer.svelte';
 export { default as TJSGlassPane }           from './TJSGlassPane.svelte';

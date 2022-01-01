@@ -1,5 +1,6 @@
 <script>
    import { getContext, setContext }   from 'svelte';
+   import { applyStyles }              from '@typhonjs-fvtt/svelte/action';
 
    import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
    import TJSContainer                 from '../TJSContainer.svelte';
@@ -22,9 +23,9 @@
    // `clientHeight`.
    export let heightChanged = false;
 
-   // Explicit style overrides for the main app and content elements.
-   export let styleApp = void 0;
-   export let styleContent = void 0;
+   // Explicit style overrides for the main app and content elements. Uses action `applyStyles`.
+   export let stylesApp;
+   export let stylesContent;
 
    // Store the initial `heightChanged` state. If it is truthy then `clientHeight` for the content & root elements
    // are bound to `heightChanged` to signal to any parent component of any change to the client & root.
@@ -132,9 +133,12 @@
         in:inTransition={inTransitionOptions}
         out:outTransition={outTransitionOptions}
         on:pointerdown|capture={bringToTop}
-        style={styleApp}>
+        use:applyStyles={stylesApp}>
       <TJSApplicationHeader />
-      <section class=window-content bind:this={elementContent} bind:clientHeight={heightChanged} style={styleContent}>
+      <section class=window-content
+               bind:this={elementContent}
+               bind:clientHeight={heightChanged}
+               use:applyStyles={stylesContent}>
          {#if Array.isArray(allChildren)}
             <TJSContainer children={allChildren} />
          {:else}
@@ -151,9 +155,9 @@
         in:inTransition={inTransitionOptions}
         out:outTransition={outTransitionOptions}
         on:pointerdown|capture={bringToTop}
-        style={styleApp}>
+        use:applyStyles={stylesApp}>
       <TJSApplicationHeader />
-      <section class=window-content bind:this={elementContent} style={styleContent}>
+      <section class=window-content bind:this={elementContent} use:applyStyles={stylesContent}>
          {#if Array.isArray(allChildren)}
             <TJSContainer children={allChildren} />
          {:else}

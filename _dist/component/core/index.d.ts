@@ -10,10 +10,10 @@ declare class ApplicationShell extends SvelteComponent {
     get children(): any;
     set heightChanged(arg: any);
     get heightChanged(): any;
-    set styleApp(arg: any);
-    get styleApp(): any;
-    set styleContent(arg: any);
-    get styleContent(): any;
+    set stylesApp(arg: any);
+    get stylesApp(): any;
+    set stylesContent(arg: any);
+    get stylesContent(): any;
     set transition(arg: any);
     get transition(): any;
     set inTransition(arg: any);
@@ -71,10 +71,10 @@ declare class TJSApplicationShell extends SvelteComponent {
     get children(): any;
     set heightChanged(arg: any);
     get heightChanged(): any;
-    set styleApp(arg: any);
-    get styleApp(): any;
-    set styleContent(arg: any);
-    get styleContent(): any;
+    set stylesApp(arg: any);
+    get stylesApp(): any;
+    set stylesContent(arg: any);
+    get stylesContent(): any;
     set transition(arg: any);
     get transition(): any;
     set inTransition(arg: any);
@@ -135,8 +135,5 @@ declare class TJSHeaderButton extends SvelteComponent {
     set button(arg: any);
     get button(): any;
 }
-declare class TJSStyleProperties extends SvelteComponent {
-    constructor(options: any);
-}
 
-export { ApplicationShell, DialogContent, DialogShell, EmptyApplicationShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSContextMenu, TJSGlassPane, TJSHeaderButton, TJSStyleProperties };
+export { ApplicationShell, DialogContent, DialogShell, EmptyApplicationShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSContextMenu, TJSGlassPane, TJSHeaderButton };
