@@ -826,8 +826,8 @@ function create_fragment$8(ctx) {
 			if (!mounted) {
 				dispose = [
 					listen(a, "click", stop_propagation(prevent_default(/*onClick*/ ctx[1]))),
-					listen(a, "pointerDown", prevent_default(pointerDown_handler)),
-					listen(a, "dblclick", prevent_default(dblclick_handler))
+					listen(a, "pointerdown", stop_propagation(prevent_default(pointerdown_handler))),
+					listen(a, "dblclick", stop_propagation(prevent_default(dblclick_handler)))
 				];
 
 				mounted = true;
@@ -858,13 +858,8 @@ function create_fragment$8(ctx) {
 	};
 }
 
-const pointerDown_handler = () => {
-	
-};
-
-const dblclick_handler = () => {
-	
-};
+const pointerdown_handler = () => null;
+const dblclick_handler = () => null;
 
 function instance$8($$self, $$props, $$invalidate) {
 	let { button } = $$props;

@@ -20,9 +20,10 @@
 
 <svelte:options accessors={true}/>
 
+<!-- Need to capture pointerdown / dblclick to prevent further action by TJSApplicationHeader -->
 <a on:click|preventDefault|stopPropagation={onClick}
-   on:pointerDown|preventDefault={()=>{}}
-   on:dblclick|preventDefault={()=>{}}
+   on:pointerdown|preventDefault|stopPropagation={()=>null}
+   on:dblclick|preventDefault|stopPropagation={()=>null}
    class="header-button {button.class}">
     <i class={button.icon} title={localize(button.title)}></i>{localize(button.label)}
 </a>
