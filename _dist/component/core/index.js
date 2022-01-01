@@ -1,5 +1,5 @@
 import { SvelteComponent, init, safe_not_equal, create_slot, element, insert, action_destroyer, update_slot_base, get_all_dirty_from_scope, get_slot_changes, is_function, transition_in, transition_out, detach, flush, append_styles, empty, group_outros, check_outros, attr, noop, create_component, mount_component, get_spread_update, get_spread_object, destroy_component, destroy_each, assign, listen, add_render_callback, create_in_transition, create_out_transition, binding_callbacks, text, append, set_data, space, run_all, component_subscribe, add_resize_listener, null_to_empty, set_style, create_bidirectional_transition, globals, current_component, HtmlTag, stop_propagation, prevent_default, update_keyed_each, destroy_block, bind, add_flush_callback } from 'svelte/internal';
-import { applyStyles } from '@typhonjs-fvtt/runtime/svelte/action';
+import { applyStyles } from '@typhonjs-fvtt/svelte/action';
 import { getContext, setContext, createEventDispatcher } from 'svelte';
 import { s_DEFAULT_TRANSITION, s_DEFAULT_TRANSITION_OPTIONS, slideFade } from '@typhonjs-fvtt/svelte/transition';
 import { draggable } from '@typhonjs-fvtt/svelte/action';
