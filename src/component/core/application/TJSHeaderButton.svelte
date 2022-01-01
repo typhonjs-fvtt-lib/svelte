@@ -20,6 +20,9 @@
 
 <svelte:options accessors={true}/>
 
-<a on:click|preventDefault|stopPropagation={onClick} class="header-button {button.class}">
+<a on:click|preventDefault|stopPropagation={onClick}
+   on:pointerDown|preventDefault={()=>{}}
+   on:dblclick|preventDefault={()=>{}}
+   class="header-button {button.class}">
     <i class={button.icon} title={localize(button.title)}></i>{localize(button.label)}
 </a>
