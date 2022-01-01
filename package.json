@@ -23,6 +23,10 @@
       "types": "./_dist/component/core/index.d.ts",
       "import": "./_dist/component/core/index.js"
     },
+    "./component/standard": {
+      "types": "./_dist/component/standard/index.d.ts",
+      "import": "./_dist/component/standard/index.js"
+    },
     "./gsap": {
       "types": "./_dist/gsap/index.d.ts",
       "import": "./_dist/gsap/index.js"
@@ -60,7 +64,6 @@
   "dependencies": {
   },
   "devDependencies": {
-    "@league-of-foundry-developers/foundry-vtt-types": "^0.8.9-7",
     "@itsjamie/esdoc-core": "^0.3",
     "@itsjamie/esdoc-cli": "^0.3",
     "@itsjamie/esdoc-standard-plugin": "^0.3",
@@ -69,7 +72,7 @@
     "@typhonjs-config/eslint-config": "^0.3.0",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "@typhonjs-svelte/lib": "github:typhonjs-svelte/lib",
-    "@typhonjs-utils/file-util": "^0.0.3",
+    "@typhonjs-utils/file-util": "^0.0.5",
     "@typhonjs-utils/object": "^0.0.3",
     "eslint": "^8",
     "fs-extra": "^10",

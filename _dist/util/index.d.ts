@@ -1,4 +1,16 @@
 /**
+ * Wraps a callback in a debounced timeout.
+ *
+ * Delay execution of the callback function until the function has not been called for delay milliseconds
+ *
+ * @param {Function} callback - A function to execute once the debounced threshold has been passed.
+ *
+ * @param {number}   delay - An amount of time in milliseconds to delay.
+ *
+ * @return {Function} A wrapped function which can be called to debounce execution
+ */
+declare function debounce(callback: Function, delay: number): Function;
+/**
  * Provides a method to determine if the passed in Svelte component has a getter & setter accessor.
  *
  * @param {*}        component - Svelte component.
@@ -118,4 +130,4 @@ declare function safeAccess(data: object, accessor: string, defaultValue?: any):
  */
 declare function safeSet(data: object, accessor: string, value: any, operation?: string, createMissing?: boolean): boolean;
 
-export { hasAccessor, hasGetter, hasSetter, isApplicationShell, isIterable, isIterableAsync, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet };
+export { debounce, hasAccessor, hasGetter, hasSetter, isApplicationShell, isIterable, isIterableAsync, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet };

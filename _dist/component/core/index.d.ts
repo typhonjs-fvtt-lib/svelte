@@ -135,5 +135,8 @@ declare class TJSHeaderButton extends SvelteComponent {
     set button(arg: any);
     get button(): any;
 }
+declare class TJSStyleProperties extends SvelteComponent {
+    constructor(options: any);
+}
 
-export { ApplicationShell, DialogContent, DialogShell, EmptyApplicationShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSContextMenu, TJSGlassPane, TJSHeaderButton };
+export { ApplicationShell, DialogContent, DialogShell, EmptyApplicationShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSContextMenu, TJSGlassPane, TJSHeaderButton, TJSStyleProperties };
