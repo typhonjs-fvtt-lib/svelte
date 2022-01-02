@@ -8,8 +8,6 @@ export { default as TJSApplicationHeader }   from './application/TJSApplicationH
 export { default as TJSApplicationShell }    from './application/TJSApplicationShell.svelte';
 export { default as TJSHeaderButton }        from './application/TJSHeaderButton.svelte';
 
-export { default as TJSContextMenu }         from './contextmenu/TJSContextMenu.svelte';
-
 export { default as DialogContent }          from './dialog/DialogContent.svelte';
 export { default as DialogShell }            from './dialog/DialogShell.svelte';
 

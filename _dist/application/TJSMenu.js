@@ -1,4 +1,4 @@
-import { TJSContextMenu }  from '@typhonjs-fvtt/svelte/component/core';
+import { TJSContextMenu }  from '@typhonjs-fvtt/svelte/component/standard';
 
 /**
  * Provides game wide menu functionality.
