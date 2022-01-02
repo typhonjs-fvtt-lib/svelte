@@ -32,14 +32,16 @@ declare function draggable(node: HTMLElement, { positionable, booleanStore }: {
     destroy: Function;
 };
 /**
- * Provides a toggle action for `details` HTML elements.
+ * Provides a toggle action for `details` HTML elements. The boolean store provided controls animation.
+ *
+ * It is not necessary to bind the store to the `open` attribute of the associated details element.
  *
  * @param {HTMLDetailsElement} details - The details element.
  *
- * @param {import('svelte/store').writable<boolean>} booleanStore - A boolean store.
+ * @param {import('svelte/store').Writable<boolean>} booleanStore - A boolean store.
  *
  * @returns {object} Destroy callback.
  */
-declare function toggleDetails(details: HTMLDetailsElement, booleanStore: typeof svelte_store.writable): object;
+declare function toggleDetails(details: HTMLDetailsElement, booleanStore: svelte_store.Writable<boolean>): object;
 
 export { applyStyles, draggable, toggleDetails };

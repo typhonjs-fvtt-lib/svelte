@@ -100,9 +100,6 @@ declare class TJSContainer extends SvelteComponent {
     set children(arg: any);
     get children(): any;
 }
-declare class TJSContextMenu extends SvelteComponent {
-    constructor(options: any);
-}
 declare class TJSGlassPane extends SvelteComponent {
     constructor(options: any);
     set id(arg: any);
@@ -136,4 +133,4 @@ declare class TJSHeaderButton extends SvelteComponent {
     get button(): any;
 }
 
-export { ApplicationShell, DialogContent, DialogShell, EmptyApplicationShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSContextMenu, TJSGlassPane, TJSHeaderButton };
+export { ApplicationShell, DialogContent, DialogShell, EmptyApplicationShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSGlassPane, TJSHeaderButton };
