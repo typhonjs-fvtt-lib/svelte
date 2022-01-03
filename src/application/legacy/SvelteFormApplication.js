@@ -332,7 +332,8 @@ export class SvelteFormApplication extends FormApplication
       {
          let cntr = 0;
 
-         return (elementRoot) => {
+         return (elementRoot) =>
+         {
             if (elementRoot !== null && elementRoot !== void 0 && cntr++ > 0)
             {
                this.#updateApplicationShell();
@@ -341,7 +342,7 @@ export class SvelteFormApplication extends FormApplication
 
             return false;
          };
-      }
+      };
 
       if (Array.isArray(this.options.svelte))
       {
