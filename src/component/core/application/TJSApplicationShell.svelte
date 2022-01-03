@@ -170,86 +170,135 @@
 
 
 <style>
-  /**
-   * Defines styles that mimic a Foundry popout Application. `:global` is used to preserve the unused CSS in the
-   * template above. A primary benefit of a separate Application implementation is that the styles are not overridden
-   * by any given game system / mods that might effect the standard Foundry Application CSS. This allows separate
-   * and unique styles to be given to this component regardless of game system / module modifications.
-   */
-  :global(.tjs-app) {
-    max-height: 100%;
-    background: url(/ui/denim075.png) repeat;
-    border-radius: 5px;
-    box-shadow: 0 0 20px #000;
-    margin: 3px 0;
-    color: #f0f0e0;
-    position: absolute;
-  }
+    /**
+     * Defines styles that mimic a Foundry popout Application. `:global` is used to preserve the unused CSS in the
+     * template above. A primary benefit of a separate application shell implementation is that the styles are not
+     * overridden by any given game system / modules that might alter the standard Foundry Application CSS. This allows
+     * separate and unique styles to be given to this application regardless of game system / module modifications.
+     */
+    :global(.tjs-app) {
+        max-height: 100%;
+        background: url(/ui/denim075.png) repeat;
+        border-radius: 5px;
+        box-shadow: 0 0 20px #000;
+        margin: 3px 0;
+        padding: 0.5em;
+        color: #f0f0e0;
+        z-index: 95;
+        overflow: inherit;
+    }
 
-  :global(.tjs-window-app) {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    padding: 0;
-    z-index: 99;
-  }
+    :global(.tjs-window-app) {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        position: absolute;
+        box-shadow: 0 0 20px #000;
+        padding: 0;
+        z-index: 95;
+    }
 
-  :global(.tjs-window-app .window-content) {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    padding: 8px;
-    color: #191813;
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
+    :global(.tjs-window-app > *) {
+        flex: 1;
+    }
 
-  :global(.tjs-window-app .window-header) {
-    flex: 0 0 30px;
-    overflow: hidden;
-    padding: 0 8px;
-    line-height: 30px;
-    border-bottom: 1px solid #000;
-    pointer-events: auto;
-  }
+    :global(.tjs-window-app > .flex0) {
+        display: block;
+        flex: 0;
+    }
 
-  :global(.tjs-window-app .window-header a) {
-    flex: none;
-    margin: 0 0 0 8px;
-  }
+    :global(.tjs-window-app > .flex1) {
+        flex: 1;
+    }
 
-  :global(.tjs-window-app .window-header h4) {
-    font-family: Signika, sans-serif;
-  }
+    :global(.tjs-window-app > .flex2) {
+        flex: 2;
+    }
 
-  :global(.tjs-window-app .window-header i[class^=fa]) {
-    margin-right: 3px;
-  }
+    :global(.tjs-window-app > .flex3) {
+        flex: 3;
+    }
 
-  :global(.tjs-window-app .window-header .window-title) {
-    margin: 0;
-    word-break: break-all;
-  }
+    :global(.tjs-window-app .window-header) {
+        flex: 0 0 30px;
+        overflow: hidden;
+        padding: 0 8px;
+        line-height: 30px;
+        border-bottom: 1px solid #000;
+    }
 
-  :global(.tjs-window-app .window-resizable-handle) {
-    width: 20px;
-    height: 20px;
-    position: absolute;
-    bottom: -1px;
-    right: 0;
-    background: #444;
-    padding: 2px;
-    border: 1px solid #111;
-    border-radius: 4px 0 0 0;
-  }
+    :global(.tjs-window-app .window-header .window-title) {
+        margin: 0;
+        word-break: break-all;
+    }
 
-  :global(.tjs-window-app .window-resizable-handle i.fas) {
-    transform: rotate(45deg);
-  }
+    :global(.tjs-window-app .window-header a) {
+        flex: none;
+        margin: 0 0 0 8px;
+    }
 
-  :global(.tjs-window-app.minimized .window-header) {
-     border: 1px solid #000;
-  }
+    :global(.tjs-window-app .window-header i[class^=fa]) {
+        margin-right: 3px;
+    }
+
+    :global(.tjs-window-app.minimized .window-header) {
+        border: 1px solid #000;
+    }
+
+    :global(.tjs-window-app .window-content) {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        padding: 8px;
+        color: #191813;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    :global(.window-app .window-content > *) {
+        flex: 1;
+    }
+
+    :global(.window-app .window-content > .flex0) {
+        display: block;
+        flex: 0;
+    }
+
+    :global(.window-app .window-content > .flex1) {
+        flex: 1;
+    }
+
+    :global(.window-app .window-content > .flex2) {
+        flex: 2;
+    }
+
+    :global(.window-app .window-content > .flex3) {
+        flex: 3;
+    }
+
+    :global(.window-app.zhover) {
+        z-index: calc(var(--z-index-window) + 1);
+    }
+
+    :global(.tjs-window-app .window-resizable-handle) {
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        bottom: -1px;
+        right: 0;
+        background: #444;
+        padding: 2px;
+        border: 1px solid #111;
+        border-radius: 4px 0 0 0;
+    }
+
+    :global(.tjs-window-app .window-resizable-handle i.fas) {
+        transform: rotate(45deg);
+    }
+
+    :global(.window-app.minimized .window-resizable-handle) {
+        display: none;
+    }
 </style>
