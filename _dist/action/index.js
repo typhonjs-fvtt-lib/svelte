@@ -1,3 +1,32 @@
+import 'svelte/store';
+import 'svelte/internal';
+
+/**
+ * Subscribes to the given store with two update functions provided. The first function is invoked on the initial
+ * subscription. All future updates are dispatched to the update function.
+ *
+ * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
+ *  Store to subscribe to...
+ *
+ * @param {function} first - Function to receive first update.
+ *
+ * @param {function} update - Function to receive future updates.
+ *
+ * @returns {function} Store unsubscribe function.
+ */
+
+function subscribeFirstRest(store, first, update) {
+  let firedFirst = false;
+  return store.subscribe(value => {
+    if (!firedFirst) {
+      firedFirst = true;
+      first(value);
+    } else {
+      update(value);
+    }
+  });
+}
+
 /**
  * Provides an action to apply style properties provided as an object.
  *
@@ -50,10 +79,11 @@ function toggleDetails(details, booleanStore)
    /** @type {Animation} */
    let animation;
 
+   /** @type {boolean} */
    let open = details.open;
 
-   // The booleanStore sets initial open state and handles animation on changes.
-   const unsubscribe = booleanStore.subscribe((value) =>
+   // The booleanStore sets initial open state and handles animation on further changes.
+   const unsubscribe = subscribeFirstRest(booleanStore, (value) => { open = value; details.open = open; }, (value) =>
    {
       open = value;
       handleAnimation();
