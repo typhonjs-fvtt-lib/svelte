@@ -36,6 +36,9 @@ declare function draggable(node: HTMLElement, { positionable, booleanStore }: {
  *
  * It is not necessary to bind the store to the `open` attribute of the associated details element.
  *
+ * When the action is triggered to close the details element a data attribute `closing` is set to `true`. This allows
+ * any associated closing transitions to start immediately.
+ *
  * @param {HTMLDetailsElement} details - The details element.
  *
  * @param {import('svelte/store').Writable<boolean>} booleanStore - A boolean store.
