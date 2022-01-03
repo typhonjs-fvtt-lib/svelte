@@ -325,11 +325,29 @@ export class SvelteFormApplication extends FormApplication
       // Make sure the store is updated with the latest header buttons. Also allows filtering buttons before display.
       this.reactive.updateHeaderButtons();
 
+      // Create a function to generate a callback for Svelte components to invoke to update the tracked elements for
+      // application shells in the rare cases that the main element root changes. The update is only trigged on
+      // successive changes of `elementRoot`. Returns a boolean to indicate the element roots are updated.
+      const elementRootUpdate = () =>
+      {
+         let cntr = 0;
+
+         return (elementRoot) => {
+            if (elementRoot !== null && elementRoot !== void 0 && cntr++ > 0)
+            {
+               this.#updateApplicationShell();
+               return true;
+            }
+
+            return false;
+         };
+      }
+
       if (Array.isArray(this.options.svelte))
       {
          for (const svelteConfig of this.options.svelte)
          {
-            const svelteData = s_LOAD_CONFIG(this, html, svelteConfig);
+            const svelteData = s_LOAD_CONFIG(this, html, svelteConfig, elementRootUpdate);
 
             if (isApplicationShell(svelteData.component))
             {
@@ -348,7 +366,7 @@ export class SvelteFormApplication extends FormApplication
       }
       else if (typeof this.options.svelte === 'object')
       {
-         const svelteData = s_LOAD_CONFIG(this, html, this.options.svelte);
+         const svelteData = s_LOAD_CONFIG(this, html, this.options.svelte, elementRootUpdate);
 
          if (isApplicationShell(svelteData.component))
          {
@@ -655,6 +673,53 @@ export class SvelteFormApplication extends FormApplication
       // Return the updated position object
       return currentPosition;
    }
+
+   /**
+    * This method is only invoked by the `elementRootUpdate` callback that is added to the external context passed to
+    * Svelte components. When invoked it updates the local element roots tracked by SvelteApplication.
+    */
+   #updateApplicationShell()
+   {
+      const applicationShell = this.svelte.applicationShell;
+
+      if (applicationShell !== null)
+      {
+         this._element = $(applicationShell.elementRoot);
+
+         // Detect if the application shell exports an `elementContent` accessor.
+         this.#elementContent = hasGetter(applicationShell, 'elementContent') ?
+          applicationShell.elementContent : null;
+
+         // Detect if the application shell exports an `elementTarget` accessor.
+         this.#elementTarget = hasGetter(applicationShell, 'elementTarget') ?
+          applicationShell.elementTarget : null;
+
+         if (this.#elementTarget === null)
+         {
+            const element = typeof this.options.selectorTarget === 'string' ?
+             this._element.find(this.options.selectorTarget) : this._element;
+
+            this.#elementTarget = element[0];
+         }
+
+         // The initial zIndex may be set in application options or for popOut applications is stored by `_renderOuter`
+         // in `this.#initialZIndex`.
+         if (typeof this.options.setPosition === 'boolean' && this.options.setPosition)
+         {
+            this.#elementTarget.style.zIndex = typeof this.options.zIndex === 'number' ? this.options.zIndex :
+             this.#initialZIndex ?? 95;
+
+            super.bringToTop();
+
+            this.setPosition(this.position);
+         }
+
+         super._activateCoreListeners([this.#elementTarget]);
+
+         this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent, elementTarget:
+          this.#elementTarget });
+      }
+   }
 }
 
 /**
@@ -666,9 +731,11 @@ export class SvelteFormApplication extends FormApplication
  *
  * @param {object}            config - Svelte component options
  *
+ * @param {Function}          elementRootUpdate - A callback to assign to the external context.
+ *
  * @returns {SvelteData} The config + instantiated Svelte component.
  */
-function s_LOAD_CONFIG(app, html, config)
+function s_LOAD_CONFIG(app, html, config, elementRootUpdate)
 {
    const svelteOptions = typeof config.options === 'object' ? config.options : {};
 
@@ -700,8 +767,9 @@ function s_LOAD_CONFIG(app, html, config)
 
    const externalContext = svelteConfig.context.get('external');
 
-   // Inject the Foundry application instance as a Svelte prop.
+   // Inject the Foundry application instance and `elementRootUpdate` to the external context.
    externalContext.foundryApp = app;
+   externalContext.elementRootUpdate = elementRootUpdate;
 
    let eventbus;
 
@@ -762,11 +830,7 @@ function s_LOAD_CONFIG(app, html, config)
    // If the configuration / original target is an HTML element then do not inject HTML.
    const injectHTML = !(config.target instanceof HTMLElement);
 
-   const result = { config: svelteConfig, component, element, injectHTML };
-
-   Object.freeze(result);
-
-   return result;
+   return { config: svelteConfig, component, element, injectHTML };
 }
 
 /**
@@ -858,6 +922,23 @@ class GetSvelteData
    data(index)
    {
       return this.#svelteData[index];
+   }
+
+   /**
+    * Returns the {@link SvelteData} instance for a given component.
+    *
+    * @param {object} component - Svelte component.
+    *
+    * @returns {SvelteData} -  The loaded Svelte config + component.
+    */
+   dataByComponent(component)
+   {
+      for (const data of this.#svelteData)
+      {
+         if (data.component === component) { return data; }
+      }
+
+      return void 0;
    }
 
    /**
