@@ -1,5 +1,27 @@
-import 'svelte/store';
 import 'svelte/internal';
+import 'svelte/store';
+
+/**
+ * Wraps a callback in a debounced timeout.
+ *
+ * Delay execution of the callback function until the function has not been called for delay milliseconds
+ *
+ * @param {Function} callback - A function to execute once the debounced threshold has been passed.
+ *
+ * @param {number}   delay - An amount of time in milliseconds to delay.
+ *
+ * @return {Function} A wrapped function which can be called to debounce execution
+ */
+function debounce(callback, delay)
+{
+   let timeoutId;
+
+   return function(...args)
+   {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => { callback.apply(this, args); }, delay);
+   }
+}
 
 /**
  * Subscribes to the given store with two update functions provided. The first function is invoked on the initial
@@ -58,6 +80,149 @@ function applyStyles(node, properties)
          setProperties();
       }
    };
+}
+
+/**
+ * Defines an `Element.animate` animation from provided keyframes and options.
+ *
+ * @param {object}         [opts] - Optional parameters.
+ *
+ * @param {number}         [opts.duration=600] - Duration in milliseconds.
+ *
+ * @param {Array|object}   opts.keyframes - An array of keyframe objects or a keyframe object whose properties are
+ *                                          arrays of values to iterate over.
+ *
+ * @param {object}         [opts.options] - An object containing one or more timing properties. When defined it is used
+ *                                          instead of duration.
+ *
+ * @param {string}         [opts.event='click'] - DOM event to bind element to respond with the ripple effect.
+ *
+ * @param {number}         [opts.debounce=undefined] - Add a debounce to incoming events in milliseconds.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/animate
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API/Keyframe_Formats
+ *
+ * @returns Function - Actual action.
+ */
+function animate({ duration = 600, keyframes = [], options, event = 'click', debounce: debounce$1 } = {})
+{
+   return (element) =>
+   {
+      function createAnimation() {
+         element.animate(keyframes, typeof options === 'object' && options !== null ? options : duration);
+      }
+
+      const eventFn = Number.isInteger(debounce$1) && debounce$1 > 0 ? debounce(createAnimation, debounce$1) :
+       createAnimation;
+
+      element.addEventListener(event, eventFn);
+
+      return {
+         destroy: () => element.removeEventListener(event, eventFn)
+      };
+   }
+}
+
+/**
+ * Combines multiple composable actions.
+ *
+ * Note: The update function passes the same variable to all update functions of each action.
+ *
+ * @param {...Function} actions - One or more composable action functions to combine.
+ *
+ * @returns {Function} Composed action.
+ */
+function composable(...actions)
+{
+   return (element, options) =>
+   {
+      let lifecycle = actions.map((action) => action(element, options));
+
+      return {
+         destroy: () =>
+         {
+            for (const action of lifecycle)
+            {
+               if (typeof action.destroy === 'function') { action.destroy(); }
+            }
+
+            lifecycle = void 0;
+         },
+         update: (parameters) =>
+         {
+            for (const action of lifecycle)
+            {
+               if (typeof action.update === 'function') { action.update(parameters); }
+            }
+         }
+      }
+   };
+}
+
+/**
+ * Defines the classic Material Design ripple effect as an action. `ripple` is a wrapper around the returned action.
+ * This allows it to be easily used as a prop.
+ *
+ * @param {object}   [opts] - Optional parameters.
+ *
+ * @param {number}   [opts.duration=600] - Duration in milliseconds.
+ *
+ * @param {string}   [opts.color='rgba(255, 255, 255, 0.7)'] - A valid CSS color.
+ *
+ * @param {string}   [opts.event='click'] - DOM event to bind element to respond with the ripple effect.
+ *
+ * @param {number}   [opts.debounce=undefined] - Add a debounce to incoming events in milliseconds.
+ *
+ * @returns Function - Actual action.
+ */
+function ripple({ duration = 600, color = 'rgba(255, 255, 255, 0.7)', event = 'click', debounce: debounce$1 } = {})
+{
+   return (element) =>
+   {
+      function createRipple(e) {
+         const elementRect = element.getBoundingClientRect();
+
+         const diameter = Math.max(elementRect.width, elementRect.height);
+         const radius = diameter / 2;
+         const left = `${e.clientX - (elementRect.left + radius)}px`;
+         const top = `${e.clientY - (elementRect.top + radius)}px`;
+
+         const span = document.createElement('span');
+
+         span.style.width = `${diameter}px`;
+         span.style.height = `${diameter}px`;
+         span.style.left = left;
+         span.style.top = top;
+         span.style.position = 'absolute';
+         span.style.borderRadius = '50%';
+         span.style.backgroundColor = `var(--color-effect-ripple, ${color})`;
+
+         element.append(span);
+
+         const animation = span.animate([
+            {  // from
+               transform: 'scale(.7)',
+               opacity: 0.5,
+               filter: 'blur(2px)'
+            },
+            {  // to
+               transform: 'scale(4)',
+               opacity: 0,
+               filter: 'blur(5px)'
+            }
+         ], duration);
+
+         animation.onfinish = () => span.remove();
+      }
+
+      const eventFn = Number.isInteger(debounce$1) && debounce$1 > 0 ? debounce(createRipple, debounce$1) : createRipple;
+
+      element.addEventListener(event, eventFn);
+
+      return {
+         destroy: () => element.removeEventListener(event, eventFn)
+      };
+   }
 }
 
 /**
@@ -323,5 +488,5 @@ function draggable(node, { positionable, booleanStore })
    };
 }
 
-export { applyStyles, draggable, toggleDetails };
+export { animate, applyStyles, composable, draggable, ripple, toggleDetails };
 //# sourceMappingURL=index.js.map
