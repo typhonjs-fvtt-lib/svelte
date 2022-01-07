@@ -17,19 +17,19 @@ const get_summary_end_slot_context = ctx => ({});
 const get_label_slot_changes = dirty => ({});
 const get_label_slot_context = ctx => ({});
 
-// (154:25) {label}
+// (158:25) {label}
 function fallback_block(ctx) {
 	let t;
 
 	return {
 		c() {
-			t = text(/*label*/ ctx[2]);
+			t = text(/*label*/ ctx[1]);
 		},
 		m(target, anchor) {
 			insert(target, t, anchor);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*label*/ 4) set_data(t, /*label*/ ctx[2]);
+			if (dirty & /*label*/ 2) set_data(t, /*label*/ ctx[1]);
 		},
 		d(detaching) {
 			if (detaching) detach(t);
@@ -82,8 +82,8 @@ function create_fragment$1$1(ctx) {
 			attr(summary, "class", "svelte-txio7o");
 			attr(div, "class", "contents svelte-txio7o");
 			attr(details, "class", "tjs-folder svelte-txio7o");
-			attr(details, "data-id", /*id*/ ctx[1]);
-			attr(details, "data-label", /*label*/ ctx[2]);
+			attr(details, "data-id", /*id*/ ctx[0]);
+			attr(details, "data-label", /*label*/ ctx[1]);
 			attr(details, "data-closing", "false");
 		},
 		m(target, anchor) {
@@ -120,8 +120,8 @@ function create_fragment$1$1(ctx) {
 					listen(details, "close", /*close_handler*/ ctx[10]),
 					listen(details, "openAny", /*openAny_handler*/ ctx[11]),
 					listen(details, "closeAny", /*closeAny_handler*/ ctx[12]),
-					action_destroyer(toggleDetails_action = toggleDetails.call(null, details, /*store*/ ctx[3])),
-					action_destroyer(applyStyles_action = applyStyles.call(null, details, /*styles*/ ctx[0]))
+					action_destroyer(toggleDetails_action = toggleDetails.call(null, details, /*store*/ ctx[2])),
+					action_destroyer(applyStyles_action = applyStyles.call(null, details, /*styles*/ ctx[3]))
 				];
 
 				mounted = true;
@@ -142,7 +142,7 @@ function create_fragment$1$1(ctx) {
 					);
 				}
 			} else {
-				if (label_slot_or_fallback && label_slot_or_fallback.p && (!current || dirty & /*label*/ 4)) {
+				if (label_slot_or_fallback && label_slot_or_fallback.p && (!current || dirty & /*label*/ 2)) {
 					label_slot_or_fallback.p(ctx, !current ? -1 : dirty);
 				}
 			}
@@ -177,16 +177,16 @@ function create_fragment$1$1(ctx) {
 				}
 			}
 
-			if (!current || dirty & /*id*/ 2) {
-				attr(details, "data-id", /*id*/ ctx[1]);
+			if (!current || dirty & /*id*/ 1) {
+				attr(details, "data-id", /*id*/ ctx[0]);
 			}
 
-			if (!current || dirty & /*label*/ 4) {
-				attr(details, "data-label", /*label*/ ctx[2]);
+			if (!current || dirty & /*label*/ 2) {
+				attr(details, "data-label", /*label*/ ctx[1]);
 			}
 
-			if (toggleDetails_action && is_function(toggleDetails_action.update) && dirty & /*store*/ 8) toggleDetails_action.update.call(null, /*store*/ ctx[3]);
-			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*styles*/ 1) applyStyles_action.update.call(null, /*styles*/ ctx[0]);
+			if (toggleDetails_action && is_function(toggleDetails_action.update) && dirty & /*store*/ 4) toggleDetails_action.update.call(null, /*store*/ ctx[2]);
+			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*styles*/ 8) applyStyles_action.update.call(null, /*styles*/ ctx[3]);
 		},
 		i(local) {
 			if (current) return;
@@ -285,19 +285,39 @@ function instance$1$1($$self, $$props, $$invalidate) {
 	}
 
 	$$self.$$set = $$props => {
-		if ('styles' in $$props) $$invalidate(0, styles = $$props.styles);
+		if ('styles' in $$props) $$invalidate(3, styles = $$props.styles);
 		if ('folder' in $$props) $$invalidate(5, folder = $$props.folder);
-		if ('id' in $$props) $$invalidate(1, id = $$props.id);
-		if ('label' in $$props) $$invalidate(2, label = $$props.label);
-		if ('store' in $$props) $$invalidate(3, store = $$props.store);
+		if ('id' in $$props) $$invalidate(0, id = $$props.id);
+		if ('label' in $$props) $$invalidate(1, label = $$props.label);
+		if ('store' in $$props) $$invalidate(2, store = $$props.store);
 		if ('$$scope' in $$props) $$invalidate(6, $$scope = $$props.$$scope);
 	};
 
+	$$self.$$.update = () => {
+		if ($$self.$$.dirty & /*folder, id*/ 33) {
+			$$invalidate(0, id = typeof folder === 'object'
+			? folder.icon
+			: typeof id === 'string' ? id : void 0);
+		}
+
+		if ($$self.$$.dirty & /*folder, label*/ 34) {
+			$$invalidate(1, label = typeof folder === 'object'
+			? folder.label
+			: typeof label === 'string' ? label : '');
+		}
+
+		if ($$self.$$.dirty & /*folder, store*/ 36) {
+			$$invalidate(2, store = typeof folder === 'object'
+			? folder.store
+			: typeof store === 'object' ? store : writable(false));
+		}
+	};
+
 	return [
-		styles,
 		id,
 		label,
 		store,
+		styles,
 		detailsEl,
 		folder,
 		$$scope,
@@ -322,11 +342,11 @@ class TJSFolder extends SvelteComponent {
 			create_fragment$1$1,
 			safe_not_equal,
 			{
-				styles: 0,
+				styles: 3,
 				folder: 5,
-				id: 1,
-				label: 2,
-				store: 3
+				id: 0,
+				label: 1,
+				store: 2
 			},
 			add_css$2
 		);

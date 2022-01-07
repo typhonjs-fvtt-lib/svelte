@@ -76,11 +76,16 @@ declare function draggable(node: HTMLElement, { positionable, booleanStore }: {
  * Defines the classic Material Design ripple effect as an action. `ripple` is a wrapper around the returned action.
  * This allows it to be easily used as a prop.
  *
+ * Note: A negative one translateZ transform is applied to the added spans allowing other content to be layered on top
+ * with a positive translateZ.
+ *
+ * Styling: There is a single CSS variable `--tjs-effect-ripple-background` that can be set to control the background.
+ *
  * @param {object}   [opts] - Optional parameters.
  *
  * @param {number}   [opts.duration=600] - Duration in milliseconds.
  *
- * @param {string}   [opts.color='rgba(255, 255, 255, 0.7)'] - A valid CSS color.
+ * @param {string}   [opts.background='rgba(255, 255, 255, 0.7)'] - A valid CSS background attribute.
  *
  * @param {string}   [opts.event='click'] - DOM event to bind element to respond with the ripple effect.
  *
@@ -88,9 +93,9 @@ declare function draggable(node: HTMLElement, { positionable, booleanStore }: {
  *
  * @returns Function - Actual action.
  */
-declare function ripple({ duration, color, event, debounce: debounce$1 }?: {
+declare function ripple({ duration, background, event, debounce: debounce$1 }?: {
     duration?: number;
-    color?: string;
+    background?: string;
     event?: string;
     debounce?: number;
 }): (element: any) => {
