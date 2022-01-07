@@ -9,5 +9,8 @@ declare class TJSFolder extends SvelteComponent {
 declare class TJSStyleProperties extends SvelteComponent {
     constructor(options: any);
 }
+declare class TJSToggleButton extends SvelteComponent {
+    constructor(options: any);
+}
 
-export { TJSContextMenu, TJSFolder, TJSStyleProperties };
+export { TJSContextMenu, TJSFolder, TJSStyleProperties, TJSToggleButton };
