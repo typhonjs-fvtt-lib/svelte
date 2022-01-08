@@ -166,7 +166,7 @@ function composable(...actions)
  * Note: A negative one translateZ transform is applied to the added spans allowing other content to be layered on top
  * with a positive translateZ.
  *
- * Styling: There is a single CSS variable `--tjs-effect-ripple-background` that can be set to control the background.
+ * Styling: There is a single CSS variable `--tjs-action-ripple-background` that can be set to control the background.
  *
  * @param {object}   [opts] - Optional parameters.
  *
@@ -200,7 +200,7 @@ function ripple({ duration = 600, background = 'rgba(255, 255, 255, 0.7)', event
          span.style.left = left;
          span.style.top = top;
 
-         span.style.background = `var(--tjs-effect-ripple-background, ${background})`;
+         span.style.background = `var(--tjs-action-ripple-background, ${background})`;
          span.style.borderRadius = '50%';
          span.style.pointerEvents = 'none';
          span.style.transform = 'translateZ(-1px)';
