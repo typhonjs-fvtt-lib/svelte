@@ -42,7 +42,10 @@
    }
 
    setContext('getElementContent', () => elementContent);
-   setContext('getElementRoot', () => elementRoot);
+   setContext('getElementRoot', () => {
+      console.log(`!!! TJSApplicationShell - getElementRoot`);
+      return elementRoot;
+   });
 
    const context = getContext('external');
 

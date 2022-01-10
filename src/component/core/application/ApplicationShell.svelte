@@ -42,7 +42,10 @@
    }
 
    setContext('getElementContent', () => elementContent);
-   setContext('getElementRoot', () => elementRoot);
+   setContext('getElementRoot', () => {
+      console.log(`!!! ApplicationShell - getElementRoot`);
+      return elementRoot;
+   });
 
    const context = getContext('external');
 

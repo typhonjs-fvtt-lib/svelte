@@ -1388,7 +1388,7 @@ function add_css$2(target) {
 	append_styles(target, "svelte-3vt5in", ".window-app.svelte-3vt5in{overflow:inherit}");
 }
 
-// (150:0) {:else}
+// (153:0) {:else}
 function create_else_block_1$1(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -1512,7 +1512,7 @@ function create_else_block_1$1(ctx) {
 	};
 }
 
-// (127:0) {#if bindHeightChanged}
+// (130:0) {#if bindHeightChanged}
 function create_if_block$4(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -1644,7 +1644,7 @@ function create_if_block$4(ctx) {
 	};
 }
 
-// (163:9) {:else}
+// (166:9) {:else}
 function create_else_block_2$1(ctx) {
 	let current;
 	const default_slot_template = /*#slots*/ ctx[19].default;
@@ -1692,7 +1692,7 @@ function create_else_block_2$1(ctx) {
 	};
 }
 
-// (161:9) {#if Array.isArray(allChildren)}
+// (164:9) {#if Array.isArray(allChildren)}
 function create_if_block_2$1(ctx) {
 	let tjscontainer;
 	let current;
@@ -1725,7 +1725,7 @@ function create_if_block_2$1(ctx) {
 	};
 }
 
-// (144:9) {:else}
+// (147:9) {:else}
 function create_else_block$3(ctx) {
 	let current;
 	const default_slot_template = /*#slots*/ ctx[19].default;
@@ -1773,7 +1773,7 @@ function create_else_block$3(ctx) {
 	};
 }
 
-// (142:9) {#if Array.isArray(allChildren)}
+// (145:9) {#if Array.isArray(allChildren)}
 function create_if_block_1$2(ctx) {
 	let tjscontainer;
 	let current;
@@ -1872,7 +1872,12 @@ function instance$4($$self, $$props, $$invalidate) {
 	};
 
 	setContext('getElementContent', () => elementContent);
-	setContext('getElementRoot', () => elementRoot);
+
+	setContext('getElementRoot', () => {
+		console.log(`!!! ApplicationShell - getElementRoot`);
+		return elementRoot;
+	});
+
 	const context = getContext('external');
 
 	// Store Foundry Application reference.
@@ -2610,7 +2615,7 @@ function add_css$1(target) {
 	append_styles(target, "svelte-9xueci", ".tjs-app{max-height:100%;background:url(/ui/denim075.png) repeat;border-radius:5px;box-shadow:0 0 20px #000;margin:3px 0;padding:0.5em;color:#f0f0e0;z-index:95;overflow:inherit}.tjs-window-app{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;position:absolute;box-shadow:0 0 20px #000;padding:0;z-index:95}.tjs-window-app > *{flex:1}.tjs-window-app > .flex0{display:block;flex:0}.tjs-window-app > .flex1{flex:1}.tjs-window-app > .flex2{flex:2}.tjs-window-app > .flex3{flex:3}.tjs-window-app .window-header{flex:0 0 30px;overflow:hidden;padding:0 8px;line-height:30px;border-bottom:1px solid #000}.tjs-window-app .window-header .window-title{margin:0;word-break:break-all}.tjs-window-app .window-header a{flex:none;margin:0 0 0 8px}.tjs-window-app .window-header i[class^=fa]{margin-right:3px}.tjs-window-app.minimized .window-header{border:1px solid #000}.tjs-window-app .window-content{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;padding:8px;color:#191813;overflow-y:auto;overflow-x:hidden}.window-app .window-content > *{flex:1}.window-app .window-content > .flex0{display:block;flex:0}.window-app .window-content > .flex1{flex:1}.window-app .window-content > .flex2{flex:2}.window-app .window-content > .flex3{flex:3}.window-app.zhover{z-index:calc(var(--z-index-window) + 1)}.tjs-window-app .window-resizable-handle{width:20px;height:20px;position:absolute;bottom:-1px;right:0;background:#444;padding:2px;border:1px solid #111;border-radius:4px 0 0 0}.tjs-window-app .window-resizable-handle i.fas{transform:rotate(45deg)}.window-app.minimized .window-resizable-handle{display:none}");
 }
 
-// (150:0) {:else}
+// (153:0) {:else}
 function create_else_block_1(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -2734,7 +2739,7 @@ function create_else_block_1(ctx) {
 	};
 }
 
-// (127:0) {#if bindHeightChanged}
+// (130:0) {#if bindHeightChanged}
 function create_if_block$2(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -2866,7 +2871,7 @@ function create_if_block$2(ctx) {
 	};
 }
 
-// (163:11) {:else}
+// (166:11) {:else}
 function create_else_block_2(ctx) {
 	let current;
 	const default_slot_template = /*#slots*/ ctx[19].default;
@@ -2914,7 +2919,7 @@ function create_else_block_2(ctx) {
 	};
 }
 
-// (161:11) {#if Array.isArray(allChildren)}
+// (164:11) {#if Array.isArray(allChildren)}
 function create_if_block_2(ctx) {
 	let tjscontainer;
 	let current;
@@ -2947,7 +2952,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (144:11) {:else}
+// (147:11) {:else}
 function create_else_block$1(ctx) {
 	let current;
 	const default_slot_template = /*#slots*/ ctx[19].default;
@@ -2995,7 +3000,7 @@ function create_else_block$1(ctx) {
 	};
 }
 
-// (142:11) {#if Array.isArray(allChildren)}
+// (145:11) {#if Array.isArray(allChildren)}
 function create_if_block_1$1(ctx) {
 	let tjscontainer;
 	let current;
@@ -3094,7 +3099,12 @@ function instance$2($$self, $$props, $$invalidate) {
 	};
 
 	setContext('getElementContent', () => elementContent);
-	setContext('getElementRoot', () => elementRoot);
+
+	setContext('getElementRoot', () => {
+		console.log(`!!! TJSApplicationShell - getElementRoot`);
+		return elementRoot;
+	});
+
 	const context = getContext('external');
 
 	// Store Foundry Application reference.
