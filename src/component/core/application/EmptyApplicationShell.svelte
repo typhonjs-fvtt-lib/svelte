@@ -20,14 +20,19 @@
    // are bound to `heightChanged` to signal to any parent component of any change to the client & root.
    const bindHeightChanged = !!heightChanged;
 
+   // Use a writable store to make `elementContent` and `elementRoot` accessible. A store is used in the case when
+   // One root component with an `elementRoot` is replaced with another. Due to timing issues and the onDestroy / outro
+   // transitions either of these may be set to null. I will investigate more and file a bug against Svelte.
    if (!getContext('storeElementContent')) { setContext('storeElementContent', writable(elementContent)); }
    if (!getContext('storeElementRoot')) { setContext('storeElementRoot', writable(elementRoot)); }
 
+   // Only update the `elementContent` store if the new `elementContent` is not null or undefined.
    $: if (elementContent !== void 0 && elementContent !== null)
    {
       getContext('storeElementContent').set(elementContent);
    }
 
+   // Only update the `elementRoot` store if the new `elementRoot` is not null or undefined.
    $: if (elementRoot !== void 0 && elementRoot !== null)
    {
       getContext('storeElementRoot').set(elementRoot);

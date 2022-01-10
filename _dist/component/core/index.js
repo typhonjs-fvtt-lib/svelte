@@ -1393,7 +1393,7 @@ function add_css$2(target) {
 	append_styles(target, "svelte-3vt5in", ".window-app.svelte-3vt5in{overflow:inherit}");
 }
 
-// (161:0) {:else}
+// (166:0) {:else}
 function create_else_block_1$1(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -1517,7 +1517,7 @@ function create_else_block_1$1(ctx) {
 	};
 }
 
-// (138:0) {#if bindHeightChanged}
+// (143:0) {#if bindHeightChanged}
 function create_if_block$4(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -1649,7 +1649,7 @@ function create_if_block$4(ctx) {
 	};
 }
 
-// (174:9) {:else}
+// (179:9) {:else}
 function create_else_block_2$1(ctx) {
 	let current;
 	const default_slot_template = /*#slots*/ ctx[19].default;
@@ -1697,7 +1697,7 @@ function create_else_block_2$1(ctx) {
 	};
 }
 
-// (172:9) {#if Array.isArray(allChildren)}
+// (177:9) {#if Array.isArray(allChildren)}
 function create_if_block_2$1(ctx) {
 	let tjscontainer;
 	let current;
@@ -1730,7 +1730,7 @@ function create_if_block_2$1(ctx) {
 	};
 }
 
-// (155:9) {:else}
+// (160:9) {:else}
 function create_else_block$3(ctx) {
 	let current;
 	const default_slot_template = /*#slots*/ ctx[19].default;
@@ -1778,7 +1778,7 @@ function create_else_block$3(ctx) {
 	};
 }
 
-// (153:9) {#if Array.isArray(allChildren)}
+// (158:9) {#if Array.isArray(allChildren)}
 function create_if_block_1$2(ctx) {
 	let tjscontainer;
 	let current;
@@ -1876,6 +1876,9 @@ function instance$4($$self, $$props, $$invalidate) {
 		}
 	};
 
+	// Use a writable store to make `elementContent` and `elementRoot` accessible. A store is used in the case when
+	// One root component with an `elementRoot` is replaced with another. Due to timing issues and the onDestroy / outro
+	// transitions either of these may be set to null. I will investigate more and file a bug against Svelte.
 	if (!getContext('storeElementContent')) {
 		setContext('storeElementContent', writable(elementContent));
 	}
@@ -1964,12 +1967,14 @@ function instance$4($$self, $$props, $$invalidate) {
 
 	$$self.$$.update = () => {
 		if ($$self.$$.dirty & /*elementContent*/ 1) {
+			// Only update the `elementContent` store if the new `elementContent` is not null or undefined.
 			if (elementContent !== void 0 && elementContent !== null) {
 				getContext('storeElementContent').set(elementContent);
 			}
 		}
 
 		if ($$self.$$.dirty & /*elementRoot*/ 2) {
+			// Only update the `elementRoot` store if the new `elementRoot` is not null or undefined.
 			if (elementRoot !== void 0 && elementRoot !== null) {
 				getContext('storeElementRoot').set(elementRoot);
 			}
@@ -2268,7 +2273,7 @@ function create_else_block$2(ctx) {
 	};
 }
 
-// (112:0) {#if bindHeightChanged}
+// (117:0) {#if bindHeightChanged}
 function create_if_block$3(ctx) {
 	let div;
 	let div_id_value;
@@ -2387,6 +2392,9 @@ function instance$3($$self, $$props, $$invalidate) {
 	// are bound to `heightChanged` to signal to any parent component of any change to the client & root.
 	const bindHeightChanged = !!heightChanged;
 
+	// Use a writable store to make `elementContent` and `elementRoot` accessible. A store is used in the case when
+	// One root component with an `elementRoot` is replaced with another. Due to timing issues and the onDestroy / outro
+	// transitions either of these may be set to null. I will investigate more and file a bug against Svelte.
 	if (!getContext('storeElementContent')) {
 		setContext('storeElementContent', writable(elementContent));
 	}
@@ -2451,12 +2459,14 @@ function instance$3($$self, $$props, $$invalidate) {
 		}
 
 		if ($$self.$$.dirty & /*elementContent*/ 256) {
+			// Only update the `elementContent` store if the new `elementContent` is not null or undefined.
 			if (elementContent !== void 0 && elementContent !== null) {
 				getContext('storeElementContent').set(elementContent);
 			}
 		}
 
 		if ($$self.$$.dirty & /*elementRoot*/ 1) {
+			// Only update the `elementRoot` store if the new `elementRoot` is not null or undefined.
 			if (elementRoot !== void 0 && elementRoot !== null) {
 				getContext('storeElementRoot').set(elementRoot);
 			}
@@ -2651,7 +2661,7 @@ function add_css$1(target) {
 	append_styles(target, "svelte-9xueci", ".tjs-app{max-height:100%;background:url(/ui/denim075.png) repeat;border-radius:5px;box-shadow:0 0 20px #000;margin:3px 0;padding:0.5em;color:#f0f0e0;z-index:95;overflow:inherit}.tjs-window-app{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;position:absolute;box-shadow:0 0 20px #000;padding:0;z-index:95}.tjs-window-app > *{flex:1}.tjs-window-app > .flex0{display:block;flex:0}.tjs-window-app > .flex1{flex:1}.tjs-window-app > .flex2{flex:2}.tjs-window-app > .flex3{flex:3}.tjs-window-app .window-header{flex:0 0 30px;overflow:hidden;padding:0 8px;line-height:30px;border-bottom:1px solid #000}.tjs-window-app .window-header .window-title{margin:0;word-break:break-all}.tjs-window-app .window-header a{flex:none;margin:0 0 0 8px}.tjs-window-app .window-header i[class^=fa]{margin-right:3px}.tjs-window-app.minimized .window-header{border:1px solid #000}.tjs-window-app .window-content{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;padding:8px;color:#191813;overflow-y:auto;overflow-x:hidden}.window-app .window-content > *{flex:1}.window-app .window-content > .flex0{display:block;flex:0}.window-app .window-content > .flex1{flex:1}.window-app .window-content > .flex2{flex:2}.window-app .window-content > .flex3{flex:3}.window-app.zhover{z-index:calc(var(--z-index-window) + 1)}.tjs-window-app .window-resizable-handle{width:20px;height:20px;position:absolute;bottom:-1px;right:0;background:#444;padding:2px;border:1px solid #111;border-radius:4px 0 0 0}.tjs-window-app .window-resizable-handle i.fas{transform:rotate(45deg)}.window-app.minimized .window-resizable-handle{display:none}");
 }
 
-// (161:0) {:else}
+// (166:0) {:else}
 function create_else_block_1(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -2775,7 +2785,7 @@ function create_else_block_1(ctx) {
 	};
 }
 
-// (138:0) {#if bindHeightChanged}
+// (143:0) {#if bindHeightChanged}
 function create_if_block$2(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -2907,7 +2917,7 @@ function create_if_block$2(ctx) {
 	};
 }
 
-// (174:11) {:else}
+// (179:11) {:else}
 function create_else_block_2(ctx) {
 	let current;
 	const default_slot_template = /*#slots*/ ctx[19].default;
@@ -2955,7 +2965,7 @@ function create_else_block_2(ctx) {
 	};
 }
 
-// (172:11) {#if Array.isArray(allChildren)}
+// (177:11) {#if Array.isArray(allChildren)}
 function create_if_block_2(ctx) {
 	let tjscontainer;
 	let current;
@@ -2988,7 +2998,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (155:11) {:else}
+// (160:11) {:else}
 function create_else_block$1(ctx) {
 	let current;
 	const default_slot_template = /*#slots*/ ctx[19].default;
@@ -3036,7 +3046,7 @@ function create_else_block$1(ctx) {
 	};
 }
 
-// (153:11) {#if Array.isArray(allChildren)}
+// (158:11) {#if Array.isArray(allChildren)}
 function create_if_block_1$1(ctx) {
 	let tjscontainer;
 	let current;
@@ -3134,6 +3144,9 @@ function instance$2($$self, $$props, $$invalidate) {
 		}
 	};
 
+	// Use a writable store to make `elementContent` and `elementRoot` accessible. A store is used in the case when
+	// One root component with an `elementRoot` is replaced with another. Due to timing issues and the onDestroy / outro
+	// transitions either of these may be set to null. I will investigate more and file a bug against Svelte.
 	if (!getContext('storeElementContent')) {
 		setContext('storeElementContent', writable(elementContent));
 	}
@@ -3222,12 +3235,14 @@ function instance$2($$self, $$props, $$invalidate) {
 
 	$$self.$$.update = () => {
 		if ($$self.$$.dirty & /*elementContent*/ 1) {
+			// Only update the `elementContent` store if the new `elementContent` is not null or undefined.
 			if (elementContent !== void 0 && elementContent !== null) {
 				getContext('storeElementContent').set(elementContent);
 			}
 		}
 
 		if ($$self.$$.dirty & /*elementRoot*/ 2) {
+			// Only update the `elementRoot` store if the new `elementRoot` is not null or undefined.
 			if (elementRoot !== void 0 && elementRoot !== null) {
 				getContext('storeElementRoot').set(elementRoot);
 			}
