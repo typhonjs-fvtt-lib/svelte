@@ -1,5 +1,7 @@
 import 'svelte/internal';
-import 'svelte/store';
+import { get } from 'svelte/store';
+import { tick } from 'svelte';
+import { debounce as debounce$1 } from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Wraps a callback in a debounced timeout.
@@ -78,6 +80,41 @@ function applyStyles(node, properties)
       {
          properties = newProperties;
          setProperties();
+      }
+   };
+}
+
+/**
+ * Provides an action to blur the element when any pointer down event occurs outside the element. This can be useful
+ * for input elements including select to blur / unfocus the element when any pointer down occurs outside the element.
+ *
+ * @param {HTMLElement}   element - The element to handle automatic blur on focus loss.
+ */
+function autoBlur(element)
+{
+   function blur() { document.body.removeEventListener('pointerdown', onPointerDown); }
+   function focus() { document.body.addEventListener('pointerdown', onPointerDown); }
+
+   /**
+    * Blur the element if a pointer down event happens outside the element.
+    * @param {PointerEvent} event
+    */
+   function onPointerDown(event)
+   {
+      if (event.target === element || element.contains(event.target)) { return; }
+
+      element.blur();
+   }
+
+   element.addEventListener('blur', blur);
+   element.addEventListener('focus', focus);
+
+   return {
+      destroy: () =>
+      {
+         document.body.removeEventListener('pointerdown', onPointerDown);
+         element.removeEventListener('blur', blur);
+         element.removeEventListener('focus', focus);
       }
    };
 }
@@ -235,6 +272,137 @@ function ripple({ duration = 600, background = 'rgba(255, 255, 255, 0.7)', event
 }
 
 /**
+ * Defines the classic Material Design ripple effect as an action that is attached to an elements focus and blur events.
+ * `rippleFocus` is a wrapper around the returned action. This allows it to be easily used as a prop.
+ *
+ * Note: A negative one translateZ transform is applied to the added span allowing other content to be layered on top
+ * with a positive translateZ.
+ *
+ * If providing the `selectors` option a target child element will be registered for the focus events otherwise the
+ * first child is targeted with a final fallback of the element assigned to this action.
+ *
+ * Styling: There is a single CSS variable `--tjs-action-ripple-background-focus` that can be set to control the
+ * background with a fallback to `--tjs-action-ripple-background`.
+ *
+ * @param {object}   [opts] - Optional parameters.
+ *
+ * @param {number}   [opts.duration=600] - Duration in milliseconds.
+ *
+ * @param {string}   [opts.background='rgba(255, 255, 255, 0.7)'] - A valid CSS background attribute.
+ *
+ * @param {string}   [opts.selectors] - A valid CSS selectors string.
+ *
+ * @returns Function - Actual action.
+ */
+function rippleFocus({ duration = 300, background = 'rgba(255, 255, 255, 0.7)', selectors } = {})
+{
+   return (element) =>
+   {
+      const targetEl = typeof selectors === 'string' ? element.querySelector(selectors) :
+       element.firstChild instanceof HTMLElement ? element.firstChild : element;
+
+      let span = void 0;
+      let clientX = -1;
+      let clientY = -1;
+
+      function blurRipple()
+      {
+         if (!(span instanceof HTMLElement)) { return; }
+
+         const animation = span.animate(
+         [
+            {  // from
+               transform: 'scale(3)',
+               opacity: 0.3,
+            },
+            {  // to
+               transform: 'scale(.7)',
+               opacity: 0.0,
+            }
+         ],
+         {
+            duration,
+            fill: 'forwards'
+         });
+
+         animation.onfinish = () =>
+         {
+            clientX = clientY = -1;
+            span.remove();
+         };
+      }
+
+      function focusRipple()
+      {
+         const elementRect = element.getBoundingClientRect();
+
+         // The order of events don't always occur with a pointer event first. In this case use the center of the
+         // element as the click point. Mostly this is seen when the focused target element has a followup event off
+         // the app / screen. If the next pointer down occurs on the target element the focus callback occurs before
+         // pointer down in Chrome and Firefox.
+         const actualX = clientX >= 0 ? clientX : elementRect.left + (elementRect.width / 2);
+         const actualY = clientX >= 0 ? clientY : elementRect.top + (elementRect.height / 2);
+
+         const diameter = Math.max(elementRect.width, elementRect.height);
+         const radius = diameter / 2;
+         const left = `${actualX - (elementRect.left + radius)}px`;
+         const top = `${actualY - (elementRect.top + radius)}px`;
+
+         span = document.createElement('span');
+
+         span.style.position = 'absolute';
+         span.style.width = `${diameter}px`;
+         span.style.height = `${diameter}px`;
+         span.style.left = left;
+         span.style.top = top;
+
+         span.style.background =
+          `var(--tjs-action-ripple-background-focus, var(--tjs-action-ripple-background, ${background}))`;
+
+         span.style.borderRadius = '50%';
+         span.style.pointerEvents = 'none';
+         span.style.transform = 'translateZ(-1px)';
+
+         element.prepend(span);
+
+         span.animate([
+            {  // from
+               transform: 'scale(.7)',
+               opacity: 0.5,
+            },
+            {  // to
+               transform: 'scale(3)',
+               opacity: 0.3,
+            }
+         ],
+         {
+            duration,
+            fill: 'forwards'
+         });
+      }
+
+      // Store the pointer down location for the origination of the ripple.
+      function onPointerDown(e)
+      {
+         clientX = e.clientX;
+         clientY = e.clientY;
+      }
+
+      targetEl.addEventListener('pointerdown', onPointerDown);
+      targetEl.addEventListener('blur', blurRipple);
+      targetEl.addEventListener('focus', focusRipple);
+
+      return {
+         destroy: () => {
+            targetEl.removeEventListener('pointerdown', onPointerDown);
+            targetEl.removeEventListener('blur', blurRipple);
+            targetEl.removeEventListener('focus', focusRipple);
+         }
+      };
+   }
+}
+
+/**
  * Provides a toggle action for `details` HTML elements. The boolean store provided controls animation.
  *
  * It is not necessary to bind the store to the `open` attribute of the associated details element.
@@ -341,6 +509,62 @@ function toggleDetails(details, booleanStore)
       {
          unsubscribe();
          summary.removeEventListener('click', handleClick);
+      }
+   };
+}
+
+/**
+ * Provides an action to save `scrollTop` of an element with a vertical scrollbar. This action should be used on the
+ * scrollable element and must include a writable store that holds the active store for the current `scrollTop` value.
+ * You may switch the stores externally and this action will set the `scrollTop` based on the newly set store. This is
+ * useful for instance providing a select box that controls the scrollable container.
+ *
+ * @param {HTMLElement} element - The target scrollable HTML element.
+ *
+ * @param {object}      store - The host store wrapping another store that is the `scrollTop` target.
+ */
+function storeScrolltop(element, store)
+{
+   let storeScrolltop;
+
+   const unsubscribe = store.subscribe(async (newStore) => {
+      storeScrolltop = newStore;
+
+      // If the new store is valid then set the element `scrollTop`.
+      if (typeof storeScrolltop === 'object' && typeof storeScrolltop.set === 'function')
+      {
+         // Wait for any pending updates.
+         await tick();
+
+         const value = get(storeScrolltop);
+
+         if (typeof value === 'number') { element.scrollTop = value; }
+      }
+   });
+
+   /**
+    * Save target `scrollTop` to the current set store.
+    *
+    * @param {Event} event -
+    */
+   function onScroll(event)
+   {
+      if (typeof storeScrolltop === 'object' && typeof storeScrolltop.set === 'function')
+      {
+         storeScrolltop.set(event.target.scrollTop);
+      }
+   }
+
+   const debounceFn = debounce$1((e) => onScroll(e), 500);
+
+   element.addEventListener('scroll', debounceFn);
+
+   return {
+      destroy: () =>
+      {
+         element.removeEventListener('scroll', debounceFn);
+
+         unsubscribe();
       }
    };
 }
@@ -497,5 +721,5 @@ function draggable(node, { positionable, booleanStore })
    };
 }
 
-export { animate, applyStyles, composable, draggable, ripple, toggleDetails };
+export { animate, applyStyles, autoBlur, composable, draggable, ripple, rippleFocus, storeScrolltop, toggleDetails };
 //# sourceMappingURL=index.js.map

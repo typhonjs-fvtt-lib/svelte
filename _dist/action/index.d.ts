@@ -42,6 +42,15 @@ declare function animate({ duration, keyframes, options, event, debounce: deboun
  */
 declare function applyStyles(node: HTMLElement, properties: object): Function;
 /**
+ * Provides an action to blur the element when any pointer down event occurs outside the element. This can be useful
+ * for input elements including select to blur / unfocus the element when any pointer down occurs outside the element.
+ *
+ * @param {HTMLElement}   element - The element to handle automatic blur on focus loss.
+ */
+declare function autoBlur(element: HTMLElement): {
+    destroy: () => void;
+};
+/**
  * Combines multiple composable actions.
  *
  * Note: The update function passes the same variable to all update functions of each action.
@@ -79,7 +88,7 @@ declare function draggable(node: HTMLElement, { positionable, booleanStore }: {
  * Note: A negative one translateZ transform is applied to the added spans allowing other content to be layered on top
  * with a positive translateZ.
  *
- * Styling: There is a single CSS variable `--tjs-effect-ripple-background` that can be set to control the background.
+ * Styling: There is a single CSS variable `--tjs-action-ripple-background` that can be set to control the background.
  *
  * @param {object}   [opts] - Optional parameters.
  *
@@ -102,6 +111,49 @@ declare function ripple({ duration, background, event, debounce: debounce$1 }?: 
     destroy: () => any;
 };
 /**
+ * Defines the classic Material Design ripple effect as an action that is attached to an elements focus and blur events.
+ * `rippleFocus` is a wrapper around the returned action. This allows it to be easily used as a prop.
+ *
+ * Note: A negative one translateZ transform is applied to the added span allowing other content to be layered on top
+ * with a positive translateZ.
+ *
+ * If providing the `selectors` option a target child element will be registered for the focus events otherwise the
+ * first child is targeted with a final fallback of the element assigned to this action.
+ *
+ * Styling: There is a single CSS variable `--tjs-action-ripple-background-focus` that can be set to control the
+ * background with a fallback to `--tjs-action-ripple-background`.
+ *
+ * @param {object}   [opts] - Optional parameters.
+ *
+ * @param {number}   [opts.duration=600] - Duration in milliseconds.
+ *
+ * @param {string}   [opts.background='rgba(255, 255, 255, 0.7)'] - A valid CSS background attribute.
+ *
+ * @param {string}   [opts.selectors] - A valid CSS selectors string.
+ *
+ * @returns Function - Actual action.
+ */
+declare function rippleFocus({ duration, background, selectors }?: {
+    duration?: number;
+    background?: string;
+    selectors?: string;
+}): (element: any) => {
+    destroy: () => void;
+};
+/**
+ * Provides an action to save `scrollTop` of an element with a vertical scrollbar. This action should be used on the
+ * scrollable element and must include a writable store that holds the active store for the current `scrollTop` value.
+ * You may switch the stores externally and this action will set the `scrollTop` based on the newly set store. This is
+ * useful for instance providing a select box that controls the scrollable container.
+ *
+ * @param {HTMLElement} element - The target scrollable HTML element.
+ *
+ * @param {object}      store - The host store wrapping another store that is the `scrollTop` target.
+ */
+declare function storeScrolltop(element: HTMLElement, store: object): {
+    destroy: () => void;
+};
+/**
  * Provides a toggle action for `details` HTML elements. The boolean store provided controls animation.
  *
  * It is not necessary to bind the store to the `open` attribute of the associated details element.
@@ -117,4 +169,4 @@ declare function ripple({ duration, background, event, debounce: debounce$1 }?: 
  */
 declare function toggleDetails(details: HTMLDetailsElement, booleanStore: svelte_store.Writable<boolean>): object;
 
-export { animate, applyStyles, composable, draggable, ripple, toggleDetails };
+export { animate, applyStyles, autoBlur, composable, draggable, ripple, rippleFocus, storeScrolltop, toggleDetails };
