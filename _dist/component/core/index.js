@@ -1141,10 +1141,10 @@ function create_fragment$5(ctx) {
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
-			/*div_binding*/ ctx[7](div);
+			/*div_binding*/ ctx[9](div);
 
 			if (!mounted) {
-				dispose = action_destroyer(resizable_action = /*resizable*/ ctx[4].call(null, div, /*$storeResizable*/ ctx[1]));
+				dispose = action_destroyer(resizable_action = /*resizable*/ ctx[5].call(null, div, /*$storeResizable*/ ctx[1]));
 				mounted = true;
 			}
 		},
@@ -1155,7 +1155,7 @@ function create_fragment$5(ctx) {
 		o: noop,
 		d(detaching) {
 			if (detaching) detach(div);
-			/*div_binding*/ ctx[7](null);
+			/*div_binding*/ ctx[9](null);
 			mounted = false;
 			dispose();
 		}
@@ -1163,18 +1163,20 @@ function create_fragment$5(ctx) {
 }
 
 function instance$5($$self, $$props, $$invalidate) {
+	let $storeElementRoot;
 	let $storeMinimized;
 	let $storeResizable;
 	let { isResizable = false } = $$props;
 	const foundryApp = getContext('external').foundryApp;
 
 	// Allows retrieval of the element root at runtime.
-	const getElementRoot = getContext('getElementRoot');
+	const storeElementRoot = getContext('storeElementRoot');
 
+	component_subscribe($$self, storeElementRoot, value => $$invalidate(7, $storeElementRoot = value));
 	const storeResizable = foundryApp.reactive.storeAppOptions.resizable;
 	component_subscribe($$self, storeResizable, value => $$invalidate(1, $storeResizable = value));
 	const storeMinimized = foundryApp.reactive.storeUIOptions.minimized;
-	component_subscribe($$self, storeMinimized, value => $$invalidate(6, $storeMinimized = value));
+	component_subscribe($$self, storeMinimized, value => $$invalidate(8, $storeMinimized = value));
 	let elementResize;
 
 	/**
@@ -1235,7 +1237,7 @@ function instance$5($$self, $$props, $$invalidate) {
 			// Resize handlers
 			node.addEventListener(...handlers.resizeDown);
 
-			$$invalidate(5, isResizable = true);
+			$$invalidate(6, isResizable = true);
 			node.style.display = 'block';
 		}
 
@@ -1251,7 +1253,7 @@ function instance$5($$self, $$props, $$invalidate) {
 			node.removeEventListener(...handlers.resizeMove);
 			node.removeEventListener(...handlers.resizeUp);
 			node.style.display = 'none';
-			$$invalidate(5, isResizable = false);
+			$$invalidate(6, isResizable = false);
 		}
 
 		// On mount if resizable is true then activate listeners otherwise set element display to `none`.
@@ -1281,11 +1283,11 @@ function instance$5($$self, $$props, $$invalidate) {
 			position = foundry.utils.duplicate(foundryApp.position);
 
 			if (position.height === 'auto') {
-				position.height = getElementRoot().clientHeight;
+				position.height = $storeElementRoot.clientHeight;
 			}
 
 			if (position.width === 'auto') {
-				position.width = getElementRoot().clientWidth;
+				position.width = $storeElementRoot.clientWidth;
 			}
 
 			initialPosition = { x: event.clientX, y: event.clientY };
@@ -1340,22 +1342,22 @@ function instance$5($$self, $$props, $$invalidate) {
 	function div_binding($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
 			elementResize = $$value;
-			(($$invalidate(0, elementResize), $$invalidate(5, isResizable)), $$invalidate(6, $storeMinimized));
+			((($$invalidate(0, elementResize), $$invalidate(6, isResizable)), $$invalidate(8, $storeMinimized)), $$invalidate(7, $storeElementRoot));
 		});
 	}
 
 	$$self.$$set = $$props => {
-		if ('isResizable' in $$props) $$invalidate(5, isResizable = $$props.isResizable);
+		if ('isResizable' in $$props) $$invalidate(6, isResizable = $$props.isResizable);
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*elementResize, isResizable, $storeMinimized*/ 97) {
+		if ($$self.$$.dirty & /*elementResize, isResizable, $storeMinimized, $storeElementRoot*/ 449) {
 			if (elementResize) {
 				// Instead of creating a derived store it is easier to use isResizable and the minimized store below.
 				$$invalidate(0, elementResize.style.display = isResizable && !$storeMinimized ? 'block' : 'none', elementResize);
 
 				// Add / remove `resizable` class from element root.
-				const elementRoot = getElementRoot();
+				const elementRoot = $storeElementRoot;
 
 				if (elementRoot) {
 					elementRoot.classList[isResizable ? 'add' : 'remove']('resizable');
@@ -1367,10 +1369,12 @@ function instance$5($$self, $$props, $$invalidate) {
 	return [
 		elementResize,
 		$storeResizable,
+		storeElementRoot,
 		storeResizable,
 		storeMinimized,
 		resizable,
 		isResizable,
+		$storeElementRoot,
 		$storeMinimized,
 		div_binding
 	];
@@ -1379,7 +1383,7 @@ function instance$5($$self, $$props, $$invalidate) {
 class ResizableHandle extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance$5, create_fragment$5, safe_not_equal, { isResizable: 5 });
+		init(this, options, instance$5, create_fragment$5, safe_not_equal, { isResizable: 6 });
 	}
 }
 
@@ -1389,7 +1393,7 @@ function add_css$2(target) {
 	append_styles(target, "svelte-3vt5in", ".window-app.svelte-3vt5in{overflow:inherit}");
 }
 
-// (165:0) {:else}
+// (161:0) {:else}
 function create_else_block_1$1(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -1485,7 +1489,7 @@ function create_else_block_1$1(ctx) {
 
 			add_render_callback(() => {
 				if (div_outro) div_outro.end(1);
-				div_intro = create_in_transition(div, /*inTransition*/ ctx[1], /*inTransitionOptions*/ ctx[3]);
+				div_intro = create_in_transition(div, /*inTransition*/ ctx[2], /*inTransitionOptions*/ ctx[4]);
 				div_intro.start();
 			});
 
@@ -1496,7 +1500,7 @@ function create_else_block_1$1(ctx) {
 			transition_out(if_block);
 			transition_out(resizablehandle.$$.fragment, local);
 			if (div_intro) div_intro.invalidate();
-			div_outro = create_out_transition(div, /*outTransition*/ ctx[2], /*outTransitionOptions*/ ctx[4]);
+			div_outro = create_out_transition(div, /*outTransition*/ ctx[3], /*outTransitionOptions*/ ctx[5]);
 			current = false;
 		},
 		d(detaching) {
@@ -1513,7 +1517,7 @@ function create_else_block_1$1(ctx) {
 	};
 }
 
-// (142:0) {#if bindHeightChanged}
+// (138:0) {#if bindHeightChanged}
 function create_if_block$4(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -1615,7 +1619,7 @@ function create_if_block$4(ctx) {
 
 			add_render_callback(() => {
 				if (div_outro) div_outro.end(1);
-				div_intro = create_in_transition(div, /*inTransition*/ ctx[1], /*inTransitionOptions*/ ctx[3]);
+				div_intro = create_in_transition(div, /*inTransition*/ ctx[2], /*inTransitionOptions*/ ctx[4]);
 				div_intro.start();
 			});
 
@@ -1626,7 +1630,7 @@ function create_if_block$4(ctx) {
 			transition_out(if_block);
 			transition_out(resizablehandle.$$.fragment, local);
 			if (div_intro) div_intro.invalidate();
-			div_outro = create_out_transition(div, /*outTransition*/ ctx[2], /*outTransitionOptions*/ ctx[4]);
+			div_outro = create_out_transition(div, /*outTransition*/ ctx[3], /*outTransitionOptions*/ ctx[5]);
 			current = false;
 		},
 		d(detaching) {
@@ -1645,7 +1649,7 @@ function create_if_block$4(ctx) {
 	};
 }
 
-// (178:9) {:else}
+// (174:9) {:else}
 function create_else_block_2$1(ctx) {
 	let current;
 	const default_slot_template = /*#slots*/ ctx[19].default;
@@ -1693,7 +1697,7 @@ function create_else_block_2$1(ctx) {
 	};
 }
 
-// (176:9) {#if Array.isArray(allChildren)}
+// (172:9) {#if Array.isArray(allChildren)}
 function create_if_block_2$1(ctx) {
 	let tjscontainer;
 	let current;
@@ -1726,7 +1730,7 @@ function create_if_block_2$1(ctx) {
 	};
 }
 
-// (159:9) {:else}
+// (155:9) {:else}
 function create_else_block$3(ctx) {
 	let current;
 	const default_slot_template = /*#slots*/ ctx[19].default;
@@ -1774,7 +1778,7 @@ function create_else_block$3(ctx) {
 	};
 }
 
-// (157:9) {#if Array.isArray(allChildren)}
+// (153:9) {#if Array.isArray(allChildren)}
 function create_if_block_1$2(ctx) {
 	let tjscontainer;
 	let current;
@@ -1872,12 +1876,13 @@ function instance$4($$self, $$props, $$invalidate) {
 		}
 	};
 
-	setContext('getElementContent', () => elementContent);
+	if (!getContext('storeElementContent')) {
+		setContext('storeElementContent', writable(elementContent));
+	}
 
-	setContext('getElementRoot', () => {
-		console.log(`!!! ApplicationShell - getElementRoot`);
-		return elementRoot;
-	});
+	if (!getContext('storeElementRoot')) {
+		setContext('storeElementRoot', writable(elementRoot));
+	}
 
 	const context = getContext('external');
 
@@ -1906,7 +1911,7 @@ function instance$4($$self, $$props, $$invalidate) {
 	function section_binding($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
 			elementContent = $$value;
-			$$invalidate(5, elementContent);
+			$$invalidate(0, elementContent);
 		});
 	}
 
@@ -1923,50 +1928,50 @@ function instance$4($$self, $$props, $$invalidate) {
 	function div_binding($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
 			elementRoot = $$value;
-			$$invalidate(0, elementRoot);
+			$$invalidate(1, elementRoot);
 		});
 	}
 
 	function section_binding_1($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
 			elementContent = $$value;
-			$$invalidate(5, elementContent);
+			$$invalidate(0, elementContent);
 		});
 	}
 
 	function div_binding_1($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
 			elementRoot = $$value;
-			$$invalidate(0, elementRoot);
+			$$invalidate(1, elementRoot);
 		});
 	}
 
 	$$self.$$set = $$props => {
-		if ('elementContent' in $$props) $$invalidate(5, elementContent = $$props.elementContent);
-		if ('elementRoot' in $$props) $$invalidate(0, elementRoot = $$props.elementRoot);
+		if ('elementContent' in $$props) $$invalidate(0, elementContent = $$props.elementContent);
+		if ('elementRoot' in $$props) $$invalidate(1, elementRoot = $$props.elementRoot);
 		if ('children' in $$props) $$invalidate(13, children = $$props.children);
 		if ('heightChanged' in $$props) $$invalidate(6, heightChanged = $$props.heightChanged);
 		if ('stylesApp' in $$props) $$invalidate(7, stylesApp = $$props.stylesApp);
 		if ('stylesContent' in $$props) $$invalidate(8, stylesContent = $$props.stylesContent);
 		if ('transition' in $$props) $$invalidate(14, transition = $$props.transition);
-		if ('inTransition' in $$props) $$invalidate(1, inTransition = $$props.inTransition);
-		if ('outTransition' in $$props) $$invalidate(2, outTransition = $$props.outTransition);
+		if ('inTransition' in $$props) $$invalidate(2, inTransition = $$props.inTransition);
+		if ('outTransition' in $$props) $$invalidate(3, outTransition = $$props.outTransition);
 		if ('transitionOptions' in $$props) $$invalidate(15, transitionOptions = $$props.transitionOptions);
-		if ('inTransitionOptions' in $$props) $$invalidate(3, inTransitionOptions = $$props.inTransitionOptions);
-		if ('outTransitionOptions' in $$props) $$invalidate(4, outTransitionOptions = $$props.outTransitionOptions);
+		if ('inTransitionOptions' in $$props) $$invalidate(4, inTransitionOptions = $$props.inTransitionOptions);
+		if ('outTransitionOptions' in $$props) $$invalidate(5, outTransitionOptions = $$props.outTransitionOptions);
 		if ('$$scope' in $$props) $$invalidate(18, $$scope = $$props.$$scope);
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*elementRoot*/ 1) {
-			{
-				const getTest = getContext('getTest');
+		if ($$self.$$.dirty & /*elementContent*/ 1) {
+			if (elementContent !== void 0 && elementContent !== null) {
+				getContext('storeElementContent').set(elementContent);
+			}
+		}
 
-				if (getTest) {
-					getTest.set(elementRoot);
-				} else {
-					setContext('getTest', writable(elementRoot));
-				}
+		if ($$self.$$.dirty & /*elementRoot*/ 2) {
+			if (elementRoot !== void 0 && elementRoot !== null) {
+				getContext('storeElementRoot').set(elementRoot);
 			}
 		}
 
@@ -1979,8 +1984,8 @@ function instance$4($$self, $$props, $$invalidate) {
 				? transition
 				: s_DEFAULT_TRANSITION;
 
-				$$invalidate(1, inTransition = newTransition);
-				$$invalidate(2, outTransition = newTransition);
+				$$invalidate(2, inTransition = newTransition);
+				$$invalidate(3, outTransition = newTransition);
 				$$invalidate(16, oldTransition = newTransition);
 			}
 		}
@@ -1992,24 +1997,24 @@ function instance$4($$self, $$props, $$invalidate) {
 				? transitionOptions
 				: s_DEFAULT_TRANSITION_OPTIONS;
 
-				$$invalidate(3, inTransitionOptions = newOptions);
-				$$invalidate(4, outTransitionOptions = newOptions);
+				$$invalidate(4, inTransitionOptions = newOptions);
+				$$invalidate(5, outTransitionOptions = newOptions);
 				$$invalidate(17, oldTransitionOptions = newOptions);
 			}
 		}
 
-		if ($$self.$$.dirty & /*inTransition*/ 2) {
+		if ($$self.$$.dirty & /*inTransition*/ 4) {
 			// Handle cases if inTransition is unset; assign noop default transition function.
 			if (typeof inTransition !== 'function') {
-				$$invalidate(1, inTransition = s_DEFAULT_TRANSITION);
+				$$invalidate(2, inTransition = s_DEFAULT_TRANSITION);
 			}
 		}
 
-		if ($$self.$$.dirty & /*outTransition, foundryApp*/ 516) {
+		if ($$self.$$.dirty & /*outTransition, foundryApp*/ 520) {
 			{
 				// Handle cases if outTransition is unset; assign noop default transition function.
 				if (typeof outTransition !== 'function') {
-					$$invalidate(2, outTransition = s_DEFAULT_TRANSITION);
+					$$invalidate(3, outTransition = s_DEFAULT_TRANSITION);
 				}
 
 				// Set jquery close animation to either run or not when an out transition is changed.
@@ -2019,28 +2024,28 @@ function instance$4($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*inTransitionOptions*/ 8) {
+		if ($$self.$$.dirty & /*inTransitionOptions*/ 16) {
 			// Handle cases if inTransitionOptions is unset; assign empty default transition options.
 			if (typeof inTransitionOptions !== 'object') {
-				$$invalidate(3, inTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS);
+				$$invalidate(4, inTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS);
 			}
 		}
 
-		if ($$self.$$.dirty & /*outTransitionOptions*/ 16) {
+		if ($$self.$$.dirty & /*outTransitionOptions*/ 32) {
 			// Handle cases if outTransitionOptions is unset; assign empty default transition options.
 			if (typeof outTransitionOptions !== 'object') {
-				$$invalidate(4, outTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS);
+				$$invalidate(5, outTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS);
 			}
 		}
 	};
 
 	return [
+		elementContent,
 		elementRoot,
 		inTransition,
 		outTransition,
 		inTransitionOptions,
 		outTransitionOptions,
-		elementContent,
 		heightChanged,
 		stylesApp,
 		stylesContent,
@@ -2075,25 +2080,25 @@ class ApplicationShell extends SvelteComponent {
 			create_fragment$4,
 			safe_not_equal,
 			{
-				elementContent: 5,
-				elementRoot: 0,
+				elementContent: 0,
+				elementRoot: 1,
 				children: 13,
 				heightChanged: 6,
 				stylesApp: 7,
 				stylesContent: 8,
 				transition: 14,
-				inTransition: 1,
-				outTransition: 2,
+				inTransition: 2,
+				outTransition: 3,
 				transitionOptions: 15,
-				inTransitionOptions: 3,
-				outTransitionOptions: 4
+				inTransitionOptions: 4,
+				outTransitionOptions: 5
 			},
 			add_css$2
 		);
 	}
 
 	get elementContent() {
-		return this.$$.ctx[5];
+		return this.$$.ctx[0];
 	}
 
 	set elementContent(elementContent) {
@@ -2102,7 +2107,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get elementRoot() {
-		return this.$$.ctx[0];
+		return this.$$.ctx[1];
 	}
 
 	set elementRoot(elementRoot) {
@@ -2156,7 +2161,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get inTransition() {
-		return this.$$.ctx[1];
+		return this.$$.ctx[2];
 	}
 
 	set inTransition(inTransition) {
@@ -2165,7 +2170,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get outTransition() {
-		return this.$$.ctx[2];
+		return this.$$.ctx[3];
 	}
 
 	set outTransition(outTransition) {
@@ -2183,7 +2188,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get inTransitionOptions() {
-		return this.$$.ctx[3];
+		return this.$$.ctx[4];
 	}
 
 	set inTransitionOptions(inTransitionOptions) {
@@ -2192,7 +2197,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get outTransitionOptions() {
-		return this.$$.ctx[4];
+		return this.$$.ctx[5];
 	}
 
 	set outTransitionOptions(outTransitionOptions) {
@@ -2263,7 +2268,7 @@ function create_else_block$2(ctx) {
 	};
 }
 
-// (101:0) {#if bindHeightChanged}
+// (112:0) {#if bindHeightChanged}
 function create_if_block$3(ctx) {
 	let div;
 	let div_id_value;
@@ -2382,8 +2387,14 @@ function instance$3($$self, $$props, $$invalidate) {
 	// are bound to `heightChanged` to signal to any parent component of any change to the client & root.
 	const bindHeightChanged = !!heightChanged;
 
-	setContext('getElementContent', () => elementContent);
-	setContext('getElementRoot', () => elementRoot);
+	if (!getContext('storeElementContent')) {
+		setContext('storeElementContent', writable(elementContent));
+	}
+
+	if (!getContext('storeElementRoot')) {
+		setContext('storeElementRoot', writable(elementRoot));
+	}
+
 	const context = getContext('external');
 
 	// Store Foundry Application reference.
@@ -2436,6 +2447,18 @@ function instance$3($$self, $$props, $$invalidate) {
 		if ($$self.$$.dirty & /*elementRoot*/ 1) {
 			if (elementRoot) {
 				$$invalidate(8, elementContent = elementRoot);
+			}
+		}
+
+		if ($$self.$$.dirty & /*elementContent*/ 256) {
+			if (elementContent !== void 0 && elementContent !== null) {
+				getContext('storeElementContent').set(elementContent);
+			}
+		}
+
+		if ($$self.$$.dirty & /*elementRoot*/ 1) {
+			if (elementRoot !== void 0 && elementRoot !== null) {
+				getContext('storeElementRoot').set(elementRoot);
 			}
 		}
 
@@ -2628,7 +2651,7 @@ function add_css$1(target) {
 	append_styles(target, "svelte-9xueci", ".tjs-app{max-height:100%;background:url(/ui/denim075.png) repeat;border-radius:5px;box-shadow:0 0 20px #000;margin:3px 0;padding:0.5em;color:#f0f0e0;z-index:95;overflow:inherit}.tjs-window-app{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;position:absolute;box-shadow:0 0 20px #000;padding:0;z-index:95}.tjs-window-app > *{flex:1}.tjs-window-app > .flex0{display:block;flex:0}.tjs-window-app > .flex1{flex:1}.tjs-window-app > .flex2{flex:2}.tjs-window-app > .flex3{flex:3}.tjs-window-app .window-header{flex:0 0 30px;overflow:hidden;padding:0 8px;line-height:30px;border-bottom:1px solid #000}.tjs-window-app .window-header .window-title{margin:0;word-break:break-all}.tjs-window-app .window-header a{flex:none;margin:0 0 0 8px}.tjs-window-app .window-header i[class^=fa]{margin-right:3px}.tjs-window-app.minimized .window-header{border:1px solid #000}.tjs-window-app .window-content{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;padding:8px;color:#191813;overflow-y:auto;overflow-x:hidden}.window-app .window-content > *{flex:1}.window-app .window-content > .flex0{display:block;flex:0}.window-app .window-content > .flex1{flex:1}.window-app .window-content > .flex2{flex:2}.window-app .window-content > .flex3{flex:3}.window-app.zhover{z-index:calc(var(--z-index-window) + 1)}.tjs-window-app .window-resizable-handle{width:20px;height:20px;position:absolute;bottom:-1px;right:0;background:#444;padding:2px;border:1px solid #111;border-radius:4px 0 0 0}.tjs-window-app .window-resizable-handle i.fas{transform:rotate(45deg)}.window-app.minimized .window-resizable-handle{display:none}");
 }
 
-// (164:0) {:else}
+// (161:0) {:else}
 function create_else_block_1(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -2724,7 +2747,7 @@ function create_else_block_1(ctx) {
 
 			add_render_callback(() => {
 				if (div_outro) div_outro.end(1);
-				div_intro = create_in_transition(div, /*inTransition*/ ctx[1], /*inTransitionOptions*/ ctx[3]);
+				div_intro = create_in_transition(div, /*inTransition*/ ctx[2], /*inTransitionOptions*/ ctx[4]);
 				div_intro.start();
 			});
 
@@ -2735,7 +2758,7 @@ function create_else_block_1(ctx) {
 			transition_out(if_block);
 			transition_out(resizablehandle.$$.fragment, local);
 			if (div_intro) div_intro.invalidate();
-			div_outro = create_out_transition(div, /*outTransition*/ ctx[2], /*outTransitionOptions*/ ctx[4]);
+			div_outro = create_out_transition(div, /*outTransition*/ ctx[3], /*outTransitionOptions*/ ctx[5]);
 			current = false;
 		},
 		d(detaching) {
@@ -2752,7 +2775,7 @@ function create_else_block_1(ctx) {
 	};
 }
 
-// (141:0) {#if bindHeightChanged}
+// (138:0) {#if bindHeightChanged}
 function create_if_block$2(ctx) {
 	let div;
 	let tjsapplicationheader;
@@ -2854,7 +2877,7 @@ function create_if_block$2(ctx) {
 
 			add_render_callback(() => {
 				if (div_outro) div_outro.end(1);
-				div_intro = create_in_transition(div, /*inTransition*/ ctx[1], /*inTransitionOptions*/ ctx[3]);
+				div_intro = create_in_transition(div, /*inTransition*/ ctx[2], /*inTransitionOptions*/ ctx[4]);
 				div_intro.start();
 			});
 
@@ -2865,7 +2888,7 @@ function create_if_block$2(ctx) {
 			transition_out(if_block);
 			transition_out(resizablehandle.$$.fragment, local);
 			if (div_intro) div_intro.invalidate();
-			div_outro = create_out_transition(div, /*outTransition*/ ctx[2], /*outTransitionOptions*/ ctx[4]);
+			div_outro = create_out_transition(div, /*outTransition*/ ctx[3], /*outTransitionOptions*/ ctx[5]);
 			current = false;
 		},
 		d(detaching) {
@@ -2884,7 +2907,7 @@ function create_if_block$2(ctx) {
 	};
 }
 
-// (177:11) {:else}
+// (174:11) {:else}
 function create_else_block_2(ctx) {
 	let current;
 	const default_slot_template = /*#slots*/ ctx[19].default;
@@ -2932,7 +2955,7 @@ function create_else_block_2(ctx) {
 	};
 }
 
-// (175:11) {#if Array.isArray(allChildren)}
+// (172:11) {#if Array.isArray(allChildren)}
 function create_if_block_2(ctx) {
 	let tjscontainer;
 	let current;
@@ -2965,7 +2988,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (158:11) {:else}
+// (155:11) {:else}
 function create_else_block$1(ctx) {
 	let current;
 	const default_slot_template = /*#slots*/ ctx[19].default;
@@ -3013,7 +3036,7 @@ function create_else_block$1(ctx) {
 	};
 }
 
-// (156:11) {#if Array.isArray(allChildren)}
+// (153:11) {#if Array.isArray(allChildren)}
 function create_if_block_1$1(ctx) {
 	let tjscontainer;
 	let current;
@@ -3111,12 +3134,13 @@ function instance$2($$self, $$props, $$invalidate) {
 		}
 	};
 
-	setContext('getElementContent', () => elementContent);
+	if (!getContext('storeElementContent')) {
+		setContext('storeElementContent', writable(elementContent));
+	}
 
-	setContext('getElementRoot', () => {
-		console.log(`!!! TJSApplicationShell - getElementRoot`);
-		return elementRoot;
-	});
+	if (!getContext('storeElementRoot')) {
+		setContext('storeElementRoot', writable(elementRoot));
+	}
 
 	const context = getContext('external');
 
@@ -3145,7 +3169,7 @@ function instance$2($$self, $$props, $$invalidate) {
 	function section_binding($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
 			elementContent = $$value;
-			$$invalidate(5, elementContent);
+			$$invalidate(0, elementContent);
 		});
 	}
 
@@ -3162,50 +3186,50 @@ function instance$2($$self, $$props, $$invalidate) {
 	function div_binding($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
 			elementRoot = $$value;
-			$$invalidate(0, elementRoot);
+			$$invalidate(1, elementRoot);
 		});
 	}
 
 	function section_binding_1($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
 			elementContent = $$value;
-			$$invalidate(5, elementContent);
+			$$invalidate(0, elementContent);
 		});
 	}
 
 	function div_binding_1($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
 			elementRoot = $$value;
-			$$invalidate(0, elementRoot);
+			$$invalidate(1, elementRoot);
 		});
 	}
 
 	$$self.$$set = $$props => {
-		if ('elementContent' in $$props) $$invalidate(5, elementContent = $$props.elementContent);
-		if ('elementRoot' in $$props) $$invalidate(0, elementRoot = $$props.elementRoot);
+		if ('elementContent' in $$props) $$invalidate(0, elementContent = $$props.elementContent);
+		if ('elementRoot' in $$props) $$invalidate(1, elementRoot = $$props.elementRoot);
 		if ('children' in $$props) $$invalidate(13, children = $$props.children);
 		if ('heightChanged' in $$props) $$invalidate(6, heightChanged = $$props.heightChanged);
 		if ('stylesApp' in $$props) $$invalidate(7, stylesApp = $$props.stylesApp);
 		if ('stylesContent' in $$props) $$invalidate(8, stylesContent = $$props.stylesContent);
 		if ('transition' in $$props) $$invalidate(14, transition = $$props.transition);
-		if ('inTransition' in $$props) $$invalidate(1, inTransition = $$props.inTransition);
-		if ('outTransition' in $$props) $$invalidate(2, outTransition = $$props.outTransition);
+		if ('inTransition' in $$props) $$invalidate(2, inTransition = $$props.inTransition);
+		if ('outTransition' in $$props) $$invalidate(3, outTransition = $$props.outTransition);
 		if ('transitionOptions' in $$props) $$invalidate(15, transitionOptions = $$props.transitionOptions);
-		if ('inTransitionOptions' in $$props) $$invalidate(3, inTransitionOptions = $$props.inTransitionOptions);
-		if ('outTransitionOptions' in $$props) $$invalidate(4, outTransitionOptions = $$props.outTransitionOptions);
+		if ('inTransitionOptions' in $$props) $$invalidate(4, inTransitionOptions = $$props.inTransitionOptions);
+		if ('outTransitionOptions' in $$props) $$invalidate(5, outTransitionOptions = $$props.outTransitionOptions);
 		if ('$$scope' in $$props) $$invalidate(18, $$scope = $$props.$$scope);
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*elementRoot*/ 1) {
-			{
-				const getTest = getContext('getTest');
+		if ($$self.$$.dirty & /*elementContent*/ 1) {
+			if (elementContent !== void 0 && elementContent !== null) {
+				getContext('storeElementContent').set(elementContent);
+			}
+		}
 
-				if (getTest) {
-					getTest.set(elementRoot);
-				} else {
-					setContext('getTest', writable(elementRoot));
-				}
+		if ($$self.$$.dirty & /*elementRoot*/ 2) {
+			if (elementRoot !== void 0 && elementRoot !== null) {
+				getContext('storeElementRoot').set(elementRoot);
 			}
 		}
 
@@ -3218,8 +3242,8 @@ function instance$2($$self, $$props, $$invalidate) {
 				? transition
 				: s_DEFAULT_TRANSITION;
 
-				$$invalidate(1, inTransition = newTransition);
-				$$invalidate(2, outTransition = newTransition);
+				$$invalidate(2, inTransition = newTransition);
+				$$invalidate(3, outTransition = newTransition);
 				$$invalidate(16, oldTransition = newTransition);
 			}
 		}
@@ -3231,24 +3255,24 @@ function instance$2($$self, $$props, $$invalidate) {
 				? transitionOptions
 				: s_DEFAULT_TRANSITION_OPTIONS;
 
-				$$invalidate(3, inTransitionOptions = newOptions);
-				$$invalidate(4, outTransitionOptions = newOptions);
+				$$invalidate(4, inTransitionOptions = newOptions);
+				$$invalidate(5, outTransitionOptions = newOptions);
 				$$invalidate(17, oldTransitionOptions = newOptions);
 			}
 		}
 
-		if ($$self.$$.dirty & /*inTransition*/ 2) {
+		if ($$self.$$.dirty & /*inTransition*/ 4) {
 			// Handle cases if inTransition is unset; assign noop default transition function.
 			if (typeof inTransition !== 'function') {
-				$$invalidate(1, inTransition = s_DEFAULT_TRANSITION);
+				$$invalidate(2, inTransition = s_DEFAULT_TRANSITION);
 			}
 		}
 
-		if ($$self.$$.dirty & /*outTransition, foundryApp*/ 516) {
+		if ($$self.$$.dirty & /*outTransition, foundryApp*/ 520) {
 			{
 				// Handle cases if outTransition is unset; assign noop default transition function.
 				if (typeof outTransition !== 'function') {
-					$$invalidate(2, outTransition = s_DEFAULT_TRANSITION);
+					$$invalidate(3, outTransition = s_DEFAULT_TRANSITION);
 				}
 
 				// Set jquery close animation to either run or not when an out transition is changed.
@@ -3258,28 +3282,28 @@ function instance$2($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*inTransitionOptions*/ 8) {
+		if ($$self.$$.dirty & /*inTransitionOptions*/ 16) {
 			// Handle cases if inTransitionOptions is unset; assign empty default transition options.
 			if (typeof inTransitionOptions !== 'object') {
-				$$invalidate(3, inTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS);
+				$$invalidate(4, inTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS);
 			}
 		}
 
-		if ($$self.$$.dirty & /*outTransitionOptions*/ 16) {
+		if ($$self.$$.dirty & /*outTransitionOptions*/ 32) {
 			// Handle cases if outTransitionOptions is unset; assign empty default transition options.
 			if (typeof outTransitionOptions !== 'object') {
-				$$invalidate(4, outTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS);
+				$$invalidate(5, outTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS);
 			}
 		}
 	};
 
 	return [
+		elementContent,
 		elementRoot,
 		inTransition,
 		outTransition,
 		inTransitionOptions,
 		outTransitionOptions,
-		elementContent,
 		heightChanged,
 		stylesApp,
 		stylesContent,
@@ -3314,25 +3338,25 @@ class TJSApplicationShell extends SvelteComponent {
 			create_fragment$2,
 			safe_not_equal,
 			{
-				elementContent: 5,
-				elementRoot: 0,
+				elementContent: 0,
+				elementRoot: 1,
 				children: 13,
 				heightChanged: 6,
 				stylesApp: 7,
 				stylesContent: 8,
 				transition: 14,
-				inTransition: 1,
-				outTransition: 2,
+				inTransition: 2,
+				outTransition: 3,
 				transitionOptions: 15,
-				inTransitionOptions: 3,
-				outTransitionOptions: 4
+				inTransitionOptions: 4,
+				outTransitionOptions: 5
 			},
 			add_css$1
 		);
 	}
 
 	get elementContent() {
-		return this.$$.ctx[5];
+		return this.$$.ctx[0];
 	}
 
 	set elementContent(elementContent) {
@@ -3341,7 +3365,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get elementRoot() {
-		return this.$$.ctx[0];
+		return this.$$.ctx[1];
 	}
 
 	set elementRoot(elementRoot) {
@@ -3395,7 +3419,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get inTransition() {
-		return this.$$.ctx[1];
+		return this.$$.ctx[2];
 	}
 
 	set inTransition(inTransition) {
@@ -3404,7 +3428,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get outTransition() {
-		return this.$$.ctx[2];
+		return this.$$.ctx[3];
 	}
 
 	set outTransition(outTransition) {
@@ -3422,7 +3446,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get inTransitionOptions() {
-		return this.$$.ctx[3];
+		return this.$$.ctx[4];
 	}
 
 	set inTransitionOptions(inTransitionOptions) {
@@ -3431,7 +3455,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get outTransitionOptions() {
-		return this.$$.ctx[4];
+		return this.$$.ctx[5];
 	}
 
 	set outTransitionOptions(outTransitionOptions) {

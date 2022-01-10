@@ -4,6 +4,7 @@
    import {
       s_DEFAULT_TRANSITION,
       s_DEFAULT_TRANSITION_OPTIONS }   from '@typhonjs-fvtt/svelte/transition';
+   import { writable } from "svelte/store";
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
    // use 'elementRoot' to set the element of the Application. You can also provide `elementContent` and
@@ -19,8 +20,18 @@
    // are bound to `heightChanged` to signal to any parent component of any change to the client & root.
    const bindHeightChanged = !!heightChanged;
 
-   setContext('getElementContent', () => elementContent);
-   setContext('getElementRoot', () => elementRoot);
+   if (!getContext('storeElementContent')) { setContext('storeElementContent', writable(elementContent)); }
+   if (!getContext('storeElementRoot')) { setContext('storeElementRoot', writable(elementRoot)); }
+
+   $: if (elementContent !== void 0 && elementContent !== null)
+   {
+      getContext('storeElementContent').set(elementContent);
+   }
+
+   $: if (elementRoot !== void 0 && elementRoot !== null)
+   {
+      getContext('storeElementRoot').set(elementRoot);
+   }
 
    const context = getContext('external');
 

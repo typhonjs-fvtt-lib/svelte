@@ -42,20 +42,17 @@
       }
    }
 
-   setContext('getElementContent', () => elementContent);
-   setContext('getElementRoot', () => {
-      console.log(`!!! TJSApplicationShell - getElementRoot`);
-      return elementRoot;
-   });
+   if (!getContext('storeElementContent')) { setContext('storeElementContent', writable(elementContent)); }
+   if (!getContext('storeElementRoot')) { setContext('storeElementRoot', writable(elementRoot)); }
 
-   $:
+   $: if (elementContent !== void 0 && elementContent !== null)
    {
-      const getTest = getContext('getTest');
-      if (getTest) { getTest.set(elementRoot); }
-      else
-      {
-         setContext('getTest', writable(elementRoot));
-      }
+      getContext('storeElementContent').set(elementContent);
+   }
+
+   $: if (elementRoot !== void 0 && elementRoot !== null)
+   {
+      getContext('storeElementRoot').set(elementRoot);
    }
 
    const context = getContext('external');

@@ -6,7 +6,7 @@
    const foundryApp = getContext('external').foundryApp;
 
    // Allows retrieval of the element root at runtime.
-   const getElementRoot = getContext('getElementRoot');
+   const storeElementRoot = getContext('storeElementRoot');
 
    const storeResizable = foundryApp.reactive.storeAppOptions.resizable;
    const storeMinimized = foundryApp.reactive.storeUIOptions.minimized;
@@ -19,7 +19,7 @@
       elementResize.style.display = isResizable && !$storeMinimized ? 'block' : 'none';
 
       // Add / remove `resizable` class from element root.
-      const elementRoot = getElementRoot();
+      const elementRoot = $storeElementRoot;
       if (elementRoot) { elementRoot.classList[isResizable ? 'add' : 'remove']('resizable'); }
    }
 
@@ -133,8 +133,8 @@
          // Record initial position
          position = foundry.utils.duplicate(foundryApp.position);
 
-         if (position.height === 'auto') { position.height = getElementRoot().clientHeight; }
-         if (position.width === 'auto') { position.width = getElementRoot().clientWidth; }
+         if (position.height === 'auto') { position.height = $storeElementRoot.clientHeight; }
+         if (position.width === 'auto') { position.width = $storeElementRoot.clientWidth; }
 
          initialPosition = { x: event.clientX, y: event.clientY };
 
