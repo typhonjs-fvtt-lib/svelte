@@ -1,14 +1,15 @@
 <script>
-   import { getContext, setContext }   from 'svelte';
-   import { applyStyles }              from '@typhonjs-fvtt/svelte/action';
+   import { getContext, setContext }    from 'svelte';
+   import { writable }                  from 'svelte/store';
+   import { applyStyles }               from '@typhonjs-fvtt/svelte/action';
 
-   import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
-   import TJSContainer                 from '../TJSContainer.svelte';
-   import ResizableHandle              from './ResizableHandle.svelte';
+   import TJSApplicationHeader          from './TJSApplicationHeader.svelte';
+   import TJSContainer                  from '../TJSContainer.svelte';
+   import ResizableHandle               from './ResizableHandle.svelte';
 
    import {
       s_DEFAULT_TRANSITION,
-      s_DEFAULT_TRANSITION_OPTIONS }   from '@typhonjs-fvtt/svelte/transition';
+      s_DEFAULT_TRANSITION_OPTIONS }    from '@typhonjs-fvtt/svelte/transition';
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
    // use 'elementRoot' to set the element of the Application. You can also provide `elementContent` and
@@ -46,6 +47,16 @@
       console.log(`!!! TJSApplicationShell - getElementRoot`);
       return elementRoot;
    });
+
+   $:
+   {
+      const getTest = getContext('getTest');
+      if (getTest) { getTest.set(elementRoot); }
+      else
+      {
+         setContext('getTest', writable(elementRoot));
+      }
+   }
 
    const context = getContext('external');
 

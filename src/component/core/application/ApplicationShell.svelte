@@ -1,5 +1,6 @@
 <script>
    import { getContext, setContext }   from 'svelte';
+   import { writable }                 from 'svelte/store';
    import { applyStyles }              from '@typhonjs-fvtt/svelte/action';
 
    import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
@@ -42,10 +43,21 @@
    }
 
    setContext('getElementContent', () => elementContent);
+
    setContext('getElementRoot', () => {
       console.log(`!!! ApplicationShell - getElementRoot`);
       return elementRoot;
    });
+
+   $:
+   {
+      const getTest = getContext('getTest');
+      if (getTest) { getTest.set(elementRoot); }
+      else
+      {
+         setContext('getTest', writable(elementRoot));
+      }
+   }
 
    const context = getContext('external');
 
