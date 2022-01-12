@@ -88,37 +88,6 @@ const rollupConfigs = [
    },
    {
       input: {
-         input: 'src/component/standard/index.js',
-         external: s_LOCAL_EXTERNAL,
-         plugins: [
-            svelte({
-               emitCss: false,
-               onwarn: (warning, handler) =>
-               {
-                  // Suppress `a11y-missing-attribute` for missing href in <a> links.
-                  if (warning.message.includes(`<a> element should have an href attribute`)) { return; }
-
-                  // Let Rollup handle all other warnings normally.
-                  handler(warning);
-               }
-            }),
-            typhonjsRuntime({ exclude: ['@typhonjs-svelte/lib/component/standard'] }),
-            resolve()
-         ]
-      },
-      output: {
-         output: {
-            file: '_dist/component/standard/index.js',
-            format: 'es',
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
-      }
-   },
-   {
-      input: {
          input: 'src/gsap/index.js',
          external: s_LOCAL_EXTERNAL
       },

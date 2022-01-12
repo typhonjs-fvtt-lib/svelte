@@ -23,10 +23,6 @@
       "types": "./_dist/component/core/index.d.ts",
       "import": "./_dist/component/core/index.js"
     },
-    "./component/standard": {
-      "types": "./_dist/component/standard/index.d.ts",
-      "import": "./_dist/component/standard/index.js"
-    },
     "./gsap": {
       "types": "./_dist/gsap/index.d.ts",
       "import": "./_dist/gsap/index.js"
