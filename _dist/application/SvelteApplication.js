@@ -99,7 +99,7 @@ export class SvelteApplication extends Application
          draggable: true,              // If true then application shells are draggable.
          headerButtonNoClose: false,   // If true then the close header button is removed.
          headerButtonNoLabel: false,   // If true then header button labels are removed for application shells.
-         defaultCloseAnimation: true,   // If false the Foundry JQuery close animation is not run.
+         defaultCloseAnimation: true,  // If false the Foundry JQuery close animation is not run.
          setPosition: true,            // If false then `setPosition` does not take effect.
          zIndex: null                  // When set the zIndex is manually controlled.
       });
