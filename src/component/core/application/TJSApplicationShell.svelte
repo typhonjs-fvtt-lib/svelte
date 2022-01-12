@@ -125,9 +125,9 @@
       if (typeof outTransition !== 'function') { outTransition = s_DEFAULT_TRANSITION; }
 
       // Set jquery close animation to either run or not when an out transition is changed.
-      if (foundryApp && typeof foundryApp?.options?.jqueryCloseAnimation === 'boolean')
+      if (foundryApp && typeof foundryApp?.options?.defaultCloseAnimation === 'boolean')
       {
-         foundryApp.options.jqueryCloseAnimation = outTransition === s_DEFAULT_TRANSITION;
+         foundryApp.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION;
       }
    }
 

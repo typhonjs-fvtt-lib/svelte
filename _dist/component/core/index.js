@@ -2024,8 +2024,8 @@ function instance$4($$self, $$props, $$invalidate) {
 				}
 
 				// Set jquery close animation to either run or not when an out transition is changed.
-				if (foundryApp && typeof foundryApp?.options?.jqueryCloseAnimation === 'boolean') {
-					$$invalidate(9, foundryApp.options.jqueryCloseAnimation = outTransition === s_DEFAULT_TRANSITION, foundryApp);
+				if (foundryApp && typeof foundryApp?.options?.defaultCloseAnimation === 'boolean') {
+					$$invalidate(9, foundryApp.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, foundryApp);
 				}
 			}
 		}
@@ -2516,8 +2516,8 @@ function instance$3($$self, $$props, $$invalidate) {
 				}
 
 				// Set jquery close animation to either run or not when an out transition is changed.
-				if (foundryApp && typeof foundryApp?.options?.jqueryCloseAnimation === 'boolean') {
-					$$invalidate(6, foundryApp.options.jqueryCloseAnimation = outTransition === s_DEFAULT_TRANSITION, foundryApp);
+				if (foundryApp && typeof foundryApp?.options?.defaultCloseAnimation === 'boolean') {
+					$$invalidate(6, foundryApp.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, foundryApp);
 				}
 			}
 		}
@@ -3292,8 +3292,8 @@ function instance$2($$self, $$props, $$invalidate) {
 				}
 
 				// Set jquery close animation to either run or not when an out transition is changed.
-				if (foundryApp && typeof foundryApp?.options?.jqueryCloseAnimation === 'boolean') {
-					$$invalidate(9, foundryApp.options.jqueryCloseAnimation = outTransition === s_DEFAULT_TRANSITION, foundryApp);
+				if (foundryApp && typeof foundryApp?.options?.defaultCloseAnimation === 'boolean') {
+					$$invalidate(9, foundryApp.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, foundryApp);
 				}
 			}
 		}

@@ -99,7 +99,7 @@ export class SvelteApplication extends Application
          draggable: true,              // If true then application shells are draggable.
          headerButtonNoClose: false,   // If true then the close header button is removed.
          headerButtonNoLabel: false,   // If true then header button labels are removed for application shells.
-         jqueryCloseAnimation: true,   // If false the Foundry JQuery close animation is not run.
+         defaultCloseAnimation: true,   // If false the Foundry JQuery close animation is not run.
          setPosition: true,            // If false then `setPosition` does not take effect.
          zIndex: null                  // When set the zIndex is manually controlled.
       });
@@ -216,10 +216,12 @@ export class SvelteApplication extends Application
          Hooks.call(`close${cls.name}`, this, el);
       }
 
-      // If options `jqueryCloseAnimation` is false then do not execute the standard JQuery slide up animation.
+      // If options `defaultCloseAnimation` is false then do not execute the standard JQuery slide up animation.
       // This allows Svelte components to provide any out transition. Application shells will automatically set
-      // `jqueryCloseAnimation` based on any out transition set or unset.
-      const animate = typeof this.options.jqueryCloseAnimation === 'boolean' ? this.options.jqueryCloseAnimation : true;
+      // `defaultCloseAnimation` based on any out transition set or unset.
+      const animate = typeof this.options.defaultCloseAnimation === 'boolean' ? this.options.defaultCloseAnimation :
+       true;
+
       if (animate)
       {
          // Await on JQuery to slide up the main element.
