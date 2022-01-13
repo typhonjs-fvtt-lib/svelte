@@ -27,6 +27,12 @@ const s_LOCAL_EXTERNAL = [
    `foundry-gsap`  // Replaced by consumer for Foundry GSAP path.
 ];
 
+// Defines the node-resolve config.
+const s_RESOLVE_CONFIG = {
+   browser: true,
+   dedupe: ['svelte', '@typhonjs-svelte/lib']
+};
+
 // Defines potential output plugins to use conditionally if the .env file indicates the bundles should be
 // minified / mangled.
 const outputPlugins = s_COMPRESS ? [terser(terserConfig), typhonjsRuntime()] : [typhonjsRuntime()];
@@ -40,7 +46,7 @@ const rollupConfigs = [
          input: 'src/action/index.js',
          external: s_LOCAL_EXTERNAL,
          plugins: [
-            resolve(),
+            resolve(s_RESOLVE_CONFIG),
             sourcemaps()
          ]
       },
@@ -72,7 +78,7 @@ const rollupConfigs = [
                }
             }),
             typhonjsRuntime({ exclude: ['@typhonjs-svelte/lib/component/core'] }),
-            resolve()
+            resolve(s_RESOLVE_CONFIG)
          ]
       },
       output: {
@@ -110,7 +116,7 @@ const rollupConfigs = [
          input: 'src/handler/index.js',
          external: s_LOCAL_EXTERNAL,
          plugins: [
-            resolve(),
+            resolve(s_RESOLVE_CONFIG),
             sourcemaps()
          ]
       },
@@ -146,7 +152,7 @@ const rollupConfigs = [
          input: 'src/store/index.js',
          external: s_LOCAL_EXTERNAL,
          plugins: [
-            resolve(),
+            resolve(s_RESOLVE_CONFIG),
             sourcemaps()
          ]
       },
@@ -166,7 +172,7 @@ const rollupConfigs = [
          input: 'src/transition/index.js',
          external: s_LOCAL_EXTERNAL,
          plugins: [
-            resolve(),
+            resolve(s_RESOLVE_CONFIG),
             sourcemaps()
          ]
       },
@@ -186,7 +192,7 @@ const rollupConfigs = [
          input: 'src/util/index.js',
          external: s_LOCAL_EXTERNAL,
          plugins: [
-            resolve(),
+            resolve(s_RESOLVE_CONFIG),
             sourcemaps()
          ]
       },
@@ -222,7 +228,7 @@ const rollupConfigs = [
          input: 'src/plugin/system/index.js',
          external: s_LOCAL_EXTERNAL,
          plugins: [
-            resolve(),
+            resolve(s_RESOLVE_CONFIG),
             sourcemaps()
          ]
       },
