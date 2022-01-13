@@ -1,4 +1,9 @@
 # Changelog
+## Release 0.0.3 (large update)
+- Fixed all edge cases between Svelte integration and SvelteApplication
+- reactive z-index support
+- A bunch more refinement; too much to list.
+
 ## Release 0.0.2
 - Updated SvelteApplication / SvelteFormApplication to properly handle z-index management including legacy Handlebars 
 support.
