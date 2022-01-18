@@ -153,6 +153,15 @@ declare class TJSGameSettings {
     #private;
 }
 /**
+ * Provides a basic test for a given variable to test if it has the shape of a store by having a `subscribe` function.
+ * Note: functions are also objects, so test that the variable might be a function w/ a `subscribe` function.
+ *
+ * @param {*}  store - variable to test that might be a store.
+ *
+ * @returns {boolean} Whether the variable tested has the shape of a store.
+ */
+declare function isStore(store: any): boolean;
+/**
  * Create a store for a property value in an object contained in another store.
  * [Read more...](https://github.com/PixievoltNo1/svelte-writable-derived#named-export-propertystore)
  *
@@ -214,4 +223,4 @@ declare function writableDerived(origins: any | any[], derive: Function, reflect
     withOld: Function;
 }, initial?: any): any;
 
-export { GSStore, GameSetting, LSStore, LocalStorage, SSStore, SessionStorage, TJSGameSettings, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { GSStore, GameSetting, LSStore, LocalStorage, SSStore, SessionStorage, TJSGameSettings, isStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
