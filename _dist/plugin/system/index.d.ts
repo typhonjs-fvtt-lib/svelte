@@ -9,6 +9,40 @@ type LSStore = svelte_store.Writable<any> & typeof get;
  * - The backing Svelte store; a writable w/ get method attached.
  */
 type SSStore = svelte_store.Writable<any> & typeof get;
+type GameSettingOptions = {
+    /**
+     * - If choices are defined, the resulting setting will be a select menu.
+     */
+    choices?: object;
+    /**
+     * - Specifies that the setting appears in the configuration view.
+     */
+    config?: boolean;
+    /**
+     * - A description of the registered setting and its behavior.
+     */
+    hint?: string;
+    /**
+     * - The displayed name of the setting.
+     */
+    name: string;
+    /**
+     * - An onChange callback to directly receive callbacks from Foundry on setting change.
+     */
+    onChange?: Function;
+    /**
+     * - If range is specified, the resulting setting will be a range slider.
+     */
+    range?: object;
+    /**
+     * - Scope for setting.
+     */
+    scope?: ('client' | 'world');
+    /**
+     * - A constructable object or function.
+     */
+    type: any | Function;
+};
 /**
  * - Defines a game setting.
  */
@@ -24,7 +58,7 @@ type GameSetting = {
     /**
      * - Configuration for setting data.
      */
-    options: object;
+    options: GameSettingOptions;
 };
 declare class LocalStorage {
     onPluginLoad(ev: any): void;
@@ -34,15 +68,6 @@ declare class SessionStorage {
     onPluginLoad(ev: any): void;
     #private;
 }
-/**
- * @typedef {object} GameSetting - Defines a game setting.
- *
- * @property {string} moduleId - The ID of the module / system.
- *
- * @property {string} key - The setting key to register.
- *
- * @property {object} options - Configuration for setting data.
- */
 /**
  * Provides a TyphonJS plugin to add TJSGameSettings to the plugin eventbus.
  *
@@ -58,7 +83,10 @@ declare class SessionStorage {
  * `tjs:system:game:settings:change:<SETTING KEY>` - Provides the value of the keyed event.
  */
 declare class TJSGameSettings {
-    register(moduleId: any, key: any, options: any): void;
+    /**
+     * @param {GameSetting} setting - A GameSetting instance to set to Foundry game settings.
+     */
+    register(setting: GameSetting): void;
     /**
      * Registers multiple settings.
      *
@@ -86,4 +114,4 @@ declare class TJSSettingsControl {
     #private;
 }
 
-export { GameSetting, LSStore, LocalStorage, SSStore, SessionStorage, TJSGameSettings, TJSSettingsControl };
+export { GameSetting, GameSettingOptions, LSStore, LocalStorage, SSStore, SessionStorage, TJSGameSettings, TJSSettingsControl };

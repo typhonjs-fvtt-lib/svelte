@@ -730,7 +730,7 @@ class TJSGameSettings
 
       if (typeof setting.options !== 'object')
       {
-         throw new TypeError(`TJSGameSettings - register: options is not an object.`);
+         throw new TypeError(`TJSGameSettings - register: 'options' attribute is not an object.`);
       }
 
       const moduleId = setting.moduleId;
