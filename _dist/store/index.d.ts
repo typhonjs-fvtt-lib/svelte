@@ -1,23 +1,54 @@
 import * as svelte_store from 'svelte/store';
-import { noop } from 'svelte/types/runtime/internal/utils';
 import { get } from 'svelte/types/runtime/store';
 
 /**
  * - The backing Svelte store; a writable w/ get method attached.
  */
-type LSStore = ((key: any, value: any, start?: typeof noop) => {
-    set: (new_value: any) => void;
-    update: (fn: any) => void;
-    subscribe: (run: any, invalidate?: typeof noop) => svelte_store.Unsubscriber;
-}) & typeof get;
+type LSStore = svelte_store.Writable<any> & typeof get;
 /**
  * - The backing Svelte store; a writable w/ get method attached.
  */
-type SSStore = ((key: any, value: any, start?: typeof noop) => {
-    set: (new_value: any) => void;
-    update: (fn: any) => void;
-    subscribe: (run: any, invalidate?: typeof noop) => svelte_store.Unsubscriber;
-}) & typeof get;
+type SSStore = svelte_store.Writable<any> & typeof get;
+/**
+ * - Provides a Svelte store wrapping the Foundry `game` global variable. It is initialized
+ * on the `ready` hook. You may use this store to access the global game state from a Svelte template. It is a read only
+ * store and will receive no reactive updates during runtime.
+ */
+type GameState = svelte_store.Readable<any>;
+type GameSettingOptions = {
+    /**
+     * - If choices are defined, the resulting setting will be a select menu.
+     */
+    choices?: object;
+    /**
+     * - Specifies that the setting appears in the configuration view.
+     */
+    config?: boolean;
+    /**
+     * - A description of the registered setting and its behavior.
+     */
+    hint?: string;
+    /**
+     * - The displayed name of the setting.
+     */
+    name: string;
+    /**
+     * - An onChange callback to directly receive callbacks from Foundry on setting change.
+     */
+    onChange?: Function;
+    /**
+     * - If range is specified, the resulting setting will be a range slider.
+     */
+    range?: object;
+    /**
+     * - Scope for setting.
+     */
+    scope?: ('client' | 'world');
+    /**
+     * - A constructable object or function.
+     */
+    type: any | Function;
+};
 /**
  * - Defines a game setting.
  */
@@ -33,16 +64,12 @@ type GameSetting = {
     /**
      * - Configuration for setting data.
      */
-    options: object;
+    options: GameSettingOptions;
 };
 /**
  * - The backing Svelte store; a writable w/ get method attached.
  */
-type GSStore = ((key: any, value: any, start?: typeof noop) => {
-    set: (new_value: any) => void;
-    update: (fn: any) => void;
-    subscribe: (run: any, invalidate?: typeof noop) => svelte_store.Unsubscriber;
-}) & typeof get;
+type GSStore = svelte_store.Writable<any> & typeof get;
 declare class LocalStorage {
     /**
      * Get value from the localstorage.
@@ -126,24 +153,31 @@ declare class SessionStorage {
     swapItemBoolean(key: string, defaultValue?: boolean): boolean;
 }
 /**
- * @typedef {object} GameSetting - Defines a game setting.
+ * @typedef {import('svelte/store').Readable} GameState - Provides a Svelte store wrapping the Foundry `game` global variable. It is initialized
+ * on the `ready` hook. You may use this store to access the global game state from a Svelte template. It is a read only
+ * store and will receive no reactive updates during runtime.
  *
- * @property {string} moduleId - The ID of the module / system.
+ * @property {import('svelte/store').Readable.subscribe} subscribe - Provides the Svelte store subscribe function.
  *
- * @property {string} key - The setting key to register.
- *
- * @property {object} options - Configuration for setting data.
- */
-/**
- * @typedef {writable & get} GSStore - The backing Svelte store; a writable w/ get method attached.
+ * @property {Function} get - Provides a mechanism to directly access the Foundry game state without subscribing.
  */
 /**
  * Registers game settings and creates a backing Svelte store for each setting. It is possible to add multiple
  * `onChange` callbacks on registration.
  */
 declare class TJSGameSettings {
-    getStore(key: any): GSStore;
-    register(moduleId: any, key: any, options?: {}): void;
+    /**
+     * Returns the Game Settings store for the associated key.
+     *
+     * @param {string}   key - Game setting key.
+     *
+     * @returns {GSStore|undefined} The associated store for the given game setting key.
+     */
+    getStore(key: string): GSStore | undefined;
+    /**
+     * @param {GameSetting} setting - A GameSetting instance to set to Foundry game settings.
+     */
+    register(setting: GameSetting): void;
     /**
      * Registers multiple settings.
      *
@@ -152,6 +186,10 @@ declare class TJSGameSettings {
     registerAll(settings: Iterable<GameSetting>): void;
     #private;
 }
+/**
+ * @type {GameState} Provides a Svelte store wrapping the Foundry runtime / global game state.
+ */
+declare const gameState: svelte_store.Readable<any>;
 /**
  * Provides a basic test for a given variable to test if it has the shape of a store by having a `subscribe` function.
  * Note: functions are also objects, so test that the variable might be a function w/ a `subscribe` function.
@@ -179,13 +217,13 @@ declare function propertyStore(origin: any, propName: string | number | symbol |
  * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
  *  Store to subscribe to...
  *
- * @param {function} first - Function to receive first update.
+ * @param {import('svelte/store').Updater} first - Function to receive first update.
  *
- * @param {function} update - Function to receive future updates.
+ * @param {import('svelte/store').Updater} update - Function to receive future updates.
  *
- * @returns {function} Store unsubscribe function.
+ * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
  */
-declare function subscribeFirstRest(store: svelte_store.Readable<any> | svelte_store.Writable<any>, first: Function, update: Function): Function;
+declare function subscribeFirstRest(store: svelte_store.Readable<any> | svelte_store.Writable<any>, first: any, update: any): svelte_store.Unsubscriber;
 /**
  * Subscribes to the given store with the update function provided and ignores the first automatic
  * update. All future updates are dispatched to the update function.
@@ -193,11 +231,11 @@ declare function subscribeFirstRest(store: svelte_store.Readable<any> | svelte_s
  * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
  *  Store to subscribe to...
  *
- * @param {function} update - function to receive future updates.
+ * @param {import('svelte/store').Updater} update - function to receive future updates.
  *
- * @returns {function} Store unsubscribe function.
+ * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
  */
-declare function subscribeIgnoreFirst(store: svelte_store.Readable<any> | svelte_store.Writable<any>, update: Function): Function;
+declare function subscribeIgnoreFirst(store: svelte_store.Readable<any> | svelte_store.Writable<any>, update: any): svelte_store.Unsubscriber;
 /**
  * @external Store
  * @see [Svelte stores](https://svelte.dev/docs#Store_contract)
@@ -223,4 +261,4 @@ declare function writableDerived(origins: any | any[], derive: Function, reflect
     withOld: Function;
 }, initial?: any): any;
 
-export { GSStore, GameSetting, LSStore, LocalStorage, SSStore, SessionStorage, TJSGameSettings, isStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { GSStore, GameSetting, GameSettingOptions, GameState, LSStore, LocalStorage, SSStore, SessionStorage, TJSGameSettings, gameState, isStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };

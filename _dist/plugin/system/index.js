@@ -156,7 +156,7 @@ var g$1 = generator(storage$1);
 var writable$1 = g$1.writable;
 
 /**
- * @typedef {writable & get} LSStore - The backing Svelte store; a writable w/ get method attached.
+ * @typedef {import('svelte/store').Writable & import('svelte/store').get} LSStore - The backing Svelte store; a writable w/ get method attached.
  */
 
 var _stores$1 = /*#__PURE__*/new WeakMap();
@@ -290,7 +290,7 @@ var g = generator(storage);
 var writable = g.writable;
 
 /**
- * @typedef {writable & get} SSStore - The backing Svelte store; a writable w/ get method attached.
+ * @typedef {import('svelte/store').Writable & import('svelte/store').get} SSStore - The backing Svelte store; a writable w/ get method attached.
  */
 
 var _stores = /*#__PURE__*/new WeakMap();

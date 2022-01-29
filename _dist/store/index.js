@@ -30,9 +30,9 @@ function isStore(store) {
  * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
  *  Store to subscribe to...
  *
- * @param {function} update - function to receive future updates.
+ * @param {import('svelte/store').Updater} update - function to receive future updates.
  *
- * @returns {function} Store unsubscribe function.
+ * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
  */
 
 function subscribeIgnoreFirst(store, update) {
@@ -52,11 +52,11 @@ function subscribeIgnoreFirst(store, update) {
  * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
  *  Store to subscribe to...
  *
- * @param {function} first - Function to receive first update.
+ * @param {import('svelte/store').Updater} first - Function to receive first update.
  *
- * @param {function} update - Function to receive future updates.
+ * @param {import('svelte/store').Updater} update - Function to receive future updates.
  *
- * @returns {function} Store unsubscribe function.
+ * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
  */
 
 function subscribeFirstRest(store, first, update) {
@@ -224,7 +224,7 @@ var g$1 = generator(storage$1);
 var writable$1 = g$1.writable;
 
 /**
- * @typedef {writable & get} LSStore - The backing Svelte store; a writable w/ get method attached.
+ * @typedef {import('svelte/store').Writable & import('svelte/store').get} LSStore - The backing Svelte store; a writable w/ get method attached.
  */
 
 var _stores$1 = /*#__PURE__*/new WeakMap();
@@ -358,7 +358,7 @@ var g = generator(storage);
 var writable = g.writable;
 
 /**
- * @typedef {writable & get} SSStore - The backing Svelte store; a writable w/ get method attached.
+ * @typedef {import('svelte/store').Writable & import('svelte/store').get} SSStore - The backing Svelte store; a writable w/ get method attached.
  */
 
 var _stores = /*#__PURE__*/new WeakMap();
@@ -668,18 +668,28 @@ function propertyStore(origin, propName) {
   }
 }
 
-/**
- * @typedef {object} GameSetting - Defines a game setting.
- *
- * @property {string} moduleId - The ID of the module / system.
- *
- * @property {string} key - The setting key to register.
- *
- * @property {object} options - Configuration for setting data.
- */
+const storeState = writable$2(void 0);
 
 /**
- * @typedef {writable & get} GSStore - The backing Svelte store; a writable w/ get method attached.
+ * @type {GameState} Provides a Svelte store wrapping the Foundry runtime / global game state.
+ */
+const gameState = {
+   subscribe: storeState.subscribe,
+   get: () => game
+};
+
+Object.freeze(gameState);
+
+Hooks.once('ready', () => storeState.set(game));
+
+/**
+ * @typedef {import('svelte/store').Readable} GameState - Provides a Svelte store wrapping the Foundry `game` global variable. It is initialized
+ * on the `ready` hook. You may use this store to access the global game state from a Svelte template. It is a read only
+ * store and will receive no reactive updates during runtime.
+ *
+ * @property {import('svelte/store').Readable.subscribe} subscribe - Provides the Svelte store subscribe function.
+ *
+ * @property {Function} get - Provides a mechanism to directly access the Foundry game state without subscribing.
  */
 
 /**
@@ -693,6 +703,13 @@ class TJSGameSettings
     */
    #stores = new Map();
 
+   /**
+    * Returns the Game Settings store for the associated key.
+    *
+    * @param {string}   key - Game setting key.
+    *
+    * @returns {GSStore|undefined} The associated store for the given game setting key.
+    */
    getStore(key)
    {
       if (!this.#stores.has(key))
@@ -704,9 +721,25 @@ class TJSGameSettings
       return s_GET_STORE(this.#stores, key);
    }
 
-   register(moduleId, key, options = {})
+   /**
+    * @param {GameSetting} setting - A GameSetting instance to set to Foundry game settings.
+    */
+   register(setting)
    {
-      if (typeof options !== 'object') { throw new TypeError(`TJSGameSettings - register: options is not an object.`); }
+      if (typeof setting !== 'object') { throw new TypeError(`TJSGameSettings - register: setting is not an object.`); }
+
+      if (typeof setting.options !== 'object')
+      {
+         throw new TypeError(`TJSGameSettings - register: options is not an object.`);
+      }
+
+      const moduleId = setting.moduleId;
+      const key = setting.key;
+
+      /**
+       * @type {GameSettingOptions}
+       */
+      const options = setting.options;
 
       const onchangeFunctions = [];
 
@@ -780,7 +813,7 @@ class TJSGameSettings
             throw new TypeError(`TJSGameSettings - registerAll: entry in settings missing 'options' attribute.`);
          }
 
-         this.register(entry.moduleId, entry.key, entry.options);
+         this.register(entry);
       }
    }
 }
@@ -792,7 +825,7 @@ class TJSGameSettings
  *
  * @param {string}               key - Key to lookup in stores map.
  *
- * @param {string}               initialValue - An initial value to set to new stores.
+ * @param {string}               [initialValue] - An initial value to set to new stores.
  *
  * @returns {GSStore} The store for the given key.
  */
@@ -823,5 +856,39 @@ function s_CREATE_STORE(initialValue)
    return store;
 }
 
-export { LocalStorage, SessionStorage, TJSGameSettings, isStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+/**
+ * @typedef {object} GameSettingOptions
+ *
+ * @property {object} [choices] - If choices are defined, the resulting setting will be a select menu.
+ *
+ * @property {boolean} [config=true] - Specifies that the setting appears in the configuration view.
+ *
+ * @property {string} [hint] - A description of the registered setting and its behavior.
+ *
+ * @property {string} name - The displayed name of the setting.
+ *
+ * @property {Function} [onChange] - An onChange callback to directly receive callbacks from Foundry on setting change.
+ *
+ * @property {object} [range] - If range is specified, the resulting setting will be a range slider.
+ *
+ * @property {('client' | 'world')} [scope='client'] - Scope for setting.
+ *
+ * @property {Object|Function} type - A constructable object or function.
+ */
+
+/**
+ * @typedef {object} GameSetting - Defines a game setting.
+ *
+ * @property {string} moduleId - The ID of the module / system.
+ *
+ * @property {string} key - The setting key to register.
+ *
+ * @property {GameSettingOptions} options - Configuration for setting data.
+ */
+
+/**
+ * @typedef {import('svelte/store').Writable & import('svelte/store').get} GSStore - The backing Svelte store; a writable w/ get method attached.
+ */
+
+export { LocalStorage, SessionStorage, TJSGameSettings, gameState, isStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
 //# sourceMappingURL=index.js.map

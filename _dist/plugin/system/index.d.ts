@@ -1,23 +1,14 @@
 import * as svelte_store from 'svelte/store';
-import { noop } from 'svelte/types/runtime/internal/utils';
 import { get } from 'svelte/types/runtime/store';
 
 /**
  * - The backing Svelte store; a writable w/ get method attached.
  */
-type LSStore = ((key: any, value: any, start?: typeof noop) => {
-    set: (new_value: any) => void;
-    update: (fn: any) => void;
-    subscribe: (run: any, invalidate?: typeof noop) => svelte_store.Unsubscriber;
-}) & typeof get;
+type LSStore = svelte_store.Writable<any> & typeof get;
 /**
  * - The backing Svelte store; a writable w/ get method attached.
  */
-type SSStore = ((key: any, value: any, start?: typeof noop) => {
-    set: (new_value: any) => void;
-    update: (fn: any) => void;
-    subscribe: (run: any, invalidate?: typeof noop) => svelte_store.Unsubscriber;
-}) & typeof get;
+type SSStore = svelte_store.Writable<any> & typeof get;
 /**
  * - Defines a game setting.
  */
