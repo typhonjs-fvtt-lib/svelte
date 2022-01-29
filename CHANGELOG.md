@@ -1,4 +1,10 @@
 # Changelog
+## Release 0.0.5 (medium update)
+- Skipped 0.0.4 release to bring version parity with @typhonjs-fvtt/runtime.
+- Added gameState Svelte store to access Foundry global `game` in Svelte templates.
+- Better typescript type definitions.
+- Updated @typhonjs-svelte/lib (more utility functions)
+
 ## Release 0.0.3 (large update)
 - Fixed all edge cases between Svelte integration and SvelteApplication
 - reactive z-index support
