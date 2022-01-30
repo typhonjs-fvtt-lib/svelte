@@ -26,11 +26,22 @@ export class TJSGameSettings
    {
       if (typeof setting !== 'object') { throw new TypeError(`TJSGameSettings - register: setting is not an object.`); }
 
+      if (typeof setting.moduleId !== 'string')
+      {
+         throw new TypeError(`TJSGameSettings - register: 'moduleId' attribute is not a string.`);
+      }
+
+      if (typeof setting.key !== 'string')
+      {
+         throw new TypeError(`TJSGameSettings - register: 'key' attribute is not a string.`);
+      }
+
       if (typeof setting.options !== 'object')
       {
          throw new TypeError(`TJSGameSettings - register: 'options' attribute is not an object.`);
       }
 
+      const moduleId = setting.moduleId;
       const key = setting.key;
 
       /**
@@ -49,7 +60,7 @@ export class TJSGameSettings
          }
       });
 
-      this.#gameSettings.register(setting);
+      this.#gameSettings.register({ moduleId, key, options: { ...options, onChange } });
    }
 
    /**
@@ -61,30 +72,7 @@ export class TJSGameSettings
    {
       if (!isIterable(settings)) { throw new TypeError(`TJSGameSettings - registerAll: settings is not iterable.`); }
 
-      for (const entry of settings)
-      {
-         if (typeof entry !== 'object')
-         {
-            throw new TypeError(`TJSGameSettings - registerAll: entry in settings is not an object.`);
-         }
-
-         if (typeof entry.moduleId !== 'string')
-         {
-            throw new TypeError(`TJSGameSettings - registerAll: entry in settings missing 'moduleId' attribute.`);
-         }
-
-         if (typeof entry.key !== 'string')
-         {
-            throw new TypeError(`TJSGameSettings - registerAll: entry in settings missing 'key' attribute.`);
-         }
-
-         if (typeof entry.options !== 'object')
-         {
-            throw new TypeError(`TJSGameSettings - registerAll: entry in settings missing 'options' attribute.`);
-         }
-
-         this.register(entry);
-      }
+      for (const entry of settings) { this.register(entry); }
    }
 
    onPluginLoad(ev)

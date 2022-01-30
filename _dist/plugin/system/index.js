@@ -526,21 +526,41 @@ class TJSGameSettings
    {
       if (typeof setting !== 'object') { throw new TypeError(`TJSGameSettings - register: setting is not an object.`); }
 
+      if (typeof setting.moduleId !== 'string')
+      {
+         throw new TypeError(`TJSGameSettings - register: 'moduleId' attribute is not a string.`);
+      }
+
+      if (typeof setting.key !== 'string')
+      {
+         throw new TypeError(`TJSGameSettings - register: 'key' attribute is not a string.`);
+      }
+
       if (typeof setting.options !== 'object')
       {
          throw new TypeError(`TJSGameSettings - register: 'options' attribute is not an object.`);
       }
 
-      setting.key;
+      const moduleId = setting.moduleId;
+      const key = setting.key;
 
       /**
        * @type {GameSettingOptions}
        */
       const options = setting.options;
 
-      typeof options?.onChange === 'function' ? [options.onChange] : [];
+      const onChange = typeof options?.onChange === 'function' ? [options.onChange] : [];
 
-      this.#gameSettings.register(setting);
+      onChange.push((value) =>
+      {
+         if (this._eventbus)
+         {
+            this._eventbus.trigger(`tjs:system:game:settings:change:any`, { setting: key, value });
+            this._eventbus.trigger(`tjs:system:game:settings:change:${key}`, value);
+         }
+      });
+
+      this.#gameSettings.register({ moduleId, key, options: { ...options, onChange } });
    }
 
    /**
@@ -552,30 +572,7 @@ class TJSGameSettings
    {
       if (!isIterable(settings)) { throw new TypeError(`TJSGameSettings - registerAll: settings is not iterable.`); }
 
-      for (const entry of settings)
-      {
-         if (typeof entry !== 'object')
-         {
-            throw new TypeError(`TJSGameSettings - registerAll: entry in settings is not an object.`);
-         }
-
-         if (typeof entry.moduleId !== 'string')
-         {
-            throw new TypeError(`TJSGameSettings - registerAll: entry in settings missing 'moduleId' attribute.`);
-         }
-
-         if (typeof entry.key !== 'string')
-         {
-            throw new TypeError(`TJSGameSettings - registerAll: entry in settings missing 'key' attribute.`);
-         }
-
-         if (typeof entry.options !== 'object')
-         {
-            throw new TypeError(`TJSGameSettings - registerAll: entry in settings missing 'options' attribute.`);
-         }
-
-         this.register(entry);
-      }
+      for (const entry of settings) { this.register(entry); }
    }
 
    onPluginLoad(ev)
