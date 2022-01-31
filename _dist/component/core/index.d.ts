@@ -36,6 +36,8 @@ declare class DialogShell extends SvelteComponent {
     get elementRoot(): any;
     set data(arg: any);
     get data(): any;
+    set dialogComponent(arg: any);
+    get dialogComponent(): any;
 }
 declare class EmptyApplicationShell extends SvelteComponent {
     constructor(options: any);
@@ -132,5 +134,10 @@ declare class TJSHeaderButton extends SvelteComponent {
     set button(arg: any);
     get button(): any;
 }
+declare class TJSPermissionControl extends SvelteComponent {
+    constructor(options: any);
+    set document(arg: any);
+    get document(): any;
+}
 
-export { ApplicationShell, DialogContent, DialogShell, EmptyApplicationShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSGlassPane, TJSHeaderButton };
+export { ApplicationShell, DialogContent, DialogShell, EmptyApplicationShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSGlassPane, TJSHeaderButton, TJSPermissionControl };

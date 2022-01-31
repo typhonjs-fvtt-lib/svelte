@@ -11,6 +11,8 @@ export { default as TJSHeaderButton }        from './application/TJSHeaderButton
 export { default as DialogContent }          from './dialog/DialogContent.svelte';
 export { default as DialogShell }            from './dialog/DialogShell.svelte';
 
+export { default as TJSPermissionControl }   from './dialog/content/TJSPermissionControl.svelte';
+
 /**
  * @typedef {object} TransformData
  *

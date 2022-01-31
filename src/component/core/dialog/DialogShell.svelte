@@ -12,6 +12,8 @@
    // The dialog data.
    export let data = {};
 
+   export let dialogComponent = void 0;
+
    const foundryApp = getContext('external').foundryApp;
 
    const s_MODAL_TRANSITION = fade;
@@ -172,11 +174,11 @@
 {#if modal}
    <TJSGlassPane id={foundryApp.id} stopPropagation={false} {...modalProps} {zIndex}>
       <ApplicationShell bind:elementRoot {...appProps}>
-         <DialogContent {data} />
+         <DialogContent bind:dialogInstance={dialogComponent} {data} />
       </ApplicationShell>
    </TJSGlassPane>
 {:else}
    <ApplicationShell bind:elementRoot {...appProps}>
-      <DialogContent {data} />
+      <DialogContent bind:dialogInstance={dialogComponent} {data} />
    </ApplicationShell>
 {/if}

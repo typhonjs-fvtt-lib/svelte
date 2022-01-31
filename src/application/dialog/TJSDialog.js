@@ -1,7 +1,7 @@
 import { DialogShell }           from '@typhonjs-fvtt/svelte/component/core';
 import { safeAccess, safeSet }   from '@typhonjs-fvtt/svelte/util';
 
-import { SvelteApplication }     from './SvelteApplication.js';
+import { SvelteApplication }     from '../SvelteApplication.js';
 
 /**
  * Provides a Foundry API compatible dialog alternative implemented w/ Svelte. There are several features including
@@ -57,6 +57,16 @@ export class TJSDialog extends SvelteApplication
     * @returns {object} Dialog data.
     */
    get data() { return this.#data; }
+
+   /**
+    * Returns any Svelte component that is set to the dialog content.
+    *
+    * @returns {object|undefined} Any Svelte component mounted as the dialog content.
+    */
+   get dialogComponent()
+   {
+      return this.svelte?.applicationShell?.dialogComponent;
+   }
 
    /**
     * Sets the dialog data content field; this is reactive.

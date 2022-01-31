@@ -7,6 +7,8 @@
 
    export let data = {};
 
+   export let dialogInstance = void 0;
+
    let buttons;
    let content;
    let dialogComponent;
@@ -107,7 +109,7 @@
    {#if typeof content === 'string'}
       {@html content}
    {:else if dialogComponent}
-      <svelte:component this={dialogComponent} {...dialogProps} />
+      <svelte:component bind:this={dialogInstance} this={dialogComponent} {...dialogProps} />
    {/if}
 </div>
 <div class="dialog-buttons">

@@ -153,6 +153,94 @@ declare class SessionStorage {
     swapItemBoolean(key: string, defaultValue?: boolean): boolean;
 }
 /**
+ * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.
+ * This makes documents reactive in a Svelte component, but otherwise provides subscriber functionality external to
+ * Svelte.
+ *
+ * @template {foundry.abstract.Document} T
+ */
+declare class TJSDocument<T extends any> {
+    /**
+     * @param {T}                    document - Document to wrap.
+     *
+     * @param {{delete: Function}}   options - Optional delete function to invoke when document is deleted.
+     */
+    constructor(document: T, options?: {
+        delete: Function;
+    });
+    /**
+     * Returns the options passed on last update.
+     *
+     * @returns {object} Last update options.
+     */
+    get updateOptions(): any;
+    /**
+     * Returns the UUID assigned to this store.
+     *
+     * @returns {*} UUID
+     */
+    get uuid(): any;
+    /**
+     * @returns {T | undefined} Current document
+     */
+    get(): T | undefined;
+    /**
+     * @param {T | undefined}  document - New document to set.
+     */
+    set(document: T | undefined): void;
+    /**
+     * @param {function(T): void} handler - Callback function that is invoked on update / changes.
+     *
+     * @returns {(function(): void)} Unsubscribe function.
+     */
+    subscribe(handler: (arg0: T) => void): (() => void);
+    #private;
+}
+/**
+ * Provides a wrapper implementing the Svelte store / subscriber protocol around any DocumentCollection. This makes
+ * document collections reactive in a Svelte component, but otherwise provides subscriber functionality external to
+ * Svelte.
+ *
+ * @template {DocumentCollection} T
+ */
+declare class TJSDocumentCollection<T extends any> {
+    /**
+     * @param {T}                    collection - Collection to wrap.
+     *
+     * @param {{delete: Function}}   options - Optional delete function to invoke when collection is deleted.
+     */
+    constructor(collection: T, options?: {
+        delete: Function;
+    });
+    /**
+     * Returns the options passed on last update.
+     *
+     * @returns {object} Last update options.
+     */
+    get updateOptions(): any;
+    /**
+     * Returns the UUID assigned to this store.
+     *
+     * @returns {*} UUID
+     */
+    get uuid(): any;
+    /**
+     * @returns {T | undefined} Current collection
+     */
+    get(): T | undefined;
+    /**
+     * @param {T | undefined}  collection - New collection to set.
+     */
+    set(collection: T | undefined): void;
+    /**
+     * @param {function(T): void} handler - Callback function that is invoked on update / changes.
+     *
+     * @returns {(function(): void)} Unsubscribe function.
+     */
+    subscribe(handler: (arg0: T) => void): (() => void);
+    #private;
+}
+/**
  * @typedef {import('svelte/store').Readable} GameState - Provides a Svelte store wrapping the Foundry `game` global variable. It is initialized
  * on the `ready` hook. You may use this store to access the global game state from a Svelte template. It is a read only
  * store and will receive no reactive updates during runtime.
@@ -261,4 +349,4 @@ declare function writableDerived(origins: any | any[], derive: Function, reflect
     withOld: Function;
 }, initial?: any): any;
 
-export { GSStore, GameSetting, GameSettingOptions, GameState, LSStore, LocalStorage, SSStore, SessionStorage, TJSGameSettings, gameState, isStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { GSStore, GameSetting, GameSettingOptions, GameState, LSStore, LocalStorage, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSGameSettings, gameState, isStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };

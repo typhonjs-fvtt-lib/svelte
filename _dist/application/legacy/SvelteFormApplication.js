@@ -1031,8 +1031,6 @@ class SvelteReactive
    constructor(application)
    {
       this.#application = application;
-
-      Object.freeze(this);
    }
 
    /**
