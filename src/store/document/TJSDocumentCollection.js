@@ -28,7 +28,7 @@ export class TJSDocumentCollection
          throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
       }
 
-      this.#uuid = `store-collection-${uuidv4()}`;
+      this.#uuid = `tjs-collection-${uuidv4()}`;
       this.#deleteFn = options.delete;
 
       this.set(collection);
