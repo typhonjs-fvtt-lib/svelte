@@ -25,7 +25,12 @@ export class TJSPermissionControl extends TJSDialog
          title: `${game.i18n.localize('PERMISSION.Title')}: ${document.name}`
       });
 
-      // Add accessors to reactive data for 'document'.
+      /**
+       * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with
+       *                             TJSPermissionControl.
+       *
+       * @memberOf SvelteReactive#
+       */
       Object.defineProperty(this.reactive, 'document', {
          get: () => this.svelte?.dialogComponent,
          set: (document) =>
