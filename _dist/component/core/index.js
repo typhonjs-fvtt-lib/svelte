@@ -4916,7 +4916,7 @@ function instance($$self, $$props, $$invalidate) {
 		if ($$self.$$.dirty & /*$doc, document*/ 1280) {
 			if ($doc !== document) {
 				doc.set(document);
-				const title = game.i18n.localize('PERMISSION.Title');
+				const title = localize('PERMISSION.Title');
 
 				foundryApp.reactive.title = document instanceof foundry.abstract.Document
 				? `${title}: ${document.name}`

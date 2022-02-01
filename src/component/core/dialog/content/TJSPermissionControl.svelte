@@ -19,7 +19,7 @@
    {
       doc.set(document);
 
-      const title = game.i18n.localize('PERMISSION.Title');
+      const title = localize('PERMISSION.Title');
 
       foundryApp.reactive.title = document instanceof foundry.abstract.Document ? `${title}: ${document.name}` :
        `${title}: No document assigned`;

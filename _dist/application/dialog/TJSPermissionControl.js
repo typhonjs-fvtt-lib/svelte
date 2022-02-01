@@ -27,10 +27,11 @@ export class TJSPermissionControl extends TJSDialog
 
       // Add accessors to reactive data for 'document'.
       Object.defineProperty(this.reactive, 'document', {
-         get: () => this?.dialogComponent?.document,
+         get: () => this.svelte?.dialogComponent,
          set: (document) =>
          {
-            if (hasSetter(this?.dialogComponent, 'document')) { this.dialogComponent.document = document; }
+            const dialogComponent = this.svelte.dialogComponent;
+            if (hasSetter(dialogComponent, 'document')) { dialogComponent.document = document; }
          }
       });
    }

@@ -863,8 +863,6 @@ class GetSvelteData
    {
       this.#applicationShellHolder = applicationShellHolder;
       this.#svelteData = svelteData;
-
-      Object.freeze(this);
    }
 
    /**

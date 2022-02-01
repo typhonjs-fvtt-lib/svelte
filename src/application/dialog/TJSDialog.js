@@ -17,12 +17,22 @@ export class TJSDialog extends SvelteApplication
    /**
     * @param {object}   data - Dialog data.
     *
-    * @param {object}   options -
+    * @param {object}   [options] - SvelteApplication options.
     */
-   constructor(data, options)
+   constructor(data, options = {})
    {
       super(options);
       this.#data = data;
+
+      /**
+       * @property {object} dialogComponent - A getter to SvelteData to retrieve any mounted Svelte component as the
+       *                                      dialog content.
+       *
+       * @name SvelteApplication.svelte#dialogComponent
+       */
+      Object.defineProperty(this.svelte, 'dialogComponent', {
+         get: () => this.svelte?.applicationShell?.dialogComponent,
+      });
    }
 
    /**
@@ -39,7 +49,7 @@ export class TJSDialog extends SvelteApplication
             class: DialogShell,
             intro: true,
             target: document.body,
-            props: function() { return { data: this.#data }; }
+            props: function() { return { data: this.#data }; } // this context is the SvelteApplication when invoked.
          }
       });
    }
@@ -57,16 +67,6 @@ export class TJSDialog extends SvelteApplication
     * @returns {object} Dialog data.
     */
    get data() { return this.#data; }
-
-   /**
-    * Returns any Svelte component that is set to the dialog content.
-    *
-    * @returns {object|undefined} Any Svelte component mounted as the dialog content.
-    */
-   get dialogComponent()
-   {
-      return this.svelte?.applicationShell?.dialogComponent;
-   }
 
    /**
     * Sets the dialog data content field; this is reactive.
