@@ -6,6 +6,8 @@
       parseSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
 
    export let data = {};
+   export let preventDefault = false;
+   export let stopPropagation = false;
 
    export let dialogInstance = void 0;
 
@@ -102,6 +104,11 @@
             event.preventDefault();
             event.stopPropagation();
             onClick(data.buttons[data.default]);
+            break;
+
+         default:
+            if (preventDefault) { event.preventDefault(); }
+            if (stopPropagation) { event.stopPropagation(); }
             break;
       }
    }

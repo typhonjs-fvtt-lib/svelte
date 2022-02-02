@@ -172,9 +172,9 @@
 <svelte:options accessors={true}/>
 
 {#if modal}
-   <TJSGlassPane id={foundryApp.id} stopPropagation={false} {...modalProps} {zIndex}>
+   <TJSGlassPane id={foundryApp.id} preventDefault={false} stopPropagation={false} {...modalProps} {zIndex}>
       <ApplicationShell bind:elementRoot {...appProps}>
-         <DialogContent bind:dialogInstance={dialogComponent} {data} />
+         <DialogContent bind:dialogInstance={dialogComponent} stopPropagation={true} {data} />
       </ApplicationShell>
    </TJSGlassPane>
 {:else}

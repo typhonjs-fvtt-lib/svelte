@@ -517,6 +517,8 @@ function instance$9($$self, $$props, $$invalidate) {
 	// ---------------------------------------------------------------------------------------------------------------
 	function swallow(event) {
 		if (captureInput) {
+			console.log(`!!! TJSGlassPane - swallow - preventDefault: ${preventDefault}; stopPropagation: ${stopPropagation}`);
+
 			if (preventDefault) {
 				event.preventDefault();
 			}
@@ -3489,11 +3491,11 @@ function add_css(target) {
 
 function get_each_context$1(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[11] = list[i];
+	child_ctx[13] = list[i];
 	return child_ctx;
 }
 
-// (115:29) 
+// (124:29) 
 function create_if_block_1(ctx) {
 	let switch_instance;
 	let switch_instance_anchor;
@@ -3513,7 +3515,7 @@ function create_if_block_1(ctx) {
 
 	if (switch_value) {
 		switch_instance = new switch_value(switch_props());
-		/*switch_instance_binding*/ ctx[8](switch_instance);
+		/*switch_instance_binding*/ ctx[10](switch_instance);
 	}
 
 	return {
@@ -3548,7 +3550,7 @@ function create_if_block_1(ctx) {
 
 				if (switch_value) {
 					switch_instance = new switch_value(switch_props());
-					/*switch_instance_binding*/ ctx[8](switch_instance);
+					/*switch_instance_binding*/ ctx[10](switch_instance);
 					create_component(switch_instance.$$.fragment);
 					transition_in(switch_instance.$$.fragment, 1);
 					mount_component(switch_instance, switch_instance_anchor.parentNode, switch_instance_anchor);
@@ -3569,14 +3571,14 @@ function create_if_block_1(ctx) {
 			current = false;
 		},
 		d(detaching) {
-			/*switch_instance_binding*/ ctx[8](null);
+			/*switch_instance_binding*/ ctx[10](null);
 			if (detaching) detach(switch_instance_anchor);
 			if (switch_instance) destroy_component(switch_instance, detaching);
 		}
 	};
 }
 
-// (113:3) {#if typeof content === 'string'}
+// (122:3) {#if typeof content === 'string'}
 function create_if_block$1(ctx) {
 	let html_tag;
 	let html_anchor;
@@ -3603,21 +3605,21 @@ function create_if_block$1(ctx) {
 	};
 }
 
-// (120:3) {#each buttons as button (button.id)}
+// (129:3) {#each buttons as button (button.id)}
 function create_each_block$1(key_1, ctx) {
 	let button;
 	let html_tag;
-	let raw0_value = /*button*/ ctx[11].icon + "";
+	let raw0_value = /*button*/ ctx[13].icon + "";
 	let t0;
 	let html_tag_1;
-	let raw1_value = /*button*/ ctx[11].label + "";
+	let raw1_value = /*button*/ ctx[13].label + "";
 	let t1;
 	let button_class_value;
 	let mounted;
 	let dispose;
 
 	function click_handler() {
-		return /*click_handler*/ ctx[9](/*button*/ ctx[11]);
+		return /*click_handler*/ ctx[11](/*button*/ ctx[13]);
 	}
 
 	return {
@@ -3631,7 +3633,7 @@ function create_each_block$1(key_1, ctx) {
 			t1 = space();
 			html_tag.a = t0;
 			html_tag_1.a = t1;
-			attr(button, "class", button_class_value = "dialog-button " + /*button*/ ctx[11].cssClass);
+			attr(button, "class", button_class_value = "dialog-button " + /*button*/ ctx[13].cssClass);
 			this.first = button;
 		},
 		m(target, anchor) {
@@ -3648,10 +3650,10 @@ function create_each_block$1(key_1, ctx) {
 		},
 		p(new_ctx, dirty) {
 			ctx = new_ctx;
-			if (dirty & /*buttons*/ 4 && raw0_value !== (raw0_value = /*button*/ ctx[11].icon + "")) html_tag.p(raw0_value);
-			if (dirty & /*buttons*/ 4 && raw1_value !== (raw1_value = /*button*/ ctx[11].label + "")) html_tag_1.p(raw1_value);
+			if (dirty & /*buttons*/ 4 && raw0_value !== (raw0_value = /*button*/ ctx[13].icon + "")) html_tag.p(raw0_value);
+			if (dirty & /*buttons*/ 4 && raw1_value !== (raw1_value = /*button*/ ctx[13].label + "")) html_tag_1.p(raw1_value);
 
-			if (dirty & /*buttons*/ 4 && button_class_value !== (button_class_value = "dialog-button " + /*button*/ ctx[11].cssClass)) {
+			if (dirty & /*buttons*/ 4 && button_class_value !== (button_class_value = "dialog-button " + /*button*/ ctx[13].cssClass)) {
 				attr(button, "class", button_class_value);
 			}
 		},
@@ -3689,7 +3691,7 @@ function create_fragment$2(ctx) {
 	}
 
 	let each_value = /*buttons*/ ctx[2];
-	const get_key = ctx => /*button*/ ctx[11].id;
+	const get_key = ctx => /*button*/ ctx[13].id;
 
 	for (let i = 0; i < each_value.length; i += 1) {
 		let child_ctx = get_each_context$1(ctx, each_value, i);
@@ -3807,6 +3809,8 @@ function create_fragment$2(ctx) {
 
 function instance$2($$self, $$props, $$invalidate) {
 	let { data = {} } = $$props;
+	let { preventDefault = false } = $$props;
+	let { stopPropagation = false } = $$props;
 	let { dialogInstance = void 0 } = $$props;
 	let buttons;
 	let content;
@@ -3831,6 +3835,8 @@ function instance$2($$self, $$props, $$invalidate) {
 	}
 
 	function onKeydown(event) {
+		console.log(`!!! DialogContent - onKeyDown - event.key: ${event.key}`);
+
 		switch (event.key) {
 			case 'Escape':
 				event.preventDefault();
@@ -3840,6 +3846,14 @@ function instance$2($$self, $$props, $$invalidate) {
 				event.preventDefault();
 				event.stopPropagation();
 				onClick(data.buttons[data.default]);
+				break;
+			default:
+				if (preventDefault) {
+					event.preventDefault();
+				}
+				if (stopPropagation) {
+					event.stopPropagation();
+				}
 				break;
 		}
 	}
@@ -3855,6 +3869,8 @@ function instance$2($$self, $$props, $$invalidate) {
 
 	$$self.$$set = $$props => {
 		if ('data' in $$props) $$invalidate(7, data = $$props.data);
+		if ('preventDefault' in $$props) $$invalidate(8, preventDefault = $$props.preventDefault);
+		if ('stopPropagation' in $$props) $$invalidate(9, stopPropagation = $$props.stopPropagation);
 		if ('dialogInstance' in $$props) $$invalidate(0, dialogInstance = $$props.dialogInstance);
 	};
 
@@ -3924,6 +3940,8 @@ function instance$2($$self, $$props, $$invalidate) {
 		onClick,
 		onKeydown,
 		data,
+		preventDefault,
+		stopPropagation,
 		switch_instance_binding,
 		click_handler
 	];
@@ -3932,7 +3950,21 @@ function instance$2($$self, $$props, $$invalidate) {
 class DialogContent extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance$2, create_fragment$2, safe_not_equal, { data: 7, dialogInstance: 0 }, add_css);
+
+		init(
+			this,
+			options,
+			instance$2,
+			create_fragment$2,
+			safe_not_equal,
+			{
+				data: 7,
+				preventDefault: 8,
+				stopPropagation: 9,
+				dialogInstance: 0
+			},
+			add_css
+		);
 	}
 }
 
@@ -4011,6 +4043,7 @@ function create_if_block(ctx) {
 
 	const tjsglasspane_spread_levels = [
 		{ id: /*foundryApp*/ ctx[3].id },
+		{ preventDefault: false },
 		{ stopPropagation: false },
 		/*modalProps*/ ctx[6],
 		{ zIndex: /*zIndex*/ ctx[7] }
@@ -4040,6 +4073,7 @@ function create_if_block(ctx) {
 			? get_spread_update(tjsglasspane_spread_levels, [
 					dirty & /*foundryApp*/ 8 && { id: /*foundryApp*/ ctx[3].id },
 					tjsglasspane_spread_levels[1],
+					tjsglasspane_spread_levels[2],
 					dirty & /*modalProps*/ 64 && get_spread_object(/*modalProps*/ ctx[6]),
 					dirty & /*zIndex*/ 128 && { zIndex: /*zIndex*/ ctx[7] }
 				])
@@ -4130,7 +4164,10 @@ function create_default_slot_1(ctx) {
 		/*dialogcontent_dialogInstance_binding*/ ctx[8](value);
 	}
 
-	let dialogcontent_props = { data: /*data*/ ctx[2] };
+	let dialogcontent_props = {
+		stopPropagation: true,
+		data: /*data*/ ctx[2]
+	};
 
 	if (/*dialogComponent*/ ctx[1] !== void 0) {
 		dialogcontent_props.dialogInstance = /*dialogComponent*/ ctx[1];
@@ -4174,7 +4211,7 @@ function create_default_slot_1(ctx) {
 	};
 }
 
-// (175:3) <TJSGlassPane id={foundryApp.id} stopPropagation={false} {...modalProps} {zIndex}>
+// (175:3) <TJSGlassPane id={foundryApp.id} preventDefault={false} stopPropagation={false} {...modalProps} {zIndex}>
 function create_default_slot(ctx) {
 	let applicationshell;
 	let updating_elementRoot;
