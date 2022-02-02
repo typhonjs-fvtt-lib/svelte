@@ -1,4 +1,4 @@
-import { SvelteComponent, init, safe_not_equal, flush, append_styles, empty, insert, group_outros, transition_out, check_outros, transition_in, detach, element, attr, noop, create_component, mount_component, get_spread_update, get_spread_object, destroy_component, destroy_each, assign, create_slot, listen, update_slot_base, get_all_dirty_from_scope, get_slot_changes, add_render_callback, create_in_transition, create_out_transition, binding_callbacks, text, append, stop_propagation, prevent_default, set_data, run_all, space, action_destroyer, is_function, component_subscribe, add_resize_listener, HtmlTag, update_keyed_each, destroy_block, bind, add_flush_callback, toggle_class } from 'svelte/internal';
+import { SvelteComponent, init, safe_not_equal, flush, append_styles, empty, insert, group_outros, transition_out, check_outros, transition_in, detach, element, attr, noop, create_component, mount_component, get_spread_update, get_spread_object, destroy_component, destroy_each, assign, create_slot, listen, update_slot_base, get_all_dirty_from_scope, get_slot_changes, add_render_callback, create_in_transition, create_out_transition, binding_callbacks, text, append, stop_propagation, prevent_default, set_data, run_all, space, action_destroyer, is_function, component_subscribe, add_resize_listener, update_keyed_each, destroy_block, HtmlTag, bind, add_flush_callback, toggle_class } from 'svelte/internal';
 import { getContext, setContext } from 'svelte';
 import { s_DEFAULT_TRANSITION, s_DEFAULT_TRANSITION_OPTIONS } from '@typhonjs-fvtt/svelte/transition';
 import { writable } from 'svelte/store';
@@ -1416,7 +1416,7 @@ function create_else_block_1$1(ctx) {
 	let mounted;
 	let dispose;
 	tjsapplicationheader = new TJSApplicationHeader({});
-	const if_block_creators = [create_if_block_2$1, create_else_block_2$1];
+	const if_block_creators = [create_if_block_2$2, create_else_block_2$1];
 	const if_blocks = [];
 
 	function select_block_type_2(ctx, dirty) {
@@ -1700,7 +1700,7 @@ function create_else_block_2$1(ctx) {
 }
 
 // (177:9) {#if Array.isArray(allChildren)}
-function create_if_block_2$1(ctx) {
+function create_if_block_2$2(ctx) {
 	let tjscontainer;
 	let current;
 
@@ -2684,7 +2684,7 @@ function create_else_block_1(ctx) {
 	let mounted;
 	let dispose;
 	tjsapplicationheader = new TJSApplicationHeader({});
-	const if_block_creators = [create_if_block_2, create_else_block_2];
+	const if_block_creators = [create_if_block_2$1, create_else_block_2];
 	const if_blocks = [];
 
 	function select_block_type_2(ctx, dirty) {
@@ -2968,7 +2968,7 @@ function create_else_block_2(ctx) {
 }
 
 // (177:11) {#if Array.isArray(allChildren)}
-function create_if_block_2(ctx) {
+function create_if_block_2$1(ctx) {
 	let tjscontainer;
 	let current;
 
@@ -3494,7 +3494,7 @@ function get_each_context$1(ctx, list, i) {
 }
 
 // (122:29) 
-function create_if_block_1(ctx) {
+function create_if_block_2(ctx) {
 	let switch_instance;
 	let switch_instance_anchor;
 	let current;
@@ -3577,7 +3577,7 @@ function create_if_block_1(ctx) {
 }
 
 // (120:3) {#if typeof content === 'string'}
-function create_if_block$1(ctx) {
+function create_if_block_1(ctx) {
 	let html_tag;
 	let html_anchor;
 
@@ -3603,7 +3603,54 @@ function create_if_block$1(ctx) {
 	};
 }
 
-// (127:3) {#each buttons as button (button.id)}
+// (127:0) {#if buttons.length}
+function create_if_block$1(ctx) {
+	let div;
+	let each_blocks = [];
+	let each_1_lookup = new Map();
+	let each_value = /*buttons*/ ctx[2];
+	const get_key = ctx => /*button*/ ctx[13].id;
+
+	for (let i = 0; i < each_value.length; i += 1) {
+		let child_ctx = get_each_context$1(ctx, each_value, i);
+		let key = get_key(child_ctx);
+		each_1_lookup.set(key, each_blocks[i] = create_each_block$1(key, child_ctx));
+	}
+
+	return {
+		c() {
+			div = element("div");
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].c();
+			}
+
+			attr(div, "class", "dialog-buttons svelte-14xg9ru");
+		},
+		m(target, anchor) {
+			insert(target, div, anchor);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].m(div, null);
+			}
+		},
+		p(ctx, dirty) {
+			if (dirty & /*buttons, onClick*/ 36) {
+				each_value = /*buttons*/ ctx[2];
+				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, div, destroy_block, create_each_block$1, null, get_each_context$1);
+			}
+		},
+		d(detaching) {
+			if (detaching) detach(div);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].d();
+			}
+		}
+	};
+}
+
+// (129:3) {#each buttons as button (button.id)}
 function create_each_block$1(key_1, ctx) {
 	let button;
 	let html_tag;
@@ -3665,17 +3712,15 @@ function create_each_block$1(key_1, ctx) {
 
 function create_fragment$2(ctx) {
 	let t0;
-	let div0;
+	let div;
 	let current_block_type_index;
-	let if_block;
+	let if_block0;
 	let t1;
-	let div1;
-	let each_blocks = [];
-	let each_1_lookup = new Map();
+	let if_block1_anchor;
 	let current;
 	let mounted;
 	let dispose;
-	const if_block_creators = [create_if_block$1, create_if_block_1];
+	const if_block_creators = [create_if_block_1, create_if_block_2];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -3685,48 +3730,32 @@ function create_fragment$2(ctx) {
 	}
 
 	if (~(current_block_type_index = select_block_type(ctx))) {
-		if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+		if_block0 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
 	}
 
-	let each_value = /*buttons*/ ctx[2];
-	const get_key = ctx => /*button*/ ctx[13].id;
-
-	for (let i = 0; i < each_value.length; i += 1) {
-		let child_ctx = get_each_context$1(ctx, each_value, i);
-		let key = get_key(child_ctx);
-		each_1_lookup.set(key, each_blocks[i] = create_each_block$1(key, child_ctx));
-	}
+	let if_block1 = /*buttons*/ ctx[2].length && create_if_block$1(ctx);
 
 	return {
 		c() {
 			t0 = space();
-			div0 = element("div");
-			if (if_block) if_block.c();
+			div = element("div");
+			if (if_block0) if_block0.c();
 			t1 = space();
-			div1 = element("div");
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].c();
-			}
-
-			attr(div0, "class", "dialog-content");
-			attr(div1, "class", "dialog-buttons svelte-14xg9ru");
+			if (if_block1) if_block1.c();
+			if_block1_anchor = empty();
+			attr(div, "class", "dialog-content");
 		},
 		m(target, anchor) {
 			insert(target, t0, anchor);
-			insert(target, div0, anchor);
+			insert(target, div, anchor);
 
 			if (~current_block_type_index) {
-				if_blocks[current_block_type_index].m(div0, null);
+				if_blocks[current_block_type_index].m(div, null);
 			}
 
 			insert(target, t1, anchor);
-			insert(target, div1, anchor);
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].m(div1, null);
-			}
-
+			if (if_block1) if_block1.m(target, anchor);
+			insert(target, if_block1_anchor, anchor);
 			current = true;
 
 			if (!mounted) {
@@ -3743,7 +3772,7 @@ function create_fragment$2(ctx) {
 					if_blocks[current_block_type_index].p(ctx, dirty);
 				}
 			} else {
-				if (if_block) {
+				if (if_block0) {
 					group_outros();
 
 					transition_out(if_blocks[previous_block_index], 1, 1, () => {
@@ -3754,51 +3783,55 @@ function create_fragment$2(ctx) {
 				}
 
 				if (~current_block_type_index) {
-					if_block = if_blocks[current_block_type_index];
+					if_block0 = if_blocks[current_block_type_index];
 
-					if (!if_block) {
-						if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-						if_block.c();
+					if (!if_block0) {
+						if_block0 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+						if_block0.c();
 					} else {
-						if_block.p(ctx, dirty);
+						if_block0.p(ctx, dirty);
 					}
 
-					transition_in(if_block, 1);
-					if_block.m(div0, null);
+					transition_in(if_block0, 1);
+					if_block0.m(div, null);
 				} else {
-					if_block = null;
+					if_block0 = null;
 				}
 			}
 
-			if (dirty & /*buttons, onClick*/ 36) {
-				each_value = /*buttons*/ ctx[2];
-				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, div1, destroy_block, create_each_block$1, null, get_each_context$1);
+			if (/*buttons*/ ctx[2].length) {
+				if (if_block1) {
+					if_block1.p(ctx, dirty);
+				} else {
+					if_block1 = create_if_block$1(ctx);
+					if_block1.c();
+					if_block1.m(if_block1_anchor.parentNode, if_block1_anchor);
+				}
+			} else if (if_block1) {
+				if_block1.d(1);
+				if_block1 = null;
 			}
 		},
 		i(local) {
 			if (current) return;
-			transition_in(if_block);
+			transition_in(if_block0);
 			current = true;
 		},
 		o(local) {
-			transition_out(if_block);
+			transition_out(if_block0);
 			current = false;
 		},
 		d(detaching) {
 			if (detaching) detach(t0);
-			if (detaching) detach(div0);
+			if (detaching) detach(div);
 
 			if (~current_block_type_index) {
 				if_blocks[current_block_type_index].d();
 			}
 
 			if (detaching) detach(t1);
-			if (detaching) detach(div1);
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].d();
-			}
-
+			if (if_block1) if_block1.d(detaching);
+			if (detaching) detach(if_block1_anchor);
 			mounted = false;
 			dispose();
 		}
@@ -4631,19 +4664,19 @@ class DialogShell extends SvelteComponent {
 
 function get_each_context(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[14] = list[i];
+	child_ctx[12] = list[i];
 	return child_ctx;
 }
 
-// (154:3) {#each users as data (data.user.id)}
+// (155:3) {#each users as data (data.user.id)}
 function create_each_block(key_1, ctx) {
 	let div;
 	let label;
-	let t0_value = /*data*/ ctx[14].user.name + "";
+	let t0_value = /*data*/ ctx[12].user.name + "";
 	let t0;
 	let t1;
 	let select;
-	let raw_value = selectOptions(/*playerLevels*/ ctx[2], { selected: /*data*/ ctx[14].level }) + "";
+	let raw_value = selectOptions(/*playerLevels*/ ctx[2], { selected: /*data*/ ctx[12].level }) + "";
 	let select_name_value;
 
 	return {
@@ -4655,10 +4688,10 @@ function create_each_block(key_1, ctx) {
 			t0 = text(t0_value);
 			t1 = space();
 			select = element("select");
-			attr(select, "name", select_name_value = /*data*/ ctx[14].user.id);
+			attr(select, "name", select_name_value = /*data*/ ctx[12].user.id);
 			attr(select, "data-dtype", "Number");
 			attr(div, "class", "form-group");
-			toggle_class(div, "hidden", /*data*/ ctx[14].user.isGM);
+			toggle_class(div, "hidden", /*data*/ ctx[12].user.isGM);
 			this.first = div;
 		},
 		m(target, anchor) {
@@ -4671,14 +4704,14 @@ function create_each_block(key_1, ctx) {
 		},
 		p(new_ctx, dirty) {
 			ctx = new_ctx;
-			if (dirty & /*users*/ 8 && t0_value !== (t0_value = /*data*/ ctx[14].user.name + "")) set_data(t0, t0_value);
-			if (dirty & /*playerLevels, users*/ 12 && raw_value !== (raw_value = selectOptions(/*playerLevels*/ ctx[2], { selected: /*data*/ ctx[14].level }) + "")) select.innerHTML = raw_value;
-			if (dirty & /*users*/ 8 && select_name_value !== (select_name_value = /*data*/ ctx[14].user.id)) {
+			if (dirty & /*users*/ 8 && t0_value !== (t0_value = /*data*/ ctx[12].user.name + "")) set_data(t0, t0_value);
+			if (dirty & /*playerLevels, users*/ 12 && raw_value !== (raw_value = selectOptions(/*playerLevels*/ ctx[2], { selected: /*data*/ ctx[12].level }) + "")) select.innerHTML = raw_value;
+			if (dirty & /*users*/ 8 && select_name_value !== (select_name_value = /*data*/ ctx[12].user.id)) {
 				attr(select, "name", select_name_value);
 			}
 
 			if (dirty & /*users*/ 8) {
-				toggle_class(div, "hidden", /*data*/ ctx[14].user.isGM);
+				toggle_class(div, "hidden", /*data*/ ctx[12].user.isGM);
 			}
 		},
 		d(detaching) {
@@ -4688,7 +4721,7 @@ function create_each_block(key_1, ctx) {
 }
 
 function create_fragment(ctx) {
-	let form_1;
+	let form;
 	let p;
 	let t0;
 	let t1;
@@ -4711,7 +4744,7 @@ function create_fragment(ctx) {
 	let mounted;
 	let dispose;
 	let each_value = /*users*/ ctx[3];
-	const get_key = ctx => /*data*/ ctx[14].user.id;
+	const get_key = ctx => /*data*/ ctx[12].user.id;
 
 	for (let i = 0; i < each_value.length; i += 1) {
 		let child_ctx = get_each_context(ctx, each_value, i);
@@ -4721,7 +4754,7 @@ function create_fragment(ctx) {
 
 	return {
 		c() {
-			form_1 = element("form");
+			form = element("form");
 			p = element("p");
 			t0 = text(/*instructions*/ ctx[4]);
 			t1 = space();
@@ -4748,35 +4781,35 @@ function create_fragment(ctx) {
 			attr(select, "data-dtype", "Number");
 			attr(div, "class", "form-group");
 			attr(i, "class", "far fa-save");
-			attr(form_1, "id", "permission-control");
+			attr(button, "type", "submit");
+			attr(form, "id", "permission-control");
 		},
 		m(target, anchor) {
-			insert(target, form_1, anchor);
-			append(form_1, p);
+			insert(target, form, anchor);
+			append(form, p);
 			append(p, t0);
-			append(form_1, t1);
-			append(form_1, div);
+			append(form, t1);
+			append(form, div);
 			append(div, label);
 			append(div, t3);
 			append(div, select);
 			select.innerHTML = raw_value;
-			append(form_1, t4);
-			append(form_1, hr);
-			append(form_1, t5);
+			append(form, t4);
+			append(form, hr);
+			append(form, t5);
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].m(form_1, null);
+				each_blocks[i].m(form, null);
 			}
 
-			append(form_1, t6);
-			append(form_1, button);
+			append(form, t6);
+			append(form, button);
 			append(button, i);
 			append(button, t7);
 			append(button, t8);
-			/*form_1_binding*/ ctx[11](form_1);
 
 			if (!mounted) {
-				dispose = listen(button, "click", prevent_default(/*saveData*/ ctx[7]));
+				dispose = listen(form, "submit", prevent_default(/*saveData*/ ctx[6]));
 				mounted = true;
 			}
 		},
@@ -4785,19 +4818,18 @@ function create_fragment(ctx) {
 			if (dirty & /*defaultLevels, currentDefault*/ 3 && raw_value !== (raw_value = selectOptions(/*defaultLevels*/ ctx[1], { selected: /*currentDefault*/ ctx[0] }) + "")) select.innerHTML = raw_value;
 			if (dirty & /*users, selectOptions, playerLevels*/ 12) {
 				each_value = /*users*/ ctx[3];
-				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, form_1, destroy_block, create_each_block, t6, get_each_context);
+				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, form, destroy_block, create_each_block, t6, get_each_context);
 			}
 		},
 		i: noop,
 		o: noop,
 		d(detaching) {
-			if (detaching) detach(form_1);
+			if (detaching) detach(form);
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].d();
 			}
 
-			/*form_1_binding*/ ctx[11](null);
 			mounted = false;
 			dispose();
 		}
@@ -4814,15 +4846,9 @@ function instance($$self, $$props, $$invalidate) {
 			delete: foundryApp.close.bind(foundryApp)
 		});
 
-	component_subscribe($$self, doc, value => $$invalidate(10, $doc = value));
-
-	let currentDefault,
-		defaultLevels,
-		playerLevels,
-		users,
-		isFolder,
-		instructions,
-		form;
+	component_subscribe($$self, doc, value => $$invalidate(9, $doc = value));
+	let currentDefault, defaultLevels, playerLevels, users;
+	let isFolder, instructions;
 
 	/**
  * Builds the data for the permission dialog from the document.
@@ -4882,12 +4908,12 @@ function instance($$self, $$props, $$invalidate) {
  *
  * @returns {Promise<void>}
  */
-	async function saveData() {
+	async function saveData(event) {
 		if (!($doc instanceof foundry.abstract.Document)) {
 			return;
 		}
 
-		const formData = new FormDataExtended(form).toObject();
+		const formData = new FormDataExtended(event.target).toObject();
 
 		// Collect user permissions
 		const perms = {};
@@ -4938,19 +4964,12 @@ function instance($$self, $$props, $$invalidate) {
 		foundryApp.close();
 	}
 
-	function form_1_binding($$value) {
-		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-			form = $$value;
-			$$invalidate(5, form);
-		});
-	}
-
 	$$self.$$set = $$props => {
-		if ('document' in $$props) $$invalidate(8, document = $$props.document);
+		if ('document' in $$props) $$invalidate(7, document = $$props.document);
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*$doc, document*/ 1280) {
+		if ($$self.$$.dirty & /*$doc, document*/ 640) {
 			if ($doc !== document) {
 				doc.set(document);
 				const title = localize('PERMISSION.Title');
@@ -4961,10 +4980,10 @@ function instance($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*$doc, isFolder*/ 1536) {
+		if ($$self.$$.dirty & /*$doc, isFolder*/ 768) {
 			{
-				$$invalidate(0, { currentDefault, defaultLevels, playerLevels, users } = getData(), currentDefault, (($$invalidate(1, defaultLevels), $$invalidate(10, $doc)), $$invalidate(9, isFolder)), (($$invalidate(2, playerLevels), $$invalidate(10, $doc)), $$invalidate(9, isFolder)), (($$invalidate(3, users), $$invalidate(10, $doc)), $$invalidate(9, isFolder)));
-				$$invalidate(9, isFolder = $doc instanceof Folder);
+				$$invalidate(0, { currentDefault, defaultLevels, playerLevels, users } = getData(), currentDefault, (($$invalidate(1, defaultLevels), $$invalidate(9, $doc)), $$invalidate(8, isFolder)), (($$invalidate(2, playerLevels), $$invalidate(9, $doc)), $$invalidate(8, isFolder)), (($$invalidate(3, users), $$invalidate(9, $doc)), $$invalidate(8, isFolder)));
+				$$invalidate(8, isFolder = $doc instanceof Folder);
 
 				$$invalidate(4, instructions = localize(isFolder
 				? 'PERMISSION.HintFolder'
@@ -4979,24 +4998,22 @@ function instance($$self, $$props, $$invalidate) {
 		playerLevels,
 		users,
 		instructions,
-		form,
 		doc,
 		saveData,
 		document,
 		isFolder,
-		$doc,
-		form_1_binding
+		$doc
 	];
 }
 
 class TJSPermissionControl extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance, create_fragment, safe_not_equal, { document: 8 });
+		init(this, options, instance, create_fragment, safe_not_equal, { document: 7 });
 	}
 
 	get document() {
-		return this.$$.ctx[8];
+		return this.$$.ctx[7];
 	}
 
 	set document(document) {

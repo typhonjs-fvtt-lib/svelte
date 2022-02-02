@@ -123,6 +123,8 @@
       <svelte:component bind:this={dialogInstance} this={dialogComponent} {...dialogProps} />
    {/if}
 </div>
+
+{#if buttons.length}
 <div class="dialog-buttons">
    {#each buttons as button (button.id)}
    <button class="dialog-button {button.cssClass}" on:click={() => onClick(button)}>
@@ -131,6 +133,7 @@
    </button>
    {/each}
 </div>
+{/if}
 
 <style>
    div.dialog-buttons {

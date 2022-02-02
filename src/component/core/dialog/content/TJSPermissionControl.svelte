@@ -13,7 +13,8 @@
 
    const doc = new TJSDocument(document, { delete: foundryApp.close.bind(foundryApp) });
 
-   let currentDefault, defaultLevels, playerLevels, users, isFolder, instructions, form;
+   let currentDefault, defaultLevels, playerLevels, users;
+   let isFolder, instructions;
 
    $: if ($doc !== document)
    {
@@ -93,11 +94,11 @@
     *
     * @returns {Promise<void>}
     */
-   async function saveData()
+   async function saveData(event)
    {
       if (!($doc instanceof foundry.abstract.Document)) { return; }
 
-      const formData = new FormDataExtended(form).toObject();
+      const formData = new FormDataExtended(event.target).toObject();
 
       // Collect user permissions
       const perms = {};
@@ -140,7 +141,7 @@
 
 <svelte:options accessors={true}/>
 
-<form bind:this={form} id=permission-control>
+<form on:submit|preventDefault={saveData} id=permission-control>
    <p class=notes>{instructions}</p>
 
    <div class=form-group>
@@ -160,7 +161,7 @@
         </div>
     {/each}
 
-   <button on:click|preventDefault={saveData}>
+   <button type=submit>
       <i class="far fa-save"></i> {localize('Save Changes')}
    </button>
 </form>
