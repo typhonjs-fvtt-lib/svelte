@@ -517,8 +517,6 @@ function instance$9($$self, $$props, $$invalidate) {
 	// ---------------------------------------------------------------------------------------------------------------
 	function swallow(event) {
 		if (captureInput) {
-			console.log(`!!! TJSGlassPane - swallow - preventDefault: ${preventDefault}; stopPropagation: ${stopPropagation}`);
-
 			if (preventDefault) {
 				event.preventDefault();
 			}
@@ -3495,7 +3493,7 @@ function get_each_context$1(ctx, list, i) {
 	return child_ctx;
 }
 
-// (124:29) 
+// (122:29) 
 function create_if_block_1(ctx) {
 	let switch_instance;
 	let switch_instance_anchor;
@@ -3578,7 +3576,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (122:3) {#if typeof content === 'string'}
+// (120:3) {#if typeof content === 'string'}
 function create_if_block$1(ctx) {
 	let html_tag;
 	let html_anchor;
@@ -3605,7 +3603,7 @@ function create_if_block$1(ctx) {
 	};
 }
 
-// (129:3) {#each buttons as button (button.id)}
+// (127:3) {#each buttons as button (button.id)}
 function create_each_block$1(key_1, ctx) {
 	let button;
 	let html_tag;
@@ -3835,8 +3833,6 @@ function instance$2($$self, $$props, $$invalidate) {
 	}
 
 	function onKeydown(event) {
-		console.log(`!!! DialogContent - onKeyDown - event.key: ${event.key}`);
-
 		switch (event.key) {
 			case 'Escape':
 				event.preventDefault();
