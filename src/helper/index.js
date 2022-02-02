@@ -1,2 +1,3 @@
+export * from './legacy/index.js';
+
 export * from './localize.js';
-export * from './selectOptions.js';
