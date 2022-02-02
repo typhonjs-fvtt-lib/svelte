@@ -94,16 +94,20 @@
       switch (event.key)
       {
          case 'Escape':
+            event.preventDefault();
+            event.stopPropagation();
             return foundryApp.close();
 
          case 'Enter':
+            event.preventDefault();
+            event.stopPropagation();
             onClick(data.buttons[data.default]);
             break;
       }
    }
 </script>
 
-<svelte:body on:keydown|preventDefault|stopPropagation={onKeydown} />
+<svelte:body on:keydown={onKeydown} />
 
 <div class="dialog-content">
    {#if typeof content === 'string'}

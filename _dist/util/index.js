@@ -1,6 +1,41 @@
 import { group_outros, transition_out, check_outros } from 'svelte/internal';
 
 /**
+ * Defines the application shell contract. If Svelte components export getter / setters for the following properties
+ * then that component is considered an application shell.
+ *
+ * @type {string[]}
+ */
+const applicationShellContract = ['elementRoot'];
+
+Object.freeze(applicationShellContract);
+
+/**
+ * Provides a method to determine if the passed in object is ApplicationShell or TJSApplicationShell.
+ *
+ * @param {*}  component - Object / component to test.
+ *
+ * @returns {boolean} Whether the component is a ApplicationShell or TJSApplicationShell.
+ */
+function isApplicationShell(component)
+{
+   if (component === null || component === void 0) { return false; }
+
+   // Get the prototype which is the parent SvelteComponent that has any getter / setters.
+   const prototype = Object.getPrototypeOf(component);
+
+   // Verify the application shell contract. If the accessors (getters / setters) are defined for
+   // `applicationShellContract`.
+   for (const accessor of applicationShellContract)
+   {
+      const descriptor = Object.getOwnPropertyDescriptor(prototype, accessor);
+      if (descriptor === void 0 || descriptor.get === void 0 || descriptor.set === void 0) { return false; }
+   }
+
+   return true;
+}
+
+/**
  * Wraps a callback in a debounced timeout.
  *
  * Delay execution of the callback function until the function has not been called for delay milliseconds
@@ -402,41 +437,6 @@ function s_PROCESS_PROPS(props, thisArg, config)
 }
 
 /**
- * Defines the application shell contract. If Svelte components export getter / setters for the following properties
- * then that component is considered an application shell.
- *
- * @type {string[]}
- */
-const applicationShellContract = ['elementRoot'];
-
-Object.freeze(applicationShellContract);
-
-/**
- * Provides a method to determine if the passed in object is ApplicationShell or TJSApplicationShell.
- *
- * @param {*}  component - Object / component to test.
- *
- * @returns {boolean} Whether the component is a ApplicationShell or TJSApplicationShell.
- */
-function isApplicationShell(component)
-{
-   if (component === null || component === void 0) { return false; }
-
-   // Get the prototype which is the parent SvelteComponent that has any getter / setters.
-   const prototype = Object.getPrototypeOf(component);
-
-   // Verify the application shell contract. If the accessors (getters / setters) are defined for
-   // `applicationShellContract`.
-   for (const accessor of applicationShellContract)
-   {
-      const descriptor = Object.getOwnPropertyDescriptor(prototype, accessor);
-      if (descriptor === void 0 || descriptor.get === void 0 || descriptor.set === void 0) { return false; }
-   }
-
-   return true;
-}
-
-/**
  * Provides common object manipulation utilities including depth traversal, obtaining accessors, safely setting values /
  * equality tests, and validation.
  */
@@ -467,6 +467,18 @@ function isIterableAsync(object)
    if (object === null || object === void 0 || typeof object !== 'object') { return false; }
 
    return typeof object[Symbol.asyncIterator] === 'function';
+}
+
+/**
+ * Tests for whether object is not null and a typeof object.
+ *
+ * @param {object} object - An object.
+ *
+ * @returns {boolean} Is it an object.
+ */
+function isObject(object)
+{
+   return object !== null && typeof object === 'object';
 }
 
 /**
@@ -582,5 +594,5 @@ function safeSet(data, accessor, value, operation = 'set', createMissing = true)
    return true;
 }
 
-export { debounce, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };
+export { debounce, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };
 //# sourceMappingURL=index.js.map

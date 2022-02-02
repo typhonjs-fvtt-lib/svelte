@@ -3493,7 +3493,7 @@ function get_each_context$1(ctx, list, i) {
 	return child_ctx;
 }
 
-// (111:29) 
+// (115:29) 
 function create_if_block_1(ctx) {
 	let switch_instance;
 	let switch_instance_anchor;
@@ -3576,7 +3576,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (109:3) {#if typeof content === 'string'}
+// (113:3) {#if typeof content === 'string'}
 function create_if_block$1(ctx) {
 	let html_tag;
 	let html_anchor;
@@ -3603,7 +3603,7 @@ function create_if_block$1(ctx) {
 	};
 }
 
-// (116:3) {#each buttons as button (button.id)}
+// (120:3) {#each buttons as button (button.id)}
 function create_each_block$1(key_1, ctx) {
 	let button;
 	let html_tag;
@@ -3730,7 +3730,7 @@ function create_fragment$2(ctx) {
 			current = true;
 
 			if (!mounted) {
-				dispose = listen(document.body, "keydown", stop_propagation(prevent_default(/*onKeydown*/ ctx[6])));
+				dispose = listen(document.body, "keydown", /*onKeydown*/ ctx[6]);
 				mounted = true;
 			}
 		},
@@ -3833,8 +3833,12 @@ function instance$2($$self, $$props, $$invalidate) {
 	function onKeydown(event) {
 		switch (event.key) {
 			case 'Escape':
+				event.preventDefault();
+				event.stopPropagation();
 				return foundryApp.close();
 			case 'Enter':
+				event.preventDefault();
+				event.stopPropagation();
 				onClick(data.buttons[data.default]);
 				break;
 		}

@@ -81,6 +81,14 @@ declare function isIterable(object: object): boolean;
  */
 declare function isIterableAsync(object: object): boolean;
 /**
+ * Tests for whether object is not null and a typeof object.
+ *
+ * @param {object} object - An object.
+ *
+ * @returns {boolean} Is it an object.
+ */
+declare function isObject(object: object): boolean;
+/**
  * Provides basic duck typing to determine if the provided function is a constructor function for a Svelte component.
  *
  * @param {*}  comp - Data to check as a Svelte component.
@@ -154,4 +162,4 @@ declare function safeSet(data: object, accessor: string, value: any, operation?:
  */
 declare function uuidv4(): string;
 
-export { debounce, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };
+export { debounce, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };
