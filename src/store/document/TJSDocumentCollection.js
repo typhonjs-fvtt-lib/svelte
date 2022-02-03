@@ -1,4 +1,4 @@
-import { uuidv4 } from '@typhonjs-fvtt/svelte/util';
+import { uuidv4 } from '@typhonjs-fvtt/runtime/svelte/util';
 
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any DocumentCollection. This makes
@@ -17,9 +17,9 @@ export class TJSDocumentCollection
    #updateOptions;
 
    /**
-    * @param {T}                    collection - Collection to wrap.
+    * @param {T}                    [collection] - Collection to wrap.
     *
-    * @param {{delete: Function}}   options - Optional delete function to invoke when collection is deleted.
+    * @param {{delete: Function}}   [options] - Optional delete function to invoke when collection is deleted.
     */
    constructor(collection, options = {})
    {
@@ -75,7 +75,7 @@ export class TJSDocumentCollection
     *
     * @param {object}   options - Options from render call; will have collection update context.
     */
-   #notify(force = false, options = void 0) // eslint-disable-line no-unused-vars
+   #notify(force = false, options = {}) // eslint-disable-line no-unused-vars
    {
       this.#updateOptions = options;
 
@@ -84,7 +84,7 @@ export class TJSDocumentCollection
       const subscriptions = this.#subscriptions;
       const collection = this.#collection;
 
-      for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](collection); }
+      for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](collection, options); }
    }
 
    /**
@@ -123,12 +123,28 @@ export class TJSDocumentCollection
          collection.apps.push(this.#collectionCallback);
       }
 
-      this.#collection = document;
+      this.#collection = collection;
+      this.#updateOptions = void 0;
       this.#notify();
    }
 
    /**
-    * @param {function(T): void} handler - Callback function that is invoked on update / changes.
+    * Sets options for this collection / store.
+    *
+    * @param {{delete: Function}}   [options] - Optional delete function to invoke when collection is deleted.
+    */
+   setOptions(options)
+   {
+      if (options?.delete && typeof options?.delete !== 'function')
+      {
+         throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
+      }
+
+      this.#deleteFn = options.delete;
+   }
+
+   /**
+    * @param {function(T, object): void} handler - Callback function that is invoked on update / changes.
     *
     * @returns {(function(): void)} Unsubscribe function.
     */
@@ -136,7 +152,7 @@ export class TJSDocumentCollection
    {
       this.#subscriptions.push(handler); // add handler to the array of subscribers
 
-      handler(this.#collection);           // call handler with current value
+      handler(this.#collection, this.#updateOptions);           // call handler with current value
 
       // Return unsubscribe function.
       return () =>
