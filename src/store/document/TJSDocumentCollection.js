@@ -1,4 +1,4 @@
-import { uuidv4 } from '@typhonjs-fvtt/runtime/svelte/util';
+import { uuidv4 } from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any DocumentCollection. This makes
