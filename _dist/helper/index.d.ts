@@ -11,6 +11,39 @@
  */
 declare function localize(stringId: string, data?: object): string;
 /**
+ * A helper to create a set of radio checkbox input elements in a named set.
+ * The provided keys are the possible radio values while the provided values are human readable labels.
+ *
+ * @param {string} name         The radio checkbox field name
+ *
+ * @param {object} choices      A mapping of radio checkbox values to human readable labels
+ *
+ * @param {object} options      Options which customize the radio boxes creation
+ *
+ * @param {string} options.checked    Which key is currently checked?
+ *
+ * @param {boolean} options.localize  Pass each label through string localization?
+ *
+ * @returns {string} HTML for radio boxes.
+ *
+ * @example <caption>The provided input data</caption>
+ * let groupName = "importantChoice";
+ * let choices = {a: "Choice A", b: "Choice B"};
+ * let chosen = "a";
+ *
+ * @example <caption>The template HTML structure</caption>
+ * <div class="form-group">
+ *   <label>Radio Group Label</label>
+ *   <div class="form-fields">
+ *     {@html radioBoxes(groupName, choices, { checked: chosen, localize: true})}
+ *   </div>
+ * </div>
+ */
+declare function radioBoxes(name: string, choices: object, options: {
+    checked: string;
+    localize: boolean;
+}): string;
+/**
  * Converts the `selectOptions` Handlebars helper to be Svelte compatible. This is useful when initially converting
  * over an app to Svelte and for essential usage to several dialogs that mirror the core Foundry experience. For
  * an example of usage see {@link TJSPermissionControl}.
@@ -89,4 +122,4 @@ declare function selectOptions(choices: object, options: {
     inverted?: boolean;
 }): string;
 
-export { localize, selectOptions };
+export { localize, radioBoxes, selectOptions };

@@ -3,7 +3,7 @@ import { TJSPermissionControl
 
 import { hasSetter }                from '@typhonjs-fvtt/svelte/util';
 
-import { TJSDialog }                from './TJSDialog.js';
+import { TJSDialog }                from '../TJSDialog.js';
 
 /**
  * Provides a reactive dialog for permission control that by default is modal and not draggable. An additional set of
@@ -12,18 +12,19 @@ import { TJSDialog }                from './TJSDialog.js';
  */
 export class TJSPermissionControl extends TJSDialog
 {
-   constructor(document, data = {})
+   constructor(document, options = {}, dialogData = {})
    {
       super({
          modal: true,
          draggable: false,
-         ...data,
+         ...dialogData,
          content: {
             class: TJSPermissionControlImpl,
             props: { document }
          },
-         title: `${game.i18n.localize('PERMISSION.Title')}: ${document.name}`
-      });
+         title: `${game.i18n.localize('PERMISSION.Title')}: ${document.name}`,
+         close: () => options?.resolve?.(null)
+      }, options);
 
       /**
        * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with

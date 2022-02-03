@@ -1,18 +1,47 @@
 /**
- * Localize a string including variable formatting for input arguments. Provide a string ID which defines the localized
- * template. Variables can be included in the template enclosed in braces and will be substituted using those named
- * keys.
+ * A helper to create a set of radio checkbox input elements in a named set.
+ * The provided keys are the possible radio values while the provided values are human readable labels.
  *
- * @param {string}   stringId - The string ID to translate.
+ * @param {string} name         The radio checkbox field name
  *
- * @param {object}   [data] - Provided input data.
+ * @param {object} choices      A mapping of radio checkbox values to human readable labels
  *
- * @returns {string} The translated and formatted string
+ * @param {object} options      Options which customize the radio boxes creation
+ *
+ * @param {string} options.checked    Which key is currently checked?
+ *
+ * @param {boolean} options.localize  Pass each label through string localization?
+ *
+ * @returns {string} HTML for radio boxes.
+ *
+ * @example <caption>The provided input data</caption>
+ * let groupName = "importantChoice";
+ * let choices = {a: "Choice A", b: "Choice B"};
+ * let chosen = "a";
+ *
+ * @example <caption>The template HTML structure</caption>
+ * <div class="form-group">
+ *   <label>Radio Group Label</label>
+ *   <div class="form-fields">
+ *     {@html radioBoxes(groupName, choices, { checked: chosen, localize: true})}
+ *   </div>
+ * </div>
  */
-function localize(stringId, data)
+function radioBoxes(name, choices, options)
 {
-   const result = typeof data !== 'object' ? game.i18n.localize(stringId) : game.i18n.format(stringId, data);
-   return result !== void 0 ? result : '';
+   const checked = options['checked'] || null;
+   const localize = options['localize'] || false;
+   let html = '';
+
+   for (let [key, label] of Object.entries(choices)) // eslint-disable-line prefer-const
+   {
+      if (localize) { label = game.i18n.localize(label); }
+      const isChecked = checked === key;
+      html += `<label class="checkbox"><input type="radio" name="${name}" value="${key}" ${
+       isChecked ? 'checked' : ''}> ${label}</label>`;
+   }
+
+   return html;
 }
 
 /**
@@ -130,5 +159,22 @@ function selectOptions(choices, options)
    return html;
 }
 
-export { localize, selectOptions };
+/**
+ * Localize a string including variable formatting for input arguments. Provide a string ID which defines the localized
+ * template. Variables can be included in the template enclosed in braces and will be substituted using those named
+ * keys.
+ *
+ * @param {string}   stringId - The string ID to translate.
+ *
+ * @param {object}   [data] - Provided input data.
+ *
+ * @returns {string} The translated and formatted string
+ */
+function localize(stringId, data)
+{
+   const result = typeof data !== 'object' ? game.i18n.localize(stringId) : game.i18n.format(stringId, data);
+   return result !== void 0 ? result : '';
+}
+
+export { localize, radioBoxes, selectOptions };
 //# sourceMappingURL=index.js.map

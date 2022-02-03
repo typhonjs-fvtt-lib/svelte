@@ -1,17 +1,9 @@
-export { default as TJSComponentShell }      from './TJSComponentShell.svelte';
-export { default as TJSContainer }           from './TJSContainer.svelte';
-export { default as TJSGlassPane }           from './TJSGlassPane.svelte';
-
-export { default as ApplicationShell }       from './application/ApplicationShell.svelte';
-export { default as EmptyApplicationShell }  from './application/EmptyApplicationShell.svelte';
-export { default as TJSApplicationHeader }   from './application/TJSApplicationHeader.svelte';
-export { default as TJSApplicationShell }    from './application/TJSApplicationShell.svelte';
-export { default as TJSHeaderButton }        from './application/TJSHeaderButton.svelte';
-
-export { default as DialogContent }          from './dialog/DialogContent.svelte';
-export { default as DialogShell }            from './dialog/DialogShell.svelte';
-
-export { default as TJSPermissionControl }   from './dialog/content/TJSPermissionControl.svelte';
+export { default as TJSComponentShell }   from './TJSComponentShell.svelte';
+export { default as TJSContainer }        from './TJSContainer.svelte';
+export { default as TJSGlassPane }        from './TJSGlassPane.svelte';
+export *                                  from './application/index.js';
+export *                                  from './dialog/index.js';
+export *                                  from './dialog/document/index.js';
 
 /**
  * @typedef {object} TransformData

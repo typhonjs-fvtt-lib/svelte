@@ -102,6 +102,24 @@ declare class TJSContainer extends SvelteComponent {
     set children(arg: any);
     get children(): any;
 }
+declare class TJSDocumentCreate extends SvelteComponent {
+    constructor(options: any);
+    set documentCls(arg: any);
+    get documentCls(): any;
+    set data(arg: any);
+    get data(): any;
+    set parent(arg: any);
+    get parent(): any;
+    set pack(arg: any);
+    get pack(): any;
+    set renderSheet(arg: any);
+    get renderSheet(): any;
+}
+declare class TJSFolderDialog extends SvelteComponent {
+    constructor(options: any);
+    set document(arg: any);
+    get document(): any;
+}
 declare class TJSGlassPane extends SvelteComponent {
     constructor(options: any);
     set id(arg: any);
@@ -140,4 +158,4 @@ declare class TJSPermissionControl extends SvelteComponent {
     get document(): any;
 }
 
-export { ApplicationShell, DialogContent, DialogShell, EmptyApplicationShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSGlassPane, TJSHeaderButton, TJSPermissionControl };
+export { ApplicationShell, DialogContent, DialogShell, EmptyApplicationShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSDocumentCreate, TJSFolderDialog, TJSGlassPane, TJSHeaderButton, TJSPermissionControl };
