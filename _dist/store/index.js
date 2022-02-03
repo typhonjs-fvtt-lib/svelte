@@ -1,6 +1,7 @@
 import { get, derived, writable as writable$2 } from 'svelte/store';
 import { noop, run_all, is_function } from 'svelte/internal';
 import { uuidv4, isIterable } from '@typhonjs-fvtt/svelte/util';
+import { uuidv4 as uuidv4$1 } from '@typhonjs-fvtt/runtime/svelte/util';
 
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
@@ -1680,13 +1681,13 @@ class TJSDocument
    #updateOptions;
 
    /**
-    * @param {T}                    document - Document to wrap.
+    * @param {T}                    [document] - Document to wrap.
     *
-    * @param {{delete: Function}}   options - Optional delete function to invoke when document is deleted.
+    * @param {{delete: Function}}   [options] - Optional delete function to invoke when document is deleted.
     */
    constructor(document, options = {})
    {
-      if (options?.delete && typeof options?.delete !== 'function')
+      if (options?.delete !== void 0 && typeof options?.delete !== 'function')
       {
          throw new TypeError(`TJSDocument error: 'delete' attribute in options is not a function.`);
       }
@@ -1732,11 +1733,11 @@ class TJSDocument
    }
 
    /**
-    * @param {boolean}  force - unused
+    * @param {boolean}  [force] - unused - signature from Foundry render function.
     *
-    * @param {object}   options - Options from render call; will have document update context.
+    * @param {object}   [options] - Options from render call; will have document update context.
     */
-   #notify(force = false, options = void 0) // eslint-disable-line no-unused-vars
+   #notify(force = false, options = {}) // eslint-disable-line no-unused-vars
    {
       this.#updateOptions = options;
 
@@ -1745,7 +1746,7 @@ class TJSDocument
       const subscriptions = this.#subscriptions;
       const document = this.#document;
 
-      for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](document); }
+      for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](document, options); }
    }
 
    /**
@@ -1779,11 +1780,27 @@ class TJSDocument
       }
 
       this.#document = document;
+      this.#updateOptions = void 0;
       this.#notify();
    }
 
    /**
-    * @param {function(T): void} handler - Callback function that is invoked on update / changes.
+    * Sets options for this document wrapper / store.
+    *
+    * @param {{delete: Function}}   [options] - Optional delete function to invoke when collection is deleted.
+    */
+   setOptions(options)
+   {
+      if (options?.delete !== void 0 && typeof options?.delete !== 'function')
+      {
+         throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
+      }
+
+      this.#deleteFn = options.delete;
+   }
+
+   /**
+    * @param {function(T, object): void} handler - Callback function that is invoked on update / changes.
     *
     * @returns {(function(): void)} Unsubscribe function.
     */
@@ -1791,7 +1808,7 @@ class TJSDocument
    {
       this.#subscriptions.push(handler); // add handler to the array of subscribers
 
-      handler(this.#document);           // call handler with current value
+      handler(this.#document, this.#updateOptions);           // call handler with current value
 
       // Return unsubscribe function.
       return () =>
@@ -1819,18 +1836,18 @@ class TJSDocumentCollection
    #updateOptions;
 
    /**
-    * @param {T}                    collection - Collection to wrap.
+    * @param {T}                    [collection] - Collection to wrap.
     *
-    * @param {{delete: Function}}   options - Optional delete function to invoke when collection is deleted.
+    * @param {{delete: Function}}   [options] - Optional delete function to invoke when collection is deleted.
     */
    constructor(collection, options = {})
    {
-      if (options?.delete && typeof options?.delete !== 'function')
+      if (options?.delete !== void 0 && typeof options?.delete !== 'function')
       {
          throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
       }
 
-      this.#uuid = `tjs-collection-${uuidv4()}`;
+      this.#uuid = `tjs-collection-${uuidv4$1()}`;
       this.#deleteFn = options.delete;
 
       this.set(collection);
@@ -1873,11 +1890,11 @@ class TJSDocumentCollection
    }
 
    /**
-    * @param {boolean}  force - unused
+    * @param {boolean}  [force] - unused - signature from Foundry render function.
     *
-    * @param {object}   options - Options from render call; will have collection update context.
+    * @param {object}   [options] - Options from render call; will have collection update context.
     */
-   #notify(force = false, options = void 0) // eslint-disable-line no-unused-vars
+   #notify(force = false, options = {}) // eslint-disable-line no-unused-vars
    {
       this.#updateOptions = options;
 
@@ -1886,7 +1903,7 @@ class TJSDocumentCollection
       const subscriptions = this.#subscriptions;
       const collection = this.#collection;
 
-      for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](collection); }
+      for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](collection, options); }
    }
 
    /**
@@ -1925,12 +1942,28 @@ class TJSDocumentCollection
          collection.apps.push(this.#collectionCallback);
       }
 
-      this.#collection = document;
+      this.#collection = collection;
+      this.#updateOptions = void 0;
       this.#notify();
    }
 
    /**
-    * @param {function(T): void} handler - Callback function that is invoked on update / changes.
+    * Sets options for this collection wrapper / store.
+    *
+    * @param {{delete: Function}}   [options] - Optional delete function to invoke when collection is deleted.
+    */
+   setOptions(options)
+   {
+      if (options?.delete !== void 0 && typeof options?.delete !== 'function')
+      {
+         throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
+      }
+
+      this.#deleteFn = options.delete;
+   }
+
+   /**
+    * @param {function(T, object): void} handler - Callback function that is invoked on update / changes.
     *
     * @returns {(function(): void)} Unsubscribe function.
     */
@@ -1938,7 +1971,7 @@ class TJSDocumentCollection
    {
       this.#subscriptions.push(handler); // add handler to the array of subscribers
 
-      handler(this.#collection);           // call handler with current value
+      handler(this.#collection, this.#updateOptions);           // call handler with current value
 
       // Return unsubscribe function.
       return () =>

@@ -23,7 +23,7 @@ export class TJSDocumentCollection
     */
    constructor(collection, options = {})
    {
-      if (options?.delete && typeof options?.delete !== 'function')
+      if (options?.delete !== void 0 && typeof options?.delete !== 'function')
       {
          throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
       }
@@ -71,9 +71,9 @@ export class TJSDocumentCollection
    }
 
    /**
-    * @param {boolean}  force - unused
+    * @param {boolean}  [force] - unused - signature from Foundry render function.
     *
-    * @param {object}   options - Options from render call; will have collection update context.
+    * @param {object}   [options] - Options from render call; will have collection update context.
     */
    #notify(force = false, options = {}) // eslint-disable-line no-unused-vars
    {
@@ -129,13 +129,13 @@ export class TJSDocumentCollection
    }
 
    /**
-    * Sets options for this collection / store.
+    * Sets options for this collection wrapper / store.
     *
     * @param {{delete: Function}}   [options] - Optional delete function to invoke when collection is deleted.
     */
    setOptions(options)
    {
-      if (options?.delete && typeof options?.delete !== 'function')
+      if (options?.delete !== void 0 && typeof options?.delete !== 'function')
       {
          throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
       }

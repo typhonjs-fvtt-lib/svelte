@@ -210,11 +210,11 @@ declare class SessionStorage {
  */
 declare class TJSDocument<T extends any> {
     /**
-     * @param {T}                    document - Document to wrap.
+     * @param {T}                    [document] - Document to wrap.
      *
-     * @param {{delete: Function}}   options - Optional delete function to invoke when document is deleted.
+     * @param {{delete: Function}}   [options] - Optional delete function to invoke when document is deleted.
      */
-    constructor(document: T, options?: {
+    constructor(document?: T, options?: {
         delete: Function;
     });
     /**
@@ -238,11 +238,19 @@ declare class TJSDocument<T extends any> {
      */
     set(document: T | undefined): void;
     /**
-     * @param {function(T): void} handler - Callback function that is invoked on update / changes.
+     * Sets options for this document wrapper / store.
+     *
+     * @param {{delete: Function}}   [options] - Optional delete function to invoke when collection is deleted.
+     */
+    setOptions(options?: {
+        delete: Function;
+    }): void;
+    /**
+     * @param {function(T, object): void} handler - Callback function that is invoked on update / changes.
      *
      * @returns {(function(): void)} Unsubscribe function.
      */
-    subscribe(handler: (arg0: T) => void): (() => void);
+    subscribe(handler: (arg0: T, arg1: object) => void): (() => void);
     #private;
 }
 /**
@@ -254,11 +262,11 @@ declare class TJSDocument<T extends any> {
  */
 declare class TJSDocumentCollection<T extends any> {
     /**
-     * @param {T}                    collection - Collection to wrap.
+     * @param {T}                    [collection] - Collection to wrap.
      *
-     * @param {{delete: Function}}   options - Optional delete function to invoke when collection is deleted.
+     * @param {{delete: Function}}   [options] - Optional delete function to invoke when collection is deleted.
      */
-    constructor(collection: T, options?: {
+    constructor(collection?: T, options?: {
         delete: Function;
     });
     /**
@@ -282,11 +290,19 @@ declare class TJSDocumentCollection<T extends any> {
      */
     set(collection: T | undefined): void;
     /**
-     * @param {function(T): void} handler - Callback function that is invoked on update / changes.
+     * Sets options for this collection wrapper / store.
+     *
+     * @param {{delete: Function}}   [options] - Optional delete function to invoke when collection is deleted.
+     */
+    setOptions(options?: {
+        delete: Function;
+    }): void;
+    /**
+     * @param {function(T, object): void} handler - Callback function that is invoked on update / changes.
      *
      * @returns {(function(): void)} Unsubscribe function.
      */
-    subscribe(handler: (arg0: T) => void): (() => void);
+    subscribe(handler: (arg0: T, arg1: object) => void): (() => void);
     #private;
 }
 /**
