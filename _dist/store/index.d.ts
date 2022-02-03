@@ -235,8 +235,10 @@ declare class TJSDocument<T extends any> {
     get(): T | undefined;
     /**
      * @param {T | undefined}  document - New document to set.
+     *
+     * @param {object}         [options] - New document update options to set.
      */
-    set(document: T | undefined): void;
+    set(document: T | undefined, options?: object): void;
     /**
      * Sets options for this document wrapper / store.
      *
@@ -287,8 +289,10 @@ declare class TJSDocumentCollection<T extends any> {
     get(): T | undefined;
     /**
      * @param {T | undefined}  collection - New collection to set.
+     *
+     * @param {object}         [options] - New collection update options to set.
      */
-    set(collection: T | undefined): void;
+    set(collection: T | undefined, options?: object): void;
     /**
      * Sets options for this collection wrapper / store.
      *

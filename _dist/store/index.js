@@ -1756,19 +1756,24 @@ class TJSDocument
 
    /**
     * @param {T | undefined}  document - New document to set.
+    *
+    * @param {object}         [options] - New document update options to set.
     */
-   set(document)
+   set(document, options = {})
    {
       if (this.#document)
       {
          delete this.#document.apps[this.#uuid];
       }
 
-      if (document === null) { throw new TypeError(`TJSDocument set error: 'document' is null.`); }
-
       if (document !== void 0 && !(document instanceof foundry.abstract.Document))
       {
          throw new TypeError(`TJSDocument set error: 'document' is not a valid Document or undefined.`);
+      }
+
+      if (options === null || typeof options !== 'object')
+      {
+         throw new TypeError(`TJSDocument set error: 'options' is not an object.`);
       }
 
       if (document instanceof foundry.abstract.Document)
@@ -1780,7 +1785,7 @@ class TJSDocument
       }
 
       this.#document = document;
-      this.#updateOptions = void 0;
+      this.#updateOptions = options;
       this.#notify();
    }
 
@@ -1913,8 +1918,10 @@ class TJSDocumentCollection
 
    /**
     * @param {T | undefined}  collection - New collection to set.
+    *
+    * @param {object}         [options] - New collection update options to set.
     */
-   set(collection)
+   set(collection, options = {})
    {
       if (this.#collection)
       {
@@ -1924,12 +1931,15 @@ class TJSDocumentCollection
          this.#collectionCallback = void 0;
       }
 
-      if (collection === null) { throw new TypeError(`TJSDocumentCollection set error: 'collection' is null.`); }
-
       if (collection !== void 0 && !(collection instanceof DocumentCollection))
       {
          throw new TypeError(
           `TJSDocumentCollection set error: 'collection' is not a valid DocumentCollection or undefined.`);
+      }
+
+      if (options === null || typeof options !== 'object')
+      {
+         throw new TypeError(`TJSDocument set error: 'options' is not an object.`);
       }
 
       if (collection instanceof DocumentCollection)
@@ -1943,7 +1953,7 @@ class TJSDocumentCollection
       }
 
       this.#collection = collection;
-      this.#updateOptions = void 0;
+      this.#updateOptions = options;
       this.#notify();
    }
 
