@@ -3493,7 +3493,7 @@ function get_each_context$2(ctx, list, i) {
 	return child_ctx;
 }
 
-// (122:29) 
+// (127:29) 
 function create_if_block_2(ctx) {
 	let switch_instance;
 	let switch_instance_anchor;
@@ -3576,7 +3576,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (120:3) {#if typeof content === 'string'}
+// (125:3) {#if typeof content === 'string'}
 function create_if_block_1$1(ctx) {
 	let html_tag;
 	let html_anchor;
@@ -3603,7 +3603,7 @@ function create_if_block_1$1(ctx) {
 	};
 }
 
-// (127:0) {#if buttons.length}
+// (132:0) {#if buttons.length}
 function create_if_block$2(ctx) {
 	let div;
 	let each_blocks = [];
@@ -3650,7 +3650,7 @@ function create_if_block$2(ctx) {
 	};
 }
 
-// (129:3) {#each buttons as button (button.id)}
+// (134:3) {#each buttons as button (button.id)}
 function create_each_block$2(key_1, ctx) {
 	let button;
 	let html_tag;
@@ -3849,16 +3849,21 @@ function instance$4($$self, $$props, $$invalidate) {
 	let dialogProps = {};
 	let foundryApp = getContext('external').foundryApp;
 
-	function onClick(button) {
+	async function onClick(button) {
 		try {
+			let result = null;
+
 			// Passing back the element is to keep with the existing Foundry API.
 			if (typeof button.callback === 'function') {
-				button.callback(foundryApp.options.jQuery
+				result = await button.callback(foundryApp.options.jQuery
 				? foundryApp.element
 				: foundryApp.element[0]);
 			}
 
-			foundryApp.close();
+			// Delay closing to next clock tick to be able to return result.
+			setTimeout(() => foundryApp.close(), 0);
+
+			return result;
 		} catch(err) {
 			ui.notifications.error(err);
 			throw new Error(err);

@@ -72,17 +72,22 @@
       }
    }
 
-   function onClick(button)
+   async function onClick(button)
    {
       try
       {
+         let result = null;
+
          // Passing back the element is to keep with the existing Foundry API.
          if (typeof button.callback === 'function')
          {
-            button.callback(foundryApp.options.jQuery ? foundryApp.element : foundryApp.element[0]);
+            result = await button.callback(foundryApp.options.jQuery ? foundryApp.element : foundryApp.element[0]);
          }
 
-         foundryApp.close();
+         // Delay closing to next clock tick to be able to return result.
+         setTimeout(() => foundryApp.close(), 0);
+
+         return result;
       }
       catch(err)
       {

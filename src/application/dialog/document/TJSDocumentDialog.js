@@ -18,8 +18,8 @@ export class TJSDocumentDialog
     *
     * @param {object} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Document|null>} A Promise that resolves to the changed document or null if the dialog was
-    *                                   closed.
+    * @returns {Promise<Document|null>} The modified document or 'null' if the user closed the dialog via `<Esc>` or the
+    *                                   close header button.
     */
    static async configurePermissions(document, options = {}, dialogData = {})
    {
@@ -54,8 +54,8 @@ export class TJSDocumentDialog
     *
     * @param {object} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Document|null>} A Promise that resolves to the created Document or null if the dialog was
-    *                                   closed.
+    * @returns {Promise<Document|null>} The newly created document or a falsy value; either 'false' for cancelling
+    *                                   or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async createDocument(documentCls, data = {}, { parent = null, pack = null, ...options } = {}, dialogData = {})
    {
@@ -117,7 +117,8 @@ export class TJSDocumentDialog
     *
     * @param {object} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Document|boolean|null>} The document if deleted, false if 'no' selected, null if dialog closed.
+    * @returns {Promise<Document|boolean|null>} The document if deleted or a falsy value; either 'false' for cancelling
+    *                                   or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async deleteDocument(document, options = {}, dialogData = {})
    {
@@ -149,7 +150,8 @@ export class TJSDocumentDialog
     *
     * @param {object} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<boolean|null>} True if yes, false if no, or null if dialog canceled / closed.
+    * @returns {Promise<Document|boolean|null>} The document after import completes or a falsy value; either 'false' for
+    *                         cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async importFromJSON(document, options = {}, dialogData = {})
    {
@@ -177,12 +179,16 @@ export class TJSDocumentDialog
                import: {
                   icon: '<i class="fas fa-file-import"></i>',
                   label: 'Import',
-                  callback: (html) =>
+                  callback: async (html) =>
                   {
                      const form = html.querySelector('form');
+
                      if (!form.data.files.length) { return ui.notifications.error('You did not upload a data file!'); }
-                     readTextFromFile(form.data.files[0]).then((json) => document.importFromJSON(json));
-                     resolve(true);
+
+                     const json = await readTextFromFile(form.data.files[0]);
+                     const importedDoc = await document.importFromJSON(json);
+
+                     resolve(importedDoc);
                   }
                },
                no: {
@@ -192,10 +198,7 @@ export class TJSDocumentDialog
                }
             },
             default: 'import',
-            close: () =>
-            {
-               resolve(null);
-            },
+            close: () => resolve(null)
          }, {
             width: 400,
             ...options
