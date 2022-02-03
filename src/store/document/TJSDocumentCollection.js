@@ -94,8 +94,10 @@ export class TJSDocumentCollection
 
    /**
     * @param {T | undefined}  collection - New collection to set.
+    *
+    * @param {object}         [options] - New collection update options to set.
     */
-   set(collection)
+   set(collection, options = {})
    {
       if (this.#collection)
       {
@@ -105,12 +107,15 @@ export class TJSDocumentCollection
          this.#collectionCallback = void 0;
       }
 
-      if (collection === null) { throw new TypeError(`TJSDocumentCollection set error: 'collection' is null.`); }
-
       if (collection !== void 0 && !(collection instanceof DocumentCollection))
       {
          throw new TypeError(
           `TJSDocumentCollection set error: 'collection' is not a valid DocumentCollection or undefined.`);
+      }
+
+      if (options === null || typeof options !== 'object')
+      {
+         throw new TypeError(`TJSDocument set error: 'options' is not an object.`);
       }
 
       if (collection instanceof DocumentCollection)
@@ -124,7 +129,7 @@ export class TJSDocumentCollection
       }
 
       this.#collection = collection;
-      this.#updateOptions = void 0;
+      this.#updateOptions = options;
       this.#notify();
    }
 
