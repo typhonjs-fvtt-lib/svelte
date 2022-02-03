@@ -32,7 +32,7 @@ export class TJSDocumentDialog
       return new Promise((resolve) =>
       {
          options.resolve = resolve;
-         new TJSPermissionControl(document, { width: 320, ...options }, dialogData).render(true, { focus: true });
+         new TJSPermissionControl(document, options, dialogData).render(true, { focus: true });
       });
    }
 
@@ -68,7 +68,7 @@ export class TJSDocumentDialog
       return new Promise((resolve) =>
       {
          options.resolve = resolve;
-         new TJSDocumentCreate(documentCls, data, { parent, pack, width: 320, ...options }, dialogData).render(
+         new TJSDocumentCreate(documentCls, data, { parent, pack, ...options }, dialogData).render(
           true, { focus: true });
       });
    }
@@ -104,7 +104,7 @@ export class TJSDocumentDialog
       return new Promise((resolve) =>
       {
          options.resolve = resolve;
-         new TJSFolderDialog(folder, { width: 320, ...options }, dialogData).render(true, { focus: true });
+         new TJSFolderDialog(folder, options, dialogData).render(true, { focus: true });
       });
    }
 
@@ -130,8 +130,8 @@ export class TJSDocumentDialog
 
       const type = game.i18n.localize(document.constructor.metadata.label);
       return TJSDialog.confirm({
-         modal: true,
-         draggable: false,
+         modal: typeof options?.modal === 'boolean' ? options.modal : true,
+         draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
          ...dialogData,
          title: `${game.i18n.format('DOCUMENT.Delete', { type })}: ${document.name}`,
          content: `<h4>${game.i18n.localize('AreYouSure')}</h4><p>${game.i18n.format('SIDEBAR.DeleteWarning',
@@ -170,8 +170,8 @@ export class TJSDocumentDialog
       return new Promise((resolve) =>
       {
          new TJSDialog({
-            modal: true,
-            draggable: false,
+            modal: typeof options?.modal === 'boolean' ? options.modal : true,
+            draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
             ...dialogData,
             title: `Import Data: ${document.name}`,
             content,

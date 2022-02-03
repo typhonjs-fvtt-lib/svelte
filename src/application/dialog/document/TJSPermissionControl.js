@@ -15,8 +15,8 @@ export class TJSPermissionControl extends TJSDialog
    constructor(document, options = {}, dialogData = {})
    {
       super({
-         modal: true,
-         draggable: false,
+         modal: typeof options?.modal === 'boolean' ? options.modal : true,
+         draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
          ...dialogData,
          content: {
             class: TJSPermissionControlImpl,
@@ -24,16 +24,16 @@ export class TJSPermissionControl extends TJSDialog
          },
          title: `${game.i18n.localize('PERMISSION.Title')}: ${document.name}`,
          close: () => options?.resolve?.(null)
-      }, options);
+      }, { width: 320, ...options });
 
       /**
        * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with
        *                             TJSPermissionControl.
        *
-       * @memberOf SvelteReactive#
+       * @memberof SvelteReactive#
        */
       Object.defineProperty(this.reactive, 'document', {
-         get: () => this.svelte?.dialogComponent,
+         get: () => this.svelte?.dialogComponent?.document,
          set: (document) =>
          {
             const dialogComponent = this.svelte.dialogComponent;

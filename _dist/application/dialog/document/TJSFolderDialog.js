@@ -15,8 +15,8 @@ export class TJSFolderDialog extends TJSDialog
    constructor(document, options = {}, dialogData = {})
    {
       super({
-         modal: true,
-         draggable: false,
+         modal: typeof options?.modal === 'boolean' ? options.modal : true,
+         draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
          ...dialogData,
          content: {
             class: TJSFolderDialogImpl,
@@ -24,16 +24,16 @@ export class TJSFolderDialog extends TJSDialog
          },
          title: document.id ? `${localize('FOLDER.Update')}: ${document.name}` : localize('FOLDER.Create'),
          close: () => options?.resolve?.(null)
-      }, options);
+      }, { width: 320, ...options });
 
       /**
        * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with
        *                             TJSFolderDialog.
        *
-       * @memberOf SvelteReactive#
+       * @memberof SvelteReactive#
        */
       Object.defineProperty(this.reactive, 'document', {
-         get: () => this.svelte?.dialogComponent,
+         get: () => this.svelte?.dialogComponent?.document,
          set: (document) =>
          {
             const dialogComponent = this.svelte.dialogComponent;

@@ -13,8 +13,8 @@ export class TJSDocumentCreate extends TJSDialog
     dialogData = {})
    {
       super({
-         modal: true,
-         draggable: false,
+         modal: typeof options?.modal === 'boolean' ? options.modal : true,
+         draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
          ...dialogData,
          content: {
             class: TJSDocumentCreateImpl,
@@ -28,6 +28,6 @@ export class TJSDocumentCreate extends TJSDialog
          },
          title: localize('DOCUMENT.Create', { type: localize(documentCls?.metadata?.label) }),
          close: () => options?.resolve?.(null)
-      }, options);
+      }, { width: 320, ...options });
    }
 }

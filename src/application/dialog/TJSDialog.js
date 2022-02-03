@@ -28,7 +28,7 @@ export class TJSDialog extends SvelteApplication
        * @member {object} dialogComponent - A getter to SvelteData to retrieve any mounted Svelte component as the
        *                                    dialog content.
        *
-       * @memberOf GetSvelteData#
+       * @memberof GetSvelteData#
        * @readonly
        */
       Object.defineProperty(this.svelte, 'dialogComponent', {
