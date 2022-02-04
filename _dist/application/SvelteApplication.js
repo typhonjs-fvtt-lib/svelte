@@ -157,6 +157,8 @@ export class SvelteApplication extends Application
       const z = document.defaultView.getComputedStyle(this.element[0]).zIndex;
 
       this.reactive.zIndex = z === 'null' || z === null ? null : parseInt(z, 10);
+
+      ui.activeWindow = this;
    }
 
    /**
@@ -171,9 +173,9 @@ export class SvelteApplication extends Application
     * Close the application and un-register references to it within UI mappings.
     * This function returns a Promise which resolves once the window closing animation concludes
     *
-    * @param {object}   options - Optional parameters.
+    * @param {object}   [options] - Optional parameters.
     *
-    * @param {boolean}  options.force - Force close regardless of render state.
+    * @param {boolean}  [options.force] - Force close regardless of render state.
     *
     * @returns {Promise<void>}    A Promise which resolves once the application is closed.
     * @ignore

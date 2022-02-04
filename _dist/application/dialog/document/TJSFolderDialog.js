@@ -12,6 +12,13 @@ import { TJSDialog }          from '../TJSDialog.js';
  */
 export class TJSFolderDialog extends TJSDialog
 {
+   /**
+    * @param {foundry.abstract.Document}  document -
+    *
+    * @param {object}   options -
+    *
+    * @param {object}   dialogData -
+    */
    constructor(document, options = {}, dialogData = {})
    {
       super({

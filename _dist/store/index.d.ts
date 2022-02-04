@@ -9,6 +9,26 @@ type LSStore = svelte_store.Writable<any> & typeof get;
  * - The backing Svelte store; a writable w/ get method attached.
  */
 type SSStore = svelte_store.Writable<any> & typeof get;
+type TJSDocumentOptions = {
+    /**
+     * - Optional delete function to invoke when document is deleted.
+     */
+    delete: Function;
+    /**
+     * - When true a subscribers are notified of the deletion of the document.
+     */
+    notifyOnDelete: boolean;
+};
+type TJSDocumentCollectionOptions = {
+    /**
+     * - Optional delete function to invoke when document is deleted.
+     */
+    delete: Function;
+    /**
+     * - When true a subscribers are notified of the deletion of the document.
+     */
+    notifyOnDelete: boolean;
+};
 /**
  * - Provides a Svelte store wrapping the Foundry `game` global variable. It is initialized
  * on the `ready` hook. You may use this store to access the global game state from a Svelte template. It is a read only
@@ -212,11 +232,9 @@ declare class TJSDocument<T extends any> {
     /**
      * @param {T}                    [document] - Document to wrap.
      *
-     * @param {{delete: Function}}   [options] - Optional delete function to invoke when document is deleted.
+     * @param {TJSDocumentOptions}   [options] - TJSDocument options.
      */
-    constructor(document?: T, options?: {
-        delete: Function;
-    });
+    constructor(document?: T, options?: TJSDocumentOptions);
     /**
      * Returns the options passed on last update.
      *
@@ -242,11 +260,9 @@ declare class TJSDocument<T extends any> {
     /**
      * Sets options for this document wrapper / store.
      *
-     * @param {{delete: Function}}   [options] - Optional delete function to invoke when collection is deleted.
+     * @param {TJSDocumentOptions}   options - Options for TJSDocument.
      */
-    setOptions(options?: {
-        delete: Function;
-    }): void;
+    setOptions(options: TJSDocumentOptions): void;
     /**
      * @param {function(T, object): void} handler - Callback function that is invoked on update / changes.
      *
@@ -256,6 +272,13 @@ declare class TJSDocument<T extends any> {
     #private;
 }
 /**
+ * @typedef TJSDocumentOptions
+ *
+ * @property {Function} delete - Optional delete function to invoke when document is deleted.
+ *
+ * @property {boolean} notifyOnDelete - When true a subscribers are notified of the deletion of the document.
+ */
+/**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any DocumentCollection. This makes
  * document collections reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
@@ -264,13 +287,11 @@ declare class TJSDocument<T extends any> {
  */
 declare class TJSDocumentCollection<T extends any> {
     /**
-     * @param {T}                    [collection] - Collection to wrap.
+     * @param {T}                             [collection] - Collection to wrap.
      *
-     * @param {{delete: Function}}   [options] - Optional delete function to invoke when collection is deleted.
+     * @param {TJSDocumentCollectionOptions}  [options] - TJSDocumentCollection options.
      */
-    constructor(collection?: T, options?: {
-        delete: Function;
-    });
+    constructor(collection?: T, options?: TJSDocumentCollectionOptions);
     /**
      * Returns the options passed on last update.
      *
@@ -296,11 +317,9 @@ declare class TJSDocumentCollection<T extends any> {
     /**
      * Sets options for this collection wrapper / store.
      *
-     * @param {{delete: Function}}   [options] - Optional delete function to invoke when collection is deleted.
+     * @param {TJSDocumentCollectionOptions}   options - Options for TJSDocumentCollection.
      */
-    setOptions(options?: {
-        delete: Function;
-    }): void;
+    setOptions(options: TJSDocumentCollectionOptions): void;
     /**
      * @param {function(T, object): void} handler - Callback function that is invoked on update / changes.
      *
@@ -475,4 +494,4 @@ declare class AdapterFilters<T> {
     removeById(...ids: any[]): void;
 }
 
-export { DynArrayReducer, GSStore, GameSetting, GameSettingOptions, GameState, LSStore, LocalStorage, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSGameSettings, gameState, isStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { DynArrayReducer, GSStore, GameSetting, GameSettingOptions, GameState, LSStore, LocalStorage, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, TJSGameSettings, gameState, isStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
