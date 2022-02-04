@@ -105,9 +105,9 @@ export class TJSDialog extends SvelteApplication
     * Close the dialog and un-register references to it within UI mappings.
     * This function returns a Promise which resolves once the window closing animation concludes.
     *
-    * @param {object}   options - Optional parameters.
+    * @param {object}   [options] - Optional parameters.
     *
-    * @param {boolean}  options.force - Force close regardless of render state.
+    * @param {boolean}  [options.force] - Force close regardless of render state.
     *
     * @returns {Promise<void>} A Promise which resolves once the application is closed.
     */
