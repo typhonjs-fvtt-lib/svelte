@@ -98,7 +98,7 @@ export class TJSDocumentDialog
       const label = localize(Folder.metadata.label);
 
       const data = foundry.utils.mergeObject({
-         name: game.i18n.format('DOCUMENT.New', { type: label }),
+         name: localize('DOCUMENT.New', { type: label }),
          sorting: 'a',
       }, folderData);
 
@@ -167,49 +167,5 @@ export class TJSDocumentDialog
          options.resolve = resolve;
          new TJSDocumentImport(document, options, dialogData).render(true, { focus: true });
       });
-
-      // const content = await renderTemplate('templates/apps/import-data.html',
-      // {
-      //     hint1: game.i18n.format('DOCUMENT.ImportDataHint1', { document: document.documentName }),
-      //     hint2: game.i18n.format('DOCUMENT.ImportDataHint2', { name: document.name })
-      // });
-      //
-      // return new Promise((resolve) =>
-      // {
-      //    new TJSDialog({
-      //       modal: typeof options?.modal === 'boolean' ? options.modal : true,
-      //       draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
-      //       ...dialogData,
-      //       title: `Import Data: ${document.name}`,
-      //       content,
-      //       buttons: {
-      //          import: {
-      //             icon: '<i class="fas fa-file-import"></i>',
-      //             label: 'Import',
-      //             callback: async (html) =>
-      //             {
-      //                const form = html.querySelector('form');
-      //
-      //                if (!form.data.files.length) { return ui.notifications.error('You did not upload a data file!'); }
-      //
-      //                const json = await readTextFromFile(form.data.files[0]);
-      //                const importedDoc = await document.importFromJSON(json);
-      //
-      //                resolve(importedDoc);
-      //             }
-      //          },
-      //          no: {
-      //             icon: '<i class="fas fa-times"></i>',
-      //             label: 'Cancel',
-      //             callback: () => resolve(false)
-      //          }
-      //       },
-      //       default: 'import',
-      //       close: () => resolve(null)
-      //    }, {
-      //       width: 400,
-      //       ...options
-      //    }).render(true, { focus: true });
-      // });
    }
 }
