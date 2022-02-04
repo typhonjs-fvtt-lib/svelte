@@ -28,6 +28,7 @@
       "builtinGlobals": true,
       "hoist": "all",
       "allow": [
+        "context",
         "document",
         "event",
         "name",
