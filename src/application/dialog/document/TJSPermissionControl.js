@@ -1,6 +1,7 @@
 import { TJSPermissionControl
     as TJSPermissionControlImpl }   from '@typhonjs-fvtt/svelte/component/core';
 
+import { localize }                 from '@typhonjs-fvtt/svelte/helper';
 import { hasSetter }                from '@typhonjs-fvtt/svelte/util';
 
 import { TJSDialog }                from '../TJSDialog.js';
@@ -12,6 +13,13 @@ import { TJSDialog }                from '../TJSDialog.js';
  */
 export class TJSPermissionControl extends TJSDialog
 {
+   /**
+    * @param {foundry.abstract.Document}  document -
+    *
+    * @param {object}   options -
+    *
+    * @param {object}   dialogData -
+    */
    constructor(document, options = {}, dialogData = {})
    {
       super({
@@ -22,7 +30,7 @@ export class TJSPermissionControl extends TJSDialog
             class: TJSPermissionControlImpl,
             props: { document }
          },
-         title: `${game.i18n.localize('PERMISSION.Title')}: ${document.name}`,
+         title: `${localize('PERMISSION.Title')}: ${document.name}`,
          close: () => options?.resolve?.(null)
       }, { width: 320, ...options });
 

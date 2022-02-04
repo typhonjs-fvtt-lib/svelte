@@ -1,5 +1,8 @@
+import { localize }              from '@typhonjs-fvtt/svelte/helper';
+
 import { TJSDialog }             from '../TJSDialog.js';
 import { TJSDocumentCreate }     from './TJSDocumentCreate.js';
+import { TJSDocumentDelete }     from './TJSDocumentDelete.js';
 import { TJSFolderDialog }       from './TJSFolderDialog.js';
 import { TJSPermissionControl }  from './TJSPermissionControl.js';
 
@@ -12,7 +15,7 @@ export class TJSDocumentDialog
    /**
     * Change permissions of a document by rendering a dialog to alter the default and all user / player permissions.
     *
-    * @param {object} document - Document instance to modify.
+    * @param {foundry.abstract.Document} document - Document instance to modify.
     *
     * @param {object} [options] - Rest of options to pass to TJSDialog / Application.
     *
@@ -92,7 +95,7 @@ export class TJSDocumentDialog
          return null;
       }
 
-      const label = game.i18n.localize(Folder.metadata.label);
+      const label = localize(Folder.metadata.label);
 
       const data = foundry.utils.mergeObject({
          name: game.i18n.format('DOCUMENT.New', { type: label }),
@@ -111,16 +114,20 @@ export class TJSDocumentDialog
    /**
     * Shows a modal / non-draggable dialog to delete a document.
     *
-    * @param {Document} document - Document to delete.
+    * @param {foundry.abstract.Document} document - Document to delete.
     *
-    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    * @param {object} [opts] - Additional context options or dialog positioning options.
+    *
+    * @param {object} [opts.context] - DocumentModificationContext.
+    *
+    * @param {...*} [opts.options] - Rest of options to pass to TJSDialog / Application.
     *
     * @param {object} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<Document|boolean|null>} The document if deleted or a falsy value; either 'false' for cancelling
     *                                   or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
-   static async deleteDocument(document, options = {}, dialogData = {})
+   static async deleteDocument(document, { context = {}, ...options } = {}, dialogData = {})
    {
       if (!(document instanceof foundry.abstract.Document))
       {
@@ -128,23 +135,29 @@ export class TJSDocumentDialog
          return null;
       }
 
-      const type = game.i18n.localize(document.constructor.metadata.label);
-      return TJSDialog.confirm({
-         modal: typeof options?.modal === 'boolean' ? options.modal : true,
-         draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
-         ...dialogData,
-         title: `${game.i18n.format('DOCUMENT.Delete', { type })}: ${document.name}`,
-         content: `<h4>${game.i18n.localize('AreYouSure')}</h4><p>${game.i18n.format('SIDEBAR.DeleteWarning',
-          { type })}</p>`,
-         yes: document.delete.bind(document),
-         options
+      return new Promise((resolve) =>
+      {
+         options.resolve = resolve;
+         new TJSDocumentDelete(document, { context, ...options }, dialogData).render(true, { focus: true });
       });
+
+      // const type = game.i18n.localize(document.constructor.metadata.label);
+      // return TJSDialog.confirm({
+      //    modal: typeof options?.modal === 'boolean' ? options.modal : true,
+      //    draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
+      //    ...dialogData,
+      //    title: `${game.i18n.format('DOCUMENT.Delete', { type })}: ${document.name}`,
+      //    content: `<h4>${game.i18n.localize('AreYouSure')}</h4><p>${game.i18n.format('SIDEBAR.DeleteWarning',
+      //     { type })}</p>`,
+      //    yes: document.delete.bind(document),
+      //    options
+      // });
    }
 
    /**
     * Render an import dialog for updating the data related to this Document through an exported JSON file
     *
-    * @param {Document} document - The document to import JSON to...
+    * @param {foundry.abstract.Document} document - The document to import JSON to...
     *
     * @param {object} [options] - Options to pass to TJSDialog / Application.
     *
