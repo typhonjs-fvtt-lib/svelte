@@ -3493,7 +3493,7 @@ function get_each_context$2(ctx, list, i) {
 	return child_ctx;
 }
 
-// (176:29) 
+// (178:29) 
 function create_if_block_4(ctx) {
 	let switch_instance;
 	let switch_instance_anchor;
@@ -3576,7 +3576,7 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (174:3) {#if typeof content === 'string'}
+// (176:3) {#if typeof content === 'string'}
 function create_if_block_3(ctx) {
 	let html_tag;
 	let html_anchor;
@@ -3603,7 +3603,7 @@ function create_if_block_3(ctx) {
 	};
 }
 
-// (181:0) {#if buttons.length}
+// (183:0) {#if buttons.length}
 function create_if_block$2(ctx) {
 	let div;
 	let each_blocks = [];
@@ -3650,7 +3650,7 @@ function create_if_block$2(ctx) {
 	};
 }
 
-// (187:6) {#if button.icon}
+// (189:6) {#if button.icon}
 function create_if_block_2(ctx) {
 	let html_tag;
 	let raw_value = /*button*/ ctx[14].icon + "";
@@ -3676,7 +3676,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (188:6) {#if button.label}
+// (190:6) {#if button.label}
 function create_if_block_1$1(ctx) {
 	let html_tag;
 	let raw_value = /*button*/ ctx[14].label + "";
@@ -3702,7 +3702,7 @@ function create_if_block_1$1(ctx) {
 	};
 }
 
-// (183:3) {#each buttons as button (button.id)}
+// (185:3) {#each buttons as button (button.id)}
 function create_each_block$2(key_1, ctx) {
 	let button;
 	let t0;
@@ -3933,11 +3933,15 @@ function instance$6($$self, $$props, $$invalidate) {
 		try {
 			let result = null;
 
-			// Passing back the element is to keep with the existing Foundry API.
+			// Passing back the HTML element is to keep with the existing Foundry API, however second parameter is the
+			// Svelte component instance.
 			if (typeof button.callback === 'function') {
-				result = await button.callback(foundryApp.options.jQuery
-				? foundryApp.element
-				: foundryApp.element[0]);
+				result = await button.callback(
+					foundryApp.options.jQuery
+					? foundryApp.element
+					: foundryApp.element[0],
+					dialogInstance
+				);
 			}
 
 			// Delay closing to next clock tick to be able to return result.

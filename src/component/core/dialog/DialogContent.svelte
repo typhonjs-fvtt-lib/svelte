@@ -92,10 +92,12 @@
       {
          let result = null;
 
-         // Passing back the element is to keep with the existing Foundry API.
+         // Passing back the HTML element is to keep with the existing Foundry API, however second parameter is the
+         // Svelte component instance.
          if (typeof button.callback === 'function')
          {
-            result = await button.callback(foundryApp.options.jQuery ? foundryApp.element : foundryApp.element[0]);
+            result = await button.callback(foundryApp.options.jQuery ? foundryApp.element : foundryApp.element[0],
+             dialogInstance);
          }
 
          // Delay closing to next clock tick to be able to return result.

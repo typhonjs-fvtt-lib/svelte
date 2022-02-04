@@ -41,12 +41,10 @@ export class TJSDocumentDelete extends TJSDialog
             yes: {
                icon: '<i class="fas fa-check"></i>',
                label: localize('Yes'),
-               callback: async () =>
+               callback: async (html, dialogComponent) =>
                {
-                  const dialogComponent = this.svelte.dialogComponent;
-                  dialogComponent.doc.setOptions({ delete: void 0 });
-
                   // Remove the delete Document function callback as we are intentionally deleting below.
+                  dialogComponent.doc.setOptions({ delete: void 0 });
 
                   const returnDoc = await dialogComponent.document.delete(context);
 
