@@ -1,4 +1,4 @@
-import { uuidv4 } from '@typhonjs-fvtt/svelte/util';
+import { isObject, uuidv4 } from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any DocumentCollection. This makes
@@ -12,14 +12,19 @@ export class TJSDocumentCollection
    #collection;
    #collectionCallback;
    #uuid;
-   #deleteFn;
+
+   /**
+    * @type {TJSDocumentCollectionOptions}
+    */
+   #options = { delete: void 0, notifyOnDelete: false };
+
    #subscriptions = [];
    #updateOptions;
 
    /**
-    * @param {T}                    [collection] - Collection to wrap.
+    * @param {T}                             [collection] - Collection to wrap.
     *
-    * @param {{delete: Function}}   [options] - Optional delete function to invoke when collection is deleted.
+    * @param {TJSDocumentCollectionOptions}  [options] - TJSDocumentCollection options.
     */
    constructor(collection, options = {})
    {
@@ -29,8 +34,8 @@ export class TJSDocumentCollection
       }
 
       this.#uuid = `tjs-collection-${uuidv4()}`;
-      this.#deleteFn = options.delete;
 
+      this.setOptions(options);
       this.set(collection);
    }
 
@@ -65,9 +70,9 @@ export class TJSDocumentCollection
 
       this.#updateOptions = void 0;
 
-      if (typeof this.#deleteFn === 'function') { await this.#deleteFn(); }
+      if (typeof this.#options.delete === 'function') { await this.#options.delete(); }
 
-      this.#notify();
+      if (this.#options.notifyOnDelete) { this.#notify(); }
    }
 
    /**
@@ -136,16 +141,34 @@ export class TJSDocumentCollection
    /**
     * Sets options for this collection wrapper / store.
     *
-    * @param {{delete: Function}}   [options] - Optional delete function to invoke when collection is deleted.
+    * @param {TJSDocumentCollectionOptions}   options - Options for TJSDocumentCollection.
     */
    setOptions(options)
    {
-      if (options?.delete !== void 0 && typeof options?.delete !== 'function')
+      if (!isObject(options))
+      {
+         throw new TypeError(`TJSDocumentCollection error: 'options' is not an object.`);
+      }
+
+      if (options.delete !== void 0 && typeof options.delete !== 'function')
       {
          throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
       }
 
-      this.#deleteFn = options.delete;
+      if (options.notifyOnDelete !== void 0 && typeof options.notifyOnDelete !== 'boolean')
+      {
+         throw new TypeError(`TJSDocumentCollection error: 'notifyOnDelete' attribute in options is not a boolean.`);
+      }
+
+      if (options.delete === void 0 || typeof options.notifyOnDelete === 'function')
+      {
+         this.#options.delete = options.delete;
+      }
+
+      if (typeof options.notifyOnDelete === 'boolean')
+      {
+         this.#options.notifyOnDelete = options.notifyOnDelete;
+      }
    }
 
    /**
@@ -167,3 +190,11 @@ export class TJSDocumentCollection
       };
    }
 }
+
+/**
+ * @typedef TJSDocumentCollectionOptions
+ *
+ * @property {Function} delete - Optional delete function to invoke when document is deleted.
+ *
+ * @property {boolean} notifyOnDelete - When true a subscribers are notified of the deletion of the document.
+ */
