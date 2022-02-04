@@ -2009,7 +2009,7 @@ class TJSDocumentCollection
          throw new TypeError(`TJSDocumentCollection error: 'notifyOnDelete' attribute in options is not a boolean.`);
       }
 
-      if (options.delete === void 0 || typeof options.notifyOnDelete === 'function')
+      if (options.delete === void 0 || typeof options.delete === 'function')
       {
          this.#options.delete = options.delete;
       }

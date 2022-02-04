@@ -124,6 +124,11 @@ declare class TJSDocumentDelete extends SvelteComponent {
     set context(arg: any);
     get context(): any;
 }
+declare class TJSDocumentImport extends SvelteComponent {
+    constructor(options: any);
+    set document(arg: any);
+    get document(): any;
+}
 declare class TJSFolderDialog extends SvelteComponent {
     constructor(options: any);
     set document(arg: any);
@@ -167,4 +172,4 @@ declare class TJSPermissionControl extends SvelteComponent {
     get document(): any;
 }
 
-export { ApplicationShell, DialogContent, DialogShell, EmptyApplicationShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSDocumentCreate, TJSDocumentDelete, TJSFolderDialog, TJSGlassPane, TJSHeaderButton, TJSPermissionControl };
+export { ApplicationShell, DialogContent, DialogShell, EmptyApplicationShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSDocumentCreate, TJSDocumentDelete, TJSDocumentImport, TJSFolderDialog, TJSGlassPane, TJSHeaderButton, TJSPermissionControl };
