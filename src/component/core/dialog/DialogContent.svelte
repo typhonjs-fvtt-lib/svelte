@@ -2,6 +2,7 @@
    import { getContext }   from 'svelte';
 
    import {
+      isObject,
       isSvelteComponent,
       parseSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
 
@@ -18,20 +19,33 @@
 
    let foundryApp = getContext('external').foundryApp;
 
+   let currentButtonId = data.default;
+
    // If `data.buttons` is not an object then set an empty array otherwise reduce the button data.
-   $: buttons = typeof data.buttons !== 'object' ? [] : Object.keys(data.buttons).reduce((obj, key) =>
+   $:
    {
-      const b = data.buttons[key];
-      if (b.condition !== false)
+      buttons = typeof data.buttons !== 'object' ? [] : Object.keys(data.buttons).reduce((obj, key, index) =>
       {
-         obj.push({
-            ...b,
-            id: key,
-            cssClass: [key, data.default === key ? 'default' : ''].filterJoin(' ')
-         })
-      }
-      return obj;
-   }, []);
+         const b = data.buttons[key];
+         if (b.condition !== false)
+         {
+            obj.push({
+               ...b,
+               id: key,
+            })
+         }
+         return obj;
+      }, []);
+   }
+
+   /**
+    * This reactivity block will trigger on arrow left / right key presses _and_ when buttons change. It is OK for it to
+    * trigger on both.
+    */
+   $: if (!buttons.find((button) => button.id === currentButtonId))
+   {
+      currentButtonId = void 0;
+   }
 
    $:
    {
@@ -98,8 +112,40 @@
 
    function onKeydown(event)
    {
+      /**
+       * If this dialog is not the activeWindow then return immediately. See {@link SvelteApplication.bringToTop} as
+       * SvelteApplication overrides core Foundry and always sets the activeWindow when `bringToTop` is invoked.
+       */
+      if (event.key !== 'Escape' && ui.activeWindow !== foundryApp) { return; }
+
       switch (event.key)
       {
+         case 'ArrowLeft':
+         {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const currentIndex = buttons.findIndex((button) => button.id === currentButtonId);
+            if (buttons.length && currentIndex > 0)
+            {
+               currentButtonId = buttons[currentIndex - 1].id;
+            }
+            break;
+         }
+
+         case 'ArrowRight':
+         {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const currentIndex = buttons.findIndex((button) => button.id === currentButtonId);
+            if (buttons.length && currentIndex < buttons.length - 1)
+            {
+               currentButtonId = buttons[currentIndex + 1].id;
+            }
+            break;
+         }
+
          case 'Escape':
             event.preventDefault();
             event.stopPropagation();
@@ -108,7 +154,10 @@
          case 'Enter':
             event.preventDefault();
             event.stopPropagation();
-            onClick(data.buttons[data.default]);
+            if (currentButtonId && isObject(data.buttons) && currentButtonId in data.buttons)
+            {
+               onClick(data.buttons[currentButtonId]);
+            }
             break;
 
          default:
@@ -132,9 +181,11 @@
 {#if buttons.length}
 <div class="dialog-buttons">
    {#each buttons as button (button.id)}
-   <button class="dialog-button {button.cssClass}" on:click={() => onClick(button)}>
-      {@html button.icon}
-      {@html button.label}
+   <button class="dialog-button {button.id}"
+           on:click={() => onClick(button)}
+           class:default={button.id === currentButtonId}>
+      {#if button.icon}{@html button.icon}{/if}
+      {#if button.label}{@html button.label}{/if}
    </button>
    {/each}
 </div>
