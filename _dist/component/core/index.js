@@ -1,4 +1,4 @@
-import { SvelteComponent, init, safe_not_equal, flush, append_styles, empty, insert, group_outros, transition_out, check_outros, transition_in, detach, element, attr, noop, create_component, mount_component, get_spread_update, get_spread_object, destroy_component, destroy_each, assign, create_slot, listen, update_slot_base, get_all_dirty_from_scope, get_slot_changes, add_render_callback, create_in_transition, create_out_transition, binding_callbacks, text, append, stop_propagation, prevent_default, set_data, run_all, space, action_destroyer, is_function, component_subscribe, add_resize_listener, update_keyed_each, destroy_block, toggle_class, HtmlTag, bind, add_flush_callback, select_option, select_value, bubble, set_input_value } from 'svelte/internal';
+import { SvelteComponent, init, safe_not_equal, flush, append_styles, empty, insert, group_outros, transition_out, check_outros, transition_in, detach, element, attr, noop, create_component, mount_component, get_spread_update, get_spread_object, destroy_component, destroy_each, assign, create_slot, listen, update_slot_base, get_all_dirty_from_scope, get_slot_changes, add_render_callback, create_in_transition, create_out_transition, binding_callbacks, HtmlTag, text, append, stop_propagation, prevent_default, set_data, run_all, space, action_destroyer, is_function, component_subscribe, add_resize_listener, update_keyed_each, destroy_block, toggle_class, bind, add_flush_callback, select_option, select_value, bubble, set_input_value } from 'svelte/internal';
 import { getContext, setContext } from 'svelte';
 import { s_DEFAULT_TRANSITION, s_DEFAULT_TRANSITION_OPTIONS } from '@typhonjs-fvtt/svelte/transition';
 import { writable } from 'svelte/store';
@@ -803,10 +803,7 @@ class TJSGlassPane extends SvelteComponent {
 
 function create_fragment$c(ctx) {
 	let a;
-	let i;
-	let i_class_value;
-	let i_title_value;
-	let t_value = localize(/*button*/ ctx[0].label) + "";
+	let html_tag;
 	let t;
 	let a_class_value;
 	let mounted;
@@ -815,20 +812,19 @@ function create_fragment$c(ctx) {
 	return {
 		c() {
 			a = element("a");
-			i = element("i");
-			t = text(t_value);
-			attr(i, "class", i_class_value = /*button*/ ctx[0].icon);
-			attr(i, "title", i_title_value = localize(/*button*/ ctx[0].title));
+			html_tag = new HtmlTag();
+			t = text(/*label*/ ctx[2]);
+			html_tag.a = t;
 			attr(a, "class", a_class_value = "header-button " + /*button*/ ctx[0].class);
 		},
 		m(target, anchor) {
 			insert(target, a, anchor);
-			append(a, i);
+			html_tag.m(/*icon*/ ctx[1], a);
 			append(a, t);
 
 			if (!mounted) {
 				dispose = [
-					listen(a, "click", stop_propagation(prevent_default(/*onClick*/ ctx[1]))),
+					listen(a, "click", stop_propagation(prevent_default(/*onClick*/ ctx[3]))),
 					listen(a, "pointerdown", stop_propagation(prevent_default(pointerdown_handler))),
 					listen(a, "dblclick", stop_propagation(prevent_default(dblclick_handler)))
 				];
@@ -837,15 +833,8 @@ function create_fragment$c(ctx) {
 			}
 		},
 		p(ctx, [dirty]) {
-			if (dirty & /*button*/ 1 && i_class_value !== (i_class_value = /*button*/ ctx[0].icon)) {
-				attr(i, "class", i_class_value);
-			}
-
-			if (dirty & /*button*/ 1 && i_title_value !== (i_title_value = localize(/*button*/ ctx[0].title))) {
-				attr(i, "title", i_title_value);
-			}
-
-			if (dirty & /*button*/ 1 && t_value !== (t_value = localize(/*button*/ ctx[0].label) + "")) set_data(t, t_value);
+			if (dirty & /*icon*/ 2) html_tag.p(/*icon*/ ctx[1]);
+			if (dirty & /*label*/ 4) set_data(t, /*label*/ ctx[2]);
 
 			if (dirty & /*button*/ 1 && a_class_value !== (a_class_value = "header-button " + /*button*/ ctx[0].class)) {
 				attr(a, "class", a_class_value);
@@ -861,16 +850,21 @@ function create_fragment$c(ctx) {
 	};
 }
 
+const s_REGEX_HTML$1 = /^\s*<.*>$/;
 const pointerdown_handler = () => null;
 const dblclick_handler = () => null;
 
 function instance$c($$self, $$props, $$invalidate) {
 	let { button } = $$props;
+	let icon, label, title;
 
 	function onClick() {
-		if (typeof button.onclick === 'function') {
-			button.onclick.call(button);
-			$$invalidate(0, button);
+		// Accept either callback or onclick as the function / data to invoke.
+		const invoke = button.callback ?? button.onclick;
+
+		if (typeof invoke === 'function') {
+			invoke.call(button);
+			$$invalidate(0, button); // This provides a reactive update if button data changes.
 		}
 	}
 
@@ -878,7 +872,28 @@ function instance$c($$self, $$props, $$invalidate) {
 		if ('button' in $$props) $$invalidate(0, button = $$props.button);
 	};
 
-	return [button, onClick];
+	$$self.$$.update = () => {
+		if ($$self.$$.dirty & /*button, title*/ 17) {
+			if (button) {
+				$$invalidate(4, title = typeof button.title === 'string'
+				? localize(button.title)
+				: '');
+
+				// Handle icon and treat bare strings as the icon class; otherwise assume the icon is fully formed HTML.
+				$$invalidate(1, icon = typeof button.icon !== 'string'
+				? void 0
+				: s_REGEX_HTML$1.test(button.icon)
+					? button.icon
+					: `<i class="${button.icon}" title="${title}"></i>`);
+
+				$$invalidate(2, label = typeof button.label === 'string'
+				? localize(button.label)
+				: '');
+			}
+		}
+	};
+
+	return [button, icon, label, onClick, title];
 }
 
 class TJSHeaderButton extends SvelteComponent {
@@ -3877,7 +3892,7 @@ function create_fragment$6(ctx) {
 	};
 }
 
-const s_REGEX_ICON = /^\s*<.*>$/;
+const s_REGEX_HTML = /^\s*<.*>$/;
 
 function instance$6($$self, $$props, $$invalidate) {
 	let { data = {} } = $$props;
@@ -4012,7 +4027,7 @@ function instance$6($$self, $$props, $$invalidate) {
 							// Handle icon and treat bare strings as the icon class; otherwise assume the icon is fully formed HTML.
 							const icon = typeof b.icon !== 'string'
 							? void 0
-							: s_REGEX_ICON.test(b.icon)
+							: s_REGEX_HTML.test(b.icon)
 								? b.icon
 								: `<i class="${b.icon}"></i>`;
 

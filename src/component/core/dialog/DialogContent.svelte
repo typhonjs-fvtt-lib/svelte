@@ -14,7 +14,7 @@
 
    export let dialogInstance = void 0;
 
-   const s_REGEX_ICON = /^\s*<.*>$/;
+   const s_REGEX_HTML = /^\s*<.*>$/;
 
    let buttons;
    let content;
@@ -33,7 +33,7 @@
          const b = data.buttons[key];
 
          // Handle icon and treat bare strings as the icon class; otherwise assume the icon is fully formed HTML.
-         const icon = typeof b.icon !== 'string' ? void 0 : s_REGEX_ICON.test(b.icon) ? b.icon :
+         const icon = typeof b.icon !== 'string' ? void 0 : s_REGEX_HTML.test(b.icon) ? b.icon :
           `<i class="${b.icon}"></i>`;
 
          const label = typeof b.label === 'string' ? localize(b.label) : '';
