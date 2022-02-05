@@ -1,6 +1,8 @@
 <script>
    import { getContext }   from 'svelte';
 
+   import { localize }     from '@typhonjs-fvtt/svelte/helper';
+
    import {
       isObject,
       isSvelteComponent,
@@ -11,6 +13,8 @@
    export let stopPropagation = false;
 
    export let dialogInstance = void 0;
+
+   const s_REGEX_ICON = /^\s*<.*>$/;
 
    let buttons;
    let content;
@@ -27,10 +31,22 @@
       buttons = typeof data.buttons !== 'object' ? [] : Object.keys(data.buttons).reduce((obj, key, index) =>
       {
          const b = data.buttons[key];
-         if (b.condition !== false)
+
+         // Test any condition supplied otherwise default to true.
+         const condition = typeof b.condition === 'function' ? b.condition.call(b) : b.condition ?? true;
+
+         // Handle icon and treat bare strings as the icon class; otherwise assume the icon is fully formed HTML.
+         const icon = typeof b.icon !== 'string' ? void 0 : s_REGEX_ICON.test(b.icon) ? b.icon :
+          `<i class="${b.icon}"></i>`;
+
+         const label = typeof b.label === 'string' ? localize(b.label) : '';
+
+         if (condition)
          {
             obj.push({
                ...b,
+               icon,
+               label,
                id: key,
             })
          }
@@ -196,8 +212,7 @@
    <button class="dialog-button {button.id}"
            on:click={() => onClick(button)}
            class:default={button.id === currentButtonId}>
-      {#if button.icon}{@html button.icon}{/if}
-      {#if button.label}{@html button.label}{/if}
+      {#if button.icon}{@html button.icon}{/if}{button.label}
    </button>
    {/each}
 </div>

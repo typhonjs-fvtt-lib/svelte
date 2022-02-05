@@ -3493,8 +3493,8 @@ function get_each_context$2(ctx, list, i) {
 	return child_ctx;
 }
 
-// (188:29) 
-function create_if_block_4(ctx) {
+// (204:29) 
+function create_if_block_3(ctx) {
 	let switch_instance;
 	let switch_instance_anchor;
 	let current;
@@ -3576,8 +3576,8 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (186:3) {#if typeof content === 'string'}
-function create_if_block_3(ctx) {
+// (202:3) {#if typeof content === 'string'}
+function create_if_block_2(ctx) {
 	let html_tag;
 	let html_anchor;
 
@@ -3603,7 +3603,7 @@ function create_if_block_3(ctx) {
 	};
 }
 
-// (193:0) {#if buttons.length}
+// (209:0) {#if buttons.length}
 function create_if_block$2(ctx) {
 	let div;
 	let each_blocks = [];
@@ -3650,8 +3650,8 @@ function create_if_block$2(ctx) {
 	};
 }
 
-// (199:6) {#if button.icon}
-function create_if_block_2(ctx) {
+// (215:6) {#if button.icon}
+function create_if_block_1$1(ctx) {
 	let html_tag;
 	let raw_value = /*button*/ ctx[14].icon + "";
 	let html_anchor;
@@ -3676,42 +3676,16 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (200:6) {#if button.label}
-function create_if_block_1$1(ctx) {
-	let html_tag;
-	let raw_value = /*button*/ ctx[14].label + "";
-	let html_anchor;
-
-	return {
-		c() {
-			html_tag = new HtmlTag();
-			html_anchor = empty();
-			html_tag.a = html_anchor;
-		},
-		m(target, anchor) {
-			html_tag.m(raw_value, target, anchor);
-			insert(target, html_anchor, anchor);
-		},
-		p(ctx, dirty) {
-			if (dirty & /*buttons*/ 2 && raw_value !== (raw_value = /*button*/ ctx[14].label + "")) html_tag.p(raw_value);
-		},
-		d(detaching) {
-			if (detaching) detach(html_anchor);
-			if (detaching) html_tag.d();
-		}
-	};
-}
-
-// (195:3) {#each buttons as button (button.id)}
+// (211:3) {#each buttons as button (button.id)}
 function create_each_block$2(key_1, ctx) {
 	let button;
+	let t0_value = /*button*/ ctx[14].label + "";
 	let t0;
 	let t1;
 	let button_class_value;
 	let mounted;
 	let dispose;
-	let if_block0 = /*button*/ ctx[14].icon && create_if_block_2(ctx);
-	let if_block1 = /*button*/ ctx[14].label && create_if_block_1$1(ctx);
+	let if_block = /*button*/ ctx[14].icon && create_if_block_1$1(ctx);
 
 	function click_handler() {
 		return /*click_handler*/ ctx[12](/*button*/ ctx[14]);
@@ -3722,9 +3696,8 @@ function create_each_block$2(key_1, ctx) {
 		first: null,
 		c() {
 			button = element("button");
-			if (if_block0) if_block0.c();
-			t0 = space();
-			if (if_block1) if_block1.c();
+			if (if_block) if_block.c();
+			t0 = text(t0_value);
 			t1 = space();
 			attr(button, "class", button_class_value = "dialog-button " + /*button*/ ctx[14].id);
 			toggle_class(button, "default", /*button*/ ctx[14].id === /*currentButtonId*/ ctx[3]);
@@ -3732,9 +3705,8 @@ function create_each_block$2(key_1, ctx) {
 		},
 		m(target, anchor) {
 			insert(target, button, anchor);
-			if (if_block0) if_block0.m(button, null);
+			if (if_block) if_block.m(button, null);
 			append(button, t0);
-			if (if_block1) if_block1.m(button, null);
 			append(button, t1);
 
 			if (!mounted) {
@@ -3746,30 +3718,19 @@ function create_each_block$2(key_1, ctx) {
 			ctx = new_ctx;
 
 			if (/*button*/ ctx[14].icon) {
-				if (if_block0) {
-					if_block0.p(ctx, dirty);
+				if (if_block) {
+					if_block.p(ctx, dirty);
 				} else {
-					if_block0 = create_if_block_2(ctx);
-					if_block0.c();
-					if_block0.m(button, t0);
+					if_block = create_if_block_1$1(ctx);
+					if_block.c();
+					if_block.m(button, t0);
 				}
-			} else if (if_block0) {
-				if_block0.d(1);
-				if_block0 = null;
+			} else if (if_block) {
+				if_block.d(1);
+				if_block = null;
 			}
 
-			if (/*button*/ ctx[14].label) {
-				if (if_block1) {
-					if_block1.p(ctx, dirty);
-				} else {
-					if_block1 = create_if_block_1$1(ctx);
-					if_block1.c();
-					if_block1.m(button, t1);
-				}
-			} else if (if_block1) {
-				if_block1.d(1);
-				if_block1 = null;
-			}
+			if (dirty & /*buttons*/ 2 && t0_value !== (t0_value = /*button*/ ctx[14].label + "")) set_data(t0, t0_value);
 
 			if (dirty & /*buttons*/ 2 && button_class_value !== (button_class_value = "dialog-button " + /*button*/ ctx[14].id)) {
 				attr(button, "class", button_class_value);
@@ -3781,8 +3742,7 @@ function create_each_block$2(key_1, ctx) {
 		},
 		d(detaching) {
 			if (detaching) detach(button);
-			if (if_block0) if_block0.d();
-			if (if_block1) if_block1.d();
+			if (if_block) if_block.d();
 			mounted = false;
 			dispose();
 		}
@@ -3799,7 +3759,7 @@ function create_fragment$6(ctx) {
 	let current;
 	let mounted;
 	let dispose;
-	const if_block_creators = [create_if_block_3, create_if_block_4];
+	const if_block_creators = [create_if_block_2, create_if_block_3];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -3916,6 +3876,8 @@ function create_fragment$6(ctx) {
 		}
 	};
 }
+
+const s_REGEX_ICON = /^\s*<.*>$/;
 
 function instance$6($$self, $$props, $$invalidate) {
 	let { data = {} } = $$props;
@@ -4047,8 +4009,22 @@ function instance$6($$self, $$props, $$invalidate) {
 						(obj, key, index) => {
 							const b = data.buttons[key];
 
-							if (b.condition !== false) {
-								obj.push({ ...b, id: key });
+							// Test any condition supplied otherwise default to true.
+							const condition = typeof b.condition === 'function'
+							? b.condition.call(b)
+							: b.condition ?? true;
+
+							// Handle icon and treat bare strings as the icon class; otherwise assume the icon is fully formed HTML.
+							const icon = typeof b.icon !== 'string'
+							? void 0
+							: s_REGEX_ICON.test(b.icon)
+								? b.icon
+								: `<i class="${b.icon}"></i>`;
+
+							const label = typeof b.label === 'string' ? localize(b.label) : '';
+
+							if (condition) {
+								obj.push({ ...b, icon, label, id: key });
 							}
 
 							return obj;
