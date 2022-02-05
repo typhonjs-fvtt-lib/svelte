@@ -1,4 +1,4 @@
-import { SvelteComponent, init, safe_not_equal, flush, append_styles, empty, insert, group_outros, transition_out, check_outros, transition_in, detach, element, attr, noop, create_component, mount_component, get_spread_update, get_spread_object, destroy_component, destroy_each, assign, create_slot, listen, update_slot_base, get_all_dirty_from_scope, get_slot_changes, add_render_callback, create_in_transition, create_out_transition, binding_callbacks, text, append, stop_propagation, prevent_default, set_data, run_all, space, action_destroyer, is_function, component_subscribe, add_resize_listener, update_keyed_each, destroy_block, toggle_class, HtmlTag, bind, add_flush_callback, select_option, select_value, subscribe, bubble, set_input_value } from 'svelte/internal';
+import { SvelteComponent, init, safe_not_equal, flush, append_styles, empty, insert, group_outros, transition_out, check_outros, transition_in, detach, element, attr, noop, create_component, mount_component, get_spread_update, get_spread_object, destroy_component, destroy_each, assign, create_slot, listen, update_slot_base, get_all_dirty_from_scope, get_slot_changes, add_render_callback, create_in_transition, create_out_transition, binding_callbacks, text, append, stop_propagation, prevent_default, set_data, run_all, space, action_destroyer, is_function, component_subscribe, add_resize_listener, update_keyed_each, destroy_block, toggle_class, HtmlTag, bind, add_flush_callback, select_option, select_value, bubble, set_input_value } from 'svelte/internal';
 import { getContext, setContext } from 'svelte';
 import { s_DEFAULT_TRANSITION, s_DEFAULT_TRANSITION_OPTIONS } from '@typhonjs-fvtt/svelte/transition';
 import { writable } from 'svelte/store';
@@ -3493,7 +3493,7 @@ function get_each_context$2(ctx, list, i) {
 	return child_ctx;
 }
 
-// (178:29) 
+// (188:29) 
 function create_if_block_4(ctx) {
 	let switch_instance;
 	let switch_instance_anchor;
@@ -3576,7 +3576,7 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (176:3) {#if typeof content === 'string'}
+// (186:3) {#if typeof content === 'string'}
 function create_if_block_3(ctx) {
 	let html_tag;
 	let html_anchor;
@@ -3603,7 +3603,7 @@ function create_if_block_3(ctx) {
 	};
 }
 
-// (183:0) {#if buttons.length}
+// (193:0) {#if buttons.length}
 function create_if_block$2(ctx) {
 	let div;
 	let each_blocks = [];
@@ -3650,7 +3650,7 @@ function create_if_block$2(ctx) {
 	};
 }
 
-// (189:6) {#if button.icon}
+// (199:6) {#if button.icon}
 function create_if_block_2(ctx) {
 	let html_tag;
 	let raw_value = /*button*/ ctx[14].icon + "";
@@ -3676,7 +3676,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (190:6) {#if button.label}
+// (200:6) {#if button.label}
 function create_if_block_1$1(ctx) {
 	let html_tag;
 	let raw_value = /*button*/ ctx[14].label + "";
@@ -3702,7 +3702,7 @@ function create_if_block_1$1(ctx) {
 	};
 }
 
-// (185:3) {#each buttons as button (button.id)}
+// (195:3) {#each buttons as button (button.id)}
 function create_each_block$2(key_1, ctx) {
 	let button;
 	let t0;
@@ -3933,15 +3933,26 @@ function instance$6($$self, $$props, $$invalidate) {
 		try {
 			let result = null;
 
-			// Passing back the HTML element is to keep with the existing Foundry API, however second parameter is the
-			// Svelte component instance.
-			if (typeof button.callback === 'function') {
-				result = await button.callback(
-					foundryApp.options.jQuery
-					? foundryApp.element
-					: foundryApp.element[0],
-					dialogInstance
-				);
+			// Accept either callback or onclick as the function / data to invoke.
+			const invoke = button.callback ?? button.onclick;
+
+			switch (typeof invoke) {
+				case 'function':
+					// Passing back the HTML element is to keep with the existing Foundry API, however second parameter is
+					// the Svelte component instance.
+					result = await invoke(
+						foundryApp.options.jQuery
+						? foundryApp.element
+						: foundryApp.element[0],
+						dialogInstance
+					);
+					break;
+				case 'string':
+					// Attempt lookup by function name in dialog instance component.
+					if (dialogInstance !== void 0 && typeof dialogInstance[invoke] === 'function') {
+						result = await dialogInstance[invoke]();
+					}
+					break;
 			}
 
 			// Delay closing to next clock tick to be able to return result.
@@ -5235,7 +5246,7 @@ function create_fragment$3(ctx) {
 	let h4;
 	let t1;
 	let p;
-	let t2_value = localize('SIDEBAR.DeleteWarning', { type: /*type*/ ctx[1] }) + "";
+	let t2_value = localize('SIDEBAR.DeleteWarning', { type: /*type*/ ctx[0] }) + "";
 	let t2;
 
 	return {
@@ -5253,7 +5264,7 @@ function create_fragment$3(ctx) {
 			append(p, t2);
 		},
 		p(ctx, [dirty]) {
-			if (dirty & /*type*/ 2 && t2_value !== (t2_value = localize('SIDEBAR.DeleteWarning', { type: /*type*/ ctx[1] }) + "")) set_data(t2, t2_value);
+			if (dirty & /*type*/ 1 && t2_value !== (t2_value = localize('SIDEBAR.DeleteWarning', { type: /*type*/ ctx[0] }) + "")) set_data(t2, t2_value);
 		},
 		i: noop,
 		o: noop,
@@ -5266,14 +5277,8 @@ function create_fragment$3(ctx) {
 }
 
 function instance$3($$self, $$props, $$invalidate) {
-	let $doc,
-		$$unsubscribe_doc = noop,
-		$$subscribe_doc = () => ($$unsubscribe_doc(), $$unsubscribe_doc = subscribe(doc, $$value => $$invalidate(4, $doc = $$value)), doc);
-
-	$$self.$$.on_destroy.push(() => $$unsubscribe_doc());
+	let $doc;
 	let { document = void 0 } = $$props;
-	let { doc = new TJSDocument() } = $$props;
-	$$subscribe_doc();
 	let { context = {} } = $$props;
 	const { foundryApp } = getContext('external');
 
@@ -5281,17 +5286,25 @@ function instance$3($$self, $$props, $$invalidate) {
 		throw new TypeError(`TJSDocumentDelete error: 'document' is not an instance of Document.`);
 	}
 
-	doc.setOptions({
-		delete: foundryApp.close.bind(foundryApp)
-	});
+	const doc = new TJSDocument(document,
+	{
+			delete: foundryApp.close.bind(foundryApp)
+		});
 
-	doc.set(document);
+	component_subscribe($$self, doc, value => $$invalidate(5, $doc = value));
 	(document?.id) ? document.name : '';
 	let type = localize(document.constructor.metadata.label);
 
+	async function handleClickYes() {
+		// Remove the delete Document function callback as we are intentionally deleting below.
+		doc.setOptions({ delete: void 0 });
+
+		const returnDoc = await document.delete(context);
+		foundryApp.options.resolve?.(returnDoc);
+	}
+
 	$$self.$$set = $$props => {
 		if ('document' in $$props) $$invalidate(2, document = $$props.document);
-		if ('doc' in $$props) $$subscribe_doc($$invalidate(0, doc = $$props.doc));
 		if ('context' in $$props) $$invalidate(3, context = $$props.context);
 	};
 
@@ -5302,7 +5315,7 @@ function instance$3($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*$doc, document, doc, type*/ 23) {
+		if ($$self.$$.dirty & /*$doc, document, type*/ 37) {
 			if ($doc !== document) {
 				if (!(document instanceof foundry.abstract.Document)) {
 					throw new TypeError(`TJSDocumentDelete error: 'document' is not an instance of Document.`);
@@ -5310,19 +5323,24 @@ function instance$3($$self, $$props, $$invalidate) {
 
 				doc.set(document);
 				(document?.id) ? document.name : '';
-				$$invalidate(1, type = localize(document.constructor.metadata.label));
+				$$invalidate(0, type = localize(document.constructor.metadata.label));
 				foundryApp.reactive.title = `${localize('DOCUMENT.Delete', { type })}: ${document.name}`;
 			}
 		}
 	};
 
-	return [doc, type, document, context, $doc];
+	return [type, doc, document, context, handleClickYes, $doc];
 }
 
 class TJSDocumentDelete extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance$3, create_fragment$3, safe_not_equal, { document: 2, doc: 0, context: 3 });
+
+		init(this, options, instance$3, create_fragment$3, safe_not_equal, {
+			document: 2,
+			context: 3,
+			handleClickYes: 4
+		});
 	}
 
 	get document() {
@@ -5334,15 +5352,6 @@ class TJSDocumentDelete extends SvelteComponent {
 		flush();
 	}
 
-	get doc() {
-		return this.$$.ctx[0];
-	}
-
-	set doc(doc) {
-		this.$$set({ doc });
-		flush();
-	}
-
 	get context() {
 		return this.$$.ctx[3];
 	}
@@ -5351,12 +5360,16 @@ class TJSDocumentDelete extends SvelteComponent {
 		this.$$set({ context });
 		flush();
 	}
+
+	get handleClickYes() {
+		return this.$$.ctx[4];
+	}
 }
 
 /* src\component\core\dialog\document\TJSDocumentImport.svelte generated by Svelte v3.46.0 */
 
 function create_fragment$2(ctx) {
-	let form;
+	let form_1;
 	let p0;
 	let t0;
 	let t1;
@@ -5372,12 +5385,12 @@ function create_fragment$2(ctx) {
 
 	return {
 		c() {
-			form = element("form");
+			form_1 = element("form");
 			p0 = element("p");
-			t0 = text(/*hint1*/ ctx[0]);
+			t0 = text(/*hint1*/ ctx[1]);
 			t1 = space();
 			p1 = element("p");
-			t2 = text(/*hint2*/ ctx[1]);
+			t2 = text(/*hint2*/ ctx[2]);
 			t3 = space();
 			div = element("div");
 			label = element("label");
@@ -5390,34 +5403,36 @@ function create_fragment$2(ctx) {
 			attr(input, "type", "file");
 			attr(input, "id", "data");
 			attr(div, "class", "form-group");
-			attr(form, "autocomplete", "off");
+			attr(form_1, "autocomplete", "off");
 		},
 		m(target, anchor) {
-			insert(target, form, anchor);
-			append(form, p0);
+			insert(target, form_1, anchor);
+			append(form_1, p0);
 			append(p0, t0);
-			append(form, t1);
-			append(form, p1);
+			append(form_1, t1);
+			append(form_1, p1);
 			append(p1, t2);
-			append(form, t3);
-			append(form, div);
+			append(form_1, t3);
+			append(form_1, div);
 			append(div, label);
 			append(div, t5);
 			append(div, input);
+			/*form_1_binding*/ ctx[8](form_1);
 
 			if (!mounted) {
-				dispose = listen(form, "submit", prevent_default(/*submit_handler*/ ctx[5]));
+				dispose = listen(form_1, "submit", prevent_default(/*submit_handler*/ ctx[7]));
 				mounted = true;
 			}
 		},
 		p(ctx, [dirty]) {
-			if (dirty & /*hint1*/ 1) set_data(t0, /*hint1*/ ctx[0]);
-			if (dirty & /*hint2*/ 2) set_data(t2, /*hint2*/ ctx[1]);
+			if (dirty & /*hint1*/ 2) set_data(t0, /*hint1*/ ctx[1]);
+			if (dirty & /*hint2*/ 4) set_data(t2, /*hint2*/ ctx[2]);
 		},
 		i: noop,
 		o: noop,
 		d(detaching) {
-			if (detaching) detach(form);
+			if (detaching) detach(form_1);
+			/*form_1_binding*/ ctx[8](null);
 			mounted = false;
 			dispose();
 		}
@@ -5438,49 +5453,81 @@ function instance$2($$self, $$props, $$invalidate) {
 			delete: foundryApp.close.bind(foundryApp)
 		});
 
-	component_subscribe($$self, doc, value => $$invalidate(4, $doc = value));
+	component_subscribe($$self, doc, value => $$invalidate(6, $doc = value));
+	let form;
 	let hint1 = localize('DOCUMENT.ImportDataHint1', { document: document.documentName });
 	let hint2 = localize('DOCUMENT.ImportDataHint2', { name: document.name });
+
+	async function handleImport() {
+		if (!form.data.files.length) {
+			return ui.notifications.error('You did not upload a data file!');
+		}
+
+		const json = await readTextFromFile(form.data.files[0]);
+		const importedDoc = await document.importFromJSON(json);
+		foundryApp.options.resolve?.(importedDoc);
+	}
 
 	function submit_handler(event) {
 		bubble.call(this, $$self, event);
 	}
 
+	function form_1_binding($$value) {
+		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
+			form = $$value;
+			$$invalidate(0, form);
+		});
+	}
+
 	$$self.$$set = $$props => {
-		if ('document' in $$props) $$invalidate(3, document = $$props.document);
+		if ('document' in $$props) $$invalidate(4, document = $$props.document);
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*$doc, document*/ 24) {
+		if ($$self.$$.dirty & /*$doc, document*/ 80) {
 			if ($doc !== document) {
 				if (!(document instanceof foundry.abstract.Document)) {
 					throw new TypeError(`TJSDocumentImport error: 'document' is not an instance of Document.`);
 				}
 
 				doc.set(document);
-				$$invalidate(0, hint1 = localize('DOCUMENT.ImportDataHint1', { document: document.documentName }));
-				$$invalidate(1, hint2 = localize('DOCUMENT.ImportDataHint2', { name: document.name }));
+				$$invalidate(1, hint1 = localize('DOCUMENT.ImportDataHint1', { document: document.documentName }));
+				$$invalidate(2, hint2 = localize('DOCUMENT.ImportDataHint2', { name: document.name }));
 				foundryApp.reactive.title = `${localize('DOCUMENT.ImportData')}: ${document.name}`;
 			}
 		}
 	};
 
-	return [hint1, hint2, doc, document, $doc, submit_handler];
+	return [
+		form,
+		hint1,
+		hint2,
+		doc,
+		document,
+		handleImport,
+		$doc,
+		submit_handler,
+		form_1_binding
+	];
 }
 
 class TJSDocumentImport extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance$2, create_fragment$2, safe_not_equal, { document: 3 });
+		init(this, options, instance$2, create_fragment$2, safe_not_equal, { document: 4, handleImport: 5 });
 	}
 
 	get document() {
-		return this.$$.ctx[3];
+		return this.$$.ctx[4];
 	}
 
 	set document(document) {
 		this.$$set({ document });
 		flush();
+	}
+
+	get handleImport() {
+		return this.$$.ctx[5];
 	}
 }
 
@@ -5789,7 +5836,7 @@ function get_each_context(ctx, list, i) {
 	return child_ctx;
 }
 
-// (159:3) {#each users as data (data.user.id)}
+// (157:3) {#each users as data (data.user.id)}
 function create_each_block(key_1, ctx) {
 	let div;
 	let label;

@@ -42,10 +42,7 @@
     * This reactivity block will trigger on arrow left / right key presses _and_ when buttons change. It is OK for it to
     * trigger on both.
     */
-   $: if (!buttons.find((button) => button.id === currentButtonId))
-   {
-      currentButtonId = void 0;
-   }
+   $: if (!buttons.find((button) => button.id === currentButtonId)) { currentButtonId = void 0; }
 
    $:
    {
@@ -92,12 +89,25 @@
       {
          let result = null;
 
-         // Passing back the HTML element is to keep with the existing Foundry API, however second parameter is the
-         // Svelte component instance.
-         if (typeof button.callback === 'function')
+         // Accept either callback or onclick as the function / data to invoke.
+         const invoke = button.callback ?? button.onclick;
+
+         switch (typeof invoke)
          {
-            result = await button.callback(foundryApp.options.jQuery ? foundryApp.element : foundryApp.element[0],
-             dialogInstance);
+            case 'function':
+               // Passing back the HTML element is to keep with the existing Foundry API, however second parameter is
+               // the Svelte component instance.
+               result = await invoke(foundryApp.options.jQuery ? foundryApp.element : foundryApp.element[0],
+                dialogInstance);
+               break;
+
+            case 'string':
+               // Attempt lookup by function name in dialog instance component.
+               if (dialogInstance !== void 0 && typeof dialogInstance[invoke] === 'function')
+               {
+                  result = await dialogInstance[invoke]();
+               }
+               break;
          }
 
          // Delay closing to next clock tick to be able to return result.

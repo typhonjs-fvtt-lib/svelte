@@ -65,7 +65,6 @@
       }
 
       foundryApp.options.resolve?.(modifiedDoc);
-
       foundryApp.close();
    }
 </script>

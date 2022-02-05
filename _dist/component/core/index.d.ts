@@ -119,15 +119,15 @@ declare class TJSDocumentDelete extends SvelteComponent {
     constructor(options: any);
     set document(arg: any);
     get document(): any;
-    set doc(arg: any);
-    get doc(): any;
     set context(arg: any);
     get context(): any;
+    get handleClickYes(): any;
 }
 declare class TJSDocumentImport extends SvelteComponent {
     constructor(options: any);
     set document(arg: any);
     get document(): any;
+    get handleImport(): any;
 }
 declare class TJSFolderDialog extends SvelteComponent {
     constructor(options: any);

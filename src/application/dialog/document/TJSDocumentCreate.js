@@ -27,7 +27,7 @@ export class TJSDocumentCreate extends TJSDialog
             }
          },
          title: localize('DOCUMENT.Create', { type: localize(documentCls?.metadata?.label) }),
-         close: () => options?.resolve?.(null)
+         close: () => this.options?.resolve?.(null)
       }, { width: 320, ...options });
    }
 }

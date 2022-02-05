@@ -16,6 +16,8 @@
 
    const doc = new TJSDocument(document, { delete: foundryApp.close.bind(foundryApp) });
 
+   let form;
+
    let hint1 = localize('DOCUMENT.ImportDataHint1', { document: document.documentName });
    let hint2 = localize('DOCUMENT.ImportDataHint2', { name: document.name });
 
@@ -33,11 +35,21 @@
 
       foundryApp.reactive.title = `${localize('DOCUMENT.ImportData')}: ${document.name}`;
    }
+
+   export async function handleImport()
+   {
+      if (!form.data.files.length) { return ui.notifications.error('You did not upload a data file!'); }
+
+      const json = await readTextFromFile(form.data.files[0]);
+      const importedDoc = await document.importFromJSON(json);
+
+      foundryApp.options.resolve?.(importedDoc);
+   }
 </script>
 
 <svelte:options accessors={true}/>
 
-<form on:submit|preventDefault autocomplete=off>
+<form bind:this={form} on:submit|preventDefault autocomplete=off>
     <p class=notes>{hint1}</p>
     <p class=notes>{hint2}</p>
     <div class=form-group>

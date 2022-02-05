@@ -30,7 +30,7 @@ export class TJSFolderDialog extends TJSDialog
             props: { document }
          },
          title: document.id ? `${localize('FOLDER.Update')}: ${document.name}` : localize('FOLDER.Create'),
-         close: () => options?.resolve?.(null)
+         close: () => this.options?.resolve?.(null)
       }, { width: 320, ...options });
 
       /**

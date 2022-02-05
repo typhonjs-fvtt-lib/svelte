@@ -31,7 +31,7 @@ export class TJSPermissionControl extends TJSDialog
             props: { document }
          },
          title: `${localize('PERMISSION.Title')}: ${document.name}`,
-         close: () => options?.resolve?.(null)
+         close: () => this.options?.resolve?.(null)
       }, { width: 320, ...options });
 
       /**

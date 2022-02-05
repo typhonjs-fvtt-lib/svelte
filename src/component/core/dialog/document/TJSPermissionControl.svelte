@@ -130,7 +130,6 @@
          await cls.updateDocuments(updates, { diff: false, recursive: false, noHook: true });
 
          foundryApp.options.resolve?.($doc);
-
          foundryApp.close();
       }
 
@@ -138,7 +137,6 @@
       await $doc.update({ permission: perms }, { diff: false, recursive: false, noHook: true });
 
       foundryApp.options.resolve?.($doc);
-
       foundryApp.close();
    }
 </script>

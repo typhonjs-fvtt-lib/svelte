@@ -35,33 +35,20 @@ export class TJSDocumentDelete extends TJSDialog
          },
          title: `${localize('DOCUMENT.Delete', { type: localize(document.constructor.metadata.label) })}: ${
           document.name}`,
-         close: () => options?.resolve?.(null),
          default: 'yes',
          buttons: {
             yes: {
                icon: '<i class="fas fa-check"></i>',
                label: localize('Yes'),
-               callback: async (html, dialogComponent) =>
-               {
-                  // Remove the delete Document function callback as we are intentionally deleting below.
-                  dialogComponent.doc.setOptions({ delete: void 0 });
-
-                  const returnDoc = await dialogComponent.document.delete(context);
-
-                  this.options.resolve?.(returnDoc);
-                  await this.close();
-               }
+               onclick: 'handleClickYes'
             },
             no: {
                icon: '<i class="fas fa-times"></i>',
                label: localize('No'),
-               callback: async () =>
-               {
-                  this.options.resolve?.(false);
-                  await this.close();
-               }
+               onclick: () => this.options.resolve?.(false)
             }
-         }
+         },
+         close: () => this.options?.resolve?.(null)
       }, { width: 320, ...options });
 
       /**

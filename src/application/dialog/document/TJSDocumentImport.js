@@ -34,22 +34,12 @@ export class TJSDocumentImport extends TJSDialog
             import: {
                icon: '<i class="fas fa-file-import"></i>',
                label: 'Import',
-               callback: async (html) =>
-               {
-                  const form = html.querySelector('form');
-
-                  if (!form.data.files.length) { return ui.notifications.error('You did not upload a data file!'); }
-
-                  const json = await readTextFromFile(form.data.files[0]);
-                  const importedDoc = await this.reactive.document.importFromJSON(json);
-
-                  this.options.resolve?.(importedDoc);
-               }
+               onclick: 'handleImport'
             },
             no: {
                icon: '<i class="fas fa-times"></i>',
                label: 'Cancel',
-               callback: () => this.options.resolve?.(false)
+               onclick: () => this.options.resolve?.(false)
             }
          },
          default: 'import',
