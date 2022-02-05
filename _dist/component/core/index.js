@@ -4,7 +4,7 @@ import { s_DEFAULT_TRANSITION, s_DEFAULT_TRANSITION_OPTIONS } from '@typhonjs-fv
 import { writable } from 'svelte/store';
 import { draggable, applyStyles } from '@typhonjs-fvtt/svelte/action';
 import { localize, selectOptions, radioBoxes } from '@typhonjs-fvtt/svelte/helper';
-import { isSvelteComponent, parseSvelteConfig, isObject } from '@typhonjs-fvtt/svelte/util';
+import { isObject, isSvelteComponent, parseSvelteConfig } from '@typhonjs-fvtt/svelte/util';
 import { fade } from 'svelte/transition';
 import { TJSDocument } from '@typhonjs-fvtt/svelte/store';
 
@@ -3493,7 +3493,7 @@ function get_each_context$2(ctx, list, i) {
 	return child_ctx;
 }
 
-// (204:29) 
+// (197:29) 
 function create_if_block_3(ctx) {
 	let switch_instance;
 	let switch_instance_anchor;
@@ -3576,7 +3576,7 @@ function create_if_block_3(ctx) {
 	};
 }
 
-// (202:3) {#if typeof content === 'string'}
+// (195:3) {#if typeof content === 'string'}
 function create_if_block_2(ctx) {
 	let html_tag;
 	let html_anchor;
@@ -3603,7 +3603,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (209:0) {#if buttons.length}
+// (202:0) {#if buttons.length}
 function create_if_block$2(ctx) {
 	let div;
 	let each_blocks = [];
@@ -3650,7 +3650,7 @@ function create_if_block$2(ctx) {
 	};
 }
 
-// (215:6) {#if button.icon}
+// (208:6) {#if button.icon}
 function create_if_block_1$1(ctx) {
 	let html_tag;
 	let raw_value = /*button*/ ctx[14].icon + "";
@@ -3676,7 +3676,7 @@ function create_if_block_1$1(ctx) {
 	};
 }
 
-// (211:3) {#each buttons as button (button.id)}
+// (204:3) {#each buttons as button (button.id)}
 function create_each_block$2(key_1, ctx) {
 	let button;
 	let t0_value = /*button*/ ctx[14].label + "";
@@ -4003,10 +4003,10 @@ function instance$6($$self, $$props, $$invalidate) {
 		if ($$self.$$.dirty & /*data*/ 256) {
 			// If `data.buttons` is not an object then set an empty array otherwise reduce the button data.
 			{
-				$$invalidate(1, buttons = typeof data.buttons !== 'object'
+				$$invalidate(1, buttons = !isObject(data.buttons)
 				? []
 				: Object.keys(data.buttons).reduce(
-						(obj, key, index) => {
+						(array, key) => {
 							const b = data.buttons[key];
 
 							// Test any condition supplied otherwise default to true.
@@ -4024,10 +4024,10 @@ function instance$6($$self, $$props, $$invalidate) {
 							const label = typeof b.label === 'string' ? localize(b.label) : '';
 
 							if (condition) {
-								obj.push({ ...b, icon, label, id: key });
+								array.push({ id: key, icon, label });
 							}
 
-							return obj;
+							return array;
 						},
 						[]
 					));

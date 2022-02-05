@@ -28,7 +28,7 @@
    // If `data.buttons` is not an object then set an empty array otherwise reduce the button data.
    $:
    {
-      buttons = typeof data.buttons !== 'object' ? [] : Object.keys(data.buttons).reduce((obj, key, index) =>
+      buttons = !isObject(data.buttons) ? [] : Object.keys(data.buttons).reduce((array, key) =>
       {
          const b = data.buttons[key];
 
@@ -41,16 +41,9 @@
 
          const label = typeof b.label === 'string' ? localize(b.label) : '';
 
-         if (condition)
-         {
-            obj.push({
-               ...b,
-               icon,
-               label,
-               id: key,
-            })
-         }
-         return obj;
+         if (condition) { array.push({ id: key, icon, label }); }
+
+         return array;
       }, []);
    }
 
