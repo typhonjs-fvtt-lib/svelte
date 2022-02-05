@@ -32,14 +32,14 @@
       {
          const b = data.buttons[key];
 
-         // Test any condition supplied otherwise default to true.
-         const condition = typeof b.condition === 'function' ? b.condition.call(b) : b.condition ?? true;
-
          // Handle icon and treat bare strings as the icon class; otherwise assume the icon is fully formed HTML.
          const icon = typeof b.icon !== 'string' ? void 0 : s_REGEX_ICON.test(b.icon) ? b.icon :
           `<i class="${b.icon}"></i>`;
 
          const label = typeof b.label === 'string' ? localize(b.label) : '';
+
+         // Test any condition supplied otherwise default to true.
+         const condition = typeof b.condition === 'function' ? b.condition.call(b) : b.condition ?? true;
 
          if (condition) { array.push({ id: key, icon, label }); }
 
