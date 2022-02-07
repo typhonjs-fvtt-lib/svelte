@@ -77,9 +77,9 @@ export class TJSDocumentDialog
    }
 
    /**
-    * Create a new Folder by rendering a dialog window to provide basic creation details
+    * Create a new Folder by rendering a dialog window to provide basic creation details.
     *
-    * @param {object} folderData - Initial data with which to populate the creation form
+    * @param {object} folderData - Initial data with which to populate the creation form.
     *
     * @param {object} [options] - Options to pass to TJSDialog / Application.
     *
@@ -139,6 +139,32 @@ export class TJSDocumentDialog
       {
          options.resolve = resolve;
          new TJSDocumentDelete(document, { context, ...options }, dialogData).render(true, { focus: true });
+      });
+   }
+
+   /**
+    * Edits an existing Folder by rendering a dialog window to provide basic details.
+    *
+    * @param {Folder} folder - The folder to edit.
+    *
+    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    *
+    * @param {object} [dialogData] - Optional data to modify dialog.
+    *
+    * @returns {Promise<Folder|null>} The modified Folder or null if the dialog is closed.
+    */
+   static async editFolder(folder, options = {}, dialogData = {})
+   {
+      if (!(folder instanceof Folder))
+      {
+         console.warn(`TJSDocumentDialog editFolder warning: 'folder' is not a Folder.`);
+         return null;
+      }
+
+      return new Promise((resolve) =>
+      {
+         options.resolve = resolve;
+         new TJSFolderDialog(folder, options, dialogData).render(true, { focus: true });
       });
    }
 
