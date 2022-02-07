@@ -3508,7 +3508,7 @@ function get_each_context$2(ctx, list, i) {
 	return child_ctx;
 }
 
-// (197:29) 
+// (198:29) 
 function create_if_block_3(ctx) {
 	let switch_instance;
 	let switch_instance_anchor;
@@ -3591,7 +3591,7 @@ function create_if_block_3(ctx) {
 	};
 }
 
-// (195:3) {#if typeof content === 'string'}
+// (196:3) {#if typeof content === 'string'}
 function create_if_block_2(ctx) {
 	let html_tag;
 	let html_anchor;
@@ -3618,7 +3618,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (202:0) {#if buttons.length}
+// (203:0) {#if buttons.length}
 function create_if_block$2(ctx) {
 	let div;
 	let each_blocks = [];
@@ -3665,7 +3665,7 @@ function create_if_block$2(ctx) {
 	};
 }
 
-// (208:6) {#if button.icon}
+// (209:6) {#if button.icon}
 function create_if_block_1$1(ctx) {
 	let html_tag;
 	let raw_value = /*button*/ ctx[14].icon + "";
@@ -3691,7 +3691,7 @@ function create_if_block_1$1(ctx) {
 	};
 }
 
-// (204:3) {#each buttons as button (button.id)}
+// (205:3) {#each buttons as button (button.id)}
 function create_each_block$2(key_1, ctx) {
 	let button;
 	let t0_value = /*button*/ ctx[14].label + "";
@@ -3927,7 +3927,12 @@ function instance$6($$self, $$props, $$invalidate) {
 				case 'string':
 					// Attempt lookup by function name in dialog instance component.
 					if (dialogInstance !== void 0 && typeof dialogInstance[invoke] === 'function') {
-						result = await dialogInstance[invoke]();
+						result = await dialogInstance[invoke](
+							foundryApp.options.jQuery
+							? foundryApp.element
+							: foundryApp.element[0],
+							dialogInstance
+						);
 					}
 					break;
 			}
@@ -4039,7 +4044,7 @@ function instance$6($$self, $$props, $$invalidate) {
 							: b.condition ?? true;
 
 							if (condition) {
-								array.push({ id: key, icon, label });
+								array.push({ ...b, id: key, icon, label });
 							}
 
 							return array;

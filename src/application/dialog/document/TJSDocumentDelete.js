@@ -49,7 +49,7 @@ export class TJSDocumentDelete extends TJSDialog
             }
          },
          close: () => this.options?.resolve?.(null)
-      }, { width: 320, ...options });
+      }, options);
 
       /**
        * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with

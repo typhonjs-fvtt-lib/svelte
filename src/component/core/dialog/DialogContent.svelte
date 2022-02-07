@@ -41,7 +41,7 @@
          // Test any condition supplied otherwise default to true.
          const condition = typeof b.condition === 'function' ? b.condition.call(b) : b.condition ?? true;
 
-         if (condition) { array.push({ id: key, icon, label }); }
+         if (condition) { array.push({ ...b, id: key, icon, label }); }
 
          return array;
       }, []);
@@ -114,7 +114,8 @@
                // Attempt lookup by function name in dialog instance component.
                if (dialogInstance !== void 0 && typeof dialogInstance[invoke] === 'function')
                {
-                  result = await dialogInstance[invoke]();
+                  result = await dialogInstance[invoke](foundryApp.options.jQuery ? foundryApp.element :
+                   foundryApp.element[0], dialogInstance);
                }
                break;
          }
