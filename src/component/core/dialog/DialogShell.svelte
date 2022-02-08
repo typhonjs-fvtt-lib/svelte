@@ -56,6 +56,9 @@
 
    let zIndex = void 0;
 
+   // Automatically close the dialog on button click handler completion.
+   let autoClose = true;
+
    // Only set modal once on mount. You can't change between a modal an non-modal dialog during runtime.
    if (modal === void 0) { modal = typeof data?.modal === 'boolean' ? data.modal : false; }
 
@@ -68,6 +71,8 @@
 
    $: if (typeof data === 'object')
    {
+      autoClose = typeof data.autoClose === 'boolean' ? data.autoClose : true;
+
       const newZIndex = Number.isInteger(data.zIndex) || data.zIndex === null ? data.zIndex :
        modal ? Number.MAX_SAFE_INTEGER : Number.MAX_SAFE_INTEGER - 1
       if (zIndex !== newZIndex) { zIndex = newZIndex; }
@@ -174,11 +179,11 @@
 {#if modal}
    <TJSGlassPane id={`${foundryApp.id}-glasspane`} preventDefault={false} stopPropagation={false} {...modalProps} {zIndex}>
       <ApplicationShell bind:elementRoot {...appProps}>
-         <DialogContent bind:dialogInstance={dialogComponent} stopPropagation={true} {data} />
+         <DialogContent bind:autoClose bind:dialogInstance={dialogComponent} stopPropagation={true} {data} />
       </ApplicationShell>
    </TJSGlassPane>
 {:else}
    <ApplicationShell bind:elementRoot {...appProps}>
-      <DialogContent bind:dialogInstance={dialogComponent} {data} />
+      <DialogContent bind:autoClose bind:dialogInstance={dialogComponent} {data} />
    </ApplicationShell>
 {/if}

@@ -9,6 +9,7 @@
       parseSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
 
    export let data = {};
+   export let autoClose = true;
    export let preventDefault = false;
    export let stopPropagation = false;
 
@@ -121,7 +122,7 @@
          }
 
          // Delay closing to next clock tick to be able to return result.
-         setTimeout(() => foundryApp.close(), 0);
+         if (autoClose) { setTimeout(() => foundryApp.close(), 0); }
 
          return result;
       }
