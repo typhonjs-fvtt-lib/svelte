@@ -31,8 +31,17 @@ export class TJSPermissionControl extends TJSDialog
             props: { document }
          },
          title: `${localize('PERMISSION.Title')}: ${document.name}`,
+         buttons: {
+            save: {
+               icon: 'far fa-save',
+               label: 'Save Changes',
+               onclick: 'requestSubmit'
+            }
+         },
+         default: 'save',
+         autoClose: false,
          close: () => this.options?.resolve?.(null)
-      }, { width: 320, ...options });
+      }, options);
 
       /**
        * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with

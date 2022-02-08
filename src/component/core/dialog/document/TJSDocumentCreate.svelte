@@ -13,7 +13,8 @@
 
    const { foundryApp } = getContext('external');
 
-   let name, folderSelect, folders, hasTypes, type, types, title;
+   let form;
+   let name, folderSelect, folders, hasTypes, type, types;
 
    if (!Object.prototype.isPrototypeOf.call(foundry.abstract.Document, documentCls))
    {
@@ -23,7 +24,6 @@
    // Collect data
    const documentName = documentCls.metadata.name;
    const label = localize(documentCls.metadata.label);
-   title = localize('DOCUMENT.Create', { type: label });
 
    folderSelect = data.folder || '';
    folders = parent ? [] : game.folders.filter((f) => (f.data.type === documentName) && f.displayed);
@@ -40,6 +40,11 @@
       obj[t] = game.i18n.has(typeLabel) ? localize(typeLabel) : t;
       return obj;
    }, {});
+
+   export function requestSubmit()
+   {
+      form.requestSubmit();
+   }
 
    /**
     * Creates a new document from the form data.
@@ -58,14 +63,13 @@
       const document = await documentCls.create(data, { parent, pack, renderSheet });
 
       foundryApp.options.resolve?.(document);
-
       foundryApp.close();
    }
 </script>
 
 <svelte:options accessors={true}/>
 
-<form on:submit|preventDefault={saveData} id="document-create" autocomplete="off">
+<form bind:this={form} on:submit|preventDefault={saveData} id="document-create" autocomplete="off">
    <div class="form-group">
       <label>{localize('Name')}</label>
       <div class="form-fields">
@@ -97,7 +101,4 @@
          </div>
       </div>
    {/if}
-   <button type=submit>
-      <i class="fas fa-check"></i> {title}
-   </button>
 </form>

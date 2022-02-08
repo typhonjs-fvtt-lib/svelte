@@ -9,6 +9,8 @@
 
    export let document = void 0;
 
+   const s_REGEX_HEX_COLOR = /^#(?:[0-9a-fA-F]{3}){1,2}$/;
+
    const { foundryApp } = getContext('external');
 
    if (!(document instanceof Folder))
@@ -20,9 +22,12 @@
    const newName = localize('DOCUMENT.New', { type: localize(Folder.metadata.label) });
    const sortingModes = { a: 'FOLDER.SortAlphabetical', m: 'FOLDER.SortManual' };
 
+   let form;
+
    let name = document?.id ? document.name : '';
-   let safeColor = document?.data?.color ?? '#000000';
-   let submitText = localize(document?.id ? 'FOLDER.Update' : 'FOLDER.Create');
+   let color = document?.data?.color;
+
+   let colorText = '';
 
    $: if ($doc !== document)
    {
@@ -34,11 +39,33 @@
       doc.set(document);
 
       name = document?.id ? document.name : '';
-      safeColor = document?.data?.color ?? '#000000';
-      submitText = localize(document?.id ? 'FOLDER.Update' : 'FOLDER.Create');
+      color = document?.data?.color;
 
-      foundryApp.reactive.title = document?.id ? `${localize('FOLDER.Update')}: ${document.name}` :
-       localize('FOLDER.Create');
+      // Update the button label.
+      foundryApp.mergeDialogData({
+         buttons: {
+            submit: {
+               label: localize(document?.id ? 'FOLDER.Update' : 'FOLDER.Create')
+            }
+         },
+         title: document?.id ? `${localize('FOLDER.Update')}: ${document.name}` : localize('FOLDER.Create')
+      });
+   }
+
+   // Reactive block to test color and if it is not a valid hex color then reset colorText and set color to black.
+   $: if (s_REGEX_HEX_COLOR.test(color))
+   {
+      colorText = color;
+   }
+   else
+   {
+      colorText = null;
+      color = '#000000'
+   }
+
+   export function requestSubmit()
+   {
+      form.requestSubmit();
    }
 
    /**
@@ -71,7 +98,7 @@
 
 <svelte:options accessors={true}/>
 
-<form on:submit|preventDefault={saveData} id=folder-create autocomplete=off>
+<form bind:this={form} on:submit|preventDefault={saveData} id=folder-create autocomplete=off>
    <input type=hidden name=type value={document.data.type}/>
    <input type=hidden name=parent value={document.data.parent}/>
 
@@ -85,8 +112,9 @@
    <div class=form-group>
       <label>{localize('FOLDER.Color')}</label>
       <div class=form-fields>
-         <input type=text name=color bind:value={safeColor} readonly />
-         <input type=color bind:value={safeColor} data-edit=color />
+         <input type=text name=color bind:value={colorText} readonly />
+         <input type=color bind:value={color} data-edit=color />
+         <button type=button on:click={() => color = null}><i class="fas fa-trash-restore"></i></button>
       </div>
    </div>
 
@@ -96,7 +124,4 @@
          {@html radioBoxes('sorting', sortingModes, { checked: document.data.sorting, localize: true })}
       </div>
    </div>
-   <button type=submit>
-      <i class="fas fa-check"></i> {submitText}
-   </button>
 </form>

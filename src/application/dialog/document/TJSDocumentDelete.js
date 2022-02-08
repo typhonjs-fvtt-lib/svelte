@@ -38,12 +38,12 @@ export class TJSDocumentDelete extends TJSDialog
          default: 'yes',
          buttons: {
             yes: {
-               icon: '<i class="fas fa-check"></i>',
+               icon: 'fas fa-check',
                label: localize('Yes'),
                onclick: 'handleClickYes'
             },
             no: {
-               icon: '<i class="fas fa-times"></i>',
+               icon: 'fas fa-times',
                label: localize('No'),
                onclick: () => this.options.resolve?.(false)
             }

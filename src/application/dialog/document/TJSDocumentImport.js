@@ -32,17 +32,22 @@ export class TJSDocumentImport extends TJSDialog
          },
          buttons: {
             import: {
-               icon: '<i class="fas fa-file-import"></i>',
+               icon: 'fas fa-file-import',
                label: 'Import',
-               onclick: 'handleImport'
+               onclick: 'requestSubmit'
             },
             no: {
-               icon: '<i class="fas fa-times"></i>',
+               icon: 'fas fa-times',
                label: 'Cancel',
-               onclick: () => this.options.resolve?.(false)
+               onclick: () =>
+               {
+                  this.options.resolve?.(false);
+                  this.close();
+               }
             }
          },
          default: 'import',
+         autoClose: false, // Don't automatically close on button onclick.
          close: () => this.options.resolve?.(null)
       }, { width: 400, ...options });
 

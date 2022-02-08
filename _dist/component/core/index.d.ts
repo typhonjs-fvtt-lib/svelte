@@ -114,6 +114,7 @@ declare class TJSDocumentCreate extends SvelteComponent {
     get pack(): any;
     set renderSheet(arg: any);
     get renderSheet(): any;
+    get requestSubmit(): any;
 }
 declare class TJSDocumentDelete extends SvelteComponent {
     constructor(options: any);
@@ -127,12 +128,13 @@ declare class TJSDocumentImport extends SvelteComponent {
     constructor(options: any);
     set document(arg: any);
     get document(): any;
-    get handleImport(): any;
+    get requestSubmit(): any;
 }
 declare class TJSFolderDialog extends SvelteComponent {
     constructor(options: any);
     set document(arg: any);
     get document(): any;
+    get requestSubmit(): any;
 }
 declare class TJSGlassPane extends SvelteComponent {
     constructor(options: any);
@@ -170,6 +172,7 @@ declare class TJSPermissionControl extends SvelteComponent {
     constructor(options: any);
     set document(arg: any);
     get document(): any;
+    get requestSubmit(): any;
 }
 
 export { ApplicationShell, DialogContent, DialogShell, EmptyApplicationShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSDocumentCreate, TJSDocumentDelete, TJSDocumentImport, TJSFolderDialog, TJSGlassPane, TJSHeaderButton, TJSPermissionControl };

@@ -13,17 +13,23 @@
 
    const doc = new TJSDocument(document, { delete: foundryApp.close.bind(foundryApp) });
 
+   let form;
    let currentDefault, defaultLevels, playerLevels, users;
    let isFolder, instructions;
 
    $: if ($doc !== document)
    {
+      if (!(document instanceof foundry.abstract.Document))
+      {
+         throw new TypeError(`TJSPermissionControl error: 'document' is not an instance of Document.`);
+      }
+
       doc.set(document);
 
       const title = localize('PERMISSION.Title');
 
-      foundryApp.reactive.title = document instanceof foundry.abstract.Document ? `${title}: ${document.name}` :
-       `${title}: No document assigned`;
+      foundryApp.setDialogData('title', document instanceof foundry.abstract.Document ? `${title}: ${document.name}` :
+       `${title}: No document assigned`);
    }
 
    $: {
@@ -37,16 +43,6 @@
     */
    function getData()
    {
-      if (!($doc instanceof foundry.abstract.Document))
-      {
-         return {
-            currentDefault: '',
-            defaultLevels: [],
-            playerLevels: [],
-            users: []
-         };
-      }
-
       // User permission levels
       const playerLevels = {};
       if (isFolder)
@@ -87,6 +83,11 @@
          playerLevels,
          users
       };
+   }
+
+   export function requestSubmit()
+   {
+      form.requestSubmit();
    }
 
    /**
@@ -143,7 +144,7 @@
 
 <svelte:options accessors={true}/>
 
-<form on:submit|preventDefault={saveData} id=permission-control>
+<form bind:this={form} on:submit|preventDefault={saveData} id=permission-control>
    <p class=notes>{instructions}</p>
 
    <div class=form-group>
@@ -162,8 +163,4 @@
             </select>
         </div>
     {/each}
-
-   <button type=submit>
-      <i class="far fa-save"></i> {localize('Save Changes')}
-   </button>
 </form>

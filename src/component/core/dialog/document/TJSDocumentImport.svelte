@@ -33,27 +33,34 @@
       hint1 = localize('DOCUMENT.ImportDataHint1', { document: document.documentName });
       hint2 = localize('DOCUMENT.ImportDataHint2', { name: document.name });
 
-      foundryApp.reactive.title = `${localize('DOCUMENT.ImportData')}: ${document.name}`;
+      foundryApp.setDialogData('title', `${localize('DOCUMENT.ImportData')}: ${document.name}`);
    }
 
-   export async function handleImport()
+   async function handleImport()
    {
       if (!form.data.files.length) { return ui.notifications.error('You did not upload a data file!'); }
 
       const json = await readTextFromFile(form.data.files[0]);
+
       const importedDoc = await document.importFromJSON(json);
 
       foundryApp.options.resolve?.(importedDoc);
+      foundryApp.close();
+   }
+
+   export function requestSubmit()
+   {
+      form.requestSubmit();
    }
 </script>
 
 <svelte:options accessors={true}/>
 
-<form bind:this={form} on:submit|preventDefault autocomplete=off>
+<form bind:this={form} on:submit|preventDefault={handleImport} autocomplete=off>
     <p class=notes>{hint1}</p>
     <p class=notes>{hint2}</p>
     <div class=form-group>
         <label for=data>{localize('DOCUMENT.ImportSource')}</label>
-        <input type=file id="data"/>
+        <input type=file id=data required />
     </div>
 </form>

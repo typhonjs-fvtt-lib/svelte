@@ -1,4 +1,4 @@
-import { SvelteComponent, init, safe_not_equal, flush, append_styles, empty, insert, group_outros, transition_out, check_outros, transition_in, detach, element, attr, noop, create_component, mount_component, get_spread_update, get_spread_object, destroy_component, destroy_each, assign, create_slot, listen, update_slot_base, get_all_dirty_from_scope, get_slot_changes, add_render_callback, create_in_transition, create_out_transition, binding_callbacks, HtmlTag, text, append, stop_propagation, prevent_default, set_data, run_all, space, action_destroyer, is_function, component_subscribe, add_resize_listener, update_keyed_each, destroy_block, toggle_class, bind, add_flush_callback, select_option, select_value, bubble, set_input_value } from 'svelte/internal';
+import { SvelteComponent, init, safe_not_equal, flush, append_styles, empty, insert, group_outros, transition_out, check_outros, transition_in, detach, element, attr, noop, create_component, mount_component, get_spread_update, get_spread_object, destroy_component, destroy_each, assign, create_slot, listen, update_slot_base, get_all_dirty_from_scope, get_slot_changes, add_render_callback, create_in_transition, create_out_transition, binding_callbacks, HtmlTag, text, append, stop_propagation, prevent_default, set_data, run_all, space, action_destroyer, is_function, component_subscribe, add_resize_listener, update_keyed_each, destroy_block, toggle_class, bind, add_flush_callback, select_option, select_value, set_input_value } from 'svelte/internal';
 import { getContext, setContext } from 'svelte';
 import { s_DEFAULT_TRANSITION, s_DEFAULT_TRANSITION_OPTIONS } from '@typhonjs-fvtt/svelte/transition';
 import { writable } from 'svelte/store';
@@ -3504,11 +3504,11 @@ function add_css(target) {
 
 function get_each_context$2(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[14] = list[i];
+	child_ctx[15] = list[i];
 	return child_ctx;
 }
 
-// (198:29) 
+// (199:29) 
 function create_if_block_3(ctx) {
 	let switch_instance;
 	let switch_instance_anchor;
@@ -3528,7 +3528,7 @@ function create_if_block_3(ctx) {
 
 	if (switch_value) {
 		switch_instance = new switch_value(switch_props());
-		/*switch_instance_binding*/ ctx[11](switch_instance);
+		/*switch_instance_binding*/ ctx[12](switch_instance);
 	}
 
 	return {
@@ -3563,7 +3563,7 @@ function create_if_block_3(ctx) {
 
 				if (switch_value) {
 					switch_instance = new switch_value(switch_props());
-					/*switch_instance_binding*/ ctx[11](switch_instance);
+					/*switch_instance_binding*/ ctx[12](switch_instance);
 					create_component(switch_instance.$$.fragment);
 					transition_in(switch_instance.$$.fragment, 1);
 					mount_component(switch_instance, switch_instance_anchor.parentNode, switch_instance_anchor);
@@ -3584,14 +3584,14 @@ function create_if_block_3(ctx) {
 			current = false;
 		},
 		d(detaching) {
-			/*switch_instance_binding*/ ctx[11](null);
+			/*switch_instance_binding*/ ctx[12](null);
 			if (detaching) detach(switch_instance_anchor);
 			if (switch_instance) destroy_component(switch_instance, detaching);
 		}
 	};
 }
 
-// (196:3) {#if typeof content === 'string'}
+// (197:3) {#if typeof content === 'string'}
 function create_if_block_2(ctx) {
 	let html_tag;
 	let html_anchor;
@@ -3618,13 +3618,13 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (203:0) {#if buttons.length}
+// (204:0) {#if buttons.length}
 function create_if_block$2(ctx) {
 	let div;
 	let each_blocks = [];
 	let each_1_lookup = new Map();
 	let each_value = /*buttons*/ ctx[1];
-	const get_key = ctx => /*button*/ ctx[14].id;
+	const get_key = ctx => /*button*/ ctx[15].id;
 
 	for (let i = 0; i < each_value.length; i += 1) {
 		let child_ctx = get_each_context$2(ctx, each_value, i);
@@ -3665,10 +3665,10 @@ function create_if_block$2(ctx) {
 	};
 }
 
-// (209:6) {#if button.icon}
+// (210:6) {#if button.icon}
 function create_if_block_1$1(ctx) {
 	let html_tag;
-	let raw_value = /*button*/ ctx[14].icon + "";
+	let raw_value = /*button*/ ctx[15].icon + "";
 	let html_anchor;
 
 	return {
@@ -3682,7 +3682,7 @@ function create_if_block_1$1(ctx) {
 			insert(target, html_anchor, anchor);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*buttons*/ 2 && raw_value !== (raw_value = /*button*/ ctx[14].icon + "")) html_tag.p(raw_value);
+			if (dirty & /*buttons*/ 2 && raw_value !== (raw_value = /*button*/ ctx[15].icon + "")) html_tag.p(raw_value);
 		},
 		d(detaching) {
 			if (detaching) detach(html_anchor);
@@ -3691,19 +3691,19 @@ function create_if_block_1$1(ctx) {
 	};
 }
 
-// (205:3) {#each buttons as button (button.id)}
+// (206:3) {#each buttons as button (button.id)}
 function create_each_block$2(key_1, ctx) {
 	let button;
-	let t0_value = /*button*/ ctx[14].label + "";
+	let t0_value = /*button*/ ctx[15].label + "";
 	let t0;
 	let t1;
 	let button_class_value;
 	let mounted;
 	let dispose;
-	let if_block = /*button*/ ctx[14].icon && create_if_block_1$1(ctx);
+	let if_block = /*button*/ ctx[15].icon && create_if_block_1$1(ctx);
 
 	function click_handler() {
-		return /*click_handler*/ ctx[12](/*button*/ ctx[14]);
+		return /*click_handler*/ ctx[13](/*button*/ ctx[15]);
 	}
 
 	return {
@@ -3714,8 +3714,8 @@ function create_each_block$2(key_1, ctx) {
 			if (if_block) if_block.c();
 			t0 = text(t0_value);
 			t1 = space();
-			attr(button, "class", button_class_value = "dialog-button " + /*button*/ ctx[14].id);
-			toggle_class(button, "default", /*button*/ ctx[14].id === /*currentButtonId*/ ctx[3]);
+			attr(button, "class", button_class_value = "dialog-button " + /*button*/ ctx[15].id);
+			toggle_class(button, "default", /*button*/ ctx[15].id === /*currentButtonId*/ ctx[3]);
 			this.first = button;
 		},
 		m(target, anchor) {
@@ -3732,7 +3732,7 @@ function create_each_block$2(key_1, ctx) {
 		p(new_ctx, dirty) {
 			ctx = new_ctx;
 
-			if (/*button*/ ctx[14].icon) {
+			if (/*button*/ ctx[15].icon) {
 				if (if_block) {
 					if_block.p(ctx, dirty);
 				} else {
@@ -3745,14 +3745,14 @@ function create_each_block$2(key_1, ctx) {
 				if_block = null;
 			}
 
-			if (dirty & /*buttons*/ 2 && t0_value !== (t0_value = /*button*/ ctx[14].label + "")) set_data(t0, t0_value);
+			if (dirty & /*buttons*/ 2 && t0_value !== (t0_value = /*button*/ ctx[15].label + "")) set_data(t0, t0_value);
 
-			if (dirty & /*buttons*/ 2 && button_class_value !== (button_class_value = "dialog-button " + /*button*/ ctx[14].id)) {
+			if (dirty & /*buttons*/ 2 && button_class_value !== (button_class_value = "dialog-button " + /*button*/ ctx[15].id)) {
 				attr(button, "class", button_class_value);
 			}
 
 			if (dirty & /*buttons, buttons, currentButtonId*/ 10) {
-				toggle_class(button, "default", /*button*/ ctx[14].id === /*currentButtonId*/ ctx[3]);
+				toggle_class(button, "default", /*button*/ ctx[15].id === /*currentButtonId*/ ctx[3]);
 			}
 		},
 		d(detaching) {
@@ -3896,6 +3896,7 @@ const s_REGEX_HTML = /^\s*<.*>$/;
 
 function instance$6($$self, $$props, $$invalidate) {
 	let { data = {} } = $$props;
+	let { autoClose = true } = $$props;
 	let { preventDefault = false } = $$props;
 	let { stopPropagation = false } = $$props;
 	let { dialogInstance = void 0 } = $$props;
@@ -3938,7 +3939,9 @@ function instance$6($$self, $$props, $$invalidate) {
 			}
 
 			// Delay closing to next clock tick to be able to return result.
-			setTimeout(() => foundryApp.close(), 0);
+			if (autoClose) {
+				setTimeout(() => foundryApp.close(), 0);
+			}
 
 			return result;
 		} catch(err) {
@@ -4014,8 +4017,9 @@ function instance$6($$self, $$props, $$invalidate) {
 
 	$$self.$$set = $$props => {
 		if ('data' in $$props) $$invalidate(8, data = $$props.data);
-		if ('preventDefault' in $$props) $$invalidate(9, preventDefault = $$props.preventDefault);
-		if ('stopPropagation' in $$props) $$invalidate(10, stopPropagation = $$props.stopPropagation);
+		if ('autoClose' in $$props) $$invalidate(9, autoClose = $$props.autoClose);
+		if ('preventDefault' in $$props) $$invalidate(10, preventDefault = $$props.preventDefault);
+		if ('stopPropagation' in $$props) $$invalidate(11, stopPropagation = $$props.stopPropagation);
 		if ('dialogInstance' in $$props) $$invalidate(0, dialogInstance = $$props.dialogInstance);
 	};
 
@@ -4108,6 +4112,7 @@ function instance$6($$self, $$props, $$invalidate) {
 		onClick,
 		onKeydown,
 		data,
+		autoClose,
 		preventDefault,
 		stopPropagation,
 		switch_instance_binding,
@@ -4127,8 +4132,9 @@ class DialogContent extends SvelteComponent {
 			safe_not_equal,
 			{
 				data: 8,
-				preventDefault: 9,
-				stopPropagation: 10,
+				autoClose: 9,
+				preventDefault: 10,
+				stopPropagation: 11,
 				dialogInstance: 0
 			},
 			add_css
@@ -4145,7 +4151,7 @@ function create_else_block(ctx) {
 	const applicationshell_spread_levels = [/*appProps*/ ctx[5]];
 
 	function applicationshell_elementRoot_binding_1(value) {
-		/*applicationshell_elementRoot_binding_1*/ ctx[11](value);
+		/*applicationshell_elementRoot_binding_1*/ ctx[14](value);
 	}
 
 	let applicationshell_props = {
@@ -4177,7 +4183,7 @@ function create_else_block(ctx) {
 			? get_spread_update(applicationshell_spread_levels, [get_spread_object(/*appProps*/ ctx[5])])
 			: {};
 
-			if (dirty & /*$$scope, data, dialogComponent*/ 16390) {
+			if (dirty & /*$$scope, data, autoClose, dialogComponent*/ 131334) {
 				applicationshell_changes.$$scope = { dirty, ctx };
 			}
 
@@ -4204,13 +4210,15 @@ function create_else_block(ctx) {
 	};
 }
 
-// (174:0) {#if modal}
+// (179:0) {#if modal}
 function create_if_block$1(ctx) {
 	let tjsglasspane;
 	let current;
 
 	const tjsglasspane_spread_levels = [
-		{ id: /*foundryApp*/ ctx[3].id },
+		{
+			id: `${/*foundryApp*/ ctx[3].id}-glasspane`
+		},
 		{ preventDefault: false },
 		{ stopPropagation: false },
 		/*modalProps*/ ctx[6],
@@ -4239,7 +4247,9 @@ function create_if_block$1(ctx) {
 		p(ctx, dirty) {
 			const tjsglasspane_changes = (dirty & /*foundryApp, modalProps, zIndex*/ 200)
 			? get_spread_update(tjsglasspane_spread_levels, [
-					dirty & /*foundryApp*/ 8 && { id: /*foundryApp*/ ctx[3].id },
+					dirty & /*foundryApp*/ 8 && {
+						id: `${/*foundryApp*/ ctx[3].id}-glasspane`
+					},
 					tjsglasspane_spread_levels[1],
 					tjsglasspane_spread_levels[2],
 					dirty & /*modalProps*/ 64 && get_spread_object(/*modalProps*/ ctx[6]),
@@ -4247,7 +4257,7 @@ function create_if_block$1(ctx) {
 				])
 			: {};
 
-			if (dirty & /*$$scope, appProps, elementRoot, data, dialogComponent*/ 16423) {
+			if (dirty & /*$$scope, appProps, elementRoot, data, autoClose, dialogComponent*/ 131367) {
 				tjsglasspane_changes.$$scope = { dirty, ctx };
 			}
 
@@ -4268,23 +4278,33 @@ function create_if_block$1(ctx) {
 	};
 }
 
-// (181:3) <ApplicationShell bind:elementRoot {...appProps}>
+// (186:3) <ApplicationShell bind:elementRoot {...appProps}>
 function create_default_slot_2(ctx) {
 	let dialogcontent;
+	let updating_autoClose;
 	let updating_dialogInstance;
 	let current;
 
+	function dialogcontent_autoClose_binding_1(value) {
+		/*dialogcontent_autoClose_binding_1*/ ctx[12](value);
+	}
+
 	function dialogcontent_dialogInstance_binding_1(value) {
-		/*dialogcontent_dialogInstance_binding_1*/ ctx[10](value);
+		/*dialogcontent_dialogInstance_binding_1*/ ctx[13](value);
 	}
 
 	let dialogcontent_props = { data: /*data*/ ctx[2] };
+
+	if (/*autoClose*/ ctx[8] !== void 0) {
+		dialogcontent_props.autoClose = /*autoClose*/ ctx[8];
+	}
 
 	if (/*dialogComponent*/ ctx[1] !== void 0) {
 		dialogcontent_props.dialogInstance = /*dialogComponent*/ ctx[1];
 	}
 
 	dialogcontent = new DialogContent({ props: dialogcontent_props });
+	binding_callbacks.push(() => bind(dialogcontent, 'autoClose', dialogcontent_autoClose_binding_1));
 	binding_callbacks.push(() => bind(dialogcontent, 'dialogInstance', dialogcontent_dialogInstance_binding_1));
 
 	return {
@@ -4299,6 +4319,12 @@ function create_default_slot_2(ctx) {
 			const dialogcontent_changes = {};
 			if (dirty & /*data*/ 4) dialogcontent_changes.data = /*data*/ ctx[2];
 
+			if (!updating_autoClose && dirty & /*autoClose*/ 256) {
+				updating_autoClose = true;
+				dialogcontent_changes.autoClose = /*autoClose*/ ctx[8];
+				add_flush_callback(() => updating_autoClose = false);
+			}
+
 			if (!updating_dialogInstance && dirty & /*dialogComponent*/ 2) {
 				updating_dialogInstance = true;
 				dialogcontent_changes.dialogInstance = /*dialogComponent*/ ctx[1];
@@ -4322,14 +4348,19 @@ function create_default_slot_2(ctx) {
 	};
 }
 
-// (176:6) <ApplicationShell bind:elementRoot {...appProps}>
+// (181:6) <ApplicationShell bind:elementRoot {...appProps}>
 function create_default_slot_1(ctx) {
 	let dialogcontent;
+	let updating_autoClose;
 	let updating_dialogInstance;
 	let current;
 
+	function dialogcontent_autoClose_binding(value) {
+		/*dialogcontent_autoClose_binding*/ ctx[9](value);
+	}
+
 	function dialogcontent_dialogInstance_binding(value) {
-		/*dialogcontent_dialogInstance_binding*/ ctx[8](value);
+		/*dialogcontent_dialogInstance_binding*/ ctx[10](value);
 	}
 
 	let dialogcontent_props = {
@@ -4337,11 +4368,16 @@ function create_default_slot_1(ctx) {
 		data: /*data*/ ctx[2]
 	};
 
+	if (/*autoClose*/ ctx[8] !== void 0) {
+		dialogcontent_props.autoClose = /*autoClose*/ ctx[8];
+	}
+
 	if (/*dialogComponent*/ ctx[1] !== void 0) {
 		dialogcontent_props.dialogInstance = /*dialogComponent*/ ctx[1];
 	}
 
 	dialogcontent = new DialogContent({ props: dialogcontent_props });
+	binding_callbacks.push(() => bind(dialogcontent, 'autoClose', dialogcontent_autoClose_binding));
 	binding_callbacks.push(() => bind(dialogcontent, 'dialogInstance', dialogcontent_dialogInstance_binding));
 
 	return {
@@ -4356,6 +4392,12 @@ function create_default_slot_1(ctx) {
 			const dialogcontent_changes = {};
 			if (dirty & /*data*/ 4) dialogcontent_changes.data = /*data*/ ctx[2];
 
+			if (!updating_autoClose && dirty & /*autoClose*/ 256) {
+				updating_autoClose = true;
+				dialogcontent_changes.autoClose = /*autoClose*/ ctx[8];
+				add_flush_callback(() => updating_autoClose = false);
+			}
+
 			if (!updating_dialogInstance && dirty & /*dialogComponent*/ 2) {
 				updating_dialogInstance = true;
 				dialogcontent_changes.dialogInstance = /*dialogComponent*/ ctx[1];
@@ -4379,7 +4421,7 @@ function create_default_slot_1(ctx) {
 	};
 }
 
-// (175:3) <TJSGlassPane id={foundryApp.id} preventDefault={false} stopPropagation={false} {...modalProps} {zIndex}>
+// (180:3) <TJSGlassPane id={`${foundryApp.id}-glasspane`} preventDefault={false} stopPropagation={false} {...modalProps} {zIndex}>
 function create_default_slot(ctx) {
 	let applicationshell;
 	let updating_elementRoot;
@@ -4387,7 +4429,7 @@ function create_default_slot(ctx) {
 	const applicationshell_spread_levels = [/*appProps*/ ctx[5]];
 
 	function applicationshell_elementRoot_binding(value) {
-		/*applicationshell_elementRoot_binding*/ ctx[9](value);
+		/*applicationshell_elementRoot_binding*/ ctx[11](value);
 	}
 
 	let applicationshell_props = {
@@ -4419,7 +4461,7 @@ function create_default_slot(ctx) {
 			? get_spread_update(applicationshell_spread_levels, [get_spread_object(/*appProps*/ ctx[5])])
 			: {};
 
-			if (dirty & /*$$scope, data, dialogComponent*/ 16390) {
+			if (dirty & /*$$scope, data, autoClose, dialogComponent*/ 131334) {
 				applicationshell_changes.$$scope = { dirty, ctx };
 			}
 
@@ -4556,9 +4598,17 @@ function instance$5($$self, $$props, $$invalidate) {
 
 	let zIndex = void 0;
 
+	// Automatically close the dialog on button click handler completion.
+	let autoClose = true;
+
 	// Only set modal once on mount. You can't change between a modal an non-modal dialog during runtime.
 	if (modal === void 0) {
 		modal = typeof data?.modal === 'boolean' ? data.modal : false;
+	}
+
+	function dialogcontent_autoClose_binding(value) {
+		autoClose = value;
+		(((($$invalidate(8, autoClose), $$invalidate(2, data)), $$invalidate(4, modal)), $$invalidate(7, zIndex)), $$invalidate(3, foundryApp));
 	}
 
 	function dialogcontent_dialogInstance_binding(value) {
@@ -4569,6 +4619,11 @@ function instance$5($$self, $$props, $$invalidate) {
 	function applicationshell_elementRoot_binding(value) {
 		elementRoot = value;
 		$$invalidate(0, elementRoot);
+	}
+
+	function dialogcontent_autoClose_binding_1(value) {
+		autoClose = value;
+		(((($$invalidate(8, autoClose), $$invalidate(2, data)), $$invalidate(4, modal)), $$invalidate(7, zIndex)), $$invalidate(3, foundryApp));
 	}
 
 	function dialogcontent_dialogInstance_binding_1(value) {
@@ -4595,6 +4650,10 @@ function instance$5($$self, $$props, $$invalidate) {
 			// Prevent any unnecessary changing of local & `foundryApp` variables unless actual changes occur.
 			// Foundry App options --------------------------------------------------------------------------------------------
 			if (typeof data === 'object') {
+				$$invalidate(8, autoClose = typeof data.autoClose === 'boolean'
+				? data.autoClose
+				: true);
+
 				const newZIndex = Number.isInteger(data.zIndex) || data.zIndex === null
 				? data.zIndex
 				: modal
@@ -4753,8 +4812,11 @@ function instance$5($$self, $$props, $$invalidate) {
 		appProps,
 		modalProps,
 		zIndex,
+		autoClose,
+		dialogcontent_autoClose_binding,
 		dialogcontent_dialogInstance_binding,
 		applicationshell_elementRoot_binding,
+		dialogcontent_autoClose_binding_1,
 		dialogcontent_dialogInstance_binding_1,
 		applicationshell_elementRoot_binding_1
 	];
@@ -4803,18 +4865,18 @@ class DialogShell extends SvelteComponent {
 
 function get_each_context$1(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[17] = list[i];
+	child_ctx[19] = list[i];
 	return child_ctx;
 }
 
-// (76:3) {#if hasTypes}
+// (80:3) {#if hasTypes}
 function create_if_block_1(ctx) {
 	let div1;
 	let label_1;
 	let t1;
 	let div0;
 	let select;
-	let raw_value = selectOptions(/*types*/ ctx[5], { selected: /*type*/ ctx[4] }) + "";
+	let raw_value = selectOptions(/*types*/ ctx[6], { selected: /*type*/ ctx[5] }) + "";
 
 	return {
 		c() {
@@ -4837,14 +4899,14 @@ function create_if_block_1(ctx) {
 			select.innerHTML = raw_value;
 		},
 		p(ctx, dirty) {
-			if (dirty & /*types, type*/ 48 && raw_value !== (raw_value = selectOptions(/*types*/ ctx[5], { selected: /*type*/ ctx[4] }) + "")) select.innerHTML = raw_value;		},
+			if (dirty & /*types, type*/ 96 && raw_value !== (raw_value = selectOptions(/*types*/ ctx[6], { selected: /*type*/ ctx[5] }) + "")) select.innerHTML = raw_value;		},
 		d(detaching) {
 			if (detaching) detach(div1);
 		}
 	};
 }
 
-// (87:3) {#if folders.length >= 1}
+// (91:3) {#if folders.length >= 1}
 function create_if_block(ctx) {
 	let div1;
 	let label_1;
@@ -4854,7 +4916,7 @@ function create_if_block(ctx) {
 	let option;
 	let mounted;
 	let dispose;
-	let each_value = /*folders*/ ctx[2];
+	let each_value = /*folders*/ ctx[3];
 	let each_blocks = [];
 
 	for (let i = 0; i < each_value.length; i += 1) {
@@ -4878,7 +4940,7 @@ function create_if_block(ctx) {
 			option.__value = "";
 			option.value = option.__value;
 			attr(select, "name", "folder");
-			if (/*folderSelect*/ ctx[1] === void 0) add_render_callback(() => /*select_change_handler*/ ctx[13].call(select));
+			if (/*folderSelect*/ ctx[2] === void 0) add_render_callback(() => /*select_change_handler*/ ctx[14].call(select));
 			attr(div0, "class", "form-fields");
 			attr(div1, "class", "form-group");
 		},
@@ -4894,16 +4956,16 @@ function create_if_block(ctx) {
 				each_blocks[i].m(select, null);
 			}
 
-			select_option(select, /*folderSelect*/ ctx[1]);
+			select_option(select, /*folderSelect*/ ctx[2]);
 
 			if (!mounted) {
-				dispose = listen(select, "change", /*select_change_handler*/ ctx[13]);
+				dispose = listen(select, "change", /*select_change_handler*/ ctx[14]);
 				mounted = true;
 			}
 		},
 		p(ctx, dirty) {
-			if (dirty & /*folders*/ 4) {
-				each_value = /*folders*/ ctx[2];
+			if (dirty & /*folders*/ 8) {
+				each_value = /*folders*/ ctx[3];
 				let i;
 
 				for (i = 0; i < each_value.length; i += 1) {
@@ -4925,8 +4987,8 @@ function create_if_block(ctx) {
 				each_blocks.length = each_value.length;
 			}
 
-			if (dirty & /*folderSelect, folders*/ 6) {
-				select_option(select, /*folderSelect*/ ctx[1]);
+			if (dirty & /*folderSelect, folders*/ 12) {
+				select_option(select, /*folderSelect*/ ctx[2]);
 			}
 		},
 		d(detaching) {
@@ -4938,10 +5000,10 @@ function create_if_block(ctx) {
 	};
 }
 
-// (93:15) {#each folders as folder}
+// (97:15) {#each folders as folder}
 function create_each_block$1(ctx) {
 	let option;
-	let t_value = /*folder*/ ctx[17].name + "";
+	let t_value = /*folder*/ ctx[19].name + "";
 	let t;
 	let option_value_value;
 
@@ -4949,7 +5011,7 @@ function create_each_block$1(ctx) {
 		c() {
 			option = element("option");
 			t = text(t_value);
-			option.__value = option_value_value = /*folder*/ ctx[17].id;
+			option.__value = option_value_value = /*folder*/ ctx[19].id;
 			option.value = option.__value;
 		},
 		m(target, anchor) {
@@ -4957,9 +5019,9 @@ function create_each_block$1(ctx) {
 			append(option, t);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*folders*/ 4 && t_value !== (t_value = /*folder*/ ctx[17].name + "")) set_data(t, t_value);
+			if (dirty & /*folders*/ 8 && t_value !== (t_value = /*folder*/ ctx[19].name + "")) set_data(t, t_value);
 
-			if (dirty & /*folders*/ 4 && option_value_value !== (option_value_value = /*folder*/ ctx[17].id)) {
+			if (dirty & /*folders*/ 8 && option_value_value !== (option_value_value = /*folder*/ ctx[19].id)) {
 				option.__value = option_value_value;
 				option.value = option.__value;
 			}
@@ -4971,7 +5033,7 @@ function create_each_block$1(ctx) {
 }
 
 function create_fragment$4(ctx) {
-	let form;
+	let form_1;
 	let div1;
 	let label_1;
 	let t1;
@@ -4979,19 +5041,14 @@ function create_fragment$4(ctx) {
 	let input;
 	let t2;
 	let t3;
-	let t4;
-	let button;
-	let i;
-	let t5;
-	let t6;
 	let mounted;
 	let dispose;
-	let if_block0 = /*hasTypes*/ ctx[3] && create_if_block_1(ctx);
-	let if_block1 = /*folders*/ ctx[2].length >= 1 && create_if_block(ctx);
+	let if_block0 = /*hasTypes*/ ctx[4] && create_if_block_1(ctx);
+	let if_block1 = /*folders*/ ctx[3].length >= 1 && create_if_block(ctx);
 
 	return {
 		c() {
-			form = element("form");
+			form_1 = element("form");
 			div1 = element("div");
 			label_1 = element("label");
 			label_1.textContent = `${localize('Name')}`;
@@ -5002,83 +5059,71 @@ function create_fragment$4(ctx) {
 			if (if_block0) if_block0.c();
 			t3 = space();
 			if (if_block1) if_block1.c();
-			t4 = space();
-			button = element("button");
-			i = element("i");
-			t5 = space();
-			t6 = text(/*title*/ ctx[6]);
 			attr(input, "type", "text");
 			attr(input, "name", "name");
-			attr(input, "placeholder", /*name*/ ctx[0]);
+			attr(input, "placeholder", /*name*/ ctx[1]);
 			input.required = true;
 			attr(div0, "class", "form-fields");
 			attr(div1, "class", "form-group");
-			attr(i, "class", "fas fa-check");
-			attr(button, "type", "submit");
-			attr(form, "id", "document-create");
-			attr(form, "autocomplete", "off");
+			attr(form_1, "id", "document-create");
+			attr(form_1, "autocomplete", "off");
 		},
 		m(target, anchor) {
-			insert(target, form, anchor);
-			append(form, div1);
+			insert(target, form_1, anchor);
+			append(form_1, div1);
 			append(div1, label_1);
 			append(div1, t1);
 			append(div1, div0);
 			append(div0, input);
-			append(form, t2);
-			if (if_block0) if_block0.m(form, null);
-			append(form, t3);
-			if (if_block1) if_block1.m(form, null);
-			append(form, t4);
-			append(form, button);
-			append(button, i);
-			append(button, t5);
-			append(button, t6);
+			append(form_1, t2);
+			if (if_block0) if_block0.m(form_1, null);
+			append(form_1, t3);
+			if (if_block1) if_block1.m(form_1, null);
+			/*form_1_binding*/ ctx[15](form_1);
 
 			if (!mounted) {
-				dispose = listen(form, "submit", prevent_default(/*saveData*/ ctx[7]));
+				dispose = listen(form_1, "submit", prevent_default(/*saveData*/ ctx[7]));
 				mounted = true;
 			}
 		},
 		p(ctx, [dirty]) {
-			if (dirty & /*name*/ 1) {
-				attr(input, "placeholder", /*name*/ ctx[0]);
+			if (dirty & /*name*/ 2) {
+				attr(input, "placeholder", /*name*/ ctx[1]);
 			}
 
-			if (/*hasTypes*/ ctx[3]) {
+			if (/*hasTypes*/ ctx[4]) {
 				if (if_block0) {
 					if_block0.p(ctx, dirty);
 				} else {
 					if_block0 = create_if_block_1(ctx);
 					if_block0.c();
-					if_block0.m(form, t3);
+					if_block0.m(form_1, t3);
 				}
 			} else if (if_block0) {
 				if_block0.d(1);
 				if_block0 = null;
 			}
 
-			if (/*folders*/ ctx[2].length >= 1) {
+			if (/*folders*/ ctx[3].length >= 1) {
 				if (if_block1) {
 					if_block1.p(ctx, dirty);
 				} else {
 					if_block1 = create_if_block(ctx);
 					if_block1.c();
-					if_block1.m(form, t4);
+					if_block1.m(form_1, null);
 				}
 			} else if (if_block1) {
 				if_block1.d(1);
 				if_block1 = null;
 			}
-
-			if (dirty & /*title*/ 64) set_data(t6, /*title*/ ctx[6]);
 		},
 		i: noop,
 		o: noop,
 		d(detaching) {
-			if (detaching) detach(form);
+			if (detaching) detach(form_1);
 			if (if_block0) if_block0.d();
 			if (if_block1) if_block1.d();
+			/*form_1_binding*/ ctx[15](null);
 			mounted = false;
 			dispose();
 		}
@@ -5092,7 +5137,8 @@ function instance$4($$self, $$props, $$invalidate) {
 	let { pack = null } = $$props;
 	let { renderSheet = true } = $$props;
 	const { foundryApp } = getContext('external');
-	let name, folderSelect, folders, hasTypes, type, types, title;
+	let form;
+	let name, folderSelect, folders, hasTypes, type, types;
 
 	if (!Object.prototype.isPrototypeOf.call(foundry.abstract.Document, documentCls)) {
 		throw new TypeError(`TJSCreateDocument error: 'documentCls' is not a Document.`);
@@ -5102,7 +5148,6 @@ function instance$4($$self, $$props, $$invalidate) {
 	const documentName = documentCls.metadata.name;
 
 	const label = localize(documentCls.metadata.label);
-	title = localize('DOCUMENT.Create', { type: label });
 	folderSelect = data.folder || '';
 
 	folders = parent
@@ -5122,6 +5167,10 @@ function instance$4($$self, $$props, $$invalidate) {
 		},
 		{}
 	);
+
+	function requestSubmit() {
+		form.requestSubmit();
+	}
 
 	/**
  * Creates a new document from the form data.
@@ -5147,8 +5196,15 @@ function instance$4($$self, $$props, $$invalidate) {
 
 	function select_change_handler() {
 		folderSelect = select_value(this);
-		$$invalidate(1, folderSelect);
-		$$invalidate(2, folders);
+		$$invalidate(2, folderSelect);
+		$$invalidate(3, folders);
+	}
+
+	function form_1_binding($$value) {
+		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
+			form = $$value;
+			$$invalidate(0, form);
+		});
 	}
 
 	$$self.$$set = $$props => {
@@ -5160,20 +5216,22 @@ function instance$4($$self, $$props, $$invalidate) {
 	};
 
 	return [
+		form,
 		name,
 		folderSelect,
 		folders,
 		hasTypes,
 		type,
 		types,
-		title,
 		saveData,
 		data,
 		documentCls,
 		parent,
 		pack,
 		renderSheet,
-		select_change_handler
+		requestSubmit,
+		select_change_handler,
+		form_1_binding
 	];
 }
 
@@ -5186,7 +5244,8 @@ class TJSDocumentCreate extends SvelteComponent {
 			data: 8,
 			parent: 10,
 			pack: 11,
-			renderSheet: 12
+			renderSheet: 12,
+			requestSubmit: 13
 		});
 	}
 
@@ -5233,6 +5292,10 @@ class TJSDocumentCreate extends SvelteComponent {
 	set renderSheet(renderSheet) {
 		this.$$set({ renderSheet });
 		flush();
+	}
+
+	get requestSubmit() {
+		return this.$$.ctx[13];
 	}
 }
 
@@ -5320,7 +5383,7 @@ function instance$3($$self, $$props, $$invalidate) {
 				doc.set(document);
 				(document?.id) ? document.name : '';
 				$$invalidate(0, type = localize(document.constructor.metadata.label));
-				foundryApp.reactive.title = `${localize('DOCUMENT.Delete', { type })}: ${document.name}`;
+				foundryApp.setDialogData('title', `${localize('DOCUMENT.Delete', { type })}: ${document.name}`);
 			}
 		}
 	};
@@ -5398,6 +5461,7 @@ function create_fragment$2(ctx) {
 			attr(label, "for", "data");
 			attr(input, "type", "file");
 			attr(input, "id", "data");
+			input.required = true;
 			attr(div, "class", "form-group");
 			attr(form_1, "autocomplete", "off");
 		},
@@ -5416,7 +5480,7 @@ function create_fragment$2(ctx) {
 			/*form_1_binding*/ ctx[8](form_1);
 
 			if (!mounted) {
-				dispose = listen(form_1, "submit", prevent_default(/*submit_handler*/ ctx[7]));
+				dispose = listen(form_1, "submit", prevent_default(/*handleImport*/ ctx[4]));
 				mounted = true;
 			}
 		},
@@ -5449,7 +5513,7 @@ function instance$2($$self, $$props, $$invalidate) {
 			delete: foundryApp.close.bind(foundryApp)
 		});
 
-	component_subscribe($$self, doc, value => $$invalidate(6, $doc = value));
+	component_subscribe($$self, doc, value => $$invalidate(7, $doc = value));
 	let form;
 	let hint1 = localize('DOCUMENT.ImportDataHint1', { document: document.documentName });
 	let hint2 = localize('DOCUMENT.ImportDataHint2', { name: document.name });
@@ -5462,10 +5526,11 @@ function instance$2($$self, $$props, $$invalidate) {
 		const json = await readTextFromFile(form.data.files[0]);
 		const importedDoc = await document.importFromJSON(json);
 		foundryApp.options.resolve?.(importedDoc);
+		foundryApp.close();
 	}
 
-	function submit_handler(event) {
-		bubble.call(this, $$self, event);
+	function requestSubmit() {
+		form.requestSubmit();
 	}
 
 	function form_1_binding($$value) {
@@ -5476,11 +5541,11 @@ function instance$2($$self, $$props, $$invalidate) {
 	}
 
 	$$self.$$set = $$props => {
-		if ('document' in $$props) $$invalidate(4, document = $$props.document);
+		if ('document' in $$props) $$invalidate(5, document = $$props.document);
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*$doc, document*/ 80) {
+		if ($$self.$$.dirty & /*$doc, document*/ 160) {
 			if ($doc !== document) {
 				if (!(document instanceof foundry.abstract.Document)) {
 					throw new TypeError(`TJSDocumentImport error: 'document' is not an instance of Document.`);
@@ -5489,7 +5554,7 @@ function instance$2($$self, $$props, $$invalidate) {
 				doc.set(document);
 				$$invalidate(1, hint1 = localize('DOCUMENT.ImportDataHint1', { document: document.documentName }));
 				$$invalidate(2, hint2 = localize('DOCUMENT.ImportDataHint2', { name: document.name }));
-				foundryApp.reactive.title = `${localize('DOCUMENT.ImportData')}: ${document.name}`;
+				foundryApp.setDialogData('title', `${localize('DOCUMENT.ImportData')}: ${document.name}`);
 			}
 		}
 	};
@@ -5499,10 +5564,10 @@ function instance$2($$self, $$props, $$invalidate) {
 		hint1,
 		hint2,
 		doc,
-		document,
 		handleImport,
+		document,
+		requestSubmit,
 		$doc,
-		submit_handler,
 		form_1_binding
 	];
 }
@@ -5510,11 +5575,11 @@ function instance$2($$self, $$props, $$invalidate) {
 class TJSDocumentImport extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance$2, create_fragment$2, safe_not_equal, { document: 4, handleImport: 5 });
+		init(this, options, instance$2, create_fragment$2, safe_not_equal, { document: 5, requestSubmit: 6 });
 	}
 
 	get document() {
-		return this.$$.ctx[4];
+		return this.$$.ctx[5];
 	}
 
 	set document(document) {
@@ -5522,15 +5587,15 @@ class TJSDocumentImport extends SvelteComponent {
 		flush();
 	}
 
-	get handleImport() {
-		return this.$$.ctx[5];
+	get requestSubmit() {
+		return this.$$.ctx[6];
 	}
 }
 
 /* src\component\core\dialog\document\TJSFolderDialog.svelte generated by Svelte v3.46.0 */
 
 function create_fragment$1(ctx) {
-	let form;
+	let form_1;
 	let input0;
 	let input0_value_value;
 	let t0;
@@ -5551,27 +5616,24 @@ function create_fragment$1(ctx) {
 	let t7;
 	let input4;
 	let t8;
+	let button;
+	let t9;
 	let div5;
 	let label2;
-	let t10;
+	let t11;
 	let div4;
 
-	let raw_value = radioBoxes('sorting', /*sortingModes*/ ctx[6], {
+	let raw_value = radioBoxes('sorting', /*sortingModes*/ ctx[7], {
 		checked: /*document*/ ctx[0].data.sorting,
 		localize: true
 	}) + "";
 
-	let t11;
-	let button;
-	let i;
-	let t12;
-	let t13;
 	let mounted;
 	let dispose;
 
 	return {
 		c() {
-			form = element("form");
+			form_1 = element("form");
 			input0 = element("input");
 			t0 = space();
 			input1 = element("input");
@@ -5592,16 +5654,14 @@ function create_fragment$1(ctx) {
 			t7 = space();
 			input4 = element("input");
 			t8 = space();
+			button = element("button");
+			button.innerHTML = `<i class="fas fa-trash-restore"></i>`;
+			t9 = space();
 			div5 = element("div");
 			label2 = element("label");
 			label2.textContent = `${localize('FOLDER.SortMode')}`;
-			t10 = space();
-			div4 = element("div");
 			t11 = space();
-			button = element("button");
-			i = element("i");
-			t12 = space();
-			t13 = text(/*submitText*/ ctx[3]);
+			div4 = element("div");
 			attr(input0, "type", "hidden");
 			attr(input0, "name", "type");
 			input0.value = input0_value_value = /*document*/ ctx[0].data.type;
@@ -5610,8 +5670,8 @@ function create_fragment$1(ctx) {
 			input1.value = input1_value_value = /*document*/ ctx[0].data.parent;
 			attr(input2, "type", "text");
 			attr(input2, "name", "name");
-			attr(input2, "placeholder", /*newName*/ ctx[5]);
-			input2.value = /*name*/ ctx[1];
+			attr(input2, "placeholder", /*newName*/ ctx[6]);
+			input2.value = /*name*/ ctx[3];
 			input2.required = true;
 			attr(div0, "class", "form-fields");
 			attr(div1, "class", "form-group");
@@ -5620,53 +5680,51 @@ function create_fragment$1(ctx) {
 			input3.readOnly = true;
 			attr(input4, "type", "color");
 			attr(input4, "data-edit", "color");
+			attr(button, "type", "button");
 			attr(div2, "class", "form-fields");
 			attr(div3, "class", "form-group");
 			attr(div4, "class", "form-fields");
 			attr(div5, "class", "form-group");
-			attr(i, "class", "fas fa-check");
-			attr(button, "type", "submit");
-			attr(form, "id", "folder-create");
-			attr(form, "autocomplete", "off");
+			attr(form_1, "id", "folder-create");
+			attr(form_1, "autocomplete", "off");
 		},
 		m(target, anchor) {
-			insert(target, form, anchor);
-			append(form, input0);
-			append(form, t0);
-			append(form, input1);
-			append(form, t1);
-			append(form, div1);
+			insert(target, form_1, anchor);
+			append(form_1, input0);
+			append(form_1, t0);
+			append(form_1, input1);
+			append(form_1, t1);
+			append(form_1, div1);
 			append(div1, label0);
 			append(div1, t3);
 			append(div1, div0);
 			append(div0, input2);
-			append(form, t4);
-			append(form, div3);
+			append(form_1, t4);
+			append(form_1, div3);
 			append(div3, label1);
 			append(div3, t6);
 			append(div3, div2);
 			append(div2, input3);
-			set_input_value(input3, /*safeColor*/ ctx[2]);
+			set_input_value(input3, /*colorText*/ ctx[4]);
 			append(div2, t7);
 			append(div2, input4);
-			set_input_value(input4, /*safeColor*/ ctx[2]);
-			append(form, t8);
-			append(form, div5);
+			set_input_value(input4, /*color*/ ctx[1]);
+			append(div2, t8);
+			append(div2, button);
+			append(form_1, t9);
+			append(form_1, div5);
 			append(div5, label2);
-			append(div5, t10);
+			append(div5, t11);
 			append(div5, div4);
 			div4.innerHTML = raw_value;
-			append(form, t11);
-			append(form, button);
-			append(button, i);
-			append(button, t12);
-			append(button, t13);
+			/*form_1_binding*/ ctx[14](form_1);
 
 			if (!mounted) {
 				dispose = [
-					listen(input3, "input", /*input3_input_handler*/ ctx[9]),
-					listen(input4, "input", /*input4_input_handler*/ ctx[10]),
-					listen(form, "submit", prevent_default(/*saveData*/ ctx[7]))
+					listen(input3, "input", /*input3_input_handler*/ ctx[11]),
+					listen(input4, "input", /*input4_input_handler*/ ctx[12]),
+					listen(button, "click", /*click_handler*/ ctx[13]),
+					listen(form_1, "submit", prevent_default(/*saveData*/ ctx[8]))
 				];
 
 				mounted = true;
@@ -5681,33 +5739,34 @@ function create_fragment$1(ctx) {
 				input1.value = input1_value_value;
 			}
 
-			if (dirty & /*name*/ 2 && input2.value !== /*name*/ ctx[1]) {
-				input2.value = /*name*/ ctx[1];
+			if (dirty & /*name*/ 8 && input2.value !== /*name*/ ctx[3]) {
+				input2.value = /*name*/ ctx[3];
 			}
 
-			if (dirty & /*safeColor*/ 4 && input3.value !== /*safeColor*/ ctx[2]) {
-				set_input_value(input3, /*safeColor*/ ctx[2]);
+			if (dirty & /*colorText*/ 16 && input3.value !== /*colorText*/ ctx[4]) {
+				set_input_value(input3, /*colorText*/ ctx[4]);
 			}
 
-			if (dirty & /*safeColor*/ 4) {
-				set_input_value(input4, /*safeColor*/ ctx[2]);
+			if (dirty & /*color*/ 2) {
+				set_input_value(input4, /*color*/ ctx[1]);
 			}
 
-			if (dirty & /*document*/ 1 && raw_value !== (raw_value = radioBoxes('sorting', /*sortingModes*/ ctx[6], {
+			if (dirty & /*document*/ 1 && raw_value !== (raw_value = radioBoxes('sorting', /*sortingModes*/ ctx[7], {
 				checked: /*document*/ ctx[0].data.sorting,
 				localize: true
-			}) + "")) div4.innerHTML = raw_value;
-			if (dirty & /*submitText*/ 8) set_data(t13, /*submitText*/ ctx[3]);
-		},
+			}) + "")) div4.innerHTML = raw_value;		},
 		i: noop,
 		o: noop,
 		d(detaching) {
-			if (detaching) detach(form);
+			if (detaching) detach(form_1);
+			/*form_1_binding*/ ctx[14](null);
 			mounted = false;
 			run_all(dispose);
 		}
 	};
 }
+
+const s_REGEX_HEX_COLOR = /^#(?:[0-9a-fA-F]{3}){1,2}$/;
 
 function instance$1($$self, $$props, $$invalidate) {
 	let $doc;
@@ -5723,7 +5782,7 @@ function instance$1($$self, $$props, $$invalidate) {
 			delete: foundryApp.close.bind(foundryApp)
 		});
 
-	component_subscribe($$self, doc, value => $$invalidate(8, $doc = value));
+	component_subscribe($$self, doc, value => $$invalidate(10, $doc = value));
 	const newName = localize('DOCUMENT.New', { type: localize(Folder.metadata.label) });
 
 	const sortingModes = {
@@ -5731,9 +5790,14 @@ function instance$1($$self, $$props, $$invalidate) {
 		m: 'FOLDER.SortManual'
 	};
 
+	let form;
 	let name = (document?.id) ? document.name : '';
-	let safeColor = document?.data?.color ?? '#000000';
-	let submitText = localize((document?.id) ? 'FOLDER.Update' : 'FOLDER.Create');
+	let color = document?.data?.color;
+	let colorText = '';
+
+	function requestSubmit() {
+		form.requestSubmit();
+	}
 
 	/**
  * Saves any form data / changes to document.
@@ -5761,13 +5825,22 @@ function instance$1($$self, $$props, $$invalidate) {
 	}
 
 	function input3_input_handler() {
-		safeColor = this.value;
-		(($$invalidate(2, safeColor), $$invalidate(8, $doc)), $$invalidate(0, document));
+		colorText = this.value;
+		((($$invalidate(4, colorText), $$invalidate(1, color)), $$invalidate(10, $doc)), $$invalidate(0, document));
 	}
 
 	function input4_input_handler() {
-		safeColor = this.value;
-		(($$invalidate(2, safeColor), $$invalidate(8, $doc)), $$invalidate(0, document));
+		color = this.value;
+		(($$invalidate(1, color), $$invalidate(10, $doc)), $$invalidate(0, document));
+	}
+
+	const click_handler = () => $$invalidate(1, color = null);
+
+	function form_1_binding($$value) {
+		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
+			form = $$value;
+			$$invalidate(2, form);
+		});
 	}
 
 	$$self.$$set = $$props => {
@@ -5775,43 +5848,64 @@ function instance$1($$self, $$props, $$invalidate) {
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*$doc, document*/ 257) {
+		if ($$self.$$.dirty & /*$doc, document*/ 1025) {
 			if ($doc !== document) {
 				if (!(document instanceof Folder)) {
 					throw new TypeError(`TJSFolderDialog error: 'document' is not an instance of Folder.`);
 				}
 
 				doc.set(document);
-				$$invalidate(1, name = (document?.id) ? document.name : '');
-				$$invalidate(2, safeColor = document?.data?.color ?? '#000000');
-				$$invalidate(3, submitText = localize((document?.id) ? 'FOLDER.Update' : 'FOLDER.Create'));
+				$$invalidate(3, name = (document?.id) ? document.name : '');
+				$$invalidate(1, color = document?.data?.color);
 
-				foundryApp.reactive.title = (document?.id)
-				? `${localize('FOLDER.Update')}: ${document.name}`
-				: localize('FOLDER.Create');
+				// Update the button label.
+				foundryApp.mergeDialogData({
+					buttons: {
+						submit: {
+							label: localize((document?.id) ? 'FOLDER.Update' : 'FOLDER.Create')
+						}
+					},
+					title: (document?.id)
+					? `${localize('FOLDER.Update')}: ${document.name}`
+					: localize('FOLDER.Create')
+				});
+			}
+		}
+
+		if ($$self.$$.dirty & /*color*/ 2) {
+			// Reactive block to test color and if it is not a valid hex color then reset colorText and set color to black.
+			if (s_REGEX_HEX_COLOR.test(color)) {
+				$$invalidate(4, colorText = color);
+			} else {
+				$$invalidate(4, colorText = null);
+				$$invalidate(1, color = '#000000');
 			}
 		}
 	};
 
 	return [
 		document,
+		color,
+		form,
 		name,
-		safeColor,
-		submitText,
+		colorText,
 		doc,
 		newName,
 		sortingModes,
 		saveData,
+		requestSubmit,
 		$doc,
 		input3_input_handler,
-		input4_input_handler
+		input4_input_handler,
+		click_handler,
+		form_1_binding
 	];
 }
 
 class TJSFolderDialog extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance$1, create_fragment$1, safe_not_equal, { document: 0 });
+		init(this, options, instance$1, create_fragment$1, safe_not_equal, { document: 0, requestSubmit: 9 });
 	}
 
 	get document() {
@@ -5822,26 +5916,31 @@ class TJSFolderDialog extends SvelteComponent {
 		this.$$set({ document });
 		flush();
 	}
+
+	get requestSubmit() {
+		return this.$$.ctx[9];
+	}
 }
 
 /* src\component\core\dialog\document\TJSPermissionControl.svelte generated by Svelte v3.46.0 */
 
 function get_each_context(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[12] = list[i];
+	child_ctx[15] = list[i];
 	return child_ctx;
 }
 
-// (157:3) {#each users as data (data.user.id)}
+// (158:3) {#each users as data (data.user.id)}
 function create_each_block(key_1, ctx) {
 	let div;
 	let label;
-	let t0_value = /*data*/ ctx[12].user.name + "";
+	let t0_value = /*data*/ ctx[15].user.name + "";
 	let t0;
 	let t1;
 	let select;
-	let raw_value = selectOptions(/*playerLevels*/ ctx[2], { selected: /*data*/ ctx[12].level }) + "";
+	let raw_value = selectOptions(/*playerLevels*/ ctx[3], { selected: /*data*/ ctx[15].level }) + "";
 	let select_name_value;
+	let t2;
 
 	return {
 		key: key_1,
@@ -5852,10 +5951,11 @@ function create_each_block(key_1, ctx) {
 			t0 = text(t0_value);
 			t1 = space();
 			select = element("select");
-			attr(select, "name", select_name_value = /*data*/ ctx[12].user.id);
+			t2 = space();
+			attr(select, "name", select_name_value = /*data*/ ctx[15].user.id);
 			attr(select, "data-dtype", "Number");
 			attr(div, "class", "form-group");
-			toggle_class(div, "hidden", /*data*/ ctx[12].user.isGM);
+			toggle_class(div, "hidden", /*data*/ ctx[15].user.isGM);
 			this.first = div;
 		},
 		m(target, anchor) {
@@ -5865,17 +5965,18 @@ function create_each_block(key_1, ctx) {
 			append(div, t1);
 			append(div, select);
 			select.innerHTML = raw_value;
+			append(div, t2);
 		},
 		p(new_ctx, dirty) {
 			ctx = new_ctx;
-			if (dirty & /*users*/ 8 && t0_value !== (t0_value = /*data*/ ctx[12].user.name + "")) set_data(t0, t0_value);
-			if (dirty & /*playerLevels, users*/ 12 && raw_value !== (raw_value = selectOptions(/*playerLevels*/ ctx[2], { selected: /*data*/ ctx[12].level }) + "")) select.innerHTML = raw_value;
-			if (dirty & /*users*/ 8 && select_name_value !== (select_name_value = /*data*/ ctx[12].user.id)) {
+			if (dirty & /*users*/ 16 && t0_value !== (t0_value = /*data*/ ctx[15].user.name + "")) set_data(t0, t0_value);
+			if (dirty & /*playerLevels, users*/ 24 && raw_value !== (raw_value = selectOptions(/*playerLevels*/ ctx[3], { selected: /*data*/ ctx[15].level }) + "")) select.innerHTML = raw_value;
+			if (dirty & /*users*/ 16 && select_name_value !== (select_name_value = /*data*/ ctx[15].user.id)) {
 				attr(select, "name", select_name_value);
 			}
 
-			if (dirty & /*users*/ 8) {
-				toggle_class(div, "hidden", /*data*/ ctx[12].user.isGM);
+			if (dirty & /*users*/ 16) {
+				toggle_class(div, "hidden", /*data*/ ctx[15].user.isGM);
 			}
 		},
 		d(detaching) {
@@ -5885,7 +5986,7 @@ function create_each_block(key_1, ctx) {
 }
 
 function create_fragment(ctx) {
-	let form;
+	let form_1;
 	let p;
 	let t0;
 	let t1;
@@ -5893,22 +5994,16 @@ function create_fragment(ctx) {
 	let label;
 	let t3;
 	let select;
-	let raw_value = selectOptions(/*defaultLevels*/ ctx[1], { selected: /*currentDefault*/ ctx[0] }) + "";
+	let raw_value = selectOptions(/*defaultLevels*/ ctx[2], { selected: /*currentDefault*/ ctx[1] }) + "";
 	let t4;
 	let hr;
 	let t5;
 	let each_blocks = [];
 	let each_1_lookup = new Map();
-	let t6;
-	let button;
-	let i;
-	let t7;
-	let t8_value = localize('Save Changes') + "";
-	let t8;
 	let mounted;
 	let dispose;
-	let each_value = /*users*/ ctx[3];
-	const get_key = ctx => /*data*/ ctx[12].user.id;
+	let each_value = /*users*/ ctx[4];
+	const get_key = ctx => /*data*/ ctx[15].user.id;
 
 	for (let i = 0; i < each_value.length; i += 1) {
 		let child_ctx = get_each_context(ctx, each_value, i);
@@ -5918,9 +6013,9 @@ function create_fragment(ctx) {
 
 	return {
 		c() {
-			form = element("form");
+			form_1 = element("form");
 			p = element("p");
-			t0 = text(/*instructions*/ ctx[4]);
+			t0 = text(/*instructions*/ ctx[5]);
 			t1 = space();
 			div = element("div");
 			label = element("label");
@@ -5935,65 +6030,55 @@ function create_fragment(ctx) {
 				each_blocks[i].c();
 			}
 
-			t6 = space();
-			button = element("button");
-			i = element("i");
-			t7 = space();
-			t8 = text(t8_value);
 			attr(p, "class", "notes");
 			attr(select, "name", "default");
 			attr(select, "data-dtype", "Number");
 			attr(div, "class", "form-group");
-			attr(i, "class", "far fa-save");
-			attr(button, "type", "submit");
-			attr(form, "id", "permission-control");
+			attr(form_1, "id", "permission-control");
 		},
 		m(target, anchor) {
-			insert(target, form, anchor);
-			append(form, p);
+			insert(target, form_1, anchor);
+			append(form_1, p);
 			append(p, t0);
-			append(form, t1);
-			append(form, div);
+			append(form_1, t1);
+			append(form_1, div);
 			append(div, label);
 			append(div, t3);
 			append(div, select);
 			select.innerHTML = raw_value;
-			append(form, t4);
-			append(form, hr);
-			append(form, t5);
+			append(form_1, t4);
+			append(form_1, hr);
+			append(form_1, t5);
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].m(form, null);
+				each_blocks[i].m(form_1, null);
 			}
 
-			append(form, t6);
-			append(form, button);
-			append(button, i);
-			append(button, t7);
-			append(button, t8);
+			/*form_1_binding*/ ctx[12](form_1);
 
 			if (!mounted) {
-				dispose = listen(form, "submit", prevent_default(/*saveData*/ ctx[6]));
+				dispose = listen(form_1, "submit", prevent_default(/*saveData*/ ctx[7]));
 				mounted = true;
 			}
 		},
 		p(ctx, [dirty]) {
-			if (dirty & /*instructions*/ 16) set_data(t0, /*instructions*/ ctx[4]);
-			if (dirty & /*defaultLevels, currentDefault*/ 3 && raw_value !== (raw_value = selectOptions(/*defaultLevels*/ ctx[1], { selected: /*currentDefault*/ ctx[0] }) + "")) select.innerHTML = raw_value;
-			if (dirty & /*users, selectOptions, playerLevels*/ 12) {
-				each_value = /*users*/ ctx[3];
-				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, form, destroy_block, create_each_block, t6, get_each_context);
+			if (dirty & /*instructions*/ 32) set_data(t0, /*instructions*/ ctx[5]);
+			if (dirty & /*defaultLevels, currentDefault*/ 6 && raw_value !== (raw_value = selectOptions(/*defaultLevels*/ ctx[2], { selected: /*currentDefault*/ ctx[1] }) + "")) select.innerHTML = raw_value;
+			if (dirty & /*users, selectOptions, playerLevels*/ 24) {
+				each_value = /*users*/ ctx[4];
+				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, form_1, destroy_block, create_each_block, null, get_each_context);
 			}
 		},
 		i: noop,
 		o: noop,
 		d(detaching) {
-			if (detaching) detach(form);
+			if (detaching) detach(form_1);
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].d();
 			}
 
+			/*form_1_binding*/ ctx[12](null);
 			mounted = false;
 			dispose();
 		}
@@ -6010,7 +6095,8 @@ function instance($$self, $$props, $$invalidate) {
 			delete: foundryApp.close.bind(foundryApp)
 		});
 
-	component_subscribe($$self, doc, value => $$invalidate(9, $doc = value));
+	component_subscribe($$self, doc, value => $$invalidate(11, $doc = value));
+	let form;
 	let currentDefault, defaultLevels, playerLevels, users;
 	let isFolder, instructions;
 
@@ -6018,15 +6104,6 @@ function instance($$self, $$props, $$invalidate) {
  * Builds the data for the permission dialog from the document.
  */
 	function getData() {
-		if (!($doc instanceof foundry.abstract.Document)) {
-			return {
-				currentDefault: '',
-				defaultLevels: [],
-				playerLevels: [],
-				users: []
-			};
-		}
-
 		// User permission levels
 		const playerLevels = {};
 
@@ -6065,6 +6142,10 @@ function instance($$self, $$props, $$invalidate) {
 			playerLevels,
 			users
 		};
+	}
+
+	function requestSubmit() {
+		form.requestSubmit();
 	}
 
 	/**
@@ -6130,28 +6211,39 @@ function instance($$self, $$props, $$invalidate) {
 		foundryApp.close();
 	}
 
+	function form_1_binding($$value) {
+		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
+			form = $$value;
+			$$invalidate(0, form);
+		});
+	}
+
 	$$self.$$set = $$props => {
-		if ('document' in $$props) $$invalidate(7, document = $$props.document);
+		if ('document' in $$props) $$invalidate(8, document = $$props.document);
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*$doc, document*/ 640) {
+		if ($$self.$$.dirty & /*$doc, document*/ 2304) {
 			if ($doc !== document) {
+				if (!(document instanceof foundry.abstract.Document)) {
+					throw new TypeError(`TJSPermissionControl error: 'document' is not an instance of Document.`);
+				}
+
 				doc.set(document);
 				const title = localize('PERMISSION.Title');
 
-				foundryApp.reactive.title = document instanceof foundry.abstract.Document
+				foundryApp.setDialogData('title', document instanceof foundry.abstract.Document
 				? `${title}: ${document.name}`
-				: `${title}: No document assigned`;
+				: `${title}: No document assigned`);
 			}
 		}
 
-		if ($$self.$$.dirty & /*$doc, isFolder*/ 768) {
+		if ($$self.$$.dirty & /*$doc, isFolder*/ 3072) {
 			{
-				$$invalidate(0, { currentDefault, defaultLevels, playerLevels, users } = getData(), currentDefault, (($$invalidate(1, defaultLevels), $$invalidate(9, $doc)), $$invalidate(8, isFolder)), (($$invalidate(2, playerLevels), $$invalidate(9, $doc)), $$invalidate(8, isFolder)), (($$invalidate(3, users), $$invalidate(9, $doc)), $$invalidate(8, isFolder)));
-				$$invalidate(8, isFolder = $doc instanceof Folder);
+				$$invalidate(1, { currentDefault, defaultLevels, playerLevels, users } = getData(), currentDefault, (($$invalidate(2, defaultLevels), $$invalidate(11, $doc)), $$invalidate(10, isFolder)), (($$invalidate(3, playerLevels), $$invalidate(11, $doc)), $$invalidate(10, isFolder)), (($$invalidate(4, users), $$invalidate(11, $doc)), $$invalidate(10, isFolder)));
+				$$invalidate(10, isFolder = $doc instanceof Folder);
 
-				$$invalidate(4, instructions = localize(isFolder
+				$$invalidate(5, instructions = localize(isFolder
 				? 'PERMISSION.HintFolder'
 				: 'PERMISSION.HintDocument'));
 			}
@@ -6159,6 +6251,7 @@ function instance($$self, $$props, $$invalidate) {
 	};
 
 	return [
+		form,
 		currentDefault,
 		defaultLevels,
 		playerLevels,
@@ -6167,24 +6260,30 @@ function instance($$self, $$props, $$invalidate) {
 		doc,
 		saveData,
 		document,
+		requestSubmit,
 		isFolder,
-		$doc
+		$doc,
+		form_1_binding
 	];
 }
 
 class TJSPermissionControl extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance, create_fragment, safe_not_equal, { document: 7 });
+		init(this, options, instance, create_fragment, safe_not_equal, { document: 8, requestSubmit: 9 });
 	}
 
 	get document() {
-		return this.$$.ctx[7];
+		return this.$$.ctx[8];
 	}
 
 	set document(document) {
 		this.$$set({ document });
 		flush();
+	}
+
+	get requestSubmit() {
+		return this.$$.ctx[9];
 	}
 }
 

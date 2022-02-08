@@ -27,6 +27,15 @@ export class TJSDocumentCreate extends TJSDialog
             }
          },
          title: localize('DOCUMENT.Create', { type: localize(documentCls?.metadata?.label) }),
+         buttons: {
+            create: {
+               icon: 'fas fa-check',
+               label: localize('DOCUMENT.Create', { type: localize(documentCls?.metadata?.label) }),
+               onclick: 'requestSubmit'
+            }
+         },
+         default: 'create',
+         autoClose: false,
          close: () => this.options?.resolve?.(null)
       }, { width: 320, ...options });
    }
