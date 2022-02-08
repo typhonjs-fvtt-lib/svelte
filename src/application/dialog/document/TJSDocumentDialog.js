@@ -107,17 +107,7 @@ export class TJSDocumentDialog
       return new Promise((resolve) =>
       {
          options.resolve = resolve;
-         const dialog = new TJSFolderDialog(folder, options, dialogData).render(true, { focus: true });
-
-         setTimeout(() =>
-         {
-            dialog.reactive.document = game.folders.get('LsZIX3zmBaaLEuKW');
-         }, 3000);
-
-         setTimeout(() =>
-         {
-            dialog.reactive.document = folder;
-         }, 6000);
+         new TJSFolderDialog(folder, options, dialogData).render(true, { focus: true });
       });
    }
 

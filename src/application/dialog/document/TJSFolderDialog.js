@@ -40,7 +40,7 @@ export class TJSFolderDialog extends TJSDialog
          default: 'submit',
          autoClose: false,
          close: () => this.options?.resolve?.(null)
-      }, { id: `tjs-folder-edit-${document.id}`, ...options });
+      }, options);
 
       /**
        * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with
