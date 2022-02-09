@@ -28,7 +28,7 @@
 
       const title = localize('PERMISSION.Title');
 
-      foundryApp.setDialogData('title', document instanceof foundry.abstract.Document ? `${title}: ${document.name}` :
+      foundryApp.data.set('title', document instanceof foundry.abstract.Document ? `${title}: ${document.name}` :
        `${title}: No document assigned`);
    }
 

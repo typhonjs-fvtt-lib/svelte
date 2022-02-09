@@ -39,7 +39,7 @@
       name = document?.id ? document.name : '';
       type = localize(document.constructor.metadata.label);
 
-      foundryApp.setDialogData('title', `${localize('DOCUMENT.Delete', { type })}: ${document.name}`);
+      foundryApp.data.set('title', `${localize('DOCUMENT.Delete', { type })}: ${document.name}`);
    }
 
    /**

@@ -1,7 +1,7 @@
-import { DialogShell }           from '@typhonjs-fvtt/svelte/component/core';
-import { safeAccess, safeSet }   from '@typhonjs-fvtt/svelte/util';
+import { DialogShell }        from '@typhonjs-fvtt/svelte/component/core';
 
-import { SvelteApplication }     from '../SvelteApplication.js';
+import { SvelteApplication }  from '../SvelteApplication.js';
+import { DialogData }         from '../internal/DialogData.js';
 
 /**
  * Provides a Foundry API compatible dialog alternative implemented w/ Svelte. There are several features including
@@ -10,7 +10,7 @@ import { SvelteApplication }     from '../SvelteApplication.js';
 export class TJSDialog extends SvelteApplication
 {
    /**
-    * @type {object}
+    * @type {DialogData}
     */
    #data;
 
@@ -22,7 +22,9 @@ export class TJSDialog extends SvelteApplication
    constructor(data, options = {})
    {
       super(options);
-      this.#data = data;
+
+      this.#data = new DialogData(this);
+      this.data = data;
 
       /**
        * @member {object} dialogComponent - A getter to SvelteData to retrieve any mounted Svelte component as the
@@ -56,25 +58,11 @@ export class TJSDialog extends SvelteApplication
    }
 
    /**
-    * Returns the content field in dialog data.
-    *
-    * @returns {*} content field.
-    */
-   get content() { return this.getDialogData('content'); }
-
-   /**
     * Returns the dialog data.
     *
-    * @returns {object} Dialog data.
+    * @returns {DialogData} Dialog data.
     */
    get data() { return this.#data; }
-
-   /**
-    * Sets the dialog data content field; this is reactive.
-    *
-    * @param {*} content - Content to set.
-    */
-   set content(content) { this.setDialogData('content', content); }
 
    /**
     * Sets the dialog data; this is reactive.
@@ -83,10 +71,16 @@ export class TJSDialog extends SvelteApplication
     */
    set data(data)
    {
-      this.#data = data;
+      const descriptors = Object.getOwnPropertyDescriptors(this.#data);
 
-      const component = this.svelte.applicationShell;
-      if (component?.data) { component.data = data; }
+      // Remove old data for all configurable descriptors.
+      for (const descriptor in descriptors)
+      {
+         if (descriptors[descriptor].configurable) { delete this.#data[descriptor]; }
+      }
+
+      // Merge new data and perform a reactive update.
+      this.#data.merge(data);
    }
 
    /**
@@ -122,57 +116,6 @@ export class TJSDialog extends SvelteApplication
       }
 
       return super.close(options);
-   }
-
-   /**
-    * Provides a way to safely get this dialogs data given an accessor string which describes the
-    * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
-    * to walk.
-    *
-    * // TODO DOCUMENT the accessor in more detail.
-    *
-    * @param {string}   accessor - The path / key to set. You can set multiple levels.
-    *
-    * @param {*}        [defaultValue] - A default value returned if the accessor is not found.
-    *
-    * @returns {*} Value at the accessor.
-    */
-   getDialogData(accessor, defaultValue)
-   {
-      return safeAccess(this.#data, accessor, defaultValue);
-   }
-
-   /**
-    * @param {object} data - Merge provided data object into Dialog data.
-    */
-   mergeDialogData(data)
-   {
-      this.data = foundry.utils.mergeObject(this.#data, data, { inplace: false });
-   }
-
-   /**
-    * Provides a way to safely set this dialogs data given an accessor string which describes the
-    * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
-    * to walk.
-    *
-    * Automatically the dialog data will be updated in the associated DialogShell Svelte component.
-    *
-    * // TODO DOCUMENT the accessor in more detail.
-    *
-    * @param {string}   accessor - The path / key to set. You can set multiple levels.
-    *
-    * @param {*}        value - Value to set.
-    */
-   setDialogData(accessor, value)
-   {
-      const success = safeSet(this.#data, accessor, value);
-
-      // If `this.options` modified then update the app options store.
-      if (success)
-      {
-         const component = this.svelte.component(0);
-         if (component?.data) { component.data = this.#data; }
-      }
    }
 
    // ---------------------------------------------------------------------------------------------------------------

@@ -5383,7 +5383,7 @@ function instance$3($$self, $$props, $$invalidate) {
 				doc.set(document);
 				(document?.id) ? document.name : '';
 				$$invalidate(0, type = localize(document.constructor.metadata.label));
-				foundryApp.setDialogData('title', `${localize('DOCUMENT.Delete', { type })}: ${document.name}`);
+				foundryApp.data.set('title', `${localize('DOCUMENT.Delete', { type })}: ${document.name}`);
 			}
 		}
 	};
@@ -5554,7 +5554,7 @@ function instance$2($$self, $$props, $$invalidate) {
 				doc.set(document);
 				$$invalidate(1, hint1 = localize('DOCUMENT.ImportDataHint1', { document: document.documentName }));
 				$$invalidate(2, hint2 = localize('DOCUMENT.ImportDataHint2', { name: document.name }));
-				foundryApp.setDialogData('title', `${localize('DOCUMENT.ImportData')}: ${document.name}`);
+				foundryApp.data.set('title', `${localize('DOCUMENT.ImportData')}: ${document.name}`);
 			}
 		}
 	};
@@ -5858,8 +5858,8 @@ function instance$1($$self, $$props, $$invalidate) {
 				$$invalidate(3, name = (document?.id) ? document.name : '');
 				$$invalidate(1, color = document?.data?.color);
 
-				// Update the button label.
-				foundryApp.mergeDialogData({
+				// Update the dialog button label and title.
+				foundryApp.data.merge({
 					buttons: {
 						submit: {
 							label: localize((document?.id) ? 'FOLDER.Update' : 'FOLDER.Create')
@@ -6232,7 +6232,7 @@ function instance($$self, $$props, $$invalidate) {
 				doc.set(document);
 				const title = localize('PERMISSION.Title');
 
-				foundryApp.setDialogData('title', document instanceof foundry.abstract.Document
+				foundryApp.data.set('title', document instanceof foundry.abstract.Document
 				? `${title}: ${document.name}`
 				: `${title}: No document assigned`);
 			}

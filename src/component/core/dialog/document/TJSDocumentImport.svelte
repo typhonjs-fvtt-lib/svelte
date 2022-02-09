@@ -33,7 +33,7 @@
       hint1 = localize('DOCUMENT.ImportDataHint1', { document: document.documentName });
       hint2 = localize('DOCUMENT.ImportDataHint2', { name: document.name });
 
-      foundryApp.setDialogData('title', `${localize('DOCUMENT.ImportData')}: ${document.name}`);
+      foundryApp.data.set('title', `${localize('DOCUMENT.ImportData')}: ${document.name}`);
    }
 
    async function handleImport()

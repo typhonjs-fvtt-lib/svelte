@@ -41,8 +41,8 @@
       name = document?.id ? document.name : '';
       color = document?.data?.color;
 
-      // Update the button label.
-      foundryApp.mergeDialogData({
+      // Update the dialog button label and title.
+      foundryApp.data.merge({
          buttons: {
             submit: {
                label: localize(document?.id ? 'FOLDER.Update' : 'FOLDER.Create')
