@@ -1,11 +1,14 @@
 import { DialogShell }        from '@typhonjs-fvtt/svelte/component/core';
 
+import { DialogData }         from './DialogData.js';
 import { SvelteApplication }  from '../SvelteApplication.js';
-import { DialogData }         from '../internal/DialogData.js';
 
 /**
  * Provides a Foundry API compatible dialog alternative implemented w/ Svelte. There are several features including
  * a glasspane / modal option with various styling and transition capabilities.
+ *
+ * TODO: document all dialog data parameters; keep track of newly added like button -> styles, title; modal,
+ * draggable, transition options, modal transitions
  */
 export class TJSDialog extends SvelteApplication
 {

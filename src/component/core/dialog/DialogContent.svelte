@@ -1,6 +1,7 @@
 <script>
    import { getContext }   from 'svelte';
 
+   import { applyStyles }  from '@typhonjs-fvtt/svelte/action';
    import { localize }     from '@typhonjs-fvtt/svelte/helper';
 
    import {
@@ -39,10 +40,12 @@
 
          const label = typeof b.label === 'string' ? localize(b.label) : '';
 
+         const title = typeof b.title === 'string' ? localize(b.title) : void 0;
+
          // Test any condition supplied otherwise default to true.
          const condition = typeof b.condition === 'function' ? b.condition.call(b) : b.condition ?? true;
 
-         if (condition) { array.push({ ...b, id: key, icon, label }); }
+         if (condition) { array.push({ ...b, id: key, icon, label, title }); }
 
          return array;
       }, []);
@@ -206,8 +209,9 @@
    {#each buttons as button (button.id)}
    <button class="dialog-button {button.id}"
            on:click={() => onClick(button)}
-           class:default={button.id === currentButtonId}>
-      {#if button.icon}{@html button.icon}{/if}{button.label}
+           class:default={button.id === currentButtonId}
+           use:applyStyles={button.styles}>
+      <span title={button.title}>{#if button.icon}{@html button.icon}{/if}{button.label}</span>
    </button>
    {/each}
 </div>

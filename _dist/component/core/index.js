@@ -3508,7 +3508,7 @@ function get_each_context$2(ctx, list, i) {
 	return child_ctx;
 }
 
-// (199:29) 
+// (202:29) 
 function create_if_block_3(ctx) {
 	let switch_instance;
 	let switch_instance_anchor;
@@ -3591,7 +3591,7 @@ function create_if_block_3(ctx) {
 	};
 }
 
-// (197:3) {#if typeof content === 'string'}
+// (200:3) {#if typeof content === 'string'}
 function create_if_block_2(ctx) {
 	let html_tag;
 	let html_anchor;
@@ -3618,7 +3618,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (204:0) {#if buttons.length}
+// (207:0) {#if buttons.length}
 function create_if_block$2(ctx) {
 	let div;
 	let each_blocks = [];
@@ -3665,7 +3665,7 @@ function create_if_block$2(ctx) {
 	};
 }
 
-// (210:6) {#if button.icon}
+// (214:33) {#if button.icon}
 function create_if_block_1$1(ctx) {
 	let html_tag;
 	let raw_value = /*button*/ ctx[15].icon + "";
@@ -3691,13 +3691,16 @@ function create_if_block_1$1(ctx) {
 	};
 }
 
-// (206:3) {#each buttons as button (button.id)}
+// (209:3) {#each buttons as button (button.id)}
 function create_each_block$2(key_1, ctx) {
 	let button;
+	let span;
 	let t0_value = /*button*/ ctx[15].label + "";
 	let t0;
+	let span_title_value;
 	let t1;
 	let button_class_value;
+	let applyStyles_action;
 	let mounted;
 	let dispose;
 	let if_block = /*button*/ ctx[15].icon && create_if_block_1$1(ctx);
@@ -3711,21 +3714,28 @@ function create_each_block$2(key_1, ctx) {
 		first: null,
 		c() {
 			button = element("button");
+			span = element("span");
 			if (if_block) if_block.c();
 			t0 = text(t0_value);
 			t1 = space();
+			attr(span, "title", span_title_value = /*button*/ ctx[15].title);
 			attr(button, "class", button_class_value = "dialog-button " + /*button*/ ctx[15].id);
 			toggle_class(button, "default", /*button*/ ctx[15].id === /*currentButtonId*/ ctx[3]);
 			this.first = button;
 		},
 		m(target, anchor) {
 			insert(target, button, anchor);
-			if (if_block) if_block.m(button, null);
-			append(button, t0);
+			append(button, span);
+			if (if_block) if_block.m(span, null);
+			append(span, t0);
 			append(button, t1);
 
 			if (!mounted) {
-				dispose = listen(button, "click", click_handler);
+				dispose = [
+					listen(button, "click", click_handler),
+					action_destroyer(applyStyles_action = applyStyles.call(null, button, /*button*/ ctx[15].styles))
+				];
+
 				mounted = true;
 			}
 		},
@@ -3738,7 +3748,7 @@ function create_each_block$2(key_1, ctx) {
 				} else {
 					if_block = create_if_block_1$1(ctx);
 					if_block.c();
-					if_block.m(button, t0);
+					if_block.m(span, t0);
 				}
 			} else if (if_block) {
 				if_block.d(1);
@@ -3747,9 +3757,15 @@ function create_each_block$2(key_1, ctx) {
 
 			if (dirty & /*buttons*/ 2 && t0_value !== (t0_value = /*button*/ ctx[15].label + "")) set_data(t0, t0_value);
 
+			if (dirty & /*buttons*/ 2 && span_title_value !== (span_title_value = /*button*/ ctx[15].title)) {
+				attr(span, "title", span_title_value);
+			}
+
 			if (dirty & /*buttons*/ 2 && button_class_value !== (button_class_value = "dialog-button " + /*button*/ ctx[15].id)) {
 				attr(button, "class", button_class_value);
 			}
+
+			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*buttons*/ 2) applyStyles_action.update.call(null, /*button*/ ctx[15].styles);
 
 			if (dirty & /*buttons, buttons, currentButtonId*/ 10) {
 				toggle_class(button, "default", /*button*/ ctx[15].id === /*currentButtonId*/ ctx[3]);
@@ -3759,7 +3775,7 @@ function create_each_block$2(key_1, ctx) {
 			if (detaching) detach(button);
 			if (if_block) if_block.d();
 			mounted = false;
-			dispose();
+			run_all(dispose);
 		}
 	};
 }
@@ -4041,6 +4057,7 @@ function instance$6($$self, $$props, $$invalidate) {
 								: `<i class="${b.icon}"></i>`;
 
 							const label = typeof b.label === 'string' ? localize(b.label) : '';
+							const title = typeof b.title === 'string' ? localize(b.title) : void 0;
 
 							// Test any condition supplied otherwise default to true.
 							const condition = typeof b.condition === 'function'
@@ -4048,7 +4065,7 @@ function instance$6($$self, $$props, $$invalidate) {
 							: b.condition ?? true;
 
 							if (condition) {
-								array.push({ ...b, id: key, icon, label });
+								array.push({ ...b, id: key, icon, label, title });
 							}
 
 							return array;
