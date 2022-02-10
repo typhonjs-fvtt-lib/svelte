@@ -19,7 +19,7 @@
    const s_REGEX_HTML = /^\s*<.*>$/;
 
    let buttons;
-   let content;
+   let content = void 0;
    let dialogComponent;
    let dialogProps = {};
 
@@ -57,7 +57,7 @@
     */
    $: if (!buttons.find((button) => button.id === currentButtonId)) { currentButtonId = void 0; }
 
-   $:
+   $: if (content !== data.content) // Only update the content if it has changed.
    {
       content = data.content;
 
