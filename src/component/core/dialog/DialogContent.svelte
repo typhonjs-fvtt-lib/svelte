@@ -38,7 +38,7 @@
          const icon = typeof b.icon !== 'string' ? void 0 : s_REGEX_HTML.test(b.icon) ? b.icon :
           `<i class="${b.icon}"></i>`;
 
-         const label = typeof b.label === 'string' ? localize(b.label) : '';
+         const label = typeof b.label === 'string' ? `${icon !== void 0 ? ' ' : ''}${localize(b.label)}` : '';
 
          const title = typeof b.title === 'string' ? localize(b.title) : void 0;
 
