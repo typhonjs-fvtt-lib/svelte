@@ -1,8 +1,8 @@
-import { SvelteComponent, init, safe_not_equal, flush, append_styles, empty, insert, group_outros, transition_out, check_outros, transition_in, detach, element, attr, noop, create_component, mount_component, get_spread_update, get_spread_object, destroy_component, destroy_each, assign, create_slot, listen, update_slot_base, get_all_dirty_from_scope, get_slot_changes, add_render_callback, create_in_transition, create_out_transition, binding_callbacks, HtmlTag, text, append, stop_propagation, prevent_default, set_data, run_all, space, action_destroyer, is_function, component_subscribe, add_resize_listener, update_keyed_each, destroy_block, toggle_class, bind, add_flush_callback, select_option, select_value, set_input_value } from 'svelte/internal';
+import { SvelteComponent, init, safe_not_equal, flush, append_styles, empty, insert, group_outros, transition_out, check_outros, transition_in, detach, element, attr, noop, create_component, mount_component, get_spread_update, get_spread_object, destroy_component, destroy_each, assign, create_slot, listen, update_slot_base, get_all_dirty_from_scope, get_slot_changes, add_render_callback, create_in_transition, create_out_transition, binding_callbacks, HtmlTag, text, append, stop_propagation, prevent_default, action_destroyer, set_data, is_function, run_all, space, component_subscribe, add_resize_listener, update_keyed_each, destroy_block, toggle_class, bind, add_flush_callback, select_option, select_value, set_input_value } from 'svelte/internal';
 import { getContext, setContext } from 'svelte';
 import { s_DEFAULT_TRANSITION, s_DEFAULT_TRANSITION_OPTIONS } from '@typhonjs-fvtt/svelte/transition';
 import { writable } from 'svelte/store';
-import { draggable, applyStyles } from '@typhonjs-fvtt/svelte/action';
+import { applyStyles, draggable } from '@typhonjs-fvtt/svelte/action';
 import { localize, selectOptions, radioBoxes } from '@typhonjs-fvtt/svelte/helper';
 import { isObject, isSvelteComponent, parseSvelteConfig } from '@typhonjs-fvtt/svelte/util';
 import { fade } from 'svelte/transition';
@@ -806,6 +806,7 @@ function create_fragment$c(ctx) {
 	let html_tag;
 	let t;
 	let a_class_value;
+	let applyStyles_action;
 	let mounted;
 	let dispose;
 
@@ -824,9 +825,10 @@ function create_fragment$c(ctx) {
 
 			if (!mounted) {
 				dispose = [
-					listen(a, "click", stop_propagation(prevent_default(/*onClick*/ ctx[3]))),
+					listen(a, "click", stop_propagation(prevent_default(/*onClick*/ ctx[4]))),
 					listen(a, "pointerdown", stop_propagation(prevent_default(pointerdown_handler))),
-					listen(a, "dblclick", stop_propagation(prevent_default(dblclick_handler)))
+					listen(a, "dblclick", stop_propagation(prevent_default(dblclick_handler))),
+					action_destroyer(applyStyles_action = applyStyles.call(null, a, /*styles*/ ctx[3]))
 				];
 
 				mounted = true;
@@ -839,6 +841,8 @@ function create_fragment$c(ctx) {
 			if (dirty & /*button*/ 1 && a_class_value !== (a_class_value = "header-button " + /*button*/ ctx[0].class)) {
 				attr(a, "class", a_class_value);
 			}
+
+			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*styles*/ 8) applyStyles_action.update.call(null, /*styles*/ ctx[3]);
 		},
 		i: noop,
 		o: noop,
@@ -856,7 +860,7 @@ const dblclick_handler = () => null;
 
 function instance$c($$self, $$props, $$invalidate) {
 	let { button } = $$props;
-	let icon, label, title;
+	let icon, label, title, styles;
 
 	function onClick() {
 		// Accept either callback or onclick as the function / data to invoke.
@@ -873,9 +877,9 @@ function instance$c($$self, $$props, $$invalidate) {
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*button, title*/ 17) {
+		if ($$self.$$.dirty & /*button, title*/ 33) {
 			if (button) {
-				$$invalidate(4, title = typeof button.title === 'string'
+				$$invalidate(5, title = typeof button.title === 'string'
 				? localize(button.title)
 				: '');
 
@@ -889,11 +893,15 @@ function instance$c($$self, $$props, $$invalidate) {
 				$$invalidate(2, label = typeof button.label === 'string'
 				? localize(button.label)
 				: '');
+
+				$$invalidate(3, styles = typeof button.styles === 'object'
+				? button.styles
+				: void 0);
 			}
 		}
 	};
 
-	return [button, icon, label, onClick, title];
+	return [button, icon, label, styles, onClick, title];
 }
 
 class TJSHeaderButton extends SvelteComponent {

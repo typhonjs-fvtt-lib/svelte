@@ -4,13 +4,14 @@
     * `title` field is supported to give a tool tip for the button. The `onclick` function if defined is invoked when
     * the button is clicked and state is updated accordingly.
     */
-   import { localize }  from '@typhonjs-fvtt/svelte/helper';
+   import { applyStyles }   from '@typhonjs-fvtt/svelte/action';
+   import { localize }      from '@typhonjs-fvtt/svelte/helper';
 
    export let button;
 
    const s_REGEX_HTML = /^\s*<.*>$/;
 
-   let icon, label, title;
+   let icon, label, title, styles
 
    $: if (button)
    {
@@ -21,6 +22,8 @@
        `<i class="${button.icon}" title="${title}"></i>`;
 
       label = typeof button.label === 'string' ? localize(button.label) : '';
+
+      styles = typeof button.styles === 'object' ? button.styles : void 0;
    }
 
    function onClick()
@@ -42,6 +45,7 @@
 <a on:click|preventDefault|stopPropagation={onClick}
    on:pointerdown|preventDefault|stopPropagation={()=>null}
    on:dblclick|preventDefault|stopPropagation={()=>null}
+   use:applyStyles={styles}
    class="header-button {button.class}">
     {@html icon}{label}
 </a>
