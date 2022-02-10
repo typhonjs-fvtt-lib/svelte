@@ -47,7 +47,7 @@ function radioBoxes(name, choices, options)
 /**
  * Converts the `selectOptions` Handlebars helper to be Svelte compatible. This is useful when initially converting
  * over an app to Svelte and for essential usage to several dialogs that mirror the core Foundry experience. For
- * an example of usage see {@link TJSPermissionControl}.
+ * an example of usage see {@link TJSFolderPermissions}.
  *
  * A helper to create a set of <option> elements in a <select> block based on a provided dictionary.
  * The provided keys are the option values while the provided values are human-readable labels.

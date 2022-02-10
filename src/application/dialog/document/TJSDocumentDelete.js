@@ -35,19 +35,19 @@ export class TJSDocumentDelete extends TJSDialog
          },
          title: `${localize('DOCUMENT.Delete', { type: localize(document.constructor.metadata.label) })}: ${
           document.name}`,
-         default: 'yes',
          buttons: {
-            yes: {
-               icon: 'fas fa-check',
-               label: localize('Yes'),
-               onclick: 'handleClickYes'
+            delete: {
+               icon: 'fas fa-trash',
+               label: localize('DOCUMENT.Delete', { type: localize(document.constructor.metadata.label) }),
+               onclick: 'deleteDocument'
             },
-            no: {
+            cancel: {
                icon: 'fas fa-times',
-               label: localize('No'),
+               label: 'Cancel',
                onclick: () => this.options.resolve?.(false)
             }
          },
+         default: 'delete',
          close: () => this.options?.resolve?.(null)
       }, options);
 

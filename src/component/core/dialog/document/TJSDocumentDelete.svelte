@@ -47,7 +47,7 @@
     *
     * @returns {Promise<void>}
     */
-   export async function handleClickYes()
+   export async function deleteDocument()
    {
       // Remove the delete Document function callback as we are intentionally deleting below.
       doc.setOptions({ delete: void 0 });

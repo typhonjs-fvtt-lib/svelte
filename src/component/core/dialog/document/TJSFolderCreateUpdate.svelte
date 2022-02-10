@@ -15,7 +15,7 @@
 
    if (!(document instanceof Folder))
    {
-      throw new TypeError(`TJSFolderDialog error: 'document' is not an instance of Folder.`);
+      throw new TypeError(`TJSFolderCreateUpdate error: 'document' is not an instance of Folder.`);
    }
 
    const doc = new TJSDocument(document, { delete: foundryApp.close.bind(foundryApp) });
@@ -33,7 +33,7 @@
    {
       if (!(document instanceof Folder))
       {
-         throw new TypeError(`TJSFolderDialog error: 'document' is not an instance of Folder.`);
+         throw new TypeError(`TJSFolderCreateUpdate error: 'document' is not an instance of Folder.`);
       }
 
       doc.set(document);

@@ -11,11 +11,16 @@
 
    const { foundryApp } = getContext('external');
 
+   if (!(document instanceof foundry.abstract.Document))
+   {
+      throw new TypeError(`TJSPermissionControl error: 'document' is not an instance of Document.`);
+   }
+
    const doc = new TJSDocument(document, { delete: foundryApp.close.bind(foundryApp) });
 
-   let form;
+   let form, instructions;
    let currentDefault, defaultLevels, playerLevels, users;
-   let isFolder, instructions;
+   let isFolder = document instanceof Folder;
 
    $: if ($doc !== document)
    {
@@ -28,8 +33,7 @@
 
       const title = localize('PERMISSION.Title');
 
-      foundryApp.data.set('title', document instanceof foundry.abstract.Document ? `${title}: ${document.name}` :
-       `${title}: No document assigned`);
+      foundryApp.data.set('title', `${title}: ${document.name}`);
    }
 
    $: {
@@ -62,10 +66,9 @@
 
       // Default permission levels
       const defaultLevels = foundry.utils.deepClone(playerLevels);
-      if (isFolder)
-      { delete defaultLevels['-2']; }
-      else
-      { delete defaultLevels['-1']; }
+
+      if (isFolder) { delete defaultLevels['-2']; }
+      else { delete defaultLevels['-1']; }
 
       // Player users
       const users = game.users.map((u) =>

@@ -122,7 +122,7 @@ declare class TJSDocumentDelete extends SvelteComponent {
     get document(): any;
     set context(arg: any);
     get context(): any;
-    get handleClickYes(): any;
+    get deleteDocument(): any;
 }
 declare class TJSDocumentImport extends SvelteComponent {
     constructor(options: any);
@@ -130,11 +130,41 @@ declare class TJSDocumentImport extends SvelteComponent {
     get document(): any;
     get requestSubmit(): any;
 }
-declare class TJSFolderDialog extends SvelteComponent {
+declare class TJSFolderCreateUpdate extends SvelteComponent {
     constructor(options: any);
     set document(arg: any);
     get document(): any;
     get requestSubmit(): any;
+}
+declare class TJSFolderDelete extends SvelteComponent {
+    constructor(options: any);
+    set document(arg: any);
+    get document(): any;
+    get deleteFolder(): any;
+}
+declare class TJSFolderExport extends SvelteComponent {
+    constructor(options: any);
+    set document(arg: any);
+    get document(): any;
+    set packName(arg: any);
+    get packName(): any;
+    set merge(arg: any);
+    get merge(): any;
+    set keepId(arg: any);
+    get keepId(): any;
+    get exportData(): any;
+}
+declare class TJSFolderRemove extends SvelteComponent {
+    constructor(options: any);
+    set document(arg: any);
+    get document(): any;
+    get removeFolder(): any;
+}
+declare class TJSFolderRolltable extends SvelteComponent {
+    constructor(options: any);
+    set document(arg: any);
+    get document(): any;
+    get createTable(): any;
 }
 declare class TJSGlassPane extends SvelteComponent {
     constructor(options: any);
@@ -175,4 +205,4 @@ declare class TJSPermissionControl extends SvelteComponent {
     get requestSubmit(): any;
 }
 
-export { ApplicationShell, DialogContent, DialogShell, EmptyApplicationShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSDocumentCreate, TJSDocumentDelete, TJSDocumentImport, TJSFolderDialog, TJSGlassPane, TJSHeaderButton, TJSPermissionControl };
+export { ApplicationShell, DialogContent, DialogShell, EmptyApplicationShell, TJSApplicationHeader, TJSApplicationShell, TJSComponentShell, TJSContainer, TJSDocumentCreate, TJSDocumentDelete, TJSDocumentImport, TJSFolderCreateUpdate, TJSFolderDelete, TJSFolderExport, TJSFolderRemove, TJSFolderRolltable, TJSGlassPane, TJSHeaderButton, TJSPermissionControl };
