@@ -10,6 +10,7 @@
 
    const storeTitle = foundryApp.reactive.storeAppOptions.title;
    const storeDraggable = foundryApp.reactive.storeAppOptions.draggable;
+   const storeDragging = foundryApp.reactive.storeUIOptions.dragging;
    const storeHeaderButtons = foundryApp.reactive.storeUIOptions.headerButtons;
    const storeMinimizable = foundryApp.reactive.storeAppOptions.minimizable;
 
@@ -35,7 +36,7 @@
 </script>
 
 <header class="window-header flexrow"
-        use:draggable={{ positionable: foundryApp, booleanStore: $storeDraggable }}
+        use:draggable={{ positionable: foundryApp, active: $storeDraggable, storeDragging }}
         use:minimizable={$storeMinimizable}>
     <h4 class=window-title>{localize($storeTitle)}</h4>
     {#each $storeHeaderButtons as button}

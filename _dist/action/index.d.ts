@@ -18,13 +18,16 @@ declare function applyStyles(node: HTMLElement, properties: object): Function;
  *
  * @param {Positionable}      params.positionable - A positionable object.
  *
- * @param {Readable<boolean>} params.booleanStore - A Svelte store that contains a boolean.
+ * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
+ *
+ * @param {Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging" state.
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-declare function draggable(node: HTMLElement, { positionable, booleanStore }: {
+declare function draggable(node: HTMLElement, { positionable, active, storeDragging }: {
     positionable: any;
-    booleanStore: any;
+    active?: boolean;
+    storeDragging?: any;
 }): {
     update: Function;
     destroy: Function;

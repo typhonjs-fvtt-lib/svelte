@@ -924,15 +924,15 @@ class TJSHeaderButton extends SvelteComponent {
 
 function get_each_context$4(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[10] = list[i];
+	child_ctx[11] = list[i];
 	return child_ctx;
 }
 
-// (41:4) {#each $storeHeaderButtons as button}
+// (42:4) {#each $storeHeaderButtons as button}
 function create_each_block$4(ctx) {
 	let tjsheaderbutton;
 	let current;
-	tjsheaderbutton = new TJSHeaderButton({ props: { button: /*button*/ ctx[10] } });
+	tjsheaderbutton = new TJSHeaderButton({ props: { button: /*button*/ ctx[11] } });
 
 	return {
 		c() {
@@ -944,7 +944,7 @@ function create_each_block$4(ctx) {
 		},
 		p(ctx, dirty) {
 			const tjsheaderbutton_changes = {};
-			if (dirty & /*$storeHeaderButtons*/ 8) tjsheaderbutton_changes.button = /*button*/ ctx[10];
+			if (dirty & /*$storeHeaderButtons*/ 8) tjsheaderbutton_changes.button = /*button*/ ctx[11];
 			tjsheaderbutton.$set(tjsheaderbutton_changes);
 		},
 		i(local) {
@@ -1014,9 +1014,10 @@ function create_fragment$f(ctx) {
 				dispose = [
 					action_destroyer(draggable_action = draggable.call(null, header, {
 						positionable: /*foundryApp*/ ctx[4],
-						booleanStore: /*$storeDraggable*/ ctx[0]
+						active: /*$storeDraggable*/ ctx[0],
+						storeDragging: /*storeDragging*/ ctx[7]
 					})),
-					action_destroyer(minimizable_action = /*minimizable*/ ctx[9].call(null, header, /*$storeMinimizable*/ ctx[1]))
+					action_destroyer(minimizable_action = /*minimizable*/ ctx[10].call(null, header, /*$storeMinimizable*/ ctx[1]))
 				];
 
 				mounted = true;
@@ -1054,7 +1055,8 @@ function create_fragment$f(ctx) {
 
 			if (draggable_action && is_function(draggable_action.update) && dirty & /*$storeDraggable*/ 1) draggable_action.update.call(null, {
 				positionable: /*foundryApp*/ ctx[4],
-				booleanStore: /*$storeDraggable*/ ctx[0]
+				active: /*$storeDraggable*/ ctx[0],
+				storeDragging: /*storeDragging*/ ctx[7]
 			});
 
 			if (minimizable_action && is_function(minimizable_action.update) && dirty & /*$storeMinimizable*/ 2) minimizable_action.update.call(null, /*$storeMinimizable*/ ctx[1]);
@@ -1096,6 +1098,7 @@ function instance$f($$self, $$props, $$invalidate) {
 	component_subscribe($$self, storeTitle, value => $$invalidate(2, $storeTitle = value));
 	const storeDraggable = foundryApp.reactive.storeAppOptions.draggable;
 	component_subscribe($$self, storeDraggable, value => $$invalidate(0, $storeDraggable = value));
+	const storeDragging = foundryApp.reactive.storeUIOptions.dragging;
 	const storeHeaderButtons = foundryApp.reactive.storeUIOptions.headerButtons;
 	component_subscribe($$self, storeHeaderButtons, value => $$invalidate(3, $storeHeaderButtons = value));
 	const storeMinimizable = foundryApp.reactive.storeAppOptions.minimizable;
@@ -1137,6 +1140,7 @@ function instance$f($$self, $$props, $$invalidate) {
 		foundryApp,
 		storeTitle,
 		storeDraggable,
+		storeDragging,
 		storeHeaderButtons,
 		storeMinimizable,
 		minimizable

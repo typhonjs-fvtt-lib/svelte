@@ -3,9 +3,11 @@ import {
    isApplicationShell,
    outroAndDestroy }          from '@typhonjs-fvtt/svelte/util';
 
-import { GetSvelteData }      from './internal/GetSvelteData.js';
-import { loadSvelteConfig }   from './internal/loadSvelteConfig.js';
-import { SvelteReactive }     from './internal/SvelteReactive.js';
+import {
+   GetSvelteData,
+   loadSvelteConfig,
+   Position,
+   SvelteReactive }           from './internal/index.js';
 
 /**
  * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
@@ -42,6 +44,13 @@ export class SvelteApplication extends Application
    #initialZIndex = 95;
 
    /**
+    * The position store.
+    *
+    * @type {Position}
+    */
+   #position;
+
+   /**
     * Contains the Svelte stores and reactive accessors.
     *
     * @type {SvelteReactive}
@@ -76,6 +85,24 @@ export class SvelteApplication extends Application
    constructor(options)
    {
       super(options);
+
+      // Initialize Position with the position object set by Application.
+      this.#position = new Position(this.position);
+
+      // Remove old position field.
+      delete this.position;
+
+      /**
+       * Define accessors to retrieve Position by `this.position`.
+       *
+       * @member {PositionData} position - Adds accessors to SvelteApplication to get / set the position data.
+       *
+       * @memberof SvelteApplication#
+       */
+      Object.defineProperty(this, 'position', {
+         get: () => this.#position,
+         set: (position) => { if (typeof position === 'object') { this.#position.set(position); } }
+      });
 
       this.#reactive = new SvelteReactive(this);
 
@@ -553,38 +580,46 @@ export class SvelteApplication extends Application
 
    /**
     * Modified Application `setPosition` which changes a few aspects from the default {@link Application.setPosition}.
-    * The gate on `popOut` is removed, so if manually called popOut applications can use `setPosition`.
+    * The gate on `popOut` is removed, so if manually called popOut applications can set `this.options.setPosition` to
+    * true.
     *
-    * There are two new options `noHeight` and `noWidth` that respect `width` & `height` style options while still
-    * producing a correct position object in return. You may set these options manually, but they are also automatically
-    * determined when not explicitly provided by checking if the target element style for `height` or `width` is `auto`.
+    * An added second parameter provides additional options. `apply` when set to false will not apply any position
+    * changes. This is useful when providing overridden `setPosition` implementations as `this.position` is now a store
+    * and this prevents multiple updates / notifications. The other two new options `noHeight` and `noWidth` that
+    * respect `width` & `height` style options while still producing a correct position object in return. You may set
+    * these options manually, but they are also automatically determined when not explicitly provided by checking if
+    * the target element style for `height` or `width` is `auto`.
+    *
+    * @param {object}               [pos] - Position data.
+    *
+    * @param {number|null}          [pos.left] - The left offset position in pixels
+    *
+    * @param {number|null}          [pos.top] - The top offset position in pixels
+    *
+    * @param {number|string|null}   [pos.width] - The application width in pixels
+    *
+    * @param {number|string|null}   [pos.height] - The application height in pixels
+    *
+    * @param {number|null}          [pos.scale] - The application scale as a numeric factor where 1.0 is default
     *
     * @param {object}               [opts] - Optional parameters.
-    *
-    * @param {number|null}          [opts.left] - The left offset position in pixels
-    *
-    * @param {number|null}          [opts.top] - The top offset position in pixels
-    *
-    * @param {number|string|null}   [opts.width] - The application width in pixels
-    *
-    * @param {number|string|null}   [opts.height] - The application height in pixels
-    *
-    * @param {number|null}          [opts.scale] - The application scale as a numeric factor where 1.0 is default
     *
     * @param {boolean}              [opts.noHeight] - When true no element height is modified.
     *
     * @param {boolean}              [opts.noWidth] - When true no element width is modified.
     *
-    * @returns {{left: number, top: number, width: number, height: number, scale:number}}
+    * @param {boolean}              [opts.apply=true] - When true adjusted position is applied to Position.
+    *
+    * @returns {PositionData}
     * The updated position object for the application containing the new values
     */
-   setPosition({ left, top, width, height, scale, noHeight, noWidth } = {})
+   setPosition({ left, top, width, height, scale } = {}, { noHeight, noWidth, apply = true } = {})
    {
       // An early out to prevent `setPosition` from taking effect.
       if (typeof this.options.setPosition === 'boolean' && !this.options.setPosition) { return; }
 
       const el = this.elementTarget;
-      const currentPosition = this.position;
+      const currentPosition = this.position.get();
       const styles = globalThis.getComputedStyle(el);
 
       // Automatically determine if noHeightActual from manual value or when `el.style.height` is `auto`.
@@ -644,6 +679,10 @@ export class SvelteApplication extends Application
          if (scale === 1) { el.style.transform = ""; }
          else { el.style.transform = `scale(${scale})`; }
       }
+
+      // Apply the modified position to Position store. This is useful when child classes need to make further
+      // modification before setting. This also allows a single update to occur for cumulative position changes.
+      if (apply) { this.position.set(currentPosition); }
 
       // Return the updated position object
       return currentPosition;

@@ -41,11 +41,13 @@ function applyStyles(node, properties)
  *
  * @param {Positionable}      params.positionable - A positionable object.
  *
- * @param {Readable<boolean>} params.booleanStore - A Svelte store that contains a boolean.
+ * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
+ *
+ * @param {Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging" state.
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-function draggable(node, { positionable, booleanStore })
+function draggable(node, { positionable, active = true, storeDragging = void 0 })
 {
    /**
     * Duplicate the app / Positionable starting position to track differences.
@@ -69,13 +71,6 @@ function draggable(node, { positionable, booleanStore })
    let moveTime = 0;
 
    /**
-    * Stores the active state and is used to cut off any active dragging when the store value changes.
-    *
-    * @type {Readable<boolean>}
-    */
-   let active = booleanStore;
-
-   /**
     * Remember event handlers associated with this action so they may be later unregistered.
     *
     * @type {object}
@@ -91,8 +86,6 @@ function draggable(node, { positionable, booleanStore })
     */
    function activateListeners()
    {
-      active = true;
-
       // Drag handlers
       node.addEventListener(...handlers.dragDown);
       node.classList.add('draggable');
@@ -103,7 +96,7 @@ function draggable(node, { positionable, booleanStore })
     */
    function removeListeners()
    {
-      active = false;
+      if (typeof storeDragging?.set === 'function') { storeDragging.set(false); }
 
       // Drag handlers
       node.removeEventListener(...handlers.dragDown);
@@ -126,13 +119,17 @@ function draggable(node, { positionable, booleanStore })
    {
       event.preventDefault();
 
+      if (typeof storeDragging?.set === 'function') { storeDragging.set(true); }
+
       // Record initial position
       position = foundry.utils.duplicate(positionable.position);
       initialPosition = { x: event.clientX, y: event.clientY };
 
       // Add temporary handlers
-      globalThis.addEventListener(...handlers.dragMove);
-      globalThis.addEventListener(...handlers.dragUp);
+      node.addEventListener(...handlers.dragMove);
+      node.addEventListener(...handlers.dragUp);
+
+      node.setPointerCapture(event.pointerId);
    }
 
    /**
@@ -143,8 +140,6 @@ function draggable(node, { positionable, booleanStore })
    function onDragPointerMove(event)
    {
       event.preventDefault();
-
-      if (!active) { return; }
 
       // Limit dragging to 60 updates per second
       const now = Date.now();
@@ -167,19 +162,25 @@ function draggable(node, { positionable, booleanStore })
     */
    function onDragPointerUp(event)
    {
+      if (typeof storeDragging?.set === 'function') { storeDragging.set(false); }
+
       event.preventDefault();
-      globalThis.removeEventListener(...handlers.dragMove);
-      globalThis.removeEventListener(...handlers.dragUp);
+      node.removeEventListener(...handlers.dragMove);
+      node.removeEventListener(...handlers.dragUp);
    }
 
    return {
-      update: ({ booleanStore }) =>  // eslint-disable-line no-shadow
+      update: ({ active }) =>  // eslint-disable-line no-shadow
       {
-         if (booleanStore) { activateListeners(); }
+         if (active) { activateListeners(); }
          else { removeListeners(); }
       },
 
-      destroy: () => removeListeners()
+      destroy: () =>
+      {
+         if (typeof storeDragging?.set === 'function') { storeDragging.set(false); }
+         removeListeners();
+      }
    };
 }
 

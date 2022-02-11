@@ -332,6 +332,7 @@ export class SvelteReactive
 
       // Create a store for UI state data.
       const writableUIOptions = writable({
+         dragging: false,
          headerButtons: [],
          minimized: this.#application._minimized
       });
@@ -344,6 +345,8 @@ export class SvelteReactive
        */
       const storeUIOptions = {
          subscribe: writableUIOptions.subscribe,
+
+         dragging: propertyStore(writableUIOptions, 'dragging'),
 
          headerButtons: derived(writableUIOptions, ($options, set) => set($options.headerButtons)),
          minimized: derived(writableUIOptions, ($options, set) => set($options.minimized))

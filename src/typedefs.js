@@ -47,6 +47,8 @@
  *
  * @property {import('svelte/store').Readable.subscribe} subscribe - Subscribe to all UI options updates.
  *
+ * @property {import('svelte/store').Writable<boolean>} dragging - Derived store for `dragging` updates.
+ *
  * @property {import('svelte/store').Readable<ApplicationHeaderButton[]>} headerButtons - Derived store for
  *                                                                                        `headerButtons` updates.
  *
