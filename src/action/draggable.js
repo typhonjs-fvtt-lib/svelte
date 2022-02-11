@@ -95,6 +95,8 @@ export function draggable(node, { positionable, active = true, storeDragging = v
       // Add temporary handlers
       node.addEventListener(...handlers.dragMove);
       node.addEventListener(...handlers.dragUp);
+
+      node.setPointerCapture(event.pointerId);
    }
 
    /**
