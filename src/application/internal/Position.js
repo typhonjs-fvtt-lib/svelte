@@ -167,15 +167,22 @@ export class Position
     */
    #notify()
    {
+      // Subscriptions are stored locally as on the browser Babel is still used for private class fields / Babel
+      // support until 2023. IE not doing this will require several extra method calls otherwise.
+      const subscriptions = this.#subscriptions;
+
+      // Early out if there are no subscribers.
+      if (subscriptions.length === 0) { return; }
+
       const data = this.#data;
 
       // Create hash with current values.
       let newHash = 37;
 
-      newHash ^= data.left + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
-      newHash ^= data.top + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
-      newHash ^= data.scale + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
-      newHash ^= data.zIndex + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
+      newHash ^= (typeof data.left === 'number' ? data.left : 0) + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
+      newHash ^= (typeof data.top === 'number' ? data.top : 0) + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
+      newHash ^= (typeof data.scale === 'number' ? data.scale : 0) + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
+      newHash ^= (typeof data.zIndex === 'number' ? data.zIndex : 0) + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
       newHash ^= (typeof data.width === 'number' ? data.width : hashCode(data.width)) + 0x9e3779b9 + (newHash << 6) +
        (newHash >> 2);
       newHash ^= (typeof data.height === 'number' ? data.height : hashCode(data.height)) + 0x9e3779b9 + (newHash << 6) +
@@ -188,9 +195,6 @@ export class Position
 
          this.#hash = newHash;
 
-         // Subscriptions are stored locally as on the browser Babel is still used for private class fields / Babel
-         // support until 2023. IE not doing this will require several extra method calls otherwise.
-         const subscriptions = this.#subscriptions;
          for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](position); }
       }
    }
