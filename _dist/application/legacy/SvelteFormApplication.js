@@ -615,7 +615,7 @@ export class SvelteFormApplication extends FormApplication
     * these options manually, but they are also automatically determined when not explicitly provided by checking if
     * the target element style for `height` or `width` is `auto`.
     *
-    * @param {object}               [pos] - Optional parameters.
+    * @param {PositionData}               [pos] - Optional parameters.
     *
     * @param {number|null}          [pos.left] - The left offset position in pixels
     *
@@ -627,20 +627,15 @@ export class SvelteFormApplication extends FormApplication
     *
     * @param {number|null}          [pos.scale] - The application scale as a numeric factor where 1.0 is default
     *
-    * @param {object}               [opts] - Optional parameters.
-    *
-    * @param {boolean}              [opts.apply=true] - When true adjusted position is applied to Position.
-    *
-    * @returns {PositionData}
-    * The updated position object for the application containing the new values
+    * @returns {PositionData} The updated position object for the application containing the new values
     */
-   setPosition({ left, top, width, height, scale } = {}, { apply = true } = {})
+   setPosition({ left, top, width, height, scale } = {})
    {
       // An early out to prevent `setPosition` from taking effect.
       if (typeof this.options.setPosition === 'boolean' && !this.options.setPosition) { return; }
 
       const el = this.elementTarget;
-      const currentPosition = this.position.get();
+      let currentPosition = this.position.get();
       const styles = globalThis.getComputedStyle(el);
 
       // Automatically determine if noHeight when `el.style.height` is `auto`.
@@ -654,10 +649,9 @@ export class SvelteFormApplication extends FormApplication
       {
          const tarW = width || el.offsetWidth;
          const minW = parseInt(styles.minWidth) || MIN_WINDOW_WIDTH;
-         const maxW = el.style.maxWidth || globalThis.innerWidth;
+         const maxW = parseInt(styles.maxWidth) || el.style.maxWidth || globalThis.innerWidth;
          currentPosition.width = width = Math.clamped(tarW, minW, maxW);
 
-         if (!noWidth) { el.style.width = `${width}px`; }
          if ((width + currentPosition.left) > globalThis.innerWidth) { left = currentPosition.left; }
       }
       width = el.offsetWidth;
@@ -667,10 +661,9 @@ export class SvelteFormApplication extends FormApplication
       {
          const tarH = height || (el.offsetHeight + 1);
          const minH = parseInt(styles.minHeight) || MIN_WINDOW_HEIGHT;
-         const maxH = el.style.maxHeight || globalThis.innerHeight;
+         const maxH = parseInt(styles.maxHeight) || el.style.maxHeight || globalThis.innerHeight;
          currentPosition.height = height = Math.clamped(tarH, minH, maxH);
 
-         if (!noHeight) { el.style.height = `${height}px`; }
          if ((height + currentPosition.top) > globalThis.innerHeight + 1) { top = currentPosition.top - 1; }
       }
       height = el.offsetHeight;
@@ -681,7 +674,6 @@ export class SvelteFormApplication extends FormApplication
          const tarL = Number.isFinite(left) ? left : (globalThis.innerWidth - width) / 2;
          const maxL = Math.max(globalThis.innerWidth - width, 0);
          currentPosition.left = left = Math.clamped(tarL, 0, maxL);
-         el.style.left = `${left}px`;
       }
 
       // Update Top
@@ -690,20 +682,30 @@ export class SvelteFormApplication extends FormApplication
          const tarT = Number.isFinite(top) ? top : (globalThis.innerHeight - height) / 2;
          const maxT = Math.max(globalThis.innerHeight - height, 0);
          currentPosition.top = top = Math.clamped(tarT, 0, maxT);
-         el.style.top = `${currentPosition.top}px`;
       }
 
       // Update Scale
       if (scale)
       {
          currentPosition.scale = Math.max(scale, 0);
-         if (scale === 1) { el.style.transform = ''; }
-         else { el.style.transform = `scale(${scale})`; }
       }
 
-      // Apply the modified position to Position store. This gate is useful when child classes need to make further
-      // modification before setting allowing a single update to occur if there are further modifications.
-      if (apply) { this.position.set(currentPosition); }
+      // Set the position and allow any validators to alter the position data.
+      currentPosition = this.position.set(currentPosition);
+
+      if (currentPosition)
+      {
+         if (!noWidth) { el.style.width = `${currentPosition.width}px`; }
+         if (!noHeight) { el.style.height = `${currentPosition.height}px`; }
+         el.style.left = `${currentPosition.left}px`;
+         el.style.top = `${currentPosition.top}px`;
+
+         if (currentPosition.scale)
+         {
+            if (currentPosition.scale === 1) { el.style.transform = ''; }
+            else { el.style.transform = `scale(${currentPosition.scale})`; }
+         }
+      }
 
       // Return the updated position object
       return currentPosition;

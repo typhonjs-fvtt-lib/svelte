@@ -1,4 +1,6 @@
-import { hashCode } from '@typhonjs-fvtt/svelte/util';
+import { hashCode }           from '@typhonjs-fvtt/svelte/util';
+
+import { AdapterValidators }  from './AdapterValidators.js';
 
 /**
  * Provides a store for position following the subscriber protocol.
@@ -21,17 +23,26 @@ export class Position
    #hash = 0;
 
    /**
+    * @type {AdapterValidators}
+    */
+   #validators;
+
+   /**
+    * @type {ValidatorData[]}
+    */
+   #validatorsAdapter;
+
+   /**
     * @param {PositionData}   position - Initial position data.
     */
    constructor(position)
    {
+      [this.#validators, this.#validatorsAdapter] = new AdapterValidators();
+
       this.set(position);
    }
 
-   /**
-    * @returns {number|string} height
-    */
-   get height() { return this.#data.height; }
+   get validators() { return this.#validators; }
 
    /**
     * Provides a boolean to check / verify that the given object is a Position instance.
@@ -39,6 +50,13 @@ export class Position
     * @returns {boolean} Is this a Position instance.
     */
    get isPosition() { return true; }
+
+// Data accessors ----------------------------------------------------------------------------------------------------
+
+   /**
+    * @returns {number|string} height
+    */
+   get height() { return this.#data.height; }
 
    /**
     * @returns {number} left
@@ -203,12 +221,25 @@ export class Position
     * @param {PositionData}   position - Position data to set.
     *
     * @param {boolean}        [notify=true] - Notify subscribers.
+    *
+    * @returns {PositionData|null} The set position data after validation or null if rejected.
     */
    set(position, notify = true)
    {
-      if (typeof position !== 'object') { return; }
+      if (typeof position !== 'object') { return null; }
 
       const data = this.#data;
+      const validators = this.#validators;
+
+      if (validators.length)
+      {
+         for (const validator of validators)
+         {
+            position = validator.validator(null, position);
+
+            if (position === null) { return null; }
+         }
+      }
 
       if (typeof position.left === 'number') { data.left = position.left; }
       if (typeof position.top === 'number') { data.top = position.top; }
@@ -218,6 +249,8 @@ export class Position
       if (typeof position.height === 'number' || position.height === 'auto') { data.height = position.height; }
 
       if (notify) { this.#notify(); }
+
+      return position;
    }
 
    /**
