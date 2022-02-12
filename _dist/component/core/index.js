@@ -1322,9 +1322,10 @@ function instance$e($$self, $$props, $$invalidate) {
 			initialPosition = { x: event.clientX, y: event.clientY };
 
 			// Add temporary handlers
-			globalThis.addEventListener(...handlers.resizeMove);
+			node.addEventListener(...handlers.resizeMove);
 
-			globalThis.addEventListener(...handlers.resizeUp);
+			node.addEventListener(...handlers.resizeUp);
+			node.setPointerCapture(event.pointerId);
 		}
 
 		/**
@@ -1350,8 +1351,8 @@ function instance$e($$self, $$props, $$invalidate) {
  */
 		function onResizePointerUp(event) {
 			event.preventDefault();
-			globalThis.removeEventListener(...handlers.resizeMove);
-			globalThis.removeEventListener(...handlers.resizeUp);
+			node.removeEventListener(...handlers.resizeMove);
+			node.removeEventListener(...handlers.resizeUp);
 			foundryApp._onResize(event);
 		}
 
