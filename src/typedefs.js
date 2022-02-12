@@ -53,6 +53,8 @@
  *                                                                                        `headerButtons` updates.
  *
  * @property {import('svelte/store').Readable<boolean>} minimized - Derived store for `minimized` updates.
+ *
+ * @property {import('svelte/store').Writable<boolean>} resizing - Derived store for `resizing` updates.
  */
 
 /**

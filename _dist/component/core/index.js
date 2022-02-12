@@ -1170,21 +1170,28 @@ function create_fragment$e(ctx) {
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
-			/*div_binding*/ ctx[9](div);
+			/*div_binding*/ ctx[10](div);
 
 			if (!mounted) {
-				dispose = action_destroyer(resizable_action = /*resizable*/ ctx[5].call(null, div, /*$storeResizable*/ ctx[1]));
+				dispose = action_destroyer(resizable_action = /*resizable*/ ctx[6].call(null, div, {
+					active: /*$storeResizable*/ ctx[1],
+					storeResizing: /*storeResizing*/ ctx[5]
+				}));
+
 				mounted = true;
 			}
 		},
 		p(ctx, [dirty]) {
-			if (resizable_action && is_function(resizable_action.update) && dirty & /*$storeResizable*/ 2) resizable_action.update.call(null, /*$storeResizable*/ ctx[1]);
+			if (resizable_action && is_function(resizable_action.update) && dirty & /*$storeResizable*/ 2) resizable_action.update.call(null, {
+				active: /*$storeResizable*/ ctx[1],
+				storeResizing: /*storeResizing*/ ctx[5]
+			});
 		},
 		i: noop,
 		o: noop,
 		d(detaching) {
 			if (detaching) detach(div);
-			/*div_binding*/ ctx[9](null);
+			/*div_binding*/ ctx[10](null);
 			mounted = false;
 			dispose();
 		}
@@ -1201,11 +1208,12 @@ function instance$e($$self, $$props, $$invalidate) {
 	// Allows retrieval of the element root at runtime.
 	const storeElementRoot = getContext('storeElementRoot');
 
-	component_subscribe($$self, storeElementRoot, value => $$invalidate(7, $storeElementRoot = value));
+	component_subscribe($$self, storeElementRoot, value => $$invalidate(8, $storeElementRoot = value));
 	const storeResizable = foundryApp.reactive.storeAppOptions.resizable;
 	component_subscribe($$self, storeResizable, value => $$invalidate(1, $storeResizable = value));
 	const storeMinimized = foundryApp.reactive.storeUIOptions.minimized;
-	component_subscribe($$self, storeMinimized, value => $$invalidate(8, $storeMinimized = value));
+	component_subscribe($$self, storeMinimized, value => $$invalidate(9, $storeMinimized = value));
+	const storeResizing = foundryApp.reactive.storeUIOptions.resizing;
 	let elementResize;
 
 	/**
@@ -1213,11 +1221,15 @@ function instance$e($$self, $$props, $$invalidate) {
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
- * @param {Readable<boolean>} booleanStore - A Svelte store that contains a boolean.
+ * @param {object}            [opts] - Optional parameters.
+ *
+ * @param {boolean}           [opts.active=true] - A boolean value; attached to a readable store.
+ *
+ * @param {Writable<boolean>} [opts.storeResizing] - A writable store that tracks "resizing" state.
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-	function resizable(node, booleanStore) {
+	function resizable(node, { active = true, storeResizing = void 0 } = {}) {
 		/**
  * Duplicate the app / Positionable starting position to track differences.
  *
@@ -1240,13 +1252,6 @@ function instance$e($$self, $$props, $$invalidate) {
 		let moveTime = 0;
 
 		/**
- * Stores the active state and is used to cut off any active resizing when the store value changes.
- *
- * @type {boolean}
- */
-		let active = booleanStore;
-
-		/**
  * Remember event handlers associated with this action so they may be later unregistered.
  *
  * @type {Object}
@@ -1261,12 +1266,10 @@ function instance$e($$self, $$props, $$invalidate) {
  * Activates listeners.
  */
 		function activateListeners() {
-			active = true;
-
 			// Resize handlers
 			node.addEventListener(...handlers.resizeDown);
 
-			$$invalidate(6, isResizable = true);
+			$$invalidate(7, isResizable = true);
 			node.style.display = 'block';
 		}
 
@@ -1274,7 +1277,9 @@ function instance$e($$self, $$props, $$invalidate) {
  * Removes listeners.
  */
 		function removeListeners() {
-			active = false;
+			if (typeof storeResizing?.set === 'function') {
+				storeResizing.set(false);
+			}
 
 			// Resize handlers
 			node.removeEventListener(...handlers.resizeDown);
@@ -1282,7 +1287,7 @@ function instance$e($$self, $$props, $$invalidate) {
 			node.removeEventListener(...handlers.resizeMove);
 			node.removeEventListener(...handlers.resizeUp);
 			node.style.display = 'none';
-			$$invalidate(6, isResizable = false);
+			$$invalidate(7, isResizable = false);
 		}
 
 		// On mount if resizable is true then activate listeners otherwise set element display to `none`.
@@ -1298,6 +1303,10 @@ function instance$e($$self, $$props, $$invalidate) {
  */
 		function onResizePointerDown(event) {
 			event.preventDefault();
+
+			if (typeof storeResizing?.set === 'function') {
+				storeResizing.set(true);
+			}
 
 			// Limit dragging to 60 updates per second
 			const now = Date.now();
@@ -1335,10 +1344,6 @@ function instance$e($$self, $$props, $$invalidate) {
 		function onResizePointerMove(event) {
 			event.preventDefault();
 
-			if (!active) {
-				return;
-			}
-
 			foundryApp.setPosition({
 				width: position.width + (event.clientX - initialPosition.x),
 				height: position.height + (event.clientY - initialPosition.y)
@@ -1350,6 +1355,10 @@ function instance$e($$self, $$props, $$invalidate) {
  * @private
  */
 		function onResizePointerUp(event) {
+			if (typeof storeResizing?.set === 'function') {
+				storeResizing.set(false);
+			}
+
 			event.preventDefault();
 			node.removeEventListener(...handlers.resizeMove);
 			node.removeEventListener(...handlers.resizeUp);
@@ -1357,9 +1366,9 @@ function instance$e($$self, $$props, $$invalidate) {
 		}
 
 		return {
-			update: booleanStore => // eslint-disable-line no-shadow
+			update: ({ active }) => // eslint-disable-line no-shadow
 			{
-				if (booleanStore) {
+				if (active) {
 					activateListeners();
 				} else {
 					removeListeners();
@@ -1372,16 +1381,16 @@ function instance$e($$self, $$props, $$invalidate) {
 	function div_binding($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
 			elementResize = $$value;
-			((($$invalidate(0, elementResize), $$invalidate(6, isResizable)), $$invalidate(8, $storeMinimized)), $$invalidate(7, $storeElementRoot));
+			((($$invalidate(0, elementResize), $$invalidate(7, isResizable)), $$invalidate(9, $storeMinimized)), $$invalidate(8, $storeElementRoot));
 		});
 	}
 
 	$$self.$$set = $$props => {
-		if ('isResizable' in $$props) $$invalidate(6, isResizable = $$props.isResizable);
+		if ('isResizable' in $$props) $$invalidate(7, isResizable = $$props.isResizable);
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*elementResize, isResizable, $storeMinimized, $storeElementRoot*/ 449) {
+		if ($$self.$$.dirty & /*elementResize, isResizable, $storeMinimized, $storeElementRoot*/ 897) {
 			if (elementResize) {
 				// Instead of creating a derived store it is easier to use isResizable and the minimized store below.
 				$$invalidate(0, elementResize.style.display = isResizable && !$storeMinimized ? 'block' : 'none', elementResize);
@@ -1402,6 +1411,7 @@ function instance$e($$self, $$props, $$invalidate) {
 		storeElementRoot,
 		storeResizable,
 		storeMinimized,
+		storeResizing,
 		resizable,
 		isResizable,
 		$storeElementRoot,
@@ -1413,7 +1423,7 @@ function instance$e($$self, $$props, $$invalidate) {
 class ResizableHandle extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance$e, create_fragment$e, safe_not_equal, { isResizable: 6 });
+		init(this, options, instance$e, create_fragment$e, safe_not_equal, { isResizable: 7 });
 	}
 }
 

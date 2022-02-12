@@ -334,7 +334,8 @@ export class SvelteReactive
       const writableUIOptions = writable({
          dragging: false,
          headerButtons: [],
-         minimized: this.#application._minimized
+         minimized: this.#application._minimized,
+         resizing: false
       });
 
       // Keep the update function locally, but make the store essentially readable.
@@ -347,9 +348,9 @@ export class SvelteReactive
          subscribe: writableUIOptions.subscribe,
 
          dragging: propertyStore(writableUIOptions, 'dragging'),
-
          headerButtons: derived(writableUIOptions, ($options, set) => set($options.headerButtons)),
-         minimized: derived(writableUIOptions, ($options, set) => set($options.minimized))
+         minimized: derived(writableUIOptions, ($options, set) => set($options.minimized)),
+         resizing: propertyStore(writableUIOptions, 'resizing')
       };
 
       Object.freeze(storeUIOptions);

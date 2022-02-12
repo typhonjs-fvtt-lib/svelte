@@ -9,7 +9,9 @@
    const storeElementRoot = getContext('storeElementRoot');
 
    const storeResizable = foundryApp.reactive.storeAppOptions.resizable;
+
    const storeMinimized = foundryApp.reactive.storeUIOptions.minimized;
+   const storeResizing = foundryApp.reactive.storeUIOptions.resizing;
 
    let elementResize;
 
@@ -28,11 +30,15 @@
     *
     * @param {HTMLElement}       node - The node associated with the action.
     *
-    * @param {Readable<boolean>} booleanStore - A Svelte store that contains a boolean.
+    * @param {object}            [opts] - Optional parameters.
+    *
+    * @param {boolean}           [opts.active=true] - A boolean value; attached to a readable store.
+    *
+    * @param {Writable<boolean>} [opts.storeResizing] - A writable store that tracks "resizing" state.
     *
     * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
     */
-   function resizable(node, booleanStore)
+   function resizable(node, { active = true, storeResizing = void 0 } = {})
    {
       /**
        * Duplicate the app / Positionable starting position to track differences.
@@ -56,13 +62,6 @@
       let moveTime = 0;
 
       /**
-       * Stores the active state and is used to cut off any active resizing when the store value changes.
-       *
-       * @type {boolean}
-       */
-      let active = booleanStore;
-
-      /**
        * Remember event handlers associated with this action so they may be later unregistered.
        *
        * @type {Object}
@@ -78,8 +77,6 @@
        */
       function activateListeners()
       {
-         active = true;
-
          // Resize handlers
          node.addEventListener(...handlers.resizeDown);
 
@@ -93,7 +90,7 @@
        */
       function removeListeners()
       {
-         active = false;
+         if (typeof storeResizing?.set === 'function') { storeResizing.set(false); }
 
          // Resize handlers
          node.removeEventListener(...handlers.resizeDown);
@@ -122,6 +119,8 @@
       function onResizePointerDown(event)
       {
          event.preventDefault();
+
+         if (typeof storeResizing?.set === 'function') { storeResizing.set(true); }
 
          // Limit dragging to 60 updates per second
          const now = Date.now();
@@ -153,8 +152,6 @@
       {
          event.preventDefault();
 
-         if (!active) { return; }
-
          foundryApp.setPosition({
             width: position.width + (event.clientX - initialPosition.x),
             height: position.height + (event.clientY - initialPosition.y)
@@ -167,19 +164,19 @@
        */
       function onResizePointerUp(event)
       {
-         event.preventDefault();
+         if (typeof storeResizing?.set === 'function') { storeResizing.set(false); }
 
+         event.preventDefault();
          node.removeEventListener(...handlers.resizeMove);
          node.removeEventListener(...handlers.resizeUp);
 
          foundryApp._onResize(event);
       }
 
-
       return {
-         update: (booleanStore) =>  // eslint-disable-line no-shadow
+         update: ({ active }) =>  // eslint-disable-line no-shadow
          {
-            if (booleanStore) { activateListeners(); }
+            if (active) { activateListeners(); }
             else { removeListeners(); }
          },
 
@@ -190,7 +187,7 @@
 </script>
 
 <div class="window-resizable-handle"
-     use:resizable={$storeResizable}
+     use:resizable={{active: $storeResizable, storeResizing}}
      bind:this={elementResize}>
    <i class="fas fa-arrows-alt-h"></i>
 </div>
