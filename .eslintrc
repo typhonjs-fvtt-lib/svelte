@@ -31,6 +31,7 @@
         "context",
         "document",
         "event",
+        "length",
         "name",
         "parent",
         "status",
