@@ -176,11 +176,7 @@ function draggable(node, { positionable, active = true, storeDragging = void 0 }
          else { removeListeners(); }
       },
 
-      destroy: () =>
-      {
-         if (typeof storeDragging?.set === 'function') { storeDragging.set(false); }
-         removeListeners();
-      }
+      destroy: () => removeListeners()
    };
 }
 
