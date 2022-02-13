@@ -66,4 +66,31 @@ export class TJSFolderRemove extends TJSDialog
          }
       });
    }
+
+   /**
+    * Removes a folder, but does not delete / remove subfolders / documents.
+    *
+    * @param {Folder} document - Folder to remove.
+    *
+    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    *
+    * @param {object} [dialogData] - Optional data to modify dialog.
+    *
+    * @returns {Promise<Folder|boolean|null>} The removed Folder or a falsy value; either 'false' for cancelling or
+    * 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    */
+   static async show(document, options = {}, dialogData = {})
+   {
+      if (!(document instanceof Folder))
+      {
+         console.warn(`TJSFolderRemove - show - warning: 'document' is not a Folder.`);
+         return null;
+      }
+
+      return new Promise((resolve) =>
+      {
+         options.resolve = resolve;
+         new TJSFolderRemove(document, options, dialogData).render(true, { focus: true });
+      });
+   }
 }

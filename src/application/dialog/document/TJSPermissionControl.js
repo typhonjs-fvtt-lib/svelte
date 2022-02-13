@@ -58,4 +58,31 @@ export class TJSPermissionControl extends TJSDialog
          }
       });
    }
+
+   /**
+    * Change permissions of a document by rendering a dialog to alter the default and all user / player permissions.
+    *
+    * @param {foundry.abstract.Document} document - Document instance to modify.
+    *
+    * @param {object} [options] - Rest of options to pass to TJSDialog / Application.
+    *
+    * @param {object} [dialogData] - Optional data to modify dialog.
+    *
+    * @returns {Promise<Document|null>} The modified document or 'null' if the user closed the dialog via `<Esc>` or the
+    *                                   close header button.
+    */
+   static async show(document, options = {}, dialogData = {})
+   {
+      if (!(document instanceof foundry.abstract.Document))
+      {
+         console.warn(`TJSPermissionControl - show - warning: 'document' is not a Document.`);
+         return null;
+      }
+
+      return new Promise((resolve) =>
+      {
+         options.resolve = resolve;
+         new TJSPermissionControl(document, options, dialogData).render(true, { focus: true });
+      });
+   }
 }

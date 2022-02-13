@@ -66,4 +66,37 @@ export class TJSDocumentImport extends TJSDialog
          }
       });
    }
+
+   /**
+    * Render an import dialog for updating the data related to this Document through an exported JSON file
+    *
+    * @param {foundry.abstract.Document} document - The document to import JSON to...
+    *
+    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    *
+    * @param {object} [dialogData] - Optional data to modify dialog.
+    *
+    * @returns {Promise<Document|boolean|null>} The document after import completes or a falsy value; either 'false' for
+    *                         cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    */
+   static async show(document, options = {}, dialogData = {})
+   {
+      if (!(document instanceof foundry.abstract.Document))
+      {
+         console.warn(`TJSDocumentImport - show - warning: 'document' is not a Document.`);
+         return null;
+      }
+
+      if (document instanceof Folder)
+      {
+         console.warn(`TJSDocumentImport - show - warning: 'document' is a Folder; unsupported operation'.`);
+         return null;
+      }
+
+      return new Promise((resolve) =>
+      {
+         options.resolve = resolve;
+         new TJSDocumentImport(document, options, dialogData).render(true, { focus: true });
+      });
+   }
 }

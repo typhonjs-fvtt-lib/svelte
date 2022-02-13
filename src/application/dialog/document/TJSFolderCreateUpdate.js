@@ -57,4 +57,66 @@ export class TJSFolderCreateUpdate extends TJSDialog
          }
       });
    }
+
+   /**
+    * Create a new Folder by rendering a dialog window to provide basic creation details.
+    *
+    * @param {object} folderData - Initial data with which to populate the creation form.
+    *
+    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    *
+    * @param {object} [dialogData] - Optional data to modify dialog.
+    *
+    * @returns {Promise<Folder|null>} The newly created Folder or null if the dialog is closed.
+    */
+   static async showCreate(folderData, options = {}, dialogData = {})
+   {
+      if (!(folderData?.type in CONFIG))
+      {
+         console.warn(
+          `TJSFolderCreateUpdate - showCreate - warning: 'type' attribute of folderData is not a Document.`);
+         return null;
+      }
+
+      const label = localize(Folder.metadata.label);
+
+      const data = foundry.utils.mergeObject({
+         name: localize('DOCUMENT.New', { type: label }),
+         sorting: 'a',
+      }, folderData);
+
+      const document = new Folder(data);
+
+      return new Promise((resolve) =>
+      {
+         options.resolve = resolve;
+         new TJSFolderCreateUpdate(document, options, dialogData).render(true, { focus: true });
+      });
+   }
+
+   /**
+    * Updates an existing Folder by rendering a dialog window with basic details.
+    *
+    * @param {Folder} document - The folder to edit.
+    *
+    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    *
+    * @param {object} [dialogData] - Optional data to modify dialog.
+    *
+    * @returns {Promise<Folder|null>} The modified Folder or null if the dialog is closed.
+    */
+   static async showUpdate(document, options = {}, dialogData = {})
+   {
+      if (!(document instanceof Folder))
+      {
+         console.warn(`TJSFolderCreateUpdate - show - warning: 'document' is not a Folder.`);
+         return null;
+      }
+
+      return new Promise((resolve) =>
+      {
+         options.resolve = resolve;
+         new TJSFolderCreateUpdate(document, options, dialogData).render(true, { focus: true });
+      });
+   }
 }

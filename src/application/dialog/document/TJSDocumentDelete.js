@@ -81,4 +81,41 @@ export class TJSDocumentDelete extends TJSDialog
          }
       });
    }
+
+   /**
+    * Shows a modal / non-draggable dialog to delete a document.
+    *
+    * @param {foundry.abstract.Document} document - Document to delete.
+    *
+    * @param {object} [opts] - Additional context options or dialog positioning options.
+    *
+    * @param {object} [opts.context] - DocumentModificationContext.
+    *
+    * @param {...*} [opts.options] - Rest of options to pass to TJSDialog / Application.
+    *
+    * @param {object} [dialogData] - Optional data to modify dialog.
+    *
+    * @returns {Promise<Document|boolean|null>} The document if deleted or a falsy value; either 'false' for cancelling
+    *                                   or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    */
+   static async show(document, { context = {}, ...options } = {}, dialogData = {})
+   {
+      if (!(document instanceof foundry.abstract.Document))
+      {
+         console.warn(`TJSDocumentDelete - show - warning: 'document' is not a Document.`);
+         return null;
+      }
+
+      if (document instanceof Folder)
+      {
+         console.warn(`TJSDocumentDelete - show - warning: 'document' is a Folder.`);
+         return null;
+      }
+
+      return new Promise((resolve) =>
+      {
+         options.resolve = resolve;
+         new TJSDocumentDelete(document, { context, ...options }, dialogData).render(true, { focus: true });
+      });
+   }
 }

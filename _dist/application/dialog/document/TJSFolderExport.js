@@ -78,4 +78,47 @@ export class TJSFolderExport extends TJSDialog
          close: () => this.options?.resolve?.(null)
       };
    }
+
+   /**
+    * Shows a modal / non-draggable dialog to export a folder to an eligible compendium pack.
+    *
+    * @param {Folder} document - Folder to export.
+    *
+    * @param {object} [opts] - Additional options.
+    *
+    * @param {string} [opts.pack] - The name of the compendium pack to provide an initial selection value in the dialog.
+    *
+    * @param {boolean} [opts.merge=true] - Update existing entries in the Compendium pack, matching by name
+    *
+    * @param {boolean} [opts.keepId=true] - Keep document IDs.
+    *
+    * @param {...*} [opts.options] - Rest of options to pass to TJSDialog / Application.
+    *
+    * @param {object} [dialogData] - Optional data to modify dialog.
+    *
+    * @returns {Promise<CompendiumCollection|boolean|null>} The compendium collection the folder is exported to or a
+    * falsy value; either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header
+    * button.
+    */
+   static async show(document, { pack, merge, keepId, ...options } = {}, dialogData = {})
+   {
+      if (!(document instanceof Folder))
+      {
+         console.warn(`TJSFolderExport - show - warning: 'document' is not a Folder.`);
+         return null;
+      }
+
+      // Get eligible pack destinations if there are none then post a warning.
+      const packs = game.packs.filter((p) => (p.documentName === document.type) && !p.locked);
+      if (!packs.length)
+      {
+         return ui.notifications.warn(localize('FOLDER.ExportWarningNone', { type: document.type }));
+      }
+
+      return new Promise((resolve) =>
+      {
+         options.resolve = resolve;
+         new TJSFolderExport(document, { pack, merge, keepId, ...options }, dialogData).render(true, { focus: true });
+      });
+   }
 }

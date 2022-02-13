@@ -1,5 +1,3 @@
-import { localize }              from '@typhonjs-fvtt/svelte/helper';
-
 import { TJSDocumentCreate }     from './TJSDocumentCreate.js';
 import { TJSDocumentDelete }     from './TJSDocumentDelete.js';
 import { TJSDocumentImport }     from './TJSDocumentImport.js';
@@ -30,17 +28,7 @@ export class TJSDocumentDialog
     */
    static async configurePermissions(document, options = {}, dialogData = {})
    {
-      if (!(document instanceof foundry.abstract.Document))
-      {
-         console.warn(`TJSDocumentDialog configurePermissions warning: 'document' is not a Document.`);
-         return null;
-      }
-
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSPermissionControl(document, options, dialogData).render(true, { focus: true });
-      });
+      return TJSPermissionControl.show(document, options, dialogData);
    }
 
    /**
@@ -66,25 +54,7 @@ export class TJSDocumentDialog
     */
    static async documentCreate(documentCls, data = {}, { parent = null, pack = null, ...options } = {}, dialogData = {})
    {
-      if (!Object.prototype.isPrototypeOf.call(foundry.abstract.Document, documentCls))
-      {
-         console.warn(`TJSDocumentDialog documentCreate warning: 'documentCls' is not a Document.`);
-         return null;
-      }
-
-      if (Object.prototype.isPrototypeOf.call(Folder, documentCls))
-      {
-         console.warn(
-          `TJSDocumentDialog documentCreate warning: 'documentCls' is a Folder; please use 'createFolder'.`);
-         return null;
-      }
-
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSDocumentCreate(documentCls, data, { parent, pack, ...options }, dialogData).render(
-          true, { focus: true });
-      });
+      return TJSDocumentCreate.show(documentCls, data, { parent, pack, ...options }, dialogData);
    }
 
    /**
@@ -105,23 +75,7 @@ export class TJSDocumentDialog
     */
    static async documentDelete(document, { context = {}, ...options } = {}, dialogData = {})
    {
-      if (!(document instanceof foundry.abstract.Document))
-      {
-         console.warn(`TJSDocumentDialog documentDelete warning: 'document' is not a Document.`);
-         return null;
-      }
-
-      if (document instanceof Folder)
-      {
-         console.warn(`TJSDocumentDialog documentDelete warning: 'document' is a Folder; please use 'deleteFolder'.`);
-         return null;
-      }
-
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSDocumentDelete(document, { context, ...options }, dialogData).render(true, { focus: true });
-      });
+      return TJSDocumentDelete.show(document, { context, ...options }, dialogData);
    }
 
    /**
@@ -137,26 +91,7 @@ export class TJSDocumentDialog
     */
    static async folderCreate(folderData, options = {}, dialogData = {})
    {
-      if (!(folderData?.type in CONFIG))
-      {
-         console.warn(`TJSFolderDialog folderCreate warning: 'type' attribute of folderData is not a Document.`);
-         return null;
-      }
-
-      const label = localize(Folder.metadata.label);
-
-      const data = foundry.utils.mergeObject({
-         name: localize('DOCUMENT.New', { type: label }),
-         sorting: 'a',
-      }, folderData);
-
-      const document = new Folder(data);
-
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSFolderCreateUpdate(document, options, dialogData).render(true, { focus: true });
-      });
+      return TJSFolderCreateUpdate.showCreate(folderData, options, dialogData);
    }
 
    /**
@@ -173,17 +108,7 @@ export class TJSDocumentDialog
     */
    static async folderDelete(document, options = {}, dialogData = {})
    {
-      if (!(document instanceof Folder))
-      {
-         console.warn(`TJSDocumentDialog folderDelete warning: 'document' is not a Folder.`);
-         return null;
-      }
-
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSFolderDelete(document, options, dialogData).render(true, { focus: true });
-      });
+      return TJSFolderDelete.show(document, options, dialogData);
    }
 
    /**
@@ -209,24 +134,7 @@ export class TJSDocumentDialog
     */
    static async folderExport(document, { pack, merge, keepId, ...options } = {}, dialogData = {})
    {
-      if (!(document instanceof Folder))
-      {
-         console.warn(`TJSDocumentDialog folderExport warning: 'document' is not a Folder.`);
-         return null;
-      }
-
-      // Get eligible pack destinations if there are none then post a warning.
-      const packs = game.packs.filter((p) => (p.documentName === document.type) && !p.locked);
-      if (!packs.length)
-      {
-         return ui.notifications.warn(localize('FOLDER.ExportWarningNone', { type: document.type }));
-      }
-
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSFolderExport(document, { pack, merge, keepId, ...options }, dialogData).render(true, { focus: true });
-      });
+      return TJSFolderExport.show(document, { pack, merge, keepId, ...options }, dialogData);
    }
 
    /**
@@ -243,17 +151,7 @@ export class TJSDocumentDialog
     */
    static async folderRemove(document, options = {}, dialogData = {})
    {
-      if (!(document instanceof Folder))
-      {
-         console.warn(`TJSDocumentDialog folderRemove warning: 'document' is not a Folder.`);
-         return null;
-      }
-
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSFolderRemove(document, options, dialogData).render(true, { focus: true });
-      });
+      return TJSFolderRemove.show(document, options, dialogData);
    }
 
    /**
@@ -270,17 +168,7 @@ export class TJSDocumentDialog
     */
    static async folderRolltable(document, options = {}, dialogData = {})
    {
-      if (!(document instanceof Folder))
-      {
-         console.warn(`TJSDocumentDialog folderRolltable warning: 'document' is not a Folder.`);
-         return null;
-      }
-
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSFolderRolltable(document, options, dialogData).render(true, { focus: true });
-      });
+      return TJSFolderRolltable.show(document, options, dialogData);
    }
 
    /**
@@ -296,17 +184,7 @@ export class TJSDocumentDialog
     */
    static async folderUpdate(document, options = {}, dialogData = {})
    {
-      if (!(document instanceof Folder))
-      {
-         console.warn(`TJSDocumentDialog folderUpdate warning: 'document' is not a Folder.`);
-         return null;
-      }
-
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSFolderCreateUpdate(document, options, dialogData).render(true, { focus: true });
-      });
+      return TJSFolderCreateUpdate.showUpdate(document, options, dialogData);
    }
 
    /**
@@ -323,22 +201,6 @@ export class TJSDocumentDialog
     */
    static async importFromJSON(document, options = {}, dialogData = {})
    {
-      if (!(document instanceof foundry.abstract.Document))
-      {
-         console.warn(`TJSDocumentDialog importFromJSON warning: 'document' is not a Document.`);
-         return null;
-      }
-
-      if (document instanceof Folder)
-      {
-         console.warn(`TJSDocumentDialog importFromJSON warning: 'document' is a Folder; unsupported operation'.`);
-         return null;
-      }
-
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSDocumentImport(document, options, dialogData).render(true, { focus: true });
-      });
+      return TJSDocumentImport.show(document, options, dialogData);
    }
 }

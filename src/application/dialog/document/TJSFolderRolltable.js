@@ -67,4 +67,31 @@ export class TJSFolderRolltable extends TJSDialog
          }
       });
    }
+
+   /**
+    * Create a RollTable from the contents of the Folder.
+    *
+    * @param {Folder} document - Folder to create roll table from...
+    *
+    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    *
+    * @param {object} [dialogData] - Optional data to modify dialog.
+    *
+    * @returns {Promise<RollTable|boolean|null>} The newly created RollTable or a falsy value; either 'false' for
+    * cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    */
+   static async show(document, options = {}, dialogData = {})
+   {
+      if (!(document instanceof Folder))
+      {
+         console.warn(`TJSFolderRolltable - show - warning: 'document' is not a Folder.`);
+         return null;
+      }
+
+      return new Promise((resolve) =>
+      {
+         options.resolve = resolve;
+         new TJSFolderRolltable(document, options, dialogData).render(true, { focus: true });
+      });
+   }
 }
