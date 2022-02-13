@@ -7,6 +7,7 @@ import {
    GetSvelteData,
    loadSvelteConfig,
    Position,
+   styleParsePixels,
    SvelteReactive }           from '../internal/index.js';
 
 /**
@@ -606,16 +607,18 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Modified Application `setPosition` which changes a few aspects from the default {@link Application.setPosition}.
     * The gate on `popOut` is removed, so if manually called popOut applications can set `this.options.setPosition` to
-    * true.
+    * false to not apply any positional styles.
     *
-    * An added second parameter provides additional options. `apply` when set to false will not apply any position
-    * changes. This is useful when providing overridden `setPosition` implementations as `this.position` is now a store
-    * and this prevents multiple updates / notifications. The other two new options `noHeight` and `noWidth` that
-    * respect `width` & `height` style options while still producing a correct position object in return. You may set
-    * these options manually, but they are also automatically determined when not explicitly provided by checking if
-    * the target element style for `height` or `width` is `auto`.
+    * `applyHeight` / `applyWidth` is set to true when el.style.height / width is not 'auto' and height & width is
+    * applied.
     *
-    * @param {PositionData}               [pos] - Optional parameters.
+    * The initial setPosition call on an application will always set width / height as this is necessary for correct
+    * calculations.
+    *
+    * Styles are not applied immediately and the newly constructed `currentPosition` is passed to all validators that
+    * may further modify it or veto the change before styles are applied.
+    *
+    * @param {PositionData}         [pos] - Optional parameters.
     *
     * @param {number|null}          [pos.left] - The left offset position in pixels
     *
@@ -641,20 +644,22 @@ export class SvelteFormApplication extends FormApplication
       let currentPosition = this.position.get(rest);
       const styles = globalThis.getComputedStyle(el);
 
-      // Automatically determine if noHeight when `el.style.height` is `auto`.
-      const noHeight = el.style.height === 'auto';
+      // Set applyHeight to false when `el.style.height` is `auto` preventing setting height to a finite value.
+      const applyHeight = el.style.height !== 'auto';
 
-      // Automatically determine if noWidth when `el.style.width` is `auto`.
-      const noWidth = el.style.width === 'auto';
+      // Set applyWidth to false when `el.style.width` is `auto` preventing setting width to a finite value.
+      const applyWidth = el.style.width === 'auto';
 
       // Update width if an explicit value is passed, or if no width value is set on the element
       if (!el.style.width || width)
       {
          const tarW = width || el.offsetWidth;
-         const minW = parseInt(styles.minWidth) || MIN_WINDOW_WIDTH;
-         const maxW = parseInt(styles.maxWidth) || el.style.maxWidth || globalThis.innerWidth;
+         const minW = styleParsePixels(styles.minWidth) || MIN_WINDOW_WIDTH;
+         const maxW = styleParsePixels(styles.maxWidth) || el.style.maxWidth || globalThis.innerWidth;
          currentPosition.width = width = Math.clamped(tarW, minW, maxW);
 
+         // Must set el.style.width if currently undefined.
+         if (el.style.width === '' || applyWidth) { el.style.width = `${width}px`; }
          if ((width + currentPosition.left) > globalThis.innerWidth) { left = currentPosition.left; }
       }
       width = el.offsetWidth;
@@ -663,10 +668,12 @@ export class SvelteFormApplication extends FormApplication
       if (!el.style.height || height)
       {
          const tarH = height || (el.offsetHeight + 1);
-         const minH = parseInt(styles.minHeight) || MIN_WINDOW_HEIGHT;
-         const maxH = parseInt(styles.maxHeight) || el.style.maxHeight || globalThis.innerHeight;
+         const minH = styleParsePixels(styles.minHeight) || MIN_WINDOW_HEIGHT;
+         const maxH = styleParsePixels(styles.maxHeight) || el.style.maxHeight || globalThis.innerHeight;
          currentPosition.height = height = Math.clamped(tarH, minH, maxH);
 
+         // Must set el.style.height if currently undefined.
+         if (el.style.height === '' || applyHeight) { el.style.height = `${height}px`; }
          if ((height + currentPosition.top) > globalThis.innerHeight + 1) { top = currentPosition.top - 1; }
       }
       height = el.offsetHeight;
@@ -696,10 +703,11 @@ export class SvelteFormApplication extends FormApplication
       // Set the position and allow any validators to alter the position data.
       currentPosition = this.position.set(currentPosition);
 
+      // If defined / not null apply `currentPosition` to inline styles.
       if (currentPosition)
       {
-         if (!noWidth) { el.style.width = `${currentPosition.width}px`; }
-         if (!noHeight) { el.style.height = `${currentPosition.height}px`; }
+         if (applyWidth) { el.style.width = `${currentPosition.width}px`; }
+         if (applyHeight) { el.style.height = `${currentPosition.height}px`; }
          el.style.left = `${currentPosition.left}px`;
          el.style.top = `${currentPosition.top}px`;
 
@@ -710,7 +718,7 @@ export class SvelteFormApplication extends FormApplication
          }
       }
 
-      // Return the updated position object
+      // Return the updated position object.
       return currentPosition;
    }
 
