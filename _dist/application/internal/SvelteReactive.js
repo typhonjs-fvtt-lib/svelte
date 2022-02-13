@@ -42,14 +42,14 @@ export class SvelteReactive
     *
     * @type {StoreUIOptions}
     */
-   #storeUIOptions;
+   #storeUIState;
 
    /**
-    * Stores the update function for `#storeUIOptions`.
+    * Stores the update function for `#storeUIState`.
     *
     * @type {import('svelte/store').Writable.update}
     */
-   #storeUIOptionsUpdate;
+   #storeUIStateUpdate;
 
    /**
     * Stores the unsubscribe functions from local store subscriptions.
@@ -82,7 +82,7 @@ export class SvelteReactive
 
       return {
          appOptionsUpdate: this.#storeAppOptionsUpdate,
-         uiOptionsUpdate: this.#storeUIOptionsUpdate,
+         uiOptionsUpdate: this.#storeUIStateUpdate,
          subscribe: this.#storesSubscribe.bind(this),
          unsubscribe: this.#storesUnsubscribe.bind(this)
       };
@@ -140,7 +140,7 @@ export class SvelteReactive
     *
     * @returns {StoreUIOptions} UI options store.
     */
-   get storeUIOptions() { return this.#storeUIOptions; }
+   get storeUIState() { return this.#storeUIState; }
 
    /**
     * Returns the title accessor from the parent Application class.
@@ -298,7 +298,7 @@ export class SvelteReactive
     * stores are provided for essential options which are commonly used.
     *
     * These stores are injected into all Svelte components mounted under the `external` context: `storeAppOptions` and
-    * ` storeUIOptions`.
+    * ` storeUIState`.
     */
    #storesInitialize()
    {
@@ -339,12 +339,12 @@ export class SvelteReactive
       });
 
       // Keep the update function locally, but make the store essentially readable.
-      this.#storeUIOptionsUpdate = writableUIOptions.update;
+      this.#storeUIStateUpdate = writableUIOptions.update;
 
       /**
        * @type {StoreUIOptions}
        */
-      const storeUIOptions = {
+      const storeUIState = {
          subscribe: writableUIOptions.subscribe,
 
          dragging: propertyStore(writableUIOptions, 'dragging'),
@@ -353,10 +353,10 @@ export class SvelteReactive
          resizing: propertyStore(writableUIOptions, 'resizing')
       };
 
-      Object.freeze(storeUIOptions);
+      Object.freeze(storeUIState);
 
       // Initialize the store with options set in the Application constructor.
-      this.#storeUIOptions = storeUIOptions;
+      this.#storeUIState = storeUIState;
    }
 
    /**
@@ -444,7 +444,7 @@ export class SvelteReactive
          for (const button of buttons) { button.label = void 0; }
       }
 
-      this.#storeUIOptionsUpdate((options) =>
+      this.#storeUIStateUpdate((options) =>
       {
          options.headerButtons = buttons;
          return options;

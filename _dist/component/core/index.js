@@ -1097,8 +1097,8 @@ function instance$6($$self, $$props, $$invalidate) {
 	component_subscribe($$self, storeTitle, value => $$invalidate(2, $storeTitle = value));
 	const storeDraggable = application.reactive.storeAppOptions.draggable;
 	component_subscribe($$self, storeDraggable, value => $$invalidate(0, $storeDraggable = value));
-	const storeDragging = application.reactive.storeUIOptions.dragging;
-	const storeHeaderButtons = application.reactive.storeUIOptions.headerButtons;
+	const storeDragging = application.reactive.storeUIState.dragging;
+	const storeHeaderButtons = application.reactive.storeUIState.headerButtons;
 	component_subscribe($$self, storeHeaderButtons, value => $$invalidate(3, $storeHeaderButtons = value));
 	const storeMinimizable = application.reactive.storeAppOptions.minimizable;
 	component_subscribe($$self, storeMinimizable, value => $$invalidate(1, $storeMinimizable = value));
@@ -1210,9 +1210,9 @@ function instance$5($$self, $$props, $$invalidate) {
 	component_subscribe($$self, storeElementRoot, value => $$invalidate(8, $storeElementRoot = value));
 	const storeResizable = application.reactive.storeAppOptions.resizable;
 	component_subscribe($$self, storeResizable, value => $$invalidate(1, $storeResizable = value));
-	const storeMinimized = application.reactive.storeUIOptions.minimized;
+	const storeMinimized = application.reactive.storeUIState.minimized;
 	component_subscribe($$self, storeMinimized, value => $$invalidate(9, $storeMinimized = value));
-	const storeResizing = application.reactive.storeUIOptions.resizing;
+	const storeResizing = application.reactive.storeUIState.resizing;
 	let elementResize;
 
 	/**

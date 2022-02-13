@@ -10,8 +10,8 @@
 
    const storeTitle = application.reactive.storeAppOptions.title;
    const storeDraggable = application.reactive.storeAppOptions.draggable;
-   const storeDragging = application.reactive.storeUIOptions.dragging;
-   const storeHeaderButtons = application.reactive.storeUIOptions.headerButtons;
+   const storeDragging = application.reactive.storeUIState.dragging;
+   const storeHeaderButtons = application.reactive.storeUIState.headerButtons;
    const storeMinimizable = application.reactive.storeAppOptions.minimizable;
 
    function minimizable(node, booleanStore)

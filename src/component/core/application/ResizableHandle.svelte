@@ -10,8 +10,8 @@
 
    const storeResizable = application.reactive.storeAppOptions.resizable;
 
-   const storeMinimized = application.reactive.storeUIOptions.minimized;
-   const storeResizing = application.reactive.storeUIOptions.resizing;
+   const storeMinimized = application.reactive.storeUIState.minimized;
+   const storeResizing = application.reactive.storeUIState.resizing;
 
    let elementResize;
 
