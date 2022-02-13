@@ -88,7 +88,7 @@ export class SvelteFormApplication extends FormApplication
       super(object, options);
 
       // Initialize Position with the position object set by Application.
-      this.#position = new Position(this.position);
+      this.#position = new Position(this, this.position);
 
       // Remove old position field.
       delete this.position;
@@ -648,7 +648,7 @@ export class SvelteFormApplication extends FormApplication
       const applyHeight = el.style.height !== 'auto';
 
       // Set applyWidth to false when `el.style.width` is `auto` preventing setting width to a finite value.
-      const applyWidth = el.style.width === 'auto';
+      const applyWidth = el.style.width !== 'auto';
 
       // Update width if an explicit value is passed, or if no width value is set on the element
       if (!el.style.width || width)

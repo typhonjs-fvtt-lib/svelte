@@ -4,6 +4,8 @@ import { AdapterValidators }  from './AdapterValidators.js';
 
 /**
  * Provides a store for position following the subscriber protocol.
+ *
+ * TODO: Consider running validators for individual data value setting.
  */
 export class Position
 {
@@ -23,6 +25,13 @@ export class Position
    #hash = 0;
 
    /**
+    * The associated parent for positional data tracking. Used in validators.
+    *
+    * @type {object}
+    */
+   #parent;
+
+   /**
     * @type {AdapterValidators}
     */
    #validators;
@@ -33,23 +42,25 @@ export class Position
    #validatorsAdapter;
 
    /**
+    * @param {object}         parent - The associated parent for positional data tracking. Used in validators.
+    *
     * @param {PositionData}   position - Initial position data.
     */
-   constructor(position)
+   constructor(parent, position)
    {
+      this.#parent = parent;
+
       [this.#validators, this.#validatorsAdapter] = new AdapterValidators();
 
       this.set(position);
    }
 
-   get validators() { return this.#validators; }
-
    /**
-    * Provides a boolean to check / verify that the given object is a Position instance.
+    * Returns the validators.
     *
-    * @returns {boolean} Is this a Position instance.
+    * @returns {AdapterValidators} validators.
     */
-   get isPosition() { return true; }
+   get validators() { return this.#validators; }
 
 // Data accessors ----------------------------------------------------------------------------------------------------
 
@@ -172,6 +183,30 @@ export class Position
    }
 
    /**
+    * Calculates a hash code for a PositionData instance.
+    *
+    * @param {PositionData}   data - PositionData instance.
+    *
+    * @returns {number} hash code.
+    */
+   hashCode(data = this.#data)
+   {
+      // Create hash with current values.
+      let newHash = 37;
+
+      newHash ^= (typeof data.left === 'number' ? data.left : 0) + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
+      newHash ^= (typeof data.top === 'number' ? data.top : 0) + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
+      newHash ^= (typeof data.scale === 'number' ? data.scale : 0) + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
+      newHash ^= (typeof data.zIndex === 'number' ? data.zIndex : 0) + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
+      newHash ^= (typeof data.width === 'number' ? data.width : hashCode(data.width)) + 0x9e3779b9 + (newHash << 6) +
+       (newHash >> 2);
+      newHash ^= (typeof data.height === 'number' ? data.height : hashCode(data.height)) + 0x9e3779b9 + (newHash << 6) +
+       (newHash >> 2);
+
+      return newHash;
+   }
+
+   /**
     * @returns {PositionData} Current position data.
     */
    toJSON()
@@ -192,19 +227,8 @@ export class Position
       // Early out if there are no subscribers.
       if (subscriptions.length === 0) { return; }
 
-      const data = this.#data;
-
       // Create hash with current values.
-      let newHash = 37;
-
-      newHash ^= (typeof data.left === 'number' ? data.left : 0) + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
-      newHash ^= (typeof data.top === 'number' ? data.top : 0) + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
-      newHash ^= (typeof data.scale === 'number' ? data.scale : 0) + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
-      newHash ^= (typeof data.zIndex === 'number' ? data.zIndex : 0) + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
-      newHash ^= (typeof data.width === 'number' ? data.width : hashCode(data.width)) + 0x9e3779b9 + (newHash << 6) +
-       (newHash >> 2);
-      newHash ^= (typeof data.height === 'number' ? data.height : hashCode(data.height)) + 0x9e3779b9 + (newHash << 6) +
-       (newHash >> 2);
+      const newHash = this.hashCode();
 
       // Only notify subscribers if the hash is changed.
       if (newHash !== this.#hash)
@@ -229,6 +253,7 @@ export class Position
       if (typeof position !== 'object') { return null; }
 
       const data = this.#data;
+      const parent = this.#parent;
       const validators = this.#validators;
 
       // If there are any validators allow them to potentially modify position data or reject the update.
@@ -236,7 +261,7 @@ export class Position
       {
          for (const validator of validators)
          {
-            position = validator.validator(null, position);
+            position = validator.validator(parent, position);
 
             if (position === null) { return null; }
          }
