@@ -627,15 +627,18 @@ export class SvelteFormApplication extends FormApplication
     *
     * @param {number|null}          [pos.scale] - The application scale as a numeric factor where 1.0 is default
     *
+    * @param {...*}                 [pos.rest] - Any additional data is captured and added to the `currentPosition`
+    *                               object used in `setPosition`. This allows sending this data to any validators added.
+    *
     * @returns {PositionData} The updated position object for the application containing the new values
     */
-   setPosition({ left, top, width, height, scale } = {})
+   setPosition({ left, top, width, height, scale, ...rest } = {})
    {
       // An early out to prevent `setPosition` from taking effect.
       if (typeof this.options.setPosition === 'boolean' && !this.options.setPosition) { return; }
 
       const el = this.elementTarget;
-      let currentPosition = this.position.get();
+      let currentPosition = this.position.get(rest);
       const styles = globalThis.getComputedStyle(el);
 
       // Automatically determine if noHeight when `el.style.height` is `auto`.

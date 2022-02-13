@@ -231,6 +231,7 @@ export class Position
       const data = this.#data;
       const validators = this.#validators;
 
+      // If there are any validators allow them to potentially modify position data or reject the update.
       if (validators.length)
       {
          for (const validator of validators)
