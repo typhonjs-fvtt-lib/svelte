@@ -1,10 +1,8 @@
+import { TJSDialog }                from '@typhonjs-fvtt/svelte/application';
 import { TJSPermissionControl
-    as TJSPermissionControlImpl }   from '@typhonjs-fvtt/svelte/component/core';
-
+    as TJSPermissionControlImpl }   from '@typhonjs-fvtt/svelte/component/dialog';
 import { localize }                 from '@typhonjs-fvtt/svelte/helper';
 import { hasSetter }                from '@typhonjs-fvtt/svelte/util';
-
-import { TJSDialog }                from '../TJSDialog.js';
 
 /**
  * Provides a reactive dialog for permission control that by default is modal and not draggable. An additional set of

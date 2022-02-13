@@ -19,8 +19,9 @@ const s_LOCAL_EXTERNAL = [
    'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
    'svelte/types',
 
-   '@typhonjs-fvtt/svelte/action', '@typhonjs-fvtt/svelte/application', '@typhonjs-fvtt/svelte/application/legacy',
-   '@typhonjs-fvtt/svelte/component/core', '@typhonjs-fvtt/svelte/gsap', '@typhonjs-fvtt/svelte/handler',
+   '@typhonjs-fvtt/svelte/action', '@typhonjs-fvtt/svelte/application', '@typhonjs-fvtt/svelte/application/dialog',
+   '@typhonjs-fvtt/svelte/application/legacy', '@typhonjs-fvtt/svelte/component/core',
+   '@typhonjs-fvtt/svelte/component/dialog', '@typhonjs-fvtt/svelte/gsap', '@typhonjs-fvtt/svelte/handler',
    '@typhonjs-fvtt/svelte/helper', '@typhonjs-fvtt/svelte/store', '@typhonjs-fvtt/svelte/transition',
    '@typhonjs-fvtt/svelte/util', '@typhonjs-fvtt/svelte/plugin/data', '@typhonjs-fvtt/svelte/plugin/system',
 
@@ -86,6 +87,39 @@ const rollupConfigs = [
       output: {
          output: {
             file: '_dist/component/core/index.js',
+            format: 'es',
+            plugins: outputPlugins,
+            preferConst: true,
+            sourcemap,
+            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+         }
+      }
+   },
+   {
+      input: {
+         input: 'src/component/dialog/index.js',
+         external: s_LOCAL_EXTERNAL,
+         plugins: [
+            svelte({
+               emitCss: false,
+               onwarn: (warning, handler) =>
+               {
+                  // Suppress `a11y-missing-attribute` for missing href in <a> links.
+                  if (warning.message.includes(`<a> element should have an href attribute`)) { return; }
+                  // Suppress a11y form label not associated w/ a control.
+                  if (warning.message.includes(`A form label must be associated with a control`)) { return; }
+
+                  // Let Rollup handle all other warnings normally.
+                  handler(warning);
+               }
+            }),
+            typhonjsRuntime({ exclude: ['@typhonjs-svelte/lib/component/dialog'] }),
+            resolve(s_RESOLVE_CONFIG)
+         ]
+      },
+      output: {
+         output: {
+            file: '_dist/component/dialog/index.js',
             format: 'es',
             plugins: outputPlugins,
             preferConst: true,

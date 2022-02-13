@@ -1,7 +1,7 @@
 import { DialogShell }        from '@typhonjs-fvtt/svelte/component/core';
 
-import { DialogData }         from './DialogData.js';
-import { SvelteApplication }  from '../SvelteApplication.js';
+import { DialogData }         from './internal/DialogData.js';
+import { SvelteApplication }  from './SvelteApplication.js';
 
 /**
  * Provides a Foundry API compatible dialog alternative implemented w/ Svelte. There are several features including

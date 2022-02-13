@@ -1,9 +1,8 @@
+import { TJSDialog }             from '@typhonjs-fvtt/svelte/application';
 import { TJSDocumentDelete
-    as TJSDocumentDeleteImpl }   from '@typhonjs-fvtt/svelte/component/core';
+    as TJSDocumentDeleteImpl }   from '@typhonjs-fvtt/svelte/component/dialog';
 import { localize }              from '@typhonjs-fvtt/svelte/helper';
 import { hasSetter }             from '@typhonjs-fvtt/svelte/util';
-
-import { TJSDialog }             from '../TJSDialog.js';
 
 /**
  * Provides a reactive dialog for deleting documents that by default is modal and not draggable. An additional set of

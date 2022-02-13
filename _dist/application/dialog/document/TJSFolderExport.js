@@ -1,9 +1,7 @@
+import { TJSDialog }          from '@typhonjs-fvtt/svelte/application';
 import { TJSFolderExport
-    as TJSFolderExportImpl }  from '@typhonjs-fvtt/svelte/component/core';
-
+    as TJSFolderExportImpl }  from '@typhonjs-fvtt/svelte/component/dialog';
 import { localize }           from '@typhonjs-fvtt/svelte/helper';
-
-import { TJSDialog }          from '../TJSDialog.js';
 
 /**
  * Provides a reactive dialog for exporting folders to a compendium that by default is modal and not draggable.

@@ -3,7 +3,6 @@ export { default as TJSContainer }        from './TJSContainer.svelte';
 export { default as TJSGlassPane }        from './TJSGlassPane.svelte';
 export *                                  from './application/index.js';
 export *                                  from './dialog/index.js';
-export *                                  from './dialog/document/index.js';
 
 /**
  * @typedef {object} TransformData

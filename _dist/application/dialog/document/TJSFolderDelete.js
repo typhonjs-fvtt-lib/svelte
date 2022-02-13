@@ -1,9 +1,8 @@
+import { TJSDialog }          from '@typhonjs-fvtt/svelte/application';
 import { TJSFolderDelete
-    as TJSFolderDeleteImpl }  from '@typhonjs-fvtt/svelte/component/core';
+    as TJSFolderDeleteImpl }  from '@typhonjs-fvtt/svelte/component/dialog';
 import { localize }           from '@typhonjs-fvtt/svelte/helper';
 import { hasSetter }          from '@typhonjs-fvtt/svelte/util';
-
-import { TJSDialog }          from '../TJSDialog.js';
 
 /**
  * Provides a reactive dialog for deleting a folder that by default is modal and not draggable. An additional set of

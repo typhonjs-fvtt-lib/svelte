@@ -1,8 +1,7 @@
+import { TJSDialog }             from '@typhonjs-fvtt/svelte/application';
 import { TJSDocumentCreate
-    as TJSDocumentCreateImpl }   from '@typhonjs-fvtt/svelte/component/core';
+    as TJSDocumentCreateImpl }   from '@typhonjs-fvtt/svelte/component/dialog';
 import { localize }              from '@typhonjs-fvtt/svelte/helper';
-
-import { TJSDialog }             from '../TJSDialog.js';
 
 /**
  * Provides a dialog for creating documents that by default is modal and not draggable.

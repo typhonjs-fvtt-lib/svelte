@@ -1,6 +1,5 @@
-export * from './dialog/index.js';
-
 export * from './SvelteApplication.js';
+export * from './TJSDialog.js';
 
 /**
  * @typedef {object} MountedAppShell - Application shell contract for Svelte components.
