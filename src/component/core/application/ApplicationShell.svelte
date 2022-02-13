@@ -35,10 +35,10 @@
    // If the application is a popOut application then when clicked bring to top. Bound to on pointerdown.
    const bringToTop = () =>
    {
-      if (typeof foundryApp.options.popOut === 'boolean' && foundryApp.options.popOut &&
-       foundryApp !== ui?.activeWindow)
+      if (typeof application.options.popOut === 'boolean' && application.options.popOut &&
+       application !== ui?.activeWindow)
       {
-         foundryApp.bringToTop.call(foundryApp);
+         application.bringToTop.call(application);
       }
    }
 
@@ -63,7 +63,7 @@
    const context = getContext('external');
 
    // Store Foundry Application reference.
-   const foundryApp = context.foundryApp;
+   const application = context.application;
 
    // This component can host multiple children defined via props or in the TyphonJS SvelteData configuration object
    // that are potentially mounted in the content area. If no children defined then this component mounts any slotted
@@ -125,9 +125,9 @@
       if (typeof outTransition !== 'function') { outTransition = s_DEFAULT_TRANSITION; }
 
       // Set jquery close animation to either run or not when an out transition is changed.
-      if (foundryApp && typeof foundryApp?.options?.defaultCloseAnimation === 'boolean')
+      if (application && typeof application?.options?.defaultCloseAnimation === 'boolean')
       {
-         foundryApp.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION;
+         application.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION;
       }
    }
 
@@ -141,9 +141,9 @@
 <svelte:options accessors={true}/>
 
 {#if bindHeightChanged}
-   <div id={foundryApp.id}
-        class="app window-app {foundryApp.options.classes.join(' ')}"
-        data-appid={foundryApp.appId}
+   <div id={application.id}
+        class="app window-app {application.options.classes.join(' ')}"
+        data-appid={application.appId}
         bind:clientHeight={heightChanged}
         bind:this={elementRoot}
         in:inTransition={inTransitionOptions}
@@ -164,9 +164,9 @@
       <ResizableHandle />
    </div>
 {:else}
-   <div id={foundryApp.id}
-        class="app window-app {foundryApp.options.classes.join(' ')}"
-        data-appid={foundryApp.appId}
+   <div id={application.id}
+        class="app window-app {application.options.classes.join(' ')}"
+        data-appid={application.appId}
         bind:this={elementRoot}
         in:inTransition={inTransitionOptions}
         out:outTransition={outTransitionOptions}

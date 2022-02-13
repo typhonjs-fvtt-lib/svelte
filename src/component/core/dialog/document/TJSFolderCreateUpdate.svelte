@@ -11,14 +11,14 @@
 
    const s_REGEX_HEX_COLOR = /^#(?:[0-9a-fA-F]{3}){1,2}$/;
 
-   const { foundryApp } = getContext('external');
+   const { application } = getContext('external');
 
    if (!(document instanceof Folder))
    {
       throw new TypeError(`TJSFolderCreateUpdate error: 'document' is not an instance of Folder.`);
    }
 
-   const doc = new TJSDocument(document, { delete: foundryApp.close.bind(foundryApp) });
+   const doc = new TJSDocument(document, { delete: application.close.bind(application) });
    const newName = localize('DOCUMENT.New', { type: localize(Folder.metadata.label) });
    const sortingModes = { a: 'FOLDER.SortAlphabetical', m: 'FOLDER.SortManual' };
 
@@ -42,7 +42,7 @@
       color = document?.data?.color;
 
       // Update the dialog button label and title.
-      foundryApp.data.merge({
+      application.data.merge({
          buttons: {
             submit: {
                label: localize(document?.id ? 'FOLDER.Update' : 'FOLDER.Create')
@@ -91,8 +91,8 @@
          modifiedDoc = await Folder.create(document.data);
       }
 
-      foundryApp.options.resolve?.(modifiedDoc);
-      foundryApp.close();
+      application.options.resolve?.(modifiedDoc);
+      application.close();
    }
 </script>
 

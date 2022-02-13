@@ -7,14 +7,14 @@
    /** @type {foundry.abstract.Document} */
    export let document = void 0;
 
-   const { foundryApp } = getContext('external');
+   const { application } = getContext('external');
 
    if (!(document instanceof foundry.abstract.Document))
    {
       throw new TypeError(`TJSDocumentImport error: 'document' is not an instance of Document.`);
    }
 
-   const doc = new TJSDocument(document, { delete: foundryApp.close.bind(foundryApp) });
+   const doc = new TJSDocument(document, { delete: application.close.bind(application) });
 
    let form;
 
@@ -33,7 +33,7 @@
       hint1 = localize('DOCUMENT.ImportDataHint1', { document: document.documentName });
       hint2 = localize('DOCUMENT.ImportDataHint2', { name: document.name });
 
-      foundryApp.data.set('title', `${localize('DOCUMENT.ImportData')}: ${document.name}`);
+      application.data.set('title', `${localize('DOCUMENT.ImportData')}: ${document.name}`);
    }
 
    async function handleImport()
@@ -44,8 +44,8 @@
 
       const importedDoc = await document.importFromJSON(json);
 
-      foundryApp.options.resolve?.(importedDoc);
-      foundryApp.close();
+      application.options.resolve?.(importedDoc);
+      application.close();
    }
 
    export function requestSubmit()

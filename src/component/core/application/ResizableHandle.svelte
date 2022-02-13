@@ -3,15 +3,15 @@
 
    export let isResizable = false;
 
-   const foundryApp = getContext('external').foundryApp;
+   const application = getContext('external').application;
 
    // Allows retrieval of the element root at runtime.
    const storeElementRoot = getContext('storeElementRoot');
 
-   const storeResizable = foundryApp.reactive.storeAppOptions.resizable;
+   const storeResizable = application.reactive.storeAppOptions.resizable;
 
-   const storeMinimized = foundryApp.reactive.storeUIOptions.minimized;
-   const storeResizing = foundryApp.reactive.storeUIOptions.resizing;
+   const storeMinimized = application.reactive.storeUIOptions.minimized;
+   const storeResizing = application.reactive.storeUIOptions.resizing;
 
    let elementResize;
 
@@ -130,7 +130,7 @@
          moveTime = now;
 
          // Record initial position
-         position = foundry.utils.duplicate(foundryApp.position);
+         position = foundry.utils.duplicate(application.position);
 
          if (position.height === 'auto') { position.height = $storeElementRoot.clientHeight; }
          if (position.width === 'auto') { position.width = $storeElementRoot.clientWidth; }
@@ -152,7 +152,7 @@
       {
          event.preventDefault();
 
-         foundryApp.setPosition({
+         application.setPosition({
             width: position.width + (event.clientX - initialPosition.x),
             height: position.height + (event.clientY - initialPosition.y)
          });
@@ -170,7 +170,7 @@
          node.removeEventListener(...handlers.resizeMove);
          node.removeEventListener(...handlers.resizeUp);
 
-         foundryApp._onResize(event);
+         application._onResize(event);
       }
 
       return {

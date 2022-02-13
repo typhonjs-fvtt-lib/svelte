@@ -14,7 +14,7 @@
 
    export let dialogComponent = void 0;
 
-   const foundryApp = getContext('external').foundryApp;
+   const application = getContext('external').application;
 
    const s_MODAL_TRANSITION = fade;
    const s_MODAL_TRANSITION_OPTIONS = { duration: 200 };
@@ -65,7 +65,7 @@
    // Retrieve values from the DialogData object and also potentially set any SvelteApplication accessors.
    // Explicit checks are performed against existing local variables as the only externally reactive variable is `data`.
    // All of the checks below trigger when there are any external changes to the `data` prop.
-   // Prevent any unnecessary changing of local & `foundryApp` variables unless actual changes occur.
+   // Prevent any unnecessary changing of local & `application` variables unless actual changes occur.
 
    // Foundry App options --------------------------------------------------------------------------------------------
 
@@ -77,21 +77,21 @@
        modal ? Number.MAX_SAFE_INTEGER : Number.MAX_SAFE_INTEGER - 1
       if (zIndex !== newZIndex) { zIndex = newZIndex; }
 
-      // Update the main foundry options when data changes. Perform explicit checks against existing data in `foundryApp`.
+      // Update the main foundry options when data changes. Perform explicit checks against existing data in `application`.
       const newDraggable = data.draggable ?? true;
-      if (foundryApp.reactive.draggable !== newDraggable) { foundryApp.reactive.draggable = newDraggable; }
+      if (application.reactive.draggable !== newDraggable) { application.reactive.draggable = newDraggable; }
 
       const newPopOut = data.popOut ?? true;
-      if (foundryApp.reactive.popOut !== newPopOut) { foundryApp.reactive.popOut = newPopOut; }
+      if (application.reactive.popOut !== newPopOut) { application.reactive.popOut = newPopOut; }
 
       const newResizable = data.resizable ?? false;
-      if (foundryApp.reactive.resizable !== newResizable) { foundryApp.reactive.resizable = newResizable; }
+      if (application.reactive.resizable !== newResizable) { application.reactive.resizable = newResizable; }
 
-      // Note foundryApp.title from Application localizes `options.title`, so compare with `foundryApp.options.title`.
+      // Note application.title from Application localizes `options.title`, so compare with `application.options.title`.
       const newTitle = data.title ?? 'Dialog';
-      if (newTitle !== foundryApp?.options?.title) { foundryApp.reactive.title = newTitle; }
+      if (newTitle !== application?.options?.title) { application.reactive.title = newTitle; }
 
-      if (foundryApp.reactive.zIndex !== zIndex) { foundryApp.reactive.zIndex = zIndex; }
+      if (application.reactive.zIndex !== zIndex) { application.reactive.zIndex = zIndex; }
    }
 
    // ApplicationShell transition options ----------------------------------------------------------------------------
@@ -177,7 +177,7 @@
 <svelte:options accessors={true}/>
 
 {#if modal}
-   <TJSGlassPane id={`${foundryApp.id}-glasspane`} preventDefault={false} stopPropagation={false} {...modalProps} {zIndex}>
+   <TJSGlassPane id={`${application.id}-glasspane`} preventDefault={false} stopPropagation={false} {...modalProps} {zIndex}>
       <ApplicationShell bind:elementRoot {...appProps}>
          <DialogContent bind:autoClose bind:dialogInstance={dialogComponent} stopPropagation={true} {data} />
       </ApplicationShell>

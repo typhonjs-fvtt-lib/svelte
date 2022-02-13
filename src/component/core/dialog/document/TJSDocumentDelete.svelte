@@ -10,14 +10,14 @@
    /** @type {object} DocumentModificationContext */
    export let context = {};
 
-   const { foundryApp } = getContext('external');
+   const { application } = getContext('external');
 
    if (!(document instanceof foundry.abstract.Document))
    {
       throw new TypeError(`TJSDocumentDelete error: 'document' is not an instance of Document.`);
    }
 
-   const doc = new TJSDocument(document, { delete: foundryApp.close.bind(foundryApp) });
+   const doc = new TJSDocument(document, { delete: application.close.bind(application) });
 
    let name = document?.id ? document.name : '';
    let type = localize(document.constructor.metadata.label);
@@ -39,7 +39,7 @@
       name = document?.id ? document.name : '';
       type = localize(document.constructor.metadata.label);
 
-      foundryApp.data.set('title', `${localize('DOCUMENT.Delete', { type })}: ${document.name}`);
+      application.data.set('title', `${localize('DOCUMENT.Delete', { type })}: ${document.name}`);
    }
 
    /**
@@ -54,7 +54,7 @@
 
       const returnDoc = await document.delete(context);
 
-      foundryApp.options.resolve?.(returnDoc);
+      application.options.resolve?.(returnDoc);
    }
 </script>
 

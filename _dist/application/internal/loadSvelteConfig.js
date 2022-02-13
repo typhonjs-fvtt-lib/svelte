@@ -48,7 +48,7 @@ export function loadSvelteConfig(app, html, config, elementRootUpdate)
    const externalContext = svelteConfig.context.get('external');
 
    // Inject the Foundry application instance and `elementRootUpdate` to the external context.
-   externalContext.foundryApp = app;
+   externalContext.application = app;
    externalContext.elementRootUpdate = elementRootUpdate;
 
    let eventbus;

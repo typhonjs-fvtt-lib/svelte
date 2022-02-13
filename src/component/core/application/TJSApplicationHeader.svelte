@@ -6,17 +6,17 @@
 
    import TJSHeaderButton  from './TJSHeaderButton.svelte';
 
-   const foundryApp = getContext('external').foundryApp;
+   const application = getContext('external').application;
 
-   const storeTitle = foundryApp.reactive.storeAppOptions.title;
-   const storeDraggable = foundryApp.reactive.storeAppOptions.draggable;
-   const storeDragging = foundryApp.reactive.storeUIOptions.dragging;
-   const storeHeaderButtons = foundryApp.reactive.storeUIOptions.headerButtons;
-   const storeMinimizable = foundryApp.reactive.storeAppOptions.minimizable;
+   const storeTitle = application.reactive.storeAppOptions.title;
+   const storeDraggable = application.reactive.storeAppOptions.draggable;
+   const storeDragging = application.reactive.storeUIOptions.dragging;
+   const storeHeaderButtons = application.reactive.storeUIOptions.headerButtons;
+   const storeMinimizable = application.reactive.storeAppOptions.minimizable;
 
    function minimizable(node, booleanStore)
    {
-      const callback = foundryApp._onToggleMinimize.bind(foundryApp);
+      const callback = application._onToggleMinimize.bind(application);
 
       function activateListeners() { node.addEventListener('dblclick', callback); }
       function removeListeners() { node.removeEventListener('dblclick', callback); }
@@ -36,7 +36,7 @@
 </script>
 
 <header class="window-header flexrow"
-        use:draggable={{ positionable: foundryApp, active: $storeDraggable, storeDragging }}
+        use:draggable={{ positionable: application, active: $storeDraggable, storeDragging }}
         use:minimizable={$storeMinimizable}>
     <h4 class=window-title>{localize($storeTitle)}</h4>
     {#each $storeHeaderButtons as button}

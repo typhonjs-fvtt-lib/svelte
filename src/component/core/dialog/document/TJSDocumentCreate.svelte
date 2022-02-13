@@ -11,7 +11,7 @@
    export let pack = null;
    export let renderSheet = true;
 
-   const { foundryApp } = getContext('external');
+   const { application } = getContext('external');
 
    let form;
    let name, folderSelect, folders, hasTypes, type, types;
@@ -62,8 +62,8 @@
 
       const document = await documentCls.create(data, { parent, pack, renderSheet });
 
-      foundryApp.options.resolve?.(document);
-      foundryApp.close();
+      application.options.resolve?.(document);
+      application.close();
    }
 </script>
 

@@ -6,14 +6,14 @@
 
    export let document = void 0;
 
-   const { foundryApp } = getContext('external');
+   const { application } = getContext('external');
 
    if (!(document instanceof Folder))
    {
       throw new TypeError(`TJSFolderRolltable error: 'document' is not an instance of Folder.`);
    }
 
-   const doc = new TJSDocument(document, { delete: foundryApp.close.bind(foundryApp) });
+   const doc = new TJSDocument(document, { delete: application.close.bind(application) });
 
    $: if ($doc !== document)
    {
@@ -24,7 +24,7 @@
 
       doc.set(document);
 
-      foundryApp.data.set('title', `${localize('FOLDER.CreateTable')}: ${document.name}`);
+      application.data.set('title', `${localize('FOLDER.CreateTable')}: ${document.name}`);
    }
 
    /**
@@ -36,8 +36,8 @@
    {
       const rollTable = await RollTable.fromFolder(document);
 
-      foundryApp.options.resolve?.(rollTable);
-      foundryApp.close();
+      application.options.resolve?.(rollTable);
+      application.close();
    }
 </script>
 

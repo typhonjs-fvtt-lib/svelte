@@ -1013,7 +1013,7 @@ function create_fragment$f(ctx) {
 			if (!mounted) {
 				dispose = [
 					action_destroyer(draggable_action = draggable.call(null, header, {
-						positionable: /*foundryApp*/ ctx[4],
+						positionable: /*application*/ ctx[4],
 						active: /*$storeDraggable*/ ctx[0],
 						storeDragging: /*storeDragging*/ ctx[7]
 					})),
@@ -1054,7 +1054,7 @@ function create_fragment$f(ctx) {
 			}
 
 			if (draggable_action && is_function(draggable_action.update) && dirty & /*$storeDraggable*/ 1) draggable_action.update.call(null, {
-				positionable: /*foundryApp*/ ctx[4],
+				positionable: /*application*/ ctx[4],
 				active: /*$storeDraggable*/ ctx[0],
 				storeDragging: /*storeDragging*/ ctx[7]
 			});
@@ -1093,19 +1093,19 @@ function instance$f($$self, $$props, $$invalidate) {
 	let $storeMinimizable;
 	let $storeTitle;
 	let $storeHeaderButtons;
-	const foundryApp = getContext('external').foundryApp;
-	const storeTitle = foundryApp.reactive.storeAppOptions.title;
+	const application = getContext('external').application;
+	const storeTitle = application.reactive.storeAppOptions.title;
 	component_subscribe($$self, storeTitle, value => $$invalidate(2, $storeTitle = value));
-	const storeDraggable = foundryApp.reactive.storeAppOptions.draggable;
+	const storeDraggable = application.reactive.storeAppOptions.draggable;
 	component_subscribe($$self, storeDraggable, value => $$invalidate(0, $storeDraggable = value));
-	const storeDragging = foundryApp.reactive.storeUIOptions.dragging;
-	const storeHeaderButtons = foundryApp.reactive.storeUIOptions.headerButtons;
+	const storeDragging = application.reactive.storeUIOptions.dragging;
+	const storeHeaderButtons = application.reactive.storeUIOptions.headerButtons;
 	component_subscribe($$self, storeHeaderButtons, value => $$invalidate(3, $storeHeaderButtons = value));
-	const storeMinimizable = foundryApp.reactive.storeAppOptions.minimizable;
+	const storeMinimizable = application.reactive.storeAppOptions.minimizable;
 	component_subscribe($$self, storeMinimizable, value => $$invalidate(1, $storeMinimizable = value));
 
 	function minimizable(node, booleanStore) {
-		const callback = foundryApp._onToggleMinimize.bind(foundryApp);
+		const callback = application._onToggleMinimize.bind(application);
 
 		function activateListeners() {
 			node.addEventListener('dblclick', callback);
@@ -1137,7 +1137,7 @@ function instance$f($$self, $$props, $$invalidate) {
 		$storeMinimizable,
 		$storeTitle,
 		$storeHeaderButtons,
-		foundryApp,
+		application,
 		storeTitle,
 		storeDraggable,
 		storeDragging,
@@ -1203,17 +1203,17 @@ function instance$e($$self, $$props, $$invalidate) {
 	let $storeMinimized;
 	let $storeResizable;
 	let { isResizable = false } = $$props;
-	const foundryApp = getContext('external').foundryApp;
+	const application = getContext('external').application;
 
 	// Allows retrieval of the element root at runtime.
 	const storeElementRoot = getContext('storeElementRoot');
 
 	component_subscribe($$self, storeElementRoot, value => $$invalidate(8, $storeElementRoot = value));
-	const storeResizable = foundryApp.reactive.storeAppOptions.resizable;
+	const storeResizable = application.reactive.storeAppOptions.resizable;
 	component_subscribe($$self, storeResizable, value => $$invalidate(1, $storeResizable = value));
-	const storeMinimized = foundryApp.reactive.storeUIOptions.minimized;
+	const storeMinimized = application.reactive.storeUIOptions.minimized;
 	component_subscribe($$self, storeMinimized, value => $$invalidate(9, $storeMinimized = value));
-	const storeResizing = foundryApp.reactive.storeUIOptions.resizing;
+	const storeResizing = application.reactive.storeUIOptions.resizing;
 	let elementResize;
 
 	/**
@@ -1318,7 +1318,7 @@ function instance$e($$self, $$props, $$invalidate) {
 			moveTime = now;
 
 			// Record initial position
-			position = foundry.utils.duplicate(foundryApp.position);
+			position = foundry.utils.duplicate(application.position);
 
 			if (position.height === 'auto') {
 				position.height = $storeElementRoot.clientHeight;
@@ -1344,7 +1344,7 @@ function instance$e($$self, $$props, $$invalidate) {
 		function onResizePointerMove(event) {
 			event.preventDefault();
 
-			foundryApp.setPosition({
+			application.setPosition({
 				width: position.width + (event.clientX - initialPosition.x),
 				height: position.height + (event.clientY - initialPosition.y)
 			});
@@ -1362,7 +1362,7 @@ function instance$e($$self, $$props, $$invalidate) {
 			event.preventDefault();
 			node.removeEventListener(...handlers.resizeMove);
 			node.removeEventListener(...handlers.resizeUp);
-			foundryApp._onResize(event);
+			application._onResize(event);
 		}
 
 		return {
@@ -1476,9 +1476,9 @@ function create_else_block_1$1(ctx) {
 			t1 = space();
 			create_component(resizablehandle.$$.fragment);
 			attr(section, "class", "window-content");
-			attr(div, "id", div_id_value = /*foundryApp*/ ctx[9].id);
-			attr(div, "class", div_class_value = "app window-app " + /*foundryApp*/ ctx[9].options.classes.join(' ') + " svelte-3vt5in");
-			attr(div, "data-appid", div_data_appid_value = /*foundryApp*/ ctx[9].appId);
+			attr(div, "id", div_id_value = /*application*/ ctx[9].id);
+			attr(div, "class", div_class_value = "app window-app " + /*application*/ ctx[9].options.classes.join(' ') + " svelte-3vt5in");
+			attr(div, "data-appid", div_data_appid_value = /*application*/ ctx[9].appId);
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
@@ -1507,15 +1507,15 @@ function create_else_block_1$1(ctx) {
 			if_block.p(ctx, dirty);
 			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*stylesContent*/ 256) applyStyles_action.update.call(null, /*stylesContent*/ ctx[8]);
 
-			if (!current || dirty & /*foundryApp*/ 512 && div_id_value !== (div_id_value = /*foundryApp*/ ctx[9].id)) {
+			if (!current || dirty & /*application*/ 512 && div_id_value !== (div_id_value = /*application*/ ctx[9].id)) {
 				attr(div, "id", div_id_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 512 && div_class_value !== (div_class_value = "app window-app " + /*foundryApp*/ ctx[9].options.classes.join(' ') + " svelte-3vt5in")) {
+			if (!current || dirty & /*application*/ 512 && div_class_value !== (div_class_value = "app window-app " + /*application*/ ctx[9].options.classes.join(' ') + " svelte-3vt5in")) {
 				attr(div, "class", div_class_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 512 && div_data_appid_value !== (div_data_appid_value = /*foundryApp*/ ctx[9].appId)) {
+			if (!current || dirty & /*application*/ 512 && div_data_appid_value !== (div_data_appid_value = /*application*/ ctx[9].appId)) {
 				attr(div, "data-appid", div_data_appid_value);
 			}
 
@@ -1603,9 +1603,9 @@ function create_if_block$5(ctx) {
 			create_component(resizablehandle.$$.fragment);
 			attr(section, "class", "window-content");
 			add_render_callback(() => /*section_elementresize_handler*/ ctx[21].call(section));
-			attr(div, "id", div_id_value = /*foundryApp*/ ctx[9].id);
-			attr(div, "class", div_class_value = "app window-app " + /*foundryApp*/ ctx[9].options.classes.join(' ') + " svelte-3vt5in");
-			attr(div, "data-appid", div_data_appid_value = /*foundryApp*/ ctx[9].appId);
+			attr(div, "id", div_id_value = /*application*/ ctx[9].id);
+			attr(div, "class", div_class_value = "app window-app " + /*application*/ ctx[9].options.classes.join(' ') + " svelte-3vt5in");
+			attr(div, "data-appid", div_data_appid_value = /*application*/ ctx[9].appId);
 			add_render_callback(() => /*div_elementresize_handler*/ ctx[22].call(div));
 		},
 		m(target, anchor) {
@@ -1637,15 +1637,15 @@ function create_if_block$5(ctx) {
 			if_block.p(ctx, dirty);
 			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*stylesContent*/ 256) applyStyles_action.update.call(null, /*stylesContent*/ ctx[8]);
 
-			if (!current || dirty & /*foundryApp*/ 512 && div_id_value !== (div_id_value = /*foundryApp*/ ctx[9].id)) {
+			if (!current || dirty & /*application*/ 512 && div_id_value !== (div_id_value = /*application*/ ctx[9].id)) {
 				attr(div, "id", div_id_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 512 && div_class_value !== (div_class_value = "app window-app " + /*foundryApp*/ ctx[9].options.classes.join(' ') + " svelte-3vt5in")) {
+			if (!current || dirty & /*application*/ 512 && div_class_value !== (div_class_value = "app window-app " + /*application*/ ctx[9].options.classes.join(' ') + " svelte-3vt5in")) {
 				attr(div, "class", div_class_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 512 && div_data_appid_value !== (div_data_appid_value = /*foundryApp*/ ctx[9].appId)) {
+			if (!current || dirty & /*application*/ 512 && div_data_appid_value !== (div_data_appid_value = /*application*/ ctx[9].appId)) {
 				attr(div, "data-appid", div_data_appid_value);
 			}
 
@@ -1911,8 +1911,8 @@ function instance$d($$self, $$props, $$invalidate) {
 
 	// If the application is a popOut application then when clicked bring to top. Bound to on pointerdown.
 	const bringToTop = () => {
-		if (typeof foundryApp.options.popOut === 'boolean' && foundryApp.options.popOut && foundryApp !== ui?.activeWindow) {
-			foundryApp.bringToTop.call(foundryApp);
+		if (typeof application.options.popOut === 'boolean' && application.options.popOut && application !== ui?.activeWindow) {
+			application.bringToTop.call(application);
 		}
 	};
 
@@ -1930,7 +1930,7 @@ function instance$d($$self, $$props, $$invalidate) {
 	const context = getContext('external');
 
 	// Store Foundry Application reference.
-	const foundryApp = context.foundryApp;
+	const application = context.application;
 
 	// This component can host multiple children defined via props or in the TyphonJS SvelteData configuration object
 	// that are potentially mounted in the content area. If no children defined then this component mounts any slotted
@@ -2055,7 +2055,7 @@ function instance$d($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*outTransition, foundryApp*/ 520) {
+		if ($$self.$$.dirty & /*outTransition, application*/ 520) {
 			{
 				// Handle cases if outTransition is unset; assign noop default transition function.
 				if (typeof outTransition !== 'function') {
@@ -2063,8 +2063,8 @@ function instance$d($$self, $$props, $$invalidate) {
 				}
 
 				// Set jquery close animation to either run or not when an out transition is changed.
-				if (foundryApp && typeof foundryApp?.options?.defaultCloseAnimation === 'boolean') {
-					$$invalidate(9, foundryApp.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, foundryApp);
+				if (application && typeof application?.options?.defaultCloseAnimation === 'boolean') {
+					$$invalidate(9, application.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, application);
 				}
 			}
 		}
@@ -2094,7 +2094,7 @@ function instance$d($$self, $$props, $$invalidate) {
 		heightChanged,
 		stylesApp,
 		stylesContent,
-		foundryApp,
+		application,
 		bindHeightChanged,
 		bringToTop,
 		allChildren,
@@ -2265,9 +2265,9 @@ function create_else_block$2(ctx) {
 	return {
 		c() {
 			div = element("div");
-			attr(div, "id", div_id_value = /*foundryApp*/ ctx[6].id);
-			attr(div, "class", div_class_value = /*foundryApp*/ ctx[6].options.classes.join(' '));
-			attr(div, "data-appid", div_data_appid_value = /*foundryApp*/ ctx[6].appId);
+			attr(div, "id", div_id_value = /*application*/ ctx[6].id);
+			attr(div, "class", div_class_value = /*application*/ ctx[6].options.classes.join(' '));
+			attr(div, "data-appid", div_data_appid_value = /*application*/ ctx[6].appId);
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
@@ -2277,15 +2277,15 @@ function create_else_block$2(ctx) {
 		p(new_ctx, dirty) {
 			ctx = new_ctx;
 
-			if (!current || dirty & /*foundryApp*/ 64 && div_id_value !== (div_id_value = /*foundryApp*/ ctx[6].id)) {
+			if (!current || dirty & /*application*/ 64 && div_id_value !== (div_id_value = /*application*/ ctx[6].id)) {
 				attr(div, "id", div_id_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 64 && div_class_value !== (div_class_value = /*foundryApp*/ ctx[6].options.classes.join(' '))) {
+			if (!current || dirty & /*application*/ 64 && div_class_value !== (div_class_value = /*application*/ ctx[6].options.classes.join(' '))) {
 				attr(div, "class", div_class_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 64 && div_data_appid_value !== (div_data_appid_value = /*foundryApp*/ ctx[6].appId)) {
+			if (!current || dirty & /*application*/ 64 && div_data_appid_value !== (div_data_appid_value = /*application*/ ctx[6].appId)) {
 				attr(div, "data-appid", div_data_appid_value);
 			}
 		},
@@ -2327,9 +2327,9 @@ function create_if_block$4(ctx) {
 	return {
 		c() {
 			div = element("div");
-			attr(div, "id", div_id_value = /*foundryApp*/ ctx[6].id);
-			attr(div, "class", div_class_value = /*foundryApp*/ ctx[6].options.classes.join(' '));
-			attr(div, "data-appid", div_data_appid_value = /*foundryApp*/ ctx[6].appId);
+			attr(div, "id", div_id_value = /*application*/ ctx[6].id);
+			attr(div, "class", div_class_value = /*application*/ ctx[6].options.classes.join(' '));
+			attr(div, "data-appid", div_data_appid_value = /*application*/ ctx[6].appId);
 			add_render_callback(() => /*div_elementresize_handler*/ ctx[13].call(div));
 		},
 		m(target, anchor) {
@@ -2341,15 +2341,15 @@ function create_if_block$4(ctx) {
 		p(new_ctx, dirty) {
 			ctx = new_ctx;
 
-			if (!current || dirty & /*foundryApp*/ 64 && div_id_value !== (div_id_value = /*foundryApp*/ ctx[6].id)) {
+			if (!current || dirty & /*application*/ 64 && div_id_value !== (div_id_value = /*application*/ ctx[6].id)) {
 				attr(div, "id", div_id_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 64 && div_class_value !== (div_class_value = /*foundryApp*/ ctx[6].options.classes.join(' '))) {
+			if (!current || dirty & /*application*/ 64 && div_class_value !== (div_class_value = /*application*/ ctx[6].options.classes.join(' '))) {
 				attr(div, "class", div_class_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 64 && div_data_appid_value !== (div_data_appid_value = /*foundryApp*/ ctx[6].appId)) {
+			if (!current || dirty & /*application*/ 64 && div_data_appid_value !== (div_data_appid_value = /*application*/ ctx[6].appId)) {
 				attr(div, "data-appid", div_data_appid_value);
 			}
 		},
@@ -2446,7 +2446,7 @@ function instance$c($$self, $$props, $$invalidate) {
 	const context = getContext('external');
 
 	// Store Foundry Application reference.
-	const foundryApp = context.foundryApp;
+	const application = context.application;
 
 	let { transition = void 0 } = $$props;
 	let { inTransition = s_DEFAULT_TRANSITION } = $$props;
@@ -2547,7 +2547,7 @@ function instance$c($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*outTransition, foundryApp*/ 68) {
+		if ($$self.$$.dirty & /*outTransition, application*/ 68) {
 			{
 				// Handle cases if outTransition is unset; assign noop default transition function.
 				if (typeof outTransition !== 'function') {
@@ -2555,8 +2555,8 @@ function instance$c($$self, $$props, $$invalidate) {
 				}
 
 				// Set jquery close animation to either run or not when an out transition is changed.
-				if (foundryApp && typeof foundryApp?.options?.defaultCloseAnimation === 'boolean') {
-					$$invalidate(6, foundryApp.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, foundryApp);
+				if (application && typeof application?.options?.defaultCloseAnimation === 'boolean') {
+					$$invalidate(6, application.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, application);
 				}
 			}
 		}
@@ -2583,7 +2583,7 @@ function instance$c($$self, $$props, $$invalidate) {
 		inTransitionOptions,
 		outTransitionOptions,
 		heightChanged,
-		foundryApp,
+		application,
 		bindHeightChanged,
 		elementContent,
 		transition,
@@ -2744,9 +2744,9 @@ function create_else_block_1(ctx) {
 			t1 = space();
 			create_component(resizablehandle.$$.fragment);
 			attr(section, "class", "window-content");
-			attr(div, "id", div_id_value = /*foundryApp*/ ctx[9].id);
-			attr(div, "class", div_class_value = "tjs-app tjs-window-app " + /*foundryApp*/ ctx[9].options.classes.join(' '));
-			attr(div, "data-appid", div_data_appid_value = /*foundryApp*/ ctx[9].appId);
+			attr(div, "id", div_id_value = /*application*/ ctx[9].id);
+			attr(div, "class", div_class_value = "tjs-app tjs-window-app " + /*application*/ ctx[9].options.classes.join(' '));
+			attr(div, "data-appid", div_data_appid_value = /*application*/ ctx[9].appId);
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
@@ -2775,15 +2775,15 @@ function create_else_block_1(ctx) {
 			if_block.p(ctx, dirty);
 			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*stylesContent*/ 256) applyStyles_action.update.call(null, /*stylesContent*/ ctx[8]);
 
-			if (!current || dirty & /*foundryApp*/ 512 && div_id_value !== (div_id_value = /*foundryApp*/ ctx[9].id)) {
+			if (!current || dirty & /*application*/ 512 && div_id_value !== (div_id_value = /*application*/ ctx[9].id)) {
 				attr(div, "id", div_id_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 512 && div_class_value !== (div_class_value = "tjs-app tjs-window-app " + /*foundryApp*/ ctx[9].options.classes.join(' '))) {
+			if (!current || dirty & /*application*/ 512 && div_class_value !== (div_class_value = "tjs-app tjs-window-app " + /*application*/ ctx[9].options.classes.join(' '))) {
 				attr(div, "class", div_class_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 512 && div_data_appid_value !== (div_data_appid_value = /*foundryApp*/ ctx[9].appId)) {
+			if (!current || dirty & /*application*/ 512 && div_data_appid_value !== (div_data_appid_value = /*application*/ ctx[9].appId)) {
 				attr(div, "data-appid", div_data_appid_value);
 			}
 
@@ -2871,9 +2871,9 @@ function create_if_block$3(ctx) {
 			create_component(resizablehandle.$$.fragment);
 			attr(section, "class", "window-content");
 			add_render_callback(() => /*section_elementresize_handler*/ ctx[21].call(section));
-			attr(div, "id", div_id_value = /*foundryApp*/ ctx[9].id);
-			attr(div, "class", div_class_value = "tjs-app tjs-window-app " + /*foundryApp*/ ctx[9].options.classes.join(' '));
-			attr(div, "data-appid", div_data_appid_value = /*foundryApp*/ ctx[9].appId);
+			attr(div, "id", div_id_value = /*application*/ ctx[9].id);
+			attr(div, "class", div_class_value = "tjs-app tjs-window-app " + /*application*/ ctx[9].options.classes.join(' '));
+			attr(div, "data-appid", div_data_appid_value = /*application*/ ctx[9].appId);
 			add_render_callback(() => /*div_elementresize_handler*/ ctx[22].call(div));
 		},
 		m(target, anchor) {
@@ -2905,15 +2905,15 @@ function create_if_block$3(ctx) {
 			if_block.p(ctx, dirty);
 			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*stylesContent*/ 256) applyStyles_action.update.call(null, /*stylesContent*/ ctx[8]);
 
-			if (!current || dirty & /*foundryApp*/ 512 && div_id_value !== (div_id_value = /*foundryApp*/ ctx[9].id)) {
+			if (!current || dirty & /*application*/ 512 && div_id_value !== (div_id_value = /*application*/ ctx[9].id)) {
 				attr(div, "id", div_id_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 512 && div_class_value !== (div_class_value = "tjs-app tjs-window-app " + /*foundryApp*/ ctx[9].options.classes.join(' '))) {
+			if (!current || dirty & /*application*/ 512 && div_class_value !== (div_class_value = "tjs-app tjs-window-app " + /*application*/ ctx[9].options.classes.join(' '))) {
 				attr(div, "class", div_class_value);
 			}
 
-			if (!current || dirty & /*foundryApp*/ 512 && div_data_appid_value !== (div_data_appid_value = /*foundryApp*/ ctx[9].appId)) {
+			if (!current || dirty & /*application*/ 512 && div_data_appid_value !== (div_data_appid_value = /*application*/ ctx[9].appId)) {
 				attr(div, "data-appid", div_data_appid_value);
 			}
 
@@ -3179,8 +3179,8 @@ function instance$b($$self, $$props, $$invalidate) {
 
 	// If the application is a popOut application then when clicked bring to top. Bound to on pointerdown.
 	const bringToTop = () => {
-		if (typeof foundryApp.options.popOut === 'boolean' && foundryApp.options.popOut && foundryApp !== ui?.activeWindow) {
-			foundryApp.bringToTop.call(foundryApp);
+		if (typeof application.options.popOut === 'boolean' && application.options.popOut && application !== ui?.activeWindow) {
+			application.bringToTop.call(application);
 		}
 	};
 
@@ -3198,7 +3198,7 @@ function instance$b($$self, $$props, $$invalidate) {
 	const context = getContext('external');
 
 	// Store Foundry Application reference.
-	const foundryApp = context.foundryApp;
+	const application = context.application;
 
 	// This component can host multiple children defined via props or in the TyphonJS SvelteData configuration object
 	// that are potentially mounted in the content area. If no children defined then this component mounts any slotted
@@ -3323,7 +3323,7 @@ function instance$b($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*outTransition, foundryApp*/ 520) {
+		if ($$self.$$.dirty & /*outTransition, application*/ 520) {
 			{
 				// Handle cases if outTransition is unset; assign noop default transition function.
 				if (typeof outTransition !== 'function') {
@@ -3331,8 +3331,8 @@ function instance$b($$self, $$props, $$invalidate) {
 				}
 
 				// Set jquery close animation to either run or not when an out transition is changed.
-				if (foundryApp && typeof foundryApp?.options?.defaultCloseAnimation === 'boolean') {
-					$$invalidate(9, foundryApp.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, foundryApp);
+				if (application && typeof application?.options?.defaultCloseAnimation === 'boolean') {
+					$$invalidate(9, application.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, application);
 				}
 			}
 		}
@@ -3362,7 +3362,7 @@ function instance$b($$self, $$props, $$invalidate) {
 		heightChanged,
 		stylesApp,
 		stylesContent,
-		foundryApp,
+		application,
 		bindHeightChanged,
 		bringToTop,
 		allChildren,
@@ -3943,7 +3943,7 @@ function instance$a($$self, $$props, $$invalidate) {
 	let content = void 0;
 	let dialogComponent;
 	let dialogProps = {};
-	let foundryApp = getContext('external').foundryApp;
+	let application = getContext('external').application;
 	let currentButtonId = data.default;
 
 	async function onClick(button) {
@@ -3958,9 +3958,9 @@ function instance$a($$self, $$props, $$invalidate) {
 					// Passing back the HTML element is to keep with the existing Foundry API, however second parameter is
 					// the Svelte component instance.
 					result = await invoke(
-						foundryApp.options.jQuery
-						? foundryApp.element
-						: foundryApp.element[0],
+						application.options.jQuery
+						? application.element
+						: application.element[0],
 						dialogInstance
 					);
 					break;
@@ -3968,9 +3968,9 @@ function instance$a($$self, $$props, $$invalidate) {
 					// Attempt lookup by function name in dialog instance component.
 					if (dialogInstance !== void 0 && typeof dialogInstance[invoke] === 'function') {
 						result = await dialogInstance[invoke](
-							foundryApp.options.jQuery
-							? foundryApp.element
-							: foundryApp.element[0],
+							application.options.jQuery
+							? application.element
+							: application.element[0],
 							dialogInstance
 						);
 					}
@@ -3979,7 +3979,7 @@ function instance$a($$self, $$props, $$invalidate) {
 
 			// Delay closing to next clock tick to be able to return result.
 			if (autoClose) {
-				setTimeout(() => foundryApp.close(), 0);
+				setTimeout(() => application.close(), 0);
 			}
 
 			return result;
@@ -3994,7 +3994,7 @@ function instance$a($$self, $$props, $$invalidate) {
  * If this dialog is not the activeWindow then return immediately. See {@link SvelteApplication.bringToTop} as
  * SvelteApplication overrides core Foundry and always sets the activeWindow when `bringToTop` is invoked.
  */
-		if (event.key !== 'Escape' && ui.activeWindow !== foundryApp) {
+		if (event.key !== 'Escape' && ui.activeWindow !== application) {
 			return;
 		}
 
@@ -4026,7 +4026,7 @@ function instance$a($$self, $$props, $$invalidate) {
 			case 'Escape':
 				event.preventDefault();
 				event.stopPropagation();
-				return foundryApp.close();
+				return application.close();
 			case 'Enter':
 				event.preventDefault();
 				event.stopPropagation();
@@ -4120,7 +4120,7 @@ function instance$a($$self, $$props, $$invalidate) {
 						$$invalidate(4, dialogComponent = content);
 						$$invalidate(5, dialogProps = {});
 					} else if (typeof content === 'object') {
-						const svelteConfig = parseSvelteConfig(content, foundryApp);
+						const svelteConfig = parseSvelteConfig(content, application);
 						$$invalidate(4, dialogComponent = svelteConfig.class);
 						$$invalidate(5, dialogProps = svelteConfig.props ?? {});
 
@@ -4260,7 +4260,7 @@ function create_if_block$1(ctx) {
 
 	const tjsglasspane_spread_levels = [
 		{
-			id: `${/*foundryApp*/ ctx[3].id}-glasspane`
+			id: `${/*application*/ ctx[3].id}-glasspane`
 		},
 		{ preventDefault: false },
 		{ stopPropagation: false },
@@ -4288,10 +4288,10 @@ function create_if_block$1(ctx) {
 			current = true;
 		},
 		p(ctx, dirty) {
-			const tjsglasspane_changes = (dirty & /*foundryApp, modalProps, zIndex*/ 200)
+			const tjsglasspane_changes = (dirty & /*application, modalProps, zIndex*/ 200)
 			? get_spread_update(tjsglasspane_spread_levels, [
-					dirty & /*foundryApp*/ 8 && {
-						id: `${/*foundryApp*/ ctx[3].id}-glasspane`
+					dirty & /*application*/ 8 && {
+						id: `${/*application*/ ctx[3].id}-glasspane`
 					},
 					tjsglasspane_spread_levels[1],
 					tjsglasspane_spread_levels[2],
@@ -4464,7 +4464,7 @@ function create_default_slot_1(ctx) {
 	};
 }
 
-// (180:3) <TJSGlassPane id={`${foundryApp.id}-glasspane`} preventDefault={false} stopPropagation={false} {...modalProps} {zIndex}>
+// (180:3) <TJSGlassPane id={`${application.id}-glasspane`} preventDefault={false} stopPropagation={false} {...modalProps} {zIndex}>
 function create_default_slot(ctx) {
 	let applicationshell;
 	let updating_elementRoot;
@@ -4606,7 +4606,7 @@ function instance$9($$self, $$props, $$invalidate) {
 	let { elementRoot } = $$props;
 	let { data = {} } = $$props;
 	let { dialogComponent = void 0 } = $$props;
-	const foundryApp = getContext('external').foundryApp;
+	const application = getContext('external').application;
 	const s_MODAL_TRANSITION = fade;
 	const s_MODAL_TRANSITION_OPTIONS = { duration: 200 };
 	let modal = void 0;
@@ -4651,7 +4651,7 @@ function instance$9($$self, $$props, $$invalidate) {
 
 	function dialogcontent_autoClose_binding(value) {
 		autoClose = value;
-		(((($$invalidate(8, autoClose), $$invalidate(2, data)), $$invalidate(4, modal)), $$invalidate(7, zIndex)), $$invalidate(3, foundryApp));
+		(((($$invalidate(8, autoClose), $$invalidate(2, data)), $$invalidate(4, modal)), $$invalidate(7, zIndex)), $$invalidate(3, application));
 	}
 
 	function dialogcontent_dialogInstance_binding(value) {
@@ -4666,7 +4666,7 @@ function instance$9($$self, $$props, $$invalidate) {
 
 	function dialogcontent_autoClose_binding_1(value) {
 		autoClose = value;
-		(((($$invalidate(8, autoClose), $$invalidate(2, data)), $$invalidate(4, modal)), $$invalidate(7, zIndex)), $$invalidate(3, foundryApp));
+		(((($$invalidate(8, autoClose), $$invalidate(2, data)), $$invalidate(4, modal)), $$invalidate(7, zIndex)), $$invalidate(3, application));
 	}
 
 	function dialogcontent_dialogInstance_binding_1(value) {
@@ -4686,11 +4686,11 @@ function instance$9($$self, $$props, $$invalidate) {
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*data, modal, zIndex, foundryApp*/ 156) {
+		if ($$self.$$.dirty & /*data, modal, zIndex, application*/ 156) {
 			// Retrieve values from the DialogData object and also potentially set any SvelteApplication accessors.
 			// Explicit checks are performed against existing local variables as the only externally reactive variable is `data`.
 			// All of the checks below trigger when there are any external changes to the `data` prop.
-			// Prevent any unnecessary changing of local & `foundryApp` variables unless actual changes occur.
+			// Prevent any unnecessary changing of local & `application` variables unless actual changes occur.
 			// Foundry App options --------------------------------------------------------------------------------------------
 			if (typeof data === 'object') {
 				$$invalidate(8, autoClose = typeof data.autoClose === 'boolean'
@@ -4707,34 +4707,34 @@ function instance$9($$self, $$props, $$invalidate) {
 					$$invalidate(7, zIndex = newZIndex);
 				}
 
-				// Update the main foundry options when data changes. Perform explicit checks against existing data in `foundryApp`.
+				// Update the main foundry options when data changes. Perform explicit checks against existing data in `application`.
 				const newDraggable = data.draggable ?? true;
 
-				if (foundryApp.reactive.draggable !== newDraggable) {
-					$$invalidate(3, foundryApp.reactive.draggable = newDraggable, foundryApp);
+				if (application.reactive.draggable !== newDraggable) {
+					$$invalidate(3, application.reactive.draggable = newDraggable, application);
 				}
 
 				const newPopOut = data.popOut ?? true;
 
-				if (foundryApp.reactive.popOut !== newPopOut) {
-					$$invalidate(3, foundryApp.reactive.popOut = newPopOut, foundryApp);
+				if (application.reactive.popOut !== newPopOut) {
+					$$invalidate(3, application.reactive.popOut = newPopOut, application);
 				}
 
 				const newResizable = data.resizable ?? false;
 
-				if (foundryApp.reactive.resizable !== newResizable) {
-					$$invalidate(3, foundryApp.reactive.resizable = newResizable, foundryApp);
+				if (application.reactive.resizable !== newResizable) {
+					$$invalidate(3, application.reactive.resizable = newResizable, application);
 				}
 
-				// Note foundryApp.title from Application localizes `options.title`, so compare with `foundryApp.options.title`.
+				// Note application.title from Application localizes `options.title`, so compare with `application.options.title`.
 				const newTitle = data.title ?? 'Dialog';
 
-				if (newTitle !== foundryApp?.options?.title) {
-					$$invalidate(3, foundryApp.reactive.title = newTitle, foundryApp);
+				if (newTitle !== application?.options?.title) {
+					$$invalidate(3, application.reactive.title = newTitle, application);
 				}
 
-				if (foundryApp.reactive.zIndex !== zIndex) {
-					$$invalidate(3, foundryApp.reactive.zIndex = zIndex, foundryApp);
+				if (application.reactive.zIndex !== zIndex) {
+					$$invalidate(3, application.reactive.zIndex = zIndex, application);
 				}
 			}
 		}
@@ -4850,7 +4850,7 @@ function instance$9($$self, $$props, $$invalidate) {
 		elementRoot,
 		dialogComponent,
 		data,
-		foundryApp,
+		application,
 		modal,
 		appProps,
 		modalProps,
@@ -5179,7 +5179,7 @@ function instance$8($$self, $$props, $$invalidate) {
 	let { parent = null } = $$props;
 	let { pack = null } = $$props;
 	let { renderSheet = true } = $$props;
-	const { foundryApp } = getContext('external');
+	const { application } = getContext('external');
 	let form;
 	let name, folderSelect, folders, hasTypes, type, types;
 
@@ -5233,8 +5233,8 @@ function instance$8($$self, $$props, $$invalidate) {
 		}
 
 		const document = await documentCls.create(data, { parent, pack, renderSheet });
-		foundryApp.options.resolve?.(document);
-		foundryApp.close();
+		application.options.resolve?.(document);
+		application.close();
 	}
 
 	function select_change_handler() {
@@ -5382,7 +5382,7 @@ function instance$7($$self, $$props, $$invalidate) {
 	let $doc;
 	let { document = void 0 } = $$props;
 	let { context = {} } = $$props;
-	const { foundryApp } = getContext('external');
+	const { application } = getContext('external');
 
 	if (!(document instanceof foundry.abstract.Document)) {
 		throw new TypeError(`TJSDocumentDelete error: 'document' is not an instance of Document.`);
@@ -5390,7 +5390,7 @@ function instance$7($$self, $$props, $$invalidate) {
 
 	const doc = new TJSDocument(document,
 	{
-			delete: foundryApp.close.bind(foundryApp)
+			delete: application.close.bind(application)
 		});
 
 	component_subscribe($$self, doc, value => $$invalidate(5, $doc = value));
@@ -5402,7 +5402,7 @@ function instance$7($$self, $$props, $$invalidate) {
 		doc.setOptions({ delete: void 0 });
 
 		const returnDoc = await document.delete(context);
-		foundryApp.options.resolve?.(returnDoc);
+		application.options.resolve?.(returnDoc);
 	}
 
 	$$self.$$set = $$props => {
@@ -5426,7 +5426,7 @@ function instance$7($$self, $$props, $$invalidate) {
 				doc.set(document);
 				(document?.id) ? document.name : '';
 				$$invalidate(0, type = localize(document.constructor.metadata.label));
-				foundryApp.data.set('title', `${localize('DOCUMENT.Delete', { type })}: ${document.name}`);
+				application.data.set('title', `${localize('DOCUMENT.Delete', { type })}: ${document.name}`);
 			}
 		}
 	};
@@ -5545,7 +5545,7 @@ function create_fragment$6(ctx) {
 function instance$6($$self, $$props, $$invalidate) {
 	let $doc;
 	let { document = void 0 } = $$props;
-	const { foundryApp } = getContext('external');
+	const { application } = getContext('external');
 
 	if (!(document instanceof foundry.abstract.Document)) {
 		throw new TypeError(`TJSDocumentImport error: 'document' is not an instance of Document.`);
@@ -5553,7 +5553,7 @@ function instance$6($$self, $$props, $$invalidate) {
 
 	const doc = new TJSDocument(document,
 	{
-			delete: foundryApp.close.bind(foundryApp)
+			delete: application.close.bind(application)
 		});
 
 	component_subscribe($$self, doc, value => $$invalidate(7, $doc = value));
@@ -5568,8 +5568,8 @@ function instance$6($$self, $$props, $$invalidate) {
 
 		const json = await readTextFromFile(form.data.files[0]);
 		const importedDoc = await document.importFromJSON(json);
-		foundryApp.options.resolve?.(importedDoc);
-		foundryApp.close();
+		application.options.resolve?.(importedDoc);
+		application.close();
 	}
 
 	function requestSubmit() {
@@ -5597,7 +5597,7 @@ function instance$6($$self, $$props, $$invalidate) {
 				doc.set(document);
 				$$invalidate(1, hint1 = localize('DOCUMENT.ImportDataHint1', { document: document.documentName }));
 				$$invalidate(2, hint2 = localize('DOCUMENT.ImportDataHint2', { name: document.name }));
-				foundryApp.data.set('title', `${localize('DOCUMENT.ImportData')}: ${document.name}`);
+				application.data.set('title', `${localize('DOCUMENT.ImportData')}: ${document.name}`);
 			}
 		}
 	};
@@ -5814,7 +5814,7 @@ const s_REGEX_HEX_COLOR = /^#(?:[0-9a-fA-F]{3}){1,2}$/;
 function instance$5($$self, $$props, $$invalidate) {
 	let $doc;
 	let { document = void 0 } = $$props;
-	const { foundryApp } = getContext('external');
+	const { application } = getContext('external');
 
 	if (!(document instanceof Folder)) {
 		throw new TypeError(`TJSFolderCreateUpdate error: 'document' is not an instance of Folder.`);
@@ -5822,7 +5822,7 @@ function instance$5($$self, $$props, $$invalidate) {
 
 	const doc = new TJSDocument(document,
 	{
-			delete: foundryApp.close.bind(foundryApp)
+			delete: application.close.bind(application)
 		});
 
 	component_subscribe($$self, doc, value => $$invalidate(10, $doc = value));
@@ -5863,8 +5863,8 @@ function instance$5($$self, $$props, $$invalidate) {
 			modifiedDoc = await Folder.create(document.data);
 		}
 
-		foundryApp.options.resolve?.(modifiedDoc);
-		foundryApp.close();
+		application.options.resolve?.(modifiedDoc);
+		application.close();
 	}
 
 	function input3_input_handler() {
@@ -5902,7 +5902,7 @@ function instance$5($$self, $$props, $$invalidate) {
 				$$invalidate(1, color = document?.data?.color);
 
 				// Update the dialog button label and title.
-				foundryApp.data.merge({
+				application.data.merge({
 					buttons: {
 						submit: {
 							label: localize((document?.id) ? 'FOLDER.Update' : 'FOLDER.Create')
@@ -5999,7 +5999,7 @@ function create_fragment$4(ctx) {
 function instance$4($$self, $$props, $$invalidate) {
 	let $doc;
 	let { document = void 0 } = $$props;
-	const { foundryApp } = getContext('external');
+	const { application } = getContext('external');
 
 	if (!(document instanceof Folder)) {
 		throw new TypeError(`TJSFolderDelete error: 'document' is not an instance of Folder.`);
@@ -6007,7 +6007,7 @@ function instance$4($$self, $$props, $$invalidate) {
 
 	const doc = new TJSDocument(document,
 	{
-			delete: foundryApp.close.bind(foundryApp)
+			delete: application.close.bind(application)
 		});
 
 	component_subscribe($$self, doc, value => $$invalidate(3, $doc = value));
@@ -6021,8 +6021,8 @@ function instance$4($$self, $$props, $$invalidate) {
 			deleteContents: true
 		});
 
-		foundryApp.options.resolve?.(folder);
-		foundryApp.close();
+		application.options.resolve?.(folder);
+		application.close();
 	}
 
 	$$self.$$set = $$props => {
@@ -6037,7 +6037,7 @@ function instance$4($$self, $$props, $$invalidate) {
 				}
 
 				doc.set(document);
-				foundryApp.data.set('title', `${localize('FOLDER.Delete')}: ${document.name}`);
+				application.data.set('title', `${localize('FOLDER.Delete')}: ${document.name}`);
 			}
 		}
 	};
@@ -6252,7 +6252,7 @@ function instance$3($$self, $$props, $$invalidate) {
 	let { merge } = $$props;
 	let { keepId } = $$props;
 	let selected;
-	const { foundryApp } = getContext('external');
+	const { application } = getContext('external');
 
 	if (!(document instanceof Folder)) {
 		throw new TypeError(`TJSFolderExport error: 'document' is not an instance of Folder.`);
@@ -6260,7 +6260,7 @@ function instance$3($$self, $$props, $$invalidate) {
 
 	const doc = new TJSDocument(document,
 	{
-			delete: foundryApp.close.bind(foundryApp)
+			delete: application.close.bind(application)
 		});
 
 	component_subscribe($$self, doc, value => $$invalidate(8, $doc = value));
@@ -6270,8 +6270,8 @@ function instance$3($$self, $$props, $$invalidate) {
 
 	if (!packs.length) {
 		ui.notifications.warn(localize('FOLDER.ExportWarningNone', { type: document.type }));
-		foundryApp.options.resolve?.(null);
-		foundryApp.close();
+		application.options.resolve?.(null);
+		application.close();
 	}
 
 	selected = packs[0].metadata.name;
@@ -6289,12 +6289,12 @@ function instance$3($$self, $$props, $$invalidate) {
 
 		if (pack instanceof CompendiumCollection && !pack?.locked) {
 			await document.exportToCompendium(pack, { updateByName: merge, keepId });
-			foundryApp.options.resolve?.(pack);
+			application.options.resolve?.(pack);
 		} else {
-			foundryApp.options.resolve?.(false);
+			application.options.resolve?.(false);
 		}
 
-		foundryApp.close();
+		application.close();
 	}
 
 	function select_change_handler() {
@@ -6336,7 +6336,7 @@ function instance$3($$self, $$props, $$invalidate) {
 		if ($$self.$$.dirty & /*$doc*/ 256) {
 			{
 				// Update the title if document name changes
-				foundryApp.data.set('title', `${localize('FOLDER.ExportTitle')}: ${$doc.name}`);
+				application.data.set('title', `${localize('FOLDER.ExportTitle')}: ${$doc.name}`);
 			}
 		}
 	};
@@ -6445,7 +6445,7 @@ function create_fragment$2(ctx) {
 function instance$2($$self, $$props, $$invalidate) {
 	let $doc;
 	let { document = void 0 } = $$props;
-	const { foundryApp } = getContext('external');
+	const { application } = getContext('external');
 
 	if (!(document instanceof Folder)) {
 		throw new TypeError(`TJSFolderRemove error: 'document' is not an instance of Folder.`);
@@ -6453,7 +6453,7 @@ function instance$2($$self, $$props, $$invalidate) {
 
 	const doc = new TJSDocument(document,
 	{
-			delete: foundryApp.close.bind(foundryApp)
+			delete: application.close.bind(application)
 		});
 
 	component_subscribe($$self, doc, value => $$invalidate(3, $doc = value));
@@ -6467,8 +6467,8 @@ function instance$2($$self, $$props, $$invalidate) {
 			deleteContents: false
 		});
 
-		foundryApp.options.resolve?.(folder);
-		foundryApp.close();
+		application.options.resolve?.(folder);
+		application.close();
 	}
 
 	$$self.$$set = $$props => {
@@ -6483,7 +6483,7 @@ function instance$2($$self, $$props, $$invalidate) {
 				}
 
 				doc.set(document);
-				foundryApp.data.set('title', `${localize('FOLDER.Remove')}: ${document.name}`);
+				application.data.set('title', `${localize('FOLDER.Remove')}: ${document.name}`);
 			}
 		}
 	};
@@ -6536,7 +6536,7 @@ function create_fragment$1(ctx) {
 function instance$1($$self, $$props, $$invalidate) {
 	let $doc;
 	let { document = void 0 } = $$props;
-	const { foundryApp } = getContext('external');
+	const { application } = getContext('external');
 
 	if (!(document instanceof Folder)) {
 		throw new TypeError(`TJSFolderRolltable error: 'document' is not an instance of Folder.`);
@@ -6544,15 +6544,15 @@ function instance$1($$self, $$props, $$invalidate) {
 
 	const doc = new TJSDocument(document,
 	{
-			delete: foundryApp.close.bind(foundryApp)
+			delete: application.close.bind(application)
 		});
 
 	component_subscribe($$self, doc, value => $$invalidate(3, $doc = value));
 
 	async function createTable() {
 		const rollTable = await RollTable.fromFolder(document);
-		foundryApp.options.resolve?.(rollTable);
-		foundryApp.close();
+		application.options.resolve?.(rollTable);
+		application.close();
 	}
 
 	$$self.$$set = $$props => {
@@ -6567,7 +6567,7 @@ function instance$1($$self, $$props, $$invalidate) {
 				}
 
 				doc.set(document);
-				foundryApp.data.set('title', `${localize('FOLDER.CreateTable')}: ${document.name}`);
+				application.data.set('title', `${localize('FOLDER.CreateTable')}: ${document.name}`);
 			}
 		}
 	};
@@ -6761,7 +6761,7 @@ function create_fragment(ctx) {
 function instance($$self, $$props, $$invalidate) {
 	let $doc;
 	let { document = void 0 } = $$props;
-	const { foundryApp } = getContext('external');
+	const { application } = getContext('external');
 
 	if (!(document instanceof foundry.abstract.Document)) {
 		throw new TypeError(`TJSPermissionControl error: 'document' is not an instance of Document.`);
@@ -6769,7 +6769,7 @@ function instance($$self, $$props, $$invalidate) {
 
 	const doc = new TJSDocument(document,
 	{
-			delete: foundryApp.close.bind(foundryApp)
+			delete: application.close.bind(application)
 		});
 
 	component_subscribe($$self, doc, value => $$invalidate(11, $doc = value));
@@ -6873,8 +6873,8 @@ function instance($$self, $$props, $$invalidate) {
 				noHook: true
 			});
 
-			foundryApp.options.resolve?.($doc);
-			foundryApp.close();
+			application.options.resolve?.($doc);
+			application.close();
 		}
 
 		// Update a single Document
@@ -6884,8 +6884,8 @@ function instance($$self, $$props, $$invalidate) {
 			noHook: true
 		});
 
-		foundryApp.options.resolve?.($doc);
-		foundryApp.close();
+		application.options.resolve?.($doc);
+		application.close();
 	}
 
 	function form_1_binding($$value) {
@@ -6908,7 +6908,7 @@ function instance($$self, $$props, $$invalidate) {
 
 				doc.set(document);
 				const title = localize('PERMISSION.Title');
-				foundryApp.data.set('title', `${title}: ${document.name}`);
+				application.data.set('title', `${title}: ${document.name}`);
 			}
 		}
 

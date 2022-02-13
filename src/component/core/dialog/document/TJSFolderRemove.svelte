@@ -6,14 +6,14 @@
 
    export let document = void 0;
 
-   const { foundryApp } = getContext('external');
+   const { application } = getContext('external');
 
    if (!(document instanceof Folder))
    {
       throw new TypeError(`TJSFolderRemove error: 'document' is not an instance of Folder.`);
    }
 
-   const doc = new TJSDocument(document, { delete: foundryApp.close.bind(foundryApp) });
+   const doc = new TJSDocument(document, { delete: application.close.bind(application) });
 
    $: if ($doc !== document)
    {
@@ -24,7 +24,7 @@
 
       doc.set(document);
 
-      foundryApp.data.set('title', `${localize('FOLDER.Remove')}: ${document.name}`);
+      application.data.set('title', `${localize('FOLDER.Remove')}: ${document.name}`);
    }
 
    /**
@@ -39,8 +39,8 @@
 
       const folder = await document.delete({ deleteSubfolders: false, deleteContents: false });
 
-      foundryApp.options.resolve?.(folder);
-      foundryApp.close();
+      application.options.resolve?.(folder);
+      application.close();
    }
 </script>
 

@@ -17,22 +17,22 @@
    $: merge = typeof merge === 'boolean' ? merge : true;
    $: keepId = typeof keepId === 'boolean' ? keepId : true;
 
-   const { foundryApp } = getContext('external');
+   const { application } = getContext('external');
 
    if (!(document instanceof Folder))
    {
       throw new TypeError(`TJSFolderExport error: 'document' is not an instance of Folder.`);
    }
 
-   const doc = new TJSDocument(document, { delete: foundryApp.close.bind(foundryApp) });
+   const doc = new TJSDocument(document, { delete: application.close.bind(application) });
 
    // Get eligible pack destinations
    let packs = game.packs.filter(p => (p.documentName === document.type) && !p.locked);
    if (!packs.length)
    {
       ui.notifications.warn(localize('FOLDER.ExportWarningNone', { type: document.type }));
-      foundryApp.options.resolve?.(null);
-      foundryApp.close();
+      application.options.resolve?.(null);
+      application.close();
    }
 
    selected = packs[0].metadata.name;
@@ -46,7 +46,7 @@
    $:
    {
       // Update the title if document name changes
-      foundryApp.data.set('title', `${localize('FOLDER.ExportTitle')}: ${$doc.name}`);
+      application.data.set('title', `${localize('FOLDER.ExportTitle')}: ${$doc.name}`);
    }
 
    /**
@@ -66,14 +66,14 @@
             keepId
          });
 
-         foundryApp.options.resolve?.(pack);
+         application.options.resolve?.(pack);
       }
       else
       {
-         foundryApp.options.resolve?.(false);
+         application.options.resolve?.(false);
       }
 
-      foundryApp.close();
+      application.close();
    }
 </script>
 

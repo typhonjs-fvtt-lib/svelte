@@ -9,14 +9,14 @@
 
    export let document = void 0;
 
-   const { foundryApp } = getContext('external');
+   const { application } = getContext('external');
 
    if (!(document instanceof foundry.abstract.Document))
    {
       throw new TypeError(`TJSPermissionControl error: 'document' is not an instance of Document.`);
    }
 
-   const doc = new TJSDocument(document, { delete: foundryApp.close.bind(foundryApp) });
+   const doc = new TJSDocument(document, { delete: application.close.bind(application) });
 
    let form, instructions;
    let currentDefault, defaultLevels, playerLevels, users;
@@ -33,7 +33,7 @@
 
       const title = localize('PERMISSION.Title');
 
-      foundryApp.data.set('title', `${title}: ${document.name}`);
+      application.data.set('title', `${title}: ${document.name}`);
    }
 
    $: {
@@ -133,15 +133,15 @@
 
          await cls.updateDocuments(updates, { diff: false, recursive: false, noHook: true });
 
-         foundryApp.options.resolve?.($doc);
-         foundryApp.close();
+         application.options.resolve?.($doc);
+         application.close();
       }
 
       // Update a single Document
       await $doc.update({ permission: perms }, { diff: false, recursive: false, noHook: true });
 
-      foundryApp.options.resolve?.($doc);
-      foundryApp.close();
+      application.options.resolve?.($doc);
+      application.close();
    }
 </script>
 

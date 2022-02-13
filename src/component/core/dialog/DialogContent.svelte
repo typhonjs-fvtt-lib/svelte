@@ -23,7 +23,7 @@
    let dialogComponent;
    let dialogProps = {};
 
-   let foundryApp = getContext('external').foundryApp;
+   let application = getContext('external').application;
 
    let currentButtonId = data.default;
 
@@ -70,7 +70,7 @@
          }
          else if (typeof content === 'object')
          {
-            const svelteConfig = parseSvelteConfig(content, foundryApp);
+            const svelteConfig = parseSvelteConfig(content, application);
             dialogComponent = svelteConfig.class;
             dialogProps = svelteConfig.props ?? {};
 
@@ -110,7 +110,7 @@
             case 'function':
                // Passing back the HTML element is to keep with the existing Foundry API, however second parameter is
                // the Svelte component instance.
-               result = await invoke(foundryApp.options.jQuery ? foundryApp.element : foundryApp.element[0],
+               result = await invoke(application.options.jQuery ? application.element : application.element[0],
                 dialogInstance);
                break;
 
@@ -118,14 +118,14 @@
                // Attempt lookup by function name in dialog instance component.
                if (dialogInstance !== void 0 && typeof dialogInstance[invoke] === 'function')
                {
-                  result = await dialogInstance[invoke](foundryApp.options.jQuery ? foundryApp.element :
-                   foundryApp.element[0], dialogInstance);
+                  result = await dialogInstance[invoke](application.options.jQuery ? application.element :
+                   application.element[0], dialogInstance);
                }
                break;
          }
 
          // Delay closing to next clock tick to be able to return result.
-         if (autoClose) { setTimeout(() => foundryApp.close(), 0); }
+         if (autoClose) { setTimeout(() => application.close(), 0); }
 
          return result;
       }
@@ -142,7 +142,7 @@
        * If this dialog is not the activeWindow then return immediately. See {@link SvelteApplication.bringToTop} as
        * SvelteApplication overrides core Foundry and always sets the activeWindow when `bringToTop` is invoked.
        */
-      if (event.key !== 'Escape' && ui.activeWindow !== foundryApp) { return; }
+      if (event.key !== 'Escape' && ui.activeWindow !== application) { return; }
 
       switch (event.key)
       {
@@ -175,7 +175,7 @@
          case 'Escape':
             event.preventDefault();
             event.stopPropagation();
-            return foundryApp.close();
+            return application.close();
 
          case 'Enter':
             event.preventDefault();
