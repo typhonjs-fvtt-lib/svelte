@@ -4,8 +4,6 @@ import { AdapterValidators }  from './AdapterValidators.js';
 
 /**
  * Provides a store for position following the subscriber protocol.
- *
- * TODO: Consider running validators for individual data value setting.
  */
 export class Position
 {
@@ -95,17 +93,11 @@ export class Position
    get zIndex() { return this.#data.zIndex; }
 
    /**
-    * @param {number|string} height -
+    * @param {number|string|null} height -
     */
    set height(height)
    {
-      const type = typeof height;
-
-      if (type === 'number' || type === 'string')
-      {
-         this.#data.height = height;
-         this.#notify();
-      }
+      this.set({ ...this.#data, height });
    }
 
    /**
@@ -113,11 +105,7 @@ export class Position
     */
    set left(left)
    {
-      if (typeof left === 'number')
-      {
-         this.#data.left = left;
-         this.#notify();
-      }
+      this.set({ ...this.#data, left });
    }
 
    /**
@@ -125,11 +113,7 @@ export class Position
     */
    set scale(scale)
    {
-      if (typeof scale === 'number')
-      {
-         this.#data.scale = scale;
-         this.#notify();
-      }
+      this.set({ ...this.#data, scale });
    }
 
    /**
@@ -137,25 +121,15 @@ export class Position
     */
    set top(top)
    {
-      if (typeof top === 'number')
-      {
-         this.#data.top = top;
-         this.#notify();
-      }
+      this.set({ ...this.#data, top });
    }
 
    /**
-    * @param {number|string} width -
+    * @param {number|string|null} width -
     */
    set width(width)
    {
-      const type = typeof width;
-
-      if (type === 'number' || type === 'string')
-      {
-         this.#data.width = width;
-         this.#notify();
-      }
+      this.set({ ...this.#data, width });
    }
 
    /**
@@ -163,17 +137,13 @@ export class Position
     */
    set zIndex(zIndex)
    {
-      if (typeof zIndex === 'number')
-      {
-         this.#data.zIndex = zIndex;
-         this.#notify();
-      }
+      this.set({ ...this.#data, zIndex });
    }
 
    /**
     * Assigns current position to object passed into method.
     *
-    * @param {Object|PositionData} [position] - Target to assign current position data.
+    * @param {object|PositionData} [position] - Target to assign current position data.
     *
     * @returns {PositionData} Passed in object with current position data.
     */

@@ -626,7 +626,7 @@ export class SvelteApplication extends Application
       const applyWidth = el.style.width !== 'auto';
 
       // Update width if an explicit value is passed, or if no width value is set on the element
-      if (!el.style.width || width)
+      if (el.style.width === '' || width)
       {
          const tarW = width || el.offsetWidth;
          const minW = styleParsePixels(styles.minWidth) || MIN_WINDOW_WIDTH;
@@ -640,7 +640,7 @@ export class SvelteApplication extends Application
       width = el.offsetWidth;
 
       // Update height if an explicit value is passed, or if no height value is set on the element
-      if (!el.style.height || height)
+      if (el.style.height === '' || height)
       {
          const tarH = height || (el.offsetHeight + 1);
          const minH = styleParsePixels(styles.minHeight) || MIN_WINDOW_HEIGHT;
@@ -654,7 +654,7 @@ export class SvelteApplication extends Application
       height = el.offsetHeight;
 
       // Update Left
-      if ((!el.style.left) || Number.isFinite(left))
+      if (el.style.left === '' || Number.isFinite(left))
       {
          const tarL = Number.isFinite(left) ? left : (globalThis.innerWidth - width) / 2;
          const maxL = Math.max(globalThis.innerWidth - width, 0);
@@ -662,7 +662,7 @@ export class SvelteApplication extends Application
       }
 
       // Update Top
-      if ((!el.style.top) || Number.isFinite(top))
+      if (el.style.top === '' || Number.isFinite(top))
       {
          const tarT = Number.isFinite(top) ? top : (globalThis.innerHeight - height) / 2;
          const maxT = Math.max(globalThis.innerHeight - height, 0);
