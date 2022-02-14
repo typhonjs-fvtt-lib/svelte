@@ -1,4 +1,38 @@
 # Changelog
+## Release 0.0.6 (large update)
+- Breaking changes (rename of variables): 
+  - When creating a Svelte component the Foundry application accessible by 
+  `getContext('external').foundryApp` is renamed to `application` and accessible by `getContext('external').application`. 
+  - SvelteApplication / SvelteReactive `IE this.reactive.storeUIOptions` renamed to `this.reactive.storeUIState`. Added
+    two new stores for `dragging` and `resizing` that are true when the app is being dragged or resized.
+
+- TJSDocumentDialog and individual dialogs for working with documents added to 
+new sub-module `@typhonjs-fvtt/svelte/application/dialog`.
+
+- TJSDocument and TJSDocumentCollection to make documents and document collections reactive / store / subscriber 
+protocol support available via `@typhonjs-fvtt/svelte/store`
+
+- Many refinements to TJSDialog smoothing out developer experience. 
+  - Added `autoClose` option to not automatically close on button press. You must manually close the app in button
+  callback. 
+  - Normalized options for icon: you can now just pass a string for the FA icon class.
+  - Normalized callback option / you can also use `onclick`
+  - If you are using a Svelte component for the dialog content the callback can be a text string for an exported 
+  - function in the Svelte component to invoke on button press.
+  - Added `styles` option / object to specify inline styles on the button.
+  - Added `title` option to add a title / tooltip to buttons.
+  
+- The SvelteApplication `position` object is not a specific class `Position` that has the same API / shape as the 
+default core `position` object. 
+  - The new position implementation is a Svelte store / reactive.
+  - `this.position.validators` provides an API to add validation functions that are invoked on position changes allowing
+  modification of position data or cancelling an update. This allows the easy creation of window / app management code.
+  
+- Really fine-tuned `setPosition` fixing outstanding issues / integrated position validation.
+  - `max-width` / `max-height` set in styles is now included in calculations, so when resizing an app the position data 
+  correctly stops at any max value set.
+  - Validation via Position is engaged allowing much easier window management functionality.
+
 ## Release 0.0.5 (medium update)
 - Skipped 0.0.4 release to bring version parity with @typhonjs-fvtt/runtime.
 - Added gameState Svelte store to access Foundry global `game` in Svelte templates.
