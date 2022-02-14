@@ -237,12 +237,18 @@ export class Position
          }
       }
 
-      if (typeof position.left === 'number') { data.left = position.left; }
-      if (typeof position.top === 'number') { data.top = position.top; }
+      if (typeof position.left === 'number') { data.left = Math.round(position.left); }
+      if (typeof position.top === 'number') { data.top = Math.round(position.top); }
       if (typeof position.scale === 'number') { data.scale = position.scale; }
-      if (typeof position.zIndex === 'number') { data.zIndex = position.zIndex; }
-      if (typeof position.width === 'number' || position.width === 'auto') { data.width = position.width; }
-      if (typeof position.height === 'number' || position.height === 'auto') { data.height = position.height; }
+      if (typeof position.zIndex === 'number') { data.zIndex = Math.round(position.zIndex); }
+      if (typeof position.width === 'number' || position.width === 'auto')
+      {
+         data.width = typeof position.width === 'number' ? Math.round(position.width) : position.width;
+      }
+      if (typeof position.height === 'number' || position.height === 'auto')
+      {
+         data.height = typeof position.height === 'number' ? Math.round(position.height) : position.height;
+      }
 
       if (notify) { this.#notify(); }
 
