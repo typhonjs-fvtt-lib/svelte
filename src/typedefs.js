@@ -29,7 +29,13 @@
  *
  * @property {number|'auto'|null}   height - The element height in pixels.
  *
- * @property {number|null}          rotate - The element rotation as a numeric factor in degrees where 0 is default.
+ * @property {number|null}          rotate - The element rotation as a numeric factor in degrees.
+ *
+ * @property {number|null}          rotateX - The 3D element X rotation as a numeric factor in degrees.
+ *
+ * @property {number|null}          rotateY - The element rotation as a numeric factor in degrees.
+ *
+ * @property {number|null}          rotateZ - The element rotation as a numeric factor in degrees.
  *
  * @property {number|null}          scale - The element scale as a numeric factor where 1.0 is default.
  *
@@ -48,6 +54,12 @@
  * @property {import('svelte/store').Writable<number|'auto'|null>} height - Derived store for `height` updates.
  *
  * @property {import('svelte/store').Writable<number|null>} rotate - Derived store for `rotate` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} rotateX - Derived store for `rotateX` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} rotateY - Derived store for `rotateY` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} rotateZ - Derived store for `rotateZ` updates.
  *
  * @property {import('svelte/store').Writable<number|null>} scale - Derived store for `scale` updates.
  *

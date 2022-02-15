@@ -15,7 +15,15 @@ export class Position
    /**
     * @type {PositionData}
     */
-   #data = { height: null, left: null, rotate: null, scale: null, top: null, width: null, zIndex: null };
+   #data = { height: null, left: null, rotate: null, rotateX: null, rotateY: null, rotateZ: null, scale: null,
+      top: null, width: null, zIndex: null };
+
+   /**
+    * The associated parent for positional data tracking. Used in validators.
+    *
+    * @type {object}
+    */
+   #parent;
 
    #store;
 
@@ -24,12 +32,7 @@ export class Position
     */
    #stores;
 
-   /**
-    * The associated parent for positional data tracking. Used in validators.
-    *
-    * @type {object}
-    */
-   #parent;
+   #transforms = {};
 
    /**
     * @type {AdapterValidators}
@@ -56,6 +59,9 @@ export class Position
          height: propertyStore(this.#store, 'height'),
          left: propertyStore(this.#store, 'left'),
          rotate: propertyStore(this.#store, 'rotate'),
+         rotateX: propertyStore(this.#store, 'rotateX'),
+         rotateY: propertyStore(this.#store, 'rotateY'),
+         rotateZ: propertyStore(this.#store, 'rotateZ'),
          scale: propertyStore(this.#store, 'scale'),
          top: propertyStore(this.#store, 'top'),
          width: propertyStore(this.#store, 'width'),
@@ -99,6 +105,21 @@ export class Position
    get rotate() { return this.#data.rotate; }
 
    /**
+    * @returns {number|null} rotateX
+    */
+   get rotateX() { return this.#data.rotateX; }
+
+   /**
+    * @returns {number|null} rotateY
+    */
+   get rotateY() { return this.#data.rotateY; }
+
+   /**
+    * @returns {number|null} rotateZ
+    */
+   get rotateZ() { return this.#data.rotateZ; }
+
+   /**
     * @returns {number|null} scale
     */
    get scale() { return this.#data.scale; }
@@ -140,6 +161,30 @@ export class Position
    set rotate(rotate)
    {
       this.set({ ...this.#data, rotate });
+   }
+
+   /**
+    * @param {number|null} rotateX -
+    */
+   set rotateX(rotateX)
+   {
+      this.set({ ...this.#data, rotateX });
+   }
+
+   /**
+    * @param {number|null} rotateY -
+    */
+   set rotateY(rotateY)
+   {
+      this.set({ ...this.#data, rotateY });
+   }
+
+   /**
+    * @param {number|null} rotateZ -
+    */
+   set rotateZ(rotateZ)
+   {
+      this.set({ ...this.#data, rotateZ });
    }
 
    /**
@@ -214,28 +259,25 @@ export class Position
     *
     * @param {PositionData}   [position] - Position data to set.
     *
-    * @param {object}         [opts] - Optional parameters.
-    *
-    * @param {boolean}        [opts.applyStyles=true] - When false inline position styles are not updated.
-    *
     * @returns {PositionData|null} The set position data after validation or null if rejected.
     */
-   set(position = {}, { applyStyles = true } = {})
+   set(position = {})
    {
-      if (typeof position !== 'object') { return null; }
+      if (typeof position !== 'object') { return this.get(); }
 
       const parent = this.#parent;
 
       // An early out to prevent `set` from taking effect if options `setPosition` is false.
       if (parent !== void 0 && typeof parent?.options?.setPosition === 'boolean' && !parent?.options?.setPosition)
       {
-         return null;
+         return this.get();
       }
 
       const data = this.#data;
+      const transforms = this.#transforms;
       const validators = this.#validators;
 
-      let styles;
+      let styles, updateTransform = false;
 
       const el = parent?.elementTarget;
       if (el)
@@ -251,54 +293,126 @@ export class Position
          {
             position = validator.validator(parent, position);
 
-            if (position === null) { return null; }
+            if (position === null) { return this.get(); }
          }
       }
 
       let modified = false;
 
-      if (position.left === null || typeof position.left === 'number')
+      if (typeof position.left === 'number')
       {
-         position.left = position.left === null ? null : Math.round(position.left);
+         position.left = Math.round(position.left);
+
          if (data.left !== position.left) { data.left = position.left; modified = true; }
+
+         if (el) { el.style.left = `${position.left}px`; }
       }
 
       if (typeof position.top === 'number')
       {
          position.top = Math.round(position.top);
+
          if (data.top !== position.top) { data.top = position.top; modified = true; }
+
+         if (el) { el.style.top = `${position.top}px`; }
       }
 
-      if (typeof position.rotate === 'number')
+      if (typeof position.rotate === 'number' || position.rotate === null)
       {
-         if (data.rotate !== position.rotate) { data.rotate = position.rotate; modified = true; }
+         if (data.rotate !== position.rotate)
+         {
+            data.rotate = position.rotate;
+            updateTransform = modified = true;
+
+            if (typeof position.rotate === 'number') { transforms.rotate = `rotate(${position.rotate}deg)`; }
+            else { delete transforms.rotate; }
+         }
+      }
+
+      if (typeof position.rotateX === 'number' || position.rotateX === null)
+      {
+         if (data.rotateX !== position.rotateX)
+         {
+            data.rotateX = position.rotateX;
+            updateTransform = modified = true;
+
+            if (typeof position.rotateX === 'number') { transforms.rotateX = `rotateX(${position.rotateX}deg)`; }
+            else { delete transforms.rotateX; }
+         }
+      }
+
+      if (typeof position.rotateY === 'number' || position.rotateY === null)
+      {
+         if (data.rotateY !== position.rotateY)
+         {
+            data.rotateY = position.rotateY;
+            updateTransform = modified = true;
+
+            if (typeof position.rotateY === 'number') { transforms.rotateY = `rotateY(${position.rotateY}deg)`; }
+            else { delete transforms.rotateY; }
+         }
+      }
+
+      if (typeof position.rotateZ === 'number' || position.rotateZ === null)
+      {
+         if (data.rotateZ !== position.rotateZ)
+         {
+            data.rotateZ = position.rotateZ;
+            updateTransform = modified = true;
+
+            if (typeof position.rotateZ === 'number') { transforms.rotateZ = `rotateZ(${position.rotateZ}deg)`; }
+            else { delete transforms.rotateZ; }
+         }
       }
 
       if (typeof position.scale === 'number')
       {
          position.scale = Math.max(0, Math.min(position.scale, 1000));
-         if (data.scale !== position.scale) { data.scale = position.scale; modified = true; }
+
+         if (data.scale !== position.scale)
+         {
+            data.scale = position.scale;
+            updateTransform = modified = true;
+
+            if (typeof position.scale === 'number') { transforms.scale = `scale(${position.scale})`; }
+            else { delete transforms.scale; }
+         }
       }
 
       if (typeof position.zIndex === 'number')
       {
          position.zIndex = Math.round(position.zIndex);
+
          if (data.zIndex !== position.zIndex) { data.zIndex = position.zIndex; modified = true; }
       }
 
       if (typeof position.width === 'number' || position.width === 'auto' || position.width === null)
       {
          position.width = typeof position.width === 'number' ? Math.round(position.width) : position.width;
+
          if (data.width !== position.width) { data.width = position.width; modified = true; }
+
+         if (el) { el.style.width = typeof data.width === 'number' ? `${data.width}px` : data.width; }
       }
 
       if (typeof position.height === 'number' || position.height === 'auto' || position.height === null)
       {
          position.height = typeof position.height === 'number' ? Math.round(position.height) : position.height;
+
          if (data.height !== position.height) { data.height = position.height; modified = true; }
+
+         if (el) { el.style.height = typeof data.height === 'number' ? `${data.height}px` : data.height; }
       }
 
-      if (applyStyles && el) { this.#updateInlineStyles(position, el); }
+      // Update all transforms in order added to transforms object.
+      if (el && updateTransform)
+      {
+         let transformString = '';
+
+         for (const key in transforms) { transformString += transforms[key]; }
+
+         el.style.transform = transformString;
+      }
 
       // Notify main store subscribers.
       if (modified)
@@ -308,9 +422,10 @@ export class Position
          const subscriptions = this.#subscriptions;
 
          // Early out if there are no subscribers.
-         if (subscriptions.length === 0) { return; }
-
-         for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](position); }
+         if (subscriptions.length > 0)
+         {
+            for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](position); }
+         }
       }
 
       // Update derived stores and notify.
@@ -340,45 +455,46 @@ export class Position
       };
    }
 
-   #updatePosition({ left, top, width, height, rotate, scale, zIndex, ...rest } = {}, el, styles)
+   #updatePosition({ left, top, width, height, rotate, rotateX, rotateY, rotateZ, scale, zIndex, ...rest } = {}, el,
+    styles)
    {
       const currentPosition = this.get(rest);
 
-      // If the new requested width or height is 'auto' or null set it immediately.
-      if (width === 'auto' || width === null) { el.style.width = width; }
-      if (height === 'auto' || height === null) { el.style.height = height; }
-
-      // Set applyHeight to false when `el.style.height` is `auto` preventing setting height to a finite value.
-      const applyHeight = el.style.height !== 'auto';
-
-      // Set applyWidth to false when `el.style.width` is `auto` preventing setting width to a finite value.
-      const applyWidth = el.style.width !== 'auto';
-
       // Update width if an explicit value is passed, or if no width value is set on the element.
-      if (el.style.width === '' || width)
+      if (el.style.width === '' || width !== void 0)
       {
-         const tarW = width || el.offsetWidth;
-         const minW = styleParsePixels(styles.minWidth) || MIN_WINDOW_WIDTH;
-         const maxW = styleParsePixels(styles.maxWidth) || el.style.maxWidth || globalThis.innerWidth;
-         currentPosition.width = width = Math.clamped(tarW, minW, maxW);
+         if (width === 'auto' || (currentPosition.width === 'auto' && width !== null))
+         {
+            currentPosition.width = 'auto';
+         }
+         else
+         {
+            const tarW = typeof width === 'number' ? Math.round(width) : el.offsetWidth;
+            const minW = styleParsePixels(styles.minWidth) || MIN_WINDOW_WIDTH;
+            const maxW = styleParsePixels(styles.maxWidth) || el.style.maxWidth || globalThis.innerWidth;
+            currentPosition.width = width = Math.clamped(tarW, minW, maxW);
 
-         // Must set el.style.width if currently undefined.
-         if (el.style.width === '' || applyWidth) { el.style.width = `${width}px`; }
-         if ((width + left) > globalThis.innerWidth) { left = currentPosition.left; }
+            if ((width + left) > globalThis.innerWidth) { left = currentPosition.left; }
+         }
       }
       width = el.offsetWidth;
 
       // Update height if an explicit value is passed, or if no height value is set on the element.
-      if (el.style.height === '' || height)
+      if (el.style.height === '' || height !== void 0)
       {
-         const tarH = height || (el.offsetHeight + 1);
-         const minH = styleParsePixels(styles.minHeight) || MIN_WINDOW_HEIGHT;
-         const maxH = styleParsePixels(styles.maxHeight) || el.style.maxHeight || globalThis.innerHeight;
-         currentPosition.height = height = Math.clamped(tarH, minH, maxH);
+         if (height === 'auto' || (currentPosition.height === 'auto' && height !== null))
+         {
+            currentPosition.height = 'auto';
+         }
+         else
+         {
+            const tarH = typeof height === 'number' ? Math.round(height) : el.offsetHeight + 1;
+            const minH = styleParsePixels(styles.minHeight) || MIN_WINDOW_HEIGHT;
+            const maxH = styleParsePixels(styles.maxHeight) || el.style.maxHeight || globalThis.innerHeight;
+            currentPosition.height = height = Math.clamped(tarH, minH, maxH);
 
-         // Must set el.style.height if currently undefined.
-         if (el.style.height === '' || applyHeight) { el.style.height = `${height}px`; }
-         if ((height + currentPosition.top) > globalThis.innerHeight + 1) { top = currentPosition.top - 1; }
+            if ((height + currentPosition.top) > globalThis.innerHeight + 1) { top = currentPosition.top - 1; }
+         }
       }
       height = el.offsetHeight;
 
@@ -387,7 +503,7 @@ export class Position
       {
          const tarL = Number.isFinite(left) ? left : (globalThis.innerWidth - width) / 2;
          const maxL = Math.max(globalThis.innerWidth - width, 0);
-         currentPosition.left = left = Math.clamped(tarL, 0, maxL);
+         currentPosition.left = left = Math.round(Math.clamped(tarL, 0, maxL));
       }
 
       // Update top
@@ -395,53 +511,20 @@ export class Position
       {
          const tarT = Number.isFinite(top) ? top : (globalThis.innerHeight - height) / 2;
          const maxT = Math.max(globalThis.innerHeight - height, 0);
-         currentPosition.top = top = Math.clamped(tarT, 0, maxT);
+         currentPosition.top = top = Math.round(Math.clamped(tarT, 0, maxT));
       }
 
       // Update rotate, scale, z-index
-      if (rotate) { currentPosition.rotate = rotate; }
-      if (scale) { currentPosition.scale = Math.max(scale, 0); }
-      if (zIndex) { currentPosition.zIndex = zIndex; }
+      if (typeof rotate === 'number' || rotate === null) { currentPosition.rotate = rotate; }
+      if (typeof rotateX === 'number' || rotateX === null) { currentPosition.rotateX = rotateX; }
+      if (typeof rotateY === 'number' || rotateY === null) { currentPosition.rotateY = rotateY; }
+      if (typeof rotateZ === 'number' || rotateZ === null) { currentPosition.rotateZ = rotateZ; }
 
-      // If auto is set for width / height then provide the correct value.
-      if (!applyWidth) { currentPosition.width = 'auto'; }
-      if (!applyHeight) { currentPosition.height = 'auto'; }
+      if (scale) { currentPosition.scale = Math.max(scale, 0); }
+
+      if (zIndex) { currentPosition.zIndex = zIndex; }
 
       // Return the updated position object.
       return currentPosition;
-   }
-
-   #updateInlineStyles(position, el)
-   {
-      // Set applyHeight to false when `el.style.height` is `auto` preventing setting height to a finite value.
-      const applyHeight = el.style.height !== 'auto';
-
-      // Set applyWidth to false when `el.style.width` is `auto` preventing setting width to a finite value.
-      const applyWidth = el.style.width !== 'auto';
-
-      // If defined / not null apply `currentPosition` to inline styles.
-      if (applyWidth) { el.style.width = `${position.width}px`; }
-      if (applyHeight) { el.style.height = `${position.height}px`; }
-      el.style.left = `${position.left}px`;
-      el.style.top = `${position.top}px`;
-
-      let scale, rotate;
-
-      if (position.rotate)
-      {
-         if (position.rotate % 360 === 0) { rotate = ''; }
-         else { rotate = `rotate(${position.rotate}deg)`; }
-      }
-
-      if (position.scale)
-      {
-         if (position.scale === 1) { scale = ''; }
-         else { scale = `scale(${position.scale})`; }
-      }
-
-      if (scale || rotate)
-      {
-         el.style.transform = `${rotate}${rotate ? ' ' : ''}${scale}`;
-      }
    }
 }
