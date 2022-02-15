@@ -241,9 +241,9 @@ declare class GetSvelteData {
     /**
      * Returns the SvelteData entries iterator.
      *
-     * @returns {IterableIterator<Array<number, SvelteData>>} SvelteData entries iterator.
+     * @returns {IterableIterator<[number, SvelteData]>} SvelteData entries iterator.
      */
-    dataEntries(): IterableIterator<Array<number, any>>;
+    dataEntries(): IterableIterator<[number, any]>;
     /**
      * Returns the SvelteData values iterator.
      *
