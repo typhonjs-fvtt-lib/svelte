@@ -312,6 +312,12 @@ fs.writeJSONSync(`./_dist/application/package.json`, {
    type: 'module'
 });
 
+fs.writeJSONSync(`./_dist/application/dialog/package.json`, {
+   main: './index.js',
+   module: './index.js',
+   type: 'module'
+});
+
 fs.writeJSONSync(`./_dist/application/legacy/package.json`, {
    main: './index.js',
    module: './index.js',
@@ -322,6 +328,11 @@ fs.writeJSONSync(`./_dist/application/legacy/package.json`, {
 // await generateTSDef({
 //    main: './_dist/application/index.js',
 //    output: './_types/application/index.d.mts'
+// });
+//
+// await generateTSDef({
+//    main: './_dist/application/dialog/index.js',
+//    output: './_types/application/dialog/index.d.mts'
 // });
 //
 // await generateTSDef({
