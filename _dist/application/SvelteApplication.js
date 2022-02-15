@@ -7,7 +7,6 @@ import {
    GetSvelteData,
    loadSvelteConfig,
    Position,
-   styleParsePixels,
    SvelteReactive }           from './internal/index.js';
 
 /**
@@ -580,9 +579,12 @@ export class SvelteApplication extends Application
    }
 
    /**
-    * Modified Application `setPosition` which changes a few aspects from the default {@link Application.setPosition}.
-    * The gate on `popOut` is removed, so if manually called popOut applications can set `this.options.setPosition` to
-    * false to not apply any positional styles.
+    * All calculation and updates of position are implemented in {@link Position}. This allows position to be fully
+    * reactive and in control of updating inline styles for the application.
+    *
+    * Note: the logic for updating position is improved and changes a few aspects from the default
+    * {@link Application.setPosition}. The gate on `popOut` is removed, so to ensure no positional application occurs
+    * popOut applications can set `this.options.setPosition` to false to not apply any positional inline styles.
     *
     * `applyHeight` / `applyWidth` is set to true when el.style.height / width is not 'auto' and height & width is
     * applied.
@@ -593,108 +595,13 @@ export class SvelteApplication extends Application
     * Styles are not applied immediately and the newly constructed `currentPosition` is passed to all validators that
     * may further modify it or veto the change before styles are applied.
     *
-    * @param {PositionData}         [pos] - Position data.
-    *
-    * @param {number|null}          [pos.left] - The left offset position in pixels
-    *
-    * @param {number|null}          [pos.top] - The top offset position in pixels
-    *
-    * @param {number|string|null}   [pos.width] - The application width in pixels
-    *
-    * @param {number|string|null}   [pos.height] - The application height in pixels
-    *
-    * @param {number|null}          [pos.scale] - The application scale as a numeric factor where 1.0 is default
-    *
-    * @param {...*}                 [pos.rest] - Any additional data is captured and added to the `currentPosition`
-    *                               object used in `setPosition`. This allows sending this data to any validators added.
+    * @param {PositionData}         [position] - Position data.
     *
     * @returns {PositionData} The updated position object for the application containing the new values
     */
-   setPosition({ left, top, width, height, scale, ...rest } = {})
+   setPosition(position)
    {
-      // An early out to prevent `setPosition` from taking effect.
-      if (typeof this.options.setPosition === 'boolean' && !this.options.setPosition) { return; }
-
-      const el = this.elementTarget;
-      let currentPosition = this.position.get(rest);
-      const styles = globalThis.getComputedStyle(el);
-
-      // Set applyHeight to false when `el.style.height` is `auto` preventing setting height to a finite value.
-      const applyHeight = el.style.height !== 'auto';
-
-      // Set applyWidth to false when `el.style.width` is `auto` preventing setting width to a finite value.
-      const applyWidth = el.style.width !== 'auto';
-
-      // Update width if an explicit value is passed, or if no width value is set on the element
-      if (el.style.width === '' || width)
-      {
-         const tarW = width || el.offsetWidth;
-         const minW = styleParsePixels(styles.minWidth) || MIN_WINDOW_WIDTH;
-         const maxW = styleParsePixels(styles.maxWidth) || el.style.maxWidth || globalThis.innerWidth;
-         currentPosition.width = width = Math.clamped(tarW, minW, maxW);
-
-         // Must set el.style.width if currently undefined.
-         if (el.style.width === '' || applyWidth) { el.style.width = `${width}px`; }
-         if ((width + currentPosition.left) > globalThis.innerWidth) { left = currentPosition.left; }
-      }
-      width = el.offsetWidth;
-
-      // Update height if an explicit value is passed, or if no height value is set on the element
-      if (el.style.height === '' || height)
-      {
-         const tarH = height || (el.offsetHeight + 1);
-         const minH = styleParsePixels(styles.minHeight) || MIN_WINDOW_HEIGHT;
-         const maxH = styleParsePixels(styles.maxHeight) || el.style.maxHeight || globalThis.innerHeight;
-         currentPosition.height = height = Math.clamped(tarH, minH, maxH);
-
-         // Must set el.style.height if currently undefined.
-         if (el.style.height === '' || applyHeight) { el.style.height = `${height}px`; }
-         if ((height + currentPosition.top) > globalThis.innerHeight + 1) { top = currentPosition.top - 1; }
-      }
-      height = el.offsetHeight;
-
-      // Update Left
-      if (el.style.left === '' || Number.isFinite(left))
-      {
-         const tarL = Number.isFinite(left) ? left : (globalThis.innerWidth - width) / 2;
-         const maxL = Math.max(globalThis.innerWidth - width, 0);
-         currentPosition.left = left = Math.clamped(tarL, 0, maxL);
-      }
-
-      // Update Top
-      if (el.style.top === '' || Number.isFinite(top))
-      {
-         const tarT = Number.isFinite(top) ? top : (globalThis.innerHeight - height) / 2;
-         const maxT = Math.max(globalThis.innerHeight - height, 0);
-         currentPosition.top = top = Math.clamped(tarT, 0, maxT);
-      }
-
-      // Update Scale
-      if (scale)
-      {
-         currentPosition.scale = Math.max(scale, 0);
-      }
-
-      // Set the position and allow any validators to alter the position data.
-      currentPosition = this.position.set(currentPosition);
-
-      // If defined / not null apply `currentPosition` to inline styles.
-      if (currentPosition)
-      {
-         if (applyWidth) { el.style.width = `${currentPosition.width}px`; }
-         if (applyHeight) { el.style.height = `${currentPosition.height}px`; }
-         el.style.left = `${currentPosition.left}px`;
-         el.style.top = `${currentPosition.top}px`;
-
-         if (currentPosition.scale)
-         {
-            if (currentPosition.scale === 1) { el.style.transform = ''; }
-            else { el.style.transform = `scale(${currentPosition.scale})`; }
-         }
-      }
-
-      // Return the updated position object.
-      return currentPosition;
+      return this.position.set(position);
    }
 
    /**

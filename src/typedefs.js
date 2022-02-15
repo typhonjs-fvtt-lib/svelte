@@ -19,6 +19,42 @@
  */
 
 /**
+ * @typedef PositionData - Defines the position data for a positionable element.
+ *
+ * @property {number|null}          left - The left offset position in pixels.
+ *
+ * @property {number|null}          top - The top offset position in pixels.
+ *
+ * @property {number|'auto'|null}   width - The element width in pixels.
+ *
+ * @property {number|'auto'|null}   height - The element height in pixels.
+ *
+ * @property {number|null}          rotate - The element rotation as a numeric factor in degrees where 0 is default.
+ *
+ * @property {number|null}          scale - The element scale as a numeric factor where 1.0 is default.
+ *
+ * @property {number|null}          zIndex - The element z-index.
+ */
+
+/**
+ * @typedef {object} StorePosition - Provides individual writable stores for {@link Position}.
+ *
+ * @property {import('svelte/store').Writable<number|null>} left - Derived store for `left` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} top - Derived store for `top` updates.
+ *
+ * @property {import('svelte/store').Writable<number|'auto'|null>} width - Derived store for `width` updates.
+ *
+ * @property {import('svelte/store').Writable<number|'auto'|null>} height - Derived store for `height` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} rotate - Derived store for `rotate` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} scale - Derived store for `scale` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} zIndex - Derived store for `zIndex` updates.
+ */
+
+/**
  * @typedef {object} StoreAppOptions - Provides a custom readable Svelte store for Application options state.
  *
  * @property {import('svelte/store').Readable.subscribe} subscribe - Subscribe to all app options updates.
