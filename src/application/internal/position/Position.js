@@ -144,7 +144,7 @@ export class Position
     */
    set height(height)
    {
-      this.set({ ...this.#data, height });
+      this.set({ height });
    }
 
    /**
@@ -152,7 +152,7 @@ export class Position
     */
    set left(left)
    {
-      this.set({ ...this.#data, left });
+      this.set({ left });
    }
 
    /**
@@ -160,7 +160,7 @@ export class Position
     */
    set rotate(rotate)
    {
-      this.set({ ...this.#data, rotate });
+      this.set({ rotate });
    }
 
    /**
@@ -168,7 +168,7 @@ export class Position
     */
    set rotateX(rotateX)
    {
-      this.set({ ...this.#data, rotateX });
+      this.set({ rotateX });
    }
 
    /**
@@ -176,7 +176,7 @@ export class Position
     */
    set rotateY(rotateY)
    {
-      this.set({ ...this.#data, rotateY });
+      this.set({ rotateY });
    }
 
    /**
@@ -184,7 +184,7 @@ export class Position
     */
    set rotateZ(rotateZ)
    {
-      this.set({ ...this.#data, rotateZ });
+      this.set({ rotateZ });
    }
 
    /**
@@ -192,7 +192,7 @@ export class Position
     */
    set scale(scale)
    {
-      this.set({ ...this.#data, scale });
+      this.set({ scale });
    }
 
    /**
@@ -200,7 +200,7 @@ export class Position
     */
    set top(top)
    {
-      this.set({ ...this.#data, top });
+      this.set({ top });
    }
 
    /**
@@ -208,7 +208,7 @@ export class Position
     */
    set width(width)
    {
-      this.set({ ...this.#data, width });
+      this.set({ width });
    }
 
    /**
@@ -216,7 +216,7 @@ export class Position
     */
    set zIndex(zIndex)
    {
-      this.set({ ...this.#data, zIndex });
+      this.set({ zIndex });
    }
 
    /**
@@ -277,11 +277,12 @@ export class Position
       const transforms = this.#transforms;
       const validators = this.#validators;
 
-      let styles, updateTransform = false;
+      let currentTransform = '', styles, updateTransform = false;
 
       const el = parent?.elementTarget;
       if (el)
       {
+         currentTransform = el.style.transform ?? '';
          styles = globalThis.getComputedStyle(el);
          position = this.#updatePosition(position, el, styles);
       }
@@ -327,6 +328,10 @@ export class Position
             if (typeof position.rotate === 'number') { transforms.rotate = `rotate(${position.rotate}deg)`; }
             else { delete transforms.rotate; }
          }
+         else if (transforms.rotate && !currentTransform.includes('rotate('))
+         {
+            updateTransform = true;
+         }
       }
 
       if (typeof position.rotateX === 'number' || position.rotateX === null)
@@ -338,6 +343,10 @@ export class Position
 
             if (typeof position.rotateX === 'number') { transforms.rotateX = `rotateX(${position.rotateX}deg)`; }
             else { delete transforms.rotateX; }
+         }
+         else if (transforms.rotateX && !currentTransform.includes('rotateX('))
+         {
+            updateTransform = true;
          }
       }
 
@@ -351,6 +360,10 @@ export class Position
             if (typeof position.rotateY === 'number') { transforms.rotateY = `rotateY(${position.rotateY}deg)`; }
             else { delete transforms.rotateY; }
          }
+         else if (transforms.rotateY && !currentTransform.includes('rotateY('))
+         {
+            updateTransform = true;
+         }
       }
 
       if (typeof position.rotateZ === 'number' || position.rotateZ === null)
@@ -363,11 +376,15 @@ export class Position
             if (typeof position.rotateZ === 'number') { transforms.rotateZ = `rotateZ(${position.rotateZ}deg)`; }
             else { delete transforms.rotateZ; }
          }
+         else if (transforms.rotateZ && !currentTransform.includes('rotateZ('))
+         {
+            updateTransform = true;
+         }
       }
 
-      if (typeof position.scale === 'number')
+      if (typeof position.scale === 'number' || position.scale === null)
       {
-         position.scale = Math.max(0, Math.min(position.scale, 1000));
+         position.scale = typeof position.scale === 'number' ? Math.max(0, Math.min(position.scale, 1000)) : null;
 
          if (data.scale !== position.scale)
          {
@@ -376,6 +393,10 @@ export class Position
 
             if (typeof position.scale === 'number') { transforms.scale = `scale(${position.scale})`; }
             else { delete transforms.scale; }
+         }
+         else if (transforms.scale && !currentTransform.includes('scale('))
+         {
+            updateTransform = true;
          }
       }
 
@@ -466,6 +487,7 @@ export class Position
          if (width === 'auto' || (currentPosition.width === 'auto' && width !== null))
          {
             currentPosition.width = 'auto';
+            width = el.offsetWidth;
          }
          else
          {
@@ -477,7 +499,10 @@ export class Position
             if ((width + left) > globalThis.innerWidth) { left = currentPosition.left; }
          }
       }
-      width = el.offsetWidth;
+      else
+      {
+         width = el.offsetWidth;
+      }
 
       // Update height if an explicit value is passed, or if no height value is set on the element.
       if (el.style.height === '' || height !== void 0)
@@ -485,6 +510,7 @@ export class Position
          if (height === 'auto' || (currentPosition.height === 'auto' && height !== null))
          {
             currentPosition.height = 'auto';
+            height = el.offsetHeight;
          }
          else
          {
@@ -496,14 +522,17 @@ export class Position
             if ((height + currentPosition.top) > globalThis.innerHeight + 1) { top = currentPosition.top - 1; }
          }
       }
-      height = el.offsetHeight;
+      else
+      {
+         height = el.offsetHeight;
+      }
 
       // Update left
       if (el.style.left === '' || Number.isFinite(left))
       {
          const tarL = Number.isFinite(left) ? left : (globalThis.innerWidth - width) / 2;
          const maxL = Math.max(globalThis.innerWidth - width, 0);
-         currentPosition.left = left = Math.round(Math.clamped(tarL, 0, maxL));
+         currentPosition.left = Math.round(Math.clamped(tarL, 0, maxL));
       }
 
       // Update top
@@ -511,7 +540,7 @@ export class Position
       {
          const tarT = Number.isFinite(top) ? top : (globalThis.innerHeight - height) / 2;
          const maxT = Math.max(globalThis.innerHeight - height, 0);
-         currentPosition.top = top = Math.round(Math.clamped(tarT, 0, maxT));
+         currentPosition.top = Math.round(Math.clamped(tarT, 0, maxT));
       }
 
       // Update rotate, scale, z-index
@@ -520,7 +549,10 @@ export class Position
       if (typeof rotateY === 'number' || rotateY === null) { currentPosition.rotateY = rotateY; }
       if (typeof rotateZ === 'number' || rotateZ === null) { currentPosition.rotateZ = rotateZ; }
 
-      if (scale) { currentPosition.scale = Math.max(scale, 0); }
+      if (typeof scale === 'number' || scale === null)
+      {
+         currentPosition.scale = typeof scale === 'number' ? Math.max(0, Math.min(scale, 1000)) : null;
+      }
 
       if (zIndex) { currentPosition.zIndex = zIndex; }
 
