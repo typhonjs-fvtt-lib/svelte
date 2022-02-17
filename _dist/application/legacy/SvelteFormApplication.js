@@ -44,6 +44,13 @@ export class SvelteFormApplication extends FormApplication
    #initialZIndex = 95;
 
    /**
+    * Stores on mount state which is checked in _render to trigger onSvelteMount callback.
+    *
+    * @type {boolean}
+    */
+   #onMount = false;
+
+   /**
     * The position store.
     *
     * @type {Position}
@@ -324,6 +331,8 @@ export class SvelteFormApplication extends FormApplication
       this._scrollPositions = null;
       this._state = states.CLOSED;
 
+      this.#onMount = false;
+
       // Update the minimized UI store options.
       this.#stores.uiOptionsUpdate((storeOptions) => foundry.utils.mergeObject(storeOptions, {
          minimized: this._minimized
@@ -472,9 +481,6 @@ export class SvelteFormApplication extends FormApplication
 
       // Subscribe to local store handling.
       this.#stores.subscribe();
-
-      this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent, elementTarget:
-       this.#elementTarget });
    }
 
    /**
@@ -566,7 +572,15 @@ export class SvelteFormApplication extends FormApplication
          return;
       }
 
-      return super._render(force, options);
+      await super._render(force, options);
+
+      if (!this.#onMount)
+      {
+         this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent, elementTarget:
+          this.#elementTarget });
+
+         this.#onMount = true;
+      }
    }
 
    /**
