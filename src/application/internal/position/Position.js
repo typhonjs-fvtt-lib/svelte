@@ -58,56 +58,60 @@ export class Position
    {
       this.#parent = parent;
 
+      const data = this.#data;
+
       // Set default value from options.
       if (typeof options === 'object')
       {
          if (Number.isFinite(options.height) || options.height === 'auto' || options.height === null)
          {
-            this.#data.height = typeof options.height === 'number' ? Math.round(options.height) : options.height;
+            data.height = typeof options.height === 'number' ? Math.round(options.height) : options.height;
          }
 
          if (Number.isFinite(options.left) || options.left === null)
          {
-            this.#data.left = typeof options.left === 'number' ? Math.round(options.left) : options.left;
+            data.left = typeof options.left === 'number' ? Math.round(options.left) : options.left;
          }
 
          if (Number.isFinite(options.rotateX) || options.rotateX === null)
          {
-            this.#data.rotateX = options.rotateX;
+            data.rotateX = options.rotateX;
+            this.#transforms.rotateX = `rotateX(${data.rotateX}deg)`
          }
 
          if (Number.isFinite(options.rotateY) || options.rotateY === null)
          {
-            this.#data.rotateY = options.rotateY;
+            data.rotateY = options.rotateY;
+            this.#transforms.rotateY = `rotateY(${data.rotateY}deg)`
          }
 
          if (Number.isFinite(options.rotateZ) || options.rotateZ === null)
          {
-            this.#data.rotateZ = options.rotateZ;
+            data.rotateZ = options.rotateZ;
+            this.#transforms.rotateZ = `rotateZ(${data.rotateZ}deg)`
          }
 
          if (Number.isFinite(options.scale) || options.scale === null)
          {
-            this.#data.scale = options.scale;
+            data.scale = options.scale;
+            this.#transforms.scale = `scale(${data.scale})`
          }
 
          if (Number.isFinite(options.top) || options.top === null)
          {
-            this.#data.top = typeof options.top === 'number' ? Math.round(options.top) : options.top;
+            data.top = typeof options.top === 'number' ? Math.round(options.top) : options.top;
          }
 
          if (Number.isFinite(options.width) || options.width === 'auto' || options.width === null)
          {
-            this.#data.width = typeof options.width === 'number' ? Math.round(options.width) : options.width;
+            data.width = typeof options.width === 'number' ? Math.round(options.width) : options.width;
          }
 
          if (Number.isFinite(options.zIndex) || options.zIndex === null)
          {
-            this.#data.zIndex = typeof options.zIndex === 'number' ? Math.round(options.zIndex) : options.zIndex;
+            data.zIndex = typeof options.zIndex === 'number' ? Math.round(options.zIndex) : options.zIndex;
          }
       }
-
-      this.#defaultData = Object.assign({}, this.#data);
 
       this.#stores = {
          height: propertyStore(this, 'height'),
@@ -122,8 +126,6 @@ export class Position
       };
 
       [this.#validators, this.#validatorsAdapter] = new AdapterValidators();
-
-      this.set(this.#data);
    }
 
    /**
@@ -277,6 +279,31 @@ export class Position
    toJSON()
    {
       return Object.assign({}, this.#data);
+   }
+
+   /**
+    * Resets data to default values and invokes set. Check options, but by default current z-index is maintained.
+    *
+    * @param {object}   [opts] - Optional parameters.
+    *
+    * @param {boolean}  [opts.keepZIndex=true] - When true keeps current z-index.
+    *
+    * @param {boolean}  [opts.invokeSet=true] - When true invokes set method.
+    *
+    * @returns {boolean} Operation successful.
+    */
+   reset({ keepZIndex = true, invokeSet = true } = {})
+   {
+      if (typeof this.#defaultData !== 'object') { return false; }
+
+      const zIndex = this.#data.zIndex;
+
+      const data = Object.assign({}, this.#defaultData);
+
+      if (keepZIndex) { data.zIndex = zIndex; }
+      if (invokeSet) { this.set(data); }
+
+      return true;
    }
 
    /**
@@ -459,6 +486,12 @@ export class Position
          el.style.transform = transformString;
       }
 
+      // Set default data after first set operation that has a target element.
+      if (el && typeof this.#defaultData !== 'object')
+      {
+         this.#defaultData = Object.assign({}, data);
+      }
+
       // Notify main store subscribers.
       if (modified)
       {
@@ -570,7 +603,7 @@ export class Position
 
       if (typeof scale === 'number' || scale === null)
       {
-         currentPosition.scale = typeof scale === 'number' ? Math.max(0, Math.min(scale, 100)) : null;
+         currentPosition.scale = typeof scale === 'number' ? Math.max(0, Math.min(scale, 1000)) : null;
       }
 
       if (zIndex) { currentPosition.zIndex = zIndex; }

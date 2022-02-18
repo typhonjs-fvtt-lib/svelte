@@ -94,7 +94,7 @@ export class SvelteApplication extends Application
       super(options);
 
       // Initialize Position with the position object set by Application.
-      this.#position = new Position(this, { ...options, ...this.position });
+      this.#position = new Position(this, { ...this.options, ...this.position });
 
       // Remove old position field.
       delete this.position;
