@@ -76,25 +76,25 @@ export class Position
          if (Number.isFinite(options.rotateX) || options.rotateX === null)
          {
             data.rotateX = options.rotateX;
-            this.#transforms.rotateX = `rotateX(${data.rotateX}deg)`
+            if (Number.isFinite(data.rotateX)) { this.#transforms.rotateX = `rotateX(${data.rotateX}deg)`; }
          }
 
          if (Number.isFinite(options.rotateY) || options.rotateY === null)
          {
             data.rotateY = options.rotateY;
-            this.#transforms.rotateY = `rotateY(${data.rotateY}deg)`
+            if (Number.isFinite(data.rotateY)) { this.#transforms.rotateY = `rotateY(${data.rotateY}deg)`; }
          }
 
          if (Number.isFinite(options.rotateZ) || options.rotateZ === null)
          {
             data.rotateZ = options.rotateZ;
-            this.#transforms.rotateZ = `rotateZ(${data.rotateZ}deg)`
+            if (Number.isFinite(data.rotateZ)) { this.#transforms.rotateZ = `rotateZ(${data.rotateZ}deg)`; }
          }
 
          if (Number.isFinite(options.scale) || options.scale === null)
          {
             data.scale = options.scale;
-            this.#transforms.scale = `scale(${data.scale})`
+            if (Number.isFinite(data.scale)) { this.#transforms.scale = `scale(${data.scale})`; }
          }
 
          if (Number.isFinite(options.top) || options.top === null)

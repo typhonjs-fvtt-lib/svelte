@@ -1,41 +1,6 @@
 import { group_outros, transition_out, check_outros } from 'svelte/internal';
 
 /**
- * Defines the application shell contract. If Svelte components export getter / setters for the following properties
- * then that component is considered an application shell.
- *
- * @type {string[]}
- */
-const applicationShellContract = ['elementRoot'];
-
-Object.freeze(applicationShellContract);
-
-/**
- * Provides a method to determine if the passed in object is ApplicationShell or TJSApplicationShell.
- *
- * @param {*}  component - Object / component to test.
- *
- * @returns {boolean} Whether the component is a ApplicationShell or TJSApplicationShell.
- */
-function isApplicationShell(component)
-{
-   if (component === null || component === void 0) { return false; }
-
-   // Get the prototype which is the parent SvelteComponent that has any getter / setters.
-   const prototype = Object.getPrototypeOf(component);
-
-   // Verify the application shell contract. If the accessors (getters / setters) are defined for
-   // `applicationShellContract`.
-   for (const accessor of applicationShellContract)
-   {
-      const descriptor = Object.getOwnPropertyDescriptor(prototype, accessor);
-      if (descriptor === void 0 || descriptor.get === void 0 || descriptor.set === void 0) { return false; }
-   }
-
-   return true;
-}
-
-/**
  * Wraps a callback in a debounced timeout.
  *
  * Delay execution of the callback function until the function has not been called for delay milliseconds
@@ -162,6 +127,57 @@ function uuidv4()
 {
    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
     (c ^ (globalThis.crypto || globalThis.msCrypto).getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+}
+
+/**
+ * Performs linear interpolation between a start & end value by given amount between 0 - 1 inclusive.
+ *
+ * @param {number}   start - Start value.
+ *
+ * @param {number}   end - End value.
+ *
+ * @param {number}   amount - Current amount between 0 - 1 inclusive.
+ *
+ * @returns {number} Linear interpolated value between start & end.
+ */
+function lerp(start, end, amount)
+{
+   return (1 - amount) * start + amount * end;
+}
+
+/**
+ * Defines the application shell contract. If Svelte components export getter / setters for the following properties
+ * then that component is considered an application shell.
+ *
+ * @type {string[]}
+ */
+const applicationShellContract = ['elementRoot'];
+
+Object.freeze(applicationShellContract);
+
+/**
+ * Provides a method to determine if the passed in object is ApplicationShell or TJSApplicationShell.
+ *
+ * @param {*}  component - Object / component to test.
+ *
+ * @returns {boolean} Whether the component is a ApplicationShell or TJSApplicationShell.
+ */
+function isApplicationShell(component)
+{
+   if (component === null || component === void 0) { return false; }
+
+   // Get the prototype which is the parent SvelteComponent that has any getter / setters.
+   const prototype = Object.getPrototypeOf(component);
+
+   // Verify the application shell contract. If the accessors (getters / setters) are defined for
+   // `applicationShellContract`.
+   for (const accessor of applicationShellContract)
+   {
+      const descriptor = Object.getOwnPropertyDescriptor(prototype, accessor);
+      if (descriptor === void 0 || descriptor.get === void 0 || descriptor.set === void 0) { return false; }
+   }
+
+   return true;
 }
 
 /**
@@ -596,5 +612,5 @@ function safeSet(data, accessor, value, operation = 'set', createMissing = true)
    return true;
 }
 
-export { debounce, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };
+export { debounce, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, lerp, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };
 //# sourceMappingURL=index.js.map

@@ -1,7 +1,32 @@
 import { linear } from 'svelte/easing';
+import 'svelte/internal';
 import { fade, slide } from 'svelte/transition';
 
-const s_LERP$1 = (start, end, amt) => (1 - amt) * start + amt * end;
+/**
+ * Performs linear interpolation between a start & end value by given amount between 0 - 1 inclusive.
+ *
+ * @param {number}   start - Start value.
+ *
+ * @param {number}   end - End value.
+ *
+ * @param {number}   amount - Current amount between 0 - 1 inclusive.
+ *
+ * @returns {number} Linear interpolated value between start & end.
+ */
+function lerp(start, end, amount)
+{
+   return (1 - amount) * start + amount * end;
+}
+
+/**
+ * Defines the application shell contract. If Svelte components export getter / setters for the following properties
+ * then that component is considered an application shell.
+ *
+ * @type {string[]}
+ */
+const applicationShellContract = ['elementRoot'];
+
+Object.freeze(applicationShellContract);
 
 /**
  * Provides a rotate transition. For options `easing` is applied to to the rotate transition. The default easing is
@@ -41,12 +66,10 @@ function rotate(node, options)
       css: (t) =>
       {
          const rotateT = easingRotate(t);
-         return `transform: rotate(${s_LERP$1(initialDeg, endDeg, rotateT)}deg)`;
+         return `transform: rotate(${lerp(initialDeg, endDeg, rotateT)}deg)`;
       }
    };
 }
-
-const s_LERP = (start, end, amt) => (1 - amt) * start + amt * end;
 
 /**
  * Combines rotate & fade transitions into a single transition. For options `easing` this is applied to both transitions,
@@ -95,7 +118,7 @@ function rotateFade(node, options)
          const fadeT = easingFade(t);
          const rotateT = easingRotate(t);
 
-         return `transform: rotate(${s_LERP(initialDeg, endDeg, rotateT)}deg); ${fadeTransition.css(fadeT, 1 - fadeT)}`;
+         return `transform: rotate(${lerp(initialDeg, endDeg, rotateT)}deg); ${fadeTransition.css(fadeT, 1 - fadeT)}`;
       }
    };
 }
