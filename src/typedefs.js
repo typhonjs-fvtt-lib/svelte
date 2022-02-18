@@ -19,27 +19,25 @@
  */
 
 /**
- * @typedef PositionData - Defines the position data for a positionable element.
+ * @typedef {object} PositionData - Defines the position data for a positionable element.
  *
- * @property {number|null}          left - The left offset position in pixels.
+ * @property {number|null}          [left] - The left offset position in pixels.
  *
- * @property {number|null}          top - The top offset position in pixels.
+ * @property {number|null}          [top] - The top offset position in pixels.
  *
- * @property {number|'auto'|null}   width - The element width in pixels.
+ * @property {number|'auto'|null}   [width] - The element width in pixels.
  *
- * @property {number|'auto'|null}   height - The element height in pixels.
+ * @property {number|'auto'|null}   [height] - The element height in pixels.
  *
- * @property {number|null}          rotate - The element rotation as a numeric factor in degrees.
+ * @property {number|null}          [rotateX] - The 3D element X rotation as a numeric factor in degrees.
  *
- * @property {number|null}          rotateX - The 3D element X rotation as a numeric factor in degrees.
+ * @property {number|null}          [rotateY] - The element rotation as a numeric factor in degrees.
  *
- * @property {number|null}          rotateY - The element rotation as a numeric factor in degrees.
+ * @property {number|null}          [rotateZ] - The element rotation as a numeric factor in degrees.
  *
- * @property {number|null}          rotateZ - The element rotation as a numeric factor in degrees.
+ * @property {number|null}          [scale] - The element scale as a numeric factor where 1.0 is default.
  *
- * @property {number|null}          scale - The element scale as a numeric factor where 1.0 is default.
- *
- * @property {number|null}          zIndex - The element z-index.
+ * @property {number|null}          [zIndex] - The element z-index.
  */
 
 /**

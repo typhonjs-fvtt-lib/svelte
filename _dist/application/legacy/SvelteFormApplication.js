@@ -129,9 +129,12 @@ export class SvelteFormApplication extends FormApplication
          headerButtonNoClose: false,   // If true then the close header button is removed.
          headerButtonNoLabel: false,   // If true then header button labels are removed for application shells.
          defaultCloseAnimation: true,  // If false the Foundry JQuery close animation is not run.
-         setPosition: true,            // If false then `setPosition` does not take effect.
+         setPosition: true,            // If false then `position.set` / `setPosition` does not take effect.
          suppressFormInit: false,      // If true automatic suppression of core FormApplication methods is enabled.
-         zIndex: null                  // When set the zIndex is manually controlled.
+         rotateX: null,                // Assigned to position.
+         rotateY: null,                // Assigned to position.
+         rotateZ: null,                // Assigned to position.
+         zIndex: null                  // Assigned to position.
       });
    }
 

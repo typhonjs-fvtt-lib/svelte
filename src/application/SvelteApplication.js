@@ -89,12 +89,12 @@ export class SvelteApplication extends Application
    /**
     * @inheritDoc
     */
-   constructor(options)
+   constructor(options = {})
    {
       super(options);
 
       // Initialize Position with the position object set by Application.
-      this.#position = new Position(this, this.position);
+      this.#position = new Position(this, { ...options, ...this.position });
 
       // Remove old position field.
       delete this.position;
@@ -129,8 +129,11 @@ export class SvelteApplication extends Application
          headerButtonNoClose: false,   // If true then the close header button is removed.
          headerButtonNoLabel: false,   // If true then header button labels are removed for application shells.
          defaultCloseAnimation: true,  // If false the Foundry JQuery close animation is not run.
-         setPosition: true,            // If false then `setPosition` does not take effect.
-         zIndex: null                  // When set the zIndex is manually controlled.
+         setPosition: true,            // If false then `position.set` / `setPosition` does not take effect.
+         rotateX: null,                // Assigned to position.
+         rotateY: null,                // Assigned to position.
+         rotateZ: null,                // Assigned to position.
+         zIndex: null                  // Assigned to position.
       });
    }
 

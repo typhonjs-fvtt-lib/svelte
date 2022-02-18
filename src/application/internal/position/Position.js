@@ -1,4 +1,3 @@
-import { writable }           from 'svelte/store';
 import { propertyStore }      from '@typhonjs-fvtt/svelte/store';
 
 import { AdapterValidators }  from './AdapterValidators.js';
@@ -15,8 +14,13 @@ export class Position
    /**
     * @type {PositionData}
     */
-   #data = { height: null, left: null, rotate: null, rotateX: null, rotateY: null, rotateZ: null, scale: null,
-      top: null, width: null, zIndex: null };
+   #data = { height: null, left: null, rotateX: null, rotateY: null, rotateZ: null, scale: null, top: null,
+    width: null, zIndex: null };
+
+   /**
+    * @type {PositionData}
+    */
+   #defaultData;
 
    /**
     * The associated parent for positional data tracking. Used in validators.
@@ -25,13 +29,14 @@ export class Position
     */
    #parent;
 
-   #store;
-
    /**
     * @type {StorePosition}
     */
    #stores;
 
+   /**
+    * @type {Record<string, string>}
+    */
    #transforms = {};
 
    /**
@@ -47,30 +52,78 @@ export class Position
    /**
     * @param {object}         parent - The associated parent for positional data tracking. Used in validators.
     *
-    * @param {PositionData}   position - Initial position data.
+    * @param {object}         options - Default values.
     */
-   constructor(parent, position)
+   constructor(parent, options = {})
    {
       this.#parent = parent;
 
-      this.#store = writable(this.#data);
+      // Set default value from options.
+      if (typeof options === 'object')
+      {
+         if (Number.isFinite(options.height) || options.height === 'auto' || options.height === null)
+         {
+            this.#data.height = typeof options.height === 'number' ? Math.round(options.height) : options.height;
+         }
+
+         if (Number.isFinite(options.left) || options.left === null)
+         {
+            this.#data.left = typeof options.left === 'number' ? Math.round(options.left) : options.left;
+         }
+
+         if (Number.isFinite(options.rotateX) || options.rotateX === null)
+         {
+            this.#data.rotateX = options.rotateX;
+         }
+
+         if (Number.isFinite(options.rotateY) || options.rotateY === null)
+         {
+            this.#data.rotateY = options.rotateY;
+         }
+
+         if (Number.isFinite(options.rotateZ) || options.rotateZ === null)
+         {
+            this.#data.rotateZ = options.rotateZ;
+         }
+
+         if (Number.isFinite(options.scale) || options.scale === null)
+         {
+            this.#data.scale = options.scale;
+         }
+
+         if (Number.isFinite(options.top) || options.top === null)
+         {
+            this.#data.top = typeof options.top === 'number' ? Math.round(options.top) : options.top;
+         }
+
+         if (Number.isFinite(options.width) || options.width === 'auto' || options.width === null)
+         {
+            this.#data.width = typeof options.width === 'number' ? Math.round(options.width) : options.width;
+         }
+
+         if (Number.isFinite(options.zIndex) || options.zIndex === null)
+         {
+            this.#data.zIndex = typeof options.zIndex === 'number' ? Math.round(options.zIndex) : options.zIndex;
+         }
+      }
+
+      this.#defaultData = Object.assign({}, this.#data);
 
       this.#stores = {
-         height: propertyStore(this.#store, 'height'),
-         left: propertyStore(this.#store, 'left'),
-         rotate: propertyStore(this.#store, 'rotate'),
-         rotateX: propertyStore(this.#store, 'rotateX'),
-         rotateY: propertyStore(this.#store, 'rotateY'),
-         rotateZ: propertyStore(this.#store, 'rotateZ'),
-         scale: propertyStore(this.#store, 'scale'),
-         top: propertyStore(this.#store, 'top'),
-         width: propertyStore(this.#store, 'width'),
-         zIndex: propertyStore(this.#store, 'zIndex')
+         height: propertyStore(this, 'height'),
+         left: propertyStore(this, 'left'),
+         rotateX: propertyStore(this, 'rotateX'),
+         rotateY: propertyStore(this, 'rotateY'),
+         rotateZ: propertyStore(this, 'rotateZ'),
+         scale: propertyStore(this, 'scale'),
+         top: propertyStore(this, 'top'),
+         width: propertyStore(this, 'width'),
+         zIndex: propertyStore(this, 'zIndex')
       };
 
       [this.#validators, this.#validatorsAdapter] = new AdapterValidators();
 
-      this.set(position);
+      this.set(this.#data);
    }
 
    /**
@@ -98,11 +151,6 @@ export class Position
     * @returns {number|null} left
     */
    get left() { return this.#data.left; }
-
-   /**
-    * @returns {number|null} rotate
-    */
-   get rotate() { return this.#data.rotate; }
 
    /**
     * @returns {number|null} rotateX
@@ -144,7 +192,7 @@ export class Position
     */
    set height(height)
    {
-      this.set({ height });
+      this.#stores.height.set(height);
    }
 
    /**
@@ -152,15 +200,7 @@ export class Position
     */
    set left(left)
    {
-      this.set({ left });
-   }
-
-   /**
-    * @param {number|null} rotate -
-    */
-   set rotate(rotate)
-   {
-      this.set({ rotate });
+      this.#stores.left.set(left);
    }
 
    /**
@@ -168,7 +208,7 @@ export class Position
     */
    set rotateX(rotateX)
    {
-      this.set({ rotateX });
+      this.#stores.rotateX.set(rotateX);
    }
 
    /**
@@ -176,7 +216,7 @@ export class Position
     */
    set rotateY(rotateY)
    {
-      this.set({ rotateY });
+      this.#stores.rotateY.set(rotateY);
    }
 
    /**
@@ -184,7 +224,7 @@ export class Position
     */
    set rotateZ(rotateZ)
    {
-      this.set({ rotateZ });
+      this.#stores.rotateZ.set(rotateZ);
    }
 
    /**
@@ -192,7 +232,7 @@ export class Position
     */
    set scale(scale)
    {
-      this.set({ scale });
+      this.#stores.scale.set(scale);
    }
 
    /**
@@ -200,7 +240,7 @@ export class Position
     */
    set top(top)
    {
-      this.set({ top });
+      this.#stores.top.set(top);
    }
 
    /**
@@ -208,7 +248,7 @@ export class Position
     */
    set width(width)
    {
-      this.set({ width });
+      this.#stores.width.set(width);
    }
 
    /**
@@ -216,7 +256,7 @@ export class Position
     */
    set zIndex(zIndex)
    {
-      this.set({ zIndex });
+      this.#stores.zIndex.set(zIndex);
    }
 
    /**
@@ -316,22 +356,6 @@ export class Position
          if (data.top !== position.top) { data.top = position.top; modified = true; }
 
          if (el) { el.style.top = `${position.top}px`; }
-      }
-
-      if (typeof position.rotate === 'number' || position.rotate === null)
-      {
-         if (data.rotate !== position.rotate)
-         {
-            data.rotate = position.rotate;
-            updateTransform = modified = true;
-
-            if (typeof position.rotate === 'number') { transforms.rotate = `rotate(${position.rotate}deg)`; }
-            else { delete transforms.rotate; }
-         }
-         else if (transforms.rotate && !currentTransform.includes('rotate('))
-         {
-            updateTransform = true;
-         }
       }
 
       if (typeof position.rotateX === 'number' || position.rotateX === null)
@@ -449,9 +473,6 @@ export class Position
          }
       }
 
-      // Update derived stores and notify.
-      this.#store.set(data);
-
       return position;
    }
 
@@ -476,8 +497,7 @@ export class Position
       };
    }
 
-   #updatePosition({ left, top, width, height, rotate, rotateX, rotateY, rotateZ, scale, zIndex, ...rest } = {}, el,
-    styles)
+   #updatePosition({ left, top, width, height, rotateX, rotateY, rotateZ, scale, zIndex, ...rest } = {}, el, styles)
    {
       const currentPosition = this.get(rest);
 
@@ -543,15 +563,14 @@ export class Position
          currentPosition.top = Math.round(Math.clamped(tarT, 0, maxT));
       }
 
-      // Update rotate, scale, z-index
-      if (typeof rotate === 'number' || rotate === null) { currentPosition.rotate = rotate; }
+      // Update rotate X/Y/Z, scale, z-index
       if (typeof rotateX === 'number' || rotateX === null) { currentPosition.rotateX = rotateX; }
       if (typeof rotateY === 'number' || rotateY === null) { currentPosition.rotateY = rotateY; }
       if (typeof rotateZ === 'number' || rotateZ === null) { currentPosition.rotateZ = rotateZ; }
 
       if (typeof scale === 'number' || scale === null)
       {
-         currentPosition.scale = typeof scale === 'number' ? Math.max(0, Math.min(scale, 1000)) : null;
+         currentPosition.scale = typeof scale === 'number' ? Math.max(0, Math.min(scale, 100)) : null;
       }
 
       if (zIndex) { currentPosition.zIndex = zIndex; }
