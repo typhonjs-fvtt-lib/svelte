@@ -128,7 +128,7 @@ export class SvelteFormApplication extends FormApplication
          draggable: true,              // If true then application shells are draggable.
          headerButtonNoClose: false,   // If true then the close header button is removed.
          headerButtonNoLabel: false,   // If true then header button labels are removed for application shells.
-         defaultCloseAnimation: true,  // If false the Foundry JQuery close animation is not run.
+         defaultCloseAnimation: true,  // If false the default slide close animation is not run.
          positionable: true,           // If false then `position.set` does not take effect.
          suppressFormInit: false,      // If true automatic suppression of core FormApplication methods is enabled.
          rotateX: null,                // Assigned to position.
@@ -319,7 +319,7 @@ export class SvelteFormApplication extends FormApplication
       // Reset SvelteData like this to maintain reference to GetSvelteData / `this.svelte`.
       this.#svelteData.length = 0;
 
-      // Use JQuery to remove `this._element` from the DOM. Most SvelteComponents have already removed it.
+      // Remove element from the DOM. Most SvelteComponents have already removed it.
       el.remove();
 
       // Silently restore any width / height state before minimized as applicable.
@@ -544,13 +544,11 @@ export class SvelteFormApplication extends FormApplication
       content.style.display = null;
 
       // Slide-up content
-      const animation = content.animate([
+      await content.animate([
          { maxHeight: 0, paddingTop: 0, paddingBottom: 0, offset: 0 },
          { ...constraints, offset: 1 },
          { maxHeight: '100%', offset: 1 },
-      ], { duration: 100, fill: 'forwards' });
-
-      await animation.finished;
+      ], { duration: 100, fill: 'forwards' }).finished;
 
       element.classList.remove('minimized');
 
@@ -697,7 +695,7 @@ export class SvelteFormApplication extends FormApplication
 
    /**
     * Render the inner application content. Only render a template if one is defined otherwise provide an empty
-    * JQuery element.
+    * JQuery element per the core Foundry API.
     *
     * @param {Object} data         The data used to render the inner template
     *
@@ -725,7 +723,7 @@ export class SvelteFormApplication extends FormApplication
    async _renderOuter()
    {
       const html = await super._renderOuter();
-      this.#initialZIndex = html.css('zIndex');
+      this.#initialZIndex = html[0].style.zIndex;
       return html;
    }
 
