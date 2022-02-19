@@ -315,6 +315,14 @@ export class SvelteFormApplication extends FormApplication
       // Use JQuery to remove `this._element` from the DOM. Most SvelteComponents have already removed it.
       el.remove();
 
+      // Silently restore any width / height state before minimized as applicable.
+      this.position.restore({
+         name: '#beforeMinimized',
+         properties: ['width', 'height'],
+         silent: true,
+         remove: true
+      });
+
       // Clean up data
       this.#applicationShellHolder[0] = null;
       /**
@@ -489,9 +497,10 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Provides a mechanism to update the UI options store for minimized.
     *
-    * Note: the sanity check is duplicated from {@link Application.maximize} and the store is updated _before_
-    * the actual parent method is invoked. This allows application shells to remove / show any resize handlers
-    * correctly.
+    * Note: the sanity check is duplicated from {@link Application.maximize} the store is updated _before_
+    * performing the rest of animations. This allows application shells to remove / show any resize handlers
+    * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
+    * to animate the content area.
     *
     * @inheritDoc
     * @ignore
@@ -502,15 +511,57 @@ export class SvelteFormApplication extends FormApplication
 
       this.#stores.uiOptionsUpdate((options) => foundry.utils.mergeObject(options, { minimized: false }));
 
-      return super.maximize();
+      this._minimized = null;
+
+      // Get content
+      const element = this.elementTarget;
+      const header = element.querySelector('.window-header');
+      const content = element.querySelector('.window-content');
+
+      // First animate / restore width / async.
+      await this.position.restore({ name: '#beforeMinimized', async: true, animateTo: true, properties: ['width'] });
+
+      // Reset display none on all children of header.
+      for (let cntr = header.children.length; --cntr >= 0;) { header.children[cntr].style.display = null; }
+
+      // Next animate / restore height synchronously and remove key. Retrieve constraints data for slide up animation
+      // below.
+      const { constraints } = this.position.restore({
+         name: '#beforeMinimized',
+         animateTo: true,
+         properties: ['height'],
+         remove: true,
+         duration: 100
+      });
+
+      content.style.display = null;
+
+      // Slide-up content
+      const animation = content.animate([
+         { maxHeight: 0, paddingTop: 0, paddingBottom: 0, offset: 0 },
+         { ...constraints, offset: 1 },
+         { maxHeight: '100%', offset: 1 },
+      ], { duration: 100, fill: 'forwards' });
+
+      await animation.finished;
+
+      element.classList.remove('minimized');
+
+      this._minimized = false;
+
+      element.style.minWidth = null;
+      element.style.minHeight = null;
+
+      content.style.overflow = null;
    }
 
    /**
     * Provides a mechanism to update the UI options store for minimized.
     *
-    * Note: the sanity check is duplicated from {@link Application.minimize} and the store is updated _before_
-    * the actual parent method is invoked. This allows application shells to remove / show any resize handlers
-    * correctly.
+    * Note: the sanity check is duplicated from {@link Application.minimize} the store is updated _before_
+    * performing the rest of animations. This allows application shells to remove / show any resize handlers
+    * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
+    * to animate the content area.
     *
     * @inheritDoc
     * @ignore
@@ -521,7 +572,58 @@ export class SvelteFormApplication extends FormApplication
 
       this.#stores.uiOptionsUpdate((options) => foundry.utils.mergeObject(options, { minimized: true }));
 
-      return super.minimize();
+      this._minimized = null;
+
+      const element = this.elementTarget;
+
+      // Get content
+      const header = element.querySelector('.window-header');
+      const content = element.querySelector('.window-content');
+
+      // Remove minimum width and height styling rules
+      element.style.minWidth = '100px';
+      element.style.minHeight = '30px';
+
+      content.style.overflow = 'hidden';
+
+      const { paddingBottom, paddingTop } = globalThis.getComputedStyle(content);
+
+      // Extra data that is saved with the current position. Used during `maximize`.
+      const constraints = {
+         maxHeight: `${content.clientHeight}px`,
+         paddingTop,
+         paddingBottom
+      };
+
+      // Slide-up content
+      content.animate([
+         constraints,
+          { maxHeight: 0, paddingTop: 0, paddingBottom: 0 }
+      ], { duration: 100, fill: 'forwards' });
+
+      // Save current position state and add the constraint data to use in `maximize`.
+      this.position.save({ name: '#beforeMinimized', constraints });
+
+      // First await animation of height upward.
+      await this.position.animateTo({ height: header.offsetHeight + 1 }, { duration: 100 });
+
+      content.style.display = 'none';
+
+      // Set all header buttons besides close and the window title to display none.
+      for (let cntr = header.children.length; --cntr >= 0;)
+      {
+         const className = header.children[cntr].className;
+         if (className.includes('window-title') || className.includes('close')) { continue; }
+
+         header.children[cntr].style.display = 'none';
+      }
+
+      // Await animation of width to the left / minimum width.
+      await this.position.animateTo({ width: MIN_WINDOW_WIDTH }, { duration: 100 });
+
+      element.classList.add('minimized');
+
+      this._minimized = true;
    }
 
    /**
