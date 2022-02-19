@@ -19,11 +19,12 @@ const s_LOCAL_EXTERNAL = [
    'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
    'svelte/types',
 
-   '@typhonjs-fvtt/svelte/action', '@typhonjs-fvtt/svelte/application', '@typhonjs-fvtt/svelte/application/dialog',
-   '@typhonjs-fvtt/svelte/application/legacy', '@typhonjs-fvtt/svelte/component/core',
-   '@typhonjs-fvtt/svelte/component/dialog', '@typhonjs-fvtt/svelte/gsap', '@typhonjs-fvtt/svelte/handler',
-   '@typhonjs-fvtt/svelte/helper', '@typhonjs-fvtt/svelte/store', '@typhonjs-fvtt/svelte/transition',
-   '@typhonjs-fvtt/svelte/util', '@typhonjs-fvtt/svelte/plugin/data', '@typhonjs-fvtt/svelte/plugin/system',
+   '@typhonjs-fvtt/svelte/action', '@typhonjs-fvtt/svelte/animation', '@typhonjs-fvtt/svelte/application',
+   '@typhonjs-fvtt/svelte/application/dialog', '@typhonjs-fvtt/svelte/application/legacy',
+   '@typhonjs-fvtt/svelte/component/core', '@typhonjs-fvtt/svelte/component/dialog', '@typhonjs-fvtt/svelte/gsap',
+   '@typhonjs-fvtt/svelte/handler', '@typhonjs-fvtt/svelte/helper', '@typhonjs-fvtt/svelte/store',
+   '@typhonjs-fvtt/svelte/transition', '@typhonjs-fvtt/svelte/util', '@typhonjs-fvtt/svelte/plugin/data',
+   '@typhonjs-fvtt/svelte/plugin/system',
 
    `foundry-gsap`  // Replaced by consumer for Foundry GSAP path.
 ];
@@ -54,6 +55,26 @@ const rollupConfigs = [
       output: {
          output: {
             file: '_dist/action/index.js',
+            format: 'es',
+            plugins: outputPlugins,
+            preferConst: true,
+            sourcemap,
+            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
+         }
+      }
+   },
+   {
+      input: {
+         input: 'src/animate/index.js',
+         external: s_LOCAL_EXTERNAL,
+         plugins: [
+            resolve(s_RESOLVE_CONFIG),
+            sourcemaps()
+         ]
+      },
+      output: {
+         output: {
+            file: '_dist/animate/index.js',
             format: 'es',
             plugins: outputPlugins,
             preferConst: true,
