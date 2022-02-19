@@ -56,6 +56,14 @@
       let initialPosition = {};
 
       /**
+       * Stores the current resizing state and gates the move pointer as the resizing store is not
+       * set until the first pointer move.
+       *
+       * @type {boolean}
+       */
+      let resizing = false;
+
+      /**
        * Remember event handlers associated with this action so they may be later unregistered.
        *
        * @type {Object}
@@ -107,14 +115,13 @@
       }
 
       /**
-       * Handle the initial mouse click which activates dragging behavior for the application
-       * @private
+       * Handle the initial pointer down that activates resizing capture.
        */
       function onResizePointerDown(event)
       {
          event.preventDefault();
 
-         if (typeof storeResizing?.set === 'function') { storeResizing.set(true); }
+         resizing = false;
 
          // Record initial position
          position = application.position.get();
@@ -132,14 +139,19 @@
       }
 
       /**
-       * Move the window with the mouse, bounding the movement to ensure the window stays within bounds of the viewport
-       * @private
+       * Sets the width / height of the positionable application.
        */
       async function onResizePointerMove(event)
       {
          event.preventDefault();
 
          await nextAnimationFrame();
+
+         if (!resizing && typeof storeResizing?.set === 'function')
+         {
+            resizing = true;
+            storeResizing.set(true);
+         }
 
          application.position.set({
             width: position.width + (event.clientX - initialPosition.x),
@@ -148,11 +160,12 @@
       }
 
       /**
-       * Conclude the dragging behavior when the mouse is release, setting the final position and removing listeners
-       * @private
+       * Conclude the dragging behavior when the pointer is released setting the final position and
+       * removing listeners.
        */
       function onResizePointerUp(event)
       {
+         resizing = false;
          if (typeof storeResizing?.set === 'function') { storeResizing.set(false); }
 
          event.preventDefault();

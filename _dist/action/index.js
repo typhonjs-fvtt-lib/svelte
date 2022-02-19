@@ -88,6 +88,14 @@ function draggable(node, { positionable, active = true, storeDragging = void 0 }
    let initialPosition = {};
 
    /**
+    * Stores the current dragging state and gates the move pointer as the dragging store is not
+    * set until the first pointer move.
+    *
+    * @type {boolean}
+    */
+   let dragging = false;
+
+   /**
     * Remember event handlers associated with this action so they may be later unregistered.
     *
     * @type {object}
@@ -128,7 +136,7 @@ function draggable(node, { positionable, active = true, storeDragging = void 0 }
    }
 
    /**
-    * Handle the initial pointer down which activates dragging behavior for the positionable.
+    * Handle the initial pointer down that activates dragging behavior for the positionable.
     *
     * @param {PointerEvent} event - The pointer down event.
     */
@@ -136,7 +144,7 @@ function draggable(node, { positionable, active = true, storeDragging = void 0 }
    {
       event.preventDefault();
 
-      if (typeof storeDragging?.set === 'function') { storeDragging.set(true); }
+      dragging = false;
 
       // Record initial position
       position = positionable.position.get();
@@ -160,6 +168,13 @@ function draggable(node, { positionable, active = true, storeDragging = void 0 }
 
       await nextAnimationFrame();
 
+      // Only set store dragging on first move event.
+      if (!dragging && typeof storeDragging?.set === 'function')
+      {
+         dragging = true;
+         storeDragging.set(true);
+      }
+
       // Update application position
       positionable.position.set({
          left: position.left + (event.clientX - initialPosition.x),
@@ -168,15 +183,17 @@ function draggable(node, { positionable, active = true, storeDragging = void 0 }
    }
 
    /**
-    * Conclude the dragging behavior when the mouse is release, setting the final position and removing listeners
+    * Finish dragging and set the final position and removing listeners.
     *
     * @param {PointerEvent} event - The pointer up event.
     */
    function onDragPointerUp(event)
    {
+      event.preventDefault();
+
+      dragging = false;
       if (typeof storeDragging?.set === 'function') { storeDragging.set(false); }
 
-      event.preventDefault();
       node.removeEventListener(...handlers.dragMove);
       node.removeEventListener(...handlers.dragUp);
    }
