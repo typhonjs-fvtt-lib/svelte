@@ -123,7 +123,6 @@ function draggable(node, { positionable, active = true, storeDragging = void 0 }
 
       // Record initial position
       position = positionable.position.get();
-      // position = foundry.utils.duplicate(positionable.position);
       initialPosition = { x: event.clientX, y: event.clientY };
 
       // Add temporary handlers

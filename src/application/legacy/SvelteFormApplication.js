@@ -775,8 +775,8 @@ export class SvelteFormApplication extends FormApplication
 
             super.bringToTop();
 
-            // TODO REMOVE: DO WE NEED THIS?
-            this.setPosition(this.position);
+            // Ensure that new root element has inline position styles set.
+            this.position.set(this.position.get());
          }
 
          super._activateCoreListeners([this.#elementTarget]);
