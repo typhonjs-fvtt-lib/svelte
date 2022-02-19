@@ -36,7 +36,7 @@
 </script>
 
 <header class="window-header flexrow"
-        use:draggable={{ positionable: application, active: $storeDraggable, storeDragging }}
+        use:draggable={{ position: application.position, active: $storeDraggable, storeDragging }}
         use:minimizable={$storeMinimizable}>
     <h4 class=window-title>{localize($storeTitle)}</h4>
     {#each $storeHeaderButtons as button}

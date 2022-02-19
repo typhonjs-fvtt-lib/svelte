@@ -1,14 +1,14 @@
 import { nextAnimationFrame } from '@typhonjs-fvtt/svelte/animate';
 
 /**
- * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on given Positionable
- * object provided. When the attached boolean store state changes the draggable action is enabled or disabled.
+ * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on a given {@link Position}
+ * instance provided. When the attached boolean store state changes the draggable action is enabled or disabled.
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
  * @param {object}            params - Required parameters.
  *
- * @param {Positionable}      params.positionable - A positionable object.
+ * @param {Position}          params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
@@ -16,21 +16,21 @@ import { nextAnimationFrame } from '@typhonjs-fvtt/svelte/animate';
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-export function draggable(node, { positionable, active = true, storeDragging = void 0 })
+export function draggable(node, { position, active = true, storeDragging = void 0 })
 {
    /**
     * Duplicate the app / Positionable starting position to track differences.
     *
     * @type {object}
     */
-   let position = null;
+   let initialPosition = null;
 
    /**
     * Stores the initial X / Y on drag down.
     *
     * @type {object}
     */
-   let initialPosition = {};
+   let initialDragPoint = {};
 
    /**
     * Stores the current dragging state and gates the move pointer as the dragging store is not
@@ -91,11 +91,11 @@ export function draggable(node, { positionable, active = true, storeDragging = v
 
       dragging = false;
 
-      // Record initial position
-      position = positionable.position.get();
-      initialPosition = { x: event.clientX, y: event.clientY };
+      // Record initial position.
+      initialPosition = position.get();
+      initialDragPoint = { x: event.clientX, y: event.clientY };
 
-      // Add temporary handlers
+      // Add move and pointer up handlers.
       node.addEventListener(...handlers.dragMove);
       node.addEventListener(...handlers.dragUp);
 
@@ -120,10 +120,10 @@ export function draggable(node, { positionable, active = true, storeDragging = v
          storeDragging.set(true);
       }
 
-      // Update application position
-      positionable.position.set({
-         left: position.left + (event.clientX - initialPosition.x),
-         top: position.top + (event.clientY - initialPosition.y)
+      // Update application position.
+      position.set({
+         left: initialPosition.left + (event.clientX - initialDragPoint.x),
+         top: initialPosition.top + (event.clientY - initialDragPoint.y)
       });
    }
 

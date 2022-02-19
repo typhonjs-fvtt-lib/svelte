@@ -1012,7 +1012,7 @@ function create_fragment$6(ctx) {
 			if (!mounted) {
 				dispose = [
 					action_destroyer(draggable_action = draggable.call(null, header, {
-						positionable: /*application*/ ctx[4],
+						position: /*application*/ ctx[4].position,
 						active: /*$storeDraggable*/ ctx[0],
 						storeDragging: /*storeDragging*/ ctx[7]
 					})),
@@ -1053,7 +1053,7 @@ function create_fragment$6(ctx) {
 			}
 
 			if (draggable_action && is_function(draggable_action.update) && dirty & /*$storeDraggable*/ 1) draggable_action.update.call(null, {
-				positionable: /*application*/ ctx[4],
+				position: /*application*/ ctx[4].position,
 				active: /*$storeDraggable*/ ctx[0],
 				storeDragging: /*storeDragging*/ ctx[7]
 			});

@@ -9,14 +9,14 @@
  */
 declare function applyStyles(node: HTMLElement, properties: object): Function;
 /**
- * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on given Positionable
- * object provided. When the attached boolean store state changes the draggable action is enabled or disabled.
+ * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on a given {@link Position}
+ * instance provided. When the attached boolean store state changes the draggable action is enabled or disabled.
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
  * @param {object}            params - Required parameters.
  *
- * @param {Positionable}      params.positionable - A positionable object.
+ * @param {Position}          params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
@@ -24,8 +24,8 @@ declare function applyStyles(node: HTMLElement, properties: object): Function;
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-declare function draggable(node: HTMLElement, { positionable, active, storeDragging }: {
-    positionable: any;
+declare function draggable(node: HTMLElement, { position, active, storeDragging }: {
+    position: any;
     active?: boolean;
     storeDragging?: any;
 }): {
