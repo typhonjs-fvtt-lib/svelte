@@ -38,6 +38,13 @@ export class SvelteReactive
    #storeAppOptionsUpdate;
 
    /**
+    * Stores the UI state data to make it accessible via getters.
+    *
+    * @type {object}
+    */
+   #dataUIState;
+
+   /**
     * The UI option store which is injected into mounted Svelte component context under the `external` key.
     *
     * @type {StoreUIOptions}
@@ -87,6 +94,31 @@ export class SvelteReactive
          unsubscribe: this.#storesUnsubscribe.bind(this)
       };
    }
+
+// Only reactive getters ---------------------------------------------------------------------------------------------
+
+   /**
+    * Returns the current dragging UI state.
+    *
+    * @returns {boolean} Dragging UI state.
+    */
+   get dragging() { return this.#dataUIState.dragging; }
+
+   /**
+    * Returns the current minimized UI state.
+    *
+    * @returns {boolean} Minimized UI state.
+    */
+   get minimized() { return this.#dataUIState.minimized; }
+
+   /**
+    * Returns the current resizing UI state.
+    *
+    * @returns {boolean} Resizing UI state.
+    */
+   get resizing() { return this.#dataUIState.resizing; }
+
+// Reactive getter / setters -----------------------------------------------------------------------------------------
 
    /**
     * Returns the draggable app option.
@@ -330,13 +362,15 @@ export class SvelteReactive
 
       this.#storeAppOptions = storeAppOptions;
 
-      // Create a store for UI state data.
-      const writableUIOptions = writable({
+      this.#dataUIState = {
          dragging: false,
          headerButtons: [],
          minimized: this.#application._minimized,
          resizing: false
-      });
+      };
+
+      // Create a store for UI state data.
+      const writableUIOptions = writable(this.#dataUIState);
 
       // Keep the update function locally, but make the store essentially readable.
       this.#storeUIStateUpdate = writableUIOptions.update;

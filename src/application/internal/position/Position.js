@@ -1,6 +1,8 @@
 import { linear }             from 'svelte/easing';
-import { propertyStore }      from '@typhonjs-fvtt/runtime/svelte/store';
-import { lerp }               from '@typhonjs-fvtt/runtime/svelte/util';
+
+import { nextAnimationFrame } from '@typhonjs-fvtt/svelte/animate';
+import { propertyStore }      from '@typhonjs-fvtt/svelte/store';
+import { isIterable, lerp }   from '@typhonjs-fvtt/svelte/util';
 
 import { AdapterValidators }  from './AdapterValidators.js';
 import { styleParsePixels }   from '../styleParsePixels.js';
@@ -18,6 +20,11 @@ export class Position
     */
    #data = { height: null, left: null, rotateX: null, rotateY: null, rotateZ: null, scale: null, top: null,
     width: null, zIndex: null };
+
+   /**
+    * @type {Map<string, PositionData>}
+    */
+   #dataSaved = new Map();
 
    /**
     * Stores current animation keys.
@@ -374,6 +381,20 @@ export class Position
    }
 
    /**
+    * Returns any stored save state by name.
+    *
+    * @param {string}   name - Saved data set name.
+    *
+    * @returns {PositionData} The saved data set.
+    */
+   getSave({ name })
+   {
+      if (typeof name !== 'string') { throw new TypeError(`Position - getSave error: 'name' is not a string.`); }
+
+      return this.#dataSaved.get(name);
+   }
+
+   /**
     * @returns {PositionData} Current position data.
     */
    toJSON()
@@ -405,9 +426,110 @@ export class Position
       // Remove any keys that are currently animating.
       for (const key of this.#currentAnimationKeys) { delete data[key]; }
 
+      // If current minimized invoke `maximize`.
+      if (this.#parent?.reactive?.minimized) { this.#parent?.maximize?.(); }
+
       if (invokeSet) { this.set(data); }
 
       return true;
+   }
+
+   /**
+    * Restores a saved positional state returning the data. Several optional parameters are available
+    * to control whether the restore action occurs silently (no store / inline styles updates), animates
+    * to the stored data, or simply sets the stored data. Restoring via {@link Position.animateTo} allows
+    * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
+    * returned if awaiting the end of the animation.
+    *
+    * @param {object}            params - Parameters
+    *
+    * @param {string}            params.name - Saved data set name.
+    *
+    * @param {boolean}           [params.remove=false] - Remove data set.
+    *
+    * @param {Iterable<string>}  [params.properties] - Specific properties to set / animate.
+    *
+    * @param {boolean}           [params.silent] - Set position data directly; no store or style updates.
+    *
+    * @param {boolean}           [params.async=false] - If animating return a Promise that resolves with any saved data.
+    *
+    * @param {boolean}           [params.animateTo=false] - Animate to restore data.
+    *
+    * @param {number}            [params.duration=100] - Duration in milliseconds.
+    *
+    * @param {Function}          [params.easing=linear] - Easing function.
+    *
+    * @param {Function}          [params.interpolate=lerp] - Interpolation function.
+    *
+    * @returns {PositionData} Saved position data.
+    */
+   restore({ name, remove = false, properties, silent = false, async = false, animateTo = false, duration = 100,
+    easing = linear, interpolate = lerp })
+   {
+      if (typeof name !== 'string') { throw new TypeError(`Position - restore error: 'name' is not a string.`); }
+
+      const dataSaved = this.#dataSaved.get(name);
+
+      if (dataSaved)
+      {
+         if (remove) { this.#dataSaved.delete(name); }
+
+         let data = dataSaved;
+
+         if (isIterable(properties))
+         {
+            data = {};
+            for (const property of properties) { data[property] = dataSaved[property]; }
+         }
+
+         // Update data directly with no store or inline style updates.
+         if (silent)
+         {
+            for (const property in data) { this.#data[property] = data[property]; }
+            return dataSaved;
+         }
+         else if (animateTo)  // Animate to saved data.
+         {
+            // Return a Promise with saved data that resolves after animation ends.
+            if (async)
+            {
+               return this.animateTo(data, { duration, easing, interpolate }).then(() => dataSaved);
+            }
+            else  // Animate synchronously.
+            {
+               this.animateTo(data, { duration, easing, interpolate });
+            }
+         }
+         else
+         {
+            // Default options is to set data for an immediate update.
+            this.set(data);
+         }
+      }
+
+      return dataSaved;
+   }
+
+   /**
+    * Saves current position state with the opportunity to add extra data to the saved state.
+    *
+    * @param {object}   options - Options.
+    *
+    * @param {string}   options.name - name to index this saved data.
+    *
+    * @param {...*}     [options.extra] - Extra data to add to saved data.
+    *
+    * @returns {PositionData} Current position data
+    */
+   save({ name, ...extra })
+   {
+      if (typeof name !== 'string') { throw new TypeError(`Position - save error: 'name' is not a string.`); }
+
+      const data = this.get(extra);
+
+      this.#dataSaved.set(name, data);
+
+      return data;
    }
 
    /**
@@ -715,14 +837,4 @@ export class Position
       // Return the updated position object.
       return currentPosition;
    }
-}
-
-/**
- * Wraps `requestAnimationFrame` in a Promise.
- *
- * @returns {Promise<number>} Returns current time
- */
-function nextAnimationFrame()
-{
-   return new Promise((resolve) => requestAnimationFrame(resolve));
 }
