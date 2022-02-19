@@ -228,9 +228,9 @@ export class SvelteApplication extends Application
       /**
        * Get the element.
        *
-       * @type {JQuery}
+       * @type {HTMLElement}
        */
-      const el = $(this.#elementTarget);
+      const el = this.#elementTarget;
       if (!el) { return this._state = states.CLOSED; }
 
       // Dispatch Hooks for closing the base and subclass applications
@@ -250,7 +250,7 @@ export class SvelteApplication extends Application
          Hooks.call(`close${cls.name}`, this, el);
       }
 
-      // If options `defaultCloseAnimation` is false then do not execute the standard JQuery slide up animation.
+      // If options `defaultCloseAnimation` is false then do not execute the standard slide up animation.
       // This allows Svelte components to provide any out transition. Application shells will automatically set
       // `defaultCloseAnimation` based on any out transition set or unset.
       const animate = typeof this.options.defaultCloseAnimation === 'boolean' ? this.options.defaultCloseAnimation :
@@ -258,9 +258,16 @@ export class SvelteApplication extends Application
 
       if (animate)
       {
-         // Await on JQuery to slide up the main element.
-         el[0].style.minHeight = '0';
-         await new Promise((resolve) => { el.slideUp(200, () => resolve()); });
+         // Set min height for full slide.
+         el.style.minHeight = '0';
+
+         const { paddingBottom, paddingTop } = globalThis.getComputedStyle(el);
+
+         // Slide-up application.
+         await el.animate([
+            { maxHeight: `${el.clientHeight}px`, paddingTop, paddingBottom },
+            { maxHeight: 0, paddingTop: 0, paddingBottom: 0 }
+         ], { duration: 250, easing: 'ease-in', fill: 'forwards' }).finished;
       }
 
       // Stores the Promises returned from running outro transitions and destroying each Svelte component.

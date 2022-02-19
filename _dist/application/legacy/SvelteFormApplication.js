@@ -220,15 +220,15 @@ export class SvelteFormApplication extends FormApplication
 
    /**
     * Note: This method is fully overridden and duplicated as Svelte components need to be destroyed manually and the
-    * best visual result is to destroy them after the default JQuery slide up animation occurs, but before the element
+    * best visual result is to destroy them after the default slide up animation occurs, but before the element
     * is removed from the DOM.
     *
     * If you destroy the Svelte components before the slide up animation the Svelte elements are removed immediately
     * from the DOM. The purpose of overriding ensures the slide up animation is always completed before
     * the Svelte components are destroyed and then the element is removed from the DOM.
     *
-    * Close the application and un-register references to it within UI mappings.
-    * This function returns a Promise which resolves once the window closing animation concludes
+    * Close the application and unregister references to it within UI mappings.
+    * This function returns a Promise that resolves once the window closing animation concludes.
     *
     * @param {object}   [options] - Optional parameters.
     *
@@ -253,9 +253,9 @@ export class SvelteFormApplication extends FormApplication
       /**
        * Get the element.
        *
-       * @type {JQuery}
+       * @type {HTMLElement}
        */
-      const el = $(this.#elementTarget);
+      const el = this.#elementTarget;
       if (!el) { return this._state = states.CLOSED; }
 
       // Dispatch Hooks for closing the base and subclass applications
@@ -275,7 +275,7 @@ export class SvelteFormApplication extends FormApplication
          Hooks.call(`close${cls.name}`, this, el);
       }
 
-      // If options `defaultCloseAnimation` is false then do not execute the standard JQuery slide up animation.
+      // If options `defaultCloseAnimation` is false then do not execute the standard slide up animation.
       // This allows Svelte components to provide any out transition. Application shells will automatically set
       // `defaultCloseAnimation` based on any out transition set or unset.
       const animate = typeof this.options.defaultCloseAnimation === 'boolean' ? this.options.defaultCloseAnimation :
@@ -283,9 +283,16 @@ export class SvelteFormApplication extends FormApplication
 
       if (animate)
       {
-         // Await on JQuery to slide up the main element.
-         el[0].style.minHeight = '0';
-         await new Promise((resolve) => { el.slideUp(200, () => resolve()); });
+         // Set min height for full slide.
+         el.style.minHeight = '0';
+
+         const { paddingBottom, paddingTop } = globalThis.getComputedStyle(el);
+
+         // Slide-up application.
+         await el.animate([
+            { maxHeight: `${el.clientHeight}px`, paddingTop, paddingBottom },
+            { maxHeight: 0, paddingTop: 0, paddingBottom: 0 }
+         ], { duration: 250, easing: 'ease-in', fill: 'forwards' }).finished;
       }
 
       // Stores the Promises returned from running outro transitions and destroying each Svelte component.
