@@ -1,4 +1,6 @@
-import { propertyStore }      from '@typhonjs-fvtt/svelte/store';
+import { linear }             from 'svelte/easing';
+import { propertyStore }      from '@typhonjs-fvtt/runtime/svelte/store';
+import { lerp }               from '@typhonjs-fvtt/runtime/svelte/util';
 
 import { AdapterValidators }  from './AdapterValidators.js';
 import { styleParsePixels }   from '../styleParsePixels.js';
@@ -16,6 +18,13 @@ export class Position
     */
    #data = { height: null, left: null, rotateX: null, rotateY: null, rotateZ: null, scale: null, top: null,
     width: null, zIndex: null };
+
+   /**
+    * Stores current animation keys.
+    *
+    * @type {Set<string>}
+    */
+   #currentAnimationKeys = new Set();
 
    /**
     * @type {PositionData}
@@ -262,6 +271,97 @@ export class Position
    }
 
    /**
+    * Provides animation
+    *
+    * @param {PositionData}   position - The destination position.
+    *
+    * @param {object}         [opts] - Optional parameters.
+    *
+    * @param {number}         [opts.duration] - Duration in milliseconds.
+    *
+    * @param {Function}       [opts.easing=linear] - Easing function.
+    *
+    * @param {Function}       [opts.interpolate=lerp] - Interpolation function.
+    *
+    * @returns {Promise<void>} Animation complete.
+    */
+   async animateTo(position = {}, { duration = 1000, easing = linear, interpolate = lerp } = {})
+   {
+      if (typeof position !== 'object')
+      {
+         throw new TypeError(`Position - animateTo error: 'position' is not an object.`);
+      }
+
+      if (!Number.isInteger(duration) || duration < 0)
+      {
+         throw new TypeError(`Position - animateTo error: 'duration' is not a positive integer.`);
+      }
+
+      if (typeof easing !== 'function')
+      {
+         throw new TypeError(`Position - animateTo error: 'easing' is not a function.`);
+      }
+
+      if (typeof interpolate !== 'function')
+      {
+         throw new TypeError(`Position - animateTo error: 'interpolate' is not a function.`);
+      }
+
+      const data = this.#data;
+      const currentAnimationKeys = this.#currentAnimationKeys;
+      const initial = {};
+
+      // Set initial data if the key / data is defined and the end position is not equal to current data.
+      for (const key in position)
+      {
+         if (data[key] !== void 0 && position[key] !== data[key]) { initial[key] = data[key]; }
+      }
+
+      // Set initial data for transform values that are often null by default.
+      if ('rotateX' in initial && initial.rotateX === null) { initial.rotateX = 0; }
+      if ('rotateY' in initial && initial.rotateY === null) { initial.rotateY = 0; }
+      if ('rotateZ' in initial && initial.rotateZ === null) { initial.rotateZ = 0; }
+      if ('scale' in initial && initial.scale === null) { initial.scale = 1; }
+
+      // Reject all initial data that is not a number or is current animating.
+      // Add all keys that pass to `currentAnimationKeys`.
+      for (const key in initial)
+      {
+         if (!Number.isFinite(initial[key]) || currentAnimationKeys.has(key)) { delete initial[key]; }
+         else { currentAnimationKeys.add(key); }
+      }
+
+      const newData = Object.assign({}, initial);
+      const keys = Object.keys(newData);
+
+      // Nothing to animate, so return now.
+      if (keys.length === 0) { return; }
+
+      const start = performance.now();
+      let current = await nextAnimationFrame() - start;
+
+      while (current < duration)
+      {
+         const easedTime = easing(current / duration);
+
+         for (const key of keys) { newData[key] = interpolate(initial[key], position[key], easedTime); }
+
+         this.set(newData);
+
+         current = await nextAnimationFrame() - start;
+      }
+
+      // Prepare final update with end position data and remove keys from `currentAnimationKeys`.
+      for (const key of keys)
+      {
+         newData[key] = position[key];
+         currentAnimationKeys.delete(key);
+      }
+
+      this.set(newData);
+   }
+
+   /**
     * Assigns current position to object passed into method.
     *
     * @param {object|PositionData} [position] - Target to assign current position data.
@@ -301,6 +401,10 @@ export class Position
       const data = Object.assign({}, this.#defaultData);
 
       if (keepZIndex) { data.zIndex = zIndex; }
+
+      // Remove any keys that are currently animating.
+      for (const key of this.#currentAnimationKeys) { delete data[key]; }
+
       if (invokeSet) { this.set(data); }
 
       return true;
@@ -611,4 +715,14 @@ export class Position
       // Return the updated position object.
       return currentPosition;
    }
+}
+
+/**
+ * Wraps `requestAnimationFrame` in a Promise.
+ *
+ * @returns {Promise<number>} Returns current time
+ */
+function nextAnimationFrame()
+{
+   return new Promise((resolve) => requestAnimationFrame(resolve));
 }
