@@ -129,7 +129,7 @@ export class SvelteFormApplication extends FormApplication
          headerButtonNoClose: false,   // If true then the close header button is removed.
          headerButtonNoLabel: false,   // If true then header button labels are removed for application shells.
          defaultCloseAnimation: true,  // If false the Foundry JQuery close animation is not run.
-         setPosition: true,            // If false then `position.set` / `setPosition` does not take effect.
+         positionable: true,           // If false then `position.set` does not take effect.
          suppressFormInit: false,      // If true automatic suppression of core FormApplication methods is enabled.
          rotateX: null,                // Assigned to position.
          rotateY: null,                // Assigned to position.
@@ -484,7 +484,7 @@ export class SvelteFormApplication extends FormApplication
 
       // The initial zIndex may be set in application options or for popOut applications is stored by `_renderOuter`
       // in `this.#initialZIndex`.
-      if (typeof this.options.setPosition === 'boolean' && this.options.setPosition)
+      if (typeof this.options.positionable === 'boolean' && this.options.positionable)
       {
          this.#elementTarget.style.zIndex = typeof this.options.zIndex === 'number' ? this.options.zIndex :
           this.#initialZIndex ?? 95;
@@ -660,7 +660,7 @@ export class SvelteFormApplication extends FormApplication
     * explicitly set in `this.options.id` and long intro / outro transitions are assigned. If a new application
     * sharing this static ID attempts to open / render for the first time while an existing DOM element sharing
     * this static ID exists then the initial render is cancelled below rather than crashing later in the render
-    * cycle (at setPosition).
+    * cycle {@link Position.set}.
     *
     * @inheritDoc
     * @protected
@@ -723,23 +723,13 @@ export class SvelteFormApplication extends FormApplication
    }
 
    /**
-    * All calculation and updates of position are implemented in {@link Position}. This allows position to be fully
+    * All calculation and updates of position are implemented in {@link Position.set}. This allows position to be fully
     * reactive and in control of updating inline styles for the application.
     *
-    * Note: the logic for updating position is improved and changes a few aspects from the default
-    * {@link Application.setPosition}. The gate on `popOut` is removed, so to ensure no positional application occurs
-    * popOut applications can set `this.options.setPosition` to false to not apply any positional inline styles.
+    * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
+    * to update to using the {@link Position.validators} functionality.
     *
-    * `applyHeight` / `applyWidth` is set to true when el.style.height / width is not 'auto' and height & width is
-    * applied.
-    *
-    * The initial setPosition call on an application will always set width / height as this is necessary for correct
-    * calculations.
-    *
-    * Styles are not applied immediately and the newly constructed `currentPosition` is passed to all validators that
-    * may further modify it or veto the change before styles are applied.
-    *
-    * @param {PositionData}         [position] - Position data.
+    * @param {PositionData}   [position] - Position data.
     *
     * @returns {PositionData} The updated position object for the application containing the new values
     */
@@ -778,13 +768,14 @@ export class SvelteFormApplication extends FormApplication
 
          // The initial zIndex may be set in application options or for popOut applications is stored by `_renderOuter`
          // in `this.#initialZIndex`.
-         if (typeof this.options.setPosition === 'boolean' && this.options.setPosition)
+         if (typeof this.options.positionable === 'boolean' && this.options.positionable)
          {
             this.#elementTarget.style.zIndex = typeof this.options.zIndex === 'number' ? this.options.zIndex :
              this.#initialZIndex ?? 95;
 
             super.bringToTop();
 
+            // TODO REMOVE: DO WE NEED THIS?
             this.setPosition(this.position);
          }
 

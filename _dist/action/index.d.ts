@@ -9,7 +9,7 @@
  */
 declare function applyStyles(node: HTMLElement, properties: object): Function;
 /**
- * Provides an action to enable pointer dragging of an HTMLElement and invoke `setPosition` on given Positionable
+ * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on given Positionable
  * object provided. When the attached boolean store state changes the draggable action is enabled or disabled.
  *
  * @param {HTMLElement}       node - The node associated with the action.

@@ -152,7 +152,7 @@
       {
          event.preventDefault();
 
-         application.setPosition({
+         application.position.set({
             width: position.width + (event.clientX - initialPosition.x),
             height: position.height + (event.clientY - initialPosition.y)
          });

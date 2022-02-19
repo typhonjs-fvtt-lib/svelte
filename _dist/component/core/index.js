@@ -1343,7 +1343,7 @@ function instance$5($$self, $$props, $$invalidate) {
 		function onResizePointerMove(event) {
 			event.preventDefault();
 
-			application.setPosition({
+			application.position.set({
 				width: position.width + (event.clientX - initialPosition.x),
 				height: position.height + (event.clientY - initialPosition.y)
 			});

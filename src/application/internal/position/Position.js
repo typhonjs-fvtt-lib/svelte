@@ -538,9 +538,7 @@ export class Position
     *
     * Note: the logic for updating position is improved and changes a few aspects from the default
     * {@link Application.setPosition}. The gate on `popOut` is removed, so to ensure no positional application occurs
-    * popOut applications can set `this.options.setPosition` to false to ensure no positional inline styles are applied.
-    *
-    * `applyHeight` / `applyWidth` is set to true when el.style.height / width is not 'auto' and height & width is
+    * popOut applications can set `this.options.positionable` to false ensuring no positional inline styles are
     * applied.
     *
     * The initial set call on an application with a target element will always set width / height as this is
@@ -560,8 +558,8 @@ export class Position
 
       const parent = this.#parent;
 
-      // An early out to prevent `set` from taking effect if options `setPosition` is false.
-      if (parent !== void 0 && typeof parent?.options?.setPosition === 'boolean' && !parent?.options?.setPosition)
+      // An early out to prevent `set` from taking effect if options `positionable` is false.
+      if (parent !== void 0 && typeof parent?.options?.positionable === 'boolean' && !parent?.options?.positionable)
       {
          return this.get();
       }

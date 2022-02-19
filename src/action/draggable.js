@@ -1,5 +1,5 @@
 /**
- * Provides an action to enable pointer dragging of an HTMLElement and invoke `setPosition` on given Positionable
+ * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on given Positionable
  * object provided. When the attached boolean store state changes the draggable action is enabled or disabled.
  *
  * @param {HTMLElement}       node - The node associated with the action.
@@ -89,7 +89,7 @@ export function draggable(node, { positionable, active = true, storeDragging = v
       if (typeof storeDragging?.set === 'function') { storeDragging.set(true); }
 
       // Record initial position
-      position = foundry.utils.duplicate(positionable.position);
+      position = positionable.position.get();
       initialPosition = { x: event.clientX, y: event.clientY };
 
       // Add temporary handlers
@@ -116,7 +116,7 @@ export function draggable(node, { positionable, active = true, storeDragging = v
       moveTime = now;
 
       // Update application position
-      positionable.setPosition({
+      positionable.position.set({
          left: position.left + (event.clientX - initialPosition.x),
          top: position.top + (event.clientY - initialPosition.y)
       });
