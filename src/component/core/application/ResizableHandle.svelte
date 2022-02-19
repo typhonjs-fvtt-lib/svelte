@@ -1,5 +1,6 @@
 <script>
-   import { getContext } from 'svelte';
+   import { getContext }         from 'svelte';
+   import { nextAnimationFrame } from '@typhonjs-fvtt/svelte/animate';
 
    export let isResizable = false;
 
@@ -53,13 +54,6 @@
        * @type {object}
        */
       let initialPosition = {};
-
-      /**
-       * Throttle mousemove event handling to 60fps
-       *
-       * @type {number}
-       */
-      let moveTime = 0;
 
       /**
        * Remember event handlers associated with this action so they may be later unregistered.
@@ -122,15 +116,8 @@
 
          if (typeof storeResizing?.set === 'function') { storeResizing.set(true); }
 
-         // Limit dragging to 60 updates per second
-         const now = Date.now();
-
-         if ((now - moveTime) < (1000 / 60)) { return; }
-
-         moveTime = now;
-
          // Record initial position
-         position = foundry.utils.duplicate(application.position);
+         position = application.position.get();
 
          if (position.height === 'auto') { position.height = $storeElementRoot.clientHeight; }
          if (position.width === 'auto') { position.width = $storeElementRoot.clientWidth; }
@@ -148,9 +135,11 @@
        * Move the window with the mouse, bounding the movement to ensure the window stays within bounds of the viewport
        * @private
        */
-      function onResizePointerMove(event)
+      async function onResizePointerMove(event)
       {
          event.preventDefault();
+
+         await nextAnimationFrame();
 
          application.position.set({
             width: position.width + (event.clientX - initialPosition.x),

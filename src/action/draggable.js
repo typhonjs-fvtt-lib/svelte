@@ -1,3 +1,5 @@
+import { nextAnimationFrame } from '@typhonjs-fvtt/svelte/animate';
+
 /**
  * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on given Positionable
  * object provided. When the attached boolean store state changes the draggable action is enabled or disabled.
@@ -29,13 +31,6 @@ export function draggable(node, { positionable, active = true, storeDragging = v
     * @type {object}
     */
    let initialPosition = {};
-
-   /**
-    * Throttle mousemove event handling to 60fps
-    *
-    * @type {number}
-    */
-   let moveTime = 0;
 
    /**
     * Remember event handlers associated with this action so they may be later unregistered.
@@ -104,16 +99,11 @@ export function draggable(node, { positionable, active = true, storeDragging = v
     *
     * @param {PointerEvent} event - The pointer move event.
     */
-   function onDragPointerMove(event)
+   async function onDragPointerMove(event)
    {
       event.preventDefault();
 
-      // Limit dragging to 60 updates per second
-      const now = Date.now();
-
-      if ((now - moveTime) < (1000 / 60)) { return; }
-
-      moveTime = now;
+      await nextAnimationFrame();
 
       // Update application position
       positionable.position.set({
