@@ -317,18 +317,28 @@ export class Position
       const data = this.#data;
       const currentAnimationKeys = this.#currentAnimationKeys;
       const initial = {};
+      const destination = {};
 
       // Set initial data if the key / data is defined and the end position is not equal to current data.
       for (const key in position)
       {
-         if (data[key] !== void 0 && position[key] !== data[key]) { initial[key] = data[key]; }
+         if (data[key] !== void 0 && position[key] !== data[key])
+         {
+            destination[key] = position[key];
+            initial[key] = data[key];
+         }
       }
 
       // Set initial data for transform values that are often null by default.
-      if ('rotateX' in initial && initial.rotateX === null) { initial.rotateX = 0; }
-      if ('rotateY' in initial && initial.rotateY === null) { initial.rotateY = 0; }
-      if ('rotateZ' in initial && initial.rotateZ === null) { initial.rotateZ = 0; }
-      if ('scale' in initial && initial.scale === null) { initial.scale = 1; }
+      if (initial.rotateX === null) { initial.rotateX = 0; }
+      if (initial.rotateY === null) { initial.rotateY = 0; }
+      if (initial.rotateZ === null) { initial.rotateZ = 0; }
+      if (initial.scale === null) { initial.scale = 1; }
+
+      if (destination.rotateX === null) { destination.rotateX = 0; }
+      if (destination.rotateY === null) { destination.rotateY = 0; }
+      if (destination.rotateZ === null) { destination.rotateZ = 0; }
+      if (destination.scale === null) { destination.scale = 1; }
 
       // Reject all initial data that is not a number or is current animating.
       // Add all keys that pass to `currentAnimationKeys`.
@@ -351,7 +361,7 @@ export class Position
       {
          const easedTime = easing(current / duration);
 
-         for (const key of keys) { newData[key] = interpolate(initial[key], position[key], easedTime); }
+         for (const key of keys) { newData[key] = interpolate(initial[key], destination[key], easedTime); }
 
          this.set(newData);
 
