@@ -1,15 +1,27 @@
 /**
  * Wraps a callback in a debounced timeout.
  *
- * Delay execution of the callback function until the function has not been called for delay milliseconds
+ * Delay execution of the callback function until the function has not been called for the given delay in milliseconds.
  *
  * @param {Function} callback - A function to execute once the debounced threshold has been passed.
  *
  * @param {number}   delay - An amount of time in milliseconds to delay.
  *
- * @return {Function} A wrapped function which can be called to debounce execution
+ * @return {Function} A wrapped function that can be called to debounce execution.
  */
 declare function debounce(callback: Function, delay: number): Function;
+/**
+ * Recursively deep merges all source objects into the target object in place. Like `Object.assign` if you provide `{}`
+ * as the target a copy is produced. If the target and source property are object literals they are merged.
+ * Deleting keys is supported by specifying a property starting with `-=`.
+ *
+ * @param {object}      target - Target object.
+ *
+ * @param {...object}   sourceObj - One or more source objects.
+ *
+ * @returns {object}    Target object.
+ */
+declare function deepMerge(target?: object, ...sourceObj: object[]): object;
 /**
  * Provides a method to determine if the passed in Svelte component has a getter & setter accessor.
  *
@@ -60,10 +72,6 @@ declare function hashCode(str: string, seed?: number): number;
  * @returns {boolean} Whether the component is a ApplicationShell or TJSApplicationShell.
  */
 declare function isApplicationShell(component: any): boolean;
-/**
- * Provides common object manipulation utilities including depth traversal, obtaining accessors, safely setting values /
- * equality tests, and validation.
- */
 /**
  * Tests for whether an object is iterable.
  *
@@ -174,4 +182,4 @@ declare function safeSet(data: object, accessor: string, value: any, operation?:
  */
 declare function uuidv4(): string;
 
-export { debounce, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, lerp, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };
+export { debounce, deepMerge, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, lerp, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };

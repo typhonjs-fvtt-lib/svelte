@@ -80,6 +80,7 @@
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "@typhonjs-svelte/lib": "github:typhonjs-svelte/lib",
     "@typhonjs-utils/file-util": "^0.0.5",
+    "deepmerge": "^4",
     "eslint": "^8",
     "fs-extra": "^10",
     "rollup": "^2",

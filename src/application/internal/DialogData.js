@@ -1,4 +1,7 @@
-import { safeAccess, safeSet }   from '@typhonjs-fvtt/svelte/util';
+import {
+   deepMerge,
+   safeAccess,
+   safeSet }   from '@typhonjs-fvtt/svelte/util';
 
 export class DialogData
 {
@@ -38,7 +41,7 @@ export class DialogData
     */
    merge(data)
    {
-      foundry.utils.mergeObject(this, data);
+      deepMerge(this, data);
 
       const component = this.#application.svelte.component(0);
       if (component?.data) { component.data = this; }

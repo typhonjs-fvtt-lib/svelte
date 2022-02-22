@@ -1,4 +1,5 @@
 import { DialogShell }        from '@typhonjs-fvtt/svelte/component/core';
+import { deepMerge }          from '@typhonjs-fvtt/svelte/util';
 
 import { DialogData }         from './internal/DialogData.js';
 import { SvelteApplication }  from './SvelteApplication.js';
@@ -48,7 +49,7 @@ export class TJSDialog extends SvelteApplication
     */
    static get defaultOptions()
    {
-      return foundry.utils.mergeObject(super.defaultOptions, {
+      return deepMerge(super.defaultOptions, {
          classes: ['dialog'],
          width: 400,
          svelte: {
@@ -132,7 +133,7 @@ export class TJSDialog extends SvelteApplication
     * @returns {Promise<*>} A promise which resolves once the user makes a choice or closes the window.
     *
     * @example
-    * let d = Dialog.confirm({
+    * let d = TJSDialog.confirm({
     *  title: "A Yes or No Question",
     *  content: "<p>Choose wisely.</p>",
     *  yes: () => console.log("You chose ... wisely"),
@@ -145,7 +146,7 @@ export class TJSDialog extends SvelteApplication
      zIndex } = {})
    {
       // Allow overwriting of default icon and labels.
-      const mergedButtons = foundry.utils.mergeObject({
+      const mergedButtons = deepMerge({
          yes: {
             icon: '<i class="fas fa-check"></i>',
             label: game.i18n.localize('Yes')
@@ -169,7 +170,7 @@ export class TJSDialog extends SvelteApplication
             resizable,
             zIndex,
             transition,
-            buttons: foundry.utils.mergeObject(mergedButtons, {
+            buttons: deepMerge(mergedButtons, {
                yes: {
                   callback: (html) =>
                   {

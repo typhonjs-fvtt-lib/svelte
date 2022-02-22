@@ -1,4 +1,5 @@
 import {
+   deepMerge,
    hasGetter,
    isApplicationShell,
    outroAndDestroy }          from '@typhonjs-fvtt/svelte/util';
@@ -124,7 +125,7 @@ export class SvelteFormApplication extends FormApplication
     */
    static get defaultOptions()
    {
-      return foundry.utils.mergeObject(super.defaultOptions, {
+      return deepMerge(super.defaultOptions, {
          draggable: true,              // If true then application shells are draggable.
          headerButtonNoClose: false,   // If true then the close header button is removed.
          headerButtonNoLabel: false,   // If true then header button labels are removed for application shells.
@@ -352,9 +353,7 @@ export class SvelteFormApplication extends FormApplication
       this.#onMount = false;
 
       // Update the minimized UI store options.
-      this.#stores.uiOptionsUpdate((storeOptions) => foundry.utils.mergeObject(storeOptions, {
-         minimized: this._minimized
-      }));
+      this.#stores.uiOptionsUpdate((storeOptions) => deepMerge(storeOptions, { minimized: this._minimized }));
    }
 
    /**
@@ -516,7 +515,7 @@ export class SvelteFormApplication extends FormApplication
    {
       if (!this.popOut || [false, null].includes(this._minimized)) { return; }
 
-      this.#stores.uiOptionsUpdate((options) => foundry.utils.mergeObject(options, { minimized: false }));
+      this.#stores.uiOptionsUpdate((options) => deepMerge(options, { minimized: false }));
 
       this._minimized = null;
 
@@ -575,7 +574,7 @@ export class SvelteFormApplication extends FormApplication
    {
       if (!this.rendered || !this.popOut || [true, null].includes(this._minimized)) { return; }
 
-      this.#stores.uiOptionsUpdate((options) => foundry.utils.mergeObject(options, { minimized: true }));
+      this.#stores.uiOptionsUpdate((options) => deepMerge(options, { minimized: true }));
 
       this._minimized = null;
 

@@ -5,6 +5,7 @@ import {
    subscribeIgnoreFirst }     from '@typhonjs-fvtt/svelte/store';
 
 import {
+   deepMerge,
    safeAccess,
    safeSet }                  from '@typhonjs-fvtt/svelte/util';
 
@@ -295,7 +296,7 @@ export class SvelteReactive
     */
    mergeOptions(options)
    {
-      this.#storeAppOptionsUpdate((instanceOptions) => foundry.utils.mergeObject(instanceOptions, options));
+      this.#storeAppOptionsUpdate((instanceOptions) => deepMerge(instanceOptions, options));
    }
 
    /**

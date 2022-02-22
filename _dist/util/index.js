@@ -3,13 +3,13 @@ import { group_outros, transition_out, check_outros } from 'svelte/internal';
 /**
  * Wraps a callback in a debounced timeout.
  *
- * Delay execution of the callback function until the function has not been called for delay milliseconds
+ * Delay execution of the callback function until the function has not been called for the given delay in milliseconds.
  *
  * @param {Function} callback - A function to execute once the debounced threshold has been passed.
  *
  * @param {number}   delay - An amount of time in milliseconds to delay.
  *
- * @return {Function} A wrapped function which can be called to debounce execution
+ * @return {Function} A wrapped function that can be called to debounce execution.
  */
 function debounce(callback, delay)
 {
@@ -459,6 +459,37 @@ function s_PROCESS_PROPS(props, thisArg, config)
  * equality tests, and validation.
  */
 
+const s_TAG_OBJECT = '[object Object]';
+
+/**
+ * Recursively deep merges all source objects into the target object in place. Like `Object.assign` if you provide `{}`
+ * as the target a copy is produced. If the target and source property are object literals they are merged.
+ * Deleting keys is supported by specifying a property starting with `-=`.
+ *
+ * @param {object}      target - Target object.
+ *
+ * @param {...object}   sourceObj - One or more source objects.
+ *
+ * @returns {object}    Target object.
+ */
+function deepMerge(target = {}, ...sourceObj)
+{
+   if (Object.prototype.toString.call(target) !== s_TAG_OBJECT)
+   {
+      throw new TypeError(`deepMerge error: 'target' is not an 'object'.`);
+   }
+
+   for (let cntr = 0; cntr < sourceObj.length; cntr++)
+   {
+      if (Object.prototype.toString.call(sourceObj[cntr]) !== s_TAG_OBJECT)
+      {
+         throw new TypeError(`deepMerge error: 'sourceObj[${cntr}]' is not an 'object'.`);
+      }
+   }
+
+   return _deepMerge(target, ...sourceObj);
+}
+
 /**
  * Tests for whether an object is iterable.
  *
@@ -612,5 +643,43 @@ function safeSet(data, accessor, value, operation = 'set', createMissing = true)
    return true;
 }
 
-export { debounce, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, lerp, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };
+/**
+ * Internal implementation for `deepMerge`.
+ *
+ * @param {object}      target - Target object.
+ *
+ * @param {...object}   sourceObj - One or more source objects.
+ *
+ * @returns {object}    Target object.
+ */
+function _deepMerge(target = {}, ...sourceObj)
+{
+   // Iterate and merge all source objects into target.
+   for (let cntr = 0; cntr < sourceObj.length; cntr++)
+   {
+      const obj = sourceObj[cntr];
+
+      for (const prop in obj)
+      {
+         if (Object.prototype.hasOwnProperty.call(obj, prop))
+         {
+            // Handle the special property starting with '-=' to delete keys.
+            if (prop.startsWith('-='))
+            {
+               delete target[prop.slice(2)];
+               continue;
+            }
+
+            // If target already has prop and both target[prop] and obj[prop] are object literals then merge them
+            // otherwise assign obj[prop] to target[prop].
+            target[prop] = Object.prototype.hasOwnProperty.call(target, prop) && target[prop]?.constructor === Object &&
+            obj[prop]?.constructor === Object ? _deepMerge({}, target[prop], obj[prop]) : obj[prop];
+         }
+      }
+   }
+
+   return target;
+}
+
+export { debounce, deepMerge, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, lerp, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };
 //# sourceMappingURL=index.js.map
