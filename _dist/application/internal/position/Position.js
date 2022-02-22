@@ -437,11 +437,30 @@ export class Position
       for (const key of this.#currentAnimationKeys) { delete data[key]; }
 
       // If current minimized invoke `maximize`.
-      if (this.#parent?.reactive?.minimized) { this.#parent?.maximize?.(); }
+      if (this.#parent?.reactive?.minimized) { this.#parent?.maximize?.({ animate: false, duration: 0 }); }
 
       if (invokeSet) { this.set(data); }
 
       return true;
+   }
+
+   /**
+    * Removes and returns any position state by name.
+    *
+    * @param {object}   options - Options.
+    *
+    * @param {string}   options.name - Name to remove and retrieve.
+    *
+    * @returns {PositionData} Saved position data.
+    */
+   remove({ name })
+   {
+      if (typeof name !== 'string') { throw new TypeError(`Position - remove: 'name' is not a string.`); }
+
+      const data = this.#dataSaved.get(name);
+      this.#dataSaved.delete(name);
+
+      return data;
    }
 
    /**

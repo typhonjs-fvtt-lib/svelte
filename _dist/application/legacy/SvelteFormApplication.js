@@ -5,6 +5,7 @@ import {
    outroAndDestroy }          from '@typhonjs-fvtt/svelte/util';
 
 import {
+   ApplicationState,
    GetSvelteData,
    loadSvelteConfig,
    Position,
@@ -22,6 +23,13 @@ export class SvelteFormApplication extends FormApplication
     * @type {MountedAppShell[]|null[]} Application shell.
     */
    #applicationShellHolder = [null];
+
+   /**
+    * Stores and manages application state for saving / restoring / serializing.
+    *
+    * @type {ApplicationState}
+    */
+   #applicationState;
 
    /**
     * Stores the target element which may not necessarily be the main element.
@@ -94,6 +102,8 @@ export class SvelteFormApplication extends FormApplication
    {
       super(object, options);
 
+      this.#applicationState = new ApplicationState(this);
+
       // Initialize Position with the position object set by Application.
       this.#position = new Position(this, { ...this.options, ...this.position });
 
@@ -159,6 +169,13 @@ export class SvelteFormApplication extends FormApplication
     * @returns {SvelteReactive} The reactive accessors & Svelte stores.
     */
    get reactive() { return this.#reactive; }
+
+   /**
+    * Returns the application state manager.
+    *
+    * @returns {ApplicationState} The application state manager.
+    */
+   get state() { return this.#applicationState; }
 
    /**
     * Returns the Svelte helper class w/ various methods to access mounted Svelte components.
@@ -501,17 +518,20 @@ export class SvelteFormApplication extends FormApplication
    }
 
    /**
-    * Provides a mechanism to update the UI options store for minimized.
+    * Provides a mechanism to update the UI options store for maximized.
     *
     * Note: the sanity check is duplicated from {@link Application.maximize} the store is updated _before_
     * performing the rest of animations. This allows application shells to remove / show any resize handlers
     * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
     * to animate the content area.
     *
-    * @inheritDoc
-    * @ignore
+    * @param {object} [opts] - Optional parameters.
+    *
+    * @param {boolean}  [opts.animate=true] - When true perform default maximizing animation.
+    *
+    * @param {boolean}  [opts.duration=100] - Controls content area animation duration.
     */
-   async maximize()
+   async maximize({ animate = true, duration = 100 } = {})
    {
       if (!this.popOut || [false, null].includes(this._minimized)) { return; }
 
@@ -525,29 +545,41 @@ export class SvelteFormApplication extends FormApplication
       const content = element.querySelector('.window-content');
 
       // First animate / restore width / async.
-      await this.position.restore({ name: '#beforeMinimized', async: true, animateTo: true, properties: ['width'] });
+      if (animate)
+      {
+         await this.position.restore({ name: '#beforeMinimized', async: true, animateTo: true, properties: ['width'] });
+      }
 
       // Reset display none on all children of header.
       for (let cntr = header.children.length; --cntr >= 0;) { header.children[cntr].style.display = null; }
 
-      // Next animate / restore height synchronously and remove key. Retrieve constraints data for slide up animation
-      // below.
-      const { constraints } = this.position.restore({
-         name: '#beforeMinimized',
-         animateTo: true,
-         properties: ['height'],
-         remove: true,
-         duration: 100
-      });
-
       content.style.display = null;
 
-      // Slide-up content
+      let constraints;
+
+      if (animate)
+      {
+         // Next animate / restore height synchronously and remove key. Retrieve constraints data for slide up animation
+         // below.
+         ({ constraints } = this.position.restore({
+            name: '#beforeMinimized',
+            animateTo: true,
+            properties: ['height'],
+            remove: true,
+            duration: 100
+         }));
+      }
+      else
+      {
+         ({ constraints } = this.position.remove({ name: '#beforeMinimized' }));
+      }
+
+      // Slide down content with stored constraints.
       await content.animate([
          { maxHeight: 0, paddingTop: 0, paddingBottom: 0, offset: 0 },
          { ...constraints, offset: 1 },
          { maxHeight: '100%', offset: 1 },
-      ], { duration: 100, fill: 'forwards' }).finished;
+      ], { duration, fill: 'forwards' }).finished;
 
       element.classList.remove('minimized');
 
@@ -567,10 +599,13 @@ export class SvelteFormApplication extends FormApplication
     * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
     * to animate the content area.
     *
-    * @inheritDoc
-    * @ignore
+    * @param {object} [opts] - Optional parameters.
+    *
+    * @param {boolean}  [opts.animate=true] - When true perform default minimizing animation.
+    *
+    * @param {boolean}  [opts.duration=100] - Controls content area animation duration.
     */
-   async minimize()
+   async minimize({ animate = true, duration = 100 } = {})
    {
       if (!this.rendered || !this.popOut || [true, null].includes(this._minimized)) { return; }
 
@@ -600,18 +635,22 @@ export class SvelteFormApplication extends FormApplication
       };
 
       // Slide-up content
-      content.animate([
+      const animation = content.animate([
          constraints,
           { maxHeight: 0, paddingTop: 0, paddingBottom: 0 }
-      ], { duration: 100, fill: 'forwards' });
+      ], { duration, fill: 'forwards' });
+
+      // Set display style to none when animation finishes.
+      animation.finished.then(() => content.style.display = 'none');
 
       // Save current position state and add the constraint data to use in `maximize`.
       this.position.save({ name: '#beforeMinimized', constraints });
 
-      // First await animation of height upward.
-      await this.position.animateTo({ height: header.offsetHeight + 1 }, { duration: 100 });
-
-      content.style.display = 'none';
+      if (animate)
+      {
+         // First await animation of height upward.
+         await this.position.animateTo({ height: header.offsetHeight + 1 }, { duration: 100 });
+      }
 
       // Set all header buttons besides close and the window title to display none.
       for (let cntr = header.children.length; --cntr >= 0;)
@@ -622,8 +661,11 @@ export class SvelteFormApplication extends FormApplication
          header.children[cntr].style.display = 'none';
       }
 
-      // Await animation of width to the left / minimum width.
-      await this.position.animateTo({ width: MIN_WINDOW_WIDTH }, { duration: 100 });
+      if (animate)
+      {
+         // Await animation of width to the left / minimum width.
+         await this.position.animateTo({ width: MIN_WINDOW_WIDTH }, { duration: 100 });
+      }
 
       element.classList.add('minimized');
 
