@@ -1,5 +1,3 @@
-import { nextAnimationFrame } from '@typhonjs-fvtt/svelte/animate';
-
 /**
  * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on a given {@link Position}
  * instance provided. When the attached boolean store state changes the draggable action is enabled or disabled.
@@ -107,11 +105,9 @@ export function draggable(node, { position, active = true, storeDragging = void 
     *
     * @param {PointerEvent} event - The pointer move event.
     */
-   async function onDragPointerMove(event)
+   function onDragPointerMove(event)
    {
       event.preventDefault();
-
-      await nextAnimationFrame();
 
       // Only set store dragging on first move event.
       if (!dragging && typeof storeDragging?.set === 'function')

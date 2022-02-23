@@ -354,8 +354,8 @@ export class Position
       // Nothing to animate, so return now.
       if (keys.length === 0) { return; }
 
-      const start = performance.now();
-      let current = await nextAnimationFrame() - start;
+      const start = await nextAnimationFrame();
+      let current = 0;
 
       while (current < duration)
       {
@@ -363,9 +363,7 @@ export class Position
 
          for (const key of keys) { newData[key] = interpolate(initial[key], destination[key], easedTime); }
 
-         this.set(newData);
-
-         current = await nextAnimationFrame() - start;
+         current = await this.set(newData) - start;
       }
 
       // Prepare final update with end position data and remove keys from `currentAnimationKeys`.
@@ -579,18 +577,26 @@ export class Position
     *
     * @param {PositionData}   [position] - Position data to set.
     *
-    * @returns {PositionData|null} The set position data after validation or null if rejected.
+    * @returns {Promise<number>} The set position data after validation or null if rejected.
     */
-   set(position = {})
+   async set(position = {})
    {
-      if (typeof position !== 'object') { return this.get(); }
+      const currentTime = await nextAnimationFrame();
+
+      if (typeof position !== 'object')
+      {
+         console.warn(`Position - set warning: 'position' is not an object.`);
+         // return this.get();
+         return currentTime;
+      }
 
       const parent = this.#parent;
 
       // An early out to prevent `set` from taking effect if options `positionable` is false.
       if (parent !== void 0 && typeof parent?.options?.positionable === 'boolean' && !parent?.options?.positionable)
       {
-         return this.get();
+         // return this.get();
+         return currentTime;
       }
 
       const data = this.#data;
@@ -614,7 +620,11 @@ export class Position
          {
             position = validator.validator(parent, position);
 
-            if (position === null) { return this.get(); }
+            if (position === null)
+            {
+               // return this.get();
+               return currentTime;
+            }
          }
       }
 
@@ -759,7 +769,7 @@ export class Position
          }
       }
 
-      return position;
+      return currentTime;
    }
 
    /**
