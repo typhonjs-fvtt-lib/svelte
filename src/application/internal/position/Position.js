@@ -46,26 +46,11 @@ export class Position
    #parent;
 
    /**
-    * Stores the pending position update. Position changes are synchronized to `nextAnimationFrame`. This allows
-    * merging position updates.
-    *
-    * @type {PositionData}
-    */
-   #positionPending;
-
-   /**
-    * Stores the time when position was last updated via `nextAnimationFrame`.
-    *
-    * @type {number}
-    */
-   #positionUpdateTime = 0;
-
-   /**
     * Stores all pending set position Promise resolve functions.
     *
     * @type {Function[]}
     */
-   #positionPromises = [];
+   #elementUpdatePromises = [];
 
    /**
     * @type {StorePosition}
@@ -76,6 +61,16 @@ export class Position
     * @type {Record<string, string>}
     */
    #transforms = {};
+
+   /**
+    * @type {boolean}
+    */
+   #transformUpdate = false;
+
+   /**
+    * @type {boolean}
+    */
+   #updateElementInvoked = false;
 
    /**
     * @type {AdapterValidators}
@@ -164,6 +159,16 @@ export class Position
       };
 
       [this.#validators, this.#validatorsAdapter] = new AdapterValidators();
+   }
+
+   /**
+    * Returns a promise that is resolved on the next element update with the time of the update.
+    *
+    * @returns {Promise<number>} Promise resolved on element update.
+    */
+   get elementUpdated()
+   {
+      return new Promise((resolve) => this.#elementUpdatePromises.push(resolve));
    }
 
    /**
@@ -392,7 +397,7 @@ export class Position
 
          for (const key of keys) { newData[key] = interpolate(initial[key], destination[key], easedTime); }
 
-         current = await this.set(newData) - start;
+         current = await this.set(newData).elementUpdated - start;
       }
 
       // Prepare final update with end position data and remove keys from `currentAnimationKeys`.
@@ -454,7 +459,6 @@ export class Position
    {
       if (typeof this.#defaultData !== 'object') { return false; }
 
-      // If Position is currently animating values then reset is short-circuited.
       if (this.#currentAnimationKeys.size) { return false; }
 
       const zIndex = this.#data.zIndex;
@@ -607,11 +611,14 @@ export class Position
     * implement one or more validator functions and add them from the application via
     * `this.position.validators.add(<Function>)`.
     *
+    * Updates to any target element are decoupled from the underlying Position data. This method returns this instance
+    * that you can then await on the target element inline style update by using {@link Position.elementUpdated}.
+    *
     * @param {PositionData}   [position] - Position data to set.
     *
-    * @returns {Promise<number>} The set position data after validation or null if rejected.
+    * @returns {Position} This Position instance.
     */
-   async set(position = {})
+   set(position = {})
    {
       if (typeof position !== 'object') { throw new TypeError(`Position - set error: 'position' is not an object.`); }
 
@@ -620,24 +627,8 @@ export class Position
       // An early out to prevent `set` from taking effect if options `positionable` is false.
       if (parent !== void 0 && typeof parent?.options?.positionable === 'boolean' && !parent?.options?.positionable)
       {
-         return null;
+         return this;
       }
-
-      // If an update is pending assign position values to currently pending position data. Store the resolve function
-      // to resolve after update.
-      if (typeof this.#positionPending === 'object')
-      {
-         Object.assign(this.#positionPending, position);
-         return new Promise((resolve) => this.#positionPromises.push(resolve));
-      }
-
-      this.#positionPending = Object.assign({}, position);
-
-      // Await the next animation frame. In the future this can be extended to multiple frames to divide update rate.
-      const currentTime = await nextAnimationFrame();
-
-      position = this.#positionPending;
-      this.#positionPending = void 0;
 
       const data = this.#data;
       const transforms = this.#transforms;
@@ -646,6 +637,7 @@ export class Position
       let currentTransform = '', styles, updateTransform = false;
 
       const el = parent?.elementTarget;
+
       if (el)
       {
          currentTransform = el.style.transform ?? '';
@@ -658,9 +650,9 @@ export class Position
       {
          for (const validator of validators)
          {
-            position = validator.validator(position, parent, currentTime);
+            position = validator.validator(position, parent);
 
-            if (position === null) { return currentTime; }
+            if (position === null) { return this; }
          }
       }
 
@@ -671,8 +663,6 @@ export class Position
          position.left = Math.round(position.left);
 
          if (data.left !== position.left) { data.left = position.left; modified = true; }
-
-         if (el) { el.style.left = `${position.left}px`; }
       }
 
       if (typeof position.top === 'number')
@@ -680,8 +670,6 @@ export class Position
          position.top = Math.round(position.top);
 
          if (data.top !== position.top) { data.top = position.top; modified = true; }
-
-         if (el) { el.style.top = `${position.top}px`; }
       }
 
       if (typeof position.rotateX === 'number' || position.rotateX === null)
@@ -762,8 +750,6 @@ export class Position
          position.width = typeof position.width === 'number' ? Math.round(position.width) : position.width;
 
          if (data.width !== position.width) { data.width = position.width; modified = true; }
-
-         if (el) { el.style.width = typeof data.width === 'number' ? `${data.width}px` : data.width; }
       }
 
       if (typeof position.height === 'number' || position.height === 'auto' || position.height === null)
@@ -771,24 +757,18 @@ export class Position
          position.height = typeof position.height === 'number' ? Math.round(position.height) : position.height;
 
          if (data.height !== position.height) { data.height = position.height; modified = true; }
-
-         if (el) { el.style.height = typeof data.height === 'number' ? `${data.height}px` : data.height; }
       }
 
-      // Update all transforms in order added to transforms object.
-      if (el && updateTransform)
+      if (el)
       {
-         let transformString = '';
+         // Set default data after first set operation that has a target element.
+         if (typeof this.#defaultData !== 'object') { this.#defaultData = Object.assign({}, data); }
 
-         for (const key in transforms) { transformString += transforms[key]; }
+         // Track any transform updates that are handled in `#updateElement`.
+         this.#transformUpdate |= updateTransform;
 
-         el.style.transform = transformString;
-      }
-
-      // Set default data after first set operation that has a target element.
-      if (el && typeof this.#defaultData !== 'object')
-      {
-         this.#defaultData = Object.assign({}, data);
+         // If there isn't already a pending update element action then initiate it.
+         if (!this.#updateElementInvoked) { this.#updateElement(); }
       }
 
       // Notify main store subscribers.
@@ -805,14 +785,7 @@ export class Position
          }
       }
 
-      // Resolve any stored Promises when multiple updates have occurred.
-      if (this.#positionPromises.length)
-      {
-         for (const resolve of this.#positionPromises) { resolve(currentTime); }
-         this.#positionPromises.length = 0;
-      }
-
-      return currentTime;
+      return this;
    }
 
    /**
@@ -834,6 +807,87 @@ export class Position
          const index = this.#subscriptions.findIndex((sub) => sub === handler);
          if (index >= 0) { this.#subscriptions.splice(index, 1); }
       };
+   }
+
+   /**
+    * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link Position.elementUpdated} to await
+    * on the returned promise that is resolved with the current render time via `nextAnimationFrame` /
+    * `requestAnimationFrame`. This allows the underlying data model to be updated immediately while updates to the
+    * element are in sync with the browser and potentially in the future be further throttled.
+    *
+    * @returns {Promise<number>} The current time before rendering.
+    */
+   async #updateElement()
+   {
+      this.#updateElementInvoked = true;
+
+      // Await the next animation frame. In the future this can be extended to multiple frames to divide update rate.
+      const currentTime = await nextAnimationFrame();
+
+      this.#updateElementInvoked = false;
+
+      const el = this.#parent?.elementTarget;
+
+      if (!el)
+      {
+         // Resolve any stored Promises when multiple updates have occurred.
+         if (this.#elementUpdatePromises.length)
+         {
+            for (const resolve of this.#elementUpdatePromises) { resolve(currentTime); }
+            this.#elementUpdatePromises.length = 0;
+         }
+
+         return currentTime;
+      }
+
+      const data = this.#data;
+
+      if (typeof data.left === 'number')
+      {
+         el.style.left = `${data.left}px`;
+      }
+
+      if (typeof data.top === 'number')
+      {
+         el.style.top = `${data.top}px`;
+      }
+
+      if (typeof data.zIndex === 'number')
+      {
+      }
+
+      if (typeof data.width === 'number' || data.width === 'auto' || data.width === null)
+      {
+         el.style.width = typeof data.width === 'number' ? `${data.width}px` : data.width;
+      }
+
+      if (typeof data.height === 'number' || data.height === 'auto' || data.height === null)
+      {
+         el.style.height = typeof data.height === 'number' ? `${data.height}px` : data.height;
+      }
+
+      // Update all transforms in order added to transforms object.
+      if (this.#transformUpdate)
+      {
+         this.#transformUpdate = false;
+
+         let transformString = '';
+
+         const transforms = this.#transforms;
+
+         for (const key in transforms) { transformString += transforms[key]; }
+
+         el.style.transform = transformString;
+      }
+
+      // Resolve any stored Promises when multiple updates have occurred.
+      if (this.#elementUpdatePromises.length)
+      {
+         for (const resolve of this.#elementUpdatePromises) { resolve(currentTime); }
+         this.#elementUpdatePromises.length = 0;
+      }
+
+      return currentTime;
    }
 
    #updatePosition({ left, top, width, height, rotateX, rotateY, rotateZ, scale, zIndex, ...rest } = {}, el, styles)
