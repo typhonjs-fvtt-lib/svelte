@@ -46,6 +46,28 @@ export class Position
    #parent;
 
    /**
+    * Stores the pending position update. Position changes are synchronized to `nextAnimationFrame`. This allows
+    * merging position updates.
+    *
+    * @type {PositionData}
+    */
+   #positionPending;
+
+   /**
+    * Stores the time when position was last updated via `nextAnimationFrame`.
+    *
+    * @type {number}
+    */
+   #positionUpdateTime = 0;
+
+   /**
+    * Stores all pending set position Promise resolve functions.
+    *
+    * @type {Function[]}
+    */
+   #positionPromises = [];
+
+   /**
     * @type {StorePosition}
     */
    #stores;
@@ -297,6 +319,13 @@ export class Position
       if (typeof position !== 'object')
       {
          throw new TypeError(`Position - animateTo error: 'position' is not an object.`);
+      }
+
+      // Early out if the application is not positionable.
+      const parent = this.#parent;
+      if (parent !== void 0 && typeof parent?.options?.positionable === 'boolean' && !parent?.options?.positionable)
+      {
+         return;
       }
 
       if (!Number.isInteger(duration) || duration < 0)
@@ -581,23 +610,31 @@ export class Position
     */
    async set(position = {})
    {
-      const currentTime = await nextAnimationFrame();
-
-      if (typeof position !== 'object')
-      {
-         console.warn(`Position - set warning: 'position' is not an object.`);
-         // return this.get();
-         return currentTime;
-      }
+      if (typeof position !== 'object') { throw new TypeError(`Position - set error: 'position' is not an object.`); }
 
       const parent = this.#parent;
 
       // An early out to prevent `set` from taking effect if options `positionable` is false.
       if (parent !== void 0 && typeof parent?.options?.positionable === 'boolean' && !parent?.options?.positionable)
       {
-         // return this.get();
-         return currentTime;
+         return null;
       }
+
+      // If an update is pending assign position values to currently pending position data. Store the resolve function
+      // to resolve after update.
+      if (typeof this.#positionPending === 'object')
+      {
+         Object.assign(this.#positionPending, position);
+         return new Promise((resolve) => this.#positionPromises.push(resolve));
+      }
+
+      this.#positionPending = Object.assign({}, position);
+
+      // Await the next animation frame. In the future this can be extended to multiple frames to divide update rate.
+      const currentTime = await nextAnimationFrame();
+
+      position = this.#positionPending;
+      this.#positionPending = void 0;
 
       const data = this.#data;
       const transforms = this.#transforms;
@@ -618,13 +655,9 @@ export class Position
       {
          for (const validator of validators)
          {
-            position = validator.validator(parent, position);
+            position = validator.validator(position, parent, currentTime);
 
-            if (position === null)
-            {
-               // return this.get();
-               return currentTime;
-            }
+            if (position === null) { return currentTime; }
          }
       }
 
@@ -767,6 +800,13 @@ export class Position
          {
             for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](position); }
          }
+      }
+
+      // Resolve any stored Promises when multiple updates have occurred.
+      if (this.#positionPromises.length)
+      {
+         for (const resolve of this.#positionPromises) { resolve(currentTime); }
+         this.#positionPromises.length = 0;
       }
 
       return currentTime;
