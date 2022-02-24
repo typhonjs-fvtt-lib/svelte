@@ -454,6 +454,8 @@ export class Position
    {
       if (typeof this.#defaultData !== 'object') { return false; }
 
+      if (this.#currentAnimationKeys.size) { return false; }
+
       const zIndex = this.#data.zIndex;
 
       const data = Object.assign({}, this.#defaultData);

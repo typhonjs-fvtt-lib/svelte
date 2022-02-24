@@ -454,6 +454,9 @@ export class Position
    {
       if (typeof this.#defaultData !== 'object') { return false; }
 
+      // If Position is currently animating values then reset is short-circuited.
+      if (this.#currentAnimationKeys.size) { return false; }
+
       const zIndex = this.#data.zIndex;
 
       const data = Object.assign({}, this.#defaultData);
