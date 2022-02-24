@@ -610,13 +610,20 @@ export class SvelteApplication extends Application
       };
 
       // Slide-up content
-      const animation = content.animate([
-         constraints,
-          { maxHeight: 0, paddingTop: 0, paddingBottom: 0 }
-      ], { duration, fill: 'forwards' });
+      if (animate)
+      {
+         const animation = content.animate([
+            constraints,
+            { maxHeight: 0, paddingTop: 0, paddingBottom: 0 }
+         ], { duration, fill: 'forwards' });
 
-      // Set display style to none when animation finishes.
-      animation.finished.then(() => content.style.display = 'none');
+         // Set display style to none when animation finishes.
+         animation.finished.then(() => content.style.display = 'none');
+      }
+      else
+      {
+         setTimeout(() => content.style.display = 'none', duration);
+      }
 
       // Save current position state and add the constraint data to use in `maximize`.
       this.position.save({ name: '#beforeMinimized', constraints });
