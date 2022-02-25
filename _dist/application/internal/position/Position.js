@@ -449,13 +449,13 @@ export class Position
     *
     * @param {object}   [opts] - Optional parameters.
     *
-    * @param {boolean}  [opts.keepZIndex=true] - When true keeps current z-index.
+    * @param {boolean}  [opts.keepZIndex=false] - When true keeps current z-index.
     *
     * @param {boolean}  [opts.invokeSet=true] - When true invokes set method.
     *
     * @returns {boolean} Operation successful.
     */
-   reset({ keepZIndex = true, invokeSet = true } = {})
+   reset({ keepZIndex = false, invokeSet = true } = {})
    {
       if (typeof this.#defaultData !== 'object') { return false; }
 
