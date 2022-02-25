@@ -852,8 +852,9 @@ export class Position
          el.style.top = `${data.top}px`;
       }
 
-      if (typeof data.zIndex === 'number')
+      if (typeof data.zIndex === 'number' || data.zIndex === null)
       {
+         el.style.zIndex = typeof data.zIndex === 'number' ? `${data.zIndex}` : null;
       }
 
       if (typeof data.width === 'number' || data.width === 'auto' || data.width === null)
@@ -966,7 +967,10 @@ export class Position
          currentPosition.scale = typeof scale === 'number' ? Math.max(0, Math.min(scale, 1000)) : null;
       }
 
-      if (zIndex) { currentPosition.zIndex = zIndex; }
+      if (typeof zIndex === 'number' || zIndex === null)
+      {
+         currentPosition.zIndex = typeof zIndex === 'number' ? Math.round(zIndex) : zIndex;
+      }
 
       // Return the updated position object.
       return currentPosition;

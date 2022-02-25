@@ -184,13 +184,6 @@ export class SvelteReactive
    get title() { return this.#application.title; }
 
    /**
-    * Returns the zIndex app option.
-    *
-    * @returns {number} z-index app option.
-    */
-   get zIndex() { return this.#application?.options?.zIndex; }
-
-   /**
     * Sets `this.options.draggable` which is reactive for application shells.
     *
     * @param {boolean}  draggable - Sets the draggable option.
@@ -259,16 +252,6 @@ export class SvelteReactive
    set title(title)
    {
       if (typeof title === 'string') { this.setOptions('title', title); }
-   }
-
-   /**
-    * Sets `this.options.zIndex` which is reactive for application shells.
-    *
-    * @param {number}   zIndex - Application z-index.
-    */
-   set zIndex(zIndex)
-   {
-      this.setOptions('zIndex', Number.isInteger(zIndex) ? zIndex : null);
    }
 
    /**
@@ -355,8 +338,7 @@ export class SvelteReactive
          minimizable: propertyStore(writableAppOptions, 'minimizable'),
          popOut: propertyStore(writableAppOptions, 'popOut'),
          resizable: propertyStore(writableAppOptions, 'resizable'),
-         title: propertyStore(writableAppOptions, 'title'),
-         zIndex: propertyStore(writableAppOptions, 'zIndex'),
+         title: propertyStore(writableAppOptions, 'title')
       };
 
       Object.freeze(storeAppOptions);
@@ -427,12 +409,6 @@ export class SvelteReactive
          {
             delete ui.windows[this.#application.appId];
          }
-      }));
-
-      // Handles directly updating the element root `z-index` style when `zIndex` changes.
-      this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.zIndex, (value) =>
-      {
-         if (this.#application._element !== null) { this.#application._element[0].style.zIndex = value; }
       }));
    }
 
