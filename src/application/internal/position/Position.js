@@ -19,7 +19,7 @@ export class Position
     * @type {PositionData}
     */
    #data = { height: null, left: null, rotateX: null, rotateY: null, rotateZ: null, scale: null, top: null,
-    width: null, zIndex: null };
+    transformOrigin: 'top left', width: null, zIndex: null };
 
    /**
     * @type {Map<string, PositionData>}
@@ -135,6 +135,11 @@ export class Position
             data.top = typeof options.top === 'number' ? Math.round(options.top) : options.top;
          }
 
+         if (typeof options.transformOrigin === 'string' && s_TRANSFORM_ORIGINS.includes(options.transformOrigin))
+         {
+            data.transformOrigin = options.transformOrigin;
+         }
+
          if (Number.isFinite(options.width) || options.width === 'auto' || options.width === null)
          {
             data.width = typeof options.width === 'number' ? Math.round(options.width) : options.width;
@@ -154,9 +159,14 @@ export class Position
          rotateZ: propertyStore(this, 'rotateZ'),
          scale: propertyStore(this, 'scale'),
          top: propertyStore(this, 'top'),
+         transformOrigin: propertyStore(this, 'transformOrigin'),
          width: propertyStore(this, 'width'),
          zIndex: propertyStore(this, 'zIndex')
       };
+
+      this.#stores.transformOrigin.values = s_TRANSFORM_ORIGINS;
+
+      Object.freeze(this.#stores);
 
       [this.#validators, this.#validatorsAdapter] = new AdapterValidators();
    }
@@ -223,6 +233,11 @@ export class Position
    get top() { return this.#data.top; }
 
    /**
+    * @returns {string} transformOrigin
+    */
+   get transformOrigin() { return this.#data.transformOrigin; }
+
+   /**
     * @returns {number|'auto'|null} width
     */
    get width() { return this.#data.width; }
@@ -286,6 +301,14 @@ export class Position
    set top(top)
    {
       this.#stores.top.set(top);
+   }
+
+   /**
+    * @param {string} transformOrigin -
+    */
+   set transformOrigin(transformOrigin)
+   {
+      if (s_TRANSFORM_ORIGINS.includes(transformOrigin)) { this.#stores.transformOrigin.set(transformOrigin); }
    }
 
    /**
@@ -738,6 +761,18 @@ export class Position
          }
       }
 
+      if (typeof position.transformOrigin !== void 0)
+      {
+         position.transformOrigin = s_TRANSFORM_ORIGINS.includes(position.transformOrigin) ? position.transformOrigin :
+          'top left';
+
+         if (data.transformOrigin !== position.transformOrigin)
+         {
+            data.transformOrigin = position.transformOrigin;
+            updateTransform = modified = true;
+         }
+      }
+
       if (typeof position.zIndex === 'number')
       {
          position.zIndex = Math.round(position.zIndex);
@@ -878,6 +913,7 @@ export class Position
 
          for (const key in transforms) { transformString += transforms[key]; }
 
+         el.style.transformOrigin = data.transformOrigin;
          el.style.transform = transformString;
       }
 
@@ -891,7 +927,8 @@ export class Position
       return currentTime;
    }
 
-   #updatePosition({ left, top, width, height, rotateX, rotateY, rotateZ, scale, zIndex, ...rest } = {}, el, styles)
+   #updatePosition({ left, top, width, height, rotateX, rotateY, rotateZ, scale, transformOrigin, zIndex,
+    ...rest } = {}, el, styles)
    {
       const currentPosition = this.get(rest);
 
@@ -967,6 +1004,11 @@ export class Position
          currentPosition.scale = typeof scale === 'number' ? Math.max(0, Math.min(scale, 1000)) : null;
       }
 
+      if (typeof transformOrigin === 'string')
+      {
+         currentPosition.transformOrigin = s_TRANSFORM_ORIGINS.includes(transformOrigin) ? transformOrigin : 'top left';
+      }
+
       if (typeof zIndex === 'number' || zIndex === null)
       {
          currentPosition.zIndex = typeof zIndex === 'number' ? Math.round(zIndex) : zIndex;
@@ -976,3 +1018,13 @@ export class Position
       return currentPosition;
    }
 }
+
+/**
+ * Defines the valid transform origins.
+ *
+ * @type {string[]}
+ */
+const s_TRANSFORM_ORIGINS = ['top left', 'top center', 'top right', 'center left', 'center', 'center right', 'bottom left',
+ 'bottom center', 'bottom right'];
+
+Object.freeze(s_TRANSFORM_ORIGINS);

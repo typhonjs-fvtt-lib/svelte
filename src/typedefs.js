@@ -37,6 +37,8 @@
  *
  * @property {number|null}          [scale] - The element scale as a numeric factor where 1.0 is default.
  *
+ * @property {string}               [transformOrigin] - The element transform as a string.
+ *
  * @property {number|null}          [zIndex] - The element z-index.
  */
 
@@ -60,6 +62,8 @@
  * @property {import('svelte/store').Writable<number|null>} rotateZ - Derived store for `rotateZ` updates.
  *
  * @property {import('svelte/store').Writable<number|null>} scale - Derived store for `scale` updates.
+ *
+ * @property {import('svelte/store').Writable<string>} transformOrigin - Derived store for `transformOrigin`.
  *
  * @property {import('svelte/store').Writable<number|null>} zIndex - Derived store for `zIndex` updates.
  */
