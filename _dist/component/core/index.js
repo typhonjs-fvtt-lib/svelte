@@ -4208,11 +4208,16 @@ class DialogContent extends SvelteComponent {
 function create_else_block(ctx) {
 	let applicationshell;
 	let updating_elementRoot;
+	let updating_elementContent;
 	let current;
-	const applicationshell_spread_levels = [/*appProps*/ ctx[5]];
+	const applicationshell_spread_levels = [/*appProps*/ ctx[6]];
 
 	function applicationshell_elementRoot_binding_1(value) {
-		/*applicationshell_elementRoot_binding_1*/ ctx[14](value);
+		/*applicationshell_elementRoot_binding_1*/ ctx[16](value);
+	}
+
+	function applicationshell_elementContent_binding_1(value) {
+		/*applicationshell_elementContent_binding_1*/ ctx[17](value);
 	}
 
 	let applicationshell_props = {
@@ -4224,12 +4229,17 @@ function create_else_block(ctx) {
 		applicationshell_props = assign(applicationshell_props, applicationshell_spread_levels[i]);
 	}
 
-	if (/*elementRoot*/ ctx[0] !== void 0) {
-		applicationshell_props.elementRoot = /*elementRoot*/ ctx[0];
+	if (/*elementRoot*/ ctx[1] !== void 0) {
+		applicationshell_props.elementRoot = /*elementRoot*/ ctx[1];
+	}
+
+	if (/*elementContent*/ ctx[0] !== void 0) {
+		applicationshell_props.elementContent = /*elementContent*/ ctx[0];
 	}
 
 	applicationshell = new ApplicationShell({ props: applicationshell_props });
 	binding_callbacks.push(() => bind(applicationshell, 'elementRoot', applicationshell_elementRoot_binding_1));
+	binding_callbacks.push(() => bind(applicationshell, 'elementContent', applicationshell_elementContent_binding_1));
 
 	return {
 		c() {
@@ -4240,18 +4250,24 @@ function create_else_block(ctx) {
 			current = true;
 		},
 		p(ctx, dirty) {
-			const applicationshell_changes = (dirty & /*appProps*/ 32)
-			? get_spread_update(applicationshell_spread_levels, [get_spread_object(/*appProps*/ ctx[5])])
+			const applicationshell_changes = (dirty & /*appProps*/ 64)
+			? get_spread_update(applicationshell_spread_levels, [get_spread_object(/*appProps*/ ctx[6])])
 			: {};
 
-			if (dirty & /*$$scope, data, autoClose, dialogComponent*/ 131334) {
+			if (dirty & /*$$scope, data, autoClose, dialogComponent*/ 1049100) {
 				applicationshell_changes.$$scope = { dirty, ctx };
 			}
 
-			if (!updating_elementRoot && dirty & /*elementRoot*/ 1) {
+			if (!updating_elementRoot && dirty & /*elementRoot*/ 2) {
 				updating_elementRoot = true;
-				applicationshell_changes.elementRoot = /*elementRoot*/ ctx[0];
+				applicationshell_changes.elementRoot = /*elementRoot*/ ctx[1];
 				add_flush_callback(() => updating_elementRoot = false);
+			}
+
+			if (!updating_elementContent && dirty & /*elementContent*/ 1) {
+				updating_elementContent = true;
+				applicationshell_changes.elementContent = /*elementContent*/ ctx[0];
+				add_flush_callback(() => updating_elementContent = false);
 			}
 
 			applicationshell.$set(applicationshell_changes);
@@ -4271,19 +4287,19 @@ function create_else_block(ctx) {
 	};
 }
 
-// (179:0) {#if modal}
+// (180:0) {#if modal}
 function create_if_block(ctx) {
 	let tjsglasspane;
 	let current;
 
 	const tjsglasspane_spread_levels = [
 		{
-			id: `${/*application*/ ctx[3].id}-glasspane`
+			id: `${/*application*/ ctx[4].id}-glasspane`
 		},
 		{ preventDefault: false },
 		{ stopPropagation: false },
-		/*modalProps*/ ctx[6],
-		{ zIndex: /*zIndex*/ ctx[7] }
+		/*modalProps*/ ctx[7],
+		{ zIndex: /*zIndex*/ ctx[8] }
 	];
 
 	let tjsglasspane_props = {
@@ -4306,19 +4322,19 @@ function create_if_block(ctx) {
 			current = true;
 		},
 		p(ctx, dirty) {
-			const tjsglasspane_changes = (dirty & /*application, modalProps, zIndex*/ 200)
+			const tjsglasspane_changes = (dirty & /*application, modalProps, zIndex*/ 400)
 			? get_spread_update(tjsglasspane_spread_levels, [
-					dirty & /*application*/ 8 && {
-						id: `${/*application*/ ctx[3].id}-glasspane`
+					dirty & /*application*/ 16 && {
+						id: `${/*application*/ ctx[4].id}-glasspane`
 					},
 					tjsglasspane_spread_levels[1],
 					tjsglasspane_spread_levels[2],
-					dirty & /*modalProps*/ 64 && get_spread_object(/*modalProps*/ ctx[6]),
-					dirty & /*zIndex*/ 128 && { zIndex: /*zIndex*/ ctx[7] }
+					dirty & /*modalProps*/ 128 && get_spread_object(/*modalProps*/ ctx[7]),
+					dirty & /*zIndex*/ 256 && { zIndex: /*zIndex*/ ctx[8] }
 				])
 			: {};
 
-			if (dirty & /*$$scope, appProps, elementRoot, data, autoClose, dialogComponent*/ 131367) {
+			if (dirty & /*$$scope, appProps, elementRoot, elementContent, data, autoClose, dialogComponent*/ 1049167) {
 				tjsglasspane_changes.$$scope = { dirty, ctx };
 			}
 
@@ -4339,7 +4355,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (186:3) <ApplicationShell bind:elementRoot {...appProps}>
+// (187:3) <ApplicationShell bind:elementRoot bind:elementContent {...appProps}>
 function create_default_slot_2(ctx) {
 	let dialogcontent;
 	let updating_autoClose;
@@ -4347,21 +4363,21 @@ function create_default_slot_2(ctx) {
 	let current;
 
 	function dialogcontent_autoClose_binding_1(value) {
-		/*dialogcontent_autoClose_binding_1*/ ctx[12](value);
+		/*dialogcontent_autoClose_binding_1*/ ctx[14](value);
 	}
 
 	function dialogcontent_dialogInstance_binding_1(value) {
-		/*dialogcontent_dialogInstance_binding_1*/ ctx[13](value);
+		/*dialogcontent_dialogInstance_binding_1*/ ctx[15](value);
 	}
 
-	let dialogcontent_props = { data: /*data*/ ctx[2] };
+	let dialogcontent_props = { data: /*data*/ ctx[3] };
 
-	if (/*autoClose*/ ctx[8] !== void 0) {
-		dialogcontent_props.autoClose = /*autoClose*/ ctx[8];
+	if (/*autoClose*/ ctx[9] !== void 0) {
+		dialogcontent_props.autoClose = /*autoClose*/ ctx[9];
 	}
 
-	if (/*dialogComponent*/ ctx[1] !== void 0) {
-		dialogcontent_props.dialogInstance = /*dialogComponent*/ ctx[1];
+	if (/*dialogComponent*/ ctx[2] !== void 0) {
+		dialogcontent_props.dialogInstance = /*dialogComponent*/ ctx[2];
 	}
 
 	dialogcontent = new DialogContent({ props: dialogcontent_props });
@@ -4378,17 +4394,17 @@ function create_default_slot_2(ctx) {
 		},
 		p(ctx, dirty) {
 			const dialogcontent_changes = {};
-			if (dirty & /*data*/ 4) dialogcontent_changes.data = /*data*/ ctx[2];
+			if (dirty & /*data*/ 8) dialogcontent_changes.data = /*data*/ ctx[3];
 
-			if (!updating_autoClose && dirty & /*autoClose*/ 256) {
+			if (!updating_autoClose && dirty & /*autoClose*/ 512) {
 				updating_autoClose = true;
-				dialogcontent_changes.autoClose = /*autoClose*/ ctx[8];
+				dialogcontent_changes.autoClose = /*autoClose*/ ctx[9];
 				add_flush_callback(() => updating_autoClose = false);
 			}
 
-			if (!updating_dialogInstance && dirty & /*dialogComponent*/ 2) {
+			if (!updating_dialogInstance && dirty & /*dialogComponent*/ 4) {
 				updating_dialogInstance = true;
-				dialogcontent_changes.dialogInstance = /*dialogComponent*/ ctx[1];
+				dialogcontent_changes.dialogInstance = /*dialogComponent*/ ctx[2];
 				add_flush_callback(() => updating_dialogInstance = false);
 			}
 
@@ -4409,7 +4425,7 @@ function create_default_slot_2(ctx) {
 	};
 }
 
-// (181:6) <ApplicationShell bind:elementRoot {...appProps}>
+// (182:6) <ApplicationShell bind:elementRoot bind:elementContent {...appProps}>
 function create_default_slot_1(ctx) {
 	let dialogcontent;
 	let updating_autoClose;
@@ -4417,24 +4433,24 @@ function create_default_slot_1(ctx) {
 	let current;
 
 	function dialogcontent_autoClose_binding(value) {
-		/*dialogcontent_autoClose_binding*/ ctx[9](value);
+		/*dialogcontent_autoClose_binding*/ ctx[10](value);
 	}
 
 	function dialogcontent_dialogInstance_binding(value) {
-		/*dialogcontent_dialogInstance_binding*/ ctx[10](value);
+		/*dialogcontent_dialogInstance_binding*/ ctx[11](value);
 	}
 
 	let dialogcontent_props = {
 		stopPropagation: true,
-		data: /*data*/ ctx[2]
+		data: /*data*/ ctx[3]
 	};
 
-	if (/*autoClose*/ ctx[8] !== void 0) {
-		dialogcontent_props.autoClose = /*autoClose*/ ctx[8];
+	if (/*autoClose*/ ctx[9] !== void 0) {
+		dialogcontent_props.autoClose = /*autoClose*/ ctx[9];
 	}
 
-	if (/*dialogComponent*/ ctx[1] !== void 0) {
-		dialogcontent_props.dialogInstance = /*dialogComponent*/ ctx[1];
+	if (/*dialogComponent*/ ctx[2] !== void 0) {
+		dialogcontent_props.dialogInstance = /*dialogComponent*/ ctx[2];
 	}
 
 	dialogcontent = new DialogContent({ props: dialogcontent_props });
@@ -4451,17 +4467,17 @@ function create_default_slot_1(ctx) {
 		},
 		p(ctx, dirty) {
 			const dialogcontent_changes = {};
-			if (dirty & /*data*/ 4) dialogcontent_changes.data = /*data*/ ctx[2];
+			if (dirty & /*data*/ 8) dialogcontent_changes.data = /*data*/ ctx[3];
 
-			if (!updating_autoClose && dirty & /*autoClose*/ 256) {
+			if (!updating_autoClose && dirty & /*autoClose*/ 512) {
 				updating_autoClose = true;
-				dialogcontent_changes.autoClose = /*autoClose*/ ctx[8];
+				dialogcontent_changes.autoClose = /*autoClose*/ ctx[9];
 				add_flush_callback(() => updating_autoClose = false);
 			}
 
-			if (!updating_dialogInstance && dirty & /*dialogComponent*/ 2) {
+			if (!updating_dialogInstance && dirty & /*dialogComponent*/ 4) {
 				updating_dialogInstance = true;
-				dialogcontent_changes.dialogInstance = /*dialogComponent*/ ctx[1];
+				dialogcontent_changes.dialogInstance = /*dialogComponent*/ ctx[2];
 				add_flush_callback(() => updating_dialogInstance = false);
 			}
 
@@ -4482,15 +4498,20 @@ function create_default_slot_1(ctx) {
 	};
 }
 
-// (180:3) <TJSGlassPane id={`${application.id}-glasspane`} preventDefault={false} stopPropagation={false} {...modalProps} {zIndex}>
+// (181:3) <TJSGlassPane id={`${application.id}-glasspane`} preventDefault={false} stopPropagation={false} {...modalProps} {zIndex}>
 function create_default_slot(ctx) {
 	let applicationshell;
 	let updating_elementRoot;
+	let updating_elementContent;
 	let current;
-	const applicationshell_spread_levels = [/*appProps*/ ctx[5]];
+	const applicationshell_spread_levels = [/*appProps*/ ctx[6]];
 
 	function applicationshell_elementRoot_binding(value) {
-		/*applicationshell_elementRoot_binding*/ ctx[11](value);
+		/*applicationshell_elementRoot_binding*/ ctx[12](value);
+	}
+
+	function applicationshell_elementContent_binding(value) {
+		/*applicationshell_elementContent_binding*/ ctx[13](value);
 	}
 
 	let applicationshell_props = {
@@ -4502,12 +4523,17 @@ function create_default_slot(ctx) {
 		applicationshell_props = assign(applicationshell_props, applicationshell_spread_levels[i]);
 	}
 
-	if (/*elementRoot*/ ctx[0] !== void 0) {
-		applicationshell_props.elementRoot = /*elementRoot*/ ctx[0];
+	if (/*elementRoot*/ ctx[1] !== void 0) {
+		applicationshell_props.elementRoot = /*elementRoot*/ ctx[1];
+	}
+
+	if (/*elementContent*/ ctx[0] !== void 0) {
+		applicationshell_props.elementContent = /*elementContent*/ ctx[0];
 	}
 
 	applicationshell = new ApplicationShell({ props: applicationshell_props });
 	binding_callbacks.push(() => bind(applicationshell, 'elementRoot', applicationshell_elementRoot_binding));
+	binding_callbacks.push(() => bind(applicationshell, 'elementContent', applicationshell_elementContent_binding));
 
 	return {
 		c() {
@@ -4518,18 +4544,24 @@ function create_default_slot(ctx) {
 			current = true;
 		},
 		p(ctx, dirty) {
-			const applicationshell_changes = (dirty & /*appProps*/ 32)
-			? get_spread_update(applicationshell_spread_levels, [get_spread_object(/*appProps*/ ctx[5])])
+			const applicationshell_changes = (dirty & /*appProps*/ 64)
+			? get_spread_update(applicationshell_spread_levels, [get_spread_object(/*appProps*/ ctx[6])])
 			: {};
 
-			if (dirty & /*$$scope, data, autoClose, dialogComponent*/ 131334) {
+			if (dirty & /*$$scope, data, autoClose, dialogComponent*/ 1049100) {
 				applicationshell_changes.$$scope = { dirty, ctx };
 			}
 
-			if (!updating_elementRoot && dirty & /*elementRoot*/ 1) {
+			if (!updating_elementRoot && dirty & /*elementRoot*/ 2) {
 				updating_elementRoot = true;
-				applicationshell_changes.elementRoot = /*elementRoot*/ ctx[0];
+				applicationshell_changes.elementRoot = /*elementRoot*/ ctx[1];
 				add_flush_callback(() => updating_elementRoot = false);
+			}
+
+			if (!updating_elementContent && dirty & /*elementContent*/ 1) {
+				updating_elementContent = true;
+				applicationshell_changes.elementContent = /*elementContent*/ ctx[0];
+				add_flush_callback(() => updating_elementContent = false);
 			}
 
 			applicationshell.$set(applicationshell_changes);
@@ -4558,7 +4590,7 @@ function create_fragment(ctx) {
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
-		if (/*modal*/ ctx[4]) return 0;
+		if (/*modal*/ ctx[5]) return 0;
 		return 1;
 	}
 
@@ -4621,6 +4653,7 @@ function create_fragment(ctx) {
 const s_MODAL_BACKGROUND = '#50505080';
 
 function instance($$self, $$props, $$invalidate) {
+	let { elementContent } = $$props;
 	let { elementRoot } = $$props;
 	let { data = {} } = $$props;
 	let { dialogComponent = void 0 } = $$props;
@@ -4669,49 +4702,60 @@ function instance($$self, $$props, $$invalidate) {
 
 	function dialogcontent_autoClose_binding(value) {
 		autoClose = value;
-		(((($$invalidate(8, autoClose), $$invalidate(2, data)), $$invalidate(4, modal)), $$invalidate(7, zIndex)), $$invalidate(3, application));
+		(((($$invalidate(9, autoClose), $$invalidate(3, data)), $$invalidate(5, modal)), $$invalidate(8, zIndex)), $$invalidate(4, application));
 	}
 
 	function dialogcontent_dialogInstance_binding(value) {
 		dialogComponent = value;
-		$$invalidate(1, dialogComponent);
+		$$invalidate(2, dialogComponent);
 	}
 
 	function applicationshell_elementRoot_binding(value) {
 		elementRoot = value;
-		$$invalidate(0, elementRoot);
+		$$invalidate(1, elementRoot);
+	}
+
+	function applicationshell_elementContent_binding(value) {
+		elementContent = value;
+		$$invalidate(0, elementContent);
 	}
 
 	function dialogcontent_autoClose_binding_1(value) {
 		autoClose = value;
-		(((($$invalidate(8, autoClose), $$invalidate(2, data)), $$invalidate(4, modal)), $$invalidate(7, zIndex)), $$invalidate(3, application));
+		(((($$invalidate(9, autoClose), $$invalidate(3, data)), $$invalidate(5, modal)), $$invalidate(8, zIndex)), $$invalidate(4, application));
 	}
 
 	function dialogcontent_dialogInstance_binding_1(value) {
 		dialogComponent = value;
-		$$invalidate(1, dialogComponent);
+		$$invalidate(2, dialogComponent);
 	}
 
 	function applicationshell_elementRoot_binding_1(value) {
 		elementRoot = value;
-		$$invalidate(0, elementRoot);
+		$$invalidate(1, elementRoot);
+	}
+
+	function applicationshell_elementContent_binding_1(value) {
+		elementContent = value;
+		$$invalidate(0, elementContent);
 	}
 
 	$$self.$$set = $$props => {
-		if ('elementRoot' in $$props) $$invalidate(0, elementRoot = $$props.elementRoot);
-		if ('data' in $$props) $$invalidate(2, data = $$props.data);
-		if ('dialogComponent' in $$props) $$invalidate(1, dialogComponent = $$props.dialogComponent);
+		if ('elementContent' in $$props) $$invalidate(0, elementContent = $$props.elementContent);
+		if ('elementRoot' in $$props) $$invalidate(1, elementRoot = $$props.elementRoot);
+		if ('data' in $$props) $$invalidate(3, data = $$props.data);
+		if ('dialogComponent' in $$props) $$invalidate(2, dialogComponent = $$props.dialogComponent);
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*data, modal, zIndex, application*/ 156) {
+		if ($$self.$$.dirty & /*data, modal, zIndex, application*/ 312) {
 			// Retrieve values from the DialogData object and also potentially set any SvelteApplication accessors.
 			// Explicit checks are performed against existing local variables as the only externally reactive variable is `data`.
 			// All of the checks below trigger when there are any external changes to the `data` prop.
 			// Prevent any unnecessary changing of local & `application` variables unless actual changes occur.
 			// Foundry App options --------------------------------------------------------------------------------------------
 			if (typeof data === 'object') {
-				$$invalidate(8, autoClose = typeof data.autoClose === 'boolean'
+				$$invalidate(9, autoClose = typeof data.autoClose === 'boolean'
 				? data.autoClose
 				: true);
 
@@ -4722,74 +4766,74 @@ function instance($$self, $$props, $$invalidate) {
 					: Number.MAX_SAFE_INTEGER - 1;
 
 				if (zIndex !== newZIndex) {
-					$$invalidate(7, zIndex = newZIndex);
+					$$invalidate(8, zIndex = newZIndex);
 				}
 
 				// Update the main foundry options when data changes. Perform explicit checks against existing data in `application`.
 				const newDraggable = data.draggable ?? true;
 
 				if (application.reactive.draggable !== newDraggable) {
-					$$invalidate(3, application.reactive.draggable = newDraggable, application);
+					$$invalidate(4, application.reactive.draggable = newDraggable, application);
 				}
 
 				const newPopOut = data.popOut ?? true;
 
 				if (application.reactive.popOut !== newPopOut) {
-					$$invalidate(3, application.reactive.popOut = newPopOut, application);
+					$$invalidate(4, application.reactive.popOut = newPopOut, application);
 				}
 
 				const newResizable = data.resizable ?? false;
 
 				if (application.reactive.resizable !== newResizable) {
-					$$invalidate(3, application.reactive.resizable = newResizable, application);
+					$$invalidate(4, application.reactive.resizable = newResizable, application);
 				}
 
 				// Note application.title from Application localizes `options.title`, so compare with `application.options.title`.
 				const newTitle = data.title ?? 'Dialog';
 
 				if (newTitle !== application?.options?.title) {
-					$$invalidate(3, application.reactive.title = newTitle, application);
+					$$invalidate(4, application.reactive.title = newTitle, application);
 				}
 
 				if (application.reactive.zIndex !== zIndex) {
-					$$invalidate(3, application.reactive.zIndex = zIndex, application);
+					$$invalidate(4, application.reactive.zIndex = zIndex, application);
 				}
 			}
 		}
 
-		if ($$self.$$.dirty & /*data, appProps*/ 36) {
+		if ($$self.$$.dirty & /*data, appProps*/ 72) {
 			// ApplicationShell transition options ----------------------------------------------------------------------------
 			if (typeof data?.transition === 'object') {
 				// Store data.transitions to shorten statements below.
 				const d = data.transition;
 
 				if (d?.transition !== appProps.transition) {
-					$$invalidate(5, appProps.transition = d.transition, appProps);
+					$$invalidate(6, appProps.transition = d.transition, appProps);
 				}
 
 				if (d?.inTransition !== appProps.inTransition) {
-					$$invalidate(5, appProps.inTransition = d.inTransition, appProps);
+					$$invalidate(6, appProps.inTransition = d.inTransition, appProps);
 				}
 
 				if (d?.outTransition !== appProps.outTransition) {
-					$$invalidate(5, appProps.outTransition = d.outTransition, appProps);
+					$$invalidate(6, appProps.outTransition = d.outTransition, appProps);
 				}
 
 				if (d?.transitionOptions !== appProps.transitionOptions) {
-					$$invalidate(5, appProps.transitionOptions = d.transitionOptions, appProps);
+					$$invalidate(6, appProps.transitionOptions = d.transitionOptions, appProps);
 				}
 
 				if (d?.inTransitionOptions !== appProps.inTransitionOptions) {
-					$$invalidate(5, appProps.inTransitionOptions = d.inTransitionOptions, appProps);
+					$$invalidate(6, appProps.inTransitionOptions = d.inTransitionOptions, appProps);
 				}
 
 				if (d?.outTransitionOptions !== appProps.outTransitionOptions) {
-					$$invalidate(5, appProps.outTransitionOptions = d.outTransitionOptions, appProps);
+					$$invalidate(6, appProps.outTransitionOptions = d.outTransitionOptions, appProps);
 				}
 			}
 		}
 
-		if ($$self.$$.dirty & /*data, modalProps*/ 68) {
+		if ($$self.$$.dirty & /*data, modalProps*/ 136) {
 			// Modal options --------------------------------------------------------------------------------------------------
 			{
 				const newModalBackground = typeof data?.modalOptions?.background === 'string'
@@ -4797,19 +4841,19 @@ function instance($$self, $$props, $$invalidate) {
 				: s_MODAL_BACKGROUND;
 
 				if (newModalBackground !== modalProps.background) {
-					$$invalidate(6, modalProps.background = newModalBackground, modalProps);
+					$$invalidate(7, modalProps.background = newModalBackground, modalProps);
 				}
 			}
 		}
 
-		if ($$self.$$.dirty & /*data, modalProps*/ 68) {
+		if ($$self.$$.dirty & /*data, modalProps*/ 136) {
 			if (typeof data?.modalOptions?.transition === 'object') {
 				// Store data.transitions to shorten statements below.
 				const d = data.modalOptions.transition;
 
 				if (d?.transition !== modalProps.transition) {
 					$$invalidate(
-						6,
+						7,
 						modalProps.transition = typeof d?.transition === 'function'
 						? d.transition
 						: s_MODAL_TRANSITION,
@@ -4818,17 +4862,17 @@ function instance($$self, $$props, $$invalidate) {
 				}
 
 				if (d?.inTransition !== modalProps.inTransition) {
-					$$invalidate(6, modalProps.inTransition = d.inTransition, modalProps);
+					$$invalidate(7, modalProps.inTransition = d.inTransition, modalProps);
 				}
 
 				if (d?.outTransition !== modalProps.outTransition) {
-					$$invalidate(6, modalProps.outTransition = d.outTransition, modalProps);
+					$$invalidate(7, modalProps.outTransition = d.outTransition, modalProps);
 				}
 
 				// Provide default transition options if not defined.
 				if (d?.transitionOptions !== modalProps.transitionOptions) {
 					$$invalidate(
-						6,
+						7,
 						modalProps.transitionOptions = typeof d?.transitionOptions === 'object'
 						? d.transitionOptions
 						: s_MODAL_TRANSITION_OPTIONS,
@@ -4837,11 +4881,11 @@ function instance($$self, $$props, $$invalidate) {
 				}
 
 				if (d?.inTransitionOptions !== modalProps.inTransitionOptions) {
-					$$invalidate(6, modalProps.inTransitionOptions = d.inTransitionOptions, modalProps);
+					$$invalidate(7, modalProps.inTransitionOptions = d.inTransitionOptions, modalProps);
 				}
 
 				if (d?.outTransitionOptions !== modalProps.outTransitionOptions) {
-					$$invalidate(6, modalProps.outTransitionOptions = d.outTransitionOptions, modalProps);
+					$$invalidate(7, modalProps.outTransitionOptions = d.outTransitionOptions, modalProps);
 				}
 			} else // Provide a fallback / default glass pane transition when `data.modalOptions.transition` is not defined.
 			{
@@ -4850,7 +4894,7 @@ function instance($$self, $$props, $$invalidate) {
 				: s_MODAL_TRANSITION;
 
 				if (newModalTransition !== modalProps.transition) {
-					$$invalidate(6, modalProps.transition = newModalTransition, modalProps);
+					$$invalidate(7, modalProps.transition = newModalTransition, modalProps);
 				}
 
 				const newModalTransitionOptions = typeof data?.modalOptions?.transitionOptions === 'object'
@@ -4858,13 +4902,14 @@ function instance($$self, $$props, $$invalidate) {
 				: s_MODAL_TRANSITION_OPTIONS;
 
 				if (newModalTransitionOptions !== modalProps.transitionOptions) {
-					$$invalidate(6, modalProps.transitionOptions = newModalTransitionOptions, modalProps);
+					$$invalidate(7, modalProps.transitionOptions = newModalTransitionOptions, modalProps);
 				}
 			}
 		}
 	};
 
 	return [
+		elementContent,
 		elementRoot,
 		dialogComponent,
 		data,
@@ -4877,9 +4922,11 @@ function instance($$self, $$props, $$invalidate) {
 		dialogcontent_autoClose_binding,
 		dialogcontent_dialogInstance_binding,
 		applicationshell_elementRoot_binding,
+		applicationshell_elementContent_binding,
 		dialogcontent_autoClose_binding_1,
 		dialogcontent_dialogInstance_binding_1,
-		applicationshell_elementRoot_binding_1
+		applicationshell_elementRoot_binding_1,
+		applicationshell_elementContent_binding_1
 	];
 }
 
@@ -4888,14 +4935,24 @@ class DialogShell extends SvelteComponent {
 		super();
 
 		init(this, options, instance, create_fragment, safe_not_equal, {
-			elementRoot: 0,
-			data: 2,
-			dialogComponent: 1
+			elementContent: 0,
+			elementRoot: 1,
+			data: 3,
+			dialogComponent: 2
 		});
 	}
 
-	get elementRoot() {
+	get elementContent() {
 		return this.$$.ctx[0];
+	}
+
+	set elementContent(elementContent) {
+		this.$$set({ elementContent });
+		flush();
+	}
+
+	get elementRoot() {
+		return this.$$.ctx[1];
 	}
 
 	set elementRoot(elementRoot) {
@@ -4904,7 +4961,7 @@ class DialogShell extends SvelteComponent {
 	}
 
 	get data() {
-		return this.$$.ctx[2];
+		return this.$$.ctx[3];
 	}
 
 	set data(data) {
@@ -4913,7 +4970,7 @@ class DialogShell extends SvelteComponent {
 	}
 
 	get dialogComponent() {
-		return this.$$.ctx[1];
+		return this.$$.ctx[2];
 	}
 
 	set dialogComponent(dialogComponent) {

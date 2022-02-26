@@ -32,6 +32,8 @@ declare class DialogContent extends SvelteComponent {
 }
 declare class DialogShell extends SvelteComponent {
     constructor(options: any);
+    set elementContent(arg: any);
+    get elementContent(): any;
     set elementRoot(arg: any);
     get elementRoot(): any;
     set data(arg: any);

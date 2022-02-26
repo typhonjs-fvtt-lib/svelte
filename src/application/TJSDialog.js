@@ -52,6 +52,7 @@ export class TJSDialog extends SvelteApplication
       return deepMerge(super.defaultOptions, {
          classes: ['dialog'],
          width: 400,
+         jQuery: true,
          svelte: {
             class: DialogShell,
             intro: true,
@@ -96,7 +97,13 @@ export class TJSDialog extends SvelteApplication
    {
       super.activateListeners(html);
 
-      if (this.data.render instanceof Function) { this.data.render(this.options.jQuery ? html : html[0]); }
+      if (this.data.render instanceof Function)
+      {
+         const actualHTML = typeof this.options.template === 'string' ? html :
+          this.options.jQuery ? $(this.elementContent) : this.elementContent;
+
+         this.data.render(this.options.jQuery ? actualHTML : actualHTML[0]);
+      }
    }
 
    /**

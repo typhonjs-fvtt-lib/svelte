@@ -7,6 +7,7 @@
    import TJSGlassPane                 from '../TJSGlassPane.svelte';
 
    // Application shell contract.
+   export let elementContent;
    export let elementRoot;
 
    // The dialog data.
@@ -178,12 +179,12 @@
 
 {#if modal}
    <TJSGlassPane id={`${application.id}-glasspane`} preventDefault={false} stopPropagation={false} {...modalProps} {zIndex}>
-      <ApplicationShell bind:elementRoot {...appProps}>
+      <ApplicationShell bind:elementRoot bind:elementContent {...appProps}>
          <DialogContent bind:autoClose bind:dialogInstance={dialogComponent} stopPropagation={true} {data} />
       </ApplicationShell>
    </TJSGlassPane>
 {:else}
-   <ApplicationShell bind:elementRoot {...appProps}>
+   <ApplicationShell bind:elementRoot bind:elementContent {...appProps}>
       <DialogContent bind:autoClose bind:dialogInstance={dialogComponent} {data} />
    </ApplicationShell>
 {/if}
