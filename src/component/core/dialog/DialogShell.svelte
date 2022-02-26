@@ -92,7 +92,7 @@
       const newTitle = data.title ?? 'Dialog';
       if (newTitle !== application?.options?.title) { application.reactive.title = newTitle; }
 
-      if (application.reactive.zIndex !== zIndex) { application.reactive.zIndex = zIndex; }
+      if (application.position.zIndex !== zIndex) { application.position.zIndex = zIndex; }
    }
 
    // ApplicationShell transition options ----------------------------------------------------------------------------

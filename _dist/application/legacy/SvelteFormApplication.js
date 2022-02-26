@@ -204,15 +204,12 @@ export class SvelteFormApplication extends FormApplication
    }
 
    /**
-    * Provide an override to set reactive z-index after calling super method.
+    * Provide an override to set this application as the active window regardless of z-index. Changes behaviour from
+    * Foundry core. This is important / used for instance in dialog key handling for left / right button selection.
     */
    bringToTop()
    {
       super.bringToTop();
-
-      const z = document.defaultView.getComputedStyle(this.element[0]).zIndex;
-
-      this.reactive.zIndex = z === 'null' || z === null ? null : parseInt(z, 10);
 
       ui.activeWindow = this;
    }

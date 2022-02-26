@@ -4795,8 +4795,8 @@ function instance($$self, $$props, $$invalidate) {
 					$$invalidate(4, application.reactive.title = newTitle, application);
 				}
 
-				if (application.reactive.zIndex !== zIndex) {
-					$$invalidate(4, application.reactive.zIndex = zIndex, application);
+				if (application.position.zIndex !== zIndex) {
+					$$invalidate(4, application.position.zIndex = zIndex, application);
 				}
 			}
 		}

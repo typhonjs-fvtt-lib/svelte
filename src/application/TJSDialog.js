@@ -175,8 +175,8 @@ export class TJSDialog extends SvelteApplication
             modalOptions,
             popOut,
             resizable,
-            zIndex,
             transition,
+            zIndex,
             buttons: deepMerge(mergedButtons, {
                yes: {
                   callback: (html) =>
@@ -287,7 +287,7 @@ export class TJSDialog extends SvelteApplication
  *
  * @property {object}   [transition] - Transition options for the dialog.
  *
- * @property {number|null} [zIndex] - A specific z-index for the dialog. *
+ * @property {number|null} [zIndex] - A specific z-index for the dialog.
  */
 
 /**
@@ -305,7 +305,7 @@ export class TJSDialog extends SvelteApplication
  *
  * @property {boolean}  [rejectClose=false] - Reject the Promise if the Dialog is closed without making a choice.
  *
- * @property {object}   [options={}] - Additional rendering options passed to the Dialog
+ * @property {object}   [options={}] - Additional application options passed to the TJSDialog.
  *
  * @property {boolean}  [draggable=true] - The dialog is draggable when true.
  *
@@ -321,5 +321,5 @@ export class TJSDialog extends SvelteApplication
  *
  * @property {object}   [transition] - Transition options for the dialog.
  *
- * @property {number|null} [zIndex] - A specific z-index for the dialog. *
+ * @property {number|null} [zIndex] - A specific z-index for the dialog.
  */
