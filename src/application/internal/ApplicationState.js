@@ -71,7 +71,7 @@ export class ApplicationState
    }
 
    /**
-    * Restores a saved positional state returning the data. Several optional parameters are available
+    * Restores a saved application state returning the data. Several optional parameters are available
     * to control whether the restore action occurs silently (no store / inline styles updates), animates
     * to the stored data, or simply sets the stored data. Restoring via {@link Position.animateTo} allows
     * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
@@ -116,7 +116,7 @@ export class ApplicationState
    }
 
    /**
-    * Saves current position state with the opportunity to add extra data to the saved state.
+    * Saves current application state with the opportunity to add extra data to the saved state.
     *
     * @param {object}   options - Options.
     *
@@ -158,7 +158,7 @@ export class ApplicationState
     *
     * @param {Function}          [opts.interpolate=lerp] - Interpolation function.
     *
-    * @returns {ApplicationData} Saved application data.
+    * @returns {Application} application.
     */
    set(data, { async = false, animateTo = false, duration = 100, easing = linear, interpolate = lerp })
    {
@@ -167,10 +167,10 @@ export class ApplicationState
          throw new TypeError(`ApplicationState - restore error: 'data' is not an object.`);
       }
 
+      const application = this.#application;
+
       if (data)
       {
-         const application = this.#application;
-
          // Merge in saved options to application.
          if (typeof data?.options === 'object')
          {
@@ -197,11 +197,17 @@ export class ApplicationState
             // Update data directly with no store or inline style updates.
             if (animateTo)  // Animate to saved data.
             {
+               // Provide special handling to potentially change transform origin as this parameter is not animated.
+               if (data.position.transformOrigin !== application.position.transformOrigin)
+               {
+                  application.position.transformOrigin = data.position.transformOrigin;
+               }
+
                // Return a Promise with saved data that resolves after animation ends.
                if (async)
                {
                   return application.position.animateTo(data.position, { duration, easing, interpolate }).then(
-                   () => data);
+                   () => application);
                }
                else  // Animate synchronously.
                {
@@ -216,7 +222,7 @@ export class ApplicationState
          }
       }
 
-      return data;
+      return application;
    }
 }
 

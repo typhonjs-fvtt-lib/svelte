@@ -576,6 +576,12 @@ export class Position
          }
          else if (animateTo)  // Animate to saved data.
          {
+            // Provide special handling to potentially change transform origin as this parameter is not animated.
+            if (data.transformOrigin !== this.transformOrigin)
+            {
+               this.transformOrigin = data.transformOrigin;
+            }
+
             // Return a Promise with saved data that resolves after animation ends.
             if (async)
             {
@@ -1018,6 +1024,8 @@ export class Position
       return currentPosition;
    }
 }
+
+const s_TRANSFORM_ORIGIN_DEFAULT = 'top left';
 
 /**
  * Defines the valid transform origins.
