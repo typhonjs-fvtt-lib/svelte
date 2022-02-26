@@ -637,7 +637,7 @@ export class SvelteApplication extends Application
       if (animate)
       {
          // First await animation of height upward.
-         await this.position.animateTo({ height: header.offsetHeight + 1 }, { duration: 100 });
+         await this.position.animateTo({ height: header.offsetHeight }, { duration: 100 });
       }
 
       // Set all header buttons besides close and the window title to display none.
