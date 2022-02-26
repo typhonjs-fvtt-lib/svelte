@@ -563,7 +563,8 @@ export class SvelteApplication extends Application
       element.style.minWidth = null;
       element.style.minHeight = null;
 
-      content.style.overflow = null;
+      // Using a 30ms timeout prevents any instantaneous display of scrollbars with the above maximize animation.
+      setTimeout(() => content.style.overflow = null, 30);
    }
 
    /**
