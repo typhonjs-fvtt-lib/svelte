@@ -276,6 +276,11 @@ export class SvelteFormApplication extends FormApplication
       const el = this.#elementTarget;
       if (!el) { return this._state = states.CLOSED; }
 
+      // Make any window content overflow hidden to avoid any scrollbars appearing in default or Svelte outro
+      // transitions.
+      const content = el.querySelector('.window-content');
+      if (content) { content.style.overflow = 'hidden'; }
+
       // Dispatch Hooks for closing the base and subclass applications
       for (const cls of this.constructor._getInheritanceChain())
       {
