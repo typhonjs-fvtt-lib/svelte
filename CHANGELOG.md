@@ -1,4 +1,12 @@
 # Changelog
+## Release 0.0.7 (large update)
+- Complete overhaul of position / setPosition implementation making positional aspects reactive.
+  - Setting any `this.position.<XXX>` value is reactive.
+  - New `this.position.set` method. `setPosition` simply invokes it.
+  - New position validators that make advanced window management easy.
+- Introduction of Application state. this.state.save / restore and other methods including animating to a saved state
+  are now possible.
+
 ## Release 0.0.6 (large update)
 - Breaking changes (rename of variables): 
   - When creating a Svelte component the Foundry application accessible by 
