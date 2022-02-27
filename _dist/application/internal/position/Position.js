@@ -19,7 +19,7 @@ export class Position
     * @type {PositionData}
     */
    #data = { height: null, left: null, rotateX: null, rotateY: null, rotateZ: null, scale: null, top: null,
-    transformOrigin: 'top left', width: null, zIndex: null };
+    transformOrigin: s_TRANSFORM_ORIGIN_DEFAULT, width: null, zIndex: null };
 
    /**
     * @type {Map<string, PositionData>}
@@ -663,15 +663,14 @@ export class Position
       const transforms = this.#transforms;
       const validators = this.#validators;
 
-      let currentTransform = '', styles, updateTransform = false;
+      let currentTransform = '', updateTransform = false;
 
       const el = parent?.elementTarget;
 
       if (el)
       {
          currentTransform = el.style.transform ?? '';
-         styles = globalThis.getComputedStyle(el);
-         position = this.#updatePosition(position, el, styles);
+         position = this.#updatePosition(position, el);
       }
 
       // If there are any validators allow them to potentially modify position data or reject the update.
@@ -770,7 +769,7 @@ export class Position
       if (typeof position.transformOrigin !== void 0)
       {
          position.transformOrigin = s_TRANSFORM_ORIGINS.includes(position.transformOrigin) ? position.transformOrigin :
-          'top left';
+          s_TRANSFORM_ORIGIN_DEFAULT;
 
          if (data.transformOrigin !== position.transformOrigin)
          {
@@ -934,9 +933,10 @@ export class Position
    }
 
    #updatePosition({ left, top, width, height, rotateX, rotateY, rotateZ, scale, transformOrigin, zIndex,
-    ...rest } = {}, el, styles)
+    ...rest } = {}, el)
    {
       const currentPosition = this.get(rest);
+      const styles = globalThis.getComputedStyle(el);
 
       // Update width if an explicit value is passed, or if no width value is set on the element.
       if (el.style.width === '' || width !== void 0)
@@ -1012,7 +1012,8 @@ export class Position
 
       if (typeof transformOrigin === 'string')
       {
-         currentPosition.transformOrigin = s_TRANSFORM_ORIGINS.includes(transformOrigin) ? transformOrigin : 'top left';
+         currentPosition.transformOrigin = s_TRANSFORM_ORIGINS.includes(transformOrigin) ? transformOrigin :
+          s_TRANSFORM_ORIGIN_DEFAULT;
       }
 
       if (typeof zIndex === 'number' || zIndex === null)
