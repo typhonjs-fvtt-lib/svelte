@@ -1,11 +1,14 @@
 import { linear }             from 'svelte/easing';
 
 import { nextAnimationFrame } from '@typhonjs-fvtt/svelte/animate';
+import { lerp }               from '@typhonjs-fvtt/svelte/math';
 import { propertyStore }      from '@typhonjs-fvtt/svelte/store';
-import { isIterable, lerp }   from '@typhonjs-fvtt/svelte/util';
+import { isIterable }         from '@typhonjs-fvtt/svelte/util';
 
 import { AdapterValidators }  from './AdapterValidators.js';
+import * as constants         from './constants.js';
 import { styleParsePixels }   from '../styleParsePixels.js';
+import { Transforms }         from './Transforms.js';
 
 /**
  * Provides a store for position following the subscriber protocol in addition to providing individual writable derived
@@ -19,7 +22,7 @@ export class Position
     * @type {PositionData}
     */
    #data = { height: null, left: null, rotateX: null, rotateY: null, rotateZ: null, scale: null, top: null,
-    transformOrigin: s_TRANSFORM_ORIGIN_DEFAULT, width: null, zIndex: null };
+    transformOrigin: constants.transformOriginDefault, width: null, zIndex: null };
 
    /**
     * @type {Map<string, PositionData>}
@@ -53,14 +56,21 @@ export class Position
    #elementUpdatePromises = [];
 
    /**
+    * Provides a cached DOMRect for position validation.
+    *
+    * @type {DOMRect}
+    */
+   #rectValidate = new DOMRect();
+
+   /**
     * @type {StorePosition}
     */
    #stores;
 
    /**
-    * @type {Record<string, string>}
+    * @type {Transforms}
     */
-   #transforms = {};
+   #transforms = new Transforms();
 
    /**
     * @type {boolean}
@@ -93,6 +103,19 @@ export class Position
 
       const data = this.#data;
 
+      // TODO REMOVE: FOR TESTING
+      this._overlay = document.createElement('div');
+      this._overlay.style.zIndex = '99999';
+      this._overlay.style.background = 'rgba(0, 0, 255, 0.3)';
+      this._overlay.style.width = '200px';
+      this._overlay.style.height = '200px';
+      this._overlay.style.top = '100px';
+      this._overlay.style.left = '100px';
+      this._overlay.style.position = 'absolute';
+      this._overlay.style.pointerEvents = 'none';
+
+      document.body.append(this._overlay);
+
       // Set default value from options.
       if (typeof options === 'object')
       {
@@ -108,26 +131,22 @@ export class Position
 
          if (Number.isFinite(options.rotateX) || options.rotateX === null)
          {
-            data.rotateX = options.rotateX;
-            if (Number.isFinite(data.rotateX)) { this.#transforms.rotateX = `rotateX(${data.rotateX}deg)`; }
+            this.#transforms.rotateX = data.rotateX = options.rotateX;
          }
 
          if (Number.isFinite(options.rotateY) || options.rotateY === null)
          {
-            data.rotateY = options.rotateY;
-            if (Number.isFinite(data.rotateY)) { this.#transforms.rotateY = `rotateY(${data.rotateY}deg)`; }
+            this.#transforms.rotateY = data.rotateY = options.rotateY;
          }
 
          if (Number.isFinite(options.rotateZ) || options.rotateZ === null)
          {
-            data.rotateZ = options.rotateZ;
-            if (Number.isFinite(data.rotateZ)) { this.#transforms.rotateZ = `rotateZ(${data.rotateZ}deg)`; }
+            this.#transforms.rotateZ = data.rotateZ = options.rotateZ;
          }
 
          if (Number.isFinite(options.scale) || options.scale === null)
          {
-            data.scale = options.scale;
-            if (Number.isFinite(data.scale)) { this.#transforms.scale = `scale(${data.scale})`; }
+            this.#transforms.scale = data.scale = options.scale;
          }
 
          if (Number.isFinite(options.top) || options.top === null)
@@ -135,7 +154,8 @@ export class Position
             data.top = typeof options.top === 'number' ? Math.round(options.top) : options.top;
          }
 
-         if (typeof options.transformOrigin === 'string' && s_TRANSFORM_ORIGINS.includes(options.transformOrigin))
+         if (typeof options.transformOrigin === 'string' && constants.transformOrigins.includes(
+          options.transformOrigin))
          {
             data.transformOrigin = options.transformOrigin;
          }
@@ -164,7 +184,7 @@ export class Position
          zIndex: propertyStore(this, 'zIndex')
       };
 
-      this.#stores.transformOrigin.values = s_TRANSFORM_ORIGINS;
+      this.#stores.transformOrigin.values = constants.transformOrigins;
 
       Object.freeze(this.#stores);
 
@@ -308,7 +328,7 @@ export class Position
     */
    set transformOrigin(transformOrigin)
    {
-      if (s_TRANSFORM_ORIGINS.includes(transformOrigin)) { this.#stores.transformOrigin.set(transformOrigin); }
+      if (constants.transformOrigins.includes(transformOrigin)) { this.#stores.transformOrigin.set(transformOrigin); }
    }
 
    /**
@@ -704,11 +724,8 @@ export class Position
       {
          if (data.rotateX !== position.rotateX)
          {
-            data.rotateX = position.rotateX;
+            data.rotateX = transforms.rotateX = position.rotateX;
             updateTransform = modified = true;
-
-            if (typeof position.rotateX === 'number') { transforms.rotateX = `rotateX(${position.rotateX}deg)`; }
-            else { delete transforms.rotateX; }
          }
          else if (transforms.rotateX && !currentTransform.includes('rotateX('))
          {
@@ -720,11 +737,8 @@ export class Position
       {
          if (data.rotateY !== position.rotateY)
          {
-            data.rotateY = position.rotateY;
+            data.rotateY = transforms.rotateY = position.rotateY;
             updateTransform = modified = true;
-
-            if (typeof position.rotateY === 'number') { transforms.rotateY = `rotateY(${position.rotateY}deg)`; }
-            else { delete transforms.rotateY; }
          }
          else if (transforms.rotateY && !currentTransform.includes('rotateY('))
          {
@@ -736,11 +750,8 @@ export class Position
       {
          if (data.rotateZ !== position.rotateZ)
          {
-            data.rotateZ = position.rotateZ;
+            data.rotateZ = transforms.rotateZ = position.rotateZ;
             updateTransform = modified = true;
-
-            if (typeof position.rotateZ === 'number') { transforms.rotateZ = `rotateZ(${position.rotateZ}deg)`; }
-            else { delete transforms.rotateZ; }
          }
          else if (transforms.rotateZ && !currentTransform.includes('rotateZ('))
          {
@@ -754,11 +765,8 @@ export class Position
 
          if (data.scale !== position.scale)
          {
-            data.scale = position.scale;
+            data.scale = transforms.scale = position.scale;
             updateTransform = modified = true;
-
-            if (typeof position.scale === 'number') { transforms.scale = `scale(${position.scale})`; }
-            else { delete transforms.scale; }
          }
          else if (transforms.scale && !currentTransform.includes('scale('))
          {
@@ -768,8 +776,8 @@ export class Position
 
       if (typeof position.transformOrigin !== void 0)
       {
-         position.transformOrigin = s_TRANSFORM_ORIGINS.includes(position.transformOrigin) ? position.transformOrigin :
-          s_TRANSFORM_ORIGIN_DEFAULT;
+         position.transformOrigin = constants.transformOrigins.includes(position.transformOrigin) ?
+          position.transformOrigin : constants.transformOriginDefault;
 
          if (data.transformOrigin !== position.transformOrigin)
          {
@@ -912,14 +920,8 @@ export class Position
       {
          this.#transformUpdate = false;
 
-         let transformString = '';
-
-         const transforms = this.#transforms;
-
-         for (const key in transforms) { transformString += transforms[key]; }
-
          el.style.transformOrigin = data.transformOrigin;
-         el.style.transform = transformString;
+         el.style.transform = this.#transforms.getTransformString();
       }
 
       // Resolve any stored Promises when multiple updates have occurred.
@@ -1012,8 +1014,8 @@ export class Position
 
       if (typeof transformOrigin === 'string')
       {
-         currentPosition.transformOrigin = s_TRANSFORM_ORIGINS.includes(transformOrigin) ? transformOrigin :
-          s_TRANSFORM_ORIGIN_DEFAULT;
+         currentPosition.transformOrigin = constants.transformOrigins.includes(transformOrigin) ? transformOrigin :
+          constants.transformOriginDefault;
       }
 
       if (typeof zIndex === 'number' || zIndex === null)
@@ -1021,19 +1023,15 @@ export class Position
          currentPosition.zIndex = typeof zIndex === 'number' ? Math.round(zIndex) : zIndex;
       }
 
+      const rect = this.#transforms.getBoundingBox(currentPosition, this.#rectValidate);
+
+      // TODO REMOVE: FOR TESTING
+      this._overlay.style.top = `${rect.top}px`;
+      this._overlay.style.left = `${rect.left}px`;
+      this._overlay.style.width = `${rect.width}px`;
+      this._overlay.style.height = `${rect.height}px`;
+
       // Return the updated position object.
       return currentPosition;
    }
 }
-
-const s_TRANSFORM_ORIGIN_DEFAULT = 'top left';
-
-/**
- * Defines the valid transform origins.
- *
- * @type {string[]}
- */
-const s_TRANSFORM_ORIGINS = ['top left', 'top center', 'top right', 'center left', 'center', 'center right', 'bottom left',
- 'bottom center', 'bottom right'];
-
-Object.freeze(s_TRANSFORM_ORIGINS);

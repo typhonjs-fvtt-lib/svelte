@@ -105,18 +105,6 @@ declare function isObject(object: object): boolean;
  */
 declare function isSvelteComponent(comp: any): boolean;
 /**
- * Performs linear interpolation between a start & end value by given amount between 0 - 1 inclusive.
- *
- * @param {number}   start - Start value.
- *
- * @param {number}   end - End value.
- *
- * @param {number}   amount - Current amount between 0 - 1 inclusive.
- *
- * @returns {number} Linear interpolated value between start & end.
- */
-declare function lerp(start: number, end: number, amount: number): number;
-/**
  * Runs outro transition then destroys Svelte component.
  *
  * Workaround for https://github.com/sveltejs/svelte/issues/4056
@@ -182,4 +170,4 @@ declare function safeSet(data: object, accessor: string, value: any, operation?:
  */
 declare function uuidv4(): string;
 
-export { debounce, deepMerge, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, lerp, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };
+export { debounce, deepMerge, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };

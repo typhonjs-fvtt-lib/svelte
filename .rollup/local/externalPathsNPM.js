@@ -5,6 +5,7 @@ export const externalPathsNPM = {
    '@typhonjs-svelte/lib/component/standard': '@typhonjs-fvtt/svelte/component/standard',
    '@typhonjs-svelte/lib/handler': '@typhonjs-fvtt/svelte/handler',
    '@typhonjs-svelte/lib/helper': '@typhonjs-fvtt/svelte/helper',
+   '@typhonjs-svelte/lib/math': '@typhonjs-fvtt/svelte/math',
    '@typhonjs-svelte/lib/plugin/data': '@typhonjs-fvtt/svelte/plugin/data',
    '@typhonjs-svelte/lib/plugin/system': '@typhonjs-fvtt/svelte/plugin/system',
    '@typhonjs-svelte/lib/store': '@typhonjs-fvtt/svelte/store',

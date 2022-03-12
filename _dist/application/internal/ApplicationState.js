@@ -1,5 +1,5 @@
 import { linear } from "svelte/easing";
-import { lerp }   from '@typhonjs-fvtt/svelte/util';
+import { lerp }   from '@typhonjs-fvtt/svelte/math';
 
 export class ApplicationState
 {

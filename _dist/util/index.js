@@ -130,22 +130,6 @@ function uuidv4()
 }
 
 /**
- * Performs linear interpolation between a start & end value by given amount between 0 - 1 inclusive.
- *
- * @param {number}   start - Start value.
- *
- * @param {number}   end - End value.
- *
- * @param {number}   amount - Current amount between 0 - 1 inclusive.
- *
- * @returns {number} Linear interpolated value between start & end.
- */
-function lerp(start, end, amount)
-{
-   return (1 - amount) * start + amount * end;
-}
-
-/**
  * Defines the application shell contract. If Svelte components export getter / setters for the following properties
  * then that component is considered an application shell.
  *
@@ -681,5 +665,5 @@ function _deepMerge(target = {}, ...sourceObj)
    return target;
 }
 
-export { debounce, deepMerge, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, lerp, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };
+export { debounce, deepMerge, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };
 //# sourceMappingURL=index.js.map
