@@ -42,14 +42,15 @@ export class Transforms
       // TODO: Must make this detect transform from position.
       if (Object.keys(this._data).length)
       {
-         rect[0][0] = 0;
-         rect[0][1] = 0;
+         rect[0][0] = rect[0][1] = rect[0][2] = 0;
          rect[1][0] = position.width;
-         rect[1][1] = 0;
+         rect[1][1] = rect[1][2] = 0;
          rect[2][0] = position.width;
          rect[2][1] = position.height;
+         rect[2][2] = 0;
          rect[3][0] = 0;
          rect[3][1] = position.height;
+         rect[3][2] = 0;
 
          const matrix = this.getMat4FromTransforms(position);
 
@@ -165,6 +166,9 @@ export class Transforms
       return matrix;
    }
 
+   // TODO: Figure out a better check for performance.
+   get isActive() { return Object.keys(this._data).length !== 0; }
+
    get rotateX() { return this._data.rotateX; }
    get rotateY() { return this._data.rotateY; }
    get rotateZ() { return this._data.rotateZ; }
@@ -191,7 +195,22 @@ export class Transforms
    set scale(value)
    {
       if (Number.isFinite(value)) { this._data.scale = value; }
-      else { delete this._data.rotateZ; }
+      else { delete this._data.scale; }
+   }
+
+   reset(data)
+   {
+      for (const key in data)
+      {
+         if (constants.transformKeys.includes(key) && Number.isFinite(data[key]))
+         {
+            this._data[key] = data[key];
+         }
+         else
+         {
+            delete this._data[key];
+         }
+      }
    }
 }
 

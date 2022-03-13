@@ -102,6 +102,7 @@ export class Position
       this.#parent = parent;
 
       const data = this.#data;
+      const transforms = this.#transforms;
 
       // TODO REMOVE: FOR TESTING
       this._overlay = document.createElement('div');
@@ -131,22 +132,26 @@ export class Position
 
          if (Number.isFinite(options.rotateX) || options.rotateX === null)
          {
-            this.#transforms.rotateX = data.rotateX = options.rotateX;
+            transforms.rotateX = data.rotateX = options.rotateX;
+            this.#transformUpdate = true;
          }
 
          if (Number.isFinite(options.rotateY) || options.rotateY === null)
          {
-            this.#transforms.rotateY = data.rotateY = options.rotateY;
+            transforms.rotateY = data.rotateY = options.rotateY;
+            this.#transformUpdate = true;
          }
 
          if (Number.isFinite(options.rotateZ) || options.rotateZ === null)
          {
-            this.#transforms.rotateZ = data.rotateZ = options.rotateZ;
+            transforms.rotateZ = data.rotateZ = options.rotateZ;
+            this.#transformUpdate = true;
          }
 
          if (Number.isFinite(options.scale) || options.scale === null)
          {
-            this.#transforms.scale = data.scale = options.scale;
+            transforms.scale = data.scale = options.scale;
+            this.#transformUpdate = true;
          }
 
          if (Number.isFinite(options.top) || options.top === null)
@@ -512,6 +517,9 @@ export class Position
 
       // Remove any keys that are currently animating.
       for (const key of this.#currentAnimationKeys) { delete data[key]; }
+
+      // Reset the transform data.
+      this.#transforms.reset(data);
 
       // If current minimized invoke `maximize`.
       if (this.#parent?.reactive?.minimized) { this.#parent?.maximize?.({ animate: false, duration: 0 }); }
@@ -920,8 +928,17 @@ export class Position
       {
          this.#transformUpdate = false;
 
-         el.style.transformOrigin = data.transformOrigin;
-         el.style.transform = this.#transforms.getTransformString();
+         // If there are active transforms then set them otherwise reset the styles.
+         if (this.#transforms.isActive)
+         {
+            el.style.transformOrigin = data.transformOrigin;
+            el.style.transform = this.#transforms.getTransformString();
+         }
+         else
+         {
+            el.style.transformOrigin = null;
+            el.style.transform = null;
+         }
       }
 
       // Resolve any stored Promises when multiple updates have occurred.

@@ -1,4 +1,11 @@
 /**
+ * Defines the keys of PositionData that are transform keys.
+ *
+ * @type {string[]}
+ */
+const transformKeys = ['rotateX', 'rotateY', 'rotateZ', 'scale'];
+
+/**
  * Defines the default transform origin.
  *
  * @type {string}
@@ -15,4 +22,4 @@ const transformOrigins = ['top left', 'top center', 'top right', 'center left', 
 
 Object.freeze(transformOrigins);
 
-export { transformOriginDefault, transformOrigins };
+export { transformKeys, transformOriginDefault, transformOrigins };
