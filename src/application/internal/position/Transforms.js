@@ -11,6 +11,13 @@ const s_VEC3_TEMP = vec3.create();
 
 export class Transforms
 {
+   /**
+    * Stores the number of transforms currently loaded.
+    *
+    * @type {number}
+    */
+   #count = 0;
+
    constructor()
    {
       this._data = {};
@@ -27,6 +34,78 @@ export class Transforms
       for (const key in this._data) { yield key; }
    }
 
+   get isActive() { return this.#count > 0; }
+
+   get rotateX() { return this._data.rotateX; }
+   get rotateY() { return this._data.rotateY; }
+   get rotateZ() { return this._data.rotateZ; }
+   get scale() { return this._data.scale; }
+
+   set rotateX(value)
+   {
+      if (Number.isFinite(value))
+      {
+         if (this._data.rotateX === void 0) { this.#count++; }
+
+         this._data.rotateX = value;
+      }
+      else
+      {
+         if (this._data.rotateX !== void 0) { this.#count--; }
+
+         delete this._data.rotateX;
+      }
+   }
+
+   set rotateY(value)
+   {
+      if (Number.isFinite(value))
+      {
+         if (this._data.rotateY === void 0) { this.#count++; }
+
+         this._data.rotateY = value;
+      }
+      else
+      {
+         if (this._data.rotateY !== void 0) { this.#count--; }
+
+         delete this._data.rotateY;
+      }
+   }
+
+   set rotateZ(value)
+   {
+      if (Number.isFinite(value))
+      {
+         if (this._data.rotateZ === void 0) { this.#count++; }
+
+         this._data.rotateZ = value;
+      }
+
+      else
+      {
+         if (this._data.rotateZ !== void 0) { this.#count--; }
+
+         delete this._data.rotateZ;
+      }
+   }
+
+   set scale(value)
+   {
+      if (Number.isFinite(value))
+      {
+         if (this._data.scale === void 0) { this.#count++; }
+
+         this._data.scale = value;
+      }
+      else
+      {
+         if (this._data.scale !== void 0) { this.#count--; }
+
+         delete this._data.scale;
+      }
+   }
+
    /**
     *
     * @param {PositionData} position -
@@ -39,8 +118,7 @@ export class Transforms
    {
       const rect = s_RECT_TEMP;
 
-      // TODO: Must make this detect transform from position.
-      if (Object.keys(this._data).length)
+      if (this.hasTransform(position))
       {
          rect[0][0] = rect[0][1] = rect[0][2] = 0;
          rect[1][0] = position.width;
@@ -166,36 +244,19 @@ export class Transforms
       return matrix;
    }
 
-   // TODO: Figure out a better check for performance.
-   get isActive() { return Object.keys(this._data).length !== 0; }
-
-   get rotateX() { return this._data.rotateX; }
-   get rotateY() { return this._data.rotateY; }
-   get rotateZ() { return this._data.rotateZ; }
-   get scale() { return this._data.scale; }
-
-   set rotateX(value)
+   /**
+    * @param {PositionData} position -
+    *
+    * @returns {boolean} Whether the given PositionData has transforms.
+    */
+   hasTransform(position)
    {
-      if (Number.isFinite(value)) { this._data.rotateX = value; }
-      else { delete this._data.rotateX; }
-   }
+      for (const key of constants.transformKeys)
+      {
+         if (Number.isFinite(position[key])) { return true; }
+      }
 
-   set rotateY(value)
-   {
-      if (Number.isFinite(value)) { this._data.rotateY = value; }
-      else { delete this._data.rotateY; }
-   }
-
-   set rotateZ(value)
-   {
-      if (Number.isFinite(value)) { this._data.rotateZ = value; }
-      else { delete this._data.rotateZ; }
-   }
-
-   set scale(value)
-   {
-      if (Number.isFinite(value)) { this._data.scale = value; }
-      else { delete this._data.scale; }
+      return false;
    }
 
    reset(data)
@@ -211,6 +272,8 @@ export class Transforms
             delete this._data[key];
          }
       }
+
+      this.#count = Object.keys(this._data).length;
    }
 }
 
