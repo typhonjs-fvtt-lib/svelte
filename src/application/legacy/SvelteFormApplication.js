@@ -136,16 +136,17 @@ export class SvelteFormApplication extends FormApplication
    static get defaultOptions()
    {
       return deepMerge(super.defaultOptions, {
-         draggable: true,              // If true then application shells are draggable.
-         headerButtonNoClose: false,   // If true then the close header button is removed.
-         headerButtonNoLabel: false,   // If true then header button labels are removed for application shells.
-         defaultCloseAnimation: true,  // If false the default slide close animation is not run.
-         positionable: true,           // If false then `position.set` does not take effect.
-         suppressFormInit: false,      // If true automatic suppression of core FormApplication methods is enabled.
-         rotateX: null,                // Assigned to position.
-         rotateY: null,                // Assigned to position.
-         rotateZ: null,                // Assigned to position.
-         zIndex: null                  // Assigned to position.
+         draggable: true,                 // If true then application shells are draggable.
+         headerButtonNoClose: false,      // If true then the close header button is removed.
+         headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.
+         headerNoTitleMinimized: false,   // If true then header title is hidden when application is minimized.
+         defaultCloseAnimation: true,     // If false the default slide close animation is not run.
+         positionable: true,              // If false then `position.set` does not take effect.
+         suppressFormInit: false,         // If true automatic suppression of core FormApplication methods is enabled.
+         rotateX: null,                   // Assigned to position.
+         rotateY: null,                   // Assigned to position.
+         rotateZ: null,                   // Assigned to position.
+         zIndex: null                     // Assigned to position.
       });
    }
 
@@ -666,7 +667,12 @@ export class SvelteFormApplication extends FormApplication
       for (let cntr = header.children.length; --cntr >= 0;)
       {
          const className = header.children[cntr].className;
-         if (className.includes('window-title') || className.includes('close')) { continue; }
+
+         if (className.includes('window-title') || className.includes('close') ||
+          className.includes('keep-minimized'))
+         {
+            continue;
+         }
 
          header.children[cntr].style.display = 'none';
       }

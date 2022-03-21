@@ -81,6 +81,9 @@
  * @property {import('svelte/store').Writable<boolean>} headerButtonNoLabel - Derived store for `headerButtonNoLabel`
  *                                                                            updates.
  *
+ * @property {import('svelte/store').Writable<boolean>} headerNoTitleMinimized - Derived store for
+ *                                                                               `headerNoTitleMinimized` updates.
+ *
  * @property {import('svelte/store').Writable<boolean>} minimizable - Derived store for `minimizable` updates.
  *
  * @property {import('svelte/store').Writable<boolean>} popOut - Derived store for `popOut` updates.
