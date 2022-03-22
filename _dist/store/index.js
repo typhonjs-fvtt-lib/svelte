@@ -1674,7 +1674,7 @@ function propertyStore(origin, propName) {
 class TJSDocument
 {
    #document;
-   #uuid;
+   #uuidv4;
 
    /**
     * @type {TJSDocumentOptions}
@@ -1691,7 +1691,7 @@ class TJSDocument
     */
    constructor(document, options = {})
    {
-      this.#uuid = `tjs-document-${uuidv4()}`;
+      this.#uuidv4 = `tjs-document-${uuidv4()}`;
 
       this.setOptions(options);
       this.set(document);
@@ -1709,7 +1709,7 @@ class TJSDocument
     *
     * @returns {*} UUID
     */
-   get uuid() { return this.#uuid; }
+   get uuidv4() { return this.#uuidv4; }
 
    /**
     * Handles cleanup when the document is deleted. Invoking any optional delete function set in the constructor.
@@ -1720,7 +1720,7 @@ class TJSDocument
    {
       if (this.#document instanceof foundry.abstract.Document)
       {
-         delete this.#document.apps[this.#uuid];
+         delete this.#document.apps[this.#uuidv4];
          this.#document = void 0;
       }
 
@@ -1762,7 +1762,7 @@ class TJSDocument
    {
       if (this.#document)
       {
-         delete this.#document.apps[this.#uuid];
+         delete this.#document.apps[this.#uuidv4];
       }
 
       if (document !== void 0 && !(document instanceof foundry.abstract.Document))
@@ -1777,7 +1777,7 @@ class TJSDocument
 
       if (document instanceof foundry.abstract.Document)
       {
-         document.apps[this.#uuid] = {
+         document.apps[this.#uuidv4] = {
             close: this.#deleted.bind(this),
             render: this.#notify.bind(this)
          };
@@ -1786,6 +1786,34 @@ class TJSDocument
       this.#document = document;
       this.#updateOptions = options;
       this.#notify();
+   }
+
+   /**
+    * Sets the document by Foundry UUID performing a lookup and setting the document if found.
+    *
+    * @param {string}   uuid - A Foundry UUID to lookup.
+    *
+    * @param {object}   [options] - New document update options to set.
+    *
+    * @returns {boolean} True if successfully set document from UUID.
+    */
+   async setUUID(uuid, options = {})
+   {
+      if (typeof uuid !== 'string' || uuid.length === 0) { return false; }
+
+      try
+      {
+         const doc = await globalThis.fromUuid(uuid);
+
+         if (doc)
+         {
+            this.set(doc, options);
+            return true;
+         }
+      }
+      catch (err) { /**/ }
+
+      return false;
    }
 
    /**

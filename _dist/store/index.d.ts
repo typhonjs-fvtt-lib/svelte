@@ -246,7 +246,7 @@ declare class TJSDocument<T extends any> {
      *
      * @returns {*} UUID
      */
-    get uuid(): any;
+    get uuidv4(): any;
     /**
      * @returns {T | undefined} Current document
      */
@@ -257,6 +257,16 @@ declare class TJSDocument<T extends any> {
      * @param {object}         [options] - New document update options to set.
      */
     set(document: T | undefined, options?: object): void;
+    /**
+     * Sets the document by Foundry UUID performing a lookup and setting the document if found.
+     *
+     * @param {string}   uuid - A Foundry UUID to lookup.
+     *
+     * @param {object}   [options] - New document update options to set.
+     *
+     * @returns {boolean} True if successfully set document from UUID.
+     */
+    setUUID(uuid: string, options?: object): boolean;
     /**
      * Sets options for this document wrapper / store.
      *
