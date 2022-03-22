@@ -258,15 +258,25 @@ declare class TJSDocument<T extends any> {
      */
     set(document: T | undefined, options?: object): void;
     /**
+     * Potentially sets new document from data transfer object.
+     *
+     * @param {object}   data - Document transfer data.
+     *
+     * @param {ParseDataTransferOptions & TJSDocumentOptions}   [options] - Optional parameters.
+     *
+     * @returns {Promise<boolean>} Returns true if new document set from data transfer blob.
+     */
+    setFromDataTransfer(data: object, options?: any & TJSDocumentOptions): Promise<boolean>;
+    /**
      * Sets the document by Foundry UUID performing a lookup and setting the document if found.
      *
      * @param {string}   uuid - A Foundry UUID to lookup.
      *
-     * @param {object}   [options] - New document update options to set.
+     * @param {TJSDocumentOptions}   [options] - New document update options to set.
      *
-     * @returns {boolean} True if successfully set document from UUID.
+     * @returns {Promise<boolean>} True if successfully set document from UUID.
      */
-    setUUID(uuid: string, options?: object): boolean;
+    setFromUUID(uuid: string, options?: TJSDocumentOptions): Promise<boolean>;
     /**
      * Sets options for this document wrapper / store.
      *

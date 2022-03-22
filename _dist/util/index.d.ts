@@ -1,3 +1,21 @@
+type ParseDataTransferOptions = {
+    /**
+     * - Accept actor owned documents.
+     */
+    actor?: boolean;
+    /**
+     * - Accept compendium documents.
+     */
+    compendium?: boolean;
+    /**
+     * - Accept world documents.
+     */
+    world?: boolean;
+    /**
+     * - Require the `data.type` to match entry in `types`.
+     */
+    types?: string[] | undefined;
+};
 /**
  * Wraps a callback in a debounced timeout.
  *
@@ -22,6 +40,16 @@ declare function debounce(callback: Function, delay: number): Function;
  * @returns {object}    Target object.
  */
 declare function deepMerge(target?: object, ...sourceObj: object[]): object;
+/**
+ * Attempts to create a Foundry UUID from standard drop data. This may not work for all systems.
+ *
+ * @param {object}   data - Drop transfer data.
+ *
+ * @param {ParseDataTransferOptions}   opts - Optional parameters.
+ *
+ * @returns {string|undefined} Foundry UUID for drop data.
+ */
+declare function getUUIDFromDataTransfer(data: object, { actor, compendium, world, types }?: ParseDataTransferOptions): string | undefined;
 /**
  * Provides a method to determine if the passed in Svelte component has a getter & setter accessor.
  *
@@ -170,4 +198,4 @@ declare function safeSet(data: object, accessor: string, value: any, operation?:
  */
 declare function uuidv4(): string;
 
-export { debounce, deepMerge, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };
+export { ParseDataTransferOptions, debounce, deepMerge, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };

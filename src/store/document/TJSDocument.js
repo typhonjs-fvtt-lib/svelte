@@ -1,4 +1,7 @@
-import { isObject, uuidv4 } from '@typhonjs-fvtt/svelte/util';
+import {
+   getUUIDFromDataTransfer,
+   isObject,
+   uuidv4 } from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.
@@ -125,15 +128,29 @@ export class TJSDocument
    }
 
    /**
+    * Potentially sets new document from data transfer object.
+    *
+    * @param {object}   data - Document transfer data.
+    *
+    * @param {ParseDataTransferOptions & TJSDocumentOptions}   [options] - Optional parameters.
+    *
+    * @returns {Promise<boolean>} Returns true if new document set from data transfer blob.
+    */
+   async setFromDataTransfer(data, options)
+   {
+      return this.setFromUUID(getUUIDFromDataTransfer(data, options), options);
+   }
+
+   /**
     * Sets the document by Foundry UUID performing a lookup and setting the document if found.
     *
     * @param {string}   uuid - A Foundry UUID to lookup.
     *
-    * @param {object}   [options] - New document update options to set.
+    * @param {TJSDocumentOptions}   [options] - New document update options to set.
     *
-    * @returns {boolean} True if successfully set document from UUID.
+    * @returns {Promise<boolean>} True if successfully set document from UUID.
     */
-   async setUUID(uuid, options = {})
+   async setFromUUID(uuid, options = {})
    {
       if (typeof uuid !== 'string' || uuid.length === 0) { return false; }
 
