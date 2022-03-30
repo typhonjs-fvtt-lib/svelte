@@ -105,17 +105,17 @@ export class Position
       const transforms = this.#transforms;
 
       // TODO REMOVE: FOR TESTING
-      this._overlay = document.createElement('div');
-      this._overlay.style.zIndex = '99999';
-      this._overlay.style.background = 'rgba(0, 0, 255, 0.3)';
-      this._overlay.style.width = '200px';
-      this._overlay.style.height = '200px';
-      this._overlay.style.top = '100px';
-      this._overlay.style.left = '100px';
-      this._overlay.style.position = 'absolute';
-      this._overlay.style.pointerEvents = 'none';
-
-      document.body.append(this._overlay);
+      // this._overlay = document.createElement('div');
+      // this._overlay.style.zIndex = '99999';
+      // this._overlay.style.background = 'rgba(0, 0, 255, 0.3)';
+      // this._overlay.style.width = '200px';
+      // this._overlay.style.height = '200px';
+      // this._overlay.style.top = '100px';
+      // this._overlay.style.left = '100px';
+      // this._overlay.style.position = 'absolute';
+      // this._overlay.style.pointerEvents = 'none';
+      //
+      // document.body.append(this._overlay);
 
       // Set default value from options.
       if (typeof options === 'object')
@@ -1040,13 +1040,13 @@ export class Position
          currentPosition.zIndex = typeof zIndex === 'number' ? Math.round(zIndex) : zIndex;
       }
 
-      const rect = this.#transforms.getBoundingBox(currentPosition, this.#rectValidate);
+      // const rect = this.#transforms.getBoundingBox(currentPosition, this.#rectValidate);
 
       // TODO REMOVE: FOR TESTING
-      this._overlay.style.top = `${rect.top}px`;
-      this._overlay.style.left = `${rect.left}px`;
-      this._overlay.style.width = `${rect.width}px`;
-      this._overlay.style.height = `${rect.height}px`;
+      // this._overlay.style.top = `${rect.top}px`;
+      // this._overlay.style.left = `${rect.left}px`;
+      // this._overlay.style.width = `${rect.width}px`;
+      // this._overlay.style.height = `${rect.height}px`;
 
       // Return the updated position object.
       return currentPosition;
