@@ -1,4 +1,12 @@
 # Changelog
+## Release 0.0.8 (medium update)
+- Continued refinement of position / Position in SvelteApplication.
+  - Transforms are now handled by matrix3d.
+- New math package w/ glmatrix and other supporting functions.
+- Can now use a Svelte component as a header button. 
+- TJSDialog sets height as `auto` by default.
+- TJSDocument has `setFromUUID` and `setFromDataTransfer` methods
+
 ## Release 0.0.7 (large update)
 - Complete overhaul of position / setPosition implementation making positional aspects reactive.
   - Setting any `this.position.<XXX>` value is reactive.
