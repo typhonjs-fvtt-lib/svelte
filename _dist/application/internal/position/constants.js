@@ -5,6 +5,22 @@
  */
 const transformKeys = ['rotateX', 'rotateY', 'rotateZ', 'scale'];
 
+Object.freeze(transformKeys);
+
+/**
+ * Defines bitwise keys for transforms used in {@link Transforms.getMat4FromTransforms}.
+ *
+ * @type {object}
+ */
+const transformKeysBitwise = {
+   rotateX: 1,
+   rotateY: 2,
+   rotateZ: 4,
+   scale: 8
+};
+
+Object.freeze(transformKeysBitwise);
+
 /**
  * Defines the default transform origin.
  *
@@ -22,4 +38,4 @@ const transformOrigins = ['top left', 'top center', 'top right', 'center left', 
 
 Object.freeze(transformOrigins);
 
-export { transformKeys, transformOriginDefault, transformOrigins };
+export { transformKeys, transformKeysBitwise, transformOriginDefault, transformOrigins };

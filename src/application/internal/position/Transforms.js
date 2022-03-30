@@ -214,30 +214,81 @@ export class Transforms
       return `matrix3d(${this.getMat4FromTransforms(data).join(',')})`;
    }
 
+   /**
+    * Creates a transform matrix based on local data applied in order it was added.
+    *
+    * If no data object is provided then the source is the local transform data. If another data object is supplied
+    * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
+    * construction of a transform matrix in advance of setting local data and is useful in collision detection.
+    *
+    * @param {object}   data -
+    *
+    * @param {mat4}     output -
+    *
+    * @returns {mat4} Transform matrix.
+    */
    getMat4FromTransforms(data = this._data, output = s_MAT4_RESULT)
    {
       const matrix = mat4.identity(output);
 
+      // Bitwise tracks applied transform keys from local transform data.
+      let seenKeys = 0;
+
+      // First apply ordered transforms from local transform data.
       for (const key in this._data)
       {
          switch (key)
          {
             case 'rotateX':
+               seenKeys |= constants.transformKeysBitwise.rotateX;
                mat4.multiply(matrix, matrix, mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
                break;
 
             case 'rotateY':
+               seenKeys |= constants.transformKeysBitwise.rotateY;
                mat4.multiply(matrix, matrix, mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
                break;
 
             case 'rotateZ':
+               seenKeys |= constants.transformKeysBitwise.rotateZ;
                mat4.multiply(matrix, matrix, mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
                break;
 
             case 'scale':
+               seenKeys |= constants.transformKeysBitwise.scale;
                s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data[key];
                mat4.multiply(matrix, matrix, mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
                break;
+         }
+      }
+
+      // Now apply any new keys not set in local transform data that have not been applied yet.
+      if (data !== this._data)
+      {
+         for (const key of constants.transformKeys)
+         {
+            // Reject bad / no data or if the key has already been applied.
+            if (!Number.isFinite(data[key]) || (seenKeys & constants.transformKeysBitwise[key]) > 0) { continue; }
+
+            switch (key)
+            {
+               case 'rotateX':
+                  mat4.multiply(matrix, matrix, mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+
+               case 'rotateY':
+                  mat4.multiply(matrix, matrix, mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+
+               case 'rotateZ':
+                  mat4.multiply(matrix, matrix, mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+
+               case 'scale':
+                  s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data[key];
+                  mat4.multiply(matrix, matrix, mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
+                  break;
+            }
          }
       }
 
