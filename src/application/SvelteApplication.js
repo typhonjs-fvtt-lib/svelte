@@ -1,3 +1,5 @@
+import { Position }           from '@typhonjs-fvtt/svelte/store';
+
 import {
    deepMerge,
    hasGetter,
@@ -8,7 +10,6 @@ import {
    ApplicationState,
    GetSvelteData,
    loadSvelteConfig,
-   Position,
    SvelteReactive }           from './internal/index.js';
 
 /**
@@ -105,7 +106,11 @@ export class SvelteApplication extends Application
       this.#applicationState = new ApplicationState(this);
 
       // Initialize Position with the position object set by Application.
-      this.#position = new Position(this, { ...this.options, ...this.position });
+      this.#position = new Position(this, {
+         ...this.options,
+         ...this.position,
+         validators: this.options.positionValidator
+      });
 
       // Remove old position field.
       delete this.position;
@@ -142,6 +147,7 @@ export class SvelteApplication extends Application
          headerNoTitleMinimized: false,   // If true then header title is hidden when application is minimized.
          defaultCloseAnimation: true,     // If false the default slide close animation is not run.
          positionable: true,              // If false then `position.set` does not take effect.
+         positionValidator: Position.Validators.browserWindow,
          rotateX: null,                   // Assigned to position.
          rotateY: null,                   // Assigned to position.
          rotateZ: null,                   // Assigned to position.

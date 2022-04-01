@@ -186,6 +186,14 @@ declare function safeAccess(data: object, accessor: string, defaultValue?: any):
  */
 declare function safeSet(data: object, accessor: string, value: any, operation?: string, createMissing?: boolean): boolean;
 /**
+ * Parses a pixel string / computed styles. Ex. `100px` returns `100`.
+ *
+ * @param {string}   value - Value to parse.
+ *
+ * @returns {number|undefined} The integer component of a pixel string.
+ */
+declare function styleParsePixels(value: string): number | undefined;
+/**
  * Generates a UUID v4 compliant ID. Please use a complete UUID generation package for guaranteed compliance.
  *
  * This code is an evolution of the following Gist.
@@ -198,4 +206,4 @@ declare function safeSet(data: object, accessor: string, value: any, operation?:
  */
 declare function uuidv4(): string;
 
-export { ParseDataTransferOptions, debounce, deepMerge, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, uuidv4 };
+export { ParseDataTransferOptions, debounce, deepMerge, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };

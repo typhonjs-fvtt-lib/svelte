@@ -1,3 +1,5 @@
+import { Position }           from '@typhonjs-fvtt/svelte/store';
+
 import {
    deepMerge,
    hasGetter,
@@ -8,7 +10,6 @@ import {
    ApplicationState,
    GetSvelteData,
    loadSvelteConfig,
-   Position,
    SvelteReactive }           from '../internal/index.js';
 
 /**

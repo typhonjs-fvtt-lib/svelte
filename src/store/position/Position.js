@@ -1,14 +1,16 @@
-import { linear }             from 'svelte/easing';
+import { linear }                from 'svelte/easing';
 
-import { nextAnimationFrame } from '@typhonjs-fvtt/svelte/animate';
-import { lerp }               from '@typhonjs-fvtt/svelte/math';
-import { propertyStore }      from '@typhonjs-fvtt/svelte/store';
-import { isIterable }         from '@typhonjs-fvtt/svelte/util';
+import { nextAnimationFrame }    from '@typhonjs-fvtt/svelte/animate';
+import { lerp }                  from '@typhonjs-fvtt/svelte/math';
+import { isIterable,
+         styleParsePixels }      from '@typhonjs-fvtt/svelte/util';
 
-import { AdapterValidators }  from './AdapterValidators.js';
-import * as constants         from './constants.js';
-import { styleParsePixels }   from '../styleParsePixels.js';
-import { Transforms }         from './Transforms.js';
+import { propertyStore }         from '@typhonjs-svelte/lib/store';
+
+import { AdapterValidators }     from './AdapterValidators.js';
+import * as constants            from './constants.js';
+import * as positionValidators   from './validators/index.js';
+import { Transforms }            from './Transforms.js';
 
 /**
  * Provides a store for position following the subscriber protocol in addition to providing individual writable derived
@@ -56,13 +58,6 @@ export class Position
    #elementUpdatePromises = [];
 
    /**
-    * Provides a cached DOMRect for position validation.
-    *
-    * @type {DOMRect}
-    */
-   #rectValidate = new DOMRect();
-
-   /**
     * @type {StorePosition}
     */
    #stores;
@@ -92,6 +87,8 @@ export class Position
     */
    #validatorsAdapter;
 
+   static get Validators() { return positionValidators; }
+
    /**
     * @param {object}         parent - The associated parent for positional data tracking. Used in validators.
     *
@@ -103,19 +100,6 @@ export class Position
 
       const data = this.#data;
       const transforms = this.#transforms;
-
-      // TODO REMOVE: FOR TESTING
-      // this._overlay = document.createElement('div');
-      // this._overlay.style.zIndex = '99999';
-      // this._overlay.style.background = 'rgba(0, 0, 255, 0.3)';
-      // this._overlay.style.width = '200px';
-      // this._overlay.style.height = '200px';
-      // this._overlay.style.top = '100px';
-      // this._overlay.style.left = '100px';
-      // this._overlay.style.position = 'absolute';
-      // this._overlay.style.pointerEvents = 'none';
-      //
-      // document.body.append(this._overlay);
 
       // Set default value from options.
       if (typeof options === 'object')
@@ -194,6 +178,15 @@ export class Position
       Object.freeze(this.#stores);
 
       [this.#validators, this.#validatorsAdapter] = new AdapterValidators();
+
+      if (typeof options?.validators === 'function')
+      {
+         this.validators.add(options.validators);
+      }
+      else if (isIterable(options?.validators))
+      {
+         this.validators.add(...options.validators);
+      }
    }
 
    /**
@@ -689,27 +682,17 @@ export class Position
 
       const data = this.#data;
       const transforms = this.#transforms;
-      const validators = this.#validators;
 
-      let currentTransform = '', updateTransform = false;
+      let updateTransform = false;
 
-      const el = parent?.elementTarget;
+      const el = parent instanceof HTMLElement ? parent : parent?.elementTarget;
 
       if (el)
       {
-         currentTransform = el.style.transform ?? '';
-         position = this.#updatePosition(position, el);
-      }
+         position = this.#updatePosition(position, parent, el);
 
-      // If there are any validators allow them to potentially modify position data or reject the update.
-      if (validators.length)
-      {
-         for (const validator of validators)
-         {
-            position = validator.validator(position, parent);
-
-            if (position === null) { return this; }
-         }
+         // Check if a validator cancelled the update.
+         if (position === null) { return this; }
       }
 
       let modified = false;
@@ -735,10 +718,6 @@ export class Position
             data.rotateX = transforms.rotateX = position.rotateX;
             updateTransform = modified = true;
          }
-         else if (transforms.rotateX && !currentTransform.includes('rotateX('))
-         {
-            updateTransform = true;
-         }
       }
 
       if (typeof position.rotateY === 'number' || position.rotateY === null)
@@ -748,10 +727,6 @@ export class Position
             data.rotateY = transforms.rotateY = position.rotateY;
             updateTransform = modified = true;
          }
-         else if (transforms.rotateY && !currentTransform.includes('rotateY('))
-         {
-            updateTransform = true;
-         }
       }
 
       if (typeof position.rotateZ === 'number' || position.rotateZ === null)
@@ -760,10 +735,6 @@ export class Position
          {
             data.rotateZ = transforms.rotateZ = position.rotateZ;
             updateTransform = modified = true;
-         }
-         else if (transforms.rotateZ && !currentTransform.includes('rotateZ('))
-         {
-            updateTransform = true;
          }
       }
 
@@ -775,10 +746,6 @@ export class Position
          {
             data.scale = transforms.scale = position.scale;
             updateTransform = modified = true;
-         }
-         else if (transforms.scale && !currentTransform.includes('scale('))
-         {
-            updateTransform = true;
          }
       }
 
@@ -951,11 +918,28 @@ export class Position
       return currentTime;
    }
 
+   /**
+    *
+    * @param left
+    * @param top
+    * @param width
+    * @param height
+    * @param rotateX
+    * @param rotateY
+    * @param rotateZ
+    * @param scale
+    * @param transformOrigin
+    * @param zIndex
+    * @param rest
+    * @param parent
+    * @param el
+    *
+    * @returns {null|PositionData} Updated position data or null if validation fails.
+    */
    #updatePosition({ left, top, width, height, rotateX, rotateY, rotateZ, scale, transformOrigin, zIndex,
-    ...rest } = {}, el)
+    ...rest } = {}, parent, el)
    {
-      const currentPosition = this.get(rest);
-      const styles = globalThis.getComputedStyle(el);
+      let currentPosition = this.get(rest);
 
       // Update width if an explicit value is passed, or if no width value is set on the element.
       if (el.style.width === '' || width !== void 0)
@@ -967,12 +951,7 @@ export class Position
          }
          else
          {
-            const tarW = typeof width === 'number' ? Math.round(width) : el.offsetWidth;
-            const minW = styleParsePixels(styles.minWidth) || MIN_WINDOW_WIDTH;
-            const maxW = styleParsePixels(styles.maxWidth) || el.style.maxWidth || globalThis.innerWidth;
-            currentPosition.width = width = Math.clamped(tarW, minW, maxW);
-
-            if ((width + left) > globalThis.innerWidth) { left = currentPosition.left; }
+            currentPosition.width = width = typeof width === 'number' ? Math.round(width) : el.offsetWidth;
          }
       }
       else
@@ -990,12 +969,7 @@ export class Position
          }
          else
          {
-            const tarH = typeof height === 'number' ? Math.round(height) : el.offsetHeight + 1;
-            const minH = styleParsePixels(styles.minHeight) || MIN_WINDOW_HEIGHT;
-            const maxH = styleParsePixels(styles.maxHeight) || el.style.maxHeight || globalThis.innerHeight;
-            currentPosition.height = height = Math.clamped(tarH, minH, maxH);
-
-            if ((height + currentPosition.top) > globalThis.innerHeight + 1) { top = currentPosition.top - 1; }
+            currentPosition.height = height = typeof height === 'number' ? Math.round(height) : el.offsetHeight + 1;
          }
       }
       else
@@ -1006,17 +980,13 @@ export class Position
       // Update left
       if (el.style.left === '' || Number.isFinite(left))
       {
-         const tarL = Number.isFinite(left) ? left : (globalThis.innerWidth - width) / 2;
-         const maxL = Math.max(globalThis.innerWidth - width, 0);
-         currentPosition.left = Math.round(Math.clamped(tarL, 0, maxL));
+         currentPosition.left = Number.isFinite(left) ? left : (globalThis.innerWidth - width) / 2;
       }
 
       // Update top
       if (el.style.top === '' || Number.isFinite(top))
       {
-         const tarT = Number.isFinite(top) ? top : (globalThis.innerHeight - height) / 2;
-         const maxT = Math.max(globalThis.innerHeight - height, 0);
-         currentPosition.top = Math.round(Math.clamped(tarT, 0, maxT));
+         currentPosition.top = Number.isFinite(top) ? top : (globalThis.innerHeight - height) / 2;
       }
 
       // Update rotate X/Y/Z, scale, z-index
@@ -1040,15 +1010,52 @@ export class Position
          currentPosition.zIndex = typeof zIndex === 'number' ? Math.round(zIndex) : zIndex;
       }
 
-      // const rect = this.#transforms.getBoundingBox(currentPosition, this.#rectValidate);
+      const validators = this.#validators;
 
-      // TODO REMOVE: FOR TESTING
-      // this._overlay.style.top = `${rect.top}px`;
-      // this._overlay.style.left = `${rect.left}px`;
-      // this._overlay.style.width = `${rect.width}px`;
-      // this._overlay.style.height = `${rect.height}px`;
+      // If there are any validators allow them to potentially modify position data or reject the update.
+      if (validators.length)
+      {
+         s_VALIDATOR_DATA.parent = parent;
+         s_VALIDATOR_DATA.el = el;
+         s_VALIDATOR_DATA.styles = globalThis.getComputedStyle(el);
+         s_VALIDATOR_DATA.transforms = this.#transforms;
+         s_VALIDATOR_DATA.marginTop = styleParsePixels(s_VALIDATOR_DATA.styles.marginTop);
+         s_VALIDATOR_DATA.marginLeft = styleParsePixels(s_VALIDATOR_DATA.styles.marginLeft);
+         s_VALIDATOR_DATA.minWidth = styleParsePixels(s_VALIDATOR_DATA.styles.minWidth);
+         s_VALIDATOR_DATA.maxWidth = styleParsePixels(s_VALIDATOR_DATA.styles.maxWidth);
+         s_VALIDATOR_DATA.minHeight = styleParsePixels(s_VALIDATOR_DATA.styles.minHeight);
+         s_VALIDATOR_DATA.maxHeight = styleParsePixels(s_VALIDATOR_DATA.styles.maxHeight);
+         s_VALIDATOR_DATA.width = width;
+         s_VALIDATOR_DATA.height = height;
+
+         for (const validator of validators)
+         {
+            s_VALIDATOR_DATA.position = currentPosition;
+            currentPosition = validator.validator(s_VALIDATOR_DATA);
+
+            if (currentPosition === null) { return null; }
+         }
+      }
 
       // Return the updated position object.
       return currentPosition;
    }
 }
+
+const s_VALIDATOR_DATA = {
+   position: void 0,
+   parent: void 0,
+   el: void 0,
+   styles: void 0,
+   transforms: void 0,
+   marginTop: void 0,
+   marginLeft: void 0,
+   minWidth: void 0,
+   maxWidth: void 0,
+   minHeight: void 0,
+   maxHeight: void 0,
+   width: void 0,
+   height: void 0
+};
+
+Object.seal(s_VALIDATOR_DATA);
