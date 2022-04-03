@@ -209,9 +209,9 @@ export class TJSDocument
     */
    subscribe(handler)
    {
-      this.#subscriptions.push(handler); // add handler to the array of subscribers
+      this.#subscriptions.push(handler);              // Add handler to the array of subscribers.
 
-      handler(this.#document, this.#updateOptions);           // call handler with current value
+      handler(this.#document, this.updateOptions);   // Call handler with current value and update options.
 
       // Return unsubscribe function.
       return () =>
