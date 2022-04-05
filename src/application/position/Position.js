@@ -5,7 +5,8 @@ import { lerp }                  from '@typhonjs-fvtt/svelte/math';
 import { isIterable,
          styleParsePixels }      from '@typhonjs-fvtt/svelte/util';
 
-import { propertyStore }         from '@typhonjs-svelte/lib/store';
+// import { propertyStore }         from '@typhonjs-svelte/lib/store';
+import { propertyStore }         from '@typhonjs-fvtt/svelte/store';
 
 import { AdapterValidators }     from './AdapterValidators.js';
 import * as constants            from './constants.js';

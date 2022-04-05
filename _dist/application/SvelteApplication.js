@@ -1,4 +1,5 @@
-import { Position }           from '@typhonjs-fvtt/svelte/store';
+// import { Position }           from '@typhonjs-fvtt/svelte/store';
+import { Position }           from './position/Position.js';
 
 import {
    deepMerge,
