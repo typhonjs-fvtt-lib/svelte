@@ -9,7 +9,7 @@ import { isIterable,
 import { propertyStore }         from '@typhonjs-fvtt/svelte/store';
 
 import { AdapterValidators }     from './AdapterValidators.js';
-import { BoundingData }          from './BoundingData.js';
+import { TransformData }         from './TransformData.js';
 import * as constants            from './constants.js';
 import { PositionData }          from './PositionData.js';
 import * as positionValidators   from './validators/index.js';
@@ -89,7 +89,7 @@ export class Position
     */
    #validatorsAdapter;
 
-   static get BoundingData() { return BoundingData; }
+   static get BoundingData() { return TransformData; }
 
    static get Validators() { return positionValidators; }
 
@@ -1007,7 +1007,7 @@ export class Position
          if (this.#transforms.isActive)
          {
             el.style.transformOrigin = data.transformOrigin;
-            el.style.transform = this.#transforms.getTransformString();
+            el.style.transform = this.#transforms.getCSS();
          }
          else
          {

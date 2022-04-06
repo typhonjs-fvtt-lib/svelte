@@ -8,7 +8,7 @@ const transformKeys = ['rotateX', 'rotateY', 'rotateZ', 'scale'];
 Object.freeze(transformKeys);
 
 /**
- * Defines bitwise keys for transforms used in {@link Transforms.getMat4FromTransforms}.
+ * Defines bitwise keys for transforms used in {@link Transforms.getMat4}.
  *
  * @type {object}
  */

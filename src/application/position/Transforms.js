@@ -2,12 +2,11 @@ import { degToRad, mat4, vec3 }  from '@typhonjs-fvtt/svelte/math';
 
 import * as constants            from './constants.js';
 
-import { BoundingData }          from './BoundingData.js';
+import { TransformData }         from './TransformData.js';
 
 const s_SCALE_VECTOR = [1, 1, 1];
 const s_MAT4_RESULT = mat4.create();
 const s_MAT4_TEMP = mat4.create();
-const s_MAT4_TEMP_TRANSLATE = [mat4.create(), mat4.create()];
 const s_VEC3_TEMP = vec3.create();
 
 export class Transforms
@@ -35,13 +34,36 @@ export class Transforms
       for (const key in this._data) { yield key; }
    }
 
+   /**
+    * @returns {boolean} Whether there are active transforms in local data.
+    */
    get isActive() { return this.#count > 0; }
 
+   /**
+    * @returns {number|undefined} Any local rotateX data.
+    */
    get rotateX() { return this._data.rotateX; }
+
+   /**
+    * @returns {number|undefined} Any local rotateY data.
+    */
    get rotateY() { return this._data.rotateY; }
+
+   /**
+    * @returns {number|undefined} Any local rotateZ data.
+    */
    get rotateZ() { return this._data.rotateZ; }
+
+   /**
+    * @returns {number|undefined} Any local rotateZ scale.
+    */
    get scale() { return this._data.scale; }
 
+   /**
+    * Sets the local rotateX data if the value is a finite number otherwise removes the local data.
+    *
+    * @param {number|null|undefined}   value - A value to set.
+    */
    set rotateX(value)
    {
       if (Number.isFinite(value))
@@ -58,6 +80,11 @@ export class Transforms
       }
    }
 
+   /**
+    * Sets the local rotateY data if the value is a finite number otherwise removes the local data.
+    *
+    * @param {number|null|undefined}   value - A value to set.
+    */
    set rotateY(value)
    {
       if (Number.isFinite(value))
@@ -74,6 +101,11 @@ export class Transforms
       }
    }
 
+   /**
+    * Sets the local rotateZ data if the value is a finite number otherwise removes the local data.
+    *
+    * @param {number|null|undefined}   value - A value to set.
+    */
    set rotateZ(value)
    {
       if (Number.isFinite(value))
@@ -91,6 +123,11 @@ export class Transforms
       }
    }
 
+   /**
+    * Sets the local scale data if the value is a finite number otherwise removes the local data.
+    *
+    * @param {number|null|undefined}   value - A value to set.
+    */
    set scale(value)
    {
       if (Number.isFinite(value))
@@ -108,13 +145,28 @@ export class Transforms
    }
 
    /**
-    * @param {PositionData} position -
+    * Returns the matrix3d CSS transform for the given position / transform data.
     *
-    * @param {BoundingData} [output] -
+    * @param {object} [data] - Optional position data otherwise use local stored transform data.
     *
-    * @returns {BoundingData} The output BoundingData.
+    * @returns {string} The CSS matrix3d string.
     */
-   getBoundingData(position, output = new BoundingData())
+   getCSS(data = this._data)
+   {
+      return `matrix3d(${this.getMat4(data, s_MAT4_RESULT).join(',')})`;
+   }
+
+   /**
+    * Collects all data including a bounding rect, transform matrix, and points array of the given {@link PositionData}
+    * instance with the applied local transform data.
+    *
+    * @param {PositionData} position - The position data to process.
+    *
+    * @param {TransformData} [output] - Optional TransformData output instance.
+    *
+    * @returns {TransformData} The output TransformData instance.
+    */
+   getData(position, output = new TransformData())
    {
       const rect = output.points;
 
@@ -130,7 +182,7 @@ export class Transforms
          rect[3][1] = position.height;
          rect[3][2] = 0;
 
-         const matrix = this.getMat4FromTransforms(position, output.mat4);
+         const matrix = this.getMat4(position, output.mat4);
 
          if (constants.transformOriginDefault === position.transformOrigin)
          {
@@ -138,10 +190,12 @@ export class Transforms
             vec3.transformMat4(rect[1], rect[1], matrix);
             vec3.transformMat4(rect[2], rect[2], matrix);
             vec3.transformMat4(rect[3], rect[3], matrix);
+
+            this.getOriginTranslation(position, output.originTranslations);
          }
          else
          {
-            const translate = s_GET_ORIGIN_TRANSLATE(position, s_MAT4_TEMP_TRANSLATE);
+            const translate = this.getOriginTranslation(position, output.originTranslations);
 
             vec3.transformMat4(rect[0], rect[0], translate[0]);
             vec3.transformMat4(rect[0], rect[0], matrix);
@@ -205,31 +259,19 @@ export class Transforms
    }
 
    /**
-    * Returns the matrix3d CSS transform for the given position / transform data.
-    *
-    * @param data -
-    *
-    * @returns {string}
-    */
-   getTransformString(data = this._data)
-   {
-      return `matrix3d(${this.getMat4FromTransforms(data).join(',')})`;
-   }
-
-   /**
     * Creates a transform matrix based on local data applied in order it was added.
     *
     * If no data object is provided then the source is the local transform data. If another data object is supplied
     * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
     * construction of a transform matrix in advance of setting local data and is useful in collision detection.
     *
-    * @param {object}   data -
+    * @param {object}   [data] - PositionData instance or local transform data.
     *
-    * @param {mat4}     output -
+    * @param {mat4}     [output] - The output mat4 instance.
     *
     * @returns {mat4} Transform matrix.
     */
-   getMat4FromTransforms(data = this._data, output = s_MAT4_RESULT)
+   getMat4(data = this._data, output = mat4.create())
    {
       const matrix = mat4.identity(output);
 
@@ -298,20 +340,131 @@ export class Transforms
    }
 
    /**
-    * @param {PositionData} position -
+    * Returns the translations necessary to translate a matrix operation based on the `transformOrigin` parameter of the
+    * given position instance. The first entry / index 0 is the pre-translation and last entry / index 1 is the post-
+    * translation.
+    *
+    * This method is used internally, but may be useful if you need the origin translation matrices to transform
+    * bespoke points based on any `transformOrigin` set in {@link PositionData}.
+    *
+    * @param {PositionData}   position - A position instance.
+    *
+    * @param {mat4[]}         [output] - Output Mat4 array.
+    *
+    * @returns {mat4[]} Output Mat4 array.
+    */
+   getOriginTranslation(position, output = [mat4.create(), mat4.create()])
+   {
+      const vector = s_VEC3_TEMP;
+
+      switch (position.transformOrigin)
+      {
+         case 'top left':
+            vector[0] = vector[1] = 0;
+            mat4.fromTranslation(output[0], vector);
+            mat4.fromTranslation(output[1], vector);
+            break;
+
+         case 'top center':
+            vector[0] = -position.width / 2;
+            vector[1] = 0;
+            mat4.fromTranslation(output[0], vector);
+            vector[0] = position.width / 2;
+            mat4.fromTranslation(output[1], vector);
+            break;
+
+         case 'top right':
+            vector[0] = -position.width;
+            vector[1] = 0;
+            mat4.fromTranslation(output[0], vector);
+            vector[0] = position.width;
+            mat4.fromTranslation(output[1], vector);
+            break;
+
+         case 'center left':
+            vector[0] = 0;
+            vector[1] = -position.height / 2;
+            mat4.fromTranslation(output[0], vector);
+            vector[1] = position.height / 2;
+            mat4.fromTranslation(output[1], vector);
+            break;
+
+         case 'center':
+            vector[0] = -position.width / 2;
+            vector[1] = -position.height / 2;
+            mat4.fromTranslation(output[0], vector);
+            vector[0] = position.width / 2;
+            vector[1] = position.height / 2;
+            mat4.fromTranslation(output[1], vector);
+            break;
+
+         case 'center right':
+            vector[0] = -position.width;
+            vector[1] = -position.height / 2;
+            mat4.fromTranslation(output[0], vector);
+            vector[0] = position.width;
+            vector[1] = position.height / 2;
+            mat4.fromTranslation(output[1], vector);
+            break;
+
+         case 'bottom left':
+            vector[0] = 0;
+            vector[1] = -position.height;
+            mat4.fromTranslation(output[0], vector);
+            vector[1] = position.height;
+            mat4.fromTranslation(output[1], vector);
+            break;
+
+         case 'bottom center':
+            vector[0] = -position.width / 2;
+            vector[1] = -position.height;
+            mat4.fromTranslation(output[0], vector);
+            vector[0] = position.width / 2;
+            vector[1] = position.height;
+            mat4.fromTranslation(output[1], vector);
+            break;
+
+         case 'bottom right':
+            vector[0] = -position.width;
+            vector[1] = -position.height;
+            mat4.fromTranslation(output[0], vector);
+            vector[0] = position.width;
+            vector[1] = position.height;
+            mat4.fromTranslation(output[1], vector);
+            break;
+
+       // No valid transform origin parameter; set identity.
+         default:
+            mat4.identity(output[0]);
+            mat4.identity(output[1]);
+            break;
+      }
+
+      return output;
+   }
+
+   /**
+    * Tests an object if it contains transform keys and the values are finite numbers.
+    *
+    * @param {object} data - An object to test for transform data.
     *
     * @returns {boolean} Whether the given PositionData has transforms.
     */
-   hasTransform(position)
+   hasTransform(data)
    {
       for (const key of constants.transformKeys)
       {
-         if (Number.isFinite(position[key])) { return true; }
+         if (Number.isFinite(data[key])) { return true; }
       }
 
       return false;
    }
 
+   /**
+    * Resets internal data from the given object containing valid transform keys.
+    *
+    * @param {object}   data - An object with transform data.
+    */
    reset(data)
    {
       for (const key in data)
@@ -328,95 +481,4 @@ export class Transforms
 
       this.#count = Object.keys(this._data).length;
    }
-}
-
-/**
- * @param {PositionData}   position -
- *
- * @param {number[]}       output - Output Mat4 array.
- *
- * @returns {number[]} Output Mat4 array.
- */
-function s_GET_ORIGIN_TRANSLATE(position, output = s_MAT4_TEMP_TRANSLATE)
-{
-   const vector = s_VEC3_TEMP;
-
-   switch (position.transformOrigin)
-   {
-      case 'top left':
-         vector[0] = vector[1] = 0;
-         mat4.fromTranslation(output[0], vector);
-         mat4.fromTranslation(output[1], vector);
-         break;
-
-      case 'top center':
-         vector[0] = -position.width / 2;
-         vector[1] = 0;
-         mat4.fromTranslation(output[0], vector);
-         vector[0] = position.width / 2;
-         mat4.fromTranslation(output[1], vector);
-         break;
-
-      case 'top right':
-         vector[0] = -position.width;
-         vector[1] = 0;
-         mat4.fromTranslation(output[0], vector);
-         vector[0] = position.width;
-         mat4.fromTranslation(output[1], vector);
-         break;
-
-      case 'center left':
-         vector[0] = 0;
-         vector[1] = -position.height / 2;
-         mat4.fromTranslation(output[0], vector);
-         vector[1] = position.height / 2;
-         mat4.fromTranslation(output[1], vector);
-         break;
-
-      case 'center':
-         vector[0] = -position.width / 2;
-         vector[1] = -position.height / 2;
-         mat4.fromTranslation(output[0], vector);
-         vector[0] = position.width / 2;
-         vector[1] = position.height / 2;
-         mat4.fromTranslation(output[1], vector);
-         break;
-
-      case 'center right':
-         vector[0] = -position.width;
-         vector[1] = -position.height / 2;
-         mat4.fromTranslation(output[0], vector);
-         vector[0] = position.width;
-         vector[1] = position.height / 2;
-         mat4.fromTranslation(output[1], vector);
-         break;
-
-      case 'bottom left':
-         vector[0] = 0;
-         vector[1] = -position.height;
-         mat4.fromTranslation(output[0], vector);
-         vector[1] = position.height;
-         mat4.fromTranslation(output[1], vector);
-         break;
-
-      case 'bottom center':
-         vector[0] = -position.width / 2;
-         vector[1] = -position.height;
-         mat4.fromTranslation(output[0], vector);
-         vector[0] = position.width / 2;
-         vector[1] = position.height;
-         mat4.fromTranslation(output[1], vector);
-         break;
-
-      case 'bottom right':
-         vector[0] = -position.width;
-         vector[1] = -position.height;
-         mat4.fromTranslation(output[0], vector);
-         vector[0] = position.width;
-         vector[1] = position.height;
-         mat4.fromTranslation(output[1], vector);
-         break;
-   }
-
-   return output;
 }

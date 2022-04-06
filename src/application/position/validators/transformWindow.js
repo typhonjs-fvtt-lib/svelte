@@ -1,6 +1,6 @@
-import { BoundingData } from '../BoundingData.js';
+import { TransformData } from '../TransformData.js';
 
-const s_BOUNDING_DATA = new BoundingData();
+const s_TRANSFORM_DATA = new TransformData();
 
 /**
  *
@@ -40,7 +40,7 @@ export function transformWindow({ position, minWidth, marginTop, marginLeft, max
    // TODO REMOVE: FOR TESTING
    position.top += marginTop;
    position.left += marginLeft;
-   const data = transforms.getBoundingData(position, s_BOUNDING_DATA);
+   const data = transforms.getData(position, s_TRANSFORM_DATA);
    position.top -= marginTop;
    position.left -= marginLeft;
 
@@ -53,8 +53,6 @@ export function transformWindow({ position, minWidth, marginTop, marginLeft, max
    {
       position.left += Math.abs(data.boundingRect.left);
    }
-
-// console.log(`! data.boundingRect.right: ${data.boundingRect.right}`)
 
    if (data.boundingRect.right > globalThis.innerWidth)
    {
@@ -71,7 +69,6 @@ export function transformWindow({ position, minWidth, marginTop, marginLeft, max
 
 let s_INIT_ALREADY = false;
 let s_OVERLAY;
-const s_RECT = new DOMRect();
 
 function s_INIT()
 {
