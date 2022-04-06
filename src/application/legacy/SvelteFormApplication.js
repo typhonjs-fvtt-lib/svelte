@@ -107,7 +107,11 @@ export class SvelteFormApplication extends FormApplication
       this.#applicationState = new ApplicationState(this);
 
       // Initialize Position with the position object set by Application.
-      this.#position = new Position(this, { ...this.options, ...this.position });
+      this.#position = new Position(this, {
+         ...this.position,
+         ...this.options,
+         validators: this.options.positionValidator
+      });
 
       // Remove old position field.
       delete this.position;
@@ -138,16 +142,19 @@ export class SvelteFormApplication extends FormApplication
    static get defaultOptions()
    {
       return deepMerge(super.defaultOptions, {
+         defaultCloseAnimation: true,     // If false the default slide close animation is not run.
          draggable: true,                 // If true then application shells are draggable.
          headerButtonNoClose: false,      // If true then the close header button is removed.
          headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.
          headerNoTitleMinimized: false,   // If true then header title is hidden when application is minimized.
-         defaultCloseAnimation: true,     // If false the default slide close animation is not run.
+         minHeight: MIN_WINDOW_HEIGHT,    // Number specifying minimum window height.
+         minWidth: MIN_WINDOW_WIDTH,      // Number specifying minimum window width.
          positionable: true,              // If false then `position.set` does not take effect.
-         suppressFormInit: false,         // If true automatic suppression of core FormApplication methods is enabled.
+         positionValidator: Position.Validators.browserWindow, // A function providing the default validator.
          rotateX: null,                   // Assigned to position.
          rotateY: null,                   // Assigned to position.
          rotateZ: null,                   // Assigned to position.
+         suppressFormInit: false,         // If true automatic suppression of core FormApplication methods is enabled.
          zIndex: null                     // Assigned to position.
       });
    }
@@ -701,7 +708,7 @@ export class SvelteFormApplication extends FormApplication
     *
     * @param {HTMLElement} [opts.elementTarget] - HTMLElement container for main application target element.
     */
-   onSvelteMount({ element, elementContent, elementTarget }) {} // eslint-disable-line no-unused-vars
+   onSvelteMount({ element, elementContent, elementTarget } = {}) {} // eslint-disable-line no-unused-vars
 
    /**
     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer

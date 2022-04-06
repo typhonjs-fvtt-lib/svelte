@@ -53,6 +53,14 @@
  *
  * @property {import('svelte/store').Writable<number|'auto'|null>} height - Derived store for `height` updates.
  *
+ * @property {import('svelte/store').Writable<number|null>} maxHeight - Derived store for `maxHeight` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} maxWidth - Derived store for `maxWidth` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} minHeight - Derived store for `minHeight` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} minWidth - Derived store for `minWidth` updates.
+ *
  * @property {import('svelte/store').Writable<number|null>} rotate - Derived store for `rotate` updates.
  *
  * @property {import('svelte/store').Writable<number|null>} rotateX - Derived store for `rotateX` updates.

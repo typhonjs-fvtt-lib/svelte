@@ -2,11 +2,12 @@ import { degToRad, mat4, vec3 }  from '@typhonjs-fvtt/svelte/math';
 
 import * as constants            from './constants.js';
 
+import { BoundingData }          from './BoundingData.js';
+
 const s_SCALE_VECTOR = [1, 1, 1];
 const s_MAT4_RESULT = mat4.create();
 const s_MAT4_TEMP = mat4.create();
 const s_MAT4_TEMP_TRANSLATE = [mat4.create(), mat4.create()];
-const s_RECT_TEMP = [vec3.create(), vec3.create(), vec3.create(), vec3.create()];
 const s_VEC3_TEMP = vec3.create();
 
 export class Transforms
@@ -107,16 +108,15 @@ export class Transforms
    }
 
    /**
-    *
     * @param {PositionData} position -
     *
-    * @param {DOMRect}      [output] -
+    * @param {BoundingData} [output] -
     *
-    * @returns {DOMRect} The output DOMRect.
+    * @returns {BoundingData} The output BoundingData.
     */
-   getBoundingBox(position, output = new DOMRect())
+   getBoundingData(position, output = new BoundingData())
    {
-      const rect = s_RECT_TEMP;
+      const rect = output.points;
 
       if (this.hasTransform(position))
       {
@@ -130,7 +130,7 @@ export class Transforms
          rect[3][1] = position.height;
          rect[3][2] = 0;
 
-         const matrix = this.getMat4FromTransforms(position);
+         const matrix = this.getMat4FromTransforms(position, output.mat4);
 
          if (constants.transformOriginDefault === position.transformOrigin)
          {
@@ -179,6 +179,8 @@ export class Transforms
          rect[2][1] = position.top + position.height;
          rect[3][0] = position.left;
          rect[3][1] = position.top + position.height;
+
+         mat4.identity(output.mat4);
       }
 
       let maxX = Number.MIN_SAFE_INTEGER;
@@ -194,10 +196,10 @@ export class Transforms
          if (rect[cntr][1] < minY) { minY = rect[cntr][1]; }
       }
 
-      output.x = minX;
-      output.y = minY;
-      output.width = maxX - minX;
-      output.height = maxY - minY;
+      output.boundingRect.x = minX;
+      output.boundingRect.y = minY;
+      output.boundingRect.width = maxX - minX;
+      output.boundingRect.height = maxY - minY;
 
       return output;
    }

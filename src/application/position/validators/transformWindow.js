@@ -1,33 +1,36 @@
+import { BoundingData } from '../BoundingData.js';
+
+const s_BOUNDING_DATA = new BoundingData();
+
 /**
+ *
  * @param {PositionData}   position - The complete position with top, left, width, height keys.
  *
  * @param {Application}    parent - Parent application.
  *
  * @returns {PositionData} Adjusted position data.
  */
-export function transformWindow({ position, el, minWidth, marginTop, marginLeft, maxWidth, minHeight, maxHeight, width,
+export function transformWindow({ position, minWidth, marginTop, marginLeft, maxWidth, minHeight, maxHeight, width,
  height, transforms })
 {
    if (!s_INIT_ALREADY) { s_INIT(); }
 
-   // if (position.width !== 'auto')
-   // {
-   //    const minW = minWidth || MIN_WINDOW_WIDTH;
-   //    const maxW = maxWidth || el.style.maxWidth || globalThis.innerWidth;
-   //    position.width = width = Math.clamped(position.width, minW, maxW);
-   //
-   //    if ((width + position.left) > globalThis.innerWidth) { position.left = globalThis.innerWidth - width; }
-   // }
-   //
-   // if (position.height !== 'auto')
-   // {
-   //    const minH = minHeight || MIN_WINDOW_HEIGHT;
-   //    const maxH = maxHeight || el.style.maxHeight || globalThis.innerHeight;
-   //    position.height = height = Math.clamped(position.height, minH, maxH);
-   //
-   //    if ((height + position.top) > globalThis.innerHeight) { position.top = globalThis.innerHeight - height; }
-   // }
-   //
+   if (position.width !== 'auto')
+   {
+      const maxW = maxWidth || globalThis.innerWidth;
+      position.width = width = Math.clamped(position.width, minWidth, maxW);
+
+      // if ((width + position.left) > globalThis.innerWidth) { position.left = globalThis.innerWidth - width; }
+   }
+
+   if (position.height !== 'auto')
+   {
+      const maxH = maxHeight || globalThis.innerHeight;
+      position.height = height = Math.clamped(position.height, minHeight, maxH);
+
+      // if ((height + position.top) > globalThis.innerHeight) { position.top = globalThis.innerHeight - height; }
+   }
+
    // const maxL = Math.max(globalThis.innerWidth - width - marginLeft, 0);
    // position.left = Math.round(Math.clamped(position.left, 0, maxL));
    //
@@ -37,19 +40,31 @@ export function transformWindow({ position, el, minWidth, marginTop, marginLeft,
    // TODO REMOVE: FOR TESTING
    position.top += marginTop;
    position.left += marginLeft;
-   const rect = transforms.getBoundingBox(position, s_RECT);
+   const data = transforms.getBoundingData(position, s_BOUNDING_DATA);
    position.top -= marginTop;
    position.left -= marginLeft;
 
-   s_OVERLAY.style.top = `${rect.top}px`;
-   s_OVERLAY.style.left = `${rect.left}px`;
-   s_OVERLAY.style.width = `${rect.width}px`;
-   s_OVERLAY.style.height = `${rect.height}px`;
+   s_OVERLAY.style.top = `${data.boundingRect.top}px`;
+   s_OVERLAY.style.left = `${data.boundingRect.left}px`;
+   s_OVERLAY.style.width = `${data.boundingRect.width}px`;
+   s_OVERLAY.style.height = `${data.boundingRect.height}px`;
 
-   if (rect.left < 0 || rect.right > globalThis.innerWidth || rect.top < 0 || rect.bottom > globalThis.innerHeight)
+   if (data.boundingRect.left < 0)
    {
-      return null;
+      position.left += Math.abs(data.boundingRect.left);
    }
+
+// console.log(`! data.boundingRect.right: ${data.boundingRect.right}`)
+
+   if (data.boundingRect.right > globalThis.innerWidth)
+   {
+      position.left += globalThis.innerWidth - data.boundingRect.right;
+   }
+
+   // if (rect.left < 0 || rect.right > globalThis.innerWidth || rect.top < 0 || rect.bottom > globalThis.innerHeight)
+   // {
+   //    return null;
+   // }
 
    return position;
 }

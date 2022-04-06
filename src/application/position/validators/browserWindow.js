@@ -5,25 +5,29 @@
  *
  * @returns {PositionData} Adjusted position data.
  */
-export function browserWindow({ position, el, minWidth, marginTop, marginLeft, maxWidth, minHeight, maxHeight, width,
+export function browserWindow({ position, minWidth, marginTop, marginLeft, maxWidth, minHeight, maxHeight, width,
  height })
 {
    if (position.width !== 'auto')
    {
-      const minW = minWidth || MIN_WINDOW_WIDTH;
-      const maxW = maxWidth || el.style.maxWidth || globalThis.innerWidth;
-      position.width = width = Math.clamped(position.width, minW, maxW);
+      const maxW = maxWidth || globalThis.innerWidth;
+      position.width = width = Math.clamped(position.width, minWidth, maxW);
 
-      if ((width + position.left) > globalThis.innerWidth) { position.left = globalThis.innerWidth - width; }
+      if ((width + position.left + marginLeft) > globalThis.innerWidth)
+      {
+         position.left = globalThis.innerWidth - width - marginLeft;
+      }
    }
 
    if (position.height !== 'auto')
    {
-      const minH = minHeight || MIN_WINDOW_HEIGHT;
-      const maxH = maxHeight || el.style.maxHeight || globalThis.innerHeight;
-      position.height = height = Math.clamped(position.height, minH, maxH);
+      const maxH = maxHeight || globalThis.innerHeight;
+      position.height = height = Math.clamped(position.height, minHeight, maxH);
 
-      if ((height + position.top) > globalThis.innerHeight) { position.top = globalThis.innerHeight - height; }
+      if ((height + position.top + marginTop) > globalThis.innerHeight)
+      {
+         position.top = globalThis.innerHeight - height - marginTop;
+      }
    }
 
    const maxL = Math.max(globalThis.innerWidth - width - marginLeft, 0);

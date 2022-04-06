@@ -9,7 +9,9 @@ import { isIterable,
 import { propertyStore }         from '@typhonjs-fvtt/svelte/store';
 
 import { AdapterValidators }     from './AdapterValidators.js';
+import { BoundingData }          from './BoundingData.js';
 import * as constants            from './constants.js';
+import { PositionData }          from './PositionData.js';
 import * as positionValidators   from './validators/index.js';
 import { Transforms }            from './Transforms.js';
 
@@ -24,8 +26,7 @@ export class Position
    /**
     * @type {PositionData}
     */
-   #data = { height: null, left: null, rotateX: null, rotateY: null, rotateZ: null, scale: null, top: null,
-    transformOrigin: constants.transformOriginDefault, width: null, zIndex: null };
+   #data = new PositionData();
 
    /**
     * @type {Map<string, PositionData>}
@@ -88,6 +89,8 @@ export class Position
     */
    #validatorsAdapter;
 
+   static get BoundingData() { return BoundingData; }
+
    static get Validators() { return positionValidators; }
 
    /**
@@ -113,6 +116,26 @@ export class Position
          if (Number.isFinite(options.left) || options.left === null)
          {
             data.left = typeof options.left === 'number' ? Math.round(options.left) : options.left;
+         }
+
+         if (Number.isFinite(options.maxHeight) || options.maxHeight === null)
+         {
+            data.maxHeight = typeof options.maxHeight === 'number' ? Math.round(options.maxHeight) : options.maxHeight;
+         }
+
+         if (Number.isFinite(options.maxWidth) || options.maxWidth === null)
+         {
+            data.maxWidth = typeof options.maxWidth === 'number' ? Math.round(options.maxWidth) : options.maxWidth;
+         }
+
+         if (Number.isFinite(options.minHeight) || options.minHeight === null)
+         {
+            data.minHeight = typeof options.minHeight === 'number' ? Math.round(options.minHeight) : options.minHeight;
+         }
+
+         if (Number.isFinite(options.minWidth) || options.minWidth === null)
+         {
+            data.minWidth = typeof options.minWidth === 'number' ? Math.round(options.minWidth) : options.minWidth;
          }
 
          if (Number.isFinite(options.rotateX) || options.rotateX === null)
@@ -164,6 +187,10 @@ export class Position
       this.#stores = {
          height: propertyStore(this, 'height'),
          left: propertyStore(this, 'left'),
+         maxHeight: propertyStore(this, 'maxHeight'),
+         maxWidth: propertyStore(this, 'maxWidth'),
+         minHeight: propertyStore(this, 'minHeight'),
+         minWidth: propertyStore(this, 'minWidth'),
          rotateX: propertyStore(this, 'rotateX'),
          rotateY: propertyStore(this, 'rotateY'),
          rotateZ: propertyStore(this, 'rotateZ'),
@@ -227,6 +254,26 @@ export class Position
    get left() { return this.#data.left; }
 
    /**
+    * @returns {number|null} maxHeight
+    */
+   get maxHeight() { return this.#data.maxHeight; }
+
+   /**
+    * @returns {number|null} maxWidth
+    */
+   get maxWidth() { return this.#data.maxWidth; }
+
+   /**
+    * @returns {number|null} minHeight
+    */
+   get minHeight() { return this.#data.minHeight; }
+
+   /**
+    * @returns {number|null} minWidth
+    */
+   get minWidth() { return this.#data.minWidth; }
+
+   /**
     * @returns {number|null} rotateX
     */
    get rotateX() { return this.#data.rotateX; }
@@ -280,6 +327,38 @@ export class Position
    set left(left)
    {
       this.#stores.left.set(left);
+   }
+
+   /**
+    * @param {number|null} maxHeight -
+    */
+   set maxHeight(maxHeight)
+   {
+      this.#stores.maxHeight.set(maxHeight);
+   }
+
+   /**
+    * @param {number|null} maxWidth -
+    */
+   set maxWidth(maxWidth)
+   {
+      this.#stores.maxWidth.set(maxWidth);
+   }
+
+   /**
+    * @param {number|null} minHeight -
+    */
+   set minHeight(minHeight)
+   {
+      this.#stores.minHeight.set(minHeight);
+   }
+
+   /**
+    * @param {number|null} minWidth -
+    */
+   set minWidth(minWidth)
+   {
+      this.#stores.minWidth.set(minWidth);
    }
 
    /**
@@ -712,6 +791,34 @@ export class Position
          if (data.top !== position.top) { data.top = position.top; modified = true; }
       }
 
+      if (Number.isFinite(position.maxHeight) || position.maxHeight === null)
+      {
+         position.maxHeight = typeof position.maxHeight === 'number' ? Math.round(position.maxHeight) : null;
+
+         if (data.maxHeight !== position.maxHeight) { data.maxHeight = position.maxHeight; modified = true; }
+      }
+
+      if (Number.isFinite(position.maxWidth) || position.maxWidth === null)
+      {
+         position.maxWidth = typeof position.maxWidth === 'number' ? Math.round(position.maxWidth) : null;
+
+         if (data.maxWidth !== position.maxWidth) { data.maxWidth = position.maxWidth; modified = true; }
+      }
+
+      if (Number.isFinite(position.minHeight) || position.minHeight === null)
+      {
+         position.minHeight = typeof position.minHeight === 'number' ? Math.round(position.minHeight) : null;
+
+         if (data.minHeight !== position.minHeight) { data.minHeight = position.minHeight; modified = true; }
+      }
+
+      if (Number.isFinite(position.minWidth) || position.minWidth === null)
+      {
+         position.minWidth = typeof position.minWidth === 'number' ? Math.round(position.minWidth) : null;
+
+         if (data.minWidth !== position.minWidth) { data.minWidth = position.minWidth; modified = true; }
+      }
+
       if (typeof position.rotateX === 'number' || position.rotateX === null)
       {
          if (data.rotateX !== position.rotateX)
@@ -919,26 +1026,64 @@ export class Position
       return currentTime;
    }
 
+   /*
+     @returns {number|'auto'|null} height
+     @returns {number|null} left
+     @returns {number|null} maxHeight
+     @returns {number|null} maxWidth
+     @returns {number|null} minHeight
+     @returns {number|null} minWidth
+     @returns {number|null} rotateX
+     @returns {number|null} rotateY
+     @returns {number|null} rotateZ
+     @returns {number|null} scale
+     @returns {number|null} top
+     @returns {string} transformOrigin
+     @returns {number|'auto'|null} width
+     @returns {number|null} z-index
+    */
+
    /**
+    * @param {object} opts -
     *
-    * @param left
-    * @param top
-    * @param width
-    * @param height
-    * @param rotateX
-    * @param rotateY
-    * @param rotateZ
-    * @param scale
-    * @param transformOrigin
-    * @param zIndex
-    * @param rest
-    * @param parent
-    * @param el
+    * @param {number|null} opts.left -
+    *
+    * @param {number|null} opts.top -
+    *
+    * @param {number|null} opts.maxHeight -
+    *
+    * @param {number|null} opts.maxWidth -
+    *
+    * @param {number|null} opts.minHeight -
+    *
+    * @param {number|null} opts.minWidth -
+    *
+    * @param {number|'auto'|null} opts.width -
+    *
+    * @param {number|'auto'|null} opts.height -
+    *
+    * @param {number|null} opts.rotateX -
+    *
+    * @param {number|null} opts.rotateY -
+    *
+    * @param {number|null} opts.rotateZ -
+    *
+    * @param {number|null} opts.scale -
+    *
+    * @param {string} opts.transformOrigin -
+    *
+    * @param {number|null} opts.zIndex -
+    *
+    * @param {*} opts.rest -
+    *
+    * @param {object} parent -
+    *
+    * @param {HTMLElement} el -
     *
     * @returns {null|PositionData} Updated position data or null if validation fails.
     */
-   #updatePosition({ left, top, width, height, rotateX, rotateY, rotateZ, scale, transformOrigin, zIndex,
-    ...rest } = {}, parent, el)
+   #updatePosition({ left, top, maxWidth, maxHeight, minWidth, minHeight, width, height, rotateX, rotateY, rotateZ,
+    scale, transformOrigin, zIndex, ...rest } = {}, parent, el)
    {
       let currentPosition = this.get(rest);
 
@@ -970,7 +1115,7 @@ export class Position
          }
          else
          {
-            currentPosition.height = height = typeof height === 'number' ? Math.round(height) : el.offsetHeight + 1;
+            currentPosition.height = height = typeof height === 'number' ? Math.round(height) : el.offsetHeight;
          }
       }
       else
@@ -988,6 +1133,26 @@ export class Position
       if (el.style.top === '' || Number.isFinite(top))
       {
          currentPosition.top = Number.isFinite(top) ? top : (globalThis.innerHeight - height) / 2;
+      }
+
+      if (Number.isFinite(maxHeight) || maxHeight === null)
+      {
+         currentPosition.maxHeight = Number.isFinite(maxHeight) ? Math.round(maxHeight) : null;
+      }
+
+      if (Number.isFinite(maxWidth) || maxWidth === null)
+      {
+         currentPosition.maxWidth = Number.isFinite(maxWidth) ? Math.round(maxWidth) : null;
+      }
+
+      if (Number.isFinite(minHeight) || minHeight === null)
+      {
+         currentPosition.minHeight = Number.isFinite(minHeight) ? Math.round(minHeight) : null;
+      }
+
+      if (Number.isFinite(minWidth) || minWidth === null)
+      {
+         currentPosition.minWidth = Number.isFinite(minWidth) ? Math.round(minWidth) : null;
       }
 
       // Update rotate X/Y/Z, scale, z-index
@@ -1017,16 +1182,33 @@ export class Position
       if (validators.length)
       {
          s_VALIDATOR_DATA.parent = parent;
+
          s_VALIDATOR_DATA.el = el;
+
          s_VALIDATOR_DATA.styles = globalThis.getComputedStyle(el);
+
          s_VALIDATOR_DATA.transforms = this.#transforms;
-         s_VALIDATOR_DATA.marginTop = styleParsePixels(s_VALIDATOR_DATA.styles.marginTop);
-         s_VALIDATOR_DATA.marginLeft = styleParsePixels(s_VALIDATOR_DATA.styles.marginLeft);
-         s_VALIDATOR_DATA.minWidth = styleParsePixels(s_VALIDATOR_DATA.styles.minWidth);
-         s_VALIDATOR_DATA.maxWidth = styleParsePixels(s_VALIDATOR_DATA.styles.maxWidth);
-         s_VALIDATOR_DATA.minHeight = styleParsePixels(s_VALIDATOR_DATA.styles.minHeight);
-         s_VALIDATOR_DATA.maxHeight = styleParsePixels(s_VALIDATOR_DATA.styles.maxHeight);
+
+         s_VALIDATOR_DATA.marginTop = styleParsePixels(el.style.marginTop) ||
+          styleParsePixels(s_VALIDATOR_DATA.styles.marginTop);
+
+         s_VALIDATOR_DATA.marginLeft = styleParsePixels(el.style.marginLeft) ||
+          styleParsePixels(s_VALIDATOR_DATA.styles.marginLeft);
+
+         s_VALIDATOR_DATA.maxHeight = styleParsePixels(el.style.maxHeight) ||
+          styleParsePixels(s_VALIDATOR_DATA.styles.maxHeight) || currentPosition.maxHeight;
+
+         s_VALIDATOR_DATA.maxWidth = styleParsePixels(el.style.maxWidth) ||
+          styleParsePixels(s_VALIDATOR_DATA.styles.maxWidth) || currentPosition.maxWidth;
+
+         s_VALIDATOR_DATA.minHeight = styleParsePixels(el.style.minHeight) ||
+          styleParsePixels(s_VALIDATOR_DATA.styles.minHeight) || currentPosition.minHeight;
+
+         s_VALIDATOR_DATA.minWidth = styleParsePixels(el.style.minWidth) ||
+          styleParsePixels(s_VALIDATOR_DATA.styles.minWidth) || currentPosition.minWidth;
+
          s_VALIDATOR_DATA.width = width;
+
          s_VALIDATOR_DATA.height = height;
 
          for (const validator of validators)
