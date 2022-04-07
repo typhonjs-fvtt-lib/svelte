@@ -168,18 +168,26 @@ export class Transforms
     */
    getData(position, output = new TransformData())
    {
-      const rect = output.points;
+      const constraints = output.constraints;
+
+      position.top += constraints.offsetTop;
+      position.left += constraints.offsetLeft;
+
+      const width = Number.isFinite(position.width) ? position.width : constraints.width;
+      const height = Number.isFinite(position.height) ? position.height : constraints.height;
+
+      const rect = output.corners;
 
       if (this.hasTransform(position))
       {
          rect[0][0] = rect[0][1] = rect[0][2] = 0;
-         rect[1][0] = position.width;
+         rect[1][0] = width;
          rect[1][1] = rect[1][2] = 0;
-         rect[2][0] = position.width;
-         rect[2][1] = position.height;
+         rect[2][0] = width;
+         rect[2][1] = height;
          rect[2][2] = 0;
          rect[3][0] = 0;
-         rect[3][1] = position.height;
+         rect[3][1] = height;
          rect[3][2] = 0;
 
          const matrix = this.getMat4(position, output.mat4);
@@ -227,12 +235,12 @@ export class Transforms
       {
          rect[0][0] = position.left;
          rect[0][1] = position.top;
-         rect[1][0] = position.left + position.width;
+         rect[1][0] = position.left + width;
          rect[1][1] = position.top;
-         rect[2][0] = position.left + position.width;
-         rect[2][1] = position.top + position.height;
+         rect[2][0] = position.left + width;
+         rect[2][1] = position.top + height;
          rect[3][0] = position.left;
-         rect[3][1] = position.top + position.height;
+         rect[3][1] = position.top + height;
 
          mat4.identity(output.mat4);
       }
@@ -250,10 +258,14 @@ export class Transforms
          if (rect[cntr][1] < minY) { minY = rect[cntr][1]; }
       }
 
-      output.boundingRect.x = minX;
-      output.boundingRect.y = minY;
-      output.boundingRect.width = maxX - minX;
-      output.boundingRect.height = maxY - minY;
+      const boundingRect = output.boundingRect;
+      boundingRect.x = minX;
+      boundingRect.y = minY;
+      boundingRect.width = maxX - minX;
+      boundingRect.height = maxY - minY;
+
+      position.top -= constraints.offsetTop;
+      position.left -= constraints.offsetLeft;
 
       return output;
    }

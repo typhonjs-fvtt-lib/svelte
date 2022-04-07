@@ -3,87 +3,63 @@ import { TransformData } from '../TransformData.js';
 const s_TRANSFORM_DATA = new TransformData();
 
 /**
+ * Provides a validator that respects transforms in positional data constraining the position to within the browser
+ * window.
  *
  * @param {PositionData}   position - The complete position with top, left, width, height keys.
- *
- * @param {Application}    parent - Parent application.
  *
  * @returns {PositionData} Adjusted position data.
  */
 export function transformWindow({ position, minWidth, marginTop, marginLeft, maxWidth, minHeight, maxHeight, width,
  height, transforms })
 {
-   if (!s_INIT_ALREADY) { s_INIT(); }
-
+   // Ensure min / max width constraints when position width is 'auto'.
    if (position.width !== 'auto')
    {
       const maxW = maxWidth || globalThis.innerWidth;
-      position.width = width = Math.clamped(position.width, minWidth, maxW);
-
-      // if ((width + position.left) > globalThis.innerWidth) { position.left = globalThis.innerWidth - width; }
+      position.width = Math.clamped(width, minWidth, maxW);
    }
 
+   // Ensure min / max height constraints when position height is not 'auto'.
    if (position.height !== 'auto')
    {
       const maxH = maxHeight || globalThis.innerHeight;
-      position.height = height = Math.clamped(position.height, minHeight, maxH);
-
-      // if ((height + position.top) > globalThis.innerHeight) { position.top = globalThis.innerHeight - height; }
+      position.height = Math.clamped(height, minHeight, maxH);
    }
 
-   // const maxL = Math.max(globalThis.innerWidth - width - marginLeft, 0);
-   // position.left = Math.round(Math.clamped(position.left, 0, maxL));
-   //
-   // const maxT = Math.max(globalThis.innerHeight - height - marginTop, 0);
-   // position.top = Math.round(Math.clamped(position.top, 0, maxT));
+   // Get transform data. First set constraints including any margin top / left as offsets and width / height. Used
+   // when position width / height is 'auto'.
+   const data = transforms.getData(position, s_TRANSFORM_DATA.setConstraints(width, height, marginTop, marginLeft));
 
-   // TODO REMOVE: FOR TESTING
-   position.top += marginTop;
-   position.left += marginLeft;
-   const data = transforms.getData(position, s_TRANSFORM_DATA);
-   position.top -= marginTop;
-   position.left -= marginLeft;
+   // Check the bounding rectangle against browser height / width. Adjust position based on how far the overlap of the
+   // bounding rect is outside the browser window. The order below matters as the constraints are top / left oriented,
+   // so perform those checks last. Also adjust the bounding rectangle as position changes are made.
 
-   s_OVERLAY.style.top = `${data.boundingRect.top}px`;
-   s_OVERLAY.style.left = `${data.boundingRect.left}px`;
-   s_OVERLAY.style.width = `${data.boundingRect.width}px`;
-   s_OVERLAY.style.height = `${data.boundingRect.height}px`;
-
-   if (data.boundingRect.left < 0)
+   if (data.boundingRect.bottom + marginTop > globalThis.innerHeight)
    {
-      position.left += Math.abs(data.boundingRect.left);
+      const adjust = globalThis.innerHeight - data.boundingRect.bottom - marginTop;
+      position.top += adjust;
+      data.boundingRect.y += adjust;
    }
 
-   if (data.boundingRect.right > globalThis.innerWidth)
+   if (data.boundingRect.right + marginLeft > globalThis.innerWidth)
    {
-      position.left += globalThis.innerWidth - data.boundingRect.right;
+      const adjust = globalThis.innerWidth - data.boundingRect.right - marginLeft;
+      position.left += adjust;
+      data.boundingRect.x += adjust;
    }
 
-   // if (rect.left < 0 || rect.right > globalThis.innerWidth || rect.top < 0 || rect.bottom > globalThis.innerHeight)
-   // {
-   //    return null;
-   // }
+   if (data.boundingRect.top - marginTop < 0)
+   {
+      const adjust = Math.abs(data.boundingRect.top - marginTop);
+      position.top += adjust;
+      data.boundingRect.y += adjust;
+   }
+
+   if (data.boundingRect.left - marginLeft < 0)
+   {
+      position.left += Math.abs(data.boundingRect.left - marginLeft);
+   }
 
    return position;
-}
-
-let s_INIT_ALREADY = false;
-let s_OVERLAY;
-
-function s_INIT()
-{
-   s_INIT_ALREADY = true;
-
-   // TODO REMOVE: FOR TESTING
-   s_OVERLAY = document.createElement('div');
-   s_OVERLAY.style.zIndex = '99999';
-   s_OVERLAY.style.background = 'rgba(0, 0, 255, 0.3)';
-   s_OVERLAY.style.width = '200px';
-   s_OVERLAY.style.height = '200px';
-   s_OVERLAY.style.top = '100px';
-   s_OVERLAY.style.left = '100px';
-   s_OVERLAY.style.position = 'absolute';
-   s_OVERLAY.style.pointerEvents = 'none';
-
-   document.body.append(s_OVERLAY);
 }

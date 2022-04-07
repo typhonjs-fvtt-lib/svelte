@@ -150,7 +150,7 @@ export class SvelteApplication extends Application
          minHeight: MIN_WINDOW_HEIGHT,    // Number specifying minimum window height.
          minWidth: MIN_WINDOW_WIDTH,      // Number specifying minimum window width.
          positionable: true,              // If false then `position.set` does not take effect.
-         positionValidator: Position.Validators.browserWindow, // A function providing the default validator.
+         positionValidator: Position.Validators.transformWindow, // A function providing the default validator.
          rotateX: null,                   // Assigned to position.
          rotateY: null,                   // Assigned to position.
          rotateZ: null,                   // Assigned to position.

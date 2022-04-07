@@ -1,11 +1,11 @@
 /**
- * @param {PositionData}   position - The complete position with top, left, width, height keys.
+ * Provides basic browser window constraints when position data contains no transforms. This is a fast validator.
  *
- * @param {Application}    parent - Parent application.
+ * @param {PositionData}   position - The complete position with top, left, width, height keys.
  *
  * @returns {PositionData} Adjusted position data.
  */
-export function browserWindow({ position, minWidth, marginTop, marginLeft, maxWidth, minHeight, maxHeight, width,
+export function basicWindow({ position, minWidth, marginTop, marginLeft, maxWidth, minHeight, maxHeight, width,
  height })
 {
    if (position.width !== 'auto')

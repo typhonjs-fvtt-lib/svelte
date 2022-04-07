@@ -1,2 +1,2 @@
-export * from './browserWindow.js';
+export * from './basicWindow.js';
 export * from './transformWindow.js';

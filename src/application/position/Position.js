@@ -5,7 +5,6 @@ import { lerp }                  from '@typhonjs-fvtt/svelte/math';
 import { isIterable,
          styleParsePixels }      from '@typhonjs-fvtt/svelte/util';
 
-// import { propertyStore }         from '@typhonjs-svelte/lib/store';
 import { propertyStore }         from '@typhonjs-fvtt/svelte/store';
 
 import { AdapterValidators }     from './AdapterValidators.js';
@@ -48,7 +47,7 @@ export class Position
    /**
     * The associated parent for positional data tracking. Used in validators.
     *
-    * @type {object}
+    * @type {PositionParent}
     */
    #parent;
 
@@ -89,12 +88,12 @@ export class Position
     */
    #validatorsAdapter;
 
-   static get BoundingData() { return TransformData; }
+   static get TransformData() { return TransformData; }
 
    static get Validators() { return positionValidators; }
 
    /**
-    * @param {object}         parent - The associated parent for positional data tracking. Used in validators.
+    * @param {PositionParent} parent - The associated parent for positional data tracking. Used in validators.
     *
     * @param {object}         options - Default values.
     */
@@ -228,6 +227,13 @@ export class Position
    }
 
    /**
+    * Returns the associated {@link PositionParent} instance.
+    *
+    * @returns {PositionParent} The PositionParent instance.
+    */
+   get parent() { return this.#parent; }
+
+   /**
     * Returns the derived writable stores for individual data variables.
     *
     * @returns {StorePosition} Derived / writable stores.
@@ -240,6 +246,17 @@ export class Position
     * @returns {AdapterValidators} validators.
     */
    get validators() { return this.#validators; }
+
+   /**
+    * Sets the associated {@link PositionParent} instance.
+    *
+    * @param {PositionParent} parent - A PositionParent instance.
+    */
+   set parent(parent)
+   {
+      this.#parent = parent;
+      this.set(this.#data);
+   }
 
 // Data accessors ----------------------------------------------------------------------------------------------------
 
@@ -957,7 +974,7 @@ export class Position
 
       this.#updateElementInvoked = false;
 
-      const el = this.#parent?.elementTarget;
+      const el = this.#parent instanceof HTMLElement ? this.#parent : this.#parent?.elementTarget;
 
       if (!el)
       {
@@ -1025,23 +1042,6 @@ export class Position
 
       return currentTime;
    }
-
-   /*
-     @returns {number|'auto'|null} height
-     @returns {number|null} left
-     @returns {number|null} maxHeight
-     @returns {number|null} maxWidth
-     @returns {number|null} minHeight
-     @returns {number|null} minWidth
-     @returns {number|null} rotateX
-     @returns {number|null} rotateY
-     @returns {number|null} rotateZ
-     @returns {number|null} scale
-     @returns {number|null} top
-     @returns {string} transformOrigin
-     @returns {number|'auto'|null} width
-     @returns {number|null} z-index
-    */
 
    /**
     * @param {object} opts -
@@ -1233,12 +1233,18 @@ const s_VALIDATOR_DATA = {
    transforms: void 0,
    marginTop: void 0,
    marginLeft: void 0,
-   minWidth: void 0,
+   maxHeight: void 0,
    maxWidth: void 0,
    minHeight: void 0,
-   maxHeight: void 0,
+   minWidth: void 0,
    width: void 0,
    height: void 0
 };
 
 Object.seal(s_VALIDATOR_DATA);
+
+/**
+ * @typedef {HTMLElement | object} PositionParent
+ *
+ * @property {Function} [elementTarget] - Potentially returns any parent object.
+ */
