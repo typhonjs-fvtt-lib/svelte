@@ -1181,40 +1181,40 @@ export class Position
       // If there are any validators allow them to potentially modify position data or reject the update.
       if (validators.length)
       {
-         s_VALIDATOR_DATA.parent = parent;
+         s_VALIDATION_DATA.parent = parent;
 
-         s_VALIDATOR_DATA.el = el;
+         s_VALIDATION_DATA.el = el;
 
-         s_VALIDATOR_DATA.styles = globalThis.getComputedStyle(el);
+         s_VALIDATION_DATA.styles = globalThis.getComputedStyle(el);
 
-         s_VALIDATOR_DATA.transforms = this.#transforms;
+         s_VALIDATION_DATA.transforms = this.#transforms;
 
-         s_VALIDATOR_DATA.marginTop = styleParsePixels(el.style.marginTop) ||
-          styleParsePixels(s_VALIDATOR_DATA.styles.marginTop);
+         s_VALIDATION_DATA.height = height;
 
-         s_VALIDATOR_DATA.marginLeft = styleParsePixels(el.style.marginLeft) ||
-          styleParsePixels(s_VALIDATOR_DATA.styles.marginLeft);
+         s_VALIDATION_DATA.width = width;
 
-         s_VALIDATOR_DATA.maxHeight = styleParsePixels(el.style.maxHeight) ||
-          styleParsePixels(s_VALIDATOR_DATA.styles.maxHeight) || currentPosition.maxHeight;
+         s_VALIDATION_DATA.marginLeft = styleParsePixels(el.style.marginLeft) ||
+          styleParsePixels(s_VALIDATION_DATA.styles.marginLeft);
 
-         s_VALIDATOR_DATA.maxWidth = styleParsePixels(el.style.maxWidth) ||
-          styleParsePixels(s_VALIDATOR_DATA.styles.maxWidth) || currentPosition.maxWidth;
+         s_VALIDATION_DATA.marginTop = styleParsePixels(el.style.marginTop) ||
+          styleParsePixels(s_VALIDATION_DATA.styles.marginTop);
 
-         s_VALIDATOR_DATA.minHeight = styleParsePixels(el.style.minHeight) ||
-          styleParsePixels(s_VALIDATOR_DATA.styles.minHeight) || currentPosition.minHeight;
+         s_VALIDATION_DATA.maxHeight = styleParsePixels(el.style.maxHeight) ||
+          styleParsePixels(s_VALIDATION_DATA.styles.maxHeight) || currentPosition.maxHeight;
 
-         s_VALIDATOR_DATA.minWidth = styleParsePixels(el.style.minWidth) ||
-          styleParsePixels(s_VALIDATOR_DATA.styles.minWidth) || currentPosition.minWidth;
+         s_VALIDATION_DATA.maxWidth = styleParsePixels(el.style.maxWidth) ||
+          styleParsePixels(s_VALIDATION_DATA.styles.maxWidth) || currentPosition.maxWidth;
 
-         s_VALIDATOR_DATA.width = width;
+         s_VALIDATION_DATA.minHeight = styleParsePixels(el.style.minHeight) ||
+          styleParsePixels(s_VALIDATION_DATA.styles.minHeight) || currentPosition.minHeight;
 
-         s_VALIDATOR_DATA.height = height;
+         s_VALIDATION_DATA.minWidth = styleParsePixels(el.style.minWidth) ||
+          styleParsePixels(s_VALIDATION_DATA.styles.minWidth) || currentPosition.minWidth;
 
-         for (const validator of validators)
+         for (const entry of validators)
          {
-            s_VALIDATOR_DATA.position = currentPosition;
-            currentPosition = validator.validator(s_VALIDATOR_DATA);
+            s_VALIDATION_DATA.position = currentPosition;
+            currentPosition = entry.validator(s_VALIDATION_DATA);
 
             if (currentPosition === null) { return null; }
          }
@@ -1225,26 +1225,59 @@ export class Position
    }
 }
 
-const s_VALIDATOR_DATA = {
+/**
+ * @type {ValidationData}
+ */
+const s_VALIDATION_DATA = {
    position: void 0,
    parent: void 0,
    el: void 0,
    styles: void 0,
    transforms: void 0,
-   marginTop: void 0,
+   height: void 0,
+   width: void 0,
    marginLeft: void 0,
+   marginTop: void 0,
    maxHeight: void 0,
    maxWidth: void 0,
    minHeight: void 0,
-   minWidth: void 0,
-   width: void 0,
-   height: void 0
+   minWidth: void 0
 };
 
-Object.seal(s_VALIDATOR_DATA);
+Object.seal(s_VALIDATION_DATA);
 
 /**
  * @typedef {HTMLElement | object} PositionParent
  *
  * @property {Function} [elementTarget] - Potentially returns any parent object.
+ */
+
+/**
+ * @typedef {object} ValidationData
+ *
+ * @property {PositionData} position -
+ *
+ * @property {PositionParent} parent -
+ *
+ * @property {HTMLElement} el -
+ *
+ * @property {CSSStyleDeclaration} styles -
+ *
+ * @property {Transforms} transforms -
+ *
+ * @property {number} height -
+ *
+ * @property {number} width -
+ *
+ * @property {number|undefined} marginLeft -
+ *
+ * @property {number|undefined} marginTop -
+ *
+ * @property {number|undefined} maxHeight -
+ *
+ * @property {number|undefined} maxWidth -
+ *
+ * @property {number|undefined} minHeight -
+ *
+ * @property {number|undefined} minWidth -
  */

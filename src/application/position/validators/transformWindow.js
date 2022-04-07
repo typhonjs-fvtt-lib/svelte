@@ -6,13 +6,15 @@ const s_TRANSFORM_DATA = new TransformData();
  * Provides a validator that respects transforms in positional data constraining the position to within the browser
  * window.
  *
- * @param {PositionData}   position - The complete position with top, left, width, height keys.
+ * @param {ValidationData}   validationData - The associated validation data for position updates.
  *
- * @returns {PositionData} Adjusted position data.
+ * @returns {PositionData} Potentially adjusted position data.
  */
-export function transformWindow({ position, minWidth, marginTop, marginLeft, maxWidth, minHeight, maxHeight, width,
- height, transforms })
+export function transformWindow(validationData)
 {
+   const { position, minWidth, marginTop, marginLeft, maxWidth, minHeight, maxHeight, width, height, transforms } =
+    validationData;
+
    // Ensure min / max width constraints when position width is 'auto'.
    if (position.width !== 'auto')
    {

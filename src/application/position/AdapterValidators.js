@@ -293,7 +293,7 @@ export class AdapterValidators
 }
 
 /**
- * @typedef {function(object, PositionData): PositionData|null} ValidatorFn - Position validator function that
+ * @typedef {function(ValidationData): PositionData|null} ValidatorFn - Position validator function that
  *                         takes a {@link PositionData} instance potentially modifying it or returning null if invalid.
  *
  * @property {Function} [subscribe] - Optional subscribe function following the Svelte store / subscribe pattern.

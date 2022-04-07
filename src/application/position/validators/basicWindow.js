@@ -1,13 +1,15 @@
 /**
  * Provides basic browser window constraints when position data contains no transforms. This is a fast validator.
  *
- * @param {PositionData}   position - The complete position with top, left, width, height keys.
+ * @param {ValidationData}   validationData - The associated validation data for position updates.
  *
- * @returns {PositionData} Adjusted position data.
+ * @returns {PositionData} Potentially adjusted position data.
  */
-export function basicWindow({ position, minWidth, marginTop, marginLeft, maxWidth, minHeight, maxHeight, width,
- height })
+export function basicWindow(validationData)
 {
+   const { position, minWidth, marginTop, marginLeft, maxWidth, minHeight, maxHeight } = validationData;
+   let { width, height } = validationData;
+
    if (position.width !== 'auto')
    {
       const maxW = maxWidth || globalThis.innerWidth;

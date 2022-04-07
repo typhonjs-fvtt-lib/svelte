@@ -1,5 +1,8 @@
 import * as constants   from './constants.js';
 
+/**
+ * Defines stored positional data.
+ */
 export class PositionData
 {
    constructor({ height = null, left = null, maxHeight = null, maxWidth = null, minHeight = null, minWidth = null,
