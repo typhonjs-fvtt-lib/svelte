@@ -216,10 +216,15 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Provide an override to set this application as the active window regardless of z-index. Changes behaviour from
     * Foundry core. This is important / used for instance in dialog key handling for left / right button selection.
+    *
+    * @param {object} [opts] - Optional parameters.
+    *
+    * @param {boolean} [opts.force=false] - Force bring to top; will increment z-index by popOut order.
+    *
     */
-   bringToTop()
+   bringToTop({ force = false } = {})
    {
-      super.bringToTop();
+      if (force || this.popOut) { super.bringToTop(); }
 
       ui.activeWindow = this;
    }
