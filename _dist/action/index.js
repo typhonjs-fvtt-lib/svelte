@@ -1,3 +1,5 @@
+import { hasSetter } from '@typhonjs-fvtt/svelte/util';
+
 /**
  * Provides an action to apply style properties provided as an object.
  *
@@ -28,6 +30,33 @@ function applyStyles(node, properties)
          properties = newProperties;
          setProperties();
       }
+   };
+}
+
+/**
+ * Provides an action to apply a Position instance to a HTMLElement and invoke `position.parent`
+ *
+ * @param {HTMLElement}       node - The node associated with the action.
+ *
+ * @param {Position}          position - A position instance.
+ *
+ * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
+ */
+function applyPosition(node, position)
+{
+   if (hasSetter(position, 'parent')) { position.parent = node; }
+
+   return {
+      update: (newPosition) =>
+      {
+         if (hasSetter(position)) { position.parent = void 0; }
+
+         position = newPosition;
+
+         if (hasSetter(position, 'parent')) { position.parent = node; }
+      },
+
+      destroy: () => { if (hasSetter(position, 'parent')) { position.parent = void 0; } }
    };
 }
 
@@ -183,5 +212,5 @@ function draggable(node, { position, active = true, storeDragging = void 0 })
    };
 }
 
-export { applyStyles, draggable };
+export { applyPosition, applyStyles, draggable };
 //# sourceMappingURL=index.js.map

@@ -1,4 +1,17 @@
 /**
+ * Provides an action to apply a Position instance to a HTMLElement and invoke `position.parent`
+ *
+ * @param {HTMLElement}       node - The node associated with the action.
+ *
+ * @param {Position}          position - A position instance.
+ *
+ * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
+ */
+declare function applyPosition(node: HTMLElement, position: any): {
+    update: Function;
+    destroy: Function;
+};
+/**
  * Provides an action to apply style properties provided as an object.
  *
  * @param {HTMLElement} node - Target element
@@ -33,4 +46,4 @@ declare function draggable(node: HTMLElement, { position, active, storeDragging 
     destroy: Function;
 };
 
-export { applyStyles, draggable };
+export { applyPosition, applyStyles, draggable };
