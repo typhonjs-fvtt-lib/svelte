@@ -206,13 +206,10 @@ export class Position
 
       [this.#validators, this.#validatorsAdapter] = new AdapterValidators();
 
-      if (typeof options?.validators === 'function')
+      if (options?.validators)
       {
-         this.validators.add(options.validators);
-      }
-      else if (isIterable(options?.validators))
-      {
-         this.validators.add(...options.validators);
+         if (isIterable(options?.validators)) { this.validators.add(...options.validators); }
+         else { this.validators.add(options.validators); }
       }
    }
 

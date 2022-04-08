@@ -111,8 +111,9 @@ export class AdapterValidators
 
                data = {
                   id: validator.id !== void 0 ? validator.id : void 0,
-                  validator: validator.validator,
-                  weight: validator.weight || 1
+                  validator: validator.validator.bind(validator),
+                  weight: validator.weight || 1,
+                  instance: validator
                };
 
                subscribeFn = validator.validator.subscribe ?? validator.subscribe;
