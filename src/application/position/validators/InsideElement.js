@@ -16,15 +16,25 @@ export class InsideElement
     */
    #element;
 
-   constructor({ constrain = true, element } = {})
+   /**
+    * When true the validator is active.
+    *
+    * @type {boolean}
+    */
+   #enabled;
+
+   constructor({ constrain = true, element, enabled = true } = {})
    {
       this.element = element;
       this.constrain = constrain;
+      this.enabled = enabled;
    }
 
    get constrain() { return this.#constrain; }
 
    get element() { return this.#element; }
+
+   get enabled() { return this.#enabled; }
 
    set constrain(constrain)
    {
@@ -46,6 +56,16 @@ export class InsideElement
       this.#element = element;
    }
 
+   set enabled(enabled)
+   {
+      if (typeof enabled !== 'boolean')
+      {
+         throw new TypeError(`'enabled' is not a boolean.`);
+      }
+
+      this.#enabled = enabled;
+   }
+
    /**
     * Provides a validator that respects transforms in positional data constraining the position to within the target
     * elements bounds.
@@ -56,6 +76,9 @@ export class InsideElement
     */
    validator(validationData)
    {
+      // Early out if local enabled state is false.
+      if (!this.#enabled) { return validationData.position; }
+
       const { position, minWidth, marginTop, marginLeft, maxWidth, minHeight, maxHeight, width, height, transforms } =
        validationData;
 
