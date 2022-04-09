@@ -45,6 +45,9 @@
 /**
  * @typedef {object} StorePosition - Provides individual writable stores for {@link Position}.
  *
+ * @property {import('svelte/store').Readable<{width: number, height: number}>} dimension - Readable store for dimension
+ *                                                                                          data.
+ *
  * @property {import('svelte/store').Writable<number|null>} left - Derived store for `left` updates.
  *
  * @property {import('svelte/store').Writable<number|null>} top - Derived store for `top` updates.

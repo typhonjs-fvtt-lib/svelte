@@ -46,6 +46,13 @@ export class Position
    #defaultData;
 
    /**
+    * Stores the current dimension data used for the readable `dimension` store.
+    *
+    * @type {{width: number | 'auto', height: number | 'auto'}}
+    */
+   #dimensionData = { width: 0, height: 0 };
+
+   /**
     * Stores ongoing options that are set in the constructor.
     *
     * @type {{calculateTransform: boolean}}
@@ -74,7 +81,14 @@ export class Position
    #stores;
 
    /**
-    * Stores the internal writable for the readable transform store.
+    * Stores the internal writable for the readable `dimension` store.
+    *
+    * @type {import('svelte/store').Writable<{width: number | 'auto', height: number | 'auto'}>}
+    */
+   #storeDimension;
+
+   /**
+    * Stores the internal writable for the readable `transform` store.
     *
     * @type {import('svelte/store').Writable<TransformData>}
     */
@@ -134,7 +148,8 @@ export class Position
       {
          if (Number.isFinite(options.height) || options.height === 'auto' || options.height === null)
          {
-            data.height = typeof options.height === 'number' ? Math.round(options.height) : options.height;
+            data.height = this.#dimensionData.height = typeof options.height === 'number' ?
+             Math.round(options.height) : options.height;
          }
 
          if (Number.isFinite(options.left) || options.left === null)
@@ -199,7 +214,8 @@ export class Position
 
          if (Number.isFinite(options.width) || options.width === 'auto' || options.width === null)
          {
-            data.width = typeof options.width === 'number' ? Math.round(options.width) : options.width;
+            data.width = this.#dimensionData.width = typeof options.width === 'number' ?
+             Math.round(options.width) : options.width;
          }
 
          if (Number.isFinite(options.zIndex) || options.zIndex === null)
@@ -208,9 +224,11 @@ export class Position
          }
       }
 
+      this.#storeDimension = writable(this.#dimensionData);
       this.#storeTransform = writable(this.#transformData);
 
       this.#stores = {
+         dimension: { subscribe: this.#storeDimension.subscribe },
          height: propertyStore(this, 'height'),
          left: propertyStore(this, 'left'),
          maxHeight: propertyStore(this, 'maxHeight'),
@@ -239,6 +257,20 @@ export class Position
          if (isIterable(options?.validators)) { this.validators.add(...options.validators); }
          else { this.validators.add(options.validators); }
       }
+
+      // Seal data backing readable stores.
+      Object.seal(this.#dimensionData);
+      Object.seal(this.#transformData);
+   }
+
+   /**
+    * Returns the dimension data for the readable store.
+    *
+    * @returns {{width: number | 'auto', height: number | 'auto'}} Dimension data.
+    */
+   get dimension()
+   {
+      return this.#dimensionData;
    }
 
    /**
@@ -264,6 +296,16 @@ export class Position
     * @returns {StorePosition} Derived / writable stores.
     */
    get stores() { return this.#stores; }
+
+   /**
+    * Returns the transform data for the readable store.
+    *
+    * @returns {TransformData} Transform Data.
+    */
+   get transform()
+   {
+      return this.#transformData;
+   }
 
    /**
     * Returns the validators.
@@ -818,6 +860,7 @@ export class Position
       }
 
       let modified = false;
+      let modifiedDimension = false;
 
       if (typeof position.left === 'number')
       {
@@ -922,14 +965,14 @@ export class Position
       {
          position.width = typeof position.width === 'number' ? Math.round(position.width) : position.width;
 
-         if (data.width !== position.width) { data.width = position.width; modified = true; }
+         if (data.width !== position.width) { data.width = position.width; modified = modifiedDimension = true; }
       }
 
       if (typeof position.height === 'number' || position.height === 'auto' || position.height === null)
       {
          position.height = typeof position.height === 'number' ? Math.round(position.height) : position.height;
 
-         if (data.height !== position.height) { data.height = position.height; modified = true; }
+         if (data.height !== position.height) { data.height = position.height; modified = modifiedDimension = true; }
       }
 
       if (el)
@@ -945,6 +988,14 @@ export class Position
 
          // If calculate transform options is enabled then update the transform data and set the readable store.
          if (this.#options.calculateTransform) { this.#updateTransform(el, data); }
+
+         // Update dimension data if width / height has changed.
+         if (modifiedDimension)
+         {
+            this.#dimensionData.width = data.width;
+            this.#dimensionData.height = data.height;
+            this.#storeDimension.set(this.#dimensionData);
+         }
       }
 
       // Notify main store subscribers.
