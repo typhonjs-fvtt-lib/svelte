@@ -164,17 +164,22 @@ export class Transforms
     *
     * @param {TransformData} [output] - Optional TransformData output instance.
     *
+    * @param {object} [validationData] - Optional validation data for adjustment parameters.
+    *
     * @returns {TransformData} The output TransformData instance.
     */
-   getData(position, output = new TransformData())
+   getData(position, output = new TransformData(), validationData = {})
    {
-      const constraints = output.constraints;
+      const valWidth = validationData.width ?? 0;
+      const valHeight = validationData.height ?? 0;
+      const valOffsetTop = validationData.offsetTop ?? validationData.marginTop ?? 0;
+      const valOffsetLeft = validationData.offsetLeft ?? validationData.offsetLeft ?? 0;
 
-      position.top += constraints.offsetTop;
-      position.left += constraints.offsetLeft;
+      position.top += valOffsetTop;
+      position.left += valOffsetLeft;
 
-      const width = Number.isFinite(position.width) ? position.width : constraints.width;
-      const height = Number.isFinite(position.height) ? position.height : constraints.height;
+      const width = Number.isFinite(position.width) ? position.width : valWidth;
+      const height = Number.isFinite(position.height) ? position.height : valHeight;
 
       const rect = output.corners;
 
@@ -264,8 +269,8 @@ export class Transforms
       boundingRect.width = maxX - minX;
       boundingRect.height = maxY - minY;
 
-      position.top -= constraints.offsetTop;
-      position.left -= constraints.offsetLeft;
+      position.top -= valOffsetTop;
+      position.left -= valOffsetLeft;
 
       return output;
    }

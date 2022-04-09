@@ -31,7 +31,7 @@ export function transformWindow(validationData)
 
    // Get transform data. First set constraints including any margin top / left as offsets and width / height. Used
    // when position width / height is 'auto'.
-   const data = transforms.getData(position, s_TRANSFORM_DATA.setConstraints(width, height, marginTop, marginLeft));
+   const data = transforms.getData(position, s_TRANSFORM_DATA, validationData);
 
    // Check the bounding rectangle against browser height / width. Adjust position based on how far the overlap of the
    // bounding rect is outside the browser window. The order below matters as the constraints are top / left oriented,

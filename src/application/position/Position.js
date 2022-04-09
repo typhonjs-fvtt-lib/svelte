@@ -51,7 +51,7 @@ export class Position
     * @type {{calculateTransform: boolean}}
     */
    #options = {
-      calculateTransform: true
+      calculateTransform: false
    };
 
    /**
@@ -941,10 +941,10 @@ export class Position
          this.#transformUpdate |= updateTransform;
 
          // If there isn't already a pending update element action then initiate it.
-         if (!this.#updateElementInvoked) { this.#updateElement(); }
+         if (!this.#updateElementInvoked) { this.#updateElement(el, data); }
 
          // If calculate transform options is enabled then update the transform data and set the readable store.
-         if (this.#options.calculateTransform) { this.#updateTransform(el); }
+         if (this.#options.calculateTransform) { this.#updateTransform(el, data); }
       }
 
       // Notify main store subscribers.
@@ -991,9 +991,13 @@ export class Position
     * `requestAnimationFrame`. This allows the underlying data model to be updated immediately while updates to the
     * element are in sync with the browser and potentially in the future be further throttled.
     *
+    * @param {HTMLElement} el - The target HTMLElement.
+    *
+    * @param {PositionData} data - The position data.
+    *
     * @returns {Promise<number>} The current time before rendering.
     */
-   async #updateElement()
+   async #updateElement(el, data)
    {
       this.#updateElementInvoked = true;
 
@@ -1001,8 +1005,6 @@ export class Position
       const currentTime = await nextAnimationFrame();
 
       this.#updateElementInvoked = false;
-
-      const el = this.#parent instanceof HTMLElement ? this.#parent : this.#parent?.elementTarget;
 
       if (!el)
       {
@@ -1015,8 +1017,6 @@ export class Position
 
          return currentTime;
       }
-
-      const data = this.#data;
 
       if (typeof data.left === 'number')
       {
@@ -1262,20 +1262,29 @@ export class Position
       return currentPosition;
    }
 
-   #updateTransform(el)
+   /**
+    * Updates the applied transform data and sets the readble `transform` store.
+    *
+    * @param {HTMLElement} el - The target HTMLElement.
+    *
+    * @param {PositionData} data - The position data.
+    */
+   #updateTransform(el, data)
    {
-      const data = this.#data;
+      s_VALIDATION_DATA.height = data.height !== 'auto' ? data.height : el.offsetHeight;
 
-      const width = data.width !== 'auto' ? data.width : el.offsetWidth;
-      const height = data.height !== 'auto' ? data.height : el.offsetHeight;
+      s_VALIDATION_DATA.width = data.width !== 'auto' ? data.width : el.offsetWidth;
+
+      // TODO: Parse styles data for margin / offset.
+      s_VALIDATION_DATA.marginLeft = 0;
+
+      s_VALIDATION_DATA.marginTop = 0;
 
       // Get transform data. First set constraints including any margin top / left as offsets and width / height. Used
       // when position width / height is 'auto'.
-      this.#transforms.getData(data, this.#transformData.setConstraints(width, height, 0, 0));
+      this.#transforms.getData(data, this.#transformData, s_VALIDATION_DATA);
 
       this.#storeTransform.set(this.#transformData);
-
-      // console.log(`! Position - #updateTransform - this.#transformData: `, this.#transformData);
    }
 }
 
