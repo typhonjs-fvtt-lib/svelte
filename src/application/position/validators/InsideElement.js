@@ -5,22 +5,42 @@ const s_TRANSFORM_DATA = new TransformData();
 export class InsideElement
 {
    /**
+    * When true constrains the min / max width or height to element.
+    *
+    * @type {boolean}
+    */
+   #constrain;
+
+   /**
     * @type {HTMLElement}
     */
    #element;
 
-   constructor({ element } = {})
+   constructor({ constrain = true, element } = {})
    {
       this.element = element;
+      this.constrain = constrain;
    }
 
+   get constrain() { return this.#constrain; }
+
    get element() { return this.#element; }
+
+   set constrain(constrain)
+   {
+      if (typeof constrain !== 'boolean')
+      {
+         throw new TypeError(`'constrain' is not a boolean.`);
+      }
+
+      this.#constrain = constrain;
+   }
 
    set element(element)
    {
       if (element !== void 0 && !(element instanceof HTMLElement))
       {
-         throw new TypeError(`'element' is not an HTMLElement or undefined`);
+         throw new TypeError(`'element' is not a HTMLElement or undefined.`);
       }
 
       this.#element = element;
@@ -49,14 +69,14 @@ export class InsideElement
       // Ensure min / max width constraints when position width is 'auto'.
       if (position.width !== 'auto')
       {
-         const maxW = maxWidth || elWidth;
+         const maxW = maxWidth ?? this.#constrain ? elWidth : Number.MAX_SAFE_INTEGER;
          position.width = Math.clamped(width, minWidth, maxW);
       }
 
       // Ensure min / max height constraints when position height is not 'auto'.
       if (position.height !== 'auto')
       {
-         const maxH = maxHeight || elHeight;
+         const maxH = maxHeight ?? this.#constrain ? elHeight : Number.MAX_SAFE_INTEGER;
          position.height = Math.clamped(height, minHeight, maxH);
       }
 

@@ -1,3 +1,4 @@
+import { writable }              from 'svelte/store';
 import { linear }                from 'svelte/easing';
 
 import { nextAnimationFrame }    from '@typhonjs-fvtt/svelte/animate';
@@ -28,11 +29,6 @@ export class Position
    #data = new PositionData();
 
    /**
-    * @type {Map<string, PositionData>}
-    */
-   #dataSaved = new Map();
-
-   /**
     * Stores current animation keys.
     *
     * @type {Set<string>}
@@ -40,9 +36,23 @@ export class Position
    #currentAnimationKeys = new Set();
 
    /**
+    * @type {Map<string, PositionData>}
+    */
+   #dataSaved = new Map();
+
+   /**
     * @type {PositionData}
     */
    #defaultData;
+
+   /**
+    * Stores ongoing options that are set in the constructor.
+    *
+    * @type {{calculateTransform: boolean}}
+    */
+   #options = {
+      calculateTransform: true
+   };
 
    /**
     * The associated parent for positional data tracking. Used in validators.
@@ -62,6 +72,21 @@ export class Position
     * @type {StorePosition}
     */
    #stores;
+
+   /**
+    * Stores the internal writable for the readable transform store.
+    *
+    * @type {import('svelte/store').Writable<TransformData>}
+    */
+   #storeTransform;
+
+   /**
+    * Stores the current transform data used for the readable `transform` store. It is only active when there are
+    * subscribers to the store or calculateTransform options is true.
+    *
+    * @type {TransformData}
+    */
+   #transformData = new TransformData();
 
    /**
     * @type {Transforms}
@@ -183,6 +208,8 @@ export class Position
          }
       }
 
+      this.#storeTransform = writable(this.#transformData);
+
       this.#stores = {
          height: propertyStore(this, 'height'),
          left: propertyStore(this, 'left'),
@@ -195,6 +222,7 @@ export class Position
          rotateZ: propertyStore(this, 'rotateZ'),
          scale: propertyStore(this, 'scale'),
          top: propertyStore(this, 'top'),
+         transform: { subscribe: this.#storeTransform.subscribe },
          transformOrigin: propertyStore(this, 'transformOrigin'),
          width: propertyStore(this, 'width'),
          zIndex: propertyStore(this, 'zIndex')
@@ -914,6 +942,9 @@ export class Position
 
          // If there isn't already a pending update element action then initiate it.
          if (!this.#updateElementInvoked) { this.#updateElement(); }
+
+         // If calculate transform options is enabled then update the transform data and set the readable store.
+         if (this.#options.calculateTransform) { this.#updateTransform(el); }
       }
 
       // Notify main store subscribers.
@@ -1094,12 +1125,17 @@ export class Position
          }
          else
          {
-            currentPosition.width = width = typeof width === 'number' ? Math.round(width) : el.offsetWidth;
+            // TODO: VERIFY THIS CHANGE IS CORRECT
+            const newWidth = Number.isFinite(width) ? width : currentPosition.width;
+            currentPosition.width = width = Number.isFinite(newWidth) ? Math.round(newWidth) : el.offsetWidth;
+
+            // currentPosition.width = width = typeof width === 'number' ? Math.round(width) : el.offsetWidth;
          }
       }
       else
       {
-         width = el.offsetWidth;
+         // TODO: VERIFY THIS CHANGE IS CORRECT
+         width = Number.isFinite(currentPosition.width) ? currentPosition.width : el.offsetWidth;
       }
 
       // Update height if an explicit value is passed, or if no height value is set on the element.
@@ -1112,12 +1148,17 @@ export class Position
          }
          else
          {
-            currentPosition.height = height = typeof height === 'number' ? Math.round(height) : el.offsetHeight;
+            // TODO: VERIFY THIS CHANGE IS CORRECT
+            const newHeight = Number.isFinite(height) ? height : currentPosition.height;
+            currentPosition.height = height = Number.isFinite(newHeight) ? Math.round(newHeight) : el.offsetHeight;
+
+            // currentPosition.height = height = typeof height === 'number' ? Math.round(height) : el.offsetHeight;
          }
       }
       else
       {
-         height = el.offsetHeight;
+         // TODO: VERIFY THIS CHANGE IS CORRECT
+         height = Number.isFinite(currentPosition.height) ? currentPosition.height : el.offsetHeight;
       }
 
       // Update left
@@ -1203,10 +1244,10 @@ export class Position
           styleParsePixels(s_VALIDATION_DATA.styles.maxWidth) || currentPosition.maxWidth;
 
          s_VALIDATION_DATA.minHeight = styleParsePixels(el.style.minHeight) ||
-          styleParsePixels(s_VALIDATION_DATA.styles.minHeight) || currentPosition.minHeight;
+          styleParsePixels(s_VALIDATION_DATA.styles.minHeight) || currentPosition.minHeight || 0;
 
          s_VALIDATION_DATA.minWidth = styleParsePixels(el.style.minWidth) ||
-          styleParsePixels(s_VALIDATION_DATA.styles.minWidth) || currentPosition.minWidth;
+          styleParsePixels(s_VALIDATION_DATA.styles.minWidth) || currentPosition.minWidth || 0;
 
          for (const entry of validators)
          {
@@ -1219,6 +1260,22 @@ export class Position
 
       // Return the updated position object.
       return currentPosition;
+   }
+
+   #updateTransform(el)
+   {
+      const data = this.#data;
+
+      const width = data.width !== 'auto' ? data.width : el.offsetWidth;
+      const height = data.height !== 'auto' ? data.height : el.offsetHeight;
+
+      // Get transform data. First set constraints including any margin top / left as offsets and width / height. Used
+      // when position width / height is 'auto'.
+      this.#transforms.getData(data, this.#transformData.setConstraints(width, height, 0, 0));
+
+      this.#storeTransform.set(this.#transformData);
+
+      // console.log(`! Position - #updateTransform - this.#transformData: `, this.#transformData);
    }
 }
 

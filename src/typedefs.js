@@ -71,6 +71,8 @@
  *
  * @property {import('svelte/store').Writable<number|null>} scale - Derived store for `scale` updates.
  *
+ * @property {import('svelte/store').Readable<TransformData>} transform - Readable store for transform data.
+ *
  * @property {import('svelte/store').Writable<string>} transformOrigin - Derived store for `transformOrigin`.
  *
  * @property {import('svelte/store').Writable<number|null>} zIndex - Derived store for `zIndex` updates.
