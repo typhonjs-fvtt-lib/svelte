@@ -77,6 +77,13 @@ export class Position
    #elementUpdatePromises = [];
 
    /**
+    * Stores an instance of the computer styles for the target element.
+    *
+    * @type {CSSStyleDeclaration}
+    */
+   #elementStyles;
+
+   /**
     * @type {StorePosition}
     */
    #stores;
@@ -335,6 +342,7 @@ export class Position
    {
       this.#parent = parent;
       this.#transformUpdate = true;
+      this.#elementStyles = void 0;
       this.set(this.#data);
    }
 
@@ -866,6 +874,9 @@ export class Position
 
       if (el)
       {
+         // Cache the computer styles of the element.
+         if (!this.#elementStyles) { this.#elementStyles = globalThis.getComputedStyle(el); }
+
          position = this.#updatePosition(position, parent, el);
 
          // Check if a validator cancelled the update.
@@ -1287,7 +1298,7 @@ export class Position
 
          s_VALIDATION_DATA.el = el;
 
-         s_VALIDATION_DATA.styles = globalThis.getComputedStyle(el);
+         s_VALIDATION_DATA.styles = this.#elementStyles;
 
          s_VALIDATION_DATA.transforms = this.#transforms;
 
@@ -1335,14 +1346,17 @@ export class Position
     */
    #updateTransform(el, data)
    {
+      s_VALIDATION_DATA.styles = this.#elementStyles;
+
       s_VALIDATION_DATA.height = data.height !== 'auto' ? data.height : el.offsetHeight;
 
       s_VALIDATION_DATA.width = data.width !== 'auto' ? data.width : el.offsetWidth;
 
-      // TODO: Parse styles data for margin / offset.
-      s_VALIDATION_DATA.marginLeft = 0;
+      s_VALIDATION_DATA.marginLeft = styleParsePixels(el.style.marginLeft) ||
+       styleParsePixels(s_VALIDATION_DATA.styles.marginLeft);
 
-      s_VALIDATION_DATA.marginTop = 0;
+      s_VALIDATION_DATA.marginTop = styleParsePixels(el.style.marginTop) ||
+       styleParsePixels(s_VALIDATION_DATA.styles.marginTop);
 
       // Get transform data. First set constraints including any margin top / left as offsets and width / height. Used
       // when position width / height is 'auto'.
