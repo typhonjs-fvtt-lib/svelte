@@ -53,12 +53,13 @@ export class Position
    #dimensionData = { width: 0, height: 0 };
 
    /**
-    * Stores ongoing options that are set in the constructor.
+    * Stores ongoing options that are set in the constructor or by transform store subscription.
     *
-    * @type {{calculateTransform: boolean}}
+    * @type {PositionOptions}
     */
    #options = {
-      calculateTransform: false
+      calculateTransform: false,
+      transformSubscribed: false
    };
 
    /**
@@ -146,6 +147,11 @@ export class Position
       // Set default value from options.
       if (typeof options === 'object')
       {
+         if (typeof options.calculateTransform === 'boolean')
+         {
+            this.#options.calculateTransform = options.calculateTransform;
+         }
+
          if (Number.isFinite(options.height) || options.height === 'auto' || options.height === null)
          {
             data.height = this.#dimensionData.height = typeof options.height === 'number' ?
@@ -225,7 +231,13 @@ export class Position
       }
 
       this.#storeDimension = writable(this.#dimensionData);
-      this.#storeTransform = writable(this.#transformData);
+
+      // When there are subscribers set option to calculate transform updates; set to false when no subscribers.
+      this.#storeTransform = writable(this.#transformData, () =>
+      {
+         this.#options.transformSubscribed = true;
+         return () => this.#options.transformSubscribed = false;
+      });
 
       this.#stores = {
          dimension: { subscribe: this.#storeDimension.subscribe },
@@ -322,6 +334,7 @@ export class Position
    set parent(parent)
    {
       this.#parent = parent;
+      this.#transformUpdate = true;
       this.set(this.#data);
    }
 
@@ -987,7 +1000,7 @@ export class Position
          if (!this.#updateElementInvoked) { this.#updateElement(el, data); }
 
          // If calculate transform options is enabled then update the transform data and set the readable store.
-         if (this.#options.calculateTransform) { this.#updateTransform(el, data); }
+         if (this.#options.calculateTransform || this.#options.transformSubscribed) { this.#updateTransform(el, data); }
 
          // Update dimension data if width / height has changed.
          if (modifiedDimension)
@@ -1359,6 +1372,14 @@ const s_VALIDATION_DATA = {
 };
 
 Object.seal(s_VALIDATION_DATA);
+
+/**
+ * @typedef {object} PositionOptions
+ *
+ * @property {boolean} calculateTransform - Set in constructor; when true always calculate transform data.
+ *
+ * @property {boolean} transformSubscribed - Set to true when there are subscribers to the readable transform store.
+ */
 
 /**
  * @typedef {HTMLElement | object} PositionParent
