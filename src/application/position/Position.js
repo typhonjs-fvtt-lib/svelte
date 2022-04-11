@@ -3,15 +3,16 @@ import { linear }                from 'svelte/easing';
 
 import { nextAnimationFrame }    from '@typhonjs-fvtt/svelte/animate';
 import { lerp }                  from '@typhonjs-fvtt/svelte/math';
-import { isIterable,
-         styleParsePixels }      from '@typhonjs-fvtt/svelte/util';
+import { isIterable }            from '@typhonjs-fvtt/svelte/util';
 
 import { propertyStore }         from '@typhonjs-fvtt/svelte/store';
 
 import { AdapterValidators }     from './AdapterValidators.js';
-import { TransformData }         from './TransformData.js';
 import * as constants            from './constants.js';
+import { ElementChangeSet }      from './ElementChangeSet.js';
 import { PositionData }          from './PositionData.js';
+import { StyleCache }            from './StyleCache.js';
+import { TransformData }         from './TransformData.js';
 import * as positionValidators   from './validators/index.js';
 import { Transforms }            from './Transforms.js';
 
@@ -53,6 +54,20 @@ export class Position
    #dimensionData = { width: 0, height: 0 };
 
    /**
+    * Stores the style attributes that changed on update.
+    *
+    * @type {ElementChangeSet}
+    */
+   #elementChangeSet = new ElementChangeSet();
+
+   /**
+    * Stores all pending set position Promise resolve functions.
+    *
+    * @type {Function[]}
+    */
+   #elementUpdatePromises = [];
+
+   /**
     * Stores ongoing options that are set in the constructor or by transform store subscription.
     *
     * @type {PositionOptions}
@@ -68,20 +83,6 @@ export class Position
     * @type {PositionParent}
     */
    #parent;
-
-   /**
-    * Stores all pending set position Promise resolve functions.
-    *
-    * @type {Function[]}
-    */
-   #elementUpdatePromises = [];
-
-   /**
-    * Stores an instance of the computer styles for the target element.
-    *
-    * @type {CSSStyleDeclaration}
-    */
-   #elementStyles;
 
    /**
     * @type {StorePosition}
@@ -101,6 +102,13 @@ export class Position
     * @type {import('svelte/store').Writable<TransformData>}
     */
    #storeTransform;
+
+   /**
+    * Stores an instance of the computer styles for the target element.
+    *
+    * @type {StyleCache}
+    */
+   #styleCache = new StyleCache();
 
    /**
     * Stores the current transform data used for the readable `transform` store. It is only active when there are
@@ -342,7 +350,7 @@ export class Position
    {
       this.#parent = parent;
       this.#transformUpdate = true;
-      this.#elementStyles = void 0;
+      this.#styleCache.reset();
       this.set(this.#data);
    }
 
@@ -872,10 +880,20 @@ export class Position
 
       const el = parent instanceof HTMLElement ? parent : parent?.elementTarget;
 
+      const changeSet = this.#elementChangeSet;
+      const styleCache = this.#styleCache;
+
+      changeSet.set(false);
+
       if (el)
       {
-         // Cache the computer styles of the element.
-         if (!this.#elementStyles) { this.#elementStyles = globalThis.getComputedStyle(el); }
+         // Cache the computed styles of the element.
+         if (!styleCache.hasData(el))
+         {
+            this.#transformUpdate = true;
+            styleCache.update(el);
+            changeSet.set(true);
+         }
 
          position = this.#updatePosition(position, parent, el);
 
@@ -890,14 +908,14 @@ export class Position
       {
          position.left = Math.round(position.left);
 
-         if (data.left !== position.left) { data.left = position.left; modified = true; }
+         if (data.left !== position.left) { data.left = position.left; changeSet.left = modified = true; }
       }
 
       if (typeof position.top === 'number')
       {
          position.top = Math.round(position.top);
 
-         if (data.top !== position.top) { data.top = position.top; modified = true; }
+         if (data.top !== position.top) { data.top = position.top; changeSet.top = modified = true; }
       }
 
       if (Number.isFinite(position.maxHeight) || position.maxHeight === null)
@@ -982,21 +1000,21 @@ export class Position
       {
          position.zIndex = Math.round(position.zIndex);
 
-         if (data.zIndex !== position.zIndex) { data.zIndex = position.zIndex; modified = true; }
+         if (data.zIndex !== position.zIndex) { data.zIndex = position.zIndex; changeSet.zIndex = modified = true; }
       }
 
       if (typeof position.width === 'number' || position.width === 'auto' || position.width === null)
       {
          position.width = typeof position.width === 'number' ? Math.round(position.width) : position.width;
 
-         if (data.width !== position.width) { data.width = position.width; modified = modifiedDimension = true; }
+         if (data.width !== position.width) { data.width = position.width; changeSet.width = modified = modifiedDimension = true; }
       }
 
       if (typeof position.height === 'number' || position.height === 'auto' || position.height === null)
       {
          position.height = typeof position.height === 'number' ? Math.round(position.height) : position.height;
 
-         if (data.height !== position.height) { data.height = position.height; modified = modifiedDimension = true; }
+         if (data.height !== position.height) { data.height = position.height; changeSet.height = modified = modifiedDimension = true; }
       }
 
       if (el)
@@ -1008,7 +1026,7 @@ export class Position
          this.#transformUpdate |= updateTransform;
 
          // If there isn't already a pending update element action then initiate it.
-         if (!this.#updateElementInvoked) { this.#updateElement(el, data); }
+         if (!this.#updateElementInvoked) { this.#updateElement(el, data, changeSet); }
 
          // If calculate transform options is enabled then update the transform data and set the readable store.
          if (this.#options.calculateTransform || this.#options.transformSubscribed) { this.#updateTransform(el, data); }
@@ -1070,9 +1088,11 @@ export class Position
     *
     * @param {PositionData} data - The position data.
     *
+    * @param {ElementChangeSet} changeSet - The data style data attributes that changed.
+    *
     * @returns {Promise<number>} The current time before rendering.
     */
-   async #updateElement(el, data)
+   async #updateElement(el, data, changeSet)
    {
       this.#updateElementInvoked = true;
 
@@ -1093,27 +1113,27 @@ export class Position
          return currentTime;
       }
 
-      if (typeof data.left === 'number')
+      if (changeSet.left)
       {
          el.style.left = `${data.left}px`;
       }
 
-      if (typeof data.top === 'number')
+      if (changeSet.top)
       {
          el.style.top = `${data.top}px`;
       }
 
-      if (typeof data.zIndex === 'number' || data.zIndex === null)
+      if (changeSet.zIndex)
       {
          el.style.zIndex = typeof data.zIndex === 'number' ? `${data.zIndex}` : null;
       }
 
-      if (typeof data.width === 'number' || data.width === 'auto' || data.width === null)
+      if (changeSet.width)
       {
          el.style.width = typeof data.width === 'number' ? `${data.width}px` : data.width;
       }
 
-      if (typeof data.height === 'number' || data.height === 'auto' || data.height === null)
+      if (changeSet.height)
       {
          el.style.height = typeof data.height === 'number' ? `${data.height}px` : data.height;
       }
@@ -1294,11 +1314,13 @@ export class Position
       // If there are any validators allow them to potentially modify position data or reject the update.
       if (validators.length)
       {
+         const styleCache = this.#styleCache;
+
          s_VALIDATION_DATA.parent = parent;
 
          s_VALIDATION_DATA.el = el;
 
-         s_VALIDATION_DATA.styles = this.#elementStyles;
+         s_VALIDATION_DATA.styles = styleCache.computed;
 
          s_VALIDATION_DATA.transforms = this.#transforms;
 
@@ -1306,23 +1328,17 @@ export class Position
 
          s_VALIDATION_DATA.width = width;
 
-         s_VALIDATION_DATA.marginLeft = styleParsePixels(el.style.marginLeft) ||
-          styleParsePixels(s_VALIDATION_DATA.styles.marginLeft);
+         s_VALIDATION_DATA.marginLeft = styleCache.marginLeft;
 
-         s_VALIDATION_DATA.marginTop = styleParsePixels(el.style.marginTop) ||
-          styleParsePixels(s_VALIDATION_DATA.styles.marginTop);
+         s_VALIDATION_DATA.marginTop = styleCache.marginTop;
 
-         s_VALIDATION_DATA.maxHeight = styleParsePixels(el.style.maxHeight) ||
-          styleParsePixels(s_VALIDATION_DATA.styles.maxHeight) || currentPosition.maxHeight;
+         s_VALIDATION_DATA.maxHeight = styleCache.maxHeight || currentPosition.maxHeight;
 
-         s_VALIDATION_DATA.maxWidth = styleParsePixels(el.style.maxWidth) ||
-          styleParsePixels(s_VALIDATION_DATA.styles.maxWidth) || currentPosition.maxWidth;
+         s_VALIDATION_DATA.maxWidth = styleCache.maxWidth || currentPosition.maxWidth;
 
-         s_VALIDATION_DATA.minHeight = styleParsePixels(el.style.minHeight) ||
-          styleParsePixels(s_VALIDATION_DATA.styles.minHeight) || currentPosition.minHeight || 0;
+         s_VALIDATION_DATA.minHeight = styleCache.minHeight || currentPosition.minHeight || 0;
 
-         s_VALIDATION_DATA.minWidth = styleParsePixels(el.style.minWidth) ||
-          styleParsePixels(s_VALIDATION_DATA.styles.minWidth) || currentPosition.minWidth || 0;
+         s_VALIDATION_DATA.minWidth = styleCache.minWidth || currentPosition.minWidth || 0;
 
          for (const entry of validators)
          {
@@ -1346,17 +1362,13 @@ export class Position
     */
    #updateTransform(el, data)
    {
-      s_VALIDATION_DATA.styles = this.#elementStyles;
-
       s_VALIDATION_DATA.height = data.height !== 'auto' ? data.height : el.offsetHeight;
 
       s_VALIDATION_DATA.width = data.width !== 'auto' ? data.width : el.offsetWidth;
 
-      s_VALIDATION_DATA.marginLeft = styleParsePixels(el.style.marginLeft) ||
-       styleParsePixels(s_VALIDATION_DATA.styles.marginLeft);
+      s_VALIDATION_DATA.marginLeft = this.#styleCache.marginLeft;
 
-      s_VALIDATION_DATA.marginTop = styleParsePixels(el.style.marginTop) ||
-       styleParsePixels(s_VALIDATION_DATA.styles.marginTop);
+      s_VALIDATION_DATA.marginTop = this.#styleCache.marginTop;
 
       // Get transform data. First set constraints including any margin top / left as offsets and width / height. Used
       // when position width / height is 'auto'.
