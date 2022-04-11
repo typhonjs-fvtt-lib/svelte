@@ -126,11 +126,6 @@ export class Position
    /**
     * @type {boolean}
     */
-   #transformUpdate = false;
-
-   /**
-    * @type {boolean}
-    */
    #updateElementInvoked = false;
 
    /**
@@ -201,25 +196,21 @@ export class Position
          if (Number.isFinite(options.rotateX) || options.rotateX === null)
          {
             transforms.rotateX = data.rotateX = options.rotateX;
-            this.#transformUpdate = true;
          }
 
          if (Number.isFinite(options.rotateY) || options.rotateY === null)
          {
             transforms.rotateY = data.rotateY = options.rotateY;
-            this.#transformUpdate = true;
          }
 
          if (Number.isFinite(options.rotateZ) || options.rotateZ === null)
          {
             transforms.rotateZ = data.rotateZ = options.rotateZ;
-            this.#transformUpdate = true;
          }
 
          if (Number.isFinite(options.scale) || options.scale === null)
          {
             transforms.scale = data.scale = options.scale;
-            this.#transformUpdate = true;
          }
 
          if (Number.isFinite(options.top) || options.top === null)
@@ -349,7 +340,6 @@ export class Position
    set parent(parent)
    {
       this.#parent = parent;
-      this.#transformUpdate = true;
       this.#styleCache.reset();
       this.set(this.#data);
    }
@@ -876,21 +866,16 @@ export class Position
       const data = this.#data;
       const transforms = this.#transforms;
 
-      let updateTransform = false;
-
       const el = parent instanceof HTMLElement ? parent : parent?.elementTarget;
 
       const changeSet = this.#elementChangeSet;
       const styleCache = this.#styleCache;
-
-      changeSet.set(false);
 
       if (el)
       {
          // Cache the computed styles of the element.
          if (!styleCache.hasData(el))
          {
-            this.#transformUpdate = true;
             styleCache.update(el);
             changeSet.set(true);
          }
@@ -902,7 +887,6 @@ export class Position
       }
 
       let modified = false;
-      let modifiedDimension = false;
 
       if (typeof position.left === 'number')
       {
@@ -951,7 +935,7 @@ export class Position
          if (data.rotateX !== position.rotateX)
          {
             data.rotateX = transforms.rotateX = position.rotateX;
-            updateTransform = modified = true;
+            changeSet.transform = modified = true;
          }
       }
 
@@ -960,7 +944,7 @@ export class Position
          if (data.rotateY !== position.rotateY)
          {
             data.rotateY = transforms.rotateY = position.rotateY;
-            updateTransform = modified = true;
+            changeSet.transform = modified = true;
          }
       }
 
@@ -969,7 +953,7 @@ export class Position
          if (data.rotateZ !== position.rotateZ)
          {
             data.rotateZ = transforms.rotateZ = position.rotateZ;
-            updateTransform = modified = true;
+            changeSet.transform = modified = true;
          }
       }
 
@@ -980,7 +964,7 @@ export class Position
          if (data.scale !== position.scale)
          {
             data.scale = transforms.scale = position.scale;
-            updateTransform = modified = true;
+            changeSet.transform = modified = true;
          }
       }
 
@@ -992,7 +976,7 @@ export class Position
          if (data.transformOrigin !== position.transformOrigin)
          {
             data.transformOrigin = position.transformOrigin;
-            updateTransform = modified = true;
+            changeSet.transform = modified = true;
          }
       }
 
@@ -1007,14 +991,14 @@ export class Position
       {
          position.width = typeof position.width === 'number' ? Math.round(position.width) : position.width;
 
-         if (data.width !== position.width) { data.width = position.width; changeSet.width = modified = modifiedDimension = true; }
+         if (data.width !== position.width) { data.width = position.width; changeSet.width = modified = true; }
       }
 
       if (typeof position.height === 'number' || position.height === 'auto' || position.height === null)
       {
          position.height = typeof position.height === 'number' ? Math.round(position.height) : position.height;
 
-         if (data.height !== position.height) { data.height = position.height; changeSet.height = modified = modifiedDimension = true; }
+         if (data.height !== position.height) { data.height = position.height; changeSet.height = modified = true; }
       }
 
       if (el)
@@ -1022,22 +1006,8 @@ export class Position
          // Set default data after first set operation that has a target element.
          if (typeof this.#defaultData !== 'object') { this.#defaultData = Object.assign({}, data); }
 
-         // Track any transform updates that are handled in `#updateElement`.
-         this.#transformUpdate |= updateTransform;
-
          // If there isn't already a pending update element action then initiate it.
-         if (!this.#updateElementInvoked) { this.#updateElement(el, data, changeSet); }
-
-         // If calculate transform options is enabled then update the transform data and set the readable store.
-         if (this.#options.calculateTransform || this.#options.transformSubscribed) { this.#updateTransform(el, data); }
-
-         // Update dimension data if width / height has changed.
-         if (modifiedDimension)
-         {
-            this.#dimensionData.width = data.width;
-            this.#dimensionData.height = data.height;
-            this.#storeDimension.set(this.#dimensionData);
-         }
+         if (!this.#updateElementInvoked) { this.#updateElement(el, changeSet); }
       }
 
       // Notify main store subscribers.
@@ -1086,13 +1056,11 @@ export class Position
     *
     * @param {HTMLElement} el - The target HTMLElement.
     *
-    * @param {PositionData} data - The position data.
-    *
     * @param {ElementChangeSet} changeSet - The data style data attributes that changed.
     *
     * @returns {Promise<number>} The current time before rendering.
     */
-   async #updateElement(el, data, changeSet)
+   async #updateElement(el, changeSet)
    {
       this.#updateElementInvoked = true;
 
@@ -1112,6 +1080,8 @@ export class Position
 
          return currentTime;
       }
+
+      const data = this.#data;
 
       if (changeSet.left)
       {
@@ -1139,10 +1109,8 @@ export class Position
       }
 
       // Update all transforms in order added to transforms object.
-      if (this.#transformUpdate)
+      if (changeSet.transform)
       {
-         this.#transformUpdate = false;
-
          // If there are active transforms then set them otherwise reset the styles.
          if (this.#transforms.isActive)
          {
@@ -1155,6 +1123,19 @@ export class Position
             el.style.transform = null;
          }
       }
+
+      // If calculate transform options is enabled then update the transform data and set the readable store.
+      if (this.#options.calculateTransform || this.#options.transformSubscribed) { this.#updateTransform(el, data); }
+
+      // Update dimension data if width / height has changed.
+      if (changeSet.width || changeSet.height)
+      {
+         this.#dimensionData.width = data.width;
+         this.#dimensionData.height = data.height;
+         this.#storeDimension.set(this.#dimensionData);
+      }
+
+      changeSet.set(false);
 
       // Resolve any stored Promises when multiple updates have occurred.
       if (this.#elementUpdatePromises.length)
