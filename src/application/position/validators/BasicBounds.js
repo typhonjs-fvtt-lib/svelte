@@ -74,13 +74,13 @@ export class BasicBounds
    {
       if (this.#lock) { return; }
 
-      if (element === void 0 || element instanceof HTMLElement)
+      if (element === void 0  || element === null || element instanceof HTMLElement)
       {
          this.#element = element;
       }
       else
       {
-         throw new TypeError(`'element' is not a HTMLElement or undefined.`);
+         throw new TypeError(`'element' is not a HTMLElement, undefined, or null.`);
       }
    }
 
