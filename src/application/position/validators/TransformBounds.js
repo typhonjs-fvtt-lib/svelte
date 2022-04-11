@@ -183,35 +183,35 @@ export class TransformBounds
       // when position width / height is 'auto'.
       const data = valData.transforms.getData(valData.position, s_TRANSFORM_DATA, valData);
 
-      // Check the bounding rectangle against browser height / width. Adjust position based on how far the overlap of the
-      // bounding rect is outside the browser window. The order below matters as the constraints are top / left oriented,
-      // so perform those checks last. Also adjust the bounding rectangle as position changes are made.
+      // Check the bounding rectangle against browser height / width. Adjust position based on how far the overlap of
+      // the bounding rect is outside the bounds height / width. The order below matters as the constraints are top /
+      // left oriented, so perform those checks last.
+
+      const initialX = data.boundingRect.x;
+      const initialY = data.boundingRect.y;
 
       if (data.boundingRect.bottom + valData.marginTop > boundsHeight)
       {
-         const adjust = boundsHeight - data.boundingRect.bottom - valData.marginTop;
-         valData.position.top += adjust;
-         data.boundingRect.y += adjust;
+         data.boundingRect.y += boundsHeight - data.boundingRect.bottom - valData.marginTop;
       }
 
       if (data.boundingRect.right + valData.marginLeft > boundsWidth)
       {
-         const adjust = boundsWidth - data.boundingRect.right - valData.marginLeft;
-         valData.position.left += adjust;
-         data.boundingRect.x += adjust;
+         data.boundingRect.x += boundsWidth - data.boundingRect.right - valData.marginLeft;
       }
 
       if (data.boundingRect.top - valData.marginTop < 0)
       {
-         const adjust = Math.abs(data.boundingRect.top - valData.marginTop);
-         valData.position.top += adjust;
-         data.boundingRect.y += adjust;
+         data.boundingRect.y += Math.abs(data.boundingRect.top - valData.marginTop);
       }
 
       if (data.boundingRect.left - valData.marginLeft < 0)
       {
-         valData.position.left += Math.abs(data.boundingRect.left - valData.marginLeft);
+         data.boundingRect.x += Math.abs(data.boundingRect.left - valData.marginLeft);
       }
+
+      valData.position.left -= initialX - data.boundingRect.x;
+      valData.position.top -= initialY - data.boundingRect.y;
 
       return valData.position;
    }
