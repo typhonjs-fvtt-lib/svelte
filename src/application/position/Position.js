@@ -9,7 +9,7 @@ import { propertyStore }         from '@typhonjs-fvtt/svelte/store';
 
 import { AdapterValidators }     from './AdapterValidators.js';
 import * as constants            from './constants.js';
-import { ElementChangeSet }      from './ElementChangeSet.js';
+import { PositionChangeSet }      from './PositionChangeSet.js';
 import { PositionData }          from './PositionData.js';
 import { StyleCache }            from './StyleCache.js';
 import { TransformData }         from './TransformData.js';
@@ -28,6 +28,13 @@ export class Position
     * @type {PositionData}
     */
    #data = new PositionData();
+
+   /**
+    * Provides a copy of local data sent to subscribers.
+    *
+    * @type {PositionData}
+    */
+   #dataSubscribers = new PositionData();
 
    /**
     * Stores current animation keys.
@@ -56,9 +63,9 @@ export class Position
    /**
     * Stores the style attributes that changed on update.
     *
-    * @type {ElementChangeSet}
+    * @type {PositionChangeSet}
     */
-   #elementChangeSet = new ElementChangeSet();
+   #positionChangeSet = new PositionChangeSet();
 
    /**
     * Stores all pending set position Promise resolve functions.
@@ -868,7 +875,7 @@ export class Position
 
       const el = parent instanceof HTMLElement ? parent : parent?.elementTarget;
 
-      const changeSet = this.#elementChangeSet;
+      const changeSet = this.#positionChangeSet;
       const styleCache = this.#styleCache;
 
       if (el)
@@ -886,48 +893,46 @@ export class Position
          if (position === null) { return this; }
       }
 
-      let modified = false;
-
       if (typeof position.left === 'number')
       {
          position.left = Math.round(position.left);
 
-         if (data.left !== position.left) { data.left = position.left; changeSet.left = modified = true; }
+         if (data.left !== position.left) { data.left = position.left; changeSet.left = true; }
       }
 
       if (typeof position.top === 'number')
       {
          position.top = Math.round(position.top);
 
-         if (data.top !== position.top) { data.top = position.top; changeSet.top = modified = true; }
+         if (data.top !== position.top) { data.top = position.top; changeSet.top = true; }
       }
 
       if (Number.isFinite(position.maxHeight) || position.maxHeight === null)
       {
          position.maxHeight = typeof position.maxHeight === 'number' ? Math.round(position.maxHeight) : null;
 
-         if (data.maxHeight !== position.maxHeight) { data.maxHeight = position.maxHeight; modified = true; }
+         if (data.maxHeight !== position.maxHeight) { data.maxHeight = position.maxHeight; changeSet.maxHeight = true; }
       }
 
       if (Number.isFinite(position.maxWidth) || position.maxWidth === null)
       {
          position.maxWidth = typeof position.maxWidth === 'number' ? Math.round(position.maxWidth) : null;
 
-         if (data.maxWidth !== position.maxWidth) { data.maxWidth = position.maxWidth; modified = true; }
+         if (data.maxWidth !== position.maxWidth) { data.maxWidth = position.maxWidth; changeSet.maxWidth = true; }
       }
 
       if (Number.isFinite(position.minHeight) || position.minHeight === null)
       {
          position.minHeight = typeof position.minHeight === 'number' ? Math.round(position.minHeight) : null;
 
-         if (data.minHeight !== position.minHeight) { data.minHeight = position.minHeight; modified = true; }
+         if (data.minHeight !== position.minHeight) { data.minHeight = position.minHeight; changeSet.minHeight = true; }
       }
 
       if (Number.isFinite(position.minWidth) || position.minWidth === null)
       {
          position.minWidth = typeof position.minWidth === 'number' ? Math.round(position.minWidth) : null;
 
-         if (data.minWidth !== position.minWidth) { data.minWidth = position.minWidth; modified = true; }
+         if (data.minWidth !== position.minWidth) { data.minWidth = position.minWidth; changeSet.minWidth = true; }
       }
 
       if (typeof position.rotateX === 'number' || position.rotateX === null)
@@ -935,7 +940,7 @@ export class Position
          if (data.rotateX !== position.rotateX)
          {
             data.rotateX = transforms.rotateX = position.rotateX;
-            changeSet.transform = modified = true;
+            changeSet.transform = true;
          }
       }
 
@@ -944,7 +949,7 @@ export class Position
          if (data.rotateY !== position.rotateY)
          {
             data.rotateY = transforms.rotateY = position.rotateY;
-            changeSet.transform = modified = true;
+            changeSet.transform = true;
          }
       }
 
@@ -953,7 +958,7 @@ export class Position
          if (data.rotateZ !== position.rotateZ)
          {
             data.rotateZ = transforms.rotateZ = position.rotateZ;
-            changeSet.transform = modified = true;
+            changeSet.transform = true;
          }
       }
 
@@ -964,7 +969,7 @@ export class Position
          if (data.scale !== position.scale)
          {
             data.scale = transforms.scale = position.scale;
-            changeSet.transform = modified = true;
+            changeSet.transform = true;
          }
       }
 
@@ -976,7 +981,7 @@ export class Position
          if (data.transformOrigin !== position.transformOrigin)
          {
             data.transformOrigin = position.transformOrigin;
-            changeSet.transform = modified = true;
+            changeSet.transform = true;
          }
       }
 
@@ -984,21 +989,21 @@ export class Position
       {
          position.zIndex = Math.round(position.zIndex);
 
-         if (data.zIndex !== position.zIndex) { data.zIndex = position.zIndex; changeSet.zIndex = modified = true; }
+         if (data.zIndex !== position.zIndex) { data.zIndex = position.zIndex; changeSet.zIndex = true; }
       }
 
       if (typeof position.width === 'number' || position.width === 'auto' || position.width === null)
       {
          position.width = typeof position.width === 'number' ? Math.round(position.width) : position.width;
 
-         if (data.width !== position.width) { data.width = position.width; changeSet.width = modified = true; }
+         if (data.width !== position.width) { data.width = position.width; changeSet.width = true; }
       }
 
       if (typeof position.height === 'number' || position.height === 'auto' || position.height === null)
       {
          position.height = typeof position.height === 'number' ? Math.round(position.height) : position.height;
 
-         if (data.height !== position.height) { data.height = position.height; changeSet.height = modified = true; }
+         if (data.height !== position.height) { data.height = position.height; changeSet.height = true; }
       }
 
       if (el)
@@ -1009,19 +1014,10 @@ export class Position
          // If there isn't already a pending update element action then initiate it.
          if (!this.#updateElementInvoked) { this.#updateElement(el, changeSet); }
       }
-
-      // Notify main store subscribers.
-      if (modified)
+      else
       {
-         // Subscriptions are stored locally as on the browser Babel is still used for private class fields / Babel
-         // support until 2023. IE not doing this will require several extra method calls otherwise.
-         const subscriptions = this.#subscriptions;
-
-         // Early out if there are no subscribers.
-         if (subscriptions.length > 0)
-         {
-            for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](position); }
-         }
+         // Notify main store subscribers.
+         this.#updateSubscribers(data, changeSet);
       }
 
       return this;
@@ -1056,7 +1052,7 @@ export class Position
     *
     * @param {HTMLElement} el - The target HTMLElement.
     *
-    * @param {ElementChangeSet} changeSet - The data style data attributes that changed.
+    * @param {PositionChangeSet} changeSet - The data style data attributes that changed.
     *
     * @returns {Promise<number>} The current time before rendering.
     */
@@ -1127,15 +1123,7 @@ export class Position
       // If calculate transform options is enabled then update the transform data and set the readable store.
       if (this.#options.calculateTransform || this.#options.transformSubscribed) { this.#updateTransform(el, data); }
 
-      // Update dimension data if width / height has changed.
-      if (changeSet.width || changeSet.height)
-      {
-         this.#dimensionData.width = data.width;
-         this.#dimensionData.height = data.height;
-         this.#storeDimension.set(this.#dimensionData);
-      }
-
-      changeSet.set(false);
+      this.#updateSubscribers(data, changeSet);
 
       // Resolve any stored Promises when multiple updates have occurred.
       if (this.#elementUpdatePromises.length)
@@ -1332,6 +1320,39 @@ export class Position
 
       // Return the updated position object.
       return currentPosition;
+   }
+
+   /**
+    * @param {PositionData}   data - Data to post to subscribers.
+    *
+    * @param {PositionChangeSet} changeSet - Data change set.
+    */
+   #updateSubscribers(data, changeSet)
+   {
+      if (!changeSet.hasChange()) { return; }
+
+      // Make a copy of the data.
+      const output = data.copy(this.#dataSubscribers);
+
+      // Subscriptions are stored locally as on the browser Babel is still used for private class fields / Babel
+      // support until 2023. IE not doing this will require several extra method calls otherwise.
+      const subscriptions = this.#subscriptions;
+
+      // Early out if there are no subscribers.
+      if (subscriptions.length > 0)
+      {
+         for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](output); }
+      }
+
+      // Update dimension data if width / height has changed.
+      if (changeSet.width || changeSet.height)
+      {
+         this.#dimensionData.width = data.width;
+         this.#dimensionData.height = data.height;
+         this.#storeDimension.set(this.#dimensionData);
+      }
+
+      changeSet.set(false);
    }
 
    /**

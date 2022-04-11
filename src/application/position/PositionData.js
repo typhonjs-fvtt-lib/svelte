@@ -81,4 +81,31 @@ export class PositionData
 
       Object.seal(this);
    }
+
+   /**
+    * Copies data stored in this instance to the given instance.
+    *
+    * @param {PositionData}   data - Copy to this instance.
+    *
+    * @returns {PositionData} Passed in PositionData instance.
+    */
+   copy(data)
+   {
+      data.height = this.height;
+      data.left = this.left;
+      data.maxHeight = this.maxHeight;
+      data.maxWidth = this.maxWidth;
+      data.minHeight = this.minHeight;
+      data.minWidth = this.minWidth;
+      data.rotateX = this.rotateX;
+      data.rotateY = this.rotateY;
+      data.rotateZ = this.rotateZ;
+      data.scale = this.scale;
+      data.top = this.top;
+      data.transformOrigin = this.transformOrigin;
+      data.width = this.width;
+      data.zIndex = this.zIndex;
+
+      return data;
+   }
 }
