@@ -231,6 +231,21 @@ export class Position
             data.transformOrigin = options.transformOrigin;
          }
 
+         if (Number.isFinite(options.translateX) || options.translateX === null)
+         {
+            transforms.translateX = data.translateX = options.translateX;
+         }
+
+         if (Number.isFinite(options.translateY) || options.translateY === null)
+         {
+            transforms.translateY = data.translateY = options.translateY;
+         }
+
+         if (Number.isFinite(options.translateZ) || options.translateZ === null)
+         {
+            transforms.translateZ = data.translateZ = options.translateZ;
+         }
+
          if (Number.isFinite(options.width) || options.width === 'auto' || options.width === null)
          {
             data.width = this.#dimensionData.width = typeof options.width === 'number' ?
@@ -267,6 +282,9 @@ export class Position
          top: propertyStore(this, 'top'),
          transform: { subscribe: this.#storeTransform.subscribe },
          transformOrigin: propertyStore(this, 'transformOrigin'),
+         translateX: propertyStore(this, 'translateX'),
+         translateY: propertyStore(this, 'translateY'),
+         translateZ: propertyStore(this, 'translateZ'),
          width: propertyStore(this, 'width'),
          zIndex: propertyStore(this, 'zIndex')
       };
@@ -414,6 +432,21 @@ export class Position
    get transformOrigin() { return this.#data.transformOrigin; }
 
    /**
+    * @returns {number|null} translateX
+    */
+   get translateX() { return this.#data.translateX; }
+
+   /**
+    * @returns {number|null} translateY
+    */
+   get translateY() { return this.#data.translateY; }
+
+   /**
+    * @returns {number|null} translateZ
+    */
+   get translateZ() { return this.#data.translateZ; }
+
+   /**
     * @returns {number|'auto'|null} width
     */
    get width() { return this.#data.width; }
@@ -520,6 +553,30 @@ export class Position
    }
 
    /**
+    * @param {number|null} translateX -
+    */
+   set translateX(translateX)
+   {
+      this.#stores.translateX.set(translateX);
+   }
+
+   /**
+    * @param {number|null} translateY -
+    */
+   set translateY(translateY)
+   {
+      this.#stores.translateY.set(translateY);
+   }
+
+   /**
+    * @param {number|null} translateZ -
+    */
+   set translateZ(translateZ)
+   {
+      this.#stores.translateZ.set(translateZ);
+   }
+
+   /**
     * @param {number|'auto'|null} width -
     */
    set width(width)
@@ -598,11 +655,17 @@ export class Position
       if (initial.rotateX === null) { initial.rotateX = 0; }
       if (initial.rotateY === null) { initial.rotateY = 0; }
       if (initial.rotateZ === null) { initial.rotateZ = 0; }
+      if (initial.translateX === null) { initial.translateX = 0; }
+      if (initial.translateY === null) { initial.translateY = 0; }
+      if (initial.translateZ === null) { initial.translateZ = 0; }
       if (initial.scale === null) { initial.scale = 1; }
 
       if (destination.rotateX === null) { destination.rotateX = 0; }
       if (destination.rotateY === null) { destination.rotateY = 0; }
       if (destination.rotateZ === null) { destination.rotateZ = 0; }
+      if (destination.translateX === null) { destination.translateX = 0; }
+      if (destination.translateY === null) { destination.translateY = 0; }
+      if (destination.translateZ === null) { destination.translateZ = 0; }
       if (destination.scale === null) { destination.scale = 1; }
 
       // Reject all initial data that is not a number or is current animating.
@@ -973,7 +1036,7 @@ export class Position
          }
       }
 
-      if (typeof position.transformOrigin !== void 0)
+      if (position.transformOrigin !== void 0)
       {
          position.transformOrigin = constants.transformOrigins.includes(position.transformOrigin) ?
           position.transformOrigin : constants.transformOriginDefault;
@@ -981,6 +1044,33 @@ export class Position
          if (data.transformOrigin !== position.transformOrigin)
          {
             data.transformOrigin = position.transformOrigin;
+            changeSet.transformOrigin = true;
+         }
+      }
+
+      if (typeof position.translateX === 'number' || position.translateX === null)
+      {
+         if (data.translateX !== position.translateX)
+         {
+            data.translateX = transforms.translateX = position.translateX;
+            changeSet.transform = true;
+         }
+      }
+
+      if (typeof position.translateY === 'number' || position.translateY === null)
+      {
+         if (data.translateY !== position.translateY)
+         {
+            data.translateY = transforms.translateY = position.translateY;
+            changeSet.transform = true;
+         }
+      }
+
+      if (typeof position.translateZ === 'number' || position.translateZ === null)
+      {
+         if (data.translateZ !== position.translateZ)
+         {
+            data.translateZ = transforms.translateZ = position.translateZ;
             changeSet.transform = true;
          }
       }
@@ -1011,8 +1101,8 @@ export class Position
          // Set default data after first set operation that has a target element.
          if (typeof this.#defaultData !== 'object') { this.#defaultData = Object.assign({}, data); }
 
-         // If there isn't already a pending update element action then initiate it.
-         if (!this.#updateElementInvoked) { this.#updateElement(el, changeSet); }
+         // If there isn't already a pending update element action then initiate it if there are changes.
+         if (!this.#updateElementInvoked) { this.#updateElement(el); }
       }
       else
       {
@@ -1052,11 +1142,9 @@ export class Position
     *
     * @param {HTMLElement} el - The target HTMLElement.
     *
-    * @param {PositionChangeSet} changeSet - The data style data attributes that changed.
-    *
     * @returns {Promise<number>} The current time before rendering.
     */
-   async #updateElement(el, changeSet)
+   async #updateElement(el)
    {
       this.#updateElementInvoked = true;
 
@@ -1065,6 +1153,7 @@ export class Position
 
       this.#updateElementInvoked = false;
 
+      // TODO: Verify this block of code!
       if (!el)
       {
          // Resolve any stored Promises when multiple updates have occurred.
@@ -1077,6 +1166,7 @@ export class Position
          return currentTime;
       }
 
+      const changeSet = this.#positionChangeSet;
       const data = this.#data;
 
       if (changeSet.left)
@@ -1104,25 +1194,22 @@ export class Position
          el.style.height = typeof data.height === 'number' ? `${data.height}px` : data.height;
       }
 
+      // TODO: Consider actually storing this in #transforms and updating below in the `transforms` block.
+      if (changeSet.transformOrigin)
+      {
+         el.style.transformOrigin = data.transformOrigin;
+      }
+
       // Update all transforms in order added to transforms object.
       if (changeSet.transform)
       {
-         // If there are active transforms then set them otherwise reset the styles.
-         if (this.#transforms.isActive)
-         {
-            el.style.transformOrigin = data.transformOrigin;
-            el.style.transform = this.#transforms.getCSS();
-         }
-         else
-         {
-            el.style.transformOrigin = null;
-            el.style.transform = null;
-         }
+         el.style.transform = this.#transforms.isActive ? this.#transforms.getCSS() : null;
       }
 
       // If calculate transform options is enabled then update the transform data and set the readable store.
       if (this.#options.calculateTransform || this.#options.transformSubscribed) { this.#updateTransform(el, data); }
 
+      // Update all subscribers with changed data.
       this.#updateSubscribers(data, changeSet);
 
       // Resolve any stored Promises when multiple updates have occurred.
@@ -1164,6 +1251,12 @@ export class Position
     *
     * @param {string} opts.transformOrigin -
     *
+    * @param {number|null} opts.translateX -
+    *
+    * @param {number|null} opts.translateY -
+    *
+    * @param {number|null} opts.translateZ -
+    *
     * @param {number|null} opts.zIndex -
     *
     * @param {*} opts.rest -
@@ -1175,7 +1268,7 @@ export class Position
     * @returns {null|PositionData} Updated position data or null if validation fails.
     */
    #updatePosition({ left, top, maxWidth, maxHeight, minWidth, minHeight, width, height, rotateX, rotateY, rotateZ,
-    scale, transformOrigin, zIndex, ...rest } = {}, parent, el)
+    scale, transformOrigin, translateX, translateY, translateZ, zIndex, ...rest } = {}, parent, el)
    {
       let currentPosition = this.get(rest);
 
@@ -1261,6 +1354,10 @@ export class Position
       if (typeof rotateX === 'number' || rotateX === null) { currentPosition.rotateX = rotateX; }
       if (typeof rotateY === 'number' || rotateY === null) { currentPosition.rotateY = rotateY; }
       if (typeof rotateZ === 'number' || rotateZ === null) { currentPosition.rotateZ = rotateZ; }
+
+      if (typeof translateX === 'number' || translateX === null) { currentPosition.translateX = translateX; }
+      if (typeof translateY === 'number' || translateY === null) { currentPosition.translateY = translateY; }
+      if (typeof translateZ === 'number' || translateZ === null) { currentPosition.translateZ = translateZ; }
 
       if (typeof scale === 'number' || scale === null)
       {

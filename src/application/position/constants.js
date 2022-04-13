@@ -3,7 +3,7 @@
  *
  * @type {string[]}
  */
-const transformKeys = ['rotateX', 'rotateY', 'rotateZ', 'scale'];
+const transformKeys = ['rotateX', 'rotateY', 'rotateZ', 'scale', 'translateX', 'translateY', 'translateZ'];
 
 Object.freeze(transformKeys);
 
@@ -16,7 +16,10 @@ const transformKeysBitwise = {
    rotateX: 1,
    rotateY: 2,
    rotateZ: 4,
-   scale: 8
+   scale: 8,
+   translateX: 16,
+   translateY: 32,
+   translateZ: 64
 };
 
 Object.freeze(transformKeysBitwise);

@@ -54,6 +54,12 @@
  *
  * @property {import('svelte/store').Writable<string>} transformOrigin - Derived store for `transformOrigin`.
  *
+ * @property {import('svelte/store').Writable<number|null>} translateX - Derived store for `translateX` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} translateY - Derived store for `translateY` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} translateZ - Derived store for `translateZ` updates.
+ *
  * @property {import('svelte/store').Writable<number|null>} zIndex - Derived store for `zIndex` updates.
  */
 

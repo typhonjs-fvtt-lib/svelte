@@ -5,6 +5,7 @@ import * as constants            from './constants.js';
 import { TransformData }         from './TransformData.js';
 
 const s_SCALE_VECTOR = [1, 1, 1];
+const s_TRANSLATE_VECTOR = [0, 0, 0];
 const s_MAT4_RESULT = mat4.create();
 const s_MAT4_TEMP = mat4.create();
 const s_VEC3_TEMP = vec3.create();
@@ -21,17 +22,6 @@ export class Transforms
    constructor()
    {
       this._data = {};
-   }
-
-   /**
-    * Provides an iterator for transform keys.
-    *
-    * @returns {Generator<string>} Generator / iterator of transform keys.
-    * @yields {string}
-    */
-   *[Symbol.iterator]()
-   {
-      for (const key in this._data) { yield key; }
    }
 
    /**
@@ -58,6 +48,21 @@ export class Transforms
     * @returns {number|undefined} Any local rotateZ scale.
     */
    get scale() { return this._data.scale; }
+
+   /**
+    * @returns {number|undefined} Any local translateZ data.
+    */
+   get translateX() { return this._data.translateX; }
+
+   /**
+    * @returns {number|undefined} Any local translateZ data.
+    */
+   get translateY() { return this._data.translateY; }
+
+   /**
+    * @returns {number|undefined} Any local translateZ data.
+    */
+   get translateZ() { return this._data.translateZ; }
 
    /**
     * Sets the local rotateX data if the value is a finite number otherwise removes the local data.
@@ -141,6 +146,72 @@ export class Transforms
          if (this._data.scale !== void 0) { this.#count--; }
 
          delete this._data.scale;
+      }
+   }
+
+   /**
+    * Sets the local translateX data if the value is a finite number otherwise removes the local data.
+    *
+    * @param {number|null|undefined}   value - A value to set.
+    */
+   set translateX(value)
+   {
+      if (Number.isFinite(value))
+      {
+         if (this._data.translateX === void 0) { this.#count++; }
+
+         this._data.translateX = value;
+      }
+
+      else
+      {
+         if (this._data.translateX !== void 0) { this.#count--; }
+
+         delete this._data.translateX;
+      }
+   }
+
+   /**
+    * Sets the local translateY data if the value is a finite number otherwise removes the local data.
+    *
+    * @param {number|null|undefined}   value - A value to set.
+    */
+   set translateY(value)
+   {
+      if (Number.isFinite(value))
+      {
+         if (this._data.translateY === void 0) { this.#count++; }
+
+         this._data.translateY = value;
+      }
+
+      else
+      {
+         if (this._data.translateY !== void 0) { this.#count--; }
+
+         delete this._data.translateY;
+      }
+   }
+
+   /**
+    * Sets the local translateZ data if the value is a finite number otherwise removes the local data.
+    *
+    * @param {number|null|undefined}   value - A value to set.
+    */
+   set translateZ(value)
+   {
+      if (Number.isFinite(value))
+      {
+         if (this._data.translateZ === void 0) { this.#count++; }
+
+         this._data.translateZ = value;
+      }
+
+      else
+      {
+         if (this._data.translateZ !== void 0) { this.#count--; }
+
+         delete this._data.translateZ;
       }
    }
 
@@ -320,6 +391,30 @@ export class Transforms
                s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data[key];
                mat4.multiply(matrix, matrix, mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
                break;
+
+            case 'translateX':
+               seenKeys |= constants.transformKeysBitwise.translateX;
+               s_TRANSLATE_VECTOR[0] = this._data.translateX;
+               s_TRANSLATE_VECTOR[1] = 0;
+               s_TRANSLATE_VECTOR[2] = 0;
+               mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+               break;
+
+            case 'translateY':
+               seenKeys |= constants.transformKeysBitwise.translateY;
+               s_TRANSLATE_VECTOR[0] = 0;
+               s_TRANSLATE_VECTOR[1] = this._data.translateY;
+               s_TRANSLATE_VECTOR[2] = 0;
+               mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+               break;
+
+            case 'translateZ':
+               seenKeys |= constants.transformKeysBitwise.translateZ;
+               s_TRANSLATE_VECTOR[0] = 0;
+               s_TRANSLATE_VECTOR[1] = 0;
+               s_TRANSLATE_VECTOR[2] = this._data.translateZ;
+               mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+               break;
          }
       }
 
@@ -348,6 +443,27 @@ export class Transforms
                case 'scale':
                   s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data[key];
                   mat4.multiply(matrix, matrix, mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
+                  break;
+
+               case 'translateX':
+                  s_TRANSLATE_VECTOR[0] = data[key];
+                  s_TRANSLATE_VECTOR[1] = 0;
+                  s_TRANSLATE_VECTOR[2] = 0;
+                  mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+                  break;
+
+               case 'translateY':
+                  s_TRANSLATE_VECTOR[0] = 0;
+                  s_TRANSLATE_VECTOR[1] = data[key];
+                  s_TRANSLATE_VECTOR[2] = 0;
+                  mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+                  break;
+
+               case 'translateZ':
+                  s_TRANSLATE_VECTOR[0] = 0;
+                  s_TRANSLATE_VECTOR[1] = 0;
+                  s_TRANSLATE_VECTOR[2] = data[key];
+                  mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
                   break;
             }
          }

@@ -6,8 +6,9 @@ import * as constants   from './constants.js';
 export class PositionData
 {
    constructor({ height = null, left = null, maxHeight = null, maxWidth = null, minHeight = null, minWidth = null,
-    rotateX = null, rotateY = null, rotateZ = null, scale = null, top = null,
-     transformOrigin = constants.transformOriginDefault, width = null, zIndex = null } = {})
+    rotateX = null, rotateY = null, rotateZ = null, scale = null, translateX = null, translateY = null,
+     translateZ = null, top = null, transformOrigin = constants.transformOriginDefault, width = null,
+      zIndex = null } = {})
    {
       /**
        * @type {number|'auto'|null}
@@ -70,6 +71,21 @@ export class PositionData
       this.transformOrigin = transformOrigin;
 
       /**
+       * @type {number|null}
+       */
+      this.translateX = translateX;
+
+      /**
+       * @type {number|null}
+       */
+      this.translateY = translateY;
+
+      /**
+       * @type {number|null}
+       */
+      this.translateZ = translateZ;
+
+      /**
        * @type {number|'auto'|null}
        */
       this.width = width;
@@ -103,6 +119,9 @@ export class PositionData
       data.scale = this.scale;
       data.top = this.top;
       data.transformOrigin = this.transformOrigin;
+      data.translateX = this.translateX;
+      data.translateY = this.translateY;
+      data.translateZ = this.translateZ;
       data.width = this.width;
       data.zIndex = this.zIndex;
 

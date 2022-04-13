@@ -12,12 +12,13 @@ export class PositionChangeSet
       this.minWidth = false;
       this.zIndex = false;
       this.transform = false;
+      this.transformOrigin = false;
    }
 
    hasChange()
    {
       return this.left || this.top || this.width || this.height || this.maxHeight || this.maxWidth || this.minHeight ||
-       this.minWidth || this.zIndex || this.transform;
+       this.minWidth || this.zIndex || this.transform || this.transformOrigin;
    }
 
    set(value)
@@ -32,5 +33,6 @@ export class PositionChangeSet
       this.minWidth = value;
       this.zIndex = value;
       this.transform = value;
+      this.transformOrigin = value;
    }
 }
