@@ -358,14 +358,18 @@ export class Position
    get validators() { return this.#validators; }
 
    /**
-    * Sets the associated {@link PositionParent} instance.
+    * Sets the associated {@link PositionParent} instance. Resets the style cache and default data.
     *
     * @param {PositionParent} parent - A PositionParent instance.
     */
    set parent(parent)
    {
       this.#parent = parent;
+
+      // Reset any stored default data & the style cache.
+      this.#defaultData = void 0;
       this.#styleCache.reset();
+
       this.set(this.#data);
    }
 
