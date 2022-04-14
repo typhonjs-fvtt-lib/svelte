@@ -3,9 +3,8 @@ import { linear }                from 'svelte/easing';
 
 import { nextAnimationFrame }    from '@typhonjs-fvtt/svelte/animate';
 import { lerp }                  from '@typhonjs-fvtt/svelte/math';
-import { isIterable }            from '@typhonjs-fvtt/svelte/util';
-
 import { propertyStore }         from '@typhonjs-fvtt/svelte/store';
+import { isIterable }            from '@typhonjs-fvtt/svelte/util';
 
 import { AdapterValidators }     from './AdapterValidators.js';
 import * as constants            from './constants.js';
@@ -940,7 +939,9 @@ export class Position
       const data = this.#data;
       const transforms = this.#transforms;
 
-      const el = parent instanceof HTMLElement ? parent : parent?.elementTarget;
+      // Find the target HTML element and verify that it is connected storing it in `el`.
+      const targetEl = parent instanceof HTMLElement ? parent : parent?.elementTarget;
+      const el = targetEl instanceof HTMLElement && targetEl.isConnected ? targetEl : void 0;
 
       const changeSet = this.#positionChangeSet;
       const styleCache = this.#styleCache;
@@ -1157,8 +1158,8 @@ export class Position
 
       this.#updateElementInvoked = false;
 
-      // TODO: Verify this block of code!
-      if (!el)
+      // Early out if the element is no longer connected to the DOM / shadow root.
+      if (!el.isConnected)
       {
          // Resolve any stored Promises when multiple updates have occurred.
          if (this.#elementUpdatePromises.length)
