@@ -598,6 +598,9 @@ export class SvelteFormApplication extends FormApplication
          { maxHeight: '100%', offset: 1 },
       ], { duration, fill: 'forwards' }).finished;
 
+      // minHeight needs to be adjusted to options or Foundry default window height.
+      this.position.minHeight = this.options?.minHeight ?? MIN_WINDOW_HEIGHT;
+
       element.classList.remove('minimized');
 
       this._minimized = false;
@@ -671,10 +674,15 @@ export class SvelteFormApplication extends FormApplication
       // Save current position state and add the constraint data to use in `maximize`.
       this.position.save({ name: '#beforeMinimized', constraints });
 
+      const headerOffsetHeight = header.offsetHeight;
+
+      // minHeight needs to be adjusted to header height.
+      this.position.minHeight = headerOffsetHeight;
+
       if (animate)
       {
          // First await animation of height upward.
-         await this.position.animateTo({ height: header.offsetHeight }, { duration: 100 });
+         await this.position.animateTo({ height: headerOffsetHeight }, { duration: 100 });
       }
 
       // Set all header buttons besides close and the window title to display none.
