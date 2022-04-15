@@ -110,6 +110,7 @@ export class SvelteFormApplication extends FormApplication
       this.#position = new Position(this, {
          ...this.position,
          ...this.options,
+         initial: this.options.positionInitial,
          validators: this.options.positionValidator
       });
 
@@ -147,15 +148,12 @@ export class SvelteFormApplication extends FormApplication
          headerButtonNoClose: false,      // If true then the close header button is removed.
          headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.
          headerNoTitleMinimized: false,   // If true then header title is hidden when application is minimized.
-         minHeight: MIN_WINDOW_HEIGHT,    // Number specifying minimum window height.
-         minWidth: MIN_WINDOW_WIDTH,      // Number specifying minimum window width.
+         minHeight: MIN_WINDOW_HEIGHT,    // Assigned to position. Number specifying minimum window height.
+         minWidth: MIN_WINDOW_WIDTH,      // Assigned to position. Number specifying minimum window width.
          positionable: true,              // If false then `position.set` does not take effect.
+         positionInitial: Position.Initial.browserCentered,      // A helper for initial position placement.
          positionValidator: Position.Validators.transformWindow, // A function providing the default validator.
-         rotateX: null,                   // Assigned to position.
-         rotateY: null,                   // Assigned to position.
-         rotateZ: null,                   // Assigned to position.
-         suppressFormInit: false,         // If true automatic suppression of core FormApplication methods is enabled.
-         zIndex: null                     // Assigned to position.
+         suppressFormInit: false          // If true automatic suppression of core FormApplication methods is enabled.
       });
    }
 

@@ -8,7 +8,8 @@ import { isIterable }            from '@typhonjs-fvtt/svelte/util';
 
 import { AdapterValidators }     from './AdapterValidators.js';
 import * as constants            from './constants.js';
-import { PositionChangeSet }      from './PositionChangeSet.js';
+import * as positionInitial      from './initial/index.js';
+import { PositionChangeSet }     from './PositionChangeSet.js';
 import { PositionData }          from './PositionData.js';
 import { StyleCache }            from './StyleCache.js';
 import { TransformData }         from './TransformData.js';
@@ -80,6 +81,7 @@ export class Position
     */
    #options = {
       calculateTransform: false,
+      initialHelper: void 0,
       transformSubscribed: false
    };
 
@@ -144,8 +146,26 @@ export class Position
     */
    #validatorsAdapter;
 
+   /**
+    * @returns {{browserCentered?: Centered, Centered?: *}} Initial position helpers.
+    */
+   static get Initial() { return positionInitial; }
+
+   /**
+    * Returns TransformData class / constructor.
+    *
+    * @returns {TransformData} TransformData class / constructor.
+    */
    static get TransformData() { return TransformData; }
 
+   /**
+    * Returns default validators.
+    *
+    * Note: `basicWindow` and `BasicBounds` will eventually be removed.
+    *
+    * @returns {{basicWindow?: BasicBounds, transformWindow?: TransformBounds, TransformBounds?: *, BasicBounds?: *}}
+    *  Available validators.
+    */
    static get Validators() { return positionValidators; }
 
    /**
@@ -293,6 +313,19 @@ export class Position
       Object.freeze(this.#stores);
 
       [this.#validators, this.#validatorsAdapter] = new AdapterValidators();
+
+      if (options?.initial)
+      {
+         const initialHelper = options.initial;
+
+         if (typeof initialHelper?.getLeft !== 'function' || typeof initialHelper?.getTop !== 'function')
+         {
+            throw new Error(
+             `'options.initial' position helper does not contain 'getLeft' and / or 'getTop' functions.`);
+         }
+
+         this.#options.initialHelper = options.initial;
+      }
 
       if (options?.validators)
       {
@@ -1287,16 +1320,12 @@ export class Position
          }
          else
          {
-            // TODO: VERIFY THIS CHANGE IS CORRECT
             const newWidth = Number.isFinite(width) ? width : currentPosition.width;
             currentPosition.width = width = Number.isFinite(newWidth) ? Math.round(newWidth) : el.offsetWidth;
-
-            // currentPosition.width = width = typeof width === 'number' ? Math.round(width) : el.offsetWidth;
          }
       }
       else
       {
-         // TODO: VERIFY THIS CHANGE IS CORRECT
          width = Number.isFinite(currentPosition.width) ? currentPosition.width : el.offsetWidth;
       }
 
@@ -1310,29 +1339,43 @@ export class Position
          }
          else
          {
-            // TODO: VERIFY THIS CHANGE IS CORRECT
             const newHeight = Number.isFinite(height) ? height : currentPosition.height;
             currentPosition.height = height = Number.isFinite(newHeight) ? Math.round(newHeight) : el.offsetHeight;
-
-            // currentPosition.height = height = typeof height === 'number' ? Math.round(height) : el.offsetHeight;
          }
       }
       else
       {
-         // TODO: VERIFY THIS CHANGE IS CORRECT
          height = Number.isFinite(currentPosition.height) ? currentPosition.height : el.offsetHeight;
       }
 
       // Update left
       if (el.style.left === '' || Number.isFinite(left))
       {
-         currentPosition.left = Number.isFinite(left) ? left : (globalThis.innerWidth - width) / 2;
+         if (Number.isFinite(left))
+         {
+            currentPosition.left = left;
+         }
+         else
+         {
+            // Potentially use any initial position helper if available or set to 0.
+            currentPosition.left = typeof this.#options.initialHelper?.getLeft === 'function' ?
+             this.#options.initialHelper.getLeft(width) : 0;
+         }
       }
 
       // Update top
       if (el.style.top === '' || Number.isFinite(top))
       {
-         currentPosition.top = Number.isFinite(top) ? top : (globalThis.innerHeight - height) / 2;
+         if (Number.isFinite(top))
+         {
+            currentPosition.top = top;
+         }
+         else
+         {
+            // Potentially use any initial position helper if available or set to 0.
+            currentPosition.top = typeof this.#options.initialHelper?.getTop === 'function' ?
+             this.#options.initialHelper.getTop(height) : 0;
+         }
       }
 
       if (Number.isFinite(maxHeight) || maxHeight === null)
@@ -1504,9 +1547,19 @@ const s_VALIDATION_DATA = {
 Object.seal(s_VALIDATION_DATA);
 
 /**
+ * @typedef {object} InitialHelper
+ *
+ * @property {Function} getLeft - A function that takes the width parameter and returns the left position.
+ *
+ * @property {Function} getTop - A function that takes the height parameter and returns the top position.
+ */
+
+/**
  * @typedef {object} PositionOptions
  *
  * @property {boolean} calculateTransform - Set in constructor; when true always calculate transform data.
+ *
+ * @property {InitialHelper} initialHelper - Set in constructor; provides a helper for setting initial position data.
  *
  * @property {boolean} transformSubscribed - Set to true when there are subscribers to the readable transform store.
  */
