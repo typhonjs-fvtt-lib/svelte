@@ -202,7 +202,8 @@ function draggable(node, { position, active = true, storeDragging = void 0 })
    }
 
    return {
-      update: ({ active }) =>  // eslint-disable-line no-shadow
+      // The default of active being true won't automatically add listeners twice.
+      update: ({ active = true }) =>  // eslint-disable-line no-shadow
       {
          if (active) { activateListeners(); }
          else { removeListeners(); }
