@@ -163,7 +163,7 @@ export class BasicBounds
 
       if (valData.position.width !== 'auto')
       {
-         const maxW = valData.maxWidth || boundsWidth;
+         const maxW = valData.maxWidth ?? (this.#constrain ? boundsWidth : Number.MAX_SAFE_INTEGER);
          valData.position.width = valData.width = Math.clamped(valData.position.width, valData.minWidth, maxW);
 
          if ((valData.width + valData.position.left + valData.marginLeft) > boundsWidth)
@@ -174,7 +174,7 @@ export class BasicBounds
 
       if (valData.position.height !== 'auto')
       {
-         const maxH = valData.maxHeight || boundsHeight;
+         const maxH = valData.maxHeight ?? (this.#constrain ? boundsHeight : Number.MAX_SAFE_INTEGER);
          valData.position.height = valData.height = Math.clamped(valData.position.height, valData.minHeight, maxH);
 
          if ((valData.height + valData.position.top + valData.marginTop) > boundsHeight)

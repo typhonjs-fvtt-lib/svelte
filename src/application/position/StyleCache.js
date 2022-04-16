@@ -39,22 +39,13 @@ export class StyleCache
 
       this.computed = globalThis.getComputedStyle(el);
 
-      this.marginLeft = styleParsePixels(el.style.marginLeft) ||
-       styleParsePixels(this.computed.marginLeft);
+      this.marginLeft = styleParsePixels(el.style.marginLeft) ?? styleParsePixels(this.computed.marginLeft);
+      this.marginTop = styleParsePixels(el.style.marginTop) ?? styleParsePixels(this.computed.marginTop);
+      this.maxHeight = styleParsePixels(el.style.maxHeight) ?? styleParsePixels(this.computed.maxHeight);
+      this.maxWidth = styleParsePixels(el.style.maxWidth) ?? styleParsePixels(this.computed.maxWidth);
 
-      this.marginTop = styleParsePixels(el.style.marginTop) ||
-       styleParsePixels(this.computed.marginTop);
-
-      this.maxHeight = styleParsePixels(el.style.maxHeight) ||
-       styleParsePixels(this.computed.maxHeight);
-
-      this.maxWidth = styleParsePixels(el.style.maxWidth) ||
-       styleParsePixels(this.computed.maxWidth);
-
-      this.minHeight = styleParsePixels(el.style.minHeight) ||
-       styleParsePixels(this.computed.minHeight);
-
-      this.minWidth = styleParsePixels(el.style.minWidth) ||
-       styleParsePixels(this.computed.minWidth);
+      // Note that the computed styles for below will always be 0px / 0 when no style is active.
+      this.minHeight = styleParsePixels(el.style.minHeight) ?? styleParsePixels(this.computed.minHeight);
+      this.minWidth = styleParsePixels(el.style.minWidth) ?? styleParsePixels(this.computed.minWidth);
    }
 }

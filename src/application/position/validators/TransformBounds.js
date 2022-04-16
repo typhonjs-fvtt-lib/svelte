@@ -168,14 +168,14 @@ export class TransformBounds
       // Ensure min / max width constraints when position width is not 'auto'. If constrain is true cap width bounds.
       if (valData.position.width !== 'auto')
       {
-         const maxW = valData.maxWidth ?? this.#constrain ? boundsWidth : Number.MAX_SAFE_INTEGER;
+         const maxW = valData.maxWidth ?? (this.#constrain ? boundsWidth : Number.MAX_SAFE_INTEGER);
          valData.position.width = Math.clamped(valData.width, valData.minWidth, maxW);
       }
 
       // Ensure min / max height constraints when position height is not 'auto'. If constrain is true cap height bounds.
       if (valData.position.height !== 'auto')
       {
-         const maxH = valData.maxHeight ?? this.#constrain ? boundsHeight : Number.MAX_SAFE_INTEGER;
+         const maxH = valData.maxHeight ?? (this.#constrain ? boundsHeight : Number.MAX_SAFE_INTEGER);
          valData.position.height = Math.clamped(valData.height, valData.minHeight, maxH);
       }
 

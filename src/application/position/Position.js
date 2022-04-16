@@ -1446,13 +1446,13 @@ export class Position
 
          s_VALIDATION_DATA.marginTop = styleCache.marginTop;
 
-         s_VALIDATION_DATA.maxHeight = styleCache.maxHeight || currentPosition.maxHeight;
+         s_VALIDATION_DATA.maxHeight = styleCache.maxHeight ?? currentPosition.maxHeight;
 
-         s_VALIDATION_DATA.maxWidth = styleCache.maxWidth || currentPosition.maxWidth;
+         s_VALIDATION_DATA.maxWidth = styleCache.maxWidth ?? currentPosition.maxWidth;
 
-         s_VALIDATION_DATA.minHeight = styleCache.minHeight || currentPosition.minHeight || 0;
-
-         s_VALIDATION_DATA.minWidth = styleCache.minWidth || currentPosition.minWidth || 0;
+         // Note the use of || for accessing the style cache as the left hand is ignored w/ falsy values such as '0'.
+         s_VALIDATION_DATA.minHeight = styleCache.minHeight || (currentPosition.minHeight ?? 0);
+         s_VALIDATION_DATA.minWidth = styleCache.minWidth || (currentPosition.minWidth ?? 0);
 
          for (const entry of validators)
          {
