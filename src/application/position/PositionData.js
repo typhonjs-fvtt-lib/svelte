@@ -6,9 +6,9 @@ import * as constants   from './constants.js';
 export class PositionData
 {
    constructor({ height = null, left = null, maxHeight = null, maxWidth = null, minHeight = null, minWidth = null,
-    rotateX = null, rotateY = null, rotateZ = null, scale = null, translateX = null, translateY = null,
-     translateZ = null, top = null, transformOrigin = constants.transformOriginDefault, width = null,
-      zIndex = null } = {})
+                  rotateX = null, rotateY = null, rotateZ = null, scale = null, translateX = null, translateY = null,
+                  translateZ = null, top = null, transformOrigin = constants.transformOriginDefault, width = null,
+                  zIndex = null } = {})
    {
       /**
        * @type {number|'auto'|null}
@@ -99,32 +99,32 @@ export class PositionData
    }
 
    /**
-    * Copies data stored in this instance to the given instance.
+    * Copies given data to this instance.
     *
-    * @param {PositionData}   data - Copy to this instance.
+    * @param {PositionData}   data - Copy from this instance.
     *
-    * @returns {PositionData} Passed in PositionData instance.
+    * @returns {PositionData} This instance.
     */
    copy(data)
    {
-      data.height = this.height;
-      data.left = this.left;
-      data.maxHeight = this.maxHeight;
-      data.maxWidth = this.maxWidth;
-      data.minHeight = this.minHeight;
-      data.minWidth = this.minWidth;
-      data.rotateX = this.rotateX;
-      data.rotateY = this.rotateY;
-      data.rotateZ = this.rotateZ;
-      data.scale = this.scale;
-      data.top = this.top;
-      data.transformOrigin = this.transformOrigin;
-      data.translateX = this.translateX;
-      data.translateY = this.translateY;
-      data.translateZ = this.translateZ;
-      data.width = this.width;
-      data.zIndex = this.zIndex;
+      this.height = data.height;
+      this.left = data.left;
+      this.maxHeight = data.maxHeight;
+      this.maxWidth = data.maxWidth;
+      this.minHeight = data.minHeight;
+      this.minWidth = data.minWidth;
+      this.rotateX = data.rotateX;
+      this.rotateY = data.rotateY;
+      this.rotateZ = data.rotateZ;
+      this.scale = data.scale;
+      this.top = data.top;
+      this.transformOrigin = data.transformOrigin;
+      this.translateX = data.translateX;
+      this.translateY = data.translateY;
+      this.translateZ = data.translateZ;
+      this.width = data.width;
+      this.zIndex = data.zIndex;
 
-      return data;
+      return this;
    }
 }

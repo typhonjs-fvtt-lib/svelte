@@ -1,12 +1,12 @@
 import { writable }              from 'svelte/store';
 import { linear }                from 'svelte/easing';
 
-import { nextAnimationFrame }    from '@typhonjs-fvtt/svelte/animate';
 import { lerp }                  from '@typhonjs-fvtt/svelte/math';
 import { propertyStore }         from '@typhonjs-fvtt/svelte/store';
 import { isIterable }            from '@typhonjs-fvtt/svelte/util';
 
 import { AdapterValidators }     from './AdapterValidators.js';
+import { AnimationManager }      from './animation/AnimationManager.js';
 import * as constants            from './constants.js';
 import * as positionInitial      from './initial/index.js';
 import { PositionChangeSet }     from './PositionChangeSet.js';
@@ -15,6 +15,7 @@ import { StyleCache }            from './StyleCache.js';
 import { TransformData }         from './TransformData.js';
 import * as positionValidators   from './validators/index.js';
 import { Transforms }            from './Transforms.js';
+import { UpdateElementManager }  from './UpdateElementManager.js';
 
 /**
  * Provides a store for position following the subscriber protocol in addition to providing individual writable derived
@@ -650,9 +651,9 @@ export class Position
     *
     * @param {Function}       [opts.interpolate=lerp] - Interpolation function.
     *
-    * @returns {Promise<void>} Animation complete.
+    * @returns {Promise<void>} Promise that is resolved when animation completes.
     */
-   async animateTo(position = {}, { duration = 1000, easing = linear, interpolate = lerp } = {})
+   async animateTo(position, { duration = 1000, easing = linear, interpolate = lerp } = {})
    {
       if (typeof position !== 'object')
       {
@@ -727,30 +728,19 @@ export class Position
       // Nothing to animate, so return now.
       if (keys.length === 0) { return; }
 
-      const start = await nextAnimationFrame();
-      let current = 0;
-
-      while (current < duration)
-      {
-         const easedTime = easing(current / duration);
-
-         for (const key of keys) { newData[key] = interpolate(initial[key], destination[key], easedTime); }
-
-         const newCurrent = await this.set(newData).elementUpdated - start;
-
-         // Must check that time has passed otherwise likely the element has been removed.
-         if (newCurrent === current) { break; }
-         current = newCurrent;
-      }
-
-      // Prepare final update with end position data and remove keys from `currentAnimationKeys`.
-      for (const key of keys)
-      {
-         newData[key] = position[key];
-         currentAnimationKeys.delete(key);
-      }
-
-      this.set(newData);
+      // Schedule w/ animation manager.
+      return AnimationManager.add({
+         current: 0,
+         currentAnimationKeys,
+         destination,
+         duration,
+         easing,
+         initial,
+         interpolate,
+         keys,
+         newData,
+         position: this
+      });
    }
 
    /**
@@ -1153,7 +1143,7 @@ export class Position
          if (typeof this.#defaultData !== 'object') { this.#defaultData = Object.assign({}, data); }
 
          // Add this element and bound update callback to UpdateManager.
-         this.#updateElementPromise = UpdateManager.add(el, this.#updateElementBound);
+         this.#updateElementPromise = UpdateElementManager.add(el, this.#updateElementBound);
       }
       else
       {
@@ -1419,7 +1409,7 @@ export class Position
 
          s_VALIDATION_DATA.el = el;
 
-         s_VALIDATION_DATA.styles = styleCache.computed;
+         s_VALIDATION_DATA.computed = styleCache.computed;
 
          s_VALIDATION_DATA.transforms = this.#transforms;
 
@@ -1462,7 +1452,7 @@ export class Position
       if (!changeSet.hasChange()) { return; }
 
       // Make a copy of the data.
-      const output = data.copy(this.#dataSubscribers);
+      const output = this.#dataSubscribers.copy(data);
 
       // Subscriptions are stored locally as on the browser Babel is still used for private class fields / Babel
       // support until 2023. IE not doing this will require several extra method calls otherwise.
@@ -1511,65 +1501,13 @@ export class Position
 }
 
 /**
- * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link Position.elementUpdated} to await
- * on the returned promise that is resolved with the current render time via `nextAnimationFrame` /
- * `requestAnimationFrame`. This allows the underlying data model to be updated immediately while updates to the
- * element are in sync with the browser and potentially in the future be further throttled.
- *
- * @param {HTMLElement} el - The target HTMLElement.
- */
-class UpdateManager
-{
-   static map = new Map();
-
-   static promise;
-
-   /**
-    * Potentially adds the given element and callback to the map.
-    *
-    * @param {HTMLElement} el - An HTMLElement instance.
-    *
-    * @param {Function}    callback - The callback to invoke on next animation frame.
-    */
-   static add(el, callback)
-   {
-      if (this.map.has(el)) { return this.promise; }
-
-      this.map.set(el, callback);
-
-      if (!this.promise) { this.promise = UpdateManager.wait(); }
-
-      return this.promise;
-   }
-
-   /**
-    * Await on `nextAnimationFrame` and iterate over map invoking callback function.s
-    *
-    * @returns {Promise<void>} The next frame Promise.
-    */
-   static async wait()
-   {
-      // Await the next animation frame. In the future this can be extended to multiple frames to divide update rate.
-      const currentTime = await nextAnimationFrame();
-
-      this.promise = void 0;
-
-      for (const [el, callback] of this.map.entries()) { callback(el); }
-
-      this.map.clear();
-
-      return currentTime;
-   }
-}
-
-/**
  * @type {ValidationData}
  */
 const s_VALIDATION_DATA = {
    position: void 0,
    parent: void 0,
    el: void 0,
-   styles: void 0,
+   computed: void 0,
    transforms: void 0,
    height: void 0,
    width: void 0,
@@ -1616,7 +1554,7 @@ Object.seal(s_VALIDATION_DATA);
  *
  * @property {HTMLElement} el -
  *
- * @property {CSSStyleDeclaration} styles -
+ * @property {CSSStyleDeclaration} computed -
  *
  * @property {Transforms} transforms -
  *

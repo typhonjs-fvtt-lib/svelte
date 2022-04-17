@@ -1033,14 +1033,16 @@ function s_IS_ITERABLE(data) {
 }
 
 /**
- * Provides a basic test for a given variable to test if it has the shape of a store by having a `subscribe` function.
+ * Provides a basic test for a given variable to test if it has the shape of a readable store by having a `subscribe`
+ * function.
+ *
  * Note: functions are also objects, so test that the variable might be a function w/ a `subscribe` function.
  *
  * @param {*}  store - variable to test that might be a store.
  *
  * @returns {boolean} Whether the variable tested has the shape of a store.
  */
-function isStore(store) {
+function isReadableStore(store) {
   if (store === null || store === void 0) {
     return false;
   }
@@ -1049,6 +1051,30 @@ function isStore(store) {
     case 'function':
     case 'object':
       return typeof store.subscribe === 'function';
+  }
+
+  return false;
+}
+/**
+ * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
+ * and `set` functions.
+ *
+ * Note: functions are also objects, so test that the variable might be a function w/ `subscribe` & `set` functions.
+ *
+ * @param {*}  store - variable to test that might be a store.
+ *
+ * @returns {boolean} Whether the variable tested has the shape of a store.
+ */
+
+function isWritableStore(store) {
+  if (store === null || store === void 0) {
+    return false;
+  }
+
+  switch (typeof store) {
+    case 'function':
+    case 'object':
+      return typeof store.subscribe === 'function' && typeof store.set === 'function';
   }
 
   return false;
@@ -2312,5 +2338,5 @@ function s_CREATE_STORE(initialValue)
  * @typedef {import('svelte/store').Writable & import('svelte/store').get} GSStore - The backing Svelte store; a writable w/ get method attached.
  */
 
-export { DynArrayReducer, LocalStorage, SessionStorage, TJSDocument, TJSDocumentCollection, TJSGameSettings, gameState, isStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { DynArrayReducer, LocalStorage, SessionStorage, TJSDocument, TJSDocumentCollection, TJSGameSettings, gameState, isReadableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
 //# sourceMappingURL=index.js.map
