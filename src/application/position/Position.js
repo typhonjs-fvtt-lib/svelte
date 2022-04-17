@@ -335,10 +335,10 @@ export class Position
          this.#options.initialHelper = options.initial;
       }
 
-      if (options?.validators)
+      if (options?.validator)
       {
-         if (isIterable(options?.validators)) { this.validators.add(...options.validators); }
-         else { this.validators.add(options.validators); }
+         if (isIterable(options?.validator)) { this.validators.add(...options.validator); }
+         else { this.validators.add(options.validator); }
       }
 
       // Seal data backing readable stores.

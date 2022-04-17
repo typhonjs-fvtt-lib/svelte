@@ -111,7 +111,7 @@ export class SvelteApplication extends Application
          ...this.position,
          ...this.options,
          initial: this.options.positionInitial,
-         validators: this.options.positionValidator
+         validator: this.options.positionValidator
       });
 
       // Remove old position field.
