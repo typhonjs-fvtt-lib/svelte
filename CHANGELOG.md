@@ -1,4 +1,12 @@
 # Changelog
+## Release 0.0.9 (large update)
+- Further refinement of position / Position system.
+  - Translation + min / max height & width.
+  - Massive performance improvements.
+  - Ability to apply Position to any element.
+    - New `applyPosition` action.
+- New `resizeObserver` action that is far more performance oriented than stock Svelte monitoring of offset width & height.
+
 ## Release 0.0.8 (medium update)
 - Continued refinement of position / Position in SvelteApplication.
   - Transforms are now handled by matrix3d.
