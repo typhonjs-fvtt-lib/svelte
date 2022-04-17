@@ -22,8 +22,6 @@ import { Transforms }            from './Transforms.js';
  */
 export class Position
 {
-   #subscriptions = [];
-
    /**
     * @type {PositionData}
     */
@@ -66,13 +64,6 @@ export class Position
     * @type {PositionChangeSet}
     */
    #positionChangeSet = new PositionChangeSet();
-
-   /**
-    * Stores all pending set position Promise resolve functions.
-    *
-    * @type {Function[]}
-    */
-   #elementUpdatePromises = [];
 
    /**
     * Stores ongoing options that are set in the constructor or by transform store subscription.
@@ -119,6 +110,13 @@ export class Position
    #styleCache = new StyleCache();
 
    /**
+    * Stores the subscribers.
+    *
+    * @type {[]}
+    */
+   #subscriptions = [];
+
+   /**
     * Stores the current transform data used for the readable `transform` store. It is only active when there are
     * subscribers to the store or calculateTransform options is true.
     *
@@ -132,9 +130,18 @@ export class Position
    #transforms = new Transforms();
 
    /**
-    * @type {boolean}
+    * Stores the bound update element function.
+    *
+    * @type {Function}
     */
-   #updateElementInvoked = false;
+   #updateElementBound;
+
+   /**
+    * Stores the UpdateManager wait promise.
+    *
+    * @type {Promise}
+    */
+   #updateElementPromise;
 
    /**
     * @type {AdapterValidators}
@@ -336,6 +343,8 @@ export class Position
       // Seal data backing readable stores.
       Object.seal(this.#dimensionData);
       Object.seal(this.#transformData);
+
+      this.#updateElementBound = this.#updateElement.bind(this);
    }
 
    /**
@@ -355,7 +364,7 @@ export class Position
     */
    get elementUpdated()
    {
-      return new Promise((resolve) => this.#elementUpdatePromises.push(resolve));
+      return this.#updateElementPromise;
    }
 
    /**
@@ -727,7 +736,11 @@ export class Position
 
          for (const key of keys) { newData[key] = interpolate(initial[key], destination[key], easedTime); }
 
-         current = await this.set(newData).elementUpdated - start;
+         const newCurrent = await this.set(newData).elementUpdated - start;
+
+         // Must check that time has passed otherwise likely the element has been removed.
+         if (newCurrent === current) { break; }
+         current = newCurrent;
       }
 
       // Prepare final update with end position data and remove keys from `currentAnimationKeys`.
@@ -1139,8 +1152,8 @@ export class Position
          // Set default data after first set operation that has a target element.
          if (typeof this.#defaultData !== 'object') { this.#defaultData = Object.assign({}, data); }
 
-         // If there isn't already a pending update element action then initiate it if there are changes.
-         if (!this.#updateElementInvoked) { this.#updateElement(el); }
+         // Add this element and bound update callback to UpdateManager.
+         this.#updateElementPromise = UpdateManager.add(el, this.#updateElementBound);
       }
       else
       {
@@ -1179,30 +1192,11 @@ export class Position
     * element are in sync with the browser and potentially in the future be further throttled.
     *
     * @param {HTMLElement} el - The target HTMLElement.
-    *
-    * @returns {Promise<number>} The current time before rendering.
     */
-   async #updateElement(el)
+   #updateElement(el)
    {
-      this.#updateElementInvoked = true;
-
-      // Await the next animation frame. In the future this can be extended to multiple frames to divide update rate.
-      const currentTime = await nextAnimationFrame();
-
-      this.#updateElementInvoked = false;
-
       // Early out if the element is no longer connected to the DOM / shadow root.
-      if (!el.isConnected)
-      {
-         // Resolve any stored Promises when multiple updates have occurred.
-         if (this.#elementUpdatePromises.length)
-         {
-            for (const resolve of this.#elementUpdatePromises) { resolve(currentTime); }
-            this.#elementUpdatePromises.length = 0;
-         }
-
-         return currentTime;
-      }
+      if (!el.isConnected) { return; }
 
       const changeSet = this.#positionChangeSet;
       const data = this.#data;
@@ -1249,15 +1243,6 @@ export class Position
 
       // Update all subscribers with changed data.
       this.#updateSubscribers(data, changeSet);
-
-      // Resolve any stored Promises when multiple updates have occurred.
-      if (this.#elementUpdatePromises.length)
-      {
-         for (const resolve of this.#elementUpdatePromises) { resolve(currentTime); }
-         this.#elementUpdatePromises.length = 0;
-      }
-
-      return currentTime;
    }
 
    /**
@@ -1522,6 +1507,58 @@ export class Position
       this.#transforms.getData(data, this.#transformData, s_VALIDATION_DATA);
 
       this.#storeTransform.set(this.#transformData);
+   }
+}
+
+/**
+ * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link Position.elementUpdated} to await
+ * on the returned promise that is resolved with the current render time via `nextAnimationFrame` /
+ * `requestAnimationFrame`. This allows the underlying data model to be updated immediately while updates to the
+ * element are in sync with the browser and potentially in the future be further throttled.
+ *
+ * @param {HTMLElement} el - The target HTMLElement.
+ */
+class UpdateManager
+{
+   static map = new Map();
+
+   static promise;
+
+   /**
+    * Potentially adds the given element and callback to the map.
+    *
+    * @param {HTMLElement} el - An HTMLElement instance.
+    *
+    * @param {Function}    callback - The callback to invoke on next animation frame.
+    */
+   static add(el, callback)
+   {
+      if (this.map.has(el)) { return this.promise; }
+
+      this.map.set(el, callback);
+
+      if (!this.promise) { this.promise = UpdateManager.wait(); }
+
+      return this.promise;
+   }
+
+   /**
+    * Await on `nextAnimationFrame` and iterate over map invoking callback function.s
+    *
+    * @returns {Promise<void>} The next frame Promise.
+    */
+   static async wait()
+   {
+      // Await the next animation frame. In the future this can be extended to multiple frames to divide update rate.
+      const currentTime = await nextAnimationFrame();
+
+      this.promise = void 0;
+
+      for (const [el, callback] of this.map.entries()) { callback(el); }
+
+      this.map.clear();
+
+      return currentTime;
    }
 }
 
