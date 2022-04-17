@@ -522,6 +522,7 @@ export class Transforms
             mat4.fromTranslation(output[1], vector);
             break;
 
+         case null: // By default null / no transform is center.
          case 'center':
             vector[0] = -position.width / 2;
             vector[1] = -position.height / 2;

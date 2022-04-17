@@ -1077,10 +1077,10 @@ export class Position
          }
       }
 
-      if (position.transformOrigin !== void 0)
+      if (typeof position.transformOrigin === 'string' || position.transformOrigin === null)
       {
          position.transformOrigin = constants.transformOrigins.includes(position.transformOrigin) ?
-          position.transformOrigin : constants.transformOriginDefault;
+          position.transformOrigin : null;
 
          if (data.transformOrigin !== position.transformOrigin)
          {
@@ -1216,10 +1216,10 @@ export class Position
          el.style.height = typeof data.height === 'number' ? `${data.height}px` : data.height;
       }
 
-      // TODO: Consider actually storing this in #transforms and updating below in the `transforms` block.
       if (changeSet.transformOrigin)
       {
-         el.style.transformOrigin = data.transformOrigin;
+         // When set to 'center' we can simply set the transform to null which is center by default.
+         el.style.transformOrigin = data.transformOrigin === 'center' ? null : data.transformOrigin;
       }
 
       // Update all transforms in order added to transforms object.
@@ -1387,10 +1387,10 @@ export class Position
          currentPosition.scale = typeof scale === 'number' ? Math.max(0, Math.min(scale, 1000)) : null;
       }
 
-      if (typeof transformOrigin === 'string')
+      if (typeof transformOrigin === 'string' || transformOrigin === null)
       {
          currentPosition.transformOrigin = constants.transformOrigins.includes(transformOrigin) ? transformOrigin :
-          constants.transformOriginDefault;
+          null;
       }
 
       if (typeof zIndex === 'number' || zIndex === null)

@@ -153,7 +153,8 @@ export class SvelteFormApplication extends FormApplication
          positionable: true,              // If false then `position.set` does not take effect.
          positionInitial: Position.Initial.browserCentered,      // A helper for initial position placement.
          positionValidator: Position.Validators.transformWindow, // A function providing the default validator.
-         suppressFormInit: false          // If true automatic suppression of core FormApplication methods is enabled.
+         suppressFormInit: false,         // If true automatic suppression of core FormApplication methods is enabled.
+         transformOrigin: 'top left'      // By default, 'top / left' respects rotation when minimizing.
       });
    }
 
