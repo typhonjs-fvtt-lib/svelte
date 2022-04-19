@@ -15,7 +15,7 @@ import { StyleCache }            from './StyleCache.js';
 import { TransformData }         from './TransformData.js';
 import * as positionValidators   from './validators/index.js';
 import { Transforms }            from './Transforms.js';
-import { UpdateElementManager }  from './UpdateElementManager.js';
+import { UpdateElementManager }  from './update/UpdateElementManager.js';
 
 /**
  * Provides a store for position following the subscriber protocol in addition to providing individual writable derived
