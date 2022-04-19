@@ -1,4 +1,4 @@
-import { TransformData } from '../TransformData.js';
+import { TransformData } from '../transform/TransformData.js';
 
 const s_TRANSFORM_DATA = new TransformData();
 

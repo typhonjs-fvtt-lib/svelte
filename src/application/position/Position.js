@@ -5,16 +5,16 @@ import { lerp }                  from '@typhonjs-fvtt/svelte/math';
 import { propertyStore }         from '@typhonjs-fvtt/svelte/store';
 import { isIterable }            from '@typhonjs-fvtt/svelte/util';
 
-import { AdapterValidators }     from './AdapterValidators.js';
 import { AnimationManager }      from './animation/AnimationManager.js';
 import * as constants            from './constants.js';
 import * as positionInitial      from './initial/index.js';
 import { PositionChangeSet }     from './PositionChangeSet.js';
 import { PositionData }          from './PositionData.js';
 import { StyleCache }            from './StyleCache.js';
-import { TransformData }         from './TransformData.js';
+import { TransformData }         from './transform/TransformData.js';
+import { AdapterValidators }     from './validators/AdapterValidators.js';
 import * as positionValidators   from './validators/index.js';
-import { Transforms }            from './Transforms.js';
+import { Transforms }            from './transform/Transforms.js';
 import { UpdateElementManager }  from './update/UpdateElementManager.js';
 
 /**

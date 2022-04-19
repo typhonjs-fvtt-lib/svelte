@@ -1,6 +1,6 @@
 import { nextAnimationFrame }    from '@typhonjs-fvtt/svelte/animate';
 
-import { UpdateElementManager }  from '../UpdateElementManager.js';
+import { UpdateElementManager }  from '../update/UpdateElementManager.js';
 
 const s_ACTIVE_LIST = [];
 const s_NEW_LIST = [];

@@ -1,6 +1,6 @@
 import { degToRad, mat4, vec3 }  from '@typhonjs-fvtt/svelte/math';
 
-import * as constants            from './constants.js';
+import * as constants            from '../constants.js';
 
 import { TransformData }         from './TransformData.js';
 

@@ -1,6 +1,6 @@
 import { nextAnimationFrame }    from '@typhonjs-fvtt/svelte/animate';
 
-import { UpdateElementManager }  from '../UpdateElementManager.js';
+import { UpdateElementManager }  from '../update/UpdateElementManager.js';
 
 const s_ACTIVE_LIST = [];
 const s_NEW_LIST = [];
@@ -15,8 +15,6 @@ export class AnimationManager
     * Add animation data.
     *
     * @param {object}   data -
-    *
-    * @returns {Promise<void>} Resolved when animation completes.
     */
    static add(data)
    {

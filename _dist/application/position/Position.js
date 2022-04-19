@@ -5,17 +5,17 @@ import { lerp }                  from '@typhonjs-fvtt/svelte/math';
 import { propertyStore }         from '@typhonjs-fvtt/svelte/store';
 import { isIterable }            from '@typhonjs-fvtt/svelte/util';
 
-import { AdapterValidators }     from './AdapterValidators.js';
 import { AnimationManager }      from './animation/AnimationManager.js';
 import * as constants            from './constants.js';
 import * as positionInitial      from './initial/index.js';
 import { PositionChangeSet }     from './PositionChangeSet.js';
 import { PositionData }          from './PositionData.js';
 import { StyleCache }            from './StyleCache.js';
-import { TransformData }         from './TransformData.js';
+import { TransformData }         from './transform/TransformData.js';
+import { AdapterValidators }     from './validators/AdapterValidators.js';
 import * as positionValidators   from './validators/index.js';
-import { Transforms }            from './Transforms.js';
-import { UpdateElementManager }  from './UpdateElementManager.js';
+import { Transforms }            from './transform/Transforms.js';
+import { UpdateElementManager }  from './update/UpdateElementManager.js';
 
 /**
  * Provides a store for position following the subscriber protocol in addition to providing individual writable derived
@@ -345,7 +345,7 @@ export class Position
       Object.seal(this.#dimensionData);
       Object.seal(this.#transformData);
 
-      this.#updateElementBound = this.#updateElement.bind(this);
+      this.#updateElementBound = this.#updateElementNew.bind(this);
    }
 
    /**
@@ -1236,6 +1236,71 @@ export class Position
 
       // If calculate transform options is enabled then update the transform data and set the readable store.
       if (this.#options.calculateTransform || this.#options.transformSubscribed) { this.#updateTransform(el, data); }
+
+      // Update all subscribers with changed data.
+      this.#updateSubscribers(data, changeSet);
+   }
+
+   /**
+    * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link Position.elementUpdated} to await
+    * on the returned promise that is resolved with the current render time via `nextAnimationFrame` /
+    * `requestAnimationFrame`. This allows the underlying data model to be updated immediately while updates to the
+    * element are in sync with the browser and potentially in the future be further throttled.
+    *
+    * @param {HTMLElement} el - The target HTMLElement.
+    */
+   #updateElementNew(el)
+   {
+      // Early out if the element is no longer connected to the DOM / shadow root.
+      if (!el.isConnected) { return; }
+
+      const changeSet = this.#positionChangeSet;
+      const data = this.#data;
+
+      if (changeSet.zIndex)
+      {
+// console.log(`! Position - #updateElementNew - A`)
+         el.style.zIndex = typeof data.zIndex === 'number' ? `${data.zIndex}` : null;
+      }
+
+      if (changeSet.width)
+      {
+// console.log(`! Position - #updateElementNew - B`)
+         el.style.width = typeof data.width === 'number' ? `${data.width}px` : data.width;
+      }
+
+      if (changeSet.height)
+      {
+// console.log(`! Position - #updateElementNew - C`)
+         el.style.height = typeof data.height === 'number' ? `${data.height}px` : data.height;
+      }
+
+      if (changeSet.transformOrigin)
+      {
+// console.log(`! Position - #updateElementNew - D`)
+
+         // When set to 'center' we can simply set the transform to null which is center by default.
+         el.style.transformOrigin = data.transformOrigin === 'center' ? null : data.transformOrigin;
+      }
+
+      // Update all transforms in order added to transforms object.
+      if (changeSet.left || changeSet.top || changeSet.transform)
+      {
+// console.log(`! Position - #updateElementNew - E`)
+
+// const css = this.#transforms.getCSSOrtho(data);
+// console.log(css);
+// console.log(`! Position - #updateElementNew - data.left: ${data.left}; data.top: ${data.top}`)
+
+         el.style.transform = this.#transforms.getCSSOrtho(data);
+      }
+
+      // If calculate transform options is enabled then update the transform data and set the readable store.
+      if (this.#options.calculateTransform || this.#options.transformSubscribed)
+      {
+// console.log(`! Position - #updateElementNew - F`)
+         this.#updateTransform(el, data);
+      }
 
       // Update all subscribers with changed data.
       this.#updateSubscribers(data, changeSet);
