@@ -1,5 +1,8 @@
 import { nextAnimationFrame }    from '@typhonjs-fvtt/svelte/animate';
 
+const s_MAP = new Map();
+let s_PROMISE;
+
 /**
  * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link Position.elementUpdated} to await
  * on the returned promise that is resolved with the current render time via `nextAnimationFrame` /
@@ -10,11 +13,7 @@ import { nextAnimationFrame }    from '@typhonjs-fvtt/svelte/animate';
  */
 export class UpdateElementManager
 {
-   static map = new Map();
-
-   static #promise;
-
-   static get promise() { return this.#promise; }
+   static get promise() { return s_PROMISE; }
 
    /**
     * Potentially adds the given element and callback to the map.
@@ -27,13 +26,13 @@ export class UpdateElementManager
     */
    static add(el, callback)
    {
-      if (this.map.has(el)) { return this.#promise; }
+      if (s_MAP.has(el)) { return s_PROMISE; }
 
-      this.map.set(el, callback);
+      s_MAP.set(el, callback);
 
-      if (!this.#promise) { this.#promise = this.wait(); }
+      if (!s_PROMISE) { s_PROMISE = this.wait(); }
 
-      return this.#promise;
+      return s_PROMISE;
    }
 
    /**
@@ -46,11 +45,11 @@ export class UpdateElementManager
       // Await the next animation frame. In the future this can be extended to multiple frames to divide update rate.
       const currentTime = await nextAnimationFrame();
 
-      this.#promise = void 0;
+      s_PROMISE = void 0;
 
-      for (const [el, callback] of this.map.entries()) { callback(el); }
+      for (const el of s_MAP.keys()) { s_MAP.get(el)(el); }
 
-      this.map.clear();
+      s_MAP.clear();
 
       return currentTime;
    }

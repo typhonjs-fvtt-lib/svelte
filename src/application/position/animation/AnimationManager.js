@@ -2,33 +2,25 @@ import { nextAnimationFrame }    from '@typhonjs-fvtt/svelte/animate';
 
 import { UpdateElementManager }  from '../UpdateElementManager.js';
 
+const s_ACTIVE_LIST = [];
+const s_NEW_LIST = [];
+let s_PROMISE;
+
 /**
  * Provides animation management and scheduling allowing all Position instances to utilize one micro-task.
  */
 export class AnimationManager
 {
-   static #list = [];
-
-   static #newList = [];
-
-   static #promise;
-
    /**
     * Add animation data.
     *
     * @param {object}   data -
-    *
-    * @returns {Promise<void>} Resolved when animation completes.
     */
    static add(data)
    {
-      const promise = new Promise((resolve) => data.resolve = resolve);
+      s_NEW_LIST.push(data);
 
-      this.#newList.push(data);
-
-      if (!this.#promise) { this.#promise = this.animate(); }
-
-      return promise;
+      if (!s_PROMISE) { s_PROMISE = this.animate(); }
    }
 
    /**
@@ -40,29 +32,27 @@ export class AnimationManager
    {
       let current = await nextAnimationFrame();
 
-      const list = this.#list;
-      const newList = this.#newList;
-
-      while (list.length || newList.length)
+      while (s_ACTIVE_LIST.length || s_NEW_LIST.length)
       {
-         if (newList.length)
+         if (s_NEW_LIST.length)
          {
             // Process new data
-            for (const data of newList)
+            for (let cntr = s_NEW_LIST.length; --cntr >= 0;)
             {
+               const data = s_NEW_LIST[cntr];
                data.start = current;
                data.current = 0;
 
-               list.push(data);
+               s_ACTIVE_LIST.push(data);
             }
 
-            newList.length = 0;
+            s_NEW_LIST.length = 0;
          }
 
          // Process existing data.
-         for (let cntr = list.length; --cntr >= 0;)
+         for (let cntr = s_ACTIVE_LIST.length; --cntr >= 0;)
          {
-            const data = list[cntr];
+            const data = s_ACTIVE_LIST[cntr];
 
             data.current = current - data.start;
 
@@ -70,15 +60,16 @@ export class AnimationManager
             if (data.current >= data.duration)
             {
                // Prepare final update with end position data and remove keys from `currentAnimationKeys`.
-               for (const key of data.keys)
+               for (let dataCntr = data.keys.length; --dataCntr >= 0;)
                {
+                  const key = data.keys[dataCntr];
                   data.newData[key] = data.destination[key];
                   data.currentAnimationKeys.delete(key);
                }
 
                data.position.set(data.newData);
 
-               list.splice(cntr, 1);
+               s_ACTIVE_LIST.splice(cntr, 1);
 
                data.resolve();
                continue;
@@ -86,8 +77,9 @@ export class AnimationManager
 
             const easedTime = data.easing(data.current / data.duration);
 
-            for (const key of data.keys)
+            for (let dataCntr = data.keys.length; --dataCntr >= 0;)
             {
+               const key = data.keys[dataCntr];
                data.newData[key] = data.interpolate(data.initial[key], data.destination[key], easedTime);
             }
 
@@ -102,7 +94,7 @@ export class AnimationManager
             // TODO: Temporary warning message
             // console.warn(`TRL - AnimationManager Warning - quitting animation: newCurrent <= current.`);
 
-            for (const data of list)
+            for (const data of s_ACTIVE_LIST)
             {
                for (const key of data.keys)
                {
@@ -114,7 +106,7 @@ export class AnimationManager
                data.resolve();
             }
 
-            list.length = 0;
+            s_ACTIVE_LIST.length = 0;
 
             break;
          }
@@ -122,6 +114,6 @@ export class AnimationManager
          current = newCurrent;
       }
 
-      this.#promise = void 0;
+      s_PROMISE = void 0;
    }
 }

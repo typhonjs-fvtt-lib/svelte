@@ -728,8 +728,7 @@ export class Position
       // Nothing to animate, so return now.
       if (keys.length === 0) { return; }
 
-      // Schedule w/ animation manager.
-      return AnimationManager.add({
+      const animationData = {
          current: 0,
          currentAnimationKeys,
          destination,
@@ -740,7 +739,14 @@ export class Position
          keys,
          newData,
          position: this
-      });
+      };
+
+      const promise = new Promise((resolve) => animationData.resolve = resolve);
+
+      AnimationManager.add(animationData);
+
+      // Schedule w/ animation manager.
+      return promise;
    }
 
    /**
