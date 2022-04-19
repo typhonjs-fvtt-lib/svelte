@@ -228,6 +228,18 @@ export class Transforms
    }
 
    /**
+    * Returns the matrix3d CSS transform for the given position / transform data.
+    *
+    * @param {object} [data] - Optional position data otherwise use local stored transform data.
+    *
+    * @returns {string} The CSS matrix3d string.
+    */
+   getCSSOrtho(data = this._data)
+   {
+      return `matrix3d(${this.getMat4Ortho(data, s_MAT4_RESULT).join(',')})`;
+   }
+
+   /**
     * Collects all data including a bounding rect, transform matrix, and points array of the given {@link PositionData}
     * instance with the applied local transform data.
     *
@@ -458,6 +470,138 @@ export class Transforms
                   s_TRANSLATE_VECTOR[2] = 0;
                   mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
                   break;
+
+               case 'translateZ':
+                  s_TRANSLATE_VECTOR[0] = 0;
+                  s_TRANSLATE_VECTOR[1] = 0;
+                  s_TRANSLATE_VECTOR[2] = data[key];
+                  mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+                  break;
+            }
+         }
+      }
+
+      return matrix;
+   }
+
+   /**
+    * Creates a transform matrix based on local data applied in order it was added.
+    *
+    * If no data object is provided then the source is the local transform data. If another data object is supplied
+    * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
+    * construction of a transform matrix in advance of setting local data and is useful in collision detection.
+    *
+    * @param {object}   [data] - PositionData instance or local transform data.
+    *
+    * @param {mat4}     [output] - The output mat4 instance.
+    *
+    * @returns {mat4} Transform matrix.
+    */
+   getMat4Ortho(data = this._data, output = mat4.create())
+   {
+      const matrix = mat4.identity(output);
+
+// console.log(`! Transforms - getMat4Ortho - data.left: ${data.left}; data.top: ${data.top}`)
+      s_TRANSLATE_VECTOR[0] = data.left;
+      s_TRANSLATE_VECTOR[1] = data.top;
+      s_TRANSLATE_VECTOR[2] = 0;
+      mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+
+      // Bitwise tracks applied transform keys from local transform data.
+      let seenKeys = 0;
+
+      // First apply ordered transforms from local transform data.
+      for (const key in this._data)
+      {
+         switch (key)
+         {
+            case 'rotateX':
+               seenKeys |= constants.transformKeysBitwise.rotateX;
+               mat4.multiply(matrix, matrix, mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
+               break;
+
+            case 'rotateY':
+               seenKeys |= constants.transformKeysBitwise.rotateY;
+               mat4.multiply(matrix, matrix, mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
+               break;
+
+            case 'rotateZ':
+               seenKeys |= constants.transformKeysBitwise.rotateZ;
+               mat4.multiply(matrix, matrix, mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
+               break;
+
+            case 'scale':
+               seenKeys |= constants.transformKeysBitwise.scale;
+               s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data[key];
+               mat4.multiply(matrix, matrix, mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
+               break;
+
+            // case 'translateX':
+            //    seenKeys |= constants.transformKeysBitwise.translateX;
+            //    s_TRANSLATE_VECTOR[0] = this._data.translateX + data.left;
+            //    s_TRANSLATE_VECTOR[1] = 0;
+            //    s_TRANSLATE_VECTOR[2] = 0;
+            //    mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+            //    break;
+            //
+            // case 'translateY':
+            //    seenKeys |= constants.transformKeysBitwise.translateY;
+            //    s_TRANSLATE_VECTOR[0] = 0;
+            //    s_TRANSLATE_VECTOR[1] = this._data.translateY + data.top;
+            //    s_TRANSLATE_VECTOR[2] = 0;
+            //    mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+            //    break;
+
+            case 'translateZ':
+               seenKeys |= constants.transformKeysBitwise.translateZ;
+               s_TRANSLATE_VECTOR[0] = 0;
+               s_TRANSLATE_VECTOR[1] = 0;
+               s_TRANSLATE_VECTOR[2] = this._data.translateZ;
+               mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+               break;
+         }
+      }
+
+      // Now apply any new keys not set in local transform data that have not been applied yet.
+      if (data !== this._data)
+      {
+         for (const key of constants.transformKeys)
+         {
+            // Reject bad / no data or if the key has already been applied.
+            if (!Number.isFinite(data[key]) || (seenKeys & constants.transformKeysBitwise[key]) > 0) { continue; }
+
+            switch (key)
+            {
+               case 'rotateX':
+                  mat4.multiply(matrix, matrix, mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+
+               case 'rotateY':
+                  mat4.multiply(matrix, matrix, mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+
+               case 'rotateZ':
+                  mat4.multiply(matrix, matrix, mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+
+               case 'scale':
+                  s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data[key];
+                  mat4.multiply(matrix, matrix, mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
+                  break;
+
+               // case 'translateX':
+               //    s_TRANSLATE_VECTOR[0] = data[key] + data.left;
+               //    s_TRANSLATE_VECTOR[1] = 0;
+               //    s_TRANSLATE_VECTOR[2] = 0;
+               //    mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+               //    break;
+               //
+               // case 'translateY':
+               //    s_TRANSLATE_VECTOR[0] = 0;
+               //    s_TRANSLATE_VECTOR[1] = data[key] + data.top;
+               //    s_TRANSLATE_VECTOR[2] = 0;
+               //    mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+               //    break;
 
                case 'translateZ':
                   s_TRANSLATE_VECTOR[0] = 0;
