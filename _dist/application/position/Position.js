@@ -1,4 +1,3 @@
-import { writable }              from 'svelte/store';
 import { linear }                from 'svelte/easing';
 
 import { lerp }                  from '@typhonjs-fvtt/svelte/math';
@@ -30,13 +29,6 @@ export class Position
    #data = new PositionData();
 
    /**
-    * Provides a copy of local data sent to subscribers.
-    *
-    * @type {PositionData}
-    */
-   #dataSubscribers = new PositionData();
-
-   /**
     * Stores current animation keys.
     *
     * @type {Set<string>}
@@ -52,13 +44,6 @@ export class Position
     * @type {PositionData}
     */
    #defaultData;
-
-   /**
-    * Stores the current dimension data used for the readable `dimension` store.
-    *
-    * @type {{width: number | 'auto', height: number | 'auto'}}
-    */
-   #dimensionData = { width: 0, height: 0 };
 
    /**
     * Stores the style attributes that changed on update.
@@ -91,20 +76,6 @@ export class Position
    #stores;
 
    /**
-    * Stores the internal writable for the readable `dimension` store.
-    *
-    * @type {import('svelte/store').Writable<{width: number | 'auto', height: number | 'auto'}>}
-    */
-   #storeDimension;
-
-   /**
-    * Stores the internal writable for the readable `transform` store.
-    *
-    * @type {import('svelte/store').Writable<TransformData>}
-    */
-   #storeTransform;
-
-   /**
     * Stores an instance of the computer styles for the target element.
     *
     * @type {StyleCache}
@@ -119,24 +90,9 @@ export class Position
    #subscriptions = [];
 
    /**
-    * Stores the current transform data used for the readable `transform` store. It is only active when there are
-    * subscribers to the store or calculateTransform options is true.
-    *
-    * @type {TransformData}
-    */
-   #transformData = new TransformData();
-
-   /**
     * @type {Transforms}
     */
    #transforms = new Transforms();
-
-   /**
-    * Stores the bound update element function.
-    *
-    * @type {Function}
-    */
-   #updateElementBound;
 
    /**
     * @type {UpdateElementData}
@@ -194,6 +150,17 @@ export class Position
       const data = this.#data;
       const transforms = this.#transforms;
 
+      const updateData = new UpdateElementData();
+
+      updateData.changeSet = this.#positionChangeSet;
+      updateData.data = this.#data;
+      updateData.options = this.#options;
+      updateData.styleCache = this.#styleCache;
+      updateData.subscriptions = this.#subscriptions;
+      updateData.transforms = this.#transforms;
+
+      this.#updateElementData = updateData;
+
       // Set default value from options.
       if (typeof options === 'object')
       {
@@ -204,7 +171,7 @@ export class Position
 
          if (Number.isFinite(options.height) || options.height === 'auto' || options.height === null)
          {
-            data.height = this.#dimensionData.height = typeof options.height === 'number' ?
+            data.height = updateData.dimensionData.height = typeof options.height === 'number' ?
              Math.round(options.height) : options.height;
          }
 
@@ -281,7 +248,7 @@ export class Position
 
          if (Number.isFinite(options.width) || options.width === 'auto' || options.width === null)
          {
-            data.width = this.#dimensionData.width = typeof options.width === 'number' ?
+            data.width = updateData.dimensionData.width = typeof options.width === 'number' ?
              Math.round(options.width) : options.width;
          }
 
@@ -291,17 +258,8 @@ export class Position
          }
       }
 
-      this.#storeDimension = writable(this.#dimensionData);
-
-      // When there are subscribers set option to calculate transform updates; set to false when no subscribers.
-      this.#storeTransform = writable(this.#transformData, () =>
-      {
-         this.#options.transformSubscribed = true;
-         return () => this.#options.transformSubscribed = false;
-      });
-
       this.#stores = {
-         dimension: { subscribe: this.#storeDimension.subscribe },
+         dimension: { subscribe: updateData.storeDimension.subscribe },
          height: propertyStore(this, 'height'),
          left: propertyStore(this, 'left'),
          maxHeight: propertyStore(this, 'maxHeight'),
@@ -313,7 +271,7 @@ export class Position
          rotateZ: propertyStore(this, 'rotateZ'),
          scale: propertyStore(this, 'scale'),
          top: propertyStore(this, 'top'),
-         transform: { subscribe: this.#storeTransform.subscribe },
+         transform: { subscribe: updateData.storeTransform.subscribe },
          transformOrigin: propertyStore(this, 'transformOrigin'),
          translateX: propertyStore(this, 'translateX'),
          translateY: propertyStore(this, 'translateY'),
@@ -346,22 +304,6 @@ export class Position
          if (isIterable(options?.validator)) { this.validators.add(...options.validator); }
          else { this.validators.add(options.validator); }
       }
-
-      // Seal data backing readable stores.
-      Object.seal(this.#dimensionData);
-      Object.seal(this.#transformData);
-
-      this.#updateElementBound = this.#updateElementNew.bind(this);
-
-      const updateData = new UpdateElementData();
-
-      updateData.changeSet = this.#positionChangeSet;
-      updateData.data = this.#data;
-      updateData.transforms = this.#transforms;
-      updateData.updateSubscribers = this.#updateSubscribers.bind(this);
-      updateData.updateTransform = this.#updateTransform.bind(this);
-
-      this.#updateElementData = updateData;
    }
 
    /**
@@ -371,7 +313,7 @@ export class Position
     */
    get dimension()
    {
-      return this.#dimensionData;
+      return this.#updateElementData.dimensionData;
    }
 
    /**
@@ -405,7 +347,7 @@ export class Position
     */
    get transform()
    {
-      return this.#transformData;
+      return this.#updateElementData.transformData;
    }
 
    /**
@@ -1175,13 +1117,11 @@ export class Position
 
          // Add this element and bound update callback to UpdateManager.
          this.#updateElementPromise = UpdateElementManager.add(el, this.#updateElementData);
-
-         // this.#updateElementPromise = UpdateElementManager.add(el, this.#updateElementBound);
       }
       else
       {
          // Notify main store subscribers.
-         this.#updateSubscribers(data, changeSet);
+         UpdateElementManager.updateSubscribers(this.#updateElementData);
       }
 
       return this;
@@ -1206,131 +1146,6 @@ export class Position
          const index = this.#subscriptions.findIndex((sub) => sub === handler);
          if (index >= 0) { this.#subscriptions.splice(index, 1); }
       };
-   }
-
-   /**
-    * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link Position.elementUpdated} to await
-    * on the returned promise that is resolved with the current render time via `nextAnimationFrame` /
-    * `requestAnimationFrame`. This allows the underlying data model to be updated immediately while updates to the
-    * element are in sync with the browser and potentially in the future be further throttled.
-    *
-    * @param {HTMLElement} el - The target HTMLElement.
-    */
-   #updateElement(el)
-   {
-      // Early out if the element is no longer connected to the DOM / shadow root.
-      if (!el.isConnected) { return; }
-
-      const changeSet = this.#positionChangeSet;
-      const data = this.#data;
-
-      if (changeSet.left)
-      {
-         el.style.left = `${data.left}px`;
-      }
-
-      if (changeSet.top)
-      {
-         el.style.top = `${data.top}px`;
-      }
-
-      if (changeSet.zIndex)
-      {
-         el.style.zIndex = typeof data.zIndex === 'number' ? `${data.zIndex}` : null;
-      }
-
-      if (changeSet.width)
-      {
-         el.style.width = typeof data.width === 'number' ? `${data.width}px` : data.width;
-      }
-
-      if (changeSet.height)
-      {
-         el.style.height = typeof data.height === 'number' ? `${data.height}px` : data.height;
-      }
-
-      if (changeSet.transformOrigin)
-      {
-         // When set to 'center' we can simply set the transform to null which is center by default.
-         el.style.transformOrigin = data.transformOrigin === 'center' ? null : data.transformOrigin;
-      }
-
-      // Update all transforms in order added to transforms object.
-      if (changeSet.transform)
-      {
-         el.style.transform = this.#transforms.isActive ? this.#transforms.getCSS() : null;
-      }
-
-      // If calculate transform options is enabled then update the transform data and set the readable store.
-      if (this.#options.calculateTransform || this.#options.transformSubscribed) { this.#updateTransform(el, data); }
-
-      // Update all subscribers with changed data.
-      this.#updateSubscribers(data, changeSet);
-   }
-
-   /**
-    * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link Position.elementUpdated} to await
-    * on the returned promise that is resolved with the current render time via `nextAnimationFrame` /
-    * `requestAnimationFrame`. This allows the underlying data model to be updated immediately while updates to the
-    * element are in sync with the browser and potentially in the future be further throttled.
-    *
-    * @param {HTMLElement} el - The target HTMLElement.
-    */
-   #updateElementNew(el)
-   {
-      // Early out if the element is no longer connected to the DOM / shadow root.
-      if (!el.isConnected) { return; }
-
-      const changeSet = this.#positionChangeSet;
-      const data = this.#data;
-
-      if (changeSet.zIndex)
-      {
-// console.log(`! Position - #updateElementNew - A`)
-         el.style.zIndex = typeof data.zIndex === 'number' ? `${data.zIndex}` : null;
-      }
-
-      if (changeSet.width)
-      {
-// console.log(`! Position - #updateElementNew - B`)
-         el.style.width = typeof data.width === 'number' ? `${data.width}px` : data.width;
-      }
-
-      if (changeSet.height)
-      {
-// console.log(`! Position - #updateElementNew - C`)
-         el.style.height = typeof data.height === 'number' ? `${data.height}px` : data.height;
-      }
-
-      if (changeSet.transformOrigin)
-      {
-// console.log(`! Position - #updateElementNew - D`)
-
-         // When set to 'center' we can simply set the transform to null which is center by default.
-         el.style.transformOrigin = data.transformOrigin === 'center' ? null : data.transformOrigin;
-      }
-
-      // Update all transforms in order added to transforms object.
-      if (changeSet.left || changeSet.top || changeSet.transform)
-      {
-// console.log(`! Position - #updateElementNew - E`)
-
-// const css = this.#transforms.getCSSOrtho(data);
-// console.log(css);
-// console.log(`! Position - #updateElementNew - data.left: ${data.left}; data.top: ${data.top}`)
-
-         el.style.transform = this.#transforms.getCSSOrtho(data);
-      }
-
-      // If calculate transform options is enabled then update the transform data and set the readable store.
-      if (this.#options.calculateTransform || this.#options.transformSubscribed)
-      {
-// console.log(`! Position - #updateElementNew - F`)
-         this.#updateTransform(el, data);
-      }
-
-      // Update all subscribers with changed data.
-      this.#updateSubscribers(data, changeSet);
    }
 
    /**
@@ -1538,63 +1353,6 @@ export class Position
 
       // Return the updated position object.
       return currentPosition;
-   }
-
-   /**
-    * @param {PositionData}   data - Data to post to subscribers.
-    *
-    * @param {PositionChangeSet} changeSet - Data change set.
-    */
-   #updateSubscribers(data, changeSet)
-   {
-      if (!changeSet.hasChange()) { return; }
-
-      // Make a copy of the data.
-      const output = this.#dataSubscribers.copy(data);
-
-      // Subscriptions are stored locally as on the browser Babel is still used for private class fields / Babel
-      // support until 2023. IE not doing this will require several extra method calls otherwise.
-      const subscriptions = this.#subscriptions;
-
-      // Early out if there are no subscribers.
-      if (subscriptions.length > 0)
-      {
-         for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](output); }
-      }
-
-      // Update dimension data if width / height has changed.
-      if (changeSet.width || changeSet.height)
-      {
-         this.#dimensionData.width = data.width;
-         this.#dimensionData.height = data.height;
-         this.#storeDimension.set(this.#dimensionData);
-      }
-
-      changeSet.set(false);
-   }
-
-   /**
-    * Updates the applied transform data and sets the readble `transform` store.
-    *
-    * @param {HTMLElement} el - The target HTMLElement.
-    *
-    * @param {PositionData} data - The position data.
-    */
-   #updateTransform(el, data)
-   {
-      s_VALIDATION_DATA.height = data.height !== 'auto' ? data.height : el.offsetHeight;
-
-      s_VALIDATION_DATA.width = data.width !== 'auto' ? data.width : el.offsetWidth;
-
-      s_VALIDATION_DATA.marginLeft = this.#styleCache.marginLeft;
-
-      s_VALIDATION_DATA.marginTop = this.#styleCache.marginTop;
-
-      // Get transform data. First set constraints including any margin top / left as offsets and width / height. Used
-      // when position width / height is 'auto'.
-      this.#transforms.getData(data, this.#transformData, s_VALIDATION_DATA);
-
-      this.#storeTransform.set(this.#transformData);
    }
 }
 

@@ -54,6 +54,7 @@ export class AnimationManager
          {
             const data = s_ACTIVE_LIST[cntr];
 
+            // Ensure that the element is still connected otherwise remove it from active list and continue.
             if (!data.el.isConnected)
             {
                s_ACTIVE_LIST.splice(cntr, 1);

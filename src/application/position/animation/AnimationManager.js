@@ -93,9 +93,6 @@ export class AnimationManager
             data.position.set(data.newData);
          }
 
-         // Early out if all active list items are removed.
-         if (s_ACTIVE_LIST.length === 0) { return; }
-
          const newCurrent = await UpdateElementManager.promise;
 
          // Must check that time has passed otherwise likely the element has been removed.

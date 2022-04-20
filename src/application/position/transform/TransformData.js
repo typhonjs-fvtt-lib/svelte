@@ -5,6 +5,11 @@ import { mat4, vec3 }   from '@typhonjs-fvtt/svelte/math';
  */
 export class TransformData
 {
+   constructor()
+   {
+      Object.seal(this);
+   }
+
    /**
     * Stores the calculated bounding rectangle.
     *
