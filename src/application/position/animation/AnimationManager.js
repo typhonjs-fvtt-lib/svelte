@@ -54,6 +54,13 @@ export class AnimationManager
          {
             const data = s_ACTIVE_LIST[cntr];
 
+            // Ensure that the element is still connected otherwise remove it from active list and continue.
+            if (!data.el.isConnected)
+            {
+               s_ACTIVE_LIST.splice(cntr, 1);
+               continue;
+            }
+
             data.current = current - data.start;
 
             // Remove this animation instance.
@@ -85,6 +92,9 @@ export class AnimationManager
 
             data.position.set(data.newData);
          }
+
+         // Early out if all active list items are removed.
+         if (s_ACTIVE_LIST.length === 0) { return; }
 
          const newCurrent = await UpdateElementManager.promise;
 

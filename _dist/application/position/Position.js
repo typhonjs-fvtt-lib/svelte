@@ -15,6 +15,7 @@ import { TransformData }         from './transform/TransformData.js';
 import { AdapterValidators }     from './validators/AdapterValidators.js';
 import * as positionValidators   from './validators/index.js';
 import { Transforms }            from './transform/Transforms.js';
+import { UpdateElementData }  from './update/UpdateElementData.js';
 import { UpdateElementManager }  from './update/UpdateElementManager.js';
 
 /**
@@ -136,6 +137,11 @@ export class Position
     * @type {Function}
     */
    #updateElementBound;
+
+   /**
+    * @type {UpdateElementData}
+    */
+   #updateElementData;
 
    /**
     * Stores the UpdateManager wait promise.
@@ -346,6 +352,16 @@ export class Position
       Object.seal(this.#transformData);
 
       this.#updateElementBound = this.#updateElementNew.bind(this);
+
+      const updateData = new UpdateElementData();
+
+      updateData.changeSet = this.#positionChangeSet;
+      updateData.data = this.#data;
+      updateData.transforms = this.#transforms;
+      updateData.updateSubscribers = this.#updateSubscribers.bind(this);
+      updateData.updateTransform = this.#updateTransform.bind(this);
+
+      this.#updateElementData = updateData;
    }
 
    /**
@@ -667,6 +683,11 @@ export class Position
          return;
       }
 
+      const targetEl = parent instanceof HTMLElement ? parent : parent?.elementTarget;
+      const el = targetEl instanceof HTMLElement && targetEl.isConnected ? targetEl : void 0;
+
+      if (!el) { return; }
+
       if (!Number.isInteger(duration) || duration < 0)
       {
          throw new TypeError(`Position - animateTo error: 'duration' is not a positive integer.`);
@@ -734,6 +755,7 @@ export class Position
          destination,
          duration,
          easing,
+         el,
          initial,
          interpolate,
          keys,
@@ -1148,8 +1170,13 @@ export class Position
          // Set default data after first set operation that has a target element.
          if (typeof this.#defaultData !== 'object') { this.#defaultData = Object.assign({}, data); }
 
+         this.#updateElementData.calculateTransform = this.#options.calculateTransform ||
+          this.#options.transformSubscribed;
+
          // Add this element and bound update callback to UpdateManager.
-         this.#updateElementPromise = UpdateElementManager.add(el, this.#updateElementBound);
+         this.#updateElementPromise = UpdateElementManager.add(el, this.#updateElementData);
+
+         // this.#updateElementPromise = UpdateElementManager.add(el, this.#updateElementBound);
       }
       else
       {

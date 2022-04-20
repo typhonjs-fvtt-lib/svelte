@@ -54,6 +54,12 @@ export class AnimationManager
          {
             const data = s_ACTIVE_LIST[cntr];
 
+            if (!data.el.isConnected)
+            {
+               s_ACTIVE_LIST.splice(cntr, 1);
+               continue;
+            }
+
             data.current = current - data.start;
 
             // Remove this animation instance.
