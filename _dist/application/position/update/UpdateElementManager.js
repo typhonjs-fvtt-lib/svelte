@@ -1,7 +1,9 @@
 import { nextAnimationFrame }    from '@typhonjs-fvtt/svelte/animate';
 
-const s_MAP = new Map();
 let s_PROMISE;
+
+const s_LIST = [];
+let s_LIST_CNTR = 0;
 
 /**
  * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link Position.elementUpdated} to await
@@ -26,9 +28,19 @@ export class UpdateElementManager
     */
    static add(el, updateData)
    {
-      if (s_MAP.has(el)) { return s_PROMISE; }
+      if (s_LIST_CNTR < s_LIST.length)
+      {
+         const entry = s_LIST[s_LIST_CNTR];
+         entry[0] = el;
+         entry[1] = updateData;
+      }
+      else
+      {
+         s_LIST.push([el, updateData]);
+      }
 
-      s_MAP.set(el, updateData);
+      s_LIST_CNTR++;
+      updateData.queued = true;
 
       if (!s_PROMISE) { s_PROMISE = this.wait(); }
 
@@ -47,14 +59,31 @@ export class UpdateElementManager
 
       s_PROMISE = void 0;
 
-      for (const el of s_MAP.keys())
+      for (let cntr = s_LIST_CNTR; --cntr >= 0;)
       {
-         const updateData = s_MAP.get(el);
+         // Obtain data for entry.
+         const entry = s_LIST[cntr];
+         const el = entry[0];
+         const updateData = entry[1];
+
+         // Clear entry data.
+         entry[0] = void 0;
+         entry[1] = void 0;
+
+         // Reset queued state.
+         updateData.queued = false;
 
          // Early out if the element is no longer connected to the DOM / shadow root.
          if (!el.isConnected || !updateData.changeSet.hasChange()) { continue; }
 
-         s_UPDATE_ELEMENT_ORTHO(el, updateData);
+         if (updateData.options.ortho)
+         {
+            s_UPDATE_ELEMENT_ORTHO(el, updateData);
+         }
+         else
+         {
+            s_UPDATE_ELEMENT(el, updateData);
+         }
 
          // If calculate transform options is enabled then update the transform data and set the readable store.
          if (updateData.options.calculateTransform || updateData.options.transformSubscribed)
@@ -66,7 +95,7 @@ export class UpdateElementManager
          this.updateSubscribers(updateData);
       }
 
-      s_MAP.clear();
+      s_LIST_CNTR = 0;
 
       return currentTime;
    }

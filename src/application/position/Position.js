@@ -14,7 +14,7 @@ import { TransformData }         from './transform/TransformData.js';
 import { AdapterValidators }     from './validators/AdapterValidators.js';
 import * as positionValidators   from './validators/index.js';
 import { Transforms }            from './transform/Transforms.js';
-import { UpdateElementData }  from './update/UpdateElementData.js';
+import { UpdateElementData }     from './update/UpdateElementData.js';
 import { UpdateElementManager }  from './update/UpdateElementManager.js';
 
 /**
@@ -60,6 +60,7 @@ export class Position
    #options = {
       calculateTransform: false,
       initialHelper: void 0,
+      ortho: false,
       transformSubscribed: false
    };
 
@@ -85,7 +86,7 @@ export class Position
    /**
     * Stores the subscribers.
     *
-    * @type {[]}
+    * @type {(function(PositionData): void)[]}
     */
    #subscriptions = [];
 
@@ -161,13 +162,20 @@ export class Position
 
       this.#updateElementData = updateData;
 
-      // Set default value from options.
       if (typeof options === 'object')
       {
+         // Set Position options
          if (typeof options.calculateTransform === 'boolean')
          {
             this.#options.calculateTransform = options.calculateTransform;
          }
+
+         if (typeof options.ortho === 'boolean')
+         {
+            this.#options.ortho = options.ortho;
+         }
+
+         // Set default values from options.
 
          if (Number.isFinite(options.height) || options.height === 'auto' || options.height === null)
          {
@@ -286,9 +294,9 @@ export class Position
 
       [this.#validators, this.#validatorsAdapter] = new AdapterValidators();
 
-      if (options?.initial)
+      if (options?.initial || options?.positionInitial)
       {
-         const initialHelper = options.initial;
+         const initialHelper = options.initial ?? options.positionInitial;
 
          if (typeof initialHelper?.getLeft !== 'function' || typeof initialHelper?.getTop !== 'function')
          {
@@ -1116,7 +1124,10 @@ export class Position
           this.#options.transformSubscribed;
 
          // Add this element and bound update callback to UpdateManager.
-         this.#updateElementPromise = UpdateElementManager.add(el, this.#updateElementData);
+         if (!this.#updateElementData.queued)
+         {
+            this.#updateElementPromise = UpdateElementManager.add(el, this.#updateElementData);
+         }
       }
       else
       {
@@ -1237,33 +1248,27 @@ export class Position
       }
 
       // Update left
-      if (el.style.left === '' || Number.isFinite(left))
+      if (Number.isFinite(left))
       {
-         if (Number.isFinite(left))
-         {
-            currentPosition.left = left;
-         }
-         else
-         {
-            // Potentially use any initial position helper if available or set to 0.
-            currentPosition.left = typeof this.#options.initialHelper?.getLeft === 'function' ?
-             this.#options.initialHelper.getLeft(width) : 0;
-         }
+         currentPosition.left = left;
+      }
+      else if (!Number.isFinite(currentPosition.left))
+      {
+         // Potentially use any initial position helper if available or set to 0.
+         currentPosition.left = typeof this.#options.initialHelper?.getLeft === 'function' ?
+          this.#options.initialHelper.getLeft(width) : 0;
       }
 
       // Update top
-      if (el.style.top === '' || Number.isFinite(top))
+      if (Number.isFinite(top))
       {
-         if (Number.isFinite(top))
-         {
-            currentPosition.top = top;
-         }
-         else
-         {
-            // Potentially use any initial position helper if available or set to 0.
-            currentPosition.top = typeof this.#options.initialHelper?.getTop === 'function' ?
-             this.#options.initialHelper.getTop(height) : 0;
-         }
+         currentPosition.top = top;
+      }
+      else if (!Number.isFinite(currentPosition.top))
+      {
+         // Potentially use any initial position helper if available or set to 0.
+         currentPosition.top = typeof this.#options.initialHelper?.getTop === 'function' ?
+          this.#options.initialHelper.getTop(height) : 0;
       }
 
       if (Number.isFinite(maxHeight) || maxHeight === null)
@@ -1386,11 +1391,13 @@ Object.seal(s_VALIDATION_DATA);
  */
 
 /**
- * @typedef {object} PositionOptions
+ * @typedef {object} PositionOptions - Options set in constructor.
  *
- * @property {boolean} calculateTransform - Set in constructor; when true always calculate transform data.
+ * @property {boolean} calculateTransform - When true always calculate transform data.
  *
- * @property {InitialHelper} initialHelper - Set in constructor; provides a helper for setting initial position data.
+ * @property {InitialHelper} initialHelper - Provides a helper for setting initial position data.
+ *
+ * @property {boolean} ortho - Sets Position to orthographic mode using just transform / matrix3d for positioning.
  *
  * @property {boolean} transformSubscribed - Set to true when there are subscribers to the readable transform store.
  */
