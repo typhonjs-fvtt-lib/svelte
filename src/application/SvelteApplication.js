@@ -153,6 +153,7 @@ export class SvelteApplication extends Application
          minWidth: MIN_WINDOW_WIDTH,      // Assigned to position. Number specifying minimum window width.
          positionable: true,              // If false then `position.set` does not take effect.
          positionInitial: Position.Initial.browserCentered,      // A helper for initial position placement.
+         positionOrtho: true,             // When true Position is optimized for orthographic use.
          positionValidator: Position.Validators.transformWindow, // A function providing the default validator.
          transformOrigin: 'top left'      // By default, 'top / left' respects rotation when minimizing.
       });

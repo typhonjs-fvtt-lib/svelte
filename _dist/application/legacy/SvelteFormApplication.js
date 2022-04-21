@@ -153,7 +153,7 @@ export class SvelteFormApplication extends FormApplication
          minWidth: MIN_WINDOW_WIDTH,      // Assigned to position. Number specifying minimum window width.
          positionable: true,              // If false then `position.set` does not take effect.
          positionInitial: Position.Initial.browserCentered,      // A helper for initial position placement.
-         positionOrtho: false,            // When true Position is optimized for orthographic use.
+         positionOrtho: true,             // When true Position is optimized for orthographic use.
          positionValidator: Position.Validators.transformWindow, // A function providing the default validator.
          suppressFormInit: false,         // If true automatic suppression of core FormApplication methods is enabled.
          transformOrigin: 'top left'      // By default, 'top / left' respects rotation when minimizing.

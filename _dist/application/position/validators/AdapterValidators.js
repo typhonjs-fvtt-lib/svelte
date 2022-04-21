@@ -24,7 +24,11 @@
  */
 export class AdapterValidators
 {
+   /**
+    * @type {ValidatorData[]}
+    */
    #validatorData;
+
    #mapUnsubscribe = new Map();
 
    /**
@@ -294,10 +298,13 @@ export class AdapterValidators
 }
 
 /**
- * @typedef {function(ValidationData): PositionData|null} ValidatorFn - Position validator function that
- *                         takes a {@link PositionData} instance potentially modifying it or returning null if invalid.
+ * @callback ValidatorFn - Position validator function that takes a {@link PositionData} instance potentially
+ *                             modifying it or returning null if invalid.
  *
- * @property {Function} [subscribe] - Optional subscribe function following the Svelte store / subscribe pattern.
+ * @param {ValidationData} valData - Validation data.
+ *
+ * @returns {PositionData|null} The validated position data or null to cancel position update.
+ *
  */
 
 /**

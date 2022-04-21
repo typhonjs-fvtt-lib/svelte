@@ -115,7 +115,7 @@ export class Position
    /**
     * @type {ValidatorData[]}
     */
-   #validatorsAdapter;
+   #validatorData;
 
    /**
     * @returns {{browserCentered?: Centered, Centered?: *}} Initial position helpers.
@@ -292,7 +292,7 @@ export class Position
 
       Object.freeze(this.#stores);
 
-      [this.#validators, this.#validatorsAdapter] = new AdapterValidators();
+      [this.#validators, this.#validatorData] = new AdapterValidators();
 
       if (options?.initial || options?.positionInitial)
       {
@@ -1207,7 +1207,7 @@ export class Position
    #updatePosition({ left, top, maxWidth, maxHeight, minWidth, minHeight, width, height, rotateX, rotateY, rotateZ,
     scale, transformOrigin, translateX, translateY, translateZ, zIndex, ...rest } = {}, parent, el)
    {
-      let currentPosition = this.get(rest);
+      let currentPosition = s_DATA_UPDATE.copy(this.#data);
 
       // Update width if an explicit value is passed, or if no width value is set on the element.
       if (el.style.width === '' || width !== void 0)
@@ -1316,10 +1316,10 @@ export class Position
          currentPosition.zIndex = typeof zIndex === 'number' ? Math.round(zIndex) : zIndex;
       }
 
-      const validators = this.#validators;
+      const validatorData = this.#validatorData;
 
       // If there are any validators allow them to potentially modify position data or reject the update.
-      if (validators.length)
+      if (validatorData.length)
       {
          const styleCache = this.#styleCache;
 
@@ -1347,10 +1347,11 @@ export class Position
          s_VALIDATION_DATA.minHeight = styleCache.minHeight || (currentPosition.minHeight ?? 0);
          s_VALIDATION_DATA.minWidth = styleCache.minWidth || (currentPosition.minWidth ?? 0);
 
-         for (const entry of validators)
+         for (let cntr = 0; cntr < validatorData.length; cntr++)
          {
             s_VALIDATION_DATA.position = currentPosition;
-            currentPosition = entry.validator(s_VALIDATION_DATA);
+            s_VALIDATION_DATA.rest = rest;
+            currentPosition = validatorData[cntr].validator(s_VALIDATION_DATA);
 
             if (currentPosition === null) { return null; }
          }
@@ -1360,6 +1361,8 @@ export class Position
       return currentPosition;
    }
 }
+
+const s_DATA_UPDATE = new PositionData();
 
 /**
  * @type {ValidationData}
@@ -1377,7 +1380,8 @@ const s_VALIDATION_DATA = {
    maxHeight: void 0,
    maxWidth: void 0,
    minHeight: void 0,
-   minWidth: void 0
+   minWidth: void 0,
+   rest: void 0
 };
 
 Object.seal(s_VALIDATION_DATA);
@@ -1436,4 +1440,6 @@ Object.seal(s_VALIDATION_DATA);
  * @property {number|undefined} minHeight -
  *
  * @property {number|undefined} minWidth -
+ *
+ * @property {object} rest - The rest of any data submitted to {@link Position.set}
  */

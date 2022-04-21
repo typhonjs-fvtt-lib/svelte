@@ -258,4 +258,4 @@ const s_VALIDATION_DATA = {
    width: void 0,
    marginLeft: void 0,
    marginTop: void 0
-}
+};
