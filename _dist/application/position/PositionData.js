@@ -1,5 +1,3 @@
-import * as constants   from './constants.js';
-
 /**
  * Defines stored positional data.
  */
@@ -65,7 +63,7 @@ export class PositionData
       this.top = top;
 
       /**
-       * @type {string}
+       * @type {string|null}
        */
       this.transformOrigin = transformOrigin;
 

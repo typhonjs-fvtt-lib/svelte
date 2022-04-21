@@ -233,10 +233,10 @@ export class Position
             data.top = typeof options.top === 'number' ? Math.round(options.top) : options.top;
          }
 
-         if (typeof options.transformOrigin === 'string' && constants.transformOrigins.includes(
-          options.transformOrigin))
+         if (typeof options.transformOrigin === 'string' || options.transformOrigin === null)
          {
-            data.transformOrigin = options.transformOrigin;
+            data.transformOrigin = constants.transformOrigins.includes(options.transformOrigin) ?
+             options.transformOrigin : null;
          }
 
          if (Number.isFinite(options.translateX) || options.translateX === null)
@@ -1060,6 +1060,9 @@ export class Position
          position.transformOrigin = constants.transformOrigins.includes(position.transformOrigin) ?
           position.transformOrigin : null;
 
+         // Convert transform origin 'center' to null which is the browser default.
+         if (position.transformOrigin === 'center') { position.transformOrigin = null; }
+
          if (data.transformOrigin !== position.transformOrigin)
          {
             data.transformOrigin = position.transformOrigin;
@@ -1309,6 +1312,9 @@ export class Position
       {
          currentPosition.transformOrigin = constants.transformOrigins.includes(transformOrigin) ? transformOrigin :
           null;
+
+         // Convert transform origin 'center' to null which is the browser default.
+         if (currentPosition.transformOrigin === 'center') { currentPosition.transformOrigin = null; }
       }
 
       if (typeof zIndex === 'number' || zIndex === null)
