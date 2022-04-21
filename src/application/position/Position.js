@@ -967,6 +967,7 @@ export class Position
          {
             styleCache.update(el);
             changeSet.set(true);
+            this.#updateElementData.queued = false;
          }
 
          position = this.#updatePosition(position, parent, el);

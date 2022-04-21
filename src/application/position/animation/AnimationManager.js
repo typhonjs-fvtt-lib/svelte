@@ -58,6 +58,8 @@ export class AnimationManager
             if (!data.el.isConnected)
             {
                s_ACTIVE_LIST.splice(cntr, 1);
+               data.currentAnimationKeys.clear();
+               data.resolve();
                continue;
             }
 
@@ -96,15 +98,25 @@ export class AnimationManager
          const newCurrent = await UpdateElementManager.promise;
 
          // Must check that time has passed otherwise likely the element has been removed.
-         if (!Number.isFinite(newCurrent) && newCurrent <= current)
+         if (newCurrent === void 0 || newCurrent <= current)
          {
             // TODO: Temporary warning message
             // console.warn(`TRL - AnimationManager Warning - quitting animation: newCurrent <= current.`);
 
-            for (const data of s_ACTIVE_LIST)
+            for (let cntr = s_ACTIVE_LIST.length; --cntr >= 0;)
             {
-               for (const key of data.keys)
+               const data = s_ACTIVE_LIST[cntr];
+
+               if (!data.el.isConnected)
                {
+                  data.currentAnimationKeys.clear();
+                  data.resolve();
+                  continue;
+               }
+
+               for (let dataCntr = data.keys.length; --dataCntr >= 0;)
+               {
+                  const key = data.keys[dataCntr];
                   data.newData[key] = data.destination[key];
                   data.currentAnimationKeys.delete(key);
                }
