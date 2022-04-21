@@ -84,6 +84,13 @@ export class UpdateElementData
          return () => this.options.transformSubscribed = false;
       });
 
+      /**
+       * Stores the queued state for update element processing.
+       *
+       * @type {boolean}
+       */
+      this.queued = false;
+
       // Seal data backing readable stores.
       Object.seal(this.dimensionData);
    }

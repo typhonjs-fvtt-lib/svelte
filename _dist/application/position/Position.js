@@ -966,7 +966,16 @@ export class Position
          if (!styleCache.hasData(el))
          {
             styleCache.update(el);
+
+            // Add will-change property if not already set in inline or computed styles.
+            if (!styleCache.hasWillChange)
+            {
+               el.style.willChange = this.#options.ortho ? 'transform' : 'top, left, transform';
+            }
+
+            // Update all properties / clear queued state.
             changeSet.set(true);
+            this.#updateElementData.queued = false;
          }
 
          position = this.#updatePosition(position, parent, el);
