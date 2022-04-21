@@ -406,7 +406,7 @@ export class Transforms
 
             case 'translateX':
                seenKeys |= constants.transformKeysBitwise.translateX;
-               s_TRANSLATE_VECTOR[0] = this._data.translateX;
+               s_TRANSLATE_VECTOR[0] = data.translateX;
                s_TRANSLATE_VECTOR[1] = 0;
                s_TRANSLATE_VECTOR[2] = 0;
                mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
@@ -415,7 +415,7 @@ export class Transforms
             case 'translateY':
                seenKeys |= constants.transformKeysBitwise.translateY;
                s_TRANSLATE_VECTOR[0] = 0;
-               s_TRANSLATE_VECTOR[1] = this._data.translateY;
+               s_TRANSLATE_VECTOR[1] = data.translateY;
                s_TRANSLATE_VECTOR[2] = 0;
                mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
                break;
@@ -424,7 +424,7 @@ export class Transforms
                seenKeys |= constants.transformKeysBitwise.translateZ;
                s_TRANSLATE_VECTOR[0] = 0;
                s_TRANSLATE_VECTOR[1] = 0;
-               s_TRANSLATE_VECTOR[2] = this._data.translateZ;
+               s_TRANSLATE_VECTOR[2] = data.translateZ;
                mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
                break;
          }
@@ -433,10 +433,12 @@ export class Transforms
       // Now apply any new keys not set in local transform data that have not been applied yet.
       if (data !== this._data)
       {
-         for (const key of constants.transformKeys)
+         for (let cntr = 0; cntr < constants.transformKeys.length; cntr++)
          {
+            const key = constants.transformKeys[cntr];
+
             // Reject bad / no data or if the key has already been applied.
-            if (!Number.isFinite(data[key]) || (seenKeys & constants.transformKeysBitwise[key]) > 0) { continue; }
+            if (data[key] === null || (seenKeys & constants.transformKeysBitwise[key]) > 0) { continue; }
 
             switch (key)
             {
@@ -512,32 +514,26 @@ export class Transforms
       s_TRANSLATE_VECTOR[2] = data.translateZ ?? 0;
       mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
 
-      for (let cntr = 0; cntr < constants.transformKeys.length; cntr++)
+      // Order doesn't matter for the remaining transforms to potentially include.
+      if (data.rotateX !== null)
       {
-         const key = constants.transformKeys[cntr];
+         mat4.multiply(matrix, matrix, mat4.fromXRotation(s_MAT4_TEMP, degToRad(data.rotateX)));
+      }
 
-         // Reject bad / no data.
-         if (!Number.isFinite(data[key])) { continue; }
+      if (data.rotateY !== null)
+      {
+         mat4.multiply(matrix, matrix, mat4.fromYRotation(s_MAT4_TEMP, degToRad(data.rotateY)));
+      }
 
-         switch (key)
-         {
-            case 'rotateX':
-               mat4.multiply(matrix, matrix, mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
-               break;
+      if (data.rotateZ !== null)
+      {
+         mat4.multiply(matrix, matrix, mat4.fromZRotation(s_MAT4_TEMP, degToRad(data.rotateZ)));
+      }
 
-            case 'rotateY':
-               mat4.multiply(matrix, matrix, mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
-               break;
-
-            case 'rotateZ':
-               mat4.multiply(matrix, matrix, mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
-               break;
-
-            case 'scale':
-               s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data[key];
-               mat4.multiply(matrix, matrix, mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
-               break;
-         }
+      if (data.scale !== null)
+      {
+         s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data.scale;
+         mat4.multiply(matrix, matrix, mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
       }
 
       return matrix;
