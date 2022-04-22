@@ -984,14 +984,14 @@ export class Position
          if (position === null) { return this; }
       }
 
-      if (typeof position.left === 'number')
+      if (Number.isFinite(position.left))
       {
          position.left = Math.round(position.left);
 
          if (data.left !== position.left) { data.left = position.left; changeSet.left = true; }
       }
 
-      if (typeof position.top === 'number')
+      if (Number.isFinite(position.top))
       {
          position.top = Math.round(position.top);
 
@@ -1026,7 +1026,7 @@ export class Position
          if (data.minWidth !== position.minWidth) { data.minWidth = position.minWidth; changeSet.minWidth = true; }
       }
 
-      if (typeof position.rotateX === 'number' || position.rotateX === null)
+      if (Number.isFinite(position.rotateX) || position.rotateX === null)
       {
          if (data.rotateX !== position.rotateX)
          {
@@ -1035,7 +1035,7 @@ export class Position
          }
       }
 
-      if (typeof position.rotateY === 'number' || position.rotateY === null)
+      if (Number.isFinite(position.rotateY) || position.rotateY === null)
       {
          if (data.rotateY !== position.rotateY)
          {
@@ -1044,7 +1044,7 @@ export class Position
          }
       }
 
-      if (typeof position.rotateZ === 'number' || position.rotateZ === null)
+      if (Number.isFinite(position.rotateZ) || position.rotateZ === null)
       {
          if (data.rotateZ !== position.rotateZ)
          {
@@ -1053,7 +1053,7 @@ export class Position
          }
       }
 
-      if (typeof position.scale === 'number' || position.scale === null)
+      if (Number.isFinite(position.scale) || position.scale === null)
       {
          position.scale = typeof position.scale === 'number' ? Math.max(0, Math.min(position.scale, 1000)) : null;
 
@@ -1064,14 +1064,9 @@ export class Position
          }
       }
 
-      if (typeof position.transformOrigin === 'string' || position.transformOrigin === null)
+      if ((typeof position.transformOrigin === 'string' && constants.transformOrigins.includes(
+       position.transformOrigin)) || position.transformOrigin === null)
       {
-         position.transformOrigin = constants.transformOrigins.includes(position.transformOrigin) ?
-          position.transformOrigin : null;
-
-         // Convert transform origin 'center' to null which is the browser default.
-         if (position.transformOrigin === 'center') { position.transformOrigin = null; }
-
          if (data.transformOrigin !== position.transformOrigin)
          {
             data.transformOrigin = position.transformOrigin;
@@ -1079,7 +1074,7 @@ export class Position
          }
       }
 
-      if (typeof position.translateX === 'number' || position.translateX === null)
+      if (Number.isFinite(position.translateX) || position.translateX === null)
       {
          if (data.translateX !== position.translateX)
          {
@@ -1088,7 +1083,7 @@ export class Position
          }
       }
 
-      if (typeof position.translateY === 'number' || position.translateY === null)
+      if (Number.isFinite(position.translateY) || position.translateY === null)
       {
          if (data.translateY !== position.translateY)
          {
@@ -1097,7 +1092,7 @@ export class Position
          }
       }
 
-      if (typeof position.translateZ === 'number' || position.translateZ === null)
+      if (Number.isFinite(position.translateZ) || position.translateZ === null)
       {
          if (data.translateZ !== position.translateZ)
          {
@@ -1106,21 +1101,21 @@ export class Position
          }
       }
 
-      if (typeof position.zIndex === 'number')
+      if (Number.isFinite(position.zIndex))
       {
          position.zIndex = Math.round(position.zIndex);
 
          if (data.zIndex !== position.zIndex) { data.zIndex = position.zIndex; changeSet.zIndex = true; }
       }
 
-      if (typeof position.width === 'number' || position.width === 'auto' || position.width === null)
+      if (Number.isFinite(position.width) || position.width === 'auto' || position.width === null)
       {
          position.width = typeof position.width === 'number' ? Math.round(position.width) : position.width;
 
          if (data.width !== position.width) { data.width = position.width; changeSet.width = true; }
       }
 
-      if (typeof position.height === 'number' || position.height === 'auto' || position.height === null)
+      if (Number.isFinite(position.height) || position.height === 'auto' || position.height === null)
       {
          position.height = typeof position.height === 'number' ? Math.round(position.height) : position.height;
 
@@ -1132,10 +1127,7 @@ export class Position
          // Set default data after first set operation that has a target element.
          if (typeof this.#defaultData !== 'object') { this.#defaultData = Object.assign({}, data); }
 
-         this.#updateElementData.calculateTransform = this.#options.calculateTransform ||
-          this.#options.transformSubscribed;
-
-         // Add this element and bound update callback to UpdateManager.
+         // Add update element data to UpdateElementManager if not already queued.
          if (!this.#updateElementData.queued)
          {
             this.#updateElementPromise = UpdateElementManager.add(el, this.#updateElementData);
@@ -1304,15 +1296,15 @@ export class Position
       }
 
       // Update rotate X/Y/Z, scale, z-index
-      if (typeof rotateX === 'number' || rotateX === null) { currentPosition.rotateX = rotateX; }
-      if (typeof rotateY === 'number' || rotateY === null) { currentPosition.rotateY = rotateY; }
-      if (typeof rotateZ === 'number' || rotateZ === null) { currentPosition.rotateZ = rotateZ; }
+      if (Number.isFinite(rotateX) || rotateX === null) { currentPosition.rotateX = rotateX; }
+      if (Number.isFinite(rotateY) || rotateY === null) { currentPosition.rotateY = rotateY; }
+      if (Number.isFinite(rotateZ) || rotateZ === null) { currentPosition.rotateZ = rotateZ; }
 
-      if (typeof translateX === 'number' || translateX === null) { currentPosition.translateX = translateX; }
-      if (typeof translateY === 'number' || translateY === null) { currentPosition.translateY = translateY; }
-      if (typeof translateZ === 'number' || translateZ === null) { currentPosition.translateZ = translateZ; }
+      if (Number.isFinite(translateX) || translateX === null) { currentPosition.translateX = translateX; }
+      if (Number.isFinite(translateY) || translateY === null) { currentPosition.translateY = translateY; }
+      if (Number.isFinite(translateZ) || translateZ === null) { currentPosition.translateZ = translateZ; }
 
-      if (typeof scale === 'number' || scale === null)
+      if (Number.isFinite(scale) || scale === null)
       {
          currentPosition.scale = typeof scale === 'number' ? Math.max(0, Math.min(scale, 1000)) : null;
       }
@@ -1321,12 +1313,9 @@ export class Position
       {
          currentPosition.transformOrigin = constants.transformOrigins.includes(transformOrigin) ? transformOrigin :
           null;
-
-         // Convert transform origin 'center' to null which is the browser default.
-         if (currentPosition.transformOrigin === 'center') { currentPosition.transformOrigin = null; }
       }
 
-      if (typeof zIndex === 'number' || zIndex === null)
+      if (Number.isFinite(zIndex) || zIndex === null)
       {
          currentPosition.zIndex = typeof zIndex === 'number' ? Math.round(zIndex) : zIndex;
       }
