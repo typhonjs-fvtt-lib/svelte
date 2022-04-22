@@ -4,10 +4,19 @@ import * as constants            from '../constants.js';
 
 import { TransformData }         from './TransformData.js';
 
+/** @type {number[]} */
 const s_SCALE_VECTOR = [1, 1, 1];
+
+/** @type {number[]} */
 const s_TRANSLATE_VECTOR = [0, 0, 0];
+
+/** @type {Matrix4} */
 const s_MAT4_RESULT = mat4.create();
+
+/** @type {Matrix4} */
 const s_MAT4_TEMP = mat4.create();
+
+/** @type {Vector3} */
 const s_VEC3_TEMP = vec3.create();
 
 export class Transforms
@@ -280,19 +289,17 @@ export class Transforms
 
          const matrix = this.getMat4(position, output.mat4);
 
+         const translate = s_GET_ORIGIN_TRANSLATION(position.transformOrigin, width, height, output.originTranslations);
+
          if (constants.transformOriginDefault === position.transformOrigin)
          {
             vec3.transformMat4(rect[0], rect[0], matrix);
             vec3.transformMat4(rect[1], rect[1], matrix);
             vec3.transformMat4(rect[2], rect[2], matrix);
             vec3.transformMat4(rect[3], rect[3], matrix);
-
-            this.getOriginTranslation(position, output.originTranslations);
          }
          else
          {
-            const translate = this.getOriginTranslation(position, output.originTranslations);
-
             vec3.transformMat4(rect[0], rect[0], translate[0]);
             vec3.transformMat4(rect[0], rect[0], matrix);
             vec3.transformMat4(rect[0], rect[0], translate[1]);
@@ -367,9 +374,9 @@ export class Transforms
     *
     * @param {object}   [data] - PositionData instance or local transform data.
     *
-    * @param {mat4}     [output] - The output mat4 instance.
+    * @param {Matrix4}  [output] - The output mat4 instance.
     *
-    * @returns {mat4} Transform matrix.
+    * @returns {Matrix4} Transform matrix.
     */
    getMat4(data = this._data, output = mat4.create())
    {
@@ -498,9 +505,9 @@ export class Transforms
     *
     * @param {object}   [data] - PositionData instance or local transform data.
     *
-    * @param {mat4}     [output] - The output mat4 instance.
+    * @param {Matrix4}  [output] - The output mat4 instance.
     *
-    * @returns {mat4} Transform matrix.
+    * @returns {Matrix4} Transform matrix.
     */
    getMat4Ortho(data = this._data, output = mat4.create())
    {
@@ -537,111 +544,6 @@ export class Transforms
       }
 
       return matrix;
-   }
-
-   /**
-    * Returns the translations necessary to translate a matrix operation based on the `transformOrigin` parameter of the
-    * given position instance. The first entry / index 0 is the pre-translation and last entry / index 1 is the post-
-    * translation.
-    *
-    * This method is used internally, but may be useful if you need the origin translation matrices to transform
-    * bespoke points based on any `transformOrigin` set in {@link PositionData}.
-    *
-    * @param {PositionData}   position - A position instance.
-    *
-    * @param {mat4[]}         [output] - Output Mat4 array.
-    *
-    * @returns {mat4[]} Output Mat4 array.
-    */
-   getOriginTranslation(position, output = [mat4.create(), mat4.create()])
-   {
-      const vector = s_VEC3_TEMP;
-
-      switch (position.transformOrigin)
-      {
-         case 'top left':
-            vector[0] = vector[1] = 0;
-            mat4.fromTranslation(output[0], vector);
-            mat4.fromTranslation(output[1], vector);
-            break;
-
-         case 'top center':
-            vector[0] = -position.width / 2;
-            vector[1] = 0;
-            mat4.fromTranslation(output[0], vector);
-            vector[0] = position.width / 2;
-            mat4.fromTranslation(output[1], vector);
-            break;
-
-         case 'top right':
-            vector[0] = -position.width;
-            vector[1] = 0;
-            mat4.fromTranslation(output[0], vector);
-            vector[0] = position.width;
-            mat4.fromTranslation(output[1], vector);
-            break;
-
-         case 'center left':
-            vector[0] = 0;
-            vector[1] = -position.height / 2;
-            mat4.fromTranslation(output[0], vector);
-            vector[1] = position.height / 2;
-            mat4.fromTranslation(output[1], vector);
-            break;
-
-         case null: // By default null / no transform is center.
-         case 'center':
-            vector[0] = -position.width / 2;
-            vector[1] = -position.height / 2;
-            mat4.fromTranslation(output[0], vector);
-            vector[0] = position.width / 2;
-            vector[1] = position.height / 2;
-            mat4.fromTranslation(output[1], vector);
-            break;
-
-         case 'center right':
-            vector[0] = -position.width;
-            vector[1] = -position.height / 2;
-            mat4.fromTranslation(output[0], vector);
-            vector[0] = position.width;
-            vector[1] = position.height / 2;
-            mat4.fromTranslation(output[1], vector);
-            break;
-
-         case 'bottom left':
-            vector[0] = 0;
-            vector[1] = -position.height;
-            mat4.fromTranslation(output[0], vector);
-            vector[1] = position.height;
-            mat4.fromTranslation(output[1], vector);
-            break;
-
-         case 'bottom center':
-            vector[0] = -position.width / 2;
-            vector[1] = -position.height;
-            mat4.fromTranslation(output[0], vector);
-            vector[0] = position.width / 2;
-            vector[1] = position.height;
-            mat4.fromTranslation(output[1], vector);
-            break;
-
-         case 'bottom right':
-            vector[0] = -position.width;
-            vector[1] = -position.height;
-            mat4.fromTranslation(output[0], vector);
-            vector[0] = position.width;
-            vector[1] = position.height;
-            mat4.fromTranslation(output[1], vector);
-            break;
-
-       // No valid transform origin parameter; set identity.
-         default:
-            mat4.identity(output[0]);
-            mat4.identity(output[1]);
-            break;
-      }
-
-      return output;
    }
 
    /**
@@ -682,4 +584,113 @@ export class Transforms
 
       this.#count = Object.keys(this._data).length;
    }
+}
+
+/**
+ * Returns the translations necessary to translate a matrix operation based on the `transformOrigin` parameter of the
+ * given position instance. The first entry / index 0 is the pre-translation and last entry / index 1 is the post-
+ * translation.
+ *
+ * This method is used internally, but may be useful if you need the origin translation matrices to transform
+ * bespoke points based on any `transformOrigin` set in {@link PositionData}.
+ *
+ * @param {string}   transformOrigin - The transform origin attribute from PositionData.
+ *
+ * @param {number}   width - The PositionData width or validation data width when 'auto'.
+ *
+ * @param {number}   height - The PositionData height or validation data height when 'auto'.
+ *
+ * @param {Matrix4[]}   output - Output Mat4 array.
+ *
+ * @returns {Matrix4[]} Output Mat4 array.
+ */
+function s_GET_ORIGIN_TRANSLATION(transformOrigin, width, height, output)
+{
+   const vector = s_VEC3_TEMP;
+
+   switch (transformOrigin)
+   {
+      case 'top left':
+         vector[0] = vector[1] = 0;
+         mat4.fromTranslation(output[0], vector);
+         mat4.fromTranslation(output[1], vector);
+         break;
+
+      case 'top center':
+         vector[0] = -width * 0.5;
+         vector[1] = 0;
+         mat4.fromTranslation(output[0], vector);
+         vector[0] = width * 0.5;
+         mat4.fromTranslation(output[1], vector);
+         break;
+
+      case 'top right':
+         vector[0] = -width;
+         vector[1] = 0;
+         mat4.fromTranslation(output[0], vector);
+         vector[0] = width;
+         mat4.fromTranslation(output[1], vector);
+         break;
+
+      case 'center left':
+         vector[0] = 0;
+         vector[1] = -height * 0.5;
+         mat4.fromTranslation(output[0], vector);
+         vector[1] = height * 0.5;
+         mat4.fromTranslation(output[1], vector);
+         break;
+
+      case null: // By default null / no transform is center.
+      case 'center':
+         vector[0] = -width * 0.5;
+         vector[1] = -height * 0.5;
+         mat4.fromTranslation(output[0], vector);
+         vector[0] = width * 0.5;
+         vector[1] = height * 0.5;
+         mat4.fromTranslation(output[1], vector);
+         break;
+
+      case 'center right':
+         vector[0] = -width;
+         vector[1] = -height * 0.5;
+         mat4.fromTranslation(output[0], vector);
+         vector[0] = width;
+         vector[1] = height * 0.5;
+         mat4.fromTranslation(output[1], vector);
+         break;
+
+      case 'bottom left':
+         vector[0] = 0;
+         vector[1] = -height;
+         mat4.fromTranslation(output[0], vector);
+         vector[1] = height;
+         mat4.fromTranslation(output[1], vector);
+         break;
+
+      case 'bottom center':
+         vector[0] = -width * 0.5;
+         vector[1] = -height;
+         mat4.fromTranslation(output[0], vector);
+         vector[0] = width * 0.5;
+         vector[1] = height;
+         mat4.fromTranslation(output[1], vector);
+         break;
+
+      case 'bottom right':
+         vector[0] = -width;
+         vector[1] = -height;
+         mat4.fromTranslation(output[0], vector);
+         vector[0] = width;
+         vector[1] = height;
+         mat4.fromTranslation(output[1], vector);
+         break;
+
+      // No valid transform origin parameter; set identity.
+      default:
+         mat4.identity(output[0]);
+         mat4.identity(output[1]);
+         break;
+   }
+
+   return output;
 }
