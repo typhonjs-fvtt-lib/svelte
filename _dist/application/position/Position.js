@@ -103,7 +103,7 @@ export class Position
    #updateElementData;
 
    /**
-    * Stores the UpdateManager wait promise.
+    * Stores the UpdateElementManager wait promise.
     *
     * @type {Promise}
     */
@@ -272,6 +272,7 @@ export class Position
 
       this.#stores = {
          dimension: { subscribe: updateData.storeDimension.subscribe },
+         element: { subscribe: this.#styleCache.storeElement.subscribe },
          height: propertyStore(this, 'height'),
          left: propertyStore(this, 'left'),
          maxHeight: propertyStore(this, 'maxHeight'),
@@ -293,12 +294,11 @@ export class Position
          zIndex: propertyStore(this, 'zIndex')
       };
 
-      // When resize changes from any applied resizeObserver action automatically set data for new validation run.
+      // When resize change from any applied resizeObserver action automatically set data for new validation run.
       // A resizeObserver prop should be set to true for ApplicationShell components or usage of resizeObserver action
       // to monitor for changes. This should only be used on elements that have 'auto' for width or height.
       subscribeIgnoreFirst(this.#stores.resizeObserved, (resizeData) =>
       {
-// console.log(`! Position - resizeObserved subcriber - update: `, test);
          const parent = this.#parent;
          const el = parent instanceof HTMLElement ? parent : parent?.elementTarget;
 
@@ -344,6 +344,16 @@ export class Position
    get dimension()
    {
       return this.#updateElementData.dimensionData;
+   }
+
+   /**
+    * Returns the current HTMLElement being positioned.
+    *
+    * @returns {HTMLElement} Current HTMLElement being positioned.
+    */
+   get element()
+   {
+      return this.#styleCache.el;
    }
 
    /**
@@ -1437,6 +1447,67 @@ Object.seal(s_VALIDATION_DATA);
  * @typedef {HTMLElement | object} PositionParent
  *
  * @property {Function} [elementTarget] - Potentially returns any parent object.
+ */
+
+/**
+ * @typedef {object} ResizeObserverData
+ *
+ * @property {number|undefined} contentHeight -
+ *
+ * @property {number|undefined} contentWidth -
+ *
+ * @property {number|undefined} offsetHeight -
+ *
+ * @property {number|undefined} offsetWidth -
+ */
+
+/**
+ * @typedef {object} StorePosition - Provides individual writable stores for {@link Position}.
+ *
+ * @property {import('svelte/store').Readable<{width: number, height: number}>} dimension - Readable store for dimension
+ *                                                                                          data.
+ *
+ * @property {import('svelte/store').Readable<HTMLElement>} element - Readable store for current element.
+ *
+ * @property {import('svelte/store').Writable<number|null>} left - Derived store for `left` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} top - Derived store for `top` updates.
+ *
+ * @property {import('svelte/store').Writable<number|'auto'|null>} width - Derived store for `width` updates.
+ *
+ * @property {import('svelte/store').Writable<number|'auto'|null>} height - Derived store for `height` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} maxHeight - Derived store for `maxHeight` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} maxWidth - Derived store for `maxWidth` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} minHeight - Derived store for `minHeight` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} minWidth - Derived store for `minWidth` updates.
+ *
+ * @property {import('svelte/store').Writable<ResizeObserverData>} resizeObserved - Writable store for resize data.
+ *
+ * @property {import('svelte/store').Writable<number|null>} rotate - Derived store for `rotate` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} rotateX - Derived store for `rotateX` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} rotateY - Derived store for `rotateY` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} rotateZ - Derived store for `rotateZ` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} scale - Derived store for `scale` updates.
+ *
+ * @property {import('svelte/store').Readable<TransformData>} transform - Readable store for transform data.
+ *
+ * @property {import('svelte/store').Writable<string>} transformOrigin - Derived store for `transformOrigin`.
+ *
+ * @property {import('svelte/store').Writable<number|null>} translateX - Derived store for `translateX` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} translateY - Derived store for `translateY` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} translateZ - Derived store for `translateZ` updates.
+ *
+ * @property {import('svelte/store').Writable<number|null>} zIndex - Derived store for `zIndex` updates.
  */
 
 /**

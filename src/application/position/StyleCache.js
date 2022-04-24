@@ -17,6 +17,9 @@ export class StyleCache
 
       this.hasWillChange = false;
 
+      /**
+       * @type {ResizeObserverData}
+       */
       this.resizeObserved = {
          contentHeight: void 0,
          contentWidth: void 0,
@@ -24,14 +27,25 @@ export class StyleCache
          offsetWidth: void 0
       };
 
+      /**
+       * Provides a writable store to track offset & content width / height from an associated `resizeObserver` action.
+       *
+       * @type {Writable<ResizeObserverData>}
+       */
       this.storeResizeObserved = writable(this.resizeObserved);
+
+      /**
+       * Provides a writable store for the `element` readable store to update when element being tracked changes.
+       *
+       * @type {Writable<HTMLElement|undefined>}
+       */
+      this.storeElement = writable(this.el);
    }
 
    get offsetHeight()
    {
       if (this.el instanceof HTMLElement)
       {
-// console.log(`! StyleCache - get offsetHeight - this.resizeObserved.offsetHeight: ${this.resizeObserved.offsetHeight}; this.el.offsetHeight: ${this.el.offsetHeight}`)
          return this.resizeObserved.offsetHeight !== void 0 ? this.resizeObserved.offsetHeight : this.el.offsetHeight;
       }
 
@@ -42,7 +56,6 @@ export class StyleCache
    {
       if (this.el instanceof HTMLElement)
       {
-// console.log(`! StyleCache - get offsetWidth - this.resizeObserved.offsetWidth: ${this.resizeObserved.offsetWidth}; this.el.offsetWidth: ${this.el.offsetWidth}`)
          return this.resizeObserved.offsetWidth !== void 0 ? this.resizeObserved.offsetWidth : this.el.offsetWidth;
       }
 
@@ -58,6 +71,12 @@ export class StyleCache
 
    reset()
    {
+      // Remove will-change inline style from previous element if it is still connected.
+      if (this.el instanceof HTMLElement && this.el.isConnected && !this.hasWillChange)
+      {
+         this.el.style.willChange = null;
+      }
+
       this.el = void 0;
       this.computed = void 0;
       this.marginLeft = void 0;
@@ -68,6 +87,9 @@ export class StyleCache
       this.minWidth = void 0;
 
       this.hasWillChange = false;
+
+      // Reset the tracked element this Position instance is modifying.
+      this.storeElement.set(void 0);
    }
 
    update(el)
@@ -89,5 +111,8 @@ export class StyleCache
       const willChange = el.style.willChange !== '' ? el.style.willChange : void 0 ?? this.computed.willChange;
 
       this.hasWillChange = willChange !== '' && willChange !== 'auto';
+
+      // Update the tracked element this Position instance is modifying.
+      this.storeElement.set(el);
    }
 }
