@@ -1,4 +1,6 @@
-import { styleParsePixels } from '@typhonjs-fvtt/runtime/svelte/util';
+import { writable }           from 'svelte/store';
+
+import { styleParsePixels }   from '@typhonjs-fvtt/svelte/util';
 
 export class StyleCache
 {
@@ -14,6 +16,37 @@ export class StyleCache
       this.minWidth = void 0;
 
       this.hasWillChange = false;
+
+      this.resizeObserved = {
+         contentHeight: void 0,
+         contentWidth: void 0,
+         offsetHeight: void 0,
+         offsetWidth: void 0
+      };
+
+      this.storeResizeObserved = writable(this.resizeObserved);
+   }
+
+   get offsetHeight()
+   {
+      if (this.el instanceof HTMLElement)
+      {
+// console.log(`! StyleCache - get offsetHeight - this.resizeObserved.offsetHeight: ${this.resizeObserved.offsetHeight}; this.el.offsetHeight: ${this.el.offsetHeight}`)
+         return this.resizeObserved.offsetHeight !== void 0 ? this.resizeObserved.offsetHeight : this.el.offsetHeight;
+      }
+
+      throw new Error(`StyleCache - get offsetHeight error: no element assigned.`);
+   }
+
+   get offsetWidth()
+   {
+      if (this.el instanceof HTMLElement)
+      {
+// console.log(`! StyleCache - get offsetWidth - this.resizeObserved.offsetWidth: ${this.resizeObserved.offsetWidth}; this.el.offsetWidth: ${this.el.offsetWidth}`)
+         return this.resizeObserved.offsetWidth !== void 0 ? this.resizeObserved.offsetWidth : this.el.offsetWidth;
+      }
+
+      throw new Error(`StyleCache - get offsetWidth error: no element assigned.`);
    }
 
    /**

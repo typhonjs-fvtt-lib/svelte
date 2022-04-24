@@ -74,7 +74,8 @@ export class UpdateElementManager
          updateData.queued = false;
 
          // Early out if the element is no longer connected to the DOM / shadow root.
-         if (!el.isConnected || !updateData.changeSet.hasChange()) { continue; }
+         // if (!el.isConnected || !updateData.changeSet.hasChange()) { continue; }
+         if (!el.isConnected) { continue; }
 
          if (updateData.options.ortho)
          {
@@ -238,9 +239,11 @@ function s_UPDATE_ELEMENT_ORTHO(el, updateData)
  */
 function s_UPDATE_TRANSFORM(el, updateData)
 {
-   s_VALIDATION_DATA.height = updateData.data.height !== 'auto' ? updateData.data.height : el.offsetHeight;
+   s_VALIDATION_DATA.height = updateData.data.height !== 'auto' ? updateData.data.height :
+    updateData.styleCache.offsetHeight;
 
-   s_VALIDATION_DATA.width = updateData.data.width !== 'auto' ? updateData.data.width : el.offsetWidth;
+   s_VALIDATION_DATA.width = updateData.data.width !== 'auto' ? updateData.data.width :
+    updateData.styleCache.offsetWidth;
 
    s_VALIDATION_DATA.marginLeft = updateData.styleCache.marginLeft;
 

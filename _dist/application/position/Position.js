@@ -1,7 +1,9 @@
 import { linear }                from 'svelte/easing';
 
 import { lerp }                  from '@typhonjs-fvtt/svelte/math';
-import { propertyStore }         from '@typhonjs-fvtt/svelte/store';
+import {
+   propertyStore,
+   subscribeIgnoreFirst }        from '@typhonjs-fvtt/svelte/store';
 import { isIterable }            from '@typhonjs-fvtt/svelte/util';
 
 import { AnimationManager }      from './animation/AnimationManager.js';
@@ -81,7 +83,7 @@ export class Position
     *
     * @type {StyleCache}
     */
-   #styleCache = new StyleCache();
+   #styleCache;
 
    /**
     * Stores the subscribers.
@@ -150,6 +152,8 @@ export class Position
 
       const data = this.#data;
       const transforms = this.#transforms;
+
+      this.#styleCache = new StyleCache();
 
       const updateData = new UpdateElementData();
 
@@ -274,6 +278,7 @@ export class Position
          maxWidth: propertyStore(this, 'maxWidth'),
          minHeight: propertyStore(this, 'minHeight'),
          minWidth: propertyStore(this, 'minWidth'),
+         resizeObserved: this.#styleCache.storeResizeObserved,
          rotateX: propertyStore(this, 'rotateX'),
          rotateY: propertyStore(this, 'rotateY'),
          rotateZ: propertyStore(this, 'rotateZ'),
@@ -287,6 +292,23 @@ export class Position
          width: propertyStore(this, 'width'),
          zIndex: propertyStore(this, 'zIndex')
       };
+
+      // When resize changes from any applied resizeObserver action automatically set data for new validation run.
+      // A resizeObserver prop should be set to true for ApplicationShell components or usage of resizeObserver action
+      // to monitor for changes. This should only be used on elements that have 'auto' for width or height.
+      subscribeIgnoreFirst(this.#stores.resizeObserved, (resizeData) =>
+      {
+// console.log(`! Position - resizeObserved subcriber - update: `, test);
+         const parent = this.#parent;
+         const el = parent instanceof HTMLElement ? parent : parent?.elementTarget;
+
+         // Only invoke set if there is a target element and the resize data has a valid offset width & height.
+         if (el instanceof HTMLElement && Number.isFinite(resizeData?.offsetWidth) &&
+          Number.isFinite(resizeData?.offsetHeight))
+         {
+            this.set(data);
+         }
+      });
 
       this.#stores.transformOrigin.values = constants.transformOrigins;
 
@@ -978,7 +1000,7 @@ export class Position
             this.#updateElementData.queued = false;
          }
 
-         position = this.#updatePosition(position, parent, el);
+         position = this.#updatePosition(position, parent, el, styleCache);
 
          // Check if a validator cancelled the update.
          if (position === null) { return this; }
@@ -1206,10 +1228,12 @@ export class Position
     *
     * @param {HTMLElement} el -
     *
+    * @param {StyleCache} styleCache -
+    *
     * @returns {null|PositionData} Updated position data or null if validation fails.
     */
    #updatePosition({ left, top, maxWidth, maxHeight, minWidth, minHeight, width, height, rotateX, rotateY, rotateZ,
-    scale, transformOrigin, translateX, translateY, translateZ, zIndex, ...rest } = {}, parent, el)
+    scale, transformOrigin, translateX, translateY, translateZ, zIndex, ...rest } = {}, parent, el, styleCache)
    {
       let currentPosition = s_DATA_UPDATE.copy(this.#data);
 
@@ -1219,17 +1243,17 @@ export class Position
          if (width === 'auto' || (currentPosition.width === 'auto' && width !== null))
          {
             currentPosition.width = 'auto';
-            width = el.offsetWidth;
+            width = styleCache.offsetWidth;
          }
          else
          {
             const newWidth = Number.isFinite(width) ? width : currentPosition.width;
-            currentPosition.width = width = Number.isFinite(newWidth) ? Math.round(newWidth) : el.offsetWidth;
+            currentPosition.width = width = Number.isFinite(newWidth) ? Math.round(newWidth) : styleCache.offsetWidth;
          }
       }
       else
       {
-         width = Number.isFinite(currentPosition.width) ? currentPosition.width : el.offsetWidth;
+         width = Number.isFinite(currentPosition.width) ? currentPosition.width : styleCache.offsetWidth;
       }
 
       // Update height if an explicit value is passed, or if no height value is set on the element.
@@ -1238,17 +1262,18 @@ export class Position
          if (height === 'auto' || (currentPosition.height === 'auto' && height !== null))
          {
             currentPosition.height = 'auto';
-            height = el.offsetHeight;
+            height = styleCache.offsetHeight;
          }
          else
          {
             const newHeight = Number.isFinite(height) ? height : currentPosition.height;
-            currentPosition.height = height = Number.isFinite(newHeight) ? Math.round(newHeight) : el.offsetHeight;
+            currentPosition.height = height = Number.isFinite(newHeight) ? Math.round(newHeight) :
+             styleCache.offsetHeight;
          }
       }
       else
       {
-         height = Number.isFinite(currentPosition.height) ? currentPosition.height : el.offsetHeight;
+         height = Number.isFinite(currentPosition.height) ? currentPosition.height : styleCache.offsetHeight;
       }
 
       // Update left
@@ -1325,8 +1350,6 @@ export class Position
       // If there are any validators allow them to potentially modify position data or reject the update.
       if (validatorData.length)
       {
-         const styleCache = this.#styleCache;
-
          s_VALIDATION_DATA.parent = parent;
 
          s_VALIDATION_DATA.el = el;
