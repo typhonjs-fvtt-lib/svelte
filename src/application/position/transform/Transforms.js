@@ -22,11 +22,11 @@ const s_VEC3_TEMP = vec3.create();
 export class Transforms
 {
    /**
-    * Stores the number of transforms currently loaded.
+    * Stores the transform keys in the order added.
     *
-    * @type {number}
+    * @type {string[]}
     */
-   #count = 0;
+   #orderList = [];
 
    constructor()
    {
@@ -36,7 +36,7 @@ export class Transforms
    /**
     * @returns {boolean} Whether there are active transforms in local data.
     */
-   get isActive() { return this.#count > 0; }
+   get isActive() { return this.#orderList.length > 0; }
 
    /**
     * @returns {number|undefined} Any local rotateX data.
@@ -82,13 +82,17 @@ export class Transforms
    {
       if (Number.isFinite(value))
       {
-         if (this._data.rotateX === void 0) { this.#count++; }
+         if (this._data.rotateX === void 0) { this.#orderList.push('rotateX'); }
 
          this._data.rotateX = value;
       }
       else
       {
-         if (this._data.rotateX !== void 0) { this.#count--; }
+         if (this._data.rotateX !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'rotateX');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
 
          delete this._data.rotateX;
       }
@@ -103,13 +107,17 @@ export class Transforms
    {
       if (Number.isFinite(value))
       {
-         if (this._data.rotateY === void 0) { this.#count++; }
+         if (this._data.rotateY === void 0) { this.#orderList.push('rotateY'); }
 
          this._data.rotateY = value;
       }
       else
       {
-         if (this._data.rotateY !== void 0) { this.#count--; }
+         if (this._data.rotateY !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'rotateY');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
 
          delete this._data.rotateY;
       }
@@ -124,14 +132,18 @@ export class Transforms
    {
       if (Number.isFinite(value))
       {
-         if (this._data.rotateZ === void 0) { this.#count++; }
+         if (this._data.rotateZ === void 0) { this.#orderList.push('rotateZ'); }
 
          this._data.rotateZ = value;
       }
 
       else
       {
-         if (this._data.rotateZ !== void 0) { this.#count--; }
+         if (this._data.rotateZ !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'rotateZ');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
 
          delete this._data.rotateZ;
       }
@@ -146,13 +158,17 @@ export class Transforms
    {
       if (Number.isFinite(value))
       {
-         if (this._data.scale === void 0) { this.#count++; }
+         if (this._data.scale === void 0) { this.#orderList.push('scale'); }
 
          this._data.scale = value;
       }
       else
       {
-         if (this._data.scale !== void 0) { this.#count--; }
+         if (this._data.scale !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'scale');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
 
          delete this._data.scale;
       }
@@ -167,14 +183,18 @@ export class Transforms
    {
       if (Number.isFinite(value))
       {
-         if (this._data.translateX === void 0) { this.#count++; }
+         if (this._data.translateX === void 0) { this.#orderList.push('translateX'); }
 
          this._data.translateX = value;
       }
 
       else
       {
-         if (this._data.translateX !== void 0) { this.#count--; }
+         if (this._data.translateX !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'translateX');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
 
          delete this._data.translateX;
       }
@@ -189,14 +209,18 @@ export class Transforms
    {
       if (Number.isFinite(value))
       {
-         if (this._data.translateY === void 0) { this.#count++; }
+         if (this._data.translateY === void 0) { this.#orderList.push('translateY'); }
 
          this._data.translateY = value;
       }
 
       else
       {
-         if (this._data.translateY !== void 0) { this.#count--; }
+         if (this._data.translateY !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'translateY');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
 
          delete this._data.translateY;
       }
@@ -211,14 +235,18 @@ export class Transforms
    {
       if (Number.isFinite(value))
       {
-         if (this._data.translateZ === void 0) { this.#count++; }
+         if (this._data.translateZ === void 0) { this.#orderList.push('translateZ'); }
 
          this._data.translateZ = value;
       }
 
       else
       {
-         if (this._data.translateZ !== void 0) { this.#count--; }
+         if (this._data.translateZ !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'translateZ');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
 
          delete this._data.translateZ;
       }
@@ -385,9 +413,13 @@ export class Transforms
       // Bitwise tracks applied transform keys from local transform data.
       let seenKeys = 0;
 
+      const orderList = this.#orderList;
+
       // First apply ordered transforms from local transform data.
-      for (const key in this._data)
+      for (let cntr = 0; cntr < orderList.length; cntr++)
       {
+         const key = orderList[cntr];
+
          switch (key)
          {
             case 'rotateX':
@@ -536,9 +568,13 @@ export class Transforms
       // Bitwise tracks applied transform keys from local transform data.
       let seenKeys = 0;
 
+      const orderList = this.#orderList;
+
       // First apply ordered transforms from local transform data.
-      for (const key in this._data)
+      for (let cntr = 0; cntr < orderList.length; cntr++)
       {
+         const key = orderList[cntr];
+
          switch (key)
          {
             case 'rotateX':
@@ -614,17 +650,21 @@ export class Transforms
    {
       for (const key in data)
       {
-         if (constants.transformKeys.includes(key) && Number.isFinite(data[key]))
+         if (constants.transformKeys.includes(key))
          {
-            this._data[key] = data[key];
-         }
-         else
-         {
-            delete this._data[key];
+            if (Number.isFinite(data[key]))
+            {
+               this._data[key] = data[key];
+            }
+            else
+            {
+               const index = this.#orderList.findIndex((entry) => entry === key);
+               if (index >= 0) { this.#orderList.splice(index, 1); }
+
+               delete this._data[key];
+            }
          }
       }
-
-      this.#count = Object.keys(this._data).length;
    }
 }
 

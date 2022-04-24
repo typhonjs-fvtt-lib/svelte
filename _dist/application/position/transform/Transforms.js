@@ -22,11 +22,11 @@ const s_VEC3_TEMP = vec3.create();
 export class Transforms
 {
    /**
-    * Stores the number of transforms currently loaded.
+    * Stores the transform keys in the order added.
     *
-    * @type {number}
+    * @type {string[]}
     */
-   #count = 0;
+   #orderList = [];
 
    constructor()
    {
@@ -36,7 +36,7 @@ export class Transforms
    /**
     * @returns {boolean} Whether there are active transforms in local data.
     */
-   get isActive() { return this.#count > 0; }
+   get isActive() { return this.#orderList.length > 0; }
 
    /**
     * @returns {number|undefined} Any local rotateX data.
@@ -82,13 +82,17 @@ export class Transforms
    {
       if (Number.isFinite(value))
       {
-         if (this._data.rotateX === void 0) { this.#count++; }
+         if (this._data.rotateX === void 0) { this.#orderList.push('rotateX'); }
 
          this._data.rotateX = value;
       }
       else
       {
-         if (this._data.rotateX !== void 0) { this.#count--; }
+         if (this._data.rotateX !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'rotateX');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
 
          delete this._data.rotateX;
       }
@@ -103,13 +107,17 @@ export class Transforms
    {
       if (Number.isFinite(value))
       {
-         if (this._data.rotateY === void 0) { this.#count++; }
+         if (this._data.rotateY === void 0) { this.#orderList.push('rotateY'); }
 
          this._data.rotateY = value;
       }
       else
       {
-         if (this._data.rotateY !== void 0) { this.#count--; }
+         if (this._data.rotateY !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'rotateY');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
 
          delete this._data.rotateY;
       }
@@ -124,14 +132,18 @@ export class Transforms
    {
       if (Number.isFinite(value))
       {
-         if (this._data.rotateZ === void 0) { this.#count++; }
+         if (this._data.rotateZ === void 0) { this.#orderList.push('rotateZ'); }
 
          this._data.rotateZ = value;
       }
 
       else
       {
-         if (this._data.rotateZ !== void 0) { this.#count--; }
+         if (this._data.rotateZ !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'rotateZ');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
 
          delete this._data.rotateZ;
       }
@@ -146,13 +158,17 @@ export class Transforms
    {
       if (Number.isFinite(value))
       {
-         if (this._data.scale === void 0) { this.#count++; }
+         if (this._data.scale === void 0) { this.#orderList.push('scale'); }
 
          this._data.scale = value;
       }
       else
       {
-         if (this._data.scale !== void 0) { this.#count--; }
+         if (this._data.scale !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'scale');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
 
          delete this._data.scale;
       }
@@ -167,14 +183,18 @@ export class Transforms
    {
       if (Number.isFinite(value))
       {
-         if (this._data.translateX === void 0) { this.#count++; }
+         if (this._data.translateX === void 0) { this.#orderList.push('translateX'); }
 
          this._data.translateX = value;
       }
 
       else
       {
-         if (this._data.translateX !== void 0) { this.#count--; }
+         if (this._data.translateX !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'translateX');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
 
          delete this._data.translateX;
       }
@@ -189,14 +209,18 @@ export class Transforms
    {
       if (Number.isFinite(value))
       {
-         if (this._data.translateY === void 0) { this.#count++; }
+         if (this._data.translateY === void 0) { this.#orderList.push('translateY'); }
 
          this._data.translateY = value;
       }
 
       else
       {
-         if (this._data.translateY !== void 0) { this.#count--; }
+         if (this._data.translateY !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'translateY');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
 
          delete this._data.translateY;
       }
@@ -211,14 +235,18 @@ export class Transforms
    {
       if (Number.isFinite(value))
       {
-         if (this._data.translateZ === void 0) { this.#count++; }
+         if (this._data.translateZ === void 0) { this.#orderList.push('translateZ'); }
 
          this._data.translateZ = value;
       }
 
       else
       {
-         if (this._data.translateZ !== void 0) { this.#count--; }
+         if (this._data.translateZ !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'translateZ');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
 
          delete this._data.translateZ;
       }
@@ -385,9 +413,13 @@ export class Transforms
       // Bitwise tracks applied transform keys from local transform data.
       let seenKeys = 0;
 
+      const orderList = this.#orderList;
+
       // First apply ordered transforms from local transform data.
-      for (const key in this._data)
+      for (let cntr = 0; cntr < orderList.length; cntr++)
       {
+         const key = orderList[cntr];
+
          switch (key)
          {
             case 'rotateX':
@@ -521,26 +553,72 @@ export class Transforms
       s_TRANSLATE_VECTOR[2] = data.translateZ ?? 0;
       mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
 
-      // Order doesn't matter for the remaining transforms to potentially include.
-      if (data.rotateX !== null)
-      {
-         mat4.multiply(matrix, matrix, mat4.fromXRotation(s_MAT4_TEMP, degToRad(data.rotateX)));
-      }
-
-      if (data.rotateY !== null)
-      {
-         mat4.multiply(matrix, matrix, mat4.fromYRotation(s_MAT4_TEMP, degToRad(data.rotateY)));
-      }
-
-      if (data.rotateZ !== null)
-      {
-         mat4.multiply(matrix, matrix, mat4.fromZRotation(s_MAT4_TEMP, degToRad(data.rotateZ)));
-      }
-
+      // Scale can also be applied out of order.
       if (data.scale !== null)
       {
          s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data.scale;
          mat4.multiply(matrix, matrix, mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
+      }
+
+      // Early out if there is not rotation data.
+      if (data.rotateX === null && data.rotateY === null && data.rotateZ === null) { return matrix; }
+
+      // Rotation transforms must be applied in the order they are added.
+
+      // Bitwise tracks applied transform keys from local transform data.
+      let seenKeys = 0;
+
+      const orderList = this.#orderList;
+
+      // First apply ordered transforms from local transform data.
+      for (let cntr = 0; cntr < orderList.length; cntr++)
+      {
+         const key = orderList[cntr];
+
+         switch (key)
+         {
+            case 'rotateX':
+               seenKeys |= constants.transformKeysBitwise.rotateX;
+               mat4.multiply(matrix, matrix, mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
+               break;
+
+            case 'rotateY':
+               seenKeys |= constants.transformKeysBitwise.rotateY;
+               mat4.multiply(matrix, matrix, mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
+               break;
+
+            case 'rotateZ':
+               seenKeys |= constants.transformKeysBitwise.rotateZ;
+               mat4.multiply(matrix, matrix, mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
+               break;
+         }
+      }
+
+      // Now apply any new keys not set in local transform data that have not been applied yet.
+      if (data !== this._data)
+      {
+         for (let cntr = 0; cntr < constants.transformKeys.length; cntr++)
+         {
+            const key = constants.transformKeys[cntr];
+
+            // Reject bad / no data or if the key has already been applied.
+            if (data[key] === null || (seenKeys & constants.transformKeysBitwise[key]) > 0) { continue; }
+
+            switch (key)
+            {
+               case 'rotateX':
+                  mat4.multiply(matrix, matrix, mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+
+               case 'rotateY':
+                  mat4.multiply(matrix, matrix, mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+
+               case 'rotateZ':
+                  mat4.multiply(matrix, matrix, mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+            }
+         }
       }
 
       return matrix;
@@ -572,17 +650,21 @@ export class Transforms
    {
       for (const key in data)
       {
-         if (constants.transformKeys.includes(key) && Number.isFinite(data[key]))
+         if (constants.transformKeys.includes(key))
          {
-            this._data[key] = data[key];
-         }
-         else
-         {
-            delete this._data[key];
+            if (Number.isFinite(data[key]))
+            {
+               this._data[key] = data[key];
+            }
+            else
+            {
+               const index = this.#orderList.findIndex((entry) => entry === key);
+               if (index >= 0) { this.#orderList.splice(index, 1); }
+
+               delete this._data[key];
+            }
          }
       }
-
-      this.#count = Object.keys(this._data).length;
    }
 }
 
