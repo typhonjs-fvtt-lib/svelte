@@ -271,27 +271,38 @@ export class Position
       }
 
       this.#stores = {
-         dimension: { subscribe: updateData.storeDimension.subscribe },
-         element: { subscribe: this.#styleCache.storeElement.subscribe },
+         // The main properties for manipulating Position.
          height: propertyStore(this, 'height'),
          left: propertyStore(this, 'left'),
-         maxHeight: propertyStore(this, 'maxHeight'),
-         maxWidth: propertyStore(this, 'maxWidth'),
-         minHeight: propertyStore(this, 'minHeight'),
-         minWidth: propertyStore(this, 'minWidth'),
-         resizeObserved: this.#styleCache.storeResizeObserved,
          rotateX: propertyStore(this, 'rotateX'),
          rotateY: propertyStore(this, 'rotateY'),
          rotateZ: propertyStore(this, 'rotateZ'),
          scale: propertyStore(this, 'scale'),
          top: propertyStore(this, 'top'),
-         transform: { subscribe: updateData.storeTransform.subscribe },
          transformOrigin: propertyStore(this, 'transformOrigin'),
          translateX: propertyStore(this, 'translateX'),
          translateY: propertyStore(this, 'translateY'),
          translateZ: propertyStore(this, 'translateZ'),
          width: propertyStore(this, 'width'),
-         zIndex: propertyStore(this, 'zIndex')
+         zIndex: propertyStore(this, 'zIndex'),
+
+         // Stores that control validation when width / height is not `auto`.
+         maxHeight: propertyStore(this, 'maxHeight'),
+         maxWidth: propertyStore(this, 'maxWidth'),
+         minHeight: propertyStore(this, 'minHeight'),
+         minWidth: propertyStore(this, 'minWidth'),
+
+         // Readable stores based on updates or from resize observer changes.
+         dimension: { subscribe: updateData.storeDimension.subscribe },
+         element: { subscribe: this.#styleCache.stores.element.subscribe },
+         resizeContentHeight: { subscribe: this.#styleCache.stores.resizeContentHeight.subscribe },
+         resizeContentWidth: { subscribe: this.#styleCache.stores.resizeContentWidth.subscribe },
+         resizeOffsetHeight: { subscribe: this.#styleCache.stores.resizeOffsetHeight.subscribe },
+         resizeOffsetWidth: { subscribe: this.#styleCache.stores.resizeOffsetWidth.subscribe },
+         transform: { subscribe: updateData.storeTransform.subscribe },
+
+         // Protected store that should only be set by resizeObserver action.
+         resizeObserved: this.#styleCache.stores.resizeObserved,
       };
 
       // When resize change from any applied resizeObserver action automatically set data for new validation run.
@@ -1485,7 +1496,15 @@ Object.seal(s_VALIDATION_DATA);
  *
  * @property {import('svelte/store').Writable<number|null>} minWidth - Derived store for `minWidth` updates.
  *
- * @property {import('svelte/store').Writable<ResizeObserverData>} resizeObserved - Writable store for resize data.
+ * @property {import('svelte/store').Readable<number|undefined>} resizeContentHeight - Readable store for `contentHeight`.
+ *
+ * @property {import('svelte/store').Readable<number|undefined>} resizeContentWidth - Readable store for `contentWidth`.
+ *
+ * @property {import('svelte/store').Writable<ResizeObserverData>} resizeObserved - Protected store for resize observer updates.
+ *
+ * @property {import('svelte/store').Readable<number|undefined>} resizeOffsetHeight - Readable store for `offsetHeight`.
+ *
+ * @property {import('svelte/store').Readable<number|undefined>} resizeOffsetWidth - Readable store for `offsetWidth`.
  *
  * @property {import('svelte/store').Writable<number|null>} rotate - Derived store for `rotate` updates.
  *

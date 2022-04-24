@@ -1,5 +1,6 @@
 import { writable }           from 'svelte/store';
 
+import { propertyStore }      from '@typhonjs-fvtt/svelte/store';
 import { styleParsePixels }   from '@typhonjs-fvtt/svelte/util';
 
 export class StyleCache
@@ -32,14 +33,16 @@ export class StyleCache
        *
        * @type {Writable<ResizeObserverData>}
        */
-      this.storeResizeObserved = writable(this.resizeObserved);
+      const storeResizeObserved = writable(this.resizeObserved);
 
-      /**
-       * Provides a writable store for the `element` readable store to update when element being tracked changes.
-       *
-       * @type {Writable<HTMLElement|undefined>}
-       */
-      this.storeElement = writable(this.el);
+      this.stores = {
+         element: writable(this.el),
+         resizeContentHeight: propertyStore(storeResizeObserved, 'contentHeight'),
+         resizeContentWidth: propertyStore(storeResizeObserved, 'contentWidth'),
+         resizeObserved: storeResizeObserved,
+         resizeOffsetHeight: propertyStore(storeResizeObserved, 'offsetHeight'),
+         resizeOffsetWidth: propertyStore(storeResizeObserved, 'offsetWidth')
+      };
    }
 
    get offsetHeight()
@@ -88,8 +91,14 @@ export class StyleCache
 
       this.hasWillChange = false;
 
+      // Silently reset `resizedObserved`; With proper usage the `resizeObserver` action issues an update on removal.
+      this.resizeObserved.contentHeight = void 0;
+      this.resizeObserved.contentWidth = void 0;
+      this.resizeObserved.offsetHeight = void 0;
+      this.resizeObserved.offsetWidth = void 0;
+
       // Reset the tracked element this Position instance is modifying.
-      this.storeElement.set(void 0);
+      this.stores.element.set(void 0);
    }
 
    update(el)
@@ -113,6 +122,6 @@ export class StyleCache
       this.hasWillChange = willChange !== '' && willChange !== 'auto';
 
       // Update the tracked element this Position instance is modifying.
-      this.storeElement.set(el);
+      this.stores.element.set(el);
    }
 }
