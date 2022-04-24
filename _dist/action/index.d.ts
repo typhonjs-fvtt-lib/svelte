@@ -50,12 +50,14 @@ declare function draggable(node: HTMLElement, { position, active, storeDragging 
  * to the target in various ways depending on the shape of the target. The target can be one of the following and the
  * precedence order is listed from top to bottom:
  *
- *
- * - has a `setDimension` function as attribute; width / height are passed as parameters.
- * - has `setWidth` & `setHeight` functions as attribute; width & height are passed as parameters.
- * - has
- * - target is an object; width and height attributes are directly set on target.
- * - target is a function; the function is invoked with width & height parameters.
+ * - has a `resizeObserved` function as attribute; offset then content width / height are passed as parameters.
+ * - has a `setContentBounds` function as attribute; content width / height are passed as parameters.
+ * - has a `setDimension` function as attribute; offset width / height are passed as parameters.
+ * - target is an object; offset and content width / height attributes are directly set on target.
+ * - target is a function; the function is invoked with offset then content width / height parameters.
+ * - has a writable store `resizeObserved` as an attribute; updated with offset & content width / height.
+ * - has an object 'stores' that has a writable store `resizeObserved` as an attribute; updated with offset &
+ *   content width / height.
  *
  * Note: Svelte currently uses an archaic IFrame based workaround to monitor offset / client width & height changes.
  * A more up to date way to do this is with ResizeObserver. To track when Svelte receives ResizeObserver support
@@ -63,14 +65,14 @@ declare function draggable(node: HTMLElement, { position, active, storeDragging 
  *
  * Can-I-Use: {@link https://caniuse.com/resizeobserver}
  *
- * @param {HTMLElement}       node - The node associated with the action.
+ * @param {HTMLElement}          node - The node associated with the action.
  *
- * @param {object | Function} target - An object to update with observed width & height changes.
+ * @param {ResizeObserverTarget} target - An object or function to update with observed width & height changes.
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  * @see {@link https://github.com/sveltejs/svelte/issues/4233}
  */
-declare function resizeObserver(node: HTMLElement, target: object | Function): {
+declare function resizeObserver(node: HTMLElement, target: any): {
     update: Function;
     destroy: Function;
 };

@@ -399,7 +399,29 @@ declare const gameState: svelte_store.Readable<any>;
 declare function isReadableStore(store: any): boolean;
 /**
  * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
- * and `set` functions.
+ * function and a `set` function.
+ *
+ * Note: functions are also objects, so test that the variable might be a function w/ a `subscribe` function.
+ *
+ * @param {*}  store - variable to test that might be a store.
+ *
+ * @returns {boolean} Whether the variable tested has the shape of a store.
+ */
+declare function isSettableStore(store: any): boolean;
+/**
+ * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
+ * function and an `update` function.
+ *
+ * Note: functions are also objects, so test that the variable might be a function w/ a `subscribe` function.
+ *
+ * @param {*}  store - variable to test that might be a store.
+ *
+ * @returns {boolean} Whether the variable tested has the shape of a store.
+ */
+declare function isUpdatableStore(store: any): boolean;
+/**
+ * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
+ * `set`, and `update` functions.
  *
  * Note: functions are also objects, so test that the variable might be a function w/ `subscribe` & `set` functions.
  *
@@ -527,4 +549,4 @@ declare class AdapterFilters<T> {
     removeById(...ids: any[]): void;
 }
 
-export { DynArrayReducer, GSStore, GameSetting, GameSettingOptions, GameState, LSStore, LocalStorage, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, TJSGameSettings, gameState, isReadableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { DynArrayReducer, GSStore, GameSetting, GameSettingOptions, GameState, LSStore, LocalStorage, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, TJSGameSettings, gameState, isReadableStore, isSettableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
