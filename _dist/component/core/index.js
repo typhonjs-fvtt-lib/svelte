@@ -2,7 +2,7 @@ import { SvelteComponent, init, safe_not_equal, flush, append_styles, empty, ins
 import { getContext, setContext } from 'svelte';
 import { s_DEFAULT_TRANSITION, s_DEFAULT_TRANSITION_OPTIONS } from '@typhonjs-fvtt/svelte/transition';
 import { writable } from 'svelte/store';
-import { applyStyles, draggable } from '@typhonjs-fvtt/svelte/action';
+import { applyStyles, draggable, resizeObserver } from '@typhonjs-fvtt/svelte/action';
 import { localize } from '@typhonjs-fvtt/svelte/helper';
 import { isSvelteComponent, isObject, parseSvelteConfig } from '@typhonjs-fvtt/svelte/util';
 import { fade } from 'svelte/transition';
@@ -20,7 +20,7 @@ function get_each_context$2(ctx, list, i) {
 }
 
 // (12:15) 
-function create_if_block_1$3(ctx) {
+function create_if_block_1$1(ctx) {
 	let p;
 
 	return {
@@ -211,7 +211,7 @@ function create_fragment$a(ctx) {
 	let if_block;
 	let if_block_anchor;
 	let current;
-	const if_block_creators = [create_if_block$5, create_if_block_1$3];
+	const if_block_creators = [create_if_block$5, create_if_block_1$1];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -1543,348 +1543,11 @@ function add_css$2(target) {
 	append_styles(target, "svelte-3vt5in", ".window-app.svelte-3vt5in{overflow:inherit}");
 }
 
-// (166:0) {:else}
-function create_else_block_1$1(ctx) {
-	let div;
-	let tjsapplicationheader;
-	let t0;
-	let section;
-	let current_block_type_index;
-	let if_block;
-	let applyStyles_action;
-	let t1;
-	let resizablehandle;
-	let div_id_value;
-	let div_class_value;
-	let div_data_appid_value;
-	let applyStyles_action_1;
-	let div_intro;
-	let div_outro;
-	let current;
-	let mounted;
-	let dispose;
-	tjsapplicationheader = new TJSApplicationHeader({});
-	const if_block_creators = [create_if_block_2$2, create_else_block_2$1];
-	const if_blocks = [];
-
-	function select_block_type_2(ctx, dirty) {
-		if (Array.isArray(/*allChildren*/ ctx[12])) return 0;
-		return 1;
-	}
-
-	current_block_type_index = select_block_type_2(ctx);
-	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-	resizablehandle = new ResizableHandle({});
-
-	return {
-		c() {
-			div = element("div");
-			create_component(tjsapplicationheader.$$.fragment);
-			t0 = space();
-			section = element("section");
-			if_block.c();
-			t1 = space();
-			create_component(resizablehandle.$$.fragment);
-			attr(section, "class", "window-content");
-			attr(div, "id", div_id_value = /*application*/ ctx[9].id);
-			attr(div, "class", div_class_value = "app window-app " + /*application*/ ctx[9].options.classes.join(' ') + " svelte-3vt5in");
-			attr(div, "data-appid", div_data_appid_value = /*application*/ ctx[9].appId);
-		},
-		m(target, anchor) {
-			insert(target, div, anchor);
-			mount_component(tjsapplicationheader, div, null);
-			append(div, t0);
-			append(div, section);
-			if_blocks[current_block_type_index].m(section, null);
-			/*section_binding_1*/ ctx[24](section);
-			append(div, t1);
-			mount_component(resizablehandle, div, null);
-			/*div_binding_1*/ ctx[25](div);
-			current = true;
-
-			if (!mounted) {
-				dispose = [
-					action_destroyer(applyStyles_action = applyStyles.call(null, section, /*stylesContent*/ ctx[8])),
-					listen(div, "pointerdown", /*bringToTop*/ ctx[11], true),
-					action_destroyer(applyStyles_action_1 = applyStyles.call(null, div, /*stylesApp*/ ctx[7]))
-				];
-
-				mounted = true;
-			}
-		},
-		p(new_ctx, dirty) {
-			ctx = new_ctx;
-			if_block.p(ctx, dirty);
-			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*stylesContent*/ 256) applyStyles_action.update.call(null, /*stylesContent*/ ctx[8]);
-
-			if (!current || dirty & /*application*/ 512 && div_id_value !== (div_id_value = /*application*/ ctx[9].id)) {
-				attr(div, "id", div_id_value);
-			}
-
-			if (!current || dirty & /*application*/ 512 && div_class_value !== (div_class_value = "app window-app " + /*application*/ ctx[9].options.classes.join(' ') + " svelte-3vt5in")) {
-				attr(div, "class", div_class_value);
-			}
-
-			if (!current || dirty & /*application*/ 512 && div_data_appid_value !== (div_data_appid_value = /*application*/ ctx[9].appId)) {
-				attr(div, "data-appid", div_data_appid_value);
-			}
-
-			if (applyStyles_action_1 && is_function(applyStyles_action_1.update) && dirty & /*stylesApp*/ 128) applyStyles_action_1.update.call(null, /*stylesApp*/ ctx[7]);
-		},
-		i(local) {
-			if (current) return;
-			transition_in(tjsapplicationheader.$$.fragment, local);
-			transition_in(if_block);
-			transition_in(resizablehandle.$$.fragment, local);
-
-			add_render_callback(() => {
-				if (div_outro) div_outro.end(1);
-				div_intro = create_in_transition(div, /*inTransition*/ ctx[2], /*inTransitionOptions*/ ctx[4]);
-				div_intro.start();
-			});
-
-			current = true;
-		},
-		o(local) {
-			transition_out(tjsapplicationheader.$$.fragment, local);
-			transition_out(if_block);
-			transition_out(resizablehandle.$$.fragment, local);
-			if (div_intro) div_intro.invalidate();
-			div_outro = create_out_transition(div, /*outTransition*/ ctx[3], /*outTransitionOptions*/ ctx[5]);
-			current = false;
-		},
-		d(detaching) {
-			if (detaching) detach(div);
-			destroy_component(tjsapplicationheader);
-			if_blocks[current_block_type_index].d();
-			/*section_binding_1*/ ctx[24](null);
-			destroy_component(resizablehandle);
-			/*div_binding_1*/ ctx[25](null);
-			if (detaching && div_outro) div_outro.end();
-			mounted = false;
-			run_all(dispose);
-		}
-	};
-}
-
-// (143:0) {#if bindHeightChanged}
-function create_if_block$4(ctx) {
-	let div;
-	let tjsapplicationheader;
-	let t0;
-	let section;
-	let current_block_type_index;
-	let if_block;
-	let section_resize_listener;
-	let applyStyles_action;
-	let t1;
-	let resizablehandle;
-	let div_id_value;
-	let div_class_value;
-	let div_data_appid_value;
-	let div_resize_listener;
-	let applyStyles_action_1;
-	let div_intro;
-	let div_outro;
-	let current;
-	let mounted;
-	let dispose;
-	tjsapplicationheader = new TJSApplicationHeader({});
-	const if_block_creators = [create_if_block_1$2, create_else_block$3];
-	const if_blocks = [];
-
-	function select_block_type_1(ctx, dirty) {
-		if (Array.isArray(/*allChildren*/ ctx[12])) return 0;
-		return 1;
-	}
-
-	current_block_type_index = select_block_type_1(ctx);
-	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-	resizablehandle = new ResizableHandle({});
-
-	return {
-		c() {
-			div = element("div");
-			create_component(tjsapplicationheader.$$.fragment);
-			t0 = space();
-			section = element("section");
-			if_block.c();
-			t1 = space();
-			create_component(resizablehandle.$$.fragment);
-			attr(section, "class", "window-content");
-			add_render_callback(() => /*section_elementresize_handler*/ ctx[21].call(section));
-			attr(div, "id", div_id_value = /*application*/ ctx[9].id);
-			attr(div, "class", div_class_value = "app window-app " + /*application*/ ctx[9].options.classes.join(' ') + " svelte-3vt5in");
-			attr(div, "data-appid", div_data_appid_value = /*application*/ ctx[9].appId);
-			add_render_callback(() => /*div_elementresize_handler*/ ctx[22].call(div));
-		},
-		m(target, anchor) {
-			insert(target, div, anchor);
-			mount_component(tjsapplicationheader, div, null);
-			append(div, t0);
-			append(div, section);
-			if_blocks[current_block_type_index].m(section, null);
-			/*section_binding*/ ctx[20](section);
-			section_resize_listener = add_resize_listener(section, /*section_elementresize_handler*/ ctx[21].bind(section));
-			append(div, t1);
-			mount_component(resizablehandle, div, null);
-			div_resize_listener = add_resize_listener(div, /*div_elementresize_handler*/ ctx[22].bind(div));
-			/*div_binding*/ ctx[23](div);
-			current = true;
-
-			if (!mounted) {
-				dispose = [
-					action_destroyer(applyStyles_action = applyStyles.call(null, section, /*stylesContent*/ ctx[8])),
-					listen(div, "pointerdown", /*bringToTop*/ ctx[11], true),
-					action_destroyer(applyStyles_action_1 = applyStyles.call(null, div, /*stylesApp*/ ctx[7]))
-				];
-
-				mounted = true;
-			}
-		},
-		p(new_ctx, dirty) {
-			ctx = new_ctx;
-			if_block.p(ctx, dirty);
-			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*stylesContent*/ 256) applyStyles_action.update.call(null, /*stylesContent*/ ctx[8]);
-
-			if (!current || dirty & /*application*/ 512 && div_id_value !== (div_id_value = /*application*/ ctx[9].id)) {
-				attr(div, "id", div_id_value);
-			}
-
-			if (!current || dirty & /*application*/ 512 && div_class_value !== (div_class_value = "app window-app " + /*application*/ ctx[9].options.classes.join(' ') + " svelte-3vt5in")) {
-				attr(div, "class", div_class_value);
-			}
-
-			if (!current || dirty & /*application*/ 512 && div_data_appid_value !== (div_data_appid_value = /*application*/ ctx[9].appId)) {
-				attr(div, "data-appid", div_data_appid_value);
-			}
-
-			if (applyStyles_action_1 && is_function(applyStyles_action_1.update) && dirty & /*stylesApp*/ 128) applyStyles_action_1.update.call(null, /*stylesApp*/ ctx[7]);
-		},
-		i(local) {
-			if (current) return;
-			transition_in(tjsapplicationheader.$$.fragment, local);
-			transition_in(if_block);
-			transition_in(resizablehandle.$$.fragment, local);
-
-			add_render_callback(() => {
-				if (div_outro) div_outro.end(1);
-				div_intro = create_in_transition(div, /*inTransition*/ ctx[2], /*inTransitionOptions*/ ctx[4]);
-				div_intro.start();
-			});
-
-			current = true;
-		},
-		o(local) {
-			transition_out(tjsapplicationheader.$$.fragment, local);
-			transition_out(if_block);
-			transition_out(resizablehandle.$$.fragment, local);
-			if (div_intro) div_intro.invalidate();
-			div_outro = create_out_transition(div, /*outTransition*/ ctx[3], /*outTransitionOptions*/ ctx[5]);
-			current = false;
-		},
-		d(detaching) {
-			if (detaching) detach(div);
-			destroy_component(tjsapplicationheader);
-			if_blocks[current_block_type_index].d();
-			/*section_binding*/ ctx[20](null);
-			section_resize_listener();
-			destroy_component(resizablehandle);
-			div_resize_listener();
-			/*div_binding*/ ctx[23](null);
-			if (detaching && div_outro) div_outro.end();
-			mounted = false;
-			run_all(dispose);
-		}
-	};
-}
-
-// (179:9) {:else}
-function create_else_block_2$1(ctx) {
-	let current;
-	const default_slot_template = /*#slots*/ ctx[19].default;
-	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[18], null);
-
-	return {
-		c() {
-			if (default_slot) default_slot.c();
-		},
-		m(target, anchor) {
-			if (default_slot) {
-				default_slot.m(target, anchor);
-			}
-
-			current = true;
-		},
-		p(ctx, dirty) {
-			if (default_slot) {
-				if (default_slot.p && (!current || dirty & /*$$scope*/ 262144)) {
-					update_slot_base(
-						default_slot,
-						default_slot_template,
-						ctx,
-						/*$$scope*/ ctx[18],
-						!current
-						? get_all_dirty_from_scope(/*$$scope*/ ctx[18])
-						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[18], dirty, null),
-						null
-					);
-				}
-			}
-		},
-		i(local) {
-			if (current) return;
-			transition_in(default_slot, local);
-			current = true;
-		},
-		o(local) {
-			transition_out(default_slot, local);
-			current = false;
-		},
-		d(detaching) {
-			if (default_slot) default_slot.d(detaching);
-		}
-	};
-}
-
-// (177:9) {#if Array.isArray(allChildren)}
-function create_if_block_2$2(ctx) {
-	let tjscontainer;
-	let current;
-
-	tjscontainer = new TJSContainer({
-			props: { children: /*allChildren*/ ctx[12] }
-		});
-
-	return {
-		c() {
-			create_component(tjscontainer.$$.fragment);
-		},
-		m(target, anchor) {
-			mount_component(tjscontainer, target, anchor);
-			current = true;
-		},
-		p: noop,
-		i(local) {
-			if (current) return;
-			transition_in(tjscontainer.$$.fragment, local);
-			current = true;
-		},
-		o(local) {
-			transition_out(tjscontainer.$$.fragment, local);
-			current = false;
-		},
-		d(detaching) {
-			destroy_component(tjscontainer, detaching);
-		}
-	};
-}
-
-// (160:9) {:else}
+// (212:6) {:else}
 function create_else_block$3(ctx) {
 	let current;
-	const default_slot_template = /*#slots*/ ctx[19].default;
-	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[18], null);
+	const default_slot_template = /*#slots*/ ctx[25].default;
+	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[24], null);
 
 	return {
 		c() {
@@ -1899,15 +1562,15 @@ function create_else_block$3(ctx) {
 		},
 		p(ctx, dirty) {
 			if (default_slot) {
-				if (default_slot.p && (!current || dirty & /*$$scope*/ 262144)) {
+				if (default_slot.p && (!current || dirty & /*$$scope*/ 16777216)) {
 					update_slot_base(
 						default_slot,
 						default_slot_template,
 						ctx,
-						/*$$scope*/ ctx[18],
+						/*$$scope*/ ctx[24],
 						!current
-						? get_all_dirty_from_scope(/*$$scope*/ ctx[18])
-						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[18], dirty, null),
+						? get_all_dirty_from_scope(/*$$scope*/ ctx[24])
+						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[24], dirty, null),
 						null
 					);
 				}
@@ -1928,8 +1591,8 @@ function create_else_block$3(ctx) {
 	};
 }
 
-// (158:9) {#if Array.isArray(allChildren)}
-function create_if_block_1$2(ctx) {
+// (210:6) {#if Array.isArray(allChildren)}
+function create_if_block$4(ctx) {
 	let tjscontainer;
 	let current;
 
@@ -1962,46 +1625,126 @@ function create_if_block_1$2(ctx) {
 }
 
 function create_fragment$4(ctx) {
+	let div;
+	let tjsapplicationheader;
+	let t0;
+	let section;
 	let current_block_type_index;
 	let if_block;
-	let if_block_anchor;
+	let applyStyles_action;
+	let t1;
+	let resizablehandle;
+	let div_id_value;
+	let div_class_value;
+	let div_data_appid_value;
+	let applyStyles_action_1;
+	let div_intro;
+	let div_outro;
 	let current;
-	const if_block_creators = [create_if_block$4, create_else_block_1$1];
+	let mounted;
+	let dispose;
+	tjsapplicationheader = new TJSApplicationHeader({});
+	const if_block_creators = [create_if_block$4, create_else_block$3];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
-		if (/*bindHeightChanged*/ ctx[10]) return 0;
+		if (Array.isArray(/*allChildren*/ ctx[12])) return 0;
 		return 1;
 	}
 
 	current_block_type_index = select_block_type(ctx);
 	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+	resizablehandle = new ResizableHandle({});
 
 	return {
 		c() {
+			div = element("div");
+			create_component(tjsapplicationheader.$$.fragment);
+			t0 = space();
+			section = element("section");
 			if_block.c();
-			if_block_anchor = empty();
+			t1 = space();
+			create_component(resizablehandle.$$.fragment);
+			attr(section, "class", "window-content");
+			attr(div, "id", div_id_value = /*application*/ ctx[8].id);
+			attr(div, "class", div_class_value = "app window-app " + /*application*/ ctx[8].options.classes.join(' ') + " svelte-3vt5in");
+			attr(div, "data-appid", div_data_appid_value = /*application*/ ctx[8].appId);
 		},
 		m(target, anchor) {
-			if_blocks[current_block_type_index].m(target, anchor);
-			insert(target, if_block_anchor, anchor);
+			insert(target, div, anchor);
+			mount_component(tjsapplicationheader, div, null);
+			append(div, t0);
+			append(div, section);
+			if_blocks[current_block_type_index].m(section, null);
+			/*section_binding*/ ctx[26](section);
+			append(div, t1);
+			mount_component(resizablehandle, div, null);
+			/*div_binding*/ ctx[27](div);
 			current = true;
+
+			if (!mounted) {
+				dispose = [
+					action_destroyer(applyStyles_action = applyStyles.call(null, section, /*stylesContent*/ ctx[7])),
+					action_destroyer(/*contentResizeObserver*/ ctx[10].call(null, section, /*resizeObservedContent*/ ctx[13])),
+					listen(div, "pointerdown", /*bringToTop*/ ctx[11], true),
+					action_destroyer(applyStyles_action_1 = applyStyles.call(null, div, /*stylesApp*/ ctx[6])),
+					action_destroyer(/*appResizeObserver*/ ctx[9].call(null, div, /*resizeObservedApp*/ ctx[14]))
+				];
+
+				mounted = true;
+			}
 		},
-		p(ctx, [dirty]) {
+		p(new_ctx, [dirty]) {
+			ctx = new_ctx;
 			if_block.p(ctx, dirty);
+			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*stylesContent*/ 128) applyStyles_action.update.call(null, /*stylesContent*/ ctx[7]);
+
+			if (!current || dirty & /*application*/ 256 && div_id_value !== (div_id_value = /*application*/ ctx[8].id)) {
+				attr(div, "id", div_id_value);
+			}
+
+			if (!current || dirty & /*application*/ 256 && div_class_value !== (div_class_value = "app window-app " + /*application*/ ctx[8].options.classes.join(' ') + " svelte-3vt5in")) {
+				attr(div, "class", div_class_value);
+			}
+
+			if (!current || dirty & /*application*/ 256 && div_data_appid_value !== (div_data_appid_value = /*application*/ ctx[8].appId)) {
+				attr(div, "data-appid", div_data_appid_value);
+			}
+
+			if (applyStyles_action_1 && is_function(applyStyles_action_1.update) && dirty & /*stylesApp*/ 64) applyStyles_action_1.update.call(null, /*stylesApp*/ ctx[6]);
 		},
 		i(local) {
 			if (current) return;
+			transition_in(tjsapplicationheader.$$.fragment, local);
 			transition_in(if_block);
+			transition_in(resizablehandle.$$.fragment, local);
+
+			add_render_callback(() => {
+				if (div_outro) div_outro.end(1);
+				div_intro = create_in_transition(div, /*inTransition*/ ctx[2], /*inTransitionOptions*/ ctx[4]);
+				div_intro.start();
+			});
+
 			current = true;
 		},
 		o(local) {
+			transition_out(tjsapplicationheader.$$.fragment, local);
 			transition_out(if_block);
+			transition_out(resizablehandle.$$.fragment, local);
+			if (div_intro) div_intro.invalidate();
+			div_outro = create_out_transition(div, /*outTransition*/ ctx[3], /*outTransitionOptions*/ ctx[5]);
 			current = false;
 		},
 		d(detaching) {
-			if_blocks[current_block_type_index].d(detaching);
-			if (detaching) detach(if_block_anchor);
+			if (detaching) detach(div);
+			destroy_component(tjsapplicationheader);
+			if_blocks[current_block_type_index].d();
+			/*section_binding*/ ctx[26](null);
+			destroy_component(resizablehandle);
+			/*div_binding*/ ctx[27](null);
+			if (detaching && div_outro) div_outro.end();
+			mounted = false;
+			run_all(dispose);
 		}
 	};
 }
@@ -2011,13 +1754,23 @@ function instance$4($$self, $$props, $$invalidate) {
 	let { elementContent } = $$props;
 	let { elementRoot } = $$props;
 	let { children = void 0 } = $$props;
-	let { heightChanged = false } = $$props;
 	let { stylesApp } = $$props;
 	let { stylesContent } = $$props;
+	let { appOffsetHeight = false } = $$props;
+	let { appOffsetWidth = false } = $$props;
 
-	// Store the initial `heightChanged` state. If it is truthy then `clientHeight` for the content & root elements
-	// are bound to `heightChanged` to signal to any parent component of any change to the client & root.
-	const bindHeightChanged = !!heightChanged;
+	// Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
+	const appResizeObserver = !!appOffsetHeight || !!appOffsetWidth
+	? resizeObserver
+	: () => null;
+
+	let { contentOffsetHeight = false } = $$props;
+	let { contentOffsetWidth = false } = $$props;
+
+	// Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
+	const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth
+	? resizeObserver
+	: () => null;
 
 	// If the application is a popOut application then when clicked bring to top. Bound to on pointerdown.
 	const bringToTop = () => {
@@ -2061,21 +1814,49 @@ function instance$4($$self, $$props, $$invalidate) {
 
 	let oldTransitionOptions = void 0;
 
+	// ---------------------------------------------------------------------------------------------------------------
+	/**
+ * Callback for content resizeObserver action. This is enabled when contentOffsetHeight or contentOffsetWidth is
+ * bound.
+ *
+ * @param {number}   offsetWidth - Observed offsetWidth.
+ *
+ * @param {number}   offsetHeight - Observed offsetHeight
+ */
+	function resizeObservedContent(offsetWidth, offsetHeight) {
+		$$invalidate(18, contentOffsetWidth = offsetWidth);
+		$$invalidate(17, contentOffsetHeight = offsetHeight);
+	}
+
+	/**
+ * Callback for app resizeObserver action. This is enabled when appOffsetHeight or appOffsetWidth is
+ * bound. Additionally, the Application position resizeObserved store is updated.
+ *
+ * @param {number}   contentWidth - Observed contentWidth.
+ * @param {number}   contentHeight - Observed contentHeight
+ * @param {number}   offsetWidth - Observed offsetWidth.
+ * @param {number}   offsetHeight - Observed offsetHeight
+ */
+	function resizeObservedApp(offsetWidth, offsetHeight, contentWidth, contentHeight) {
+		console.log(`! ApplicationShell - resizeObservedApp`);
+
+		application.position.stores.resizeObserved.update(object => {
+			object.contentWidth = contentWidth;
+			object.contentHeight = contentHeight;
+			object.offsetWidth = offsetWidth;
+			object.offsetHeight = offsetHeight;
+			return object;
+		});
+
+		$$invalidate(15, appOffsetHeight = offsetHeight);
+		$$invalidate(16, appOffsetWidth = offsetWidth);
+	}
+
 	function section_binding($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
 			elementContent = $$value;
 			$$invalidate(0, elementContent);
 		});
-	}
-
-	function section_elementresize_handler() {
-		heightChanged = this.clientHeight;
-		$$invalidate(6, heightChanged);
-	}
-
-	function div_elementresize_handler() {
-		heightChanged = this.clientHeight;
-		$$invalidate(6, heightChanged);
 	}
 
 	function div_binding($$value) {
@@ -2085,34 +1866,23 @@ function instance$4($$self, $$props, $$invalidate) {
 		});
 	}
 
-	function section_binding_1($$value) {
-		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-			elementContent = $$value;
-			$$invalidate(0, elementContent);
-		});
-	}
-
-	function div_binding_1($$value) {
-		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-			elementRoot = $$value;
-			$$invalidate(1, elementRoot);
-		});
-	}
-
 	$$self.$$set = $$props => {
 		if ('elementContent' in $$props) $$invalidate(0, elementContent = $$props.elementContent);
 		if ('elementRoot' in $$props) $$invalidate(1, elementRoot = $$props.elementRoot);
-		if ('children' in $$props) $$invalidate(13, children = $$props.children);
-		if ('heightChanged' in $$props) $$invalidate(6, heightChanged = $$props.heightChanged);
-		if ('stylesApp' in $$props) $$invalidate(7, stylesApp = $$props.stylesApp);
-		if ('stylesContent' in $$props) $$invalidate(8, stylesContent = $$props.stylesContent);
-		if ('transition' in $$props) $$invalidate(14, transition = $$props.transition);
+		if ('children' in $$props) $$invalidate(19, children = $$props.children);
+		if ('stylesApp' in $$props) $$invalidate(6, stylesApp = $$props.stylesApp);
+		if ('stylesContent' in $$props) $$invalidate(7, stylesContent = $$props.stylesContent);
+		if ('appOffsetHeight' in $$props) $$invalidate(15, appOffsetHeight = $$props.appOffsetHeight);
+		if ('appOffsetWidth' in $$props) $$invalidate(16, appOffsetWidth = $$props.appOffsetWidth);
+		if ('contentOffsetHeight' in $$props) $$invalidate(17, contentOffsetHeight = $$props.contentOffsetHeight);
+		if ('contentOffsetWidth' in $$props) $$invalidate(18, contentOffsetWidth = $$props.contentOffsetWidth);
+		if ('transition' in $$props) $$invalidate(20, transition = $$props.transition);
 		if ('inTransition' in $$props) $$invalidate(2, inTransition = $$props.inTransition);
 		if ('outTransition' in $$props) $$invalidate(3, outTransition = $$props.outTransition);
-		if ('transitionOptions' in $$props) $$invalidate(15, transitionOptions = $$props.transitionOptions);
+		if ('transitionOptions' in $$props) $$invalidate(21, transitionOptions = $$props.transitionOptions);
 		if ('inTransitionOptions' in $$props) $$invalidate(4, inTransitionOptions = $$props.inTransitionOptions);
 		if ('outTransitionOptions' in $$props) $$invalidate(5, outTransitionOptions = $$props.outTransitionOptions);
-		if ('$$scope' in $$props) $$invalidate(18, $$scope = $$props.$$scope);
+		if ('$$scope' in $$props) $$invalidate(24, $$scope = $$props.$$scope);
 	};
 
 	$$self.$$.update = () => {
@@ -2130,7 +1900,7 @@ function instance$4($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*oldTransition, transition*/ 81920) {
+		if ($$self.$$.dirty & /*oldTransition, transition*/ 5242880) {
 			// Run this reactive block when the last transition state is not equal to the current state.
 			if (oldTransition !== transition) {
 				// If transition is defined and not the default transition then set it to both in and out transition otherwise
@@ -2141,11 +1911,11 @@ function instance$4($$self, $$props, $$invalidate) {
 
 				$$invalidate(2, inTransition = newTransition);
 				$$invalidate(3, outTransition = newTransition);
-				$$invalidate(16, oldTransition = newTransition);
+				$$invalidate(22, oldTransition = newTransition);
 			}
 		}
 
-		if ($$self.$$.dirty & /*oldTransitionOptions, transitionOptions*/ 163840) {
+		if ($$self.$$.dirty & /*oldTransitionOptions, transitionOptions*/ 10485760) {
 			// Run this reactive block when the last transition options state is not equal to the current options state.
 			if (oldTransitionOptions !== transitionOptions) {
 				const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && typeof transitionOptions === 'object'
@@ -2154,7 +1924,7 @@ function instance$4($$self, $$props, $$invalidate) {
 
 				$$invalidate(4, inTransitionOptions = newOptions);
 				$$invalidate(5, outTransitionOptions = newOptions);
-				$$invalidate(17, oldTransitionOptions = newOptions);
+				$$invalidate(23, oldTransitionOptions = newOptions);
 			}
 		}
 
@@ -2165,7 +1935,7 @@ function instance$4($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*outTransition, application*/ 520) {
+		if ($$self.$$.dirty & /*outTransition, application*/ 264) {
 			{
 				// Handle cases if outTransition is unset; assign noop default transition function.
 				if (typeof outTransition !== 'function') {
@@ -2174,7 +1944,7 @@ function instance$4($$self, $$props, $$invalidate) {
 
 				// Set jquery close animation to either run or not when an out transition is changed.
 				if (application && typeof application?.options?.defaultCloseAnimation === 'boolean') {
-					$$invalidate(9, application.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, application);
+					$$invalidate(8, application.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, application);
 				}
 			}
 		}
@@ -2201,13 +1971,19 @@ function instance$4($$self, $$props, $$invalidate) {
 		outTransition,
 		inTransitionOptions,
 		outTransitionOptions,
-		heightChanged,
 		stylesApp,
 		stylesContent,
 		application,
-		bindHeightChanged,
+		appResizeObserver,
+		contentResizeObserver,
 		bringToTop,
 		allChildren,
+		resizeObservedContent,
+		resizeObservedApp,
+		appOffsetHeight,
+		appOffsetWidth,
+		contentOffsetHeight,
+		contentOffsetWidth,
 		children,
 		transition,
 		transitionOptions,
@@ -2216,11 +1992,7 @@ function instance$4($$self, $$props, $$invalidate) {
 		$$scope,
 		slots,
 		section_binding,
-		section_elementresize_handler,
-		div_elementresize_handler,
-		div_binding,
-		section_binding_1,
-		div_binding_1
+		div_binding
 	];
 }
 
@@ -2237,14 +2009,17 @@ class ApplicationShell extends SvelteComponent {
 			{
 				elementContent: 0,
 				elementRoot: 1,
-				children: 13,
-				heightChanged: 6,
-				stylesApp: 7,
-				stylesContent: 8,
-				transition: 14,
+				children: 19,
+				stylesApp: 6,
+				stylesContent: 7,
+				appOffsetHeight: 15,
+				appOffsetWidth: 16,
+				contentOffsetHeight: 17,
+				contentOffsetWidth: 18,
+				transition: 20,
 				inTransition: 2,
 				outTransition: 3,
-				transitionOptions: 15,
+				transitionOptions: 21,
 				inTransitionOptions: 4,
 				outTransitionOptions: 5
 			},
@@ -2271,7 +2046,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get children() {
-		return this.$$.ctx[13];
+		return this.$$.ctx[19];
 	}
 
 	set children(children) {
@@ -2279,17 +2054,8 @@ class ApplicationShell extends SvelteComponent {
 		flush();
 	}
 
-	get heightChanged() {
-		return this.$$.ctx[6];
-	}
-
-	set heightChanged(heightChanged) {
-		this.$$set({ heightChanged });
-		flush();
-	}
-
 	get stylesApp() {
-		return this.$$.ctx[7];
+		return this.$$.ctx[6];
 	}
 
 	set stylesApp(stylesApp) {
@@ -2298,7 +2064,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get stylesContent() {
-		return this.$$.ctx[8];
+		return this.$$.ctx[7];
 	}
 
 	set stylesContent(stylesContent) {
@@ -2306,8 +2072,44 @@ class ApplicationShell extends SvelteComponent {
 		flush();
 	}
 
+	get appOffsetHeight() {
+		return this.$$.ctx[15];
+	}
+
+	set appOffsetHeight(appOffsetHeight) {
+		this.$$set({ appOffsetHeight });
+		flush();
+	}
+
+	get appOffsetWidth() {
+		return this.$$.ctx[16];
+	}
+
+	set appOffsetWidth(appOffsetWidth) {
+		this.$$set({ appOffsetWidth });
+		flush();
+	}
+
+	get contentOffsetHeight() {
+		return this.$$.ctx[17];
+	}
+
+	set contentOffsetHeight(contentOffsetHeight) {
+		this.$$set({ contentOffsetHeight });
+		flush();
+	}
+
+	get contentOffsetWidth() {
+		return this.$$.ctx[18];
+	}
+
+	set contentOffsetWidth(contentOffsetWidth) {
+		this.$$set({ contentOffsetWidth });
+		flush();
+	}
+
 	get transition() {
-		return this.$$.ctx[14];
+		return this.$$.ctx[20];
 	}
 
 	set transition(transition) {
@@ -2334,7 +2136,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get transitionOptions() {
-		return this.$$.ctx[15];
+		return this.$$.ctx[21];
 	}
 
 	set transitionOptions(transitionOptions) {
@@ -2811,348 +2613,11 @@ function add_css$1(target) {
 	append_styles(target, "svelte-9xueci", ".tjs-app{max-height:100%;background:url(/ui/denim075.png) repeat;border-radius:5px;box-shadow:0 0 20px #000;margin:3px 0;padding:0.5em;color:#f0f0e0;z-index:95;overflow:inherit}.tjs-window-app{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;position:absolute;box-shadow:0 0 20px #000;padding:0;z-index:95}.tjs-window-app > *{flex:1}.tjs-window-app > .flex0{display:block;flex:0}.tjs-window-app > .flex1{flex:1}.tjs-window-app > .flex2{flex:2}.tjs-window-app > .flex3{flex:3}.tjs-window-app .window-header{flex:0 0 30px;overflow:hidden;padding:0 8px;line-height:30px;border-bottom:1px solid #000}.tjs-window-app .window-header .window-title{margin:0;word-break:break-all}.tjs-window-app .window-header a{flex:none;margin:0 0 0 8px}.tjs-window-app .window-header i[class^=fa]{margin-right:3px}.tjs-window-app.minimized .window-header{border:1px solid #000}.tjs-window-app .window-content{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;padding:8px;color:#191813;overflow-y:auto;overflow-x:hidden}.window-app .window-content > *{flex:1}.window-app .window-content > .flex0{display:block;flex:0}.window-app .window-content > .flex1{flex:1}.window-app .window-content > .flex2{flex:2}.window-app .window-content > .flex3{flex:3}.window-app.zhover{z-index:calc(var(--z-index-window) + 1)}.tjs-window-app .window-resizable-handle{width:20px;height:20px;position:absolute;bottom:-1px;right:0;background:#444;padding:2px;border:1px solid #111;border-radius:4px 0 0 0}.tjs-window-app .window-resizable-handle i.fas{transform:rotate(45deg)}.window-app.minimized .window-resizable-handle{display:none}");
 }
 
-// (166:0) {:else}
-function create_else_block_1(ctx) {
-	let div;
-	let tjsapplicationheader;
-	let t0;
-	let section;
-	let current_block_type_index;
-	let if_block;
-	let applyStyles_action;
-	let t1;
-	let resizablehandle;
-	let div_id_value;
-	let div_class_value;
-	let div_data_appid_value;
-	let applyStyles_action_1;
-	let div_intro;
-	let div_outro;
-	let current;
-	let mounted;
-	let dispose;
-	tjsapplicationheader = new TJSApplicationHeader({});
-	const if_block_creators = [create_if_block_2$1, create_else_block_2];
-	const if_blocks = [];
-
-	function select_block_type_2(ctx, dirty) {
-		if (Array.isArray(/*allChildren*/ ctx[12])) return 0;
-		return 1;
-	}
-
-	current_block_type_index = select_block_type_2(ctx);
-	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-	resizablehandle = new ResizableHandle({});
-
-	return {
-		c() {
-			div = element("div");
-			create_component(tjsapplicationheader.$$.fragment);
-			t0 = space();
-			section = element("section");
-			if_block.c();
-			t1 = space();
-			create_component(resizablehandle.$$.fragment);
-			attr(section, "class", "window-content");
-			attr(div, "id", div_id_value = /*application*/ ctx[9].id);
-			attr(div, "class", div_class_value = "tjs-app tjs-window-app " + /*application*/ ctx[9].options.classes.join(' '));
-			attr(div, "data-appid", div_data_appid_value = /*application*/ ctx[9].appId);
-		},
-		m(target, anchor) {
-			insert(target, div, anchor);
-			mount_component(tjsapplicationheader, div, null);
-			append(div, t0);
-			append(div, section);
-			if_blocks[current_block_type_index].m(section, null);
-			/*section_binding_1*/ ctx[24](section);
-			append(div, t1);
-			mount_component(resizablehandle, div, null);
-			/*div_binding_1*/ ctx[25](div);
-			current = true;
-
-			if (!mounted) {
-				dispose = [
-					action_destroyer(applyStyles_action = applyStyles.call(null, section, /*stylesContent*/ ctx[8])),
-					listen(div, "pointerdown", /*bringToTop*/ ctx[11], true),
-					action_destroyer(applyStyles_action_1 = applyStyles.call(null, div, /*stylesApp*/ ctx[7]))
-				];
-
-				mounted = true;
-			}
-		},
-		p(new_ctx, dirty) {
-			ctx = new_ctx;
-			if_block.p(ctx, dirty);
-			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*stylesContent*/ 256) applyStyles_action.update.call(null, /*stylesContent*/ ctx[8]);
-
-			if (!current || dirty & /*application*/ 512 && div_id_value !== (div_id_value = /*application*/ ctx[9].id)) {
-				attr(div, "id", div_id_value);
-			}
-
-			if (!current || dirty & /*application*/ 512 && div_class_value !== (div_class_value = "tjs-app tjs-window-app " + /*application*/ ctx[9].options.classes.join(' '))) {
-				attr(div, "class", div_class_value);
-			}
-
-			if (!current || dirty & /*application*/ 512 && div_data_appid_value !== (div_data_appid_value = /*application*/ ctx[9].appId)) {
-				attr(div, "data-appid", div_data_appid_value);
-			}
-
-			if (applyStyles_action_1 && is_function(applyStyles_action_1.update) && dirty & /*stylesApp*/ 128) applyStyles_action_1.update.call(null, /*stylesApp*/ ctx[7]);
-		},
-		i(local) {
-			if (current) return;
-			transition_in(tjsapplicationheader.$$.fragment, local);
-			transition_in(if_block);
-			transition_in(resizablehandle.$$.fragment, local);
-
-			add_render_callback(() => {
-				if (div_outro) div_outro.end(1);
-				div_intro = create_in_transition(div, /*inTransition*/ ctx[2], /*inTransitionOptions*/ ctx[4]);
-				div_intro.start();
-			});
-
-			current = true;
-		},
-		o(local) {
-			transition_out(tjsapplicationheader.$$.fragment, local);
-			transition_out(if_block);
-			transition_out(resizablehandle.$$.fragment, local);
-			if (div_intro) div_intro.invalidate();
-			div_outro = create_out_transition(div, /*outTransition*/ ctx[3], /*outTransitionOptions*/ ctx[5]);
-			current = false;
-		},
-		d(detaching) {
-			if (detaching) detach(div);
-			destroy_component(tjsapplicationheader);
-			if_blocks[current_block_type_index].d();
-			/*section_binding_1*/ ctx[24](null);
-			destroy_component(resizablehandle);
-			/*div_binding_1*/ ctx[25](null);
-			if (detaching && div_outro) div_outro.end();
-			mounted = false;
-			run_all(dispose);
-		}
-	};
-}
-
-// (143:0) {#if bindHeightChanged}
-function create_if_block$2(ctx) {
-	let div;
-	let tjsapplicationheader;
-	let t0;
-	let section;
-	let current_block_type_index;
-	let if_block;
-	let section_resize_listener;
-	let applyStyles_action;
-	let t1;
-	let resizablehandle;
-	let div_id_value;
-	let div_class_value;
-	let div_data_appid_value;
-	let div_resize_listener;
-	let applyStyles_action_1;
-	let div_intro;
-	let div_outro;
-	let current;
-	let mounted;
-	let dispose;
-	tjsapplicationheader = new TJSApplicationHeader({});
-	const if_block_creators = [create_if_block_1$1, create_else_block$1];
-	const if_blocks = [];
-
-	function select_block_type_1(ctx, dirty) {
-		if (Array.isArray(/*allChildren*/ ctx[12])) return 0;
-		return 1;
-	}
-
-	current_block_type_index = select_block_type_1(ctx);
-	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-	resizablehandle = new ResizableHandle({});
-
-	return {
-		c() {
-			div = element("div");
-			create_component(tjsapplicationheader.$$.fragment);
-			t0 = space();
-			section = element("section");
-			if_block.c();
-			t1 = space();
-			create_component(resizablehandle.$$.fragment);
-			attr(section, "class", "window-content");
-			add_render_callback(() => /*section_elementresize_handler*/ ctx[21].call(section));
-			attr(div, "id", div_id_value = /*application*/ ctx[9].id);
-			attr(div, "class", div_class_value = "tjs-app tjs-window-app " + /*application*/ ctx[9].options.classes.join(' '));
-			attr(div, "data-appid", div_data_appid_value = /*application*/ ctx[9].appId);
-			add_render_callback(() => /*div_elementresize_handler*/ ctx[22].call(div));
-		},
-		m(target, anchor) {
-			insert(target, div, anchor);
-			mount_component(tjsapplicationheader, div, null);
-			append(div, t0);
-			append(div, section);
-			if_blocks[current_block_type_index].m(section, null);
-			/*section_binding*/ ctx[20](section);
-			section_resize_listener = add_resize_listener(section, /*section_elementresize_handler*/ ctx[21].bind(section));
-			append(div, t1);
-			mount_component(resizablehandle, div, null);
-			div_resize_listener = add_resize_listener(div, /*div_elementresize_handler*/ ctx[22].bind(div));
-			/*div_binding*/ ctx[23](div);
-			current = true;
-
-			if (!mounted) {
-				dispose = [
-					action_destroyer(applyStyles_action = applyStyles.call(null, section, /*stylesContent*/ ctx[8])),
-					listen(div, "pointerdown", /*bringToTop*/ ctx[11], true),
-					action_destroyer(applyStyles_action_1 = applyStyles.call(null, div, /*stylesApp*/ ctx[7]))
-				];
-
-				mounted = true;
-			}
-		},
-		p(new_ctx, dirty) {
-			ctx = new_ctx;
-			if_block.p(ctx, dirty);
-			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*stylesContent*/ 256) applyStyles_action.update.call(null, /*stylesContent*/ ctx[8]);
-
-			if (!current || dirty & /*application*/ 512 && div_id_value !== (div_id_value = /*application*/ ctx[9].id)) {
-				attr(div, "id", div_id_value);
-			}
-
-			if (!current || dirty & /*application*/ 512 && div_class_value !== (div_class_value = "tjs-app tjs-window-app " + /*application*/ ctx[9].options.classes.join(' '))) {
-				attr(div, "class", div_class_value);
-			}
-
-			if (!current || dirty & /*application*/ 512 && div_data_appid_value !== (div_data_appid_value = /*application*/ ctx[9].appId)) {
-				attr(div, "data-appid", div_data_appid_value);
-			}
-
-			if (applyStyles_action_1 && is_function(applyStyles_action_1.update) && dirty & /*stylesApp*/ 128) applyStyles_action_1.update.call(null, /*stylesApp*/ ctx[7]);
-		},
-		i(local) {
-			if (current) return;
-			transition_in(tjsapplicationheader.$$.fragment, local);
-			transition_in(if_block);
-			transition_in(resizablehandle.$$.fragment, local);
-
-			add_render_callback(() => {
-				if (div_outro) div_outro.end(1);
-				div_intro = create_in_transition(div, /*inTransition*/ ctx[2], /*inTransitionOptions*/ ctx[4]);
-				div_intro.start();
-			});
-
-			current = true;
-		},
-		o(local) {
-			transition_out(tjsapplicationheader.$$.fragment, local);
-			transition_out(if_block);
-			transition_out(resizablehandle.$$.fragment, local);
-			if (div_intro) div_intro.invalidate();
-			div_outro = create_out_transition(div, /*outTransition*/ ctx[3], /*outTransitionOptions*/ ctx[5]);
-			current = false;
-		},
-		d(detaching) {
-			if (detaching) detach(div);
-			destroy_component(tjsapplicationheader);
-			if_blocks[current_block_type_index].d();
-			/*section_binding*/ ctx[20](null);
-			section_resize_listener();
-			destroy_component(resizablehandle);
-			div_resize_listener();
-			/*div_binding*/ ctx[23](null);
-			if (detaching && div_outro) div_outro.end();
-			mounted = false;
-			run_all(dispose);
-		}
-	};
-}
-
-// (179:11) {:else}
-function create_else_block_2(ctx) {
-	let current;
-	const default_slot_template = /*#slots*/ ctx[19].default;
-	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[18], null);
-
-	return {
-		c() {
-			if (default_slot) default_slot.c();
-		},
-		m(target, anchor) {
-			if (default_slot) {
-				default_slot.m(target, anchor);
-			}
-
-			current = true;
-		},
-		p(ctx, dirty) {
-			if (default_slot) {
-				if (default_slot.p && (!current || dirty & /*$$scope*/ 262144)) {
-					update_slot_base(
-						default_slot,
-						default_slot_template,
-						ctx,
-						/*$$scope*/ ctx[18],
-						!current
-						? get_all_dirty_from_scope(/*$$scope*/ ctx[18])
-						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[18], dirty, null),
-						null
-					);
-				}
-			}
-		},
-		i(local) {
-			if (current) return;
-			transition_in(default_slot, local);
-			current = true;
-		},
-		o(local) {
-			transition_out(default_slot, local);
-			current = false;
-		},
-		d(detaching) {
-			if (default_slot) default_slot.d(detaching);
-		}
-	};
-}
-
-// (177:11) {#if Array.isArray(allChildren)}
-function create_if_block_2$1(ctx) {
-	let tjscontainer;
-	let current;
-
-	tjscontainer = new TJSContainer({
-			props: { children: /*allChildren*/ ctx[12] }
-		});
-
-	return {
-		c() {
-			create_component(tjscontainer.$$.fragment);
-		},
-		m(target, anchor) {
-			mount_component(tjscontainer, target, anchor);
-			current = true;
-		},
-		p: noop,
-		i(local) {
-			if (current) return;
-			transition_in(tjscontainer.$$.fragment, local);
-			current = true;
-		},
-		o(local) {
-			transition_out(tjscontainer.$$.fragment, local);
-			current = false;
-		},
-		d(detaching) {
-			destroy_component(tjscontainer, detaching);
-		}
-	};
-}
-
-// (160:11) {:else}
+// (211:7) {:else}
 function create_else_block$1(ctx) {
 	let current;
-	const default_slot_template = /*#slots*/ ctx[19].default;
-	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[18], null);
+	const default_slot_template = /*#slots*/ ctx[25].default;
+	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[24], null);
 
 	return {
 		c() {
@@ -3167,15 +2632,15 @@ function create_else_block$1(ctx) {
 		},
 		p(ctx, dirty) {
 			if (default_slot) {
-				if (default_slot.p && (!current || dirty & /*$$scope*/ 262144)) {
+				if (default_slot.p && (!current || dirty & /*$$scope*/ 16777216)) {
 					update_slot_base(
 						default_slot,
 						default_slot_template,
 						ctx,
-						/*$$scope*/ ctx[18],
+						/*$$scope*/ ctx[24],
 						!current
-						? get_all_dirty_from_scope(/*$$scope*/ ctx[18])
-						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[18], dirty, null),
+						? get_all_dirty_from_scope(/*$$scope*/ ctx[24])
+						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[24], dirty, null),
 						null
 					);
 				}
@@ -3196,8 +2661,8 @@ function create_else_block$1(ctx) {
 	};
 }
 
-// (158:11) {#if Array.isArray(allChildren)}
-function create_if_block_1$1(ctx) {
+// (209:7) {#if Array.isArray(allChildren)}
+function create_if_block$2(ctx) {
 	let tjscontainer;
 	let current;
 
@@ -3230,46 +2695,126 @@ function create_if_block_1$1(ctx) {
 }
 
 function create_fragment$2(ctx) {
+	let div;
+	let tjsapplicationheader;
+	let t0;
+	let section;
 	let current_block_type_index;
 	let if_block;
-	let if_block_anchor;
+	let applyStyles_action;
+	let t1;
+	let resizablehandle;
+	let div_id_value;
+	let div_class_value;
+	let div_data_appid_value;
+	let applyStyles_action_1;
+	let div_intro;
+	let div_outro;
 	let current;
-	const if_block_creators = [create_if_block$2, create_else_block_1];
+	let mounted;
+	let dispose;
+	tjsapplicationheader = new TJSApplicationHeader({});
+	const if_block_creators = [create_if_block$2, create_else_block$1];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
-		if (/*bindHeightChanged*/ ctx[10]) return 0;
+		if (Array.isArray(/*allChildren*/ ctx[12])) return 0;
 		return 1;
 	}
 
 	current_block_type_index = select_block_type(ctx);
 	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+	resizablehandle = new ResizableHandle({});
 
 	return {
 		c() {
+			div = element("div");
+			create_component(tjsapplicationheader.$$.fragment);
+			t0 = space();
+			section = element("section");
 			if_block.c();
-			if_block_anchor = empty();
+			t1 = space();
+			create_component(resizablehandle.$$.fragment);
+			attr(section, "class", "window-content");
+			attr(div, "id", div_id_value = /*application*/ ctx[8].id);
+			attr(div, "class", div_class_value = "tjs-app tjs-window-app " + /*application*/ ctx[8].options.classes.join(' '));
+			attr(div, "data-appid", div_data_appid_value = /*application*/ ctx[8].appId);
 		},
 		m(target, anchor) {
-			if_blocks[current_block_type_index].m(target, anchor);
-			insert(target, if_block_anchor, anchor);
+			insert(target, div, anchor);
+			mount_component(tjsapplicationheader, div, null);
+			append(div, t0);
+			append(div, section);
+			if_blocks[current_block_type_index].m(section, null);
+			/*section_binding*/ ctx[26](section);
+			append(div, t1);
+			mount_component(resizablehandle, div, null);
+			/*div_binding*/ ctx[27](div);
 			current = true;
+
+			if (!mounted) {
+				dispose = [
+					action_destroyer(applyStyles_action = applyStyles.call(null, section, /*stylesContent*/ ctx[7])),
+					action_destroyer(/*contentResizeObserver*/ ctx[10].call(null, section, /*resizeObservedContent*/ ctx[13])),
+					listen(div, "pointerdown", /*bringToTop*/ ctx[11], true),
+					action_destroyer(applyStyles_action_1 = applyStyles.call(null, div, /*stylesApp*/ ctx[6])),
+					action_destroyer(/*appResizeObserver*/ ctx[9].call(null, div, /*resizeObservedApp*/ ctx[14]))
+				];
+
+				mounted = true;
+			}
 		},
-		p(ctx, [dirty]) {
+		p(new_ctx, [dirty]) {
+			ctx = new_ctx;
 			if_block.p(ctx, dirty);
+			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*stylesContent*/ 128) applyStyles_action.update.call(null, /*stylesContent*/ ctx[7]);
+
+			if (!current || dirty & /*application*/ 256 && div_id_value !== (div_id_value = /*application*/ ctx[8].id)) {
+				attr(div, "id", div_id_value);
+			}
+
+			if (!current || dirty & /*application*/ 256 && div_class_value !== (div_class_value = "tjs-app tjs-window-app " + /*application*/ ctx[8].options.classes.join(' '))) {
+				attr(div, "class", div_class_value);
+			}
+
+			if (!current || dirty & /*application*/ 256 && div_data_appid_value !== (div_data_appid_value = /*application*/ ctx[8].appId)) {
+				attr(div, "data-appid", div_data_appid_value);
+			}
+
+			if (applyStyles_action_1 && is_function(applyStyles_action_1.update) && dirty & /*stylesApp*/ 64) applyStyles_action_1.update.call(null, /*stylesApp*/ ctx[6]);
 		},
 		i(local) {
 			if (current) return;
+			transition_in(tjsapplicationheader.$$.fragment, local);
 			transition_in(if_block);
+			transition_in(resizablehandle.$$.fragment, local);
+
+			add_render_callback(() => {
+				if (div_outro) div_outro.end(1);
+				div_intro = create_in_transition(div, /*inTransition*/ ctx[2], /*inTransitionOptions*/ ctx[4]);
+				div_intro.start();
+			});
+
 			current = true;
 		},
 		o(local) {
+			transition_out(tjsapplicationheader.$$.fragment, local);
 			transition_out(if_block);
+			transition_out(resizablehandle.$$.fragment, local);
+			if (div_intro) div_intro.invalidate();
+			div_outro = create_out_transition(div, /*outTransition*/ ctx[3], /*outTransitionOptions*/ ctx[5]);
 			current = false;
 		},
 		d(detaching) {
-			if_blocks[current_block_type_index].d(detaching);
-			if (detaching) detach(if_block_anchor);
+			if (detaching) detach(div);
+			destroy_component(tjsapplicationheader);
+			if_blocks[current_block_type_index].d();
+			/*section_binding*/ ctx[26](null);
+			destroy_component(resizablehandle);
+			/*div_binding*/ ctx[27](null);
+			if (detaching && div_outro) div_outro.end();
+			mounted = false;
+			run_all(dispose);
 		}
 	};
 }
@@ -3279,13 +2824,23 @@ function instance$2($$self, $$props, $$invalidate) {
 	let { elementContent } = $$props;
 	let { elementRoot } = $$props;
 	let { children = void 0 } = $$props;
-	let { heightChanged = false } = $$props;
 	let { stylesApp } = $$props;
 	let { stylesContent } = $$props;
+	let { appOffsetHeight = false } = $$props;
+	let { appOffsetWidth = false } = $$props;
 
-	// Store the initial `heightChanged` state. If it is truthy then `clientHeight` for the content & root elements
-	// are bound to `heightChanged` to signal to any parent component of any change to the client & root.
-	const bindHeightChanged = !!heightChanged;
+	// Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
+	const appResizeObserver = !!appOffsetHeight || !!appOffsetWidth
+	? resizeObserver
+	: () => null;
+
+	let { contentOffsetHeight = false } = $$props;
+	let { contentOffsetWidth = false } = $$props;
+
+	// Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
+	const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth
+	? resizeObserver
+	: () => null;
 
 	// If the application is a popOut application then when clicked bring to top. Bound to on pointerdown.
 	const bringToTop = () => {
@@ -3329,21 +2884,47 @@ function instance$2($$self, $$props, $$invalidate) {
 
 	let oldTransitionOptions = void 0;
 
+	// ---------------------------------------------------------------------------------------------------------------
+	/**
+ * Callback for content resizeObserver action. This is enabled when contentOffsetHeight or contentOffsetWidth is
+ * bound.
+ *
+ * @param {number}   offsetWidth - Observed offsetWidth.
+ *
+ * @param {number}   offsetHeight - Observed offsetHeight
+ */
+	function resizeObservedContent(offsetWidth, offsetHeight) {
+		$$invalidate(18, contentOffsetWidth = offsetWidth);
+		$$invalidate(17, contentOffsetHeight = offsetHeight);
+	}
+
+	/**
+ * Callback for app resizeObserver action. This is enabled when appOffsetHeight or appOffsetWidth is
+ * bound. Additionally, the Application position resizeObserved store is updated.
+ *
+ * @param {number}   contentWidth - Observed contentWidth.
+ * @param {number}   contentHeight - Observed contentHeight
+ * @param {number}   offsetWidth - Observed offsetWidth.
+ * @param {number}   offsetHeight - Observed offsetHeight
+ */
+	function resizeObservedApp(offsetWidth, offsetHeight, contentWidth, contentHeight) {
+		application.position.stores.resizeObserved.update(object => {
+			object.contentWidth = contentWidth;
+			object.contentHeight = contentHeight;
+			object.offsetWidth = offsetWidth;
+			object.offsetHeight = offsetHeight;
+			return object;
+		});
+
+		$$invalidate(15, appOffsetHeight = offsetHeight);
+		$$invalidate(16, appOffsetWidth = offsetWidth);
+	}
+
 	function section_binding($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
 			elementContent = $$value;
 			$$invalidate(0, elementContent);
 		});
-	}
-
-	function section_elementresize_handler() {
-		heightChanged = this.clientHeight;
-		$$invalidate(6, heightChanged);
-	}
-
-	function div_elementresize_handler() {
-		heightChanged = this.clientHeight;
-		$$invalidate(6, heightChanged);
 	}
 
 	function div_binding($$value) {
@@ -3353,34 +2934,23 @@ function instance$2($$self, $$props, $$invalidate) {
 		});
 	}
 
-	function section_binding_1($$value) {
-		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-			elementContent = $$value;
-			$$invalidate(0, elementContent);
-		});
-	}
-
-	function div_binding_1($$value) {
-		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
-			elementRoot = $$value;
-			$$invalidate(1, elementRoot);
-		});
-	}
-
 	$$self.$$set = $$props => {
 		if ('elementContent' in $$props) $$invalidate(0, elementContent = $$props.elementContent);
 		if ('elementRoot' in $$props) $$invalidate(1, elementRoot = $$props.elementRoot);
-		if ('children' in $$props) $$invalidate(13, children = $$props.children);
-		if ('heightChanged' in $$props) $$invalidate(6, heightChanged = $$props.heightChanged);
-		if ('stylesApp' in $$props) $$invalidate(7, stylesApp = $$props.stylesApp);
-		if ('stylesContent' in $$props) $$invalidate(8, stylesContent = $$props.stylesContent);
-		if ('transition' in $$props) $$invalidate(14, transition = $$props.transition);
+		if ('children' in $$props) $$invalidate(19, children = $$props.children);
+		if ('stylesApp' in $$props) $$invalidate(6, stylesApp = $$props.stylesApp);
+		if ('stylesContent' in $$props) $$invalidate(7, stylesContent = $$props.stylesContent);
+		if ('appOffsetHeight' in $$props) $$invalidate(15, appOffsetHeight = $$props.appOffsetHeight);
+		if ('appOffsetWidth' in $$props) $$invalidate(16, appOffsetWidth = $$props.appOffsetWidth);
+		if ('contentOffsetHeight' in $$props) $$invalidate(17, contentOffsetHeight = $$props.contentOffsetHeight);
+		if ('contentOffsetWidth' in $$props) $$invalidate(18, contentOffsetWidth = $$props.contentOffsetWidth);
+		if ('transition' in $$props) $$invalidate(20, transition = $$props.transition);
 		if ('inTransition' in $$props) $$invalidate(2, inTransition = $$props.inTransition);
 		if ('outTransition' in $$props) $$invalidate(3, outTransition = $$props.outTransition);
-		if ('transitionOptions' in $$props) $$invalidate(15, transitionOptions = $$props.transitionOptions);
+		if ('transitionOptions' in $$props) $$invalidate(21, transitionOptions = $$props.transitionOptions);
 		if ('inTransitionOptions' in $$props) $$invalidate(4, inTransitionOptions = $$props.inTransitionOptions);
 		if ('outTransitionOptions' in $$props) $$invalidate(5, outTransitionOptions = $$props.outTransitionOptions);
-		if ('$$scope' in $$props) $$invalidate(18, $$scope = $$props.$$scope);
+		if ('$$scope' in $$props) $$invalidate(24, $$scope = $$props.$$scope);
 	};
 
 	$$self.$$.update = () => {
@@ -3398,7 +2968,7 @@ function instance$2($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*oldTransition, transition*/ 81920) {
+		if ($$self.$$.dirty & /*oldTransition, transition*/ 5242880) {
 			// Run this reactive block when the last transition state is not equal to the current state.
 			if (oldTransition !== transition) {
 				// If transition is defined and not the default transition then set it to both in and out transition otherwise
@@ -3409,11 +2979,11 @@ function instance$2($$self, $$props, $$invalidate) {
 
 				$$invalidate(2, inTransition = newTransition);
 				$$invalidate(3, outTransition = newTransition);
-				$$invalidate(16, oldTransition = newTransition);
+				$$invalidate(22, oldTransition = newTransition);
 			}
 		}
 
-		if ($$self.$$.dirty & /*oldTransitionOptions, transitionOptions*/ 163840) {
+		if ($$self.$$.dirty & /*oldTransitionOptions, transitionOptions*/ 10485760) {
 			// Run this reactive block when the last transition options state is not equal to the current options state.
 			if (oldTransitionOptions !== transitionOptions) {
 				const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && typeof transitionOptions === 'object'
@@ -3422,7 +2992,7 @@ function instance$2($$self, $$props, $$invalidate) {
 
 				$$invalidate(4, inTransitionOptions = newOptions);
 				$$invalidate(5, outTransitionOptions = newOptions);
-				$$invalidate(17, oldTransitionOptions = newOptions);
+				$$invalidate(23, oldTransitionOptions = newOptions);
 			}
 		}
 
@@ -3433,7 +3003,7 @@ function instance$2($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*outTransition, application*/ 520) {
+		if ($$self.$$.dirty & /*outTransition, application*/ 264) {
 			{
 				// Handle cases if outTransition is unset; assign noop default transition function.
 				if (typeof outTransition !== 'function') {
@@ -3442,7 +3012,7 @@ function instance$2($$self, $$props, $$invalidate) {
 
 				// Set jquery close animation to either run or not when an out transition is changed.
 				if (application && typeof application?.options?.defaultCloseAnimation === 'boolean') {
-					$$invalidate(9, application.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, application);
+					$$invalidate(8, application.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, application);
 				}
 			}
 		}
@@ -3469,13 +3039,19 @@ function instance$2($$self, $$props, $$invalidate) {
 		outTransition,
 		inTransitionOptions,
 		outTransitionOptions,
-		heightChanged,
 		stylesApp,
 		stylesContent,
 		application,
-		bindHeightChanged,
+		appResizeObserver,
+		contentResizeObserver,
 		bringToTop,
 		allChildren,
+		resizeObservedContent,
+		resizeObservedApp,
+		appOffsetHeight,
+		appOffsetWidth,
+		contentOffsetHeight,
+		contentOffsetWidth,
 		children,
 		transition,
 		transitionOptions,
@@ -3484,11 +3060,7 @@ function instance$2($$self, $$props, $$invalidate) {
 		$$scope,
 		slots,
 		section_binding,
-		section_elementresize_handler,
-		div_elementresize_handler,
-		div_binding,
-		section_binding_1,
-		div_binding_1
+		div_binding
 	];
 }
 
@@ -3505,14 +3077,17 @@ class TJSApplicationShell extends SvelteComponent {
 			{
 				elementContent: 0,
 				elementRoot: 1,
-				children: 13,
-				heightChanged: 6,
-				stylesApp: 7,
-				stylesContent: 8,
-				transition: 14,
+				children: 19,
+				stylesApp: 6,
+				stylesContent: 7,
+				appOffsetHeight: 15,
+				appOffsetWidth: 16,
+				contentOffsetHeight: 17,
+				contentOffsetWidth: 18,
+				transition: 20,
 				inTransition: 2,
 				outTransition: 3,
-				transitionOptions: 15,
+				transitionOptions: 21,
 				inTransitionOptions: 4,
 				outTransitionOptions: 5
 			},
@@ -3539,7 +3114,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get children() {
-		return this.$$.ctx[13];
+		return this.$$.ctx[19];
 	}
 
 	set children(children) {
@@ -3547,17 +3122,8 @@ class TJSApplicationShell extends SvelteComponent {
 		flush();
 	}
 
-	get heightChanged() {
-		return this.$$.ctx[6];
-	}
-
-	set heightChanged(heightChanged) {
-		this.$$set({ heightChanged });
-		flush();
-	}
-
 	get stylesApp() {
-		return this.$$.ctx[7];
+		return this.$$.ctx[6];
 	}
 
 	set stylesApp(stylesApp) {
@@ -3566,7 +3132,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get stylesContent() {
-		return this.$$.ctx[8];
+		return this.$$.ctx[7];
 	}
 
 	set stylesContent(stylesContent) {
@@ -3574,8 +3140,44 @@ class TJSApplicationShell extends SvelteComponent {
 		flush();
 	}
 
+	get appOffsetHeight() {
+		return this.$$.ctx[15];
+	}
+
+	set appOffsetHeight(appOffsetHeight) {
+		this.$$set({ appOffsetHeight });
+		flush();
+	}
+
+	get appOffsetWidth() {
+		return this.$$.ctx[16];
+	}
+
+	set appOffsetWidth(appOffsetWidth) {
+		this.$$set({ appOffsetWidth });
+		flush();
+	}
+
+	get contentOffsetHeight() {
+		return this.$$.ctx[17];
+	}
+
+	set contentOffsetHeight(contentOffsetHeight) {
+		this.$$set({ contentOffsetHeight });
+		flush();
+	}
+
+	get contentOffsetWidth() {
+		return this.$$.ctx[18];
+	}
+
+	set contentOffsetWidth(contentOffsetWidth) {
+		this.$$set({ contentOffsetWidth });
+		flush();
+	}
+
 	get transition() {
-		return this.$$.ctx[14];
+		return this.$$.ctx[20];
 	}
 
 	set transition(transition) {
@@ -3602,7 +3204,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get transitionOptions() {
-		return this.$$.ctx[15];
+		return this.$$.ctx[21];
 	}
 
 	set transitionOptions(transitionOptions) {
@@ -4302,7 +3904,7 @@ function create_else_block(ctx) {
 	let updating_elementRoot;
 	let updating_elementContent;
 	let current;
-	const applicationshell_spread_levels = [/*appProps*/ ctx[6]];
+	const applicationshell_spread_levels = [/*appProps*/ ctx[6], { appOffsetHeight: true }];
 
 	function applicationshell_elementRoot_binding_1(value) {
 		/*applicationshell_elementRoot_binding_1*/ ctx[16](value);
@@ -4343,7 +3945,10 @@ function create_else_block(ctx) {
 		},
 		p(ctx, dirty) {
 			const applicationshell_changes = (dirty & /*appProps*/ 64)
-			? get_spread_update(applicationshell_spread_levels, [get_spread_object(/*appProps*/ ctx[6])])
+			? get_spread_update(applicationshell_spread_levels, [
+					get_spread_object(/*appProps*/ ctx[6]),
+					applicationshell_spread_levels[1]
+				])
 			: {};
 
 			if (dirty & /*$$scope, data, autoClose, dialogComponent*/ 1049100) {
@@ -4447,7 +4052,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (187:3) <ApplicationShell bind:elementRoot bind:elementContent {...appProps}>
+// (187:3) <ApplicationShell bind:elementRoot bind:elementContent {...appProps} appOffsetHeight={true}>
 function create_default_slot_2(ctx) {
 	let dialogcontent;
 	let updating_autoClose;
@@ -4517,7 +4122,7 @@ function create_default_slot_2(ctx) {
 	};
 }
 
-// (182:6) <ApplicationShell bind:elementRoot bind:elementContent {...appProps}>
+// (182:6) <ApplicationShell bind:elementRoot bind:elementContent {...appProps} appOffsetHeight={true}>
 function create_default_slot_1(ctx) {
 	let dialogcontent;
 	let updating_autoClose;
@@ -4596,7 +4201,7 @@ function create_default_slot(ctx) {
 	let updating_elementRoot;
 	let updating_elementContent;
 	let current;
-	const applicationshell_spread_levels = [/*appProps*/ ctx[6]];
+	const applicationshell_spread_levels = [/*appProps*/ ctx[6], { appOffsetHeight: true }];
 
 	function applicationshell_elementRoot_binding(value) {
 		/*applicationshell_elementRoot_binding*/ ctx[12](value);
@@ -4637,7 +4242,10 @@ function create_default_slot(ctx) {
 		},
 		p(ctx, dirty) {
 			const applicationshell_changes = (dirty & /*appProps*/ 64)
-			? get_spread_update(applicationshell_spread_levels, [get_spread_object(/*appProps*/ ctx[6])])
+			? get_spread_update(applicationshell_spread_levels, [
+					get_spread_object(/*appProps*/ ctx[6]),
+					applicationshell_spread_levels[1]
+				])
 			: {};
 
 			if (dirty & /*$$scope, data, autoClose, dialogComponent*/ 1049100) {

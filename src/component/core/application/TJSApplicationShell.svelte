@@ -1,7 +1,10 @@
 <script>
    import { getContext, setContext }    from 'svelte';
    import { writable }                  from 'svelte/store';
-   import { applyStyles }               from '@typhonjs-fvtt/svelte/action';
+
+   import {
+      applyStyles,
+      resizeObserver }                 from '@typhonjs-fvtt/svelte/action';
 
    import TJSApplicationHeader          from './TJSApplicationHeader.svelte';
    import TJSContainer                  from '../TJSContainer.svelte';
@@ -20,17 +23,25 @@
    // The children array can be specified by a parent via prop or is read below from the external context.
    export let children = void 0;
 
-   // If a parent component binds and sets `heightChanged` to true then it is bound to the content & root element
-   // `clientHeight`.
-   export let heightChanged = false;
-
    // Explicit style overrides for the main app and content elements. Uses action `applyStyles`.
    export let stylesApp;
    export let stylesContent;
 
-   // Store the initial `heightChanged` state. If it is truthy then `clientHeight` for the content & root elements
-   // are bound to `heightChanged` to signal to any parent component of any change to the client & root.
-   const bindHeightChanged = !!heightChanged;
+   // If a parent component binds and sets `appOffsetHeight` to true then a resizeObserver action is enabled on the
+   // outer application `div`. Additionally, the SvelteApplication position resizeObserved store is updated.
+   export let appOffsetHeight = false;
+   export let appOffsetWidth = false;
+
+   // Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
+   const appResizeObserver = !!appOffsetHeight || !!appOffsetWidth ? resizeObserver : () => null;
+
+   // If a parent component binds and sets `contentOffsetHeight` or `contentOffsetWidth` to true then a
+   // resizeObserver action is enabled on the content `section`.
+   export let contentOffsetHeight = false;
+   export let contentOffsetWidth = false;
+
+   // Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
+   const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth ? resizeObserver : () => null;
 
    // If the application is a popOut application then when clicked bring to top. Bound to on pointerdown.
    const bringToTop = () =>
@@ -136,54 +147,73 @@
 
    // Handle cases if outTransitionOptions is unset; assign empty default transition options.
    $: if (typeof outTransitionOptions !== 'object') { outTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS; }
+
+   // ---------------------------------------------------------------------------------------------------------------
+
+   /**
+    * Callback for content resizeObserver action. This is enabled when contentOffsetHeight or contentOffsetWidth is
+    * bound.
+    *
+    * @param {number}   offsetWidth - Observed offsetWidth.
+    *
+    * @param {number}   offsetHeight - Observed offsetHeight
+    */
+   function resizeObservedContent(offsetWidth, offsetHeight)
+   {
+      contentOffsetWidth = offsetWidth;
+      contentOffsetHeight = offsetHeight;
+   }
+
+   /**
+    * Callback for app resizeObserver action. This is enabled when appOffsetHeight or appOffsetWidth is
+    * bound. Additionally, the Application position resizeObserved store is updated.
+    *
+    * @param {number}   contentWidth - Observed contentWidth.
+    * @param {number}   contentHeight - Observed contentHeight
+    * @param {number}   offsetWidth - Observed offsetWidth.
+    * @param {number}   offsetHeight - Observed offsetHeight
+    */
+   function resizeObservedApp(offsetWidth, offsetHeight, contentWidth, contentHeight)
+   {
+      application.position.stores.resizeObserved.update((object) =>
+      {
+         object.contentWidth = contentWidth;
+         object.contentHeight = contentHeight;
+         object.offsetWidth = offsetWidth;
+         object.offsetHeight = offsetHeight;
+
+         return object;
+      });
+
+      appOffsetHeight = offsetHeight;
+      appOffsetWidth = offsetWidth;
+   }
 </script>
 
 <svelte:options accessors={true}/>
 
-{#if bindHeightChanged}
-   <div id={application.id}
-        class="tjs-app tjs-window-app {application.options.classes.join(' ')}"
-        data-appid={application.appId}
-        bind:clientHeight={heightChanged}
-        bind:this={elementRoot}
-        in:inTransition={inTransitionOptions}
-        out:outTransition={outTransitionOptions}
-        on:pointerdown|capture={bringToTop}
-        use:applyStyles={stylesApp}>
-       <TJSApplicationHeader />
-       <section class=window-content
-                bind:this={elementContent}
-                bind:clientHeight={heightChanged}
-                use:applyStyles={stylesContent}>
-           {#if Array.isArray(allChildren)}
-               <TJSContainer children={allChildren} />
-           {:else}
-               <slot />
-           {/if}
-       </section>
-       <ResizableHandle />
-   </div>
-{:else}
-   <div id={application.id}
-        class="tjs-app tjs-window-app {application.options.classes.join(' ')}"
-        data-appid={application.appId}
-        bind:this={elementRoot}
-        in:inTransition={inTransitionOptions}
-        out:outTransition={outTransitionOptions}
-        on:pointerdown|capture={bringToTop}
-        use:applyStyles={stylesApp}>
-       <TJSApplicationHeader />
-       <section class=window-content bind:this={elementContent} use:applyStyles={stylesContent}>
-           {#if Array.isArray(allChildren)}
-               <TJSContainer children={allChildren} />
-           {:else}
-               <slot />
-           {/if}
-       </section>
-      <ResizableHandle />
-   </div>
-{/if}
-
+<div id={application.id}
+    class="tjs-app tjs-window-app {application.options.classes.join(' ')}"
+    data-appid={application.appId}
+    bind:this={elementRoot}
+    in:inTransition={inTransitionOptions}
+    out:outTransition={outTransitionOptions}
+    on:pointerdown|capture={bringToTop}
+    use:applyStyles={stylesApp}
+    use:appResizeObserver={resizeObservedApp}>
+   <TJSApplicationHeader />
+   <section class=window-content
+            bind:this={elementContent}
+            use:applyStyles={stylesContent}
+            use:contentResizeObserver={resizeObservedContent}>
+       {#if Array.isArray(allChildren)}
+           <TJSContainer children={allChildren} />
+       {:else}
+           <slot />
+       {/if}
+   </section>
+   <ResizableHandle />
+</div>
 
 <style>
     /**
