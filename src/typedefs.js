@@ -19,51 +19,6 @@
  */
 
 /**
- * @typedef {object} StorePosition - Provides individual writable stores for {@link Position}.
- *
- * @property {import('svelte/store').Readable<{width: number, height: number}>} dimension - Readable store for dimension
- *                                                                                          data.
- *
- * @property {import('svelte/store').Writable<number|null>} left - Derived store for `left` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} top - Derived store for `top` updates.
- *
- * @property {import('svelte/store').Writable<number|'auto'|null>} width - Derived store for `width` updates.
- *
- * @property {import('svelte/store').Writable<number|'auto'|null>} height - Derived store for `height` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} maxHeight - Derived store for `maxHeight` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} maxWidth - Derived store for `maxWidth` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} minHeight - Derived store for `minHeight` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} minWidth - Derived store for `minWidth` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} rotate - Derived store for `rotate` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} rotateX - Derived store for `rotateX` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} rotateY - Derived store for `rotateY` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} rotateZ - Derived store for `rotateZ` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} scale - Derived store for `scale` updates.
- *
- * @property {import('svelte/store').Readable<TransformData>} transform - Readable store for transform data.
- *
- * @property {import('svelte/store').Writable<string>} transformOrigin - Derived store for `transformOrigin`.
- *
- * @property {import('svelte/store').Writable<number|null>} translateX - Derived store for `translateX` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} translateY - Derived store for `translateY` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} translateZ - Derived store for `translateZ` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} zIndex - Derived store for `zIndex` updates.
- */
-
-/**
  * @typedef {object} StoreAppOptions - Provides a custom readable Svelte store for Application options state.
  *
  * @property {import('svelte/store').Readable.subscribe} subscribe - Subscribe to all app options updates.
