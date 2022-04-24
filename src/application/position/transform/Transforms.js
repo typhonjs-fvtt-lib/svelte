@@ -521,26 +521,68 @@ export class Transforms
       s_TRANSLATE_VECTOR[2] = data.translateZ ?? 0;
       mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
 
-      // Order doesn't matter for the remaining transforms to potentially include.
-      if (data.rotateX !== null)
-      {
-         mat4.multiply(matrix, matrix, mat4.fromXRotation(s_MAT4_TEMP, degToRad(data.rotateX)));
-      }
-
-      if (data.rotateY !== null)
-      {
-         mat4.multiply(matrix, matrix, mat4.fromYRotation(s_MAT4_TEMP, degToRad(data.rotateY)));
-      }
-
-      if (data.rotateZ !== null)
-      {
-         mat4.multiply(matrix, matrix, mat4.fromZRotation(s_MAT4_TEMP, degToRad(data.rotateZ)));
-      }
-
+      // Scale can also be applied out of order.
       if (data.scale !== null)
       {
          s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data.scale;
          mat4.multiply(matrix, matrix, mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
+      }
+
+      // Early out if there is not rotation data.
+      if (data.rotateX === null && data.rotateY === null && data.rotateZ === null) { return matrix; }
+
+      // Rotation transforms must be applied in the order they are added.
+
+      // Bitwise tracks applied transform keys from local transform data.
+      let seenKeys = 0;
+
+      // First apply ordered transforms from local transform data.
+      for (const key in this._data)
+      {
+         switch (key)
+         {
+            case 'rotateX':
+               seenKeys |= constants.transformKeysBitwise.rotateX;
+               mat4.multiply(matrix, matrix, mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
+               break;
+
+            case 'rotateY':
+               seenKeys |= constants.transformKeysBitwise.rotateY;
+               mat4.multiply(matrix, matrix, mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
+               break;
+
+            case 'rotateZ':
+               seenKeys |= constants.transformKeysBitwise.rotateZ;
+               mat4.multiply(matrix, matrix, mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
+               break;
+         }
+      }
+
+      // Now apply any new keys not set in local transform data that have not been applied yet.
+      if (data !== this._data)
+      {
+         for (let cntr = 0; cntr < constants.transformKeys.length; cntr++)
+         {
+            const key = constants.transformKeys[cntr];
+
+            // Reject bad / no data or if the key has already been applied.
+            if (data[key] === null || (seenKeys & constants.transformKeysBitwise[key]) > 0) { continue; }
+
+            switch (key)
+            {
+               case 'rotateX':
+                  mat4.multiply(matrix, matrix, mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+
+               case 'rotateY':
+                  mat4.multiply(matrix, matrix, mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+
+               case 'rotateZ':
+                  mat4.multiply(matrix, matrix, mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+            }
+         }
       }
 
       return matrix;
