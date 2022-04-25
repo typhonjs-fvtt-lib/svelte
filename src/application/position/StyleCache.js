@@ -7,15 +7,31 @@ export class StyleCache
 {
    constructor()
    {
+      /** @type {HTMLElement|undefined} */
       this.el = void 0;
+
+      /** @type {CSSStyleDeclaration} */
       this.computed = void 0;
+
+      /** @type {number|undefined} */
       this.marginLeft = void 0;
+
+      /** @type {number|undefined} */
       this.marginTop = void 0;
+
+      /** @type {number|undefined} */
       this.maxHeight = void 0;
+
+      /** @type {number|undefined} */
       this.maxWidth = void 0;
+
+      /** @type {number|undefined} */
       this.minHeight = void 0;
+
+      /** @type {number|undefined} */
       this.minWidth = void 0;
 
+      /** @type {boolean} */
       this.hasWillChange = false;
 
       /**
@@ -45,6 +61,13 @@ export class StyleCache
       };
    }
 
+   /**
+    * Returns the cached offsetHeight from any attached `resizeObserver` action otherwise gets the offsetHeight from
+    * the element directly. The more optimized path is using `resizeObserver` as getting it from the element
+    * directly is more expensive and alters the execution order of an animation frame.
+    *
+    * @returns {number} The element offsetHeight.
+    */
    get offsetHeight()
    {
       if (this.el instanceof HTMLElement)
@@ -55,6 +78,13 @@ export class StyleCache
       throw new Error(`StyleCache - get offsetHeight error: no element assigned.`);
    }
 
+   /**
+    * Returns the cached offsetWidth from any attached `resizeObserver` action otherwise gets the offsetWidth from
+    * the element directly. The more optimized path is using `resizeObserver` as getting it from the element
+    * directly is more expensive and alters the execution order of an animation frame.
+    *
+    * @returns {number} The element offsetHeight.
+    */
    get offsetWidth()
    {
       if (this.el instanceof HTMLElement)
@@ -72,6 +102,9 @@ export class StyleCache
     */
    hasData(el) { return this.el === el; }
 
+   /**
+    * Resets the style cache.
+    */
    reset()
    {
       // Remove will-change inline style from previous element if it is still connected.
@@ -101,6 +134,11 @@ export class StyleCache
       this.stores.element.set(void 0);
    }
 
+   /**
+    * Updates the style cache with new data from the given element.
+    *
+    * @param {HTMLElement} el - An HTML element.
+    */
    update(el)
    {
       this.el = el;
