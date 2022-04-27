@@ -76,5 +76,16 @@ declare function resizeObserver(node: HTMLElement, target: any): {
     update: Function;
     destroy: Function;
 };
+declare namespace resizeObserver {
+    /**
+     * Provides a function that when invoked with an element updates the cached styles for each subscriber of the element.
+     *
+     * The style attributes cached to calculate offset height / width include border & padding dimensions. You only need
+     * to update the cache if you change border or padding attributes of the element.
+     *
+     * @param {HTMLElement} el - An HTML element.
+     */
+    function updateCache(el: HTMLElement): void;
+}
 
 export { applyPosition, applyStyles, draggable, resizeObserver };

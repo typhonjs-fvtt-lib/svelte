@@ -135,6 +135,47 @@ function resizeObserver(node, target)
    };
 }
 
+/**
+ * Provides a function that when invoked with an element updates the cached styles for each subscriber of the element.
+ *
+ * The style attributes cached to calculate offset height / width include border & padding dimensions. You only need
+ * to update the cache if you change border or padding attributes of the element.
+ *
+ * @param {HTMLElement} el - An HTML element.
+ */
+resizeObserver.updateCache = function(el)
+{
+   if (!(el instanceof HTMLElement)) { throw new TypeError(`resizeObserverUpdate error: 'el' is not an HTMLElement.`); }
+
+   const subscribers = s_MAP.get(el);
+
+   if (Array.isArray(subscribers))
+   {
+      const computed = globalThis.getComputedStyle(el);
+
+      // Cache styles first from any inline styles then computed styles defaulting to 0 otherwise.
+      // Used to create the offset width & height values from the context box ResizeObserver provides.
+      const borderBottom = styleParsePixels(el.style.borderBottom) ?? styleParsePixels(computed.borderBottom) ?? 0;
+      const borderLeft = styleParsePixels(el.style.borderLeft) ?? styleParsePixels(computed.borderLeft) ?? 0;
+      const borderRight = styleParsePixels(el.style.borderRight) ?? styleParsePixels(computed.borderRight) ?? 0;
+      const borderTop = styleParsePixels(el.style.borderTop) ?? styleParsePixels(computed.borderTop) ?? 0;
+      const paddingBottom = styleParsePixels(el.style.paddingBottom) ?? styleParsePixels(computed.paddingBottom) ?? 0;
+      const paddingLeft = styleParsePixels(el.style.paddingLeft) ?? styleParsePixels(computed.paddingLeft) ?? 0;
+      const paddingRight = styleParsePixels(el.style.paddingRight) ?? styleParsePixels(computed.paddingRight) ?? 0;
+      const paddingTop = styleParsePixels(el.style.paddingTop) ?? styleParsePixels(computed.paddingTop) ?? 0;
+
+      const additionalWidth = borderLeft + borderRight + paddingLeft + paddingRight;
+      const additionalHeight = borderTop + borderBottom + paddingTop + paddingBottom;
+
+      for (const subscriber of subscribers)
+      {
+         subscriber.styles.additionalWidth = additionalWidth;
+         subscriber.styles.additionalHeight = additionalHeight;
+         s_UPDATE_SUBSCRIBER(subscriber, subscriber.contentWidth, subscriber.contentHeight);
+      }
+   }
+};
+
 // Below is the static ResizeObserverManager ------------------------------------------------------------------------
 
 const s_MAP = new Map();
@@ -148,7 +189,8 @@ const s_MAP = new Map();
 class ResizeObserverManager
 {
    /**
-    * Add an HTMLElement and ResizeObserverTarget instance for monitoring.
+    * Add an HTMLElement and ResizeObserverTarget instance for monitoring. Create cached style attributes for the
+    * given element include border & padding dimensions for offset width / height calculations.
     *
     * @param {HTMLElement}    el - The element to observe.
     *
@@ -179,6 +221,10 @@ class ResizeObserverManager
       const data = {
          updateType,
          target,
+
+         // Stores most recent contentRect.width and contentRect.height values from ResizeObserver.
+         contentWidth: 0,
+         contentHeight: 0,
 
          // Convenience data for total border & padding for offset width & height calculations.
          styles: {
@@ -217,7 +263,7 @@ class ResizeObserverManager
          if (index >= 0)
          {
             // Update target subscriber with undefined values.
-            s_UPDATE_TARGET(subscribers[index], void 0, void 0);
+            s_UPDATE_SUBSCRIBER(subscribers[index], void 0, void 0);
 
             subscribers.splice(index, 1);
          }
@@ -261,7 +307,7 @@ const s_RESIZE_OBSERVER = new ResizeObserver((entries) =>
 
          for (const subscriber of subscribers)
          {
-            s_UPDATE_TARGET(subscriber, contentWidth, contentHeight);
+            s_UPDATE_SUBSCRIBER(subscriber, contentWidth, contentHeight);
          }
       }
    }
@@ -318,9 +364,12 @@ function s_GET_UPDATE_TYPE(target)
  *
  * @param {number|undefined}  contentHeight - ResizeObserver contentRect.height value or undefined.
  */
-function s_UPDATE_TARGET(subscriber, contentWidth, contentHeight)
+function s_UPDATE_SUBSCRIBER(subscriber, contentWidth, contentHeight)
 {
    const styles = subscriber.styles;
+
+   subscriber.contentWidth = contentWidth;
+   subscriber.contentHeight = contentHeight;
 
    const offsetWidth = Number.isFinite(contentWidth) ? contentWidth + styles.additionalWidth : void 0;
    const offsetHeight = Number.isFinite(contentHeight) ? contentHeight + styles.additionalHeight : void 0;

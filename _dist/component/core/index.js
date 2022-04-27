@@ -1543,7 +1543,7 @@ function add_css$2(target) {
 	append_styles(target, "svelte-3vt5in", ".window-app.svelte-3vt5in{overflow:inherit}");
 }
 
-// (212:6) {:else}
+// (211:6) {:else}
 function create_else_block$3(ctx) {
 	let current;
 	const default_slot_template = /*#slots*/ ctx[25].default;
@@ -1591,7 +1591,7 @@ function create_else_block$3(ctx) {
 	};
 }
 
-// (210:6) {#if Array.isArray(allChildren)}
+// (209:6) {#if Array.isArray(allChildren)}
 function create_if_block$4(ctx) {
 	let tjscontainer;
 	let current;
@@ -1838,8 +1838,6 @@ function instance$4($$self, $$props, $$invalidate) {
  * @param {number}   offsetHeight - Observed offsetHeight
  */
 	function resizeObservedApp(offsetWidth, offsetHeight, contentWidth, contentHeight) {
-		console.log(`! ApplicationShell - resizeObservedApp`);
-
 		application.position.stores.resizeObserved.update(object => {
 			object.contentWidth = contentWidth;
 			object.contentHeight = contentHeight;

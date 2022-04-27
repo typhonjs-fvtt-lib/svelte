@@ -360,7 +360,7 @@ export class Position
    /**
     * Returns the current HTMLElement being positioned.
     *
-    * @returns {HTMLElement} Current HTMLElement being positioned.
+    * @returns {HTMLElement|undefined} Current HTMLElement being positioned.
     */
    get element()
    {
