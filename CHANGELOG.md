@@ -1,4 +1,13 @@
 # Changelog
+## Release 0.0.10 (large update)
+- Further refinement of position / Position system.
+  - Orthographic mode
+    - top / left positional data is converted to translate X / Y in matrix3d transform.   
+    - SvelteApplication boolean option `positionOrtho` to turn off orthographic mode. 
+- `resizeObserver` action performance improvements.
+  - All resizeObserver actions share a single ResizeObserver instance.
+  - resizeObserver now caches both content & offset width / height.
+
 ## Release 0.0.9 (large update)
 - Further refinement of position / Position system.
   - Translation + min / max height & width.
