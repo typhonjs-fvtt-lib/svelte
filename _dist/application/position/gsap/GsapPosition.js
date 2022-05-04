@@ -3,8 +3,19 @@ import { gsap }         from '@typhonjs-fvtt/svelte/gsap';
 import { Position }     from '../Position.js';
 import { TimelineImpl } from './TimelineImpl.js';
 
-const s_TYPES_POSITION = new Set(['from', 'fromTo', 'to']);
+/**
+ * Stores the entry types that potentially use the generated initial position data.
+ *
+ * @type {Set<string>}
+ */
+const s_TYPES_POSITION = new Set(['from', 'fromTo', 'set', 'to']);
 
+/**
+ * Provides a data driven ways to connect a {@link Position} instance with a GSAP timeline and tweens.
+ *
+ * {@link GsapPosition.timeline} supports the following types: 'add', 'addLabel', 'addPause', 'call', 'from',
+ * 'fromTo', 'set', 'to'.
+ */
 export class GsapPosition
 {
    /**
@@ -54,8 +65,21 @@ export class GsapPosition
       {
          positionData = trlPosition.get({ immediateElementUpdate: true });
 
-         // TODO: respect any existing onUpdate function!
-         timelineOptions.onUpdate = () => trlPosition.set(positionData);
+         const existingOnUpdate = timelineOptions.onUpdate;
+
+         // Preserve invoking existing onUpdate function.
+         if (typeof existingOnUpdate === 'function')
+         {
+            timelineOptions.onUpdate = () =>
+            {
+               trlPosition.set(positionData);
+               existingOnUpdate();
+            };
+         }
+         else
+         {
+            timelineOptions.onUpdate = () => trlPosition.set(positionData);
+         }
       }
 
       const timeline = gsap.timeline(timelineOptions);
@@ -68,12 +92,32 @@ export class GsapPosition
 
          switch (type)
          {
+            case 'add':
+               TimelineImpl.add(timeline, entry, cntr);
+               break;
+
+            case 'addLabel':
+               TimelineImpl.addLabel(timeline, entry, cntr);
+               break;
+
+            case 'addPause':
+               TimelineImpl.addPause(timeline, entry, cntr);
+               break;
+
+            case 'call':
+               TimelineImpl.call(timeline, entry, cntr);
+               break;
+
             case 'from':
                TimelineImpl.from(timeline, trlPosition, positionData, entry, cntr);
                break;
 
             case 'fromTo':
                TimelineImpl.fromTo(timeline, trlPosition, positionData, entry, cntr);
+               break;
+
+            case 'set':
+               TimelineImpl.set(timeline, trlPosition, positionData, entry, cntr);
                break;
 
             case 'to':

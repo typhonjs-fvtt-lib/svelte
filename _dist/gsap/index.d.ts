@@ -10,5 +10,6 @@
 declare function animate(node: HTMLElement, { type, ...args }: {
     type: string;
 }): any;
+declare let gsap: any;
 
-export { animate };
+export { animate, gsap };
