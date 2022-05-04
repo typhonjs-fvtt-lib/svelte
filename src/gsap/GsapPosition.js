@@ -139,6 +139,55 @@ export class GsapPosition
    }
 
    /**
+    * @param {Position} trlPosition - Position instance.
+    *
+    * @param {string}   key - Property of position to manipulate.
+    *
+    * @param {object}   vars - GSAP vars object for `quickTo`.
+    *
+    * @returns {Function}  GSAP quickTo function.
+    */
+   static quickTo(trlPosition, key, vars)
+   {
+      if (!(trlPosition instanceof Position))
+      {
+         throw new TypeError(`GsapPosition.quickTo error: 'trlPosition' is not an instance of Position.`);
+      }
+
+      if (typeof vars !== 'object')
+      {
+         throw new TypeError(`GsapPosition.quickTo error: 'vars' is not an object.`);
+      }
+
+      // Only retrieve the Position keys that are in vars.
+      s_POSITION_PROPS.clear();
+      for (const prop in vars)
+      {
+         if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
+      }
+
+      const positionData = trlPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
+
+      const existingOnUpdate = vars.onUpdate;
+
+      // Preserve invoking existing onUpdate function.
+      if (typeof existingOnUpdate === 'function')
+      {
+         vars.onUpdate = () =>
+         {
+            trlPosition.set(positionData);
+            existingOnUpdate();
+         };
+      }
+      else
+      {
+         vars.onUpdate = () => trlPosition.set(positionData);
+      }
+
+      return gsap.quickTo(positionData, key, vars);
+   }
+
+   /**
     * @param {Position}          trlPosition - Position instance.
     *
     * @param {object|object[]}   arg1 - Either an object defining timelineOptions or an array of gsapData entries.

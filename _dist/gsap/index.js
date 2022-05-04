@@ -45,9 +45,19 @@ function animate(node, { type, ...args })
  */
 const s_TYPES_POSITION = new Set(['from', 'fromTo', 'set', 'to']);
 
+/**
+ * Stores the Position properties in order to create the minimum update data object when animating.
+ *
+ * @type {Set<string>}
+ */
 const s_POSITION_KEYS = new Set(['left', 'top', 'maxWidth', 'maxHeight', 'minWidth', 'minHeight', 'width', 'height',
  'rotateX', 'rotateY', 'rotateZ', 'scale', 'translateX', 'translateY', 'translateZ', 'zIndex']);
 
+/**
+ * Stores the seen Position properties when building the minimum update data object when animating.
+ *
+ * @type {Set<string>}
+ */
 const s_POSITION_PROPS = new Set();
 
 /**
@@ -59,9 +69,9 @@ const s_POSITION_PROPS = new Set();
 class GsapPosition
 {
    /**
-    * @param {Position} trlPosition -
+    * @param {Position} trlPosition - Position instance.
     *
-    * @param {object}   vars -
+    * @param {object}   vars - GSAP vars object for `from`.
     *
     * @returns {object} GSAP tween
     */
@@ -106,11 +116,11 @@ class GsapPosition
    }
 
    /**
-    * @param {Position} trlPosition -
+    * @param {Position} trlPosition - Position instance.
     *
-    * @param {object}   fromVars -
+    * @param {object}   fromVars - GSAP fromVars object for `fromTo`
     *
-    * @param {object}   toVars -
+    * @param {object}   toVars - GSAP toVars object for `fromTo`.
     *
     * @returns {object} GSAP tween
     */
@@ -165,7 +175,56 @@ class GsapPosition
    }
 
    /**
-    * @param {Position} trlPosition -
+    * @param {Position} trlPosition - Position instance.
+    *
+    * @param {string}   key - Property of position to manipulate.
+    *
+    * @param {object}   vars - GSAP vars object for `quickTo`.
+    *
+    * @returns {Function}  GSAP quickTo function.
+    */
+   static quickTo(trlPosition, key, vars)
+   {
+      if (!(trlPosition instanceof Position))
+      {
+         throw new TypeError(`GsapPosition.quickTo error: 'trlPosition' is not an instance of Position.`);
+      }
+
+      if (typeof vars !== 'object')
+      {
+         throw new TypeError(`GsapPosition.quickTo error: 'vars' is not an object.`);
+      }
+
+      // Only retrieve the Position keys that are in vars.
+      s_POSITION_PROPS.clear();
+      for (const prop in vars)
+      {
+         if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
+      }
+
+      const positionData = trlPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
+
+      const existingOnUpdate = vars.onUpdate;
+
+      // Preserve invoking existing onUpdate function.
+      if (typeof existingOnUpdate === 'function')
+      {
+         vars.onUpdate = () =>
+         {
+            trlPosition.set(positionData);
+            existingOnUpdate();
+         };
+      }
+      else
+      {
+         vars.onUpdate = () => trlPosition.set(positionData);
+      }
+
+      return gsap.quickTo(positionData, key, vars);
+   }
+
+   /**
+    * @param {Position}          trlPosition - Position instance.
     *
     * @param {object|object[]}   arg1 - Either an object defining timelineOptions or an array of gsapData entries.
     *
@@ -279,7 +338,7 @@ class GsapPosition
                break;
 
             case 'fromTo':
-               timeline.from(s_GET_TARGET(trlPosition, positionData, entry, cntr), entry.fromVars, entry.toVars,
+               timeline.fromTo(s_GET_TARGET(trlPosition, positionData, entry, cntr), entry.fromVars, entry.toVars,
                 entry.position);
                break;
 
@@ -300,9 +359,9 @@ class GsapPosition
    }
 
    /**
-    * @param {Position} trlPosition -
+    * @param {Position} trlPosition - Position instance.
     *
-    * @param {object}   vars -
+    * @param {object}   vars - GSAP vars object for `to`.
     *
     * @returns {object} GSAP tween
     */
@@ -347,6 +406,9 @@ class GsapPosition
    }
 }
 
+/**
+ * Internal helper class for timeline implementation. Performs error checking before applying any timeline actions.
+ */
 class TimelineImpl
 {
    static add(timeline, entry, cntr)
