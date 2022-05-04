@@ -9,9 +9,19 @@ import { Position }  from '@typhonjs-fvtt/svelte/application';
  */
 const s_TYPES_POSITION = new Set(['from', 'fromTo', 'set', 'to']);
 
+/**
+ * Stores the Position properties in order to create the minimum update data object when animating.
+ *
+ * @type {Set<string>}
+ */
 const s_POSITION_KEYS = new Set(['left', 'top', 'maxWidth', 'maxHeight', 'minWidth', 'minHeight', 'width', 'height',
  'rotateX', 'rotateY', 'rotateZ', 'scale', 'translateX', 'translateY', 'translateZ', 'zIndex']);
 
+/**
+ * Stores the seen Position properties when building the minimum update data object when animating.
+ *
+ * @type {Set<string>}
+ */
 const s_POSITION_PROPS = new Set();
 
 /**
@@ -23,9 +33,9 @@ const s_POSITION_PROPS = new Set();
 export class GsapPosition
 {
    /**
-    * @param {Position} trlPosition -
+    * @param {Position} trlPosition - Position instance.
     *
-    * @param {object}   vars -
+    * @param {object}   vars - GSAP vars object for `from`.
     *
     * @returns {object} GSAP tween
     */
@@ -70,11 +80,11 @@ export class GsapPosition
    }
 
    /**
-    * @param {Position} trlPosition -
+    * @param {Position} trlPosition - Position instance.
     *
-    * @param {object}   fromVars -
+    * @param {object}   fromVars - GSAP fromVars object for `fromTo`
     *
-    * @param {object}   toVars -
+    * @param {object}   toVars - GSAP toVars object for `fromTo`.
     *
     * @returns {object} GSAP tween
     */
@@ -129,7 +139,7 @@ export class GsapPosition
    }
 
    /**
-    * @param {Position} trlPosition -
+    * @param {Position}          trlPosition - Position instance.
     *
     * @param {object|object[]}   arg1 - Either an object defining timelineOptions or an array of gsapData entries.
     *
@@ -264,9 +274,9 @@ export class GsapPosition
    }
 
    /**
-    * @param {Position} trlPosition -
+    * @param {Position} trlPosition - Position instance.
     *
-    * @param {object}   vars -
+    * @param {object}   vars - GSAP vars object for `to`.
     *
     * @returns {object} GSAP tween
     */
@@ -311,6 +321,9 @@ export class GsapPosition
    }
 }
 
+/**
+ * Internal helper class for timeline implementation. Performs error checking before applying any timeline actions.
+ */
 class TimelineImpl
 {
    static add(timeline, entry, cntr)
