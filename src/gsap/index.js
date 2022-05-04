@@ -1,3 +1,4 @@
-export { gsap }   from 'foundry-gsap';
+export * from './gsap.js';
+export * from './animate.js';
 
-export *          from './animate.js';
+
