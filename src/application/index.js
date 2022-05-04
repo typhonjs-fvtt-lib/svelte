@@ -3,7 +3,6 @@ export * from './TJSDialog.js';
 
 // TODO: temporary
 export * from './position/Position.js';
-export * from './position/gsap/GsapPosition.js';
 
 /**
  * @typedef {object} MountedAppShell - Application shell contract for Svelte components.

@@ -1,7 +1,6 @@
-import { gsap }         from '@typhonjs-fvtt/svelte/gsap';
+import { gsap }      from './gsap.js';
 
-import { Position }     from '../Position.js';
-import { TimelineImpl } from './TimelineImpl.js';
+import { Position }  from '@typhonjs-fvtt/svelte/application';
 
 /**
  * Stores the entry types that potentially use the generated initial position data.
@@ -269,5 +268,202 @@ export class GsapPosition
       }
 
       return gsap.to(positionData, vars);
+   }
+}
+
+class TimelineImpl
+{
+   static add(timeline, entry, cntr)
+   {
+      const child = entry.child;
+      const position = entry.position;
+
+      if (child === void 0)
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] missing 'child' property.`);
+      }
+
+      if (position !== void 0 && !Number.isFinite(position) && typeof position !== 'string')
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
+      }
+
+      timeline.add(child, position);
+   }
+
+   static addLabel(timeline, entry, cntr)
+   {
+      const label = entry.label;
+      const position = entry.position;
+
+      if (typeof label !== 'string')
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'label' is not a string.`);
+      }
+
+      if (position !== void 0 && !Number.isFinite(position) && typeof position !== 'string')
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
+      }
+
+      timeline.addLabel(label, position);
+   }
+
+   static addPause(timeline, entry, cntr)
+   {
+      const position = entry.position;
+      const callback = entry.callback;
+      const params = entry.params;
+
+      if (position !== void 0 && !Number.isFinite(position) && typeof position !== 'string')
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
+      }
+
+      if (callback !== void 0 && typeof callback !== 'function')
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'callback' is not a function.`);
+      }
+
+      if (params !== void 0 && !Array.isArray(params))
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'params' is not an array.`);
+      }
+
+      timeline.addPause(position, callback, params);
+   }
+
+   static call(timeline, entry, cntr)
+   {
+      const callback = entry.callback;
+      const params = entry.params;
+      const position = entry.position;
+
+      if (typeof callback !== 'function')
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'callback' is not a function.`);
+      }
+
+      if (params !== void 0 && !Array.isArray(params))
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'params' is not an array.`);
+      }
+
+      if (position !== void 0 && !Number.isFinite(position) && typeof position !== 'string')
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
+      }
+
+      timeline.call(callback, params, position);
+   }
+
+   static from(timeline, trlPosition, positionData, entry, cntr)
+   {
+      const target = s_GET_TARGET(trlPosition, positionData, entry, cntr);
+      const vars = entry.vars;
+      const position = entry.position;
+
+      if (typeof vars !== 'object')
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] missing 'vars' object.`);
+      }
+
+      if (position !== void 0 && !Number.isFinite(position) && typeof position !== 'string')
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
+      }
+
+      timeline.from(target, vars, position);
+   }
+
+   static fromTo(timeline, trlPosition, positionData, entry, cntr)
+   {
+      const target = s_GET_TARGET(trlPosition, positionData, entry, cntr);
+      const fromVars = entry.fromVars;
+      const toVars = entry.toVars;
+      const position = entry.position;
+
+      if (typeof fromVars !== 'object')
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] missing 'fromVars' object.`);
+      }
+
+      if (typeof toVars !== 'object')
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] missing 'toVars' object.`);
+      }
+
+      if (position !== void 0 && !Number.isFinite(position) && typeof position !== 'string')
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
+      }
+
+      timeline.from(target, fromVars, toVars, position);
+   }
+
+   static set(timeline, trlPosition, positionData, entry, cntr)
+   {
+      const target = s_GET_TARGET(trlPosition, positionData, entry, cntr);
+      const vars = entry.vars;
+      const position = entry.position;
+
+      if (typeof vars !== 'object')
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] missing 'vars' object.`);
+      }
+
+      if (position !== void 0 && !Number.isFinite(position) && typeof position !== 'string')
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
+      }
+
+      timeline.set(target, vars, position);
+   }
+
+   static to(timeline, trlPosition, positionData, entry, cntr)
+   {
+      const target = s_GET_TARGET(trlPosition, positionData, entry, cntr);
+      const vars = entry.vars;
+      const position = entry.position;
+
+      if (typeof vars !== 'object')
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] missing 'vars' object.`);
+      }
+
+      if (position !== void 0 && !Number.isFinite(position) && typeof position !== 'string')
+      {
+         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
+      }
+
+      timeline.to(target, vars, position);
+   }
+}
+
+/**
+ * Gets the target from GSAP data entry.
+ *
+ * @param {Position}             trlPosition -
+ *
+ * @param {PositionDataExtended} positionData -
+ *
+ * @param {object}               entry -
+ *
+ * @param {number}               cntr - Current GSAP data entry index.
+ *
+ * @returns {PositionDataExtended|HTMLElement} The target object or HTMLElement.
+ */
+function s_GET_TARGET(trlPosition, positionData, entry, cntr)
+{
+   const target = entry.target ?? 'position';
+
+   switch (target)
+   {
+      case 'position':
+         return positionData;
+      case 'element':
+         return trlPosition.element;
+      default:
+         throw new Error(`GsapPosition.timeline error: 'gsapData[${cntr}]' unknown 'target' - '${target}'.`);
    }
 }
