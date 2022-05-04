@@ -21,6 +21,93 @@ export class GsapPosition
    /**
     * @param {Position} trlPosition -
     *
+    * @param {object}   vars -
+    *
+    * @returns {object} GSAP tween
+    */
+   static from(trlPosition, vars)
+   {
+      if (!(trlPosition instanceof Position))
+      {
+         throw new TypeError(`GsapPosition.from error: 'trlPosition' is not an instance of Position.`);
+      }
+
+      if (typeof vars !== 'object')
+      {
+         throw new TypeError(`GsapPosition.from error: 'vars' is not an object.`);
+      }
+
+      const positionData = trlPosition.get({ immediateElementUpdate: true });
+
+      const existingOnUpdate = vars.onUpdate;
+
+      // Preserve invoking existing onUpdate function.
+      if (typeof existingOnUpdate === 'function')
+      {
+         vars.onUpdate = () =>
+         {
+            trlPosition.set(positionData);
+            existingOnUpdate();
+         };
+      }
+      else
+      {
+         vars.onUpdate = () => trlPosition.set(positionData);
+      }
+
+      return gsap.from(positionData, vars);
+   }
+
+   /**
+    * @param {Position} trlPosition -
+    *
+    * @param {object}   fromVars -
+    *
+    * @param {object}   toVars -
+    *
+    * @returns {object} GSAP tween
+    */
+   static fromTo(trlPosition, fromVars, toVars)
+   {
+      if (!(trlPosition instanceof Position))
+      {
+         throw new TypeError(`GsapPosition.fromTo error: 'trlPosition' is not an instance of Position.`);
+      }
+
+      if (typeof fromVars !== 'object')
+      {
+         throw new TypeError(`GsapPosition.fromTo error: 'fromVars' is not an object.`);
+      }
+
+      if (typeof toVars !== 'object')
+      {
+         throw new TypeError(`GsapPosition.fromTo error: 'fromVars' is not an object.`);
+      }
+
+      const positionData = trlPosition.get({ immediateElementUpdate: true });
+
+      const existingOnUpdate = toVars.onUpdate;
+
+      // Preserve invoking existing onUpdate function.
+      if (typeof existingOnUpdate === 'function')
+      {
+         toVars.onUpdate = () =>
+         {
+            trlPosition.set(positionData);
+            existingOnUpdate();
+         };
+      }
+      else
+      {
+         toVars.onUpdate = () => trlPosition.set(positionData);
+      }
+
+      return gsap.fromTo(positionData, fromVars, toVars);
+   }
+
+   /**
+    * @param {Position} trlPosition -
+    *
     * @param {object}   timelineOptions -
     *
     * @param {object[]} gsapData -
@@ -31,12 +118,12 @@ export class GsapPosition
    {
       if (!(trlPosition instanceof Position))
       {
-         throw new TypeError(`PositionGSAP.timeline error: 'trlPosition' is not an instance of Position.`);
+         throw new TypeError(`GsapPosition.timeline error: 'trlPosition' is not an instance of Position.`);
       }
 
       if (!Array.isArray(gsapData))
       {
-         throw new TypeError(`PositionGSAP.timeline error: 'gsapData' is not an array.`);
+         throw new TypeError(`GsapPosition.timeline error: 'gsapData' is not an array.`);
       }
 
       let hasPositionUpdates = false;
@@ -48,7 +135,7 @@ export class GsapPosition
 
          if (typeof entry !== 'object')
          {
-            throw new TypeError(`PositionGSAP.timeline error: 'gsapData[${cntr}]' is not an object.`);
+            throw new TypeError(`GsapPosition.timeline error: 'gsapData[${cntr}]' is not an object.`);
          }
 
          // Determine if any of the entries has a position related type and targets position by explicit value or by
@@ -125,10 +212,50 @@ export class GsapPosition
                break;
 
             default:
-               throw new Error(`PositionGSAP.timeline error: gsapData[${cntr}] unknown 'type' - '${type}'`);
+               throw new Error(`GsapPosition.timeline error: gsapData[${cntr}] unknown 'type' - '${type}'`);
          }
       }
 
       return timeline;
+   }
+
+   /**
+    * @param {Position} trlPosition -
+    *
+    * @param {object}   vars -
+    *
+    * @returns {object} GSAP tween
+    */
+   static to(trlPosition, vars)
+   {
+      if (!(trlPosition instanceof Position))
+      {
+         throw new TypeError(`GsapPosition.to error: 'trlPosition' is not an instance of Position.`);
+      }
+
+      if (typeof vars !== 'object')
+      {
+         throw new TypeError(`GsapPosition.to error: 'vars' is not an object.`);
+      }
+
+      const positionData = trlPosition.get({ immediateElementUpdate: true });
+
+      const existingOnUpdate = vars.onUpdate;
+
+      // Preserve invoking existing onUpdate function.
+      if (typeof existingOnUpdate === 'function')
+      {
+         vars.onUpdate = () =>
+         {
+            trlPosition.set(positionData);
+            existingOnUpdate();
+         };
+      }
+      else
+      {
+         vars.onUpdate = () => trlPosition.set(positionData);
+      }
+
+      return gsap.to(positionData, vars);
    }
 }
