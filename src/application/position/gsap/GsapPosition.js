@@ -108,17 +108,29 @@ export class GsapPosition
    /**
     * @param {Position} trlPosition -
     *
-    * @param {object}   timelineOptions -
+    * @param {object|object[]}   arg1 - Either an object defining timelineOptions or an array of gsapData entries.
     *
-    * @param {object[]} gsapData -
+    * @param {object[]}          [arg2] - When arg1 is defined as an object; arg2 defines an array of gsapData entries.
     *
     * @returns {object} GSAP timeline
     */
-   static timeline(trlPosition, timelineOptions = {}, gsapData)
+   static timeline(trlPosition, arg1, arg2)
    {
       if (!(trlPosition instanceof Position))
       {
          throw new TypeError(`GsapPosition.timeline error: 'trlPosition' is not an instance of Position.`);
+      }
+
+      // Load the variable arguments from arg1 / arg2.
+      // If arg1 is an object then take it as the timelineOptions.
+      const timelineOptions = typeof arg1 === 'object' ? arg1 : {};
+
+      // If arg1 is an array then take it as `gsapData` otherwise select arg2.
+      const gsapData = Array.isArray(arg1) ? arg1 : arg2;
+
+      if (typeof timelineOptions !== 'object')
+      {
+         throw new TypeError(`GsapPosition.timeline error: 'timelineOptions' is not an object.`);
       }
 
       if (!Array.isArray(gsapData))
