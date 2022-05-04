@@ -9,6 +9,11 @@ import { Position }  from '@typhonjs-fvtt/svelte/application';
  */
 const s_TYPES_POSITION = new Set(['from', 'fromTo', 'set', 'to']);
 
+const s_POSITION_KEYS = new Set(['left', 'top', 'maxWidth', 'maxHeight', 'minWidth', 'minHeight', 'width', 'height',
+ 'rotateX', 'rotateY', 'rotateZ', 'scale', 'translateX', 'translateY', 'translateZ', 'zIndex']);
+
+const s_POSITION_PROPS = new Set();
+
 /**
  * Provides a data driven ways to connect a {@link Position} instance with a GSAP timeline and tweens.
  *
@@ -36,7 +41,14 @@ export class GsapPosition
          throw new TypeError(`GsapPosition.from error: 'vars' is not an object.`);
       }
 
-      const positionData = trlPosition.get({ immediateElementUpdate: true });
+      // Only retrieve the Position keys that are in vars.
+      s_POSITION_PROPS.clear();
+      for (const prop in vars)
+      {
+         if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
+      }
+
+      const positionData = trlPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
 
       const existingOnUpdate = vars.onUpdate;
 
@@ -83,7 +95,19 @@ export class GsapPosition
          throw new TypeError(`GsapPosition.fromTo error: 'fromVars' is not an object.`);
       }
 
-      const positionData = trlPosition.get({ immediateElementUpdate: true });
+      // Only retrieve the Position keys that are in vars.
+      s_POSITION_PROPS.clear();
+      for (const prop in fromVars)
+      {
+         if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
+      }
+
+      for (const prop in toVars)
+      {
+         if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
+      }
+
+      const positionData = trlPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
 
       const existingOnUpdate = toVars.onUpdate;
 
@@ -139,6 +163,9 @@ export class GsapPosition
 
       let hasPositionUpdates = false;
 
+      let positionData;
+      s_POSITION_PROPS.clear();
+
       // Validate gsapData.
       for (let cntr = 0; cntr < gsapData.length; cntr++)
       {
@@ -150,18 +177,23 @@ export class GsapPosition
          }
 
          // Determine if any of the entries has a position related type and targets position by explicit value or by
-         // default.
+         // default. Build up only the position properties that are being modified by all entries. This allows maximum
+         // composability when animating multiple non-overlapping properties in a timeline.
          if (s_TYPES_POSITION.has(entry.type) && (entry.target === void 0 || entry.target === 'position'))
          {
+            // Initialize positionData.
+            if (!hasPositionUpdates) { positionData = { immediateElementUpdate: true }; }
+
             hasPositionUpdates = true;
+
+            TimelineImpl.validatePositionProp(entry, cntr);
          }
       }
 
-      let positionData;
-
       if (hasPositionUpdates)
       {
-         positionData = trlPosition.get({ immediateElementUpdate: true });
+         // positionData = trlPosition.get({ immediateElementUpdate: true });
+         trlPosition.get(positionData, s_POSITION_PROPS);
 
          const existingOnUpdate = timelineOptions.onUpdate;
 
@@ -207,19 +239,20 @@ export class GsapPosition
                break;
 
             case 'from':
-               TimelineImpl.from(timeline, trlPosition, positionData, entry, cntr);
+               timeline.from(s_GET_TARGET(trlPosition, positionData, entry, cntr), entry.vars, entry.position);
                break;
 
             case 'fromTo':
-               TimelineImpl.fromTo(timeline, trlPosition, positionData, entry, cntr);
+               timeline.fromTo(s_GET_TARGET(trlPosition, positionData, entry, cntr), entry.fromVars, entry.toVars,
+                entry.position);
                break;
 
             case 'set':
-               TimelineImpl.set(timeline, trlPosition, positionData, entry, cntr);
+               timeline.set(s_GET_TARGET(trlPosition, positionData, entry, cntr), entry.vars, entry.position);
                break;
 
             case 'to':
-               TimelineImpl.to(timeline, trlPosition, positionData, entry, cntr);
+               timeline.to(s_GET_TARGET(trlPosition, positionData, entry, cntr), entry.vars, entry.position);
                break;
 
             default:
@@ -249,7 +282,14 @@ export class GsapPosition
          throw new TypeError(`GsapPosition.to error: 'vars' is not an object.`);
       }
 
-      const positionData = trlPosition.get({ immediateElementUpdate: true });
+      // Only retrieve the Position keys that are in vars.
+      s_POSITION_PROPS.clear();
+      for (const prop in vars)
+      {
+         if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
+      }
+
+      const positionData = trlPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
 
       const existingOnUpdate = vars.onUpdate;
 
@@ -357,86 +397,76 @@ class TimelineImpl
       timeline.call(callback, params, position);
    }
 
-   static from(timeline, trlPosition, positionData, entry, cntr)
+   /**
+    * Validates data for Position related properties: 'from', 'fromTo', 'set', 'to'. Also adds all properties found
+    * in Gsap entry data to s_POSITION_PROPS, so that just the properties being animated are added to animated
+    * `positionData`.
+    *
+    * @param {object}   entry - Gsap entry data.
+    *
+    * @param {number}   cntr - Current index.
+    */
+   static validatePositionProp(entry, cntr)
    {
-      const target = s_GET_TARGET(trlPosition, positionData, entry, cntr);
-      const vars = entry.vars;
       const position = entry.position;
-
-      if (typeof vars !== 'object')
-      {
-         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] missing 'vars' object.`);
-      }
 
       if (position !== void 0 && !Number.isFinite(position) && typeof position !== 'string')
       {
-         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
+         throw new TypeError(
+          `GsapPosition.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
       }
 
-      timeline.from(target, vars, position);
-   }
-
-   static fromTo(timeline, trlPosition, positionData, entry, cntr)
-   {
-      const target = s_GET_TARGET(trlPosition, positionData, entry, cntr);
-      const fromVars = entry.fromVars;
-      const toVars = entry.toVars;
-      const position = entry.position;
-
-      if (typeof fromVars !== 'object')
+      switch (entry.type)
       {
-         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] missing 'fromVars' object.`);
+         case 'from':
+         case 'to':
+         case 'set':
+         {
+            const vars = entry.vars;
+
+            if (typeof vars !== 'object')
+            {
+               throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] missing 'vars' object.`);
+            }
+
+            // Only retrieve the Position keys that are in vars.
+            for (const prop in vars)
+            {
+               if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
+            }
+
+            break;
+         }
+
+         case 'fromTo':
+         {
+            const fromVars = entry.fromVars;
+            const toVars = entry.toVars;
+
+            if (typeof fromVars !== 'object')
+            {
+               throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] missing 'fromVars' object.`);
+            }
+
+            if (typeof toVars !== 'object')
+            {
+               throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] missing 'toVars' object.`);
+            }
+
+            // Only retrieve the Position keys that are in fromVars / toVars.
+            for (const prop in fromVars)
+            {
+               if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
+            }
+
+            for (const prop in toVars)
+            {
+               if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
+            }
+
+            break;
+         }
       }
-
-      if (typeof toVars !== 'object')
-      {
-         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] missing 'toVars' object.`);
-      }
-
-      if (position !== void 0 && !Number.isFinite(position) && typeof position !== 'string')
-      {
-         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
-      }
-
-      timeline.from(target, fromVars, toVars, position);
-   }
-
-   static set(timeline, trlPosition, positionData, entry, cntr)
-   {
-      const target = s_GET_TARGET(trlPosition, positionData, entry, cntr);
-      const vars = entry.vars;
-      const position = entry.position;
-
-      if (typeof vars !== 'object')
-      {
-         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] missing 'vars' object.`);
-      }
-
-      if (position !== void 0 && !Number.isFinite(position) && typeof position !== 'string')
-      {
-         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
-      }
-
-      timeline.set(target, vars, position);
-   }
-
-   static to(timeline, trlPosition, positionData, entry, cntr)
-   {
-      const target = s_GET_TARGET(trlPosition, positionData, entry, cntr);
-      const vars = entry.vars;
-      const position = entry.position;
-
-      if (typeof vars !== 'object')
-      {
-         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] missing 'vars' object.`);
-      }
-
-      if (position !== void 0 && !Number.isFinite(position) && typeof position !== 'string')
-      {
-         throw new TypeError(`GsapPosition.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
-      }
-
-      timeline.to(target, vars, position);
    }
 }
 

@@ -767,13 +767,25 @@ export class Position
    /**
     * Assigns current position to object passed into method.
     *
-    * @param {object|PositionData} [position] - Target to assign current position data.
+    * @param {object|PositionData}  [position] - Target to assign current position data.
+    *
+    * @param {Iterable<string>}     [keys] - When provided only these keys are copied.
     *
     * @returns {PositionData} Passed in object with current position data.
     */
-   get(position = {})
+   get(position = {}, keys = void 0)
    {
-      return Object.assign(position, this.#data);
+      const data = this.#data;
+
+      if (isIterable(keys))
+      {
+         for (const key of keys) { position[key] = data[key]; }
+         return position;
+      }
+      else
+      {
+         return Object.assign(position, data);
+      }
    }
 
    /**
