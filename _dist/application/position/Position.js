@@ -977,7 +977,7 @@ export class Position
     * Updates to any target element are decoupled from the underlying Position data. This method returns this instance
     * that you can then await on the target element inline style update by using {@link Position.elementUpdated}.
     *
-    * @param {PositionData}   [position] - Position data to set.
+    * @param {PositionDataExtended} [position] - Position data to set.
     *
     * @returns {Position} This Position instance.
     */
@@ -992,6 +992,10 @@ export class Position
       {
          return this;
       }
+
+      // Callers can specify to immediately update an associated element. This is useful if set is called from
+      // requestAnimationFrame / rAF. Library integrations like GSAP invoke set from rAF.
+      const immediateElementUpdate = position.immediateElementUpdate === true;
 
       const data = this.#data;
       const transforms = this.#transforms;
@@ -1170,8 +1174,15 @@ export class Position
          // Set default data after first set operation that has a target element.
          if (typeof this.#defaultData !== 'object') { this.#defaultData = Object.assign({}, data); }
 
-         // Add update element data to UpdateElementManager if not already queued.
-         if (!this.#updateElementData.queued)
+         // If `immediateElementUpdate` is true in position data passed to `set` then update the element immediately.
+         // This is for rAF based library integrations like GSAP.
+         if (immediateElementUpdate)
+         {
+            UpdateElementManager.immediate(el, this.#updateElementData);
+            this.#updateElementPromise = Promise.resolve(performance.now());
+         }
+         // Else if not queued then queue an update for the next rAF callback.
+         else if (!this.#updateElementData.queued)
          {
             this.#updateElementPromise = UpdateElementManager.add(el, this.#updateElementData);
          }
@@ -1440,6 +1451,12 @@ Object.seal(s_VALIDATION_DATA);
  * @property {Function} getLeft - A function that takes the width parameter and returns the left position.
  *
  * @property {Function} getTop - A function that takes the height parameter and returns the top position.
+ */
+
+/**
+ * @typedef {PositionData} PositionDataExtended
+ *
+ * @property {boolean} [immediateElementUpdate] - When true any associated element is updated immediately.
  */
 
 /**
