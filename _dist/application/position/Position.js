@@ -650,7 +650,7 @@ export class Position
    /**
     * Provides animation
     *
-    * @param {PositionData}   position - The destination position.
+    * @param {PositionDataExtended} position - The destination position.
     *
     * @param {object}         [opts] - Optional parameters.
     *
@@ -1218,7 +1218,7 @@ export class Position
    }
 
    /**
-    * @param {object} opts -
+    * @param {PositionDataExtended} opts -
     *
     * @param {number|null} opts.left -
     *
