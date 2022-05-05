@@ -6,15 +6,15 @@
  */
 declare class GsapPosition {
     /**
-     * @param {Position} trlPosition - Position instance.
+     * @param {Position} tjsPosition - Position instance.
      *
      * @param {object}   vars - GSAP vars object for `from`.
      *
      * @returns {object} GSAP tween
      */
-    static from(trlPosition: any, vars: object): object;
+    static from(tjsPosition: any, vars: object): object;
     /**
-     * @param {Position} trlPosition - Position instance.
+     * @param {Position} tjsPosition - Position instance.
      *
      * @param {object}   fromVars - GSAP fromVars object for `fromTo`
      *
@@ -22,9 +22,9 @@ declare class GsapPosition {
      *
      * @returns {object} GSAP tween
      */
-    static fromTo(trlPosition: any, fromVars: object, toVars: object): object;
+    static fromTo(tjsPosition: any, fromVars: object, toVars: object): object;
     /**
-     * @param {Position} trlPosition - Position instance.
+     * @param {Position} tjsPosition - Position instance.
      *
      * @param {string}   key - Property of position to manipulate.
      *
@@ -32,9 +32,9 @@ declare class GsapPosition {
      *
      * @returns {Function}  GSAP quickTo function.
      */
-    static quickTo(trlPosition: any, key: string, vars: object): Function;
+    static quickTo(tjsPosition: any, key: string, vars: object): Function;
     /**
-     * @param {Position}          trlPosition - Position instance.
+     * @param {Position}          tjsPosition - Position instance.
      *
      * @param {object|object[]}   arg1 - Either an object defining timelineOptions or an array of gsapData entries.
      *
@@ -42,15 +42,15 @@ declare class GsapPosition {
      *
      * @returns {object} GSAP timeline
      */
-    static timeline(trlPosition: any, arg1: object | object[], arg2?: object[]): object;
+    static timeline(tjsPosition: any, arg1: object | object[], arg2?: object[]): object;
     /**
-     * @param {Position} trlPosition - Position instance.
+     * @param {Position} tjsPosition - Position instance.
      *
      * @param {object}   vars - GSAP vars object for `to`.
      *
      * @returns {object} GSAP tween
      */
-    static to(trlPosition: any, vars: object): object;
+    static to(tjsPosition: any, vars: object): object;
 }
 /**
  * @param {HTMLElement} node -

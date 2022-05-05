@@ -69,17 +69,17 @@ const s_POSITION_PROPS = new Set();
 class GsapPosition
 {
    /**
-    * @param {Position} trlPosition - Position instance.
+    * @param {Position} tjsPosition - Position instance.
     *
     * @param {object}   vars - GSAP vars object for `from`.
     *
     * @returns {object} GSAP tween
     */
-   static from(trlPosition, vars)
+   static from(tjsPosition, vars)
    {
-      if (!(trlPosition instanceof Position))
+      if (!(tjsPosition instanceof Position))
       {
-         throw new TypeError(`GsapPosition.from error: 'trlPosition' is not an instance of Position.`);
+         throw new TypeError(`GsapPosition.from error: 'tjsPosition' is not an instance of Position.`);
       }
 
       if (typeof vars !== 'object')
@@ -94,7 +94,12 @@ class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionData = trlPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
+      if (s_POSITION_PROPS.size === 0)
+      {
+         throw new Error('GsapPosition.from error: No valid Position properties detected.');
+      }
+
+      const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
 
       const existingOnUpdate = vars.onUpdate;
 
@@ -103,20 +108,20 @@ class GsapPosition
       {
          vars.onUpdate = () =>
          {
-            trlPosition.set(positionData);
+            tjsPosition.set(positionData);
             existingOnUpdate();
          };
       }
       else
       {
-         vars.onUpdate = () => trlPosition.set(positionData);
+         vars.onUpdate = () => tjsPosition.set(positionData);
       }
 
       return gsap.from(positionData, vars);
    }
 
    /**
-    * @param {Position} trlPosition - Position instance.
+    * @param {Position} tjsPosition - Position instance.
     *
     * @param {object}   fromVars - GSAP fromVars object for `fromTo`
     *
@@ -124,11 +129,11 @@ class GsapPosition
     *
     * @returns {object} GSAP tween
     */
-   static fromTo(trlPosition, fromVars, toVars)
+   static fromTo(tjsPosition, fromVars, toVars)
    {
-      if (!(trlPosition instanceof Position))
+      if (!(tjsPosition instanceof Position))
       {
-         throw new TypeError(`GsapPosition.fromTo error: 'trlPosition' is not an instance of Position.`);
+         throw new TypeError(`GsapPosition.fromTo error: 'tjsPosition' is not an instance of Position.`);
       }
 
       if (typeof fromVars !== 'object')
@@ -153,7 +158,12 @@ class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionData = trlPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
+      if (s_POSITION_PROPS.size === 0)
+      {
+         throw new Error('GsapPosition.fromTo error: No valid Position properties detected.');
+      }
+
+      const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
 
       const existingOnUpdate = toVars.onUpdate;
 
@@ -162,20 +172,20 @@ class GsapPosition
       {
          toVars.onUpdate = () =>
          {
-            trlPosition.set(positionData);
+            tjsPosition.set(positionData);
             existingOnUpdate();
          };
       }
       else
       {
-         toVars.onUpdate = () => trlPosition.set(positionData);
+         toVars.onUpdate = () => tjsPosition.set(positionData);
       }
 
       return gsap.fromTo(positionData, fromVars, toVars);
    }
 
    /**
-    * @param {Position} trlPosition - Position instance.
+    * @param {Position} tjsPosition - Position instance.
     *
     * @param {string}   key - Property of position to manipulate.
     *
@@ -183,11 +193,11 @@ class GsapPosition
     *
     * @returns {Function}  GSAP quickTo function.
     */
-   static quickTo(trlPosition, key, vars)
+   static quickTo(tjsPosition, key, vars)
    {
-      if (!(trlPosition instanceof Position))
+      if (!(tjsPosition instanceof Position))
       {
-         throw new TypeError(`GsapPosition.quickTo error: 'trlPosition' is not an instance of Position.`);
+         throw new TypeError(`GsapPosition.quickTo error: 'tjsPosition' is not an instance of Position.`);
       }
 
       if (typeof vars !== 'object')
@@ -202,7 +212,12 @@ class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionData = trlPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
+      if (s_POSITION_PROPS.size === 0)
+      {
+         throw new Error('GsapPosition.quickTo error: No valid Position properties detected.');
+      }
+
+      const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
 
       const existingOnUpdate = vars.onUpdate;
 
@@ -211,20 +226,20 @@ class GsapPosition
       {
          vars.onUpdate = () =>
          {
-            trlPosition.set(positionData);
+            tjsPosition.set(positionData);
             existingOnUpdate();
          };
       }
       else
       {
-         vars.onUpdate = () => trlPosition.set(positionData);
+         vars.onUpdate = () => tjsPosition.set(positionData);
       }
 
       return gsap.quickTo(positionData, key, vars);
    }
 
    /**
-    * @param {Position}          trlPosition - Position instance.
+    * @param {Position}          tjsPosition - Position instance.
     *
     * @param {object|object[]}   arg1 - Either an object defining timelineOptions or an array of gsapData entries.
     *
@@ -232,11 +247,11 @@ class GsapPosition
     *
     * @returns {object} GSAP timeline
     */
-   static timeline(trlPosition, arg1, arg2)
+   static timeline(tjsPosition, arg1, arg2)
    {
-      if (!(trlPosition instanceof Position))
+      if (!(tjsPosition instanceof Position))
       {
-         throw new TypeError(`GsapPosition.timeline error: 'trlPosition' is not an instance of Position.`);
+         throw new TypeError(`GsapPosition.timeline error: 'tjsPosition' is not an instance of Position.`);
       }
 
       // Load the variable arguments from arg1 / arg2.
@@ -287,8 +302,12 @@ class GsapPosition
 
       if (hasPositionUpdates)
       {
-         // positionData = trlPosition.get({ immediateElementUpdate: true });
-         trlPosition.get(positionData, s_POSITION_PROPS);
+         if (s_POSITION_PROPS.size === 0)
+         {
+            throw new Error('GsapPosition.timeline error: No valid Position properties detected.');
+         }
+
+         tjsPosition.get(positionData, s_POSITION_PROPS);
 
          const existingOnUpdate = timelineOptions.onUpdate;
 
@@ -297,13 +316,13 @@ class GsapPosition
          {
             timelineOptions.onUpdate = () =>
             {
-               trlPosition.set(positionData);
+               tjsPosition.set(positionData);
                existingOnUpdate();
             };
          }
          else
          {
-            timelineOptions.onUpdate = () => trlPosition.set(positionData);
+            timelineOptions.onUpdate = () => tjsPosition.set(positionData);
          }
       }
 
@@ -334,20 +353,20 @@ class GsapPosition
                break;
 
             case 'from':
-               timeline.from(s_GET_TARGET(trlPosition, positionData, entry, cntr), entry.vars, entry.position);
+               timeline.from(s_GET_TARGET(tjsPosition, positionData, entry, cntr), entry.vars, entry.position);
                break;
 
             case 'fromTo':
-               timeline.fromTo(s_GET_TARGET(trlPosition, positionData, entry, cntr), entry.fromVars, entry.toVars,
+               timeline.fromTo(s_GET_TARGET(tjsPosition, positionData, entry, cntr), entry.fromVars, entry.toVars,
                 entry.position);
                break;
 
             case 'set':
-               timeline.set(s_GET_TARGET(trlPosition, positionData, entry, cntr), entry.vars, entry.position);
+               timeline.set(s_GET_TARGET(tjsPosition, positionData, entry, cntr), entry.vars, entry.position);
                break;
 
             case 'to':
-               timeline.to(s_GET_TARGET(trlPosition, positionData, entry, cntr), entry.vars, entry.position);
+               timeline.to(s_GET_TARGET(tjsPosition, positionData, entry, cntr), entry.vars, entry.position);
                break;
 
             default:
@@ -359,17 +378,17 @@ class GsapPosition
    }
 
    /**
-    * @param {Position} trlPosition - Position instance.
+    * @param {Position} tjsPosition - Position instance.
     *
     * @param {object}   vars - GSAP vars object for `to`.
     *
     * @returns {object} GSAP tween
     */
-   static to(trlPosition, vars)
+   static to(tjsPosition, vars)
    {
-      if (!(trlPosition instanceof Position))
+      if (!(tjsPosition instanceof Position))
       {
-         throw new TypeError(`GsapPosition.to error: 'trlPosition' is not an instance of Position.`);
+         throw new TypeError(`GsapPosition.to error: 'tjsPosition' is not an instance of Position.`);
       }
 
       if (typeof vars !== 'object')
@@ -384,7 +403,12 @@ class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionData = trlPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
+      if (s_POSITION_PROPS.size === 0)
+      {
+         throw new Error('GsapPosition.to error: No valid Position properties detected.');
+      }
+
+      const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
 
       const existingOnUpdate = vars.onUpdate;
 
@@ -393,13 +417,13 @@ class GsapPosition
       {
          vars.onUpdate = () =>
          {
-            trlPosition.set(positionData);
+            tjsPosition.set(positionData);
             existingOnUpdate();
          };
       }
       else
       {
-         vars.onUpdate = () => trlPosition.set(positionData);
+         vars.onUpdate = () => tjsPosition.set(positionData);
       }
 
       return gsap.to(positionData, vars);
@@ -571,17 +595,17 @@ class TimelineImpl
 /**
  * Gets the target from GSAP data entry.
  *
- * @param {Position}             trlPosition -
+ * @param {Position}             tjsPosition - Position instance.
  *
- * @param {PositionDataExtended} positionData -
+ * @param {PositionDataExtended} positionData - Position data.
  *
- * @param {object}               entry -
+ * @param {object}               entry - Gsap data entry.
  *
  * @param {number}               cntr - Current GSAP data entry index.
  *
  * @returns {PositionDataExtended|HTMLElement} The target object or HTMLElement.
  */
-function s_GET_TARGET(trlPosition, positionData, entry, cntr)
+function s_GET_TARGET(tjsPosition, positionData, entry, cntr)
 {
    const target = entry.target ?? 'position';
 
@@ -590,7 +614,7 @@ function s_GET_TARGET(trlPosition, positionData, entry, cntr)
       case 'position':
          return positionData;
       case 'element':
-         return trlPosition.element;
+         return tjsPosition.element;
       default:
          throw new Error(`GsapPosition.timeline error: 'gsapData[${cntr}]' unknown 'target' - '${target}'.`);
    }
