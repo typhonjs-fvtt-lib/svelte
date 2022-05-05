@@ -7,6 +7,7 @@ let gsap = void 0;
 let CustomBounce = void 0;
 let CustomEase = void 0;
 let CustomWiggle = void 0;
+let Draggable = void 0;    // eslint-disable-line no-shadow
 let DrawSVGPlugin = void 0;
 let EasePack = void 0;
 let GSDevTools = void 0;
@@ -33,6 +34,7 @@ try
    CustomBounce = module.CustomBounce;
    CustomEase = module.CustomEase;
    CustomWiggle = module.CustomWiggle;
+   Draggable = module.Draggable;
    DrawSVGPlugin = module.DrawSVGPlugin;
    EasePack = module.EasePack;
    GSDevTools = module.GSDevTools;
@@ -634,5 +636,5 @@ function s_GET_TARGET(tjsPosition, positionData, entry, cntr)
    }
 }
 
-export { CustomBounce, CustomEase, CustomWiggle, DrawSVGPlugin, EasePack, GSDevTools, GsapPosition, InertiaPlugin, MorphSVGPlugin, MotionPathHelper, MotionPathPlugin, Physics2DPlugin, PhysicsPropsPlugin, PixiPlugin, ScrambleTextPlugin, ScrollToPlugin, ScrollTrigger, SplitText, TextPlugin, animate, gsap };
+export { CustomBounce, CustomEase, CustomWiggle, Draggable, DrawSVGPlugin, EasePack, GSDevTools, GsapPosition, InertiaPlugin, MorphSVGPlugin, MotionPathHelper, MotionPathPlugin, Physics2DPlugin, PhysicsPropsPlugin, PixiPlugin, ScrambleTextPlugin, ScrollToPlugin, ScrollTrigger, SplitText, TextPlugin, animate, gsap };
 //# sourceMappingURL=index.js.map
