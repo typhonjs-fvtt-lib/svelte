@@ -3,12 +3,51 @@ import { Position } from '@typhonjs-fvtt/svelte/application';
 
 let gsap = void 0;
 
+// Plugins
+let CustomBounce = void 0;
+let CustomEase = void 0;
+let CustomWiggle = void 0;
+let DrawSVGPlugin = void 0;
+let EasePack = void 0;
+let GSDevTools = void 0;
+let InertiaPlugin = void 0;
+let MorphSVGPlugin = void 0;
+let MotionPathHelper = void 0;
+let MotionPathPlugin = void 0;
+let Physics2DPlugin = void 0;
+let PhysicsPropsPlugin = void 0;
+let PixiPlugin = void 0;
+let ScrambleTextPlugin = void 0;
+let ScrollToPlugin = void 0;
+let ScrollTrigger = void 0;
+let SplitText = void 0;
+let TextPlugin = void 0;
+
 const modulePath = foundry.utils.getRoute('/scripts/greensock/esm/all.js');
 
 try
 {
    const module = await import(modulePath);
    gsap = module.gsap;
+
+   CustomBounce = module.CustomBounce;
+   CustomEase = module.CustomEase;
+   CustomWiggle = module.CustomWiggle;
+   DrawSVGPlugin = module.DrawSVGPlugin;
+   EasePack = module.EasePack;
+   GSDevTools = module.GSDevTools;
+   InertiaPlugin = module.InertiaPlugin;
+   MorphSVGPlugin = module.MorphSVGPlugin;
+   MotionPathHelper = module.MotionPathHelper;
+   MotionPathPlugin = module.MotionPathPlugin;
+   Physics2DPlugin = module.Physics2DPlugin;
+   PhysicsPropsPlugin = module.PhysicsPropsPlugin;
+   PixiPlugin = module.PixiPlugin;
+   ScrambleTextPlugin = module.ScrambleTextPlugin;
+   ScrollToPlugin = module.ScrollToPlugin;
+   ScrollTrigger = module.ScrollTrigger;
+   SplitText = module.SplitText;
+   TextPlugin = module.TextPlugin;
 
    // Load Svelte easing functions by prepending them w/ `svelte-`; `linear` becomes `svelte-linear`, etc.
    for (const prop of Object.keys(easingFuncs))
@@ -94,11 +133,6 @@ class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      if (s_POSITION_PROPS.size === 0)
-      {
-         throw new Error('GsapPosition.from error: No valid Position properties detected.');
-      }
-
       const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
 
       const existingOnUpdate = vars.onUpdate;
@@ -158,11 +192,6 @@ class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      if (s_POSITION_PROPS.size === 0)
-      {
-         throw new Error('GsapPosition.fromTo error: No valid Position properties detected.');
-      }
-
       const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
 
       const existingOnUpdate = toVars.onUpdate;
@@ -210,11 +239,6 @@ class GsapPosition
       for (const prop in vars)
       {
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
-      }
-
-      if (s_POSITION_PROPS.size === 0)
-      {
-         throw new Error('GsapPosition.quickTo error: No valid Position properties detected.');
       }
 
       const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
@@ -302,11 +326,6 @@ class GsapPosition
 
       if (hasPositionUpdates)
       {
-         if (s_POSITION_PROPS.size === 0)
-         {
-            throw new Error('GsapPosition.timeline error: No valid Position properties detected.');
-         }
-
          tjsPosition.get(positionData, s_POSITION_PROPS);
 
          const existingOnUpdate = timelineOptions.onUpdate;
@@ -401,11 +420,6 @@ class GsapPosition
       for (const prop in vars)
       {
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
-      }
-
-      if (s_POSITION_PROPS.size === 0)
-      {
-         throw new Error('GsapPosition.to error: No valid Position properties detected.');
       }
 
       const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
@@ -620,5 +634,5 @@ function s_GET_TARGET(tjsPosition, positionData, entry, cntr)
    }
 }
 
-export { GsapPosition, animate, gsap };
+export { CustomBounce, CustomEase, CustomWiggle, DrawSVGPlugin, EasePack, GSDevTools, GsapPosition, InertiaPlugin, MorphSVGPlugin, MotionPathHelper, MotionPathPlugin, Physics2DPlugin, PhysicsPropsPlugin, PixiPlugin, ScrambleTextPlugin, ScrollToPlugin, ScrollTrigger, SplitText, TextPlugin, animate, gsap };
 //# sourceMappingURL=index.js.map

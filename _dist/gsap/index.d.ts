@@ -64,6 +64,5 @@ declare class GsapPosition {
 declare function animate(node: HTMLElement, { type, ...args }: {
     type: string;
 }): any;
-declare let gsap: any;
 
-export { GsapPosition, animate, gsap };
+export { GsapPosition, animate };
