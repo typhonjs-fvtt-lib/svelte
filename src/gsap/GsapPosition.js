@@ -58,11 +58,6 @@ export class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      if (s_POSITION_PROPS.size === 0)
-      {
-         throw new Error('GsapPosition.from error: No valid Position properties detected.');
-      }
-
       const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
 
       const existingOnUpdate = vars.onUpdate;
@@ -122,11 +117,6 @@ export class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      if (s_POSITION_PROPS.size === 0)
-      {
-         throw new Error('GsapPosition.fromTo error: No valid Position properties detected.');
-      }
-
       const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
 
       const existingOnUpdate = toVars.onUpdate;
@@ -174,11 +164,6 @@ export class GsapPosition
       for (const prop in vars)
       {
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
-      }
-
-      if (s_POSITION_PROPS.size === 0)
-      {
-         throw new Error('GsapPosition.quickTo error: No valid Position properties detected.');
       }
 
       const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
@@ -266,11 +251,6 @@ export class GsapPosition
 
       if (hasPositionUpdates)
       {
-         if (s_POSITION_PROPS.size === 0)
-         {
-            throw new Error('GsapPosition.timeline error: No valid Position properties detected.');
-         }
-
          tjsPosition.get(positionData, s_POSITION_PROPS);
 
          const existingOnUpdate = timelineOptions.onUpdate;
@@ -365,11 +345,6 @@ export class GsapPosition
       for (const prop in vars)
       {
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
-      }
-
-      if (s_POSITION_PROPS.size === 0)
-      {
-         throw new Error('GsapPosition.to error: No valid Position properties detected.');
       }
 
       const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
