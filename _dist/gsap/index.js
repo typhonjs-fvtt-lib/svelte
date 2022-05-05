@@ -114,9 +114,11 @@ class GsapPosition
     *
     * @param {object}   vars - GSAP vars object for `from`.
     *
+    * @param {Function} [filter] - An optional filter function to adjust position data.
+    *
     * @returns {object} GSAP tween
     */
-   static from(tjsPosition, vars)
+   static from(tjsPosition, vars, filter)
    {
       if (!(tjsPosition instanceof Position))
       {
@@ -139,18 +141,37 @@ class GsapPosition
 
       const existingOnUpdate = vars.onUpdate;
 
-      // Preserve invoking existing onUpdate function.
-      if (typeof existingOnUpdate === 'function')
+      if (typeof filter === 'function')
       {
-         vars.onUpdate = () =>
+         // Preserve invoking existing onUpdate function.
+         if (typeof existingOnUpdate === 'function')
          {
-            tjsPosition.set(positionData);
-            existingOnUpdate();
-         };
+            vars.onUpdate = () =>
+            {
+               tjsPosition.set(filter(positionData));
+               existingOnUpdate();
+            };
+         }
+         else
+         {
+            vars.onUpdate = () => tjsPosition.set(filter(positionData));
+         }
       }
       else
       {
-         vars.onUpdate = () => tjsPosition.set(positionData);
+         // Preserve invoking existing onUpdate function.
+         if (typeof existingOnUpdate === 'function')
+         {
+            vars.onUpdate = () =>
+            {
+               tjsPosition.set(positionData);
+               existingOnUpdate();
+            };
+         }
+         else
+         {
+            vars.onUpdate = () => tjsPosition.set(positionData);
+         }
       }
 
       return gsap.from(positionData, vars);
@@ -163,9 +184,11 @@ class GsapPosition
     *
     * @param {object}   toVars - GSAP toVars object for `fromTo`.
     *
+    * @param {Function} [filter] - An optional filter function to adjust position data.
+    *
     * @returns {object} GSAP tween
     */
-   static fromTo(tjsPosition, fromVars, toVars)
+   static fromTo(tjsPosition, fromVars, toVars, filter)
    {
       if (!(tjsPosition instanceof Position))
       {
@@ -198,18 +221,37 @@ class GsapPosition
 
       const existingOnUpdate = toVars.onUpdate;
 
-      // Preserve invoking existing onUpdate function.
-      if (typeof existingOnUpdate === 'function')
+      if (typeof filter === 'function')
       {
-         toVars.onUpdate = () =>
+         // Preserve invoking existing onUpdate function.
+         if (typeof existingOnUpdate === 'function')
          {
-            tjsPosition.set(positionData);
-            existingOnUpdate();
-         };
+            toVars.onUpdate = () =>
+            {
+               tjsPosition.set(filter(positionData));
+               existingOnUpdate();
+            };
+         }
+         else
+         {
+            toVars.onUpdate = () => tjsPosition.set(filter(positionData));
+         }
       }
       else
       {
-         toVars.onUpdate = () => tjsPosition.set(positionData);
+         // Preserve invoking existing onUpdate function.
+         if (typeof existingOnUpdate === 'function')
+         {
+            toVars.onUpdate = () =>
+            {
+               tjsPosition.set(positionData);
+               existingOnUpdate();
+            };
+         }
+         else
+         {
+            toVars.onUpdate = () => tjsPosition.set(positionData);
+         }
       }
 
       return gsap.fromTo(positionData, fromVars, toVars);
@@ -222,9 +264,11 @@ class GsapPosition
     *
     * @param {object}   vars - GSAP vars object for `quickTo`.
     *
+    * @param {Function} [filter] - An optional filter function to adjust position data.
+    *
     * @returns {Function}  GSAP quickTo function.
     */
-   static quickTo(tjsPosition, key, vars)
+   static quickTo(tjsPosition, key, vars, filter)
    {
       if (!(tjsPosition instanceof Position))
       {
@@ -247,19 +291,39 @@ class GsapPosition
 
       const existingOnUpdate = vars.onUpdate;
 
-      // Preserve invoking existing onUpdate function.
-      if (typeof existingOnUpdate === 'function')
+      if (typeof filter === 'function')
       {
-         vars.onUpdate = () =>
+         // Preserve invoking existing onUpdate function.
+         if (typeof existingOnUpdate === 'function')
          {
-            tjsPosition.set(positionData);
-            existingOnUpdate();
-         };
+            vars.onUpdate = () =>
+            {
+               tjsPosition.set(filter(positionData));
+               existingOnUpdate();
+            };
+         }
+         else
+         {
+            vars.onUpdate = () => tjsPosition.set(filter(positionData));
+         }
       }
       else
       {
-         vars.onUpdate = () => tjsPosition.set(positionData);
+         // Preserve invoking existing onUpdate function.
+         if (typeof existingOnUpdate === 'function')
+         {
+            vars.onUpdate = () =>
+            {
+               tjsPosition.set(positionData);
+               existingOnUpdate();
+            };
+         }
+         else
+         {
+            vars.onUpdate = () => tjsPosition.set(positionData);
+         }
       }
+
 
       return gsap.quickTo(positionData, key, vars);
    }
@@ -269,11 +333,14 @@ class GsapPosition
     *
     * @param {object|object[]}   arg1 - Either an object defining timelineOptions or an array of gsapData entries.
     *
-    * @param {object[]}          [arg2] - When arg1 is defined as an object; arg2 defines an array of gsapData entries.
+    * @param {object[]|Function} [arg2] - When arg1 is defined as an object; arg2 defines an array of gsapData entries.
+    *
+    * @param {Function}          [arg3] - An optional filter function to adjust position data; may be arg2 when
+    *                                     timelineOptions omitted.
     *
     * @returns {object} GSAP timeline
     */
-   static timeline(tjsPosition, arg1, arg2)
+   static timeline(tjsPosition, arg1, arg2, arg3)
    {
       if (!(tjsPosition instanceof Position))
       {
@@ -286,6 +353,13 @@ class GsapPosition
 
       // If arg1 is an array then take it as `gsapData` otherwise select arg2.
       const gsapData = Array.isArray(arg1) ? arg1 : arg2;
+
+      /**
+       * An optional filter function to adjust position data.
+       *
+       * @type {Function}
+       */
+      const filter = gsapData === arg1 ? arg2 : arg3;
 
       if (typeof timelineOptions !== 'object')
       {
@@ -332,18 +406,37 @@ class GsapPosition
 
          const existingOnUpdate = timelineOptions.onUpdate;
 
-         // Preserve invoking existing onUpdate function.
-         if (typeof existingOnUpdate === 'function')
+         if (typeof filter === 'function')
          {
-            timelineOptions.onUpdate = () =>
+            // Preserve invoking existing onUpdate function.
+            if (typeof existingOnUpdate === 'function')
             {
-               tjsPosition.set(positionData);
-               existingOnUpdate();
-            };
+               timelineOptions.onUpdate = () =>
+               {
+                  tjsPosition.set(filter(positionData));
+                  existingOnUpdate();
+               };
+            }
+            else
+            {
+               timelineOptions.onUpdate = () => tjsPosition.set(filter(positionData));
+            }
          }
          else
          {
-            timelineOptions.onUpdate = () => tjsPosition.set(positionData);
+            // Preserve invoking existing onUpdate function.
+            if (typeof existingOnUpdate === 'function')
+            {
+               timelineOptions.onUpdate = () =>
+               {
+                  tjsPosition.set(positionData);
+                  existingOnUpdate();
+               };
+            }
+            else
+            {
+               timelineOptions.onUpdate = () => tjsPosition.set(positionData);
+            }
          }
       }
 
@@ -403,9 +496,11 @@ class GsapPosition
     *
     * @param {object}   vars - GSAP vars object for `to`.
     *
+    * @param {Function} [filter] - An optional filter function to adjust position data.
+    *
     * @returns {object} GSAP tween
     */
-   static to(tjsPosition, vars)
+   static to(tjsPosition, vars, filter)
    {
       if (!(tjsPosition instanceof Position))
       {
@@ -428,18 +523,37 @@ class GsapPosition
 
       const existingOnUpdate = vars.onUpdate;
 
-      // Preserve invoking existing onUpdate function.
-      if (typeof existingOnUpdate === 'function')
+      if (typeof filter === 'function')
       {
-         vars.onUpdate = () =>
+         // Preserve invoking existing onUpdate function.
+         if (typeof existingOnUpdate === 'function')
          {
-            tjsPosition.set(positionData);
-            existingOnUpdate();
-         };
+            vars.onUpdate = () =>
+            {
+               tjsPosition.set(filter(positionData));
+               existingOnUpdate();
+            };
+         }
+         else
+         {
+            vars.onUpdate = () => tjsPosition.set(filter(positionData));
+         }
       }
       else
       {
-         vars.onUpdate = () => tjsPosition.set(positionData);
+         // Preserve invoking existing onUpdate function.
+         if (typeof existingOnUpdate === 'function')
+         {
+            vars.onUpdate = () =>
+            {
+               tjsPosition.set(positionData);
+               existingOnUpdate();
+            };
+         }
+         else
+         {
+            vars.onUpdate = () => tjsPosition.set(positionData);
+         }
       }
 
       return gsap.to(positionData, vars);
