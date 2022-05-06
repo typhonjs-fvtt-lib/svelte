@@ -472,6 +472,11 @@ export class Position
    get rotateZ() { return this.#data.rotateZ; }
 
    /**
+    * @returns {number|null} alias for rotateZ
+    */
+   get rotation() { return this.#data.rotateZ; }
+
+   /**
     * @returns {number|null} scale
     */
    get scale() { return this.#data.scale; }
@@ -579,6 +584,14 @@ export class Position
     * @param {number|null} rotateZ -
     */
    set rotateZ(rotateZ)
+   {
+      this.#stores.rotateZ.set(rotateZ);
+   }
+
+   /**
+    * @param {number|null} rotateZ - alias for rotateZ
+    */
+   set rotation(rotateZ)
    {
       this.#stores.rotateZ.set(rotateZ);
    }
@@ -1266,6 +1279,8 @@ export class Position
     *
     * @param {number|null} opts.zIndex -
     *
+    * @param {number|null} opts.rotation - alias for rotateZ
+    *
     * @param {*} opts.rest -
     *
     * @param {object} parent -
@@ -1276,8 +1291,16 @@ export class Position
     *
     * @returns {null|PositionData} Updated position data or null if validation fails.
     */
-   #updatePosition({ left, top, maxWidth, maxHeight, minWidth, minHeight, width, height, rotateX, rotateY, rotateZ,
-    scale, transformOrigin, translateX, translateY, translateZ, zIndex, ...rest } = {}, parent, el, styleCache)
+   #updatePosition({
+      // Directly supported parameters
+      left, top, maxWidth, maxHeight, minWidth, minHeight, width, height, rotateX, rotateY, rotateZ, scale,
+       transformOrigin, translateX, translateY, translateZ, zIndex,
+
+      // Aliased parameters
+      rotation,
+
+      ...rest
+   } = {}, parent, el, styleCache)
    {
       let currentPosition = s_DATA_UPDATE.copy(this.#data);
 
@@ -1367,7 +1390,10 @@ export class Position
       // Update rotate X/Y/Z, scale, z-index
       if (Number.isFinite(rotateX) || rotateX === null) { currentPosition.rotateX = rotateX; }
       if (Number.isFinite(rotateY) || rotateY === null) { currentPosition.rotateY = rotateY; }
-      if (Number.isFinite(rotateZ) || rotateZ === null) { currentPosition.rotateZ = rotateZ; }
+
+      // Handle alias for rotateZ first then check rotateZ.
+      if (Number.isFinite(rotation) || rotation === null) { currentPosition.rotateZ = rotation; }
+      else if (Number.isFinite(rotateZ) || rotateZ === null) { currentPosition.rotateZ = rotateZ; }
 
       if (Number.isFinite(translateX) || translateX === null) { currentPosition.translateX = translateX; }
       if (Number.isFinite(translateY) || translateY === null) { currentPosition.translateY = translateY; }
@@ -1469,6 +1495,8 @@ Object.seal(s_VALIDATION_DATA);
  * @typedef {PositionData} PositionDataExtended
  *
  * @property {boolean} [immediateElementUpdate] - When true any associated element is updated immediately.
+ *
+ * @property {number|null} [rotation] - Alias for `rotateZ`.
  */
 
 /**
