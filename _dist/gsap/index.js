@@ -1,5 +1,6 @@
 import * as easingFuncs from 'svelte/easing';
 import { Position } from '@typhonjs-fvtt/svelte/application';
+import { isIterable } from '@typhonjs-fvtt/svelte/util';
 
 let gsap = void 0;
 
@@ -114,11 +115,11 @@ class GsapPosition
     *
     * @param {object}   vars - GSAP vars object for `from`.
     *
-    * @param {Function} [filter] - An optional filter function to adjust position data.
+    * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
     *
     * @returns {object} GSAP tween
     */
-   static from(tjsPosition, vars, filter)
+   static from(tjsPosition, vars, options)
    {
       if (!(tjsPosition instanceof Position))
       {
@@ -130,8 +131,23 @@ class GsapPosition
          throw new TypeError(`GsapPosition.from error: 'vars' is not an object.`);
       }
 
+      if (options !== void 0 && typeof options !== 'object')
+      {
+         throw new TypeError(`GsapPosition.from error: 'options' is not an object.`);
+      }
+
+      const filter = options.filter;
+      const initialProps = options.initialProps;
+
       // Only retrieve the Position keys that are in vars.
       s_POSITION_PROPS.clear();
+
+      // Add any initial props if defined.
+      if (isIterable(initialProps))
+      {
+         for (const prop of initialProps) { s_POSITION_PROPS.add(prop); }
+      }
+
       for (const prop in vars)
       {
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
@@ -184,11 +200,11 @@ class GsapPosition
     *
     * @param {object}   toVars - GSAP toVars object for `fromTo`.
     *
-    * @param {Function} [filter] - An optional filter function to adjust position data.
+    * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
     *
     * @returns {object} GSAP tween
     */
-   static fromTo(tjsPosition, fromVars, toVars, filter)
+   static fromTo(tjsPosition, fromVars, toVars, options)
    {
       if (!(tjsPosition instanceof Position))
       {
@@ -205,8 +221,23 @@ class GsapPosition
          throw new TypeError(`GsapPosition.fromTo error: 'fromVars' is not an object.`);
       }
 
+      if (options !== void 0 && typeof options !== 'object')
+      {
+         throw new TypeError(`GsapPosition.from error: 'options' is not an object.`);
+      }
+
+      const filter = options.filter;
+      const initialProps = options.initialProps;
+
       // Only retrieve the Position keys that are in vars.
       s_POSITION_PROPS.clear();
+
+      // Add any initial props if defined.
+      if (isIterable(initialProps))
+      {
+         for (const prop of initialProps) { s_POSITION_PROPS.add(prop); }
+      }
+
       for (const prop in fromVars)
       {
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
@@ -264,11 +295,11 @@ class GsapPosition
     *
     * @param {object}   vars - GSAP vars object for `quickTo`.
     *
-    * @param {Function} [filter] - An optional filter function to adjust position data.
+    * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
     *
     * @returns {Function}  GSAP quickTo function.
     */
-   static quickTo(tjsPosition, key, vars, filter)
+   static quickTo(tjsPosition, key, vars, options)
    {
       if (!(tjsPosition instanceof Position))
       {
@@ -280,8 +311,23 @@ class GsapPosition
          throw new TypeError(`GsapPosition.quickTo error: 'vars' is not an object.`);
       }
 
+      if (options !== void 0 && typeof options !== 'object')
+      {
+         throw new TypeError(`GsapPosition.from error: 'options' is not an object.`);
+      }
+
+      const filter = options.filter;
+      const initialProps = options.initialProps;
+
       // Only retrieve the Position keys that are in vars.
       s_POSITION_PROPS.clear();
+
+      // Add any initial props if defined.
+      if (isIterable(initialProps))
+      {
+         for (const prop of initialProps) { s_POSITION_PROPS.add(prop); }
+      }
+
       for (const prop in vars)
       {
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
@@ -335,8 +381,7 @@ class GsapPosition
     *
     * @param {object[]|Function} [arg2] - When arg1 is defined as an object; arg2 defines an array of gsapData entries.
     *
-    * @param {Function}          [arg3] - An optional filter function to adjust position data; may be arg2 when
-    *                                     timelineOptions omitted.
+    * @param {GsapPositionOptions} [arg3] - Options for filtering and initial data population.
     *
     * @returns {object} GSAP timeline
     */
@@ -354,12 +399,8 @@ class GsapPosition
       // If arg1 is an array then take it as `gsapData` otherwise select arg2.
       const gsapData = Array.isArray(arg1) ? arg1 : arg2;
 
-      /**
-       * An optional filter function to adjust position data.
-       *
-       * @type {Function}
-       */
-      const filter = gsapData === arg1 ? arg2 : arg3;
+      /** @type {GsapPositionOptions} */
+      const options = gsapData === arg1 ? arg2 : arg3;
 
       if (typeof timelineOptions !== 'object')
       {
@@ -371,10 +412,24 @@ class GsapPosition
          throw new TypeError(`GsapPosition.timeline error: 'gsapData' is not an array.`);
       }
 
+      if (options !== void 0 && typeof options !== 'object')
+      {
+         throw new TypeError(`GsapPosition.from error: 'options' is not an object.`);
+      }
+
+      const filter = options.filter;
+      const initialProps = options.initialProps;
+
       let hasPositionUpdates = false;
 
       let positionData;
       s_POSITION_PROPS.clear();
+
+      // Add any initial props if defined.
+      if (isIterable(initialProps))
+      {
+         for (const prop of initialProps) { s_POSITION_PROPS.add(prop); }
+      }
 
       // Validate gsapData.
       for (let cntr = 0; cntr < gsapData.length; cntr++)
@@ -496,11 +551,11 @@ class GsapPosition
     *
     * @param {object}   vars - GSAP vars object for `to`.
     *
-    * @param {Function} [filter] - An optional filter function to adjust position data.
+    * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
     *
     * @returns {object} GSAP tween
     */
-   static to(tjsPosition, vars, filter)
+   static to(tjsPosition, vars, options)
    {
       if (!(tjsPosition instanceof Position))
       {
@@ -512,8 +567,23 @@ class GsapPosition
          throw new TypeError(`GsapPosition.to error: 'vars' is not an object.`);
       }
 
+      if (options !== void 0 && typeof options !== 'object')
+      {
+         throw new TypeError(`GsapPosition.from error: 'options' is not an object.`);
+      }
+
+      const filter = options.filter;
+      const initialProps = options.initialProps;
+
       // Only retrieve the Position keys that are in vars.
       s_POSITION_PROPS.clear();
+
+      // Add any initial props if defined.
+      if (isIterable(initialProps))
+      {
+         for (const prop of initialProps) { s_POSITION_PROPS.add(prop); }
+      }
+
       for (const prop in vars)
       {
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
@@ -749,6 +819,18 @@ function s_GET_TARGET(tjsPosition, positionData, entry, cntr)
          throw new Error(`GsapPosition.timeline error: 'gsapData[${cntr}]' unknown 'target' - '${target}'.`);
    }
 }
+
+/**
+ * @typedef {object} GsapPositionOptions
+ *
+ * @property {Function} [filter] - An optional filter function to adjust position data in `onUpdate` callbacks. This is
+ *                                 useful if you need to transform any data from GSAP / plugins into data Position can
+ *                                 utilize.
+ *
+ * @property {Iterable<string>} [initialProps] - Provides an iterable of property keys to assign to initial position
+ *                                               data. This is useful when you are using GSAP plugins that manipulate
+ *                                               data automatically; Ex. MotionPathPlugin
+ */
 
 export { CustomBounce, CustomEase, CustomWiggle, Draggable, DrawSVGPlugin, EasePack, GSDevTools, GsapPosition, InertiaPlugin, MorphSVGPlugin, MotionPathHelper, MotionPathPlugin, Physics2DPlugin, PhysicsPropsPlugin, PixiPlugin, ScrambleTextPlugin, ScrollToPlugin, ScrollTrigger, SplitText, TextPlugin, animate, gsap };
 //# sourceMappingURL=index.js.map
