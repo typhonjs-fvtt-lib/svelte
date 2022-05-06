@@ -66,21 +66,6 @@ catch (error)
 }
 
 /**
- * @param {HTMLElement} node -
- *
- * @param {object}      options -
- *
- * @param {string}      options.type -
- *
- * @returns {*} GSAP method.
- */
-function animate(node, { type, ...args })
-{
-   const method = gsap[type];
-   return method(node, args);
-}
-
-/**
  * Stores the entry types that potentially use the generated initial position data.
  *
  * @type {Set<string>}
@@ -92,8 +77,14 @@ const s_TYPES_POSITION = new Set(['from', 'fromTo', 'set', 'to']);
  *
  * @type {Set<string>}
  */
-const s_POSITION_KEYS = new Set(['left', 'top', 'maxWidth', 'maxHeight', 'minWidth', 'minHeight', 'width', 'height',
- 'rotateX', 'rotateY', 'rotateZ', 'scale', 'translateX', 'translateY', 'translateZ', 'zIndex']);
+const s_POSITION_KEYS = new Set([
+ // Main keys
+ 'left', 'top', 'maxWidth', 'maxHeight', 'minWidth', 'minHeight', 'width', 'height',
+  'rotateX', 'rotateY', 'rotateZ', 'scale', 'translateX', 'translateY', 'translateZ', 'zIndex',
+
+ // Aliases
+ 'rotation'
+]);
 
 /**
  * Stores the seen Position properties when building the minimum update data object when animating.
@@ -101,6 +92,16 @@ const s_POSITION_KEYS = new Set(['left', 'top', 'maxWidth', 'maxHeight', 'minWid
  * @type {Set<string>}
  */
 const s_POSITION_PROPS = new Set();
+
+/**
+ * Defines the options for {@link Position.get}.
+ *
+ * @type {{keys: Set<string>, numeric: boolean}}
+ */
+const s_POSITION_GET_OPTIONS = {
+   keys: s_POSITION_PROPS,
+   numeric: true
+};
 
 /**
  * Provides a data driven ways to connect a {@link Position} instance with a GSAP timeline and tweens.
@@ -417,8 +418,8 @@ class GsapPosition
          throw new TypeError(`GsapPosition.from error: 'options' is not an object.`);
       }
 
-      const filter = options.filter;
-      const initialProps = options.initialProps;
+      const filter = options?.filter;
+      const initialProps = options?.initialProps;
 
       let hasPositionUpdates = false;
 
@@ -457,7 +458,7 @@ class GsapPosition
 
       if (hasPositionUpdates)
       {
-         tjsPosition.get(positionData, s_POSITION_PROPS);
+         tjsPosition.get(positionData, s_POSITION_GET_OPTIONS);
 
          const existingOnUpdate = timelineOptions.onUpdate;
 
@@ -832,5 +833,5 @@ function s_GET_TARGET(tjsPosition, positionData, entry, cntr)
  *                                               data automatically; Ex. MotionPathPlugin
  */
 
-export { CustomBounce, CustomEase, CustomWiggle, Draggable, DrawSVGPlugin, EasePack, GSDevTools, GsapPosition, InertiaPlugin, MorphSVGPlugin, MotionPathHelper, MotionPathPlugin, Physics2DPlugin, PhysicsPropsPlugin, PixiPlugin, ScrambleTextPlugin, ScrollToPlugin, ScrollTrigger, SplitText, TextPlugin, animate, gsap };
+export { CustomBounce, CustomEase, CustomWiggle, Draggable, DrawSVGPlugin, EasePack, GSDevTools, GsapPosition, InertiaPlugin, MorphSVGPlugin, MotionPathHelper, MotionPathPlugin, Physics2DPlugin, PhysicsPropsPlugin, PixiPlugin, ScrambleTextPlugin, ScrollToPlugin, ScrollTrigger, SplitText, TextPlugin, gsap };
 //# sourceMappingURL=index.js.map

@@ -778,19 +778,40 @@ export class Position
    }
 
    /**
+    * @typedef {object} PositionGetOptions
+    *
+    * @property {Iterable<string>} keys - When provided only these keys are copied.
+    *
+    * @property {boolean} numeric - When true any `null` values are converted into defaults.
+    */
+
+
+   /**
     * Assigns current position to object passed into method.
     *
     * @param {object|PositionData}  [position] - Target to assign current position data.
     *
-    * @param {Iterable<string>}     [keys] - When provided only these keys are copied.
+    * @param {PositionGetOptions}   [options] - Defines options for specific keys and substituting null for numeric
+    *                                           default values.
     *
     * @returns {PositionData} Passed in object with current position data.
     */
-   get(position = {}, keys = void 0)
+   get(position = {}, options)
    {
-      if (isIterable(keys))
+      const keys = options?.keys;
+
+      if (isIterable(options?.keys))
       {
-         for (const key of keys) { position[key] = this[key]; }
+         // Replace any null values potentially with numeric default values.
+         if (options?.numeric)
+         {
+            for (const key of keys) { position[key] = this[key] ?? constants.numericDefaults[key]; }
+         }
+         else // Accept current values.
+         {
+            for (const key of keys) { position[key] = this[key]; }
+         }
+
          return position;
       }
       else
@@ -1389,9 +1410,16 @@ export class Position
       if (Number.isFinite(rotateX) || rotateX === null) { currentPosition.rotateX = rotateX; }
       if (Number.isFinite(rotateY) || rotateY === null) { currentPosition.rotateY = rotateY; }
 
-      // Handle alias for rotateZ first then check rotateZ.
-      if (Number.isFinite(rotation) || rotation === null) { currentPosition.rotateZ = rotation; }
-      else if (Number.isFinite(rotateZ) || rotateZ === null) { currentPosition.rotateZ = rotateZ; }
+      // Handle alias for rotateZ. First check if `rotateZ` is valid and different from the current value. Next check if
+      // `rotation` is valid and use it for `rotateZ`.
+      if (rotateZ !== currentPosition.rotateZ && (Number.isFinite(rotateZ) || rotateZ === null))
+      {
+         currentPosition.rotateZ = rotateZ;
+      }
+      else if (rotation !== currentPosition.rotateZ && (Number.isFinite(rotation) || rotation === null))
+      {
+         currentPosition.rotateZ = rotation;
+      }
 
       if (Number.isFinite(translateX) || translateX === null) { currentPosition.translateX = translateX; }
       if (Number.isFinite(translateY) || translateY === null) { currentPosition.translateY = translateY; }

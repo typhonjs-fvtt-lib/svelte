@@ -5,6 +5,36 @@
  */
 const transformKeys = ['rotateX', 'rotateY', 'rotateZ', 'scale', 'translateX', 'translateY', 'translateZ'];
 
+/**
+ * Provides numeric defaults for all parameters. This is used by {@link Position.get} to optionally provide
+ * numeric defaults.
+ *
+ * @type {{rotation: number, scale: number, minWidth: null, minHeight: null, translateZ: number, top: number, left: number, maxHeight: null, translateY: number, translateX: number, width: number, transformOrigin: null, rotateX: number, rotateY: number, height: number, maxWidth: null, zIndex: null, rotateZ: number}}
+ */
+const numericDefaults = {
+   // Other keys
+   height: 0,
+   left: 0,
+   maxHeight: null,
+   maxWidth: null,
+   minHeight: null,
+   minWidth: null,
+   top: 0,
+   transformOrigin: null,
+   width: 0,
+   zIndex: null,
+
+   rotateX: 0,
+   rotateY: 0,
+   rotateZ: 0,
+   scale: 1,
+   translateX: 0,
+   translateY: 0,
+   translateZ: 0,
+
+   rotation: 0
+};
+
 Object.freeze(transformKeys);
 
 /**
@@ -41,4 +71,4 @@ const transformOrigins = ['top left', 'top center', 'top right', 'center left', 
 
 Object.freeze(transformOrigins);
 
-export { transformKeys, transformKeysBitwise, transformOriginDefault, transformOrigins };
+export { numericDefaults, transformKeys, transformKeysBitwise, transformOriginDefault, transformOrigins };
