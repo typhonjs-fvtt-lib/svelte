@@ -788,16 +788,14 @@ export class Position
     */
    get(position = {}, keys = void 0)
    {
-      const data = this.#data;
-
       if (isIterable(keys))
       {
-         for (const key of keys) { position[key] = data[key]; }
+         for (const key of keys) { position[key] = this[key]; }
          return position;
       }
       else
       {
-         return Object.assign(position, data);
+         return Object.assign(position, this.#data);
       }
    }
 
