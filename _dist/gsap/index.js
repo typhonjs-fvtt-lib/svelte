@@ -137,8 +137,8 @@ class GsapPosition
          throw new TypeError(`GsapPosition.from error: 'options' is not an object.`);
       }
 
-      const filter = options.filter;
-      const initialProps = options.initialProps;
+      const filter = options?.filter;
+      const initialProps = options?.initialProps;
 
       // Only retrieve the Position keys that are in vars.
       s_POSITION_PROPS.clear();
@@ -154,7 +154,7 @@ class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
+      const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_GET_OPTIONS);
 
       const existingOnUpdate = vars.onUpdate;
 
@@ -227,8 +227,8 @@ class GsapPosition
          throw new TypeError(`GsapPosition.from error: 'options' is not an object.`);
       }
 
-      const filter = options.filter;
-      const initialProps = options.initialProps;
+      const filter = options?.filter;
+      const initialProps = options?.initialProps;
 
       // Only retrieve the Position keys that are in vars.
       s_POSITION_PROPS.clear();
@@ -249,7 +249,7 @@ class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
+      const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_GET_OPTIONS);
 
       const existingOnUpdate = toVars.onUpdate;
 
@@ -317,8 +317,8 @@ class GsapPosition
          throw new TypeError(`GsapPosition.from error: 'options' is not an object.`);
       }
 
-      const filter = options.filter;
-      const initialProps = options.initialProps;
+      const filter = options?.filter;
+      const initialProps = options?.initialProps;
 
       // Only retrieve the Position keys that are in vars.
       s_POSITION_PROPS.clear();
@@ -334,7 +334,7 @@ class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
+      const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_GET_OPTIONS);
 
       const existingOnUpdate = vars.onUpdate;
 
@@ -573,8 +573,8 @@ class GsapPosition
          throw new TypeError(`GsapPosition.from error: 'options' is not an object.`);
       }
 
-      const filter = options.filter;
-      const initialProps = options.initialProps;
+      const filter = options?.filter;
+      const initialProps = options?.initialProps;
 
       // Only retrieve the Position keys that are in vars.
       s_POSITION_PROPS.clear();
@@ -590,7 +590,7 @@ class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_PROPS);
+      const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_GET_OPTIONS);
 
       const existingOnUpdate = vars.onUpdate;
 

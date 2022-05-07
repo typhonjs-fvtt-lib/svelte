@@ -5,6 +5,8 @@
  */
 const transformKeys = ['rotateX', 'rotateY', 'rotateZ', 'scale', 'translateX', 'translateY', 'translateZ'];
 
+Object.freeze(transformKeys);
+
 /**
  * Provides numeric defaults for all parameters. This is used by {@link Position.get} to optionally provide
  * numeric defaults.
@@ -35,7 +37,7 @@ const numericDefaults = {
    rotation: 0
 };
 
-Object.freeze(transformKeys);
+Object.freeze(numericDefaults);
 
 /**
  * Defines bitwise keys for transforms used in {@link Transforms.getMat4}.
