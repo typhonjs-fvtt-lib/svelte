@@ -241,15 +241,44 @@ export class GsapPosition
       // If the passed in gsapData is a function then we know we are working w/ individual positions.
       if (typeof gsapData === 'function')
       {
-         const subTimeline = gsap.timeline();
+         const optionPosition = options?.position;
 
-         for (let cntr = 0; cntr < positionInfo.gsapData.length; cntr++)
+         if (typeof optionPosition === 'function')
          {
-            this.handleGSAPDATA(positionInfo.gsapData[cntr], subTimeline, positionInfo.positionData[cntr],
-             positionInfo.elements[cntr]);
-         }
+            const positionCallbackData = {
+               index: void 0,
+               positionData: void 0,
+               element: void 0
+            };
 
-         timeline.add(subTimeline);
+            for (let index = 0; index < positionInfo.gsapData.length; index++)
+            {
+               const subTimeline = gsap.timeline();
+
+               positionCallbackData.index = index;
+               positionCallbackData.positionData = positionInfo.positionData[index];
+               positionCallbackData.element = positionInfo.elements[index];
+
+               const positionTimeline = optionPosition(positionCallbackData);
+
+               this.handleGSAPDATA(positionInfo.gsapData[index], subTimeline, positionInfo.positionData[index],
+                positionInfo.elements[index]);
+
+               timeline.add(subTimeline, positionTimeline);
+            }
+         }
+         else
+         {
+            for (let index = 0; index < positionInfo.gsapData.length; index++)
+            {
+               const subTimeline = gsap.timeline();
+
+               this.handleGSAPDATA(positionInfo.gsapData[index], subTimeline, positionInfo.positionData[index],
+                positionInfo.elements[index]);
+
+               timeline.add(subTimeline, optionPosition);
+            }
+         }
       }
       else
       {
