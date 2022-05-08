@@ -8,18 +8,38 @@ import { get, writable }   from 'svelte/store';
 export class TJSGameSettings
 {
    /**
-    * @type {Map<string, GSStore>}
+    * @type {Map<string, GSWritableStore>}
     */
    #stores = new Map();
 
    /**
-    * Returns the Game Settings store for the associated key.
+    * Returns a readable Game Settings store for the associated key.
     *
     * @param {string}   key - Game setting key.
     *
-    * @returns {GSStore|undefined} The associated store for the given game setting key.
+    * @returns {GSReadableStore|undefined} The associated store for the given game setting key.
     */
-   getStore(key)
+   getReadableStore(key)
+   {
+      if (!this.#stores.has(key))
+      {
+         console.warn(`TJSGameSettings - getStore: '${key}' is not a registered setting.`);
+         return;
+      }
+
+      const store = s_GET_STORE(this.#stores, key);
+
+      return { subscribe: store.subscribe, get: store.get };
+   }
+
+   /**
+    * Returns a writable Game Settings store for the associated key.
+    *
+    * @param {string}   key - Game setting key.
+    *
+    * @returns {GSWritableStore|undefined} The associated store for the given game setting key.
+    */
+   getWritableStore(key)
    {
       if (!this.#stores.has(key))
       {
@@ -128,15 +148,15 @@ export class TJSGameSettings
 }
 
 /**
- * Gets a store from the GSStore Map or creates a new store for the key.
+ * Gets a store from the GSWritableStore Map or creates a new store for the key.
  *
- * @param {Map<string, GSStore>} stores - Map containing Svelte stores.
+ * @param {Map<string, GSWritableStore>} stores - Map containing Svelte stores.
  *
  * @param {string}               key - Key to lookup in stores map.
  *
  * @param {string}               [initialValue] - An initial value to set to new stores.
  *
- * @returns {GSStore} The store for the given key.
+ * @returns {GSWritableStore} The store for the given key.
  */
 function s_GET_STORE(stores, key, initialValue)
 {
@@ -151,11 +171,11 @@ function s_GET_STORE(stores, key, initialValue)
 }
 
 /**
- * Creates a new GSStore for the given key.
+ * Creates a new GSWritableStore for the given key.
  *
  * @param {string}   initialValue - An initial value to set to new stores.
  *
- * @returns {GSStore} The new GSStore.
+ * @returns {GSWritableStore} The new GSWritableStore.
  */
 function s_CREATE_STORE(initialValue)
 {
@@ -196,5 +216,13 @@ function s_CREATE_STORE(initialValue)
  */
 
 /**
- * @typedef {import('svelte/store').Writable & import('svelte/store').get} GSStore - The backing Svelte store; a writable w/ get method attached.
+ * @typedef {import('svelte/store').Writable} GSWritableStore - The backing Svelte store; writable w/ get method attached.
+ *
+ * @property {Function} get -
+ */
+
+/**
+ * @typedef {import('svelte/store').Readable} GSReadableStore - The backing Svelte store; readable w/ get method attached.
+ *
+ * @property {Function} get -
  */

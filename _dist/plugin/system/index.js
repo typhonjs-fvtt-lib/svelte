@@ -506,9 +506,11 @@ class TJSSettingsControl
  *
  * The following events are available for registration:
  *
- * `tjs:system:game:settings:store:get`      - Invokes `getStore` from backing TJSGameSettings instance.
- * `tjs:system:game:settings:register`       - Registers a setting adding a callback to fire an event on change.
- * `tjs:system:game:settings:register:all`   - Registers multiple settings.
+ * `tjs:system:game:settings:store:get`          - Invokes `getWritableStore` from backing TJSGameSettings instance.
+ * `tjs:system:game:settings:store:writable:get` - Invokes `getWritableStore` from backing TJSGameSettings instance.
+ * `tjs:system:game:settings:store:readable:get` - Invokes `getReadableStore` from backing TJSGameSettings instance.
+ * `tjs:system:game:settings:register`           - Registers a setting adding a callback to fire an event on change.
+ * `tjs:system:game:settings:register:all`       - Registers multiple settings.
  *
  * The following events are triggered on change of a game setting.
  *
@@ -581,8 +583,17 @@ class TJSGameSettings
 
       const opts = { guard: true };
 
-      ev.eventbus.on(`tjs:system:game:settings:store:get`, this.#gameSettings.getStore, this.#gameSettings, opts);
+      ev.eventbus.on(`tjs:system:game:settings:store:get`, this.#gameSettings.getWritableStore, this.#gameSettings,
+       opts);
+
+      ev.eventbus.on(`tjs:system:game:settings:store:readable:get`, this.#gameSettings.getReadableStore,
+       this.#gameSettings, opts);
+
+      ev.eventbus.on(`tjs:system:game:settings:store:writable:get`, this.#gameSettings.getWritableStore,
+       this.#gameSettings, opts);
+
       ev.eventbus.on(`tjs:system:game:settings:register`, this.register, this, opts);
+
       ev.eventbus.on(`tjs:system:game:settings:register:all`, this.registerAll, this, opts);
    }
 }
