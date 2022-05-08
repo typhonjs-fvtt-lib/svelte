@@ -233,8 +233,8 @@ export class GsapPosition
       }
 
       const positionInfo = Array.isArray(tjsPosition) ?
-       s_GET_POSITIONINFO_ARRAY(tjsPosition, timelineOptions, filter, gsapData, true) :
-        s_GET_POSITIONINFO(tjsPosition, timelineOptions, filter, gsapData, true);
+       s_GET_POSITIONINFO_ARRAY(tjsPosition, timelineOptions, filter, gsapData) :
+        s_GET_POSITIONINFO(tjsPosition, timelineOptions, filter, gsapData);
 
       const timeline = gsap.timeline(timelineOptions);
 
@@ -315,28 +315,19 @@ export class GsapPosition
                break;
 
             case 'from':
-               // timeline.from(s_GET_TARGET(tjsPosition, positionInfo.positionData, entry, cntr), entry.vars,
-               //  entry.position);
                timeline.from(s_GET_TARGET(positionData, elements, entry, cntr), entry.vars, entry.position);
                break;
 
             case 'fromTo':
-               // timeline.fromTo(s_GET_TARGET(tjsPosition, positionInfo.positionData, entry, cntr), entry.fromVars,
-               //  entry.toVars, entry.position);
                timeline.fromTo(s_GET_TARGET(positionData, elements, entry, cntr), entry.fromVars, entry.toVars,
                 entry.position);
                break;
 
             case 'set':
-               // timeline.set(s_GET_TARGET(tjsPosition, positionInfo.positionData, entry, cntr), entry.vars,
-               //  entry.position);
-               timeline.set(s_GET_TARGET(positionData, elements, entry, cntr), entry.vars,
-                entry.position);
+               timeline.set(s_GET_TARGET(positionData, elements, entry, cntr), entry.vars, entry.position);
                break;
 
             case 'to':
-               // timeline.to(s_GET_TARGET(tjsPosition, positionInfo.positionData, entry, cntr), entry.vars,
-               //  entry.position);
                timeline.to(s_GET_TARGET(positionData, elements, entry, cntr), entry.vars, entry.position);
                break;
 
@@ -495,19 +486,16 @@ function s_VALIDATE_GSAP_DATA_ENTRY(gsapData)
  *
  * @param {object[]|Function}    [gsapData] -
  *
- * @param {boolean}              [includeElements] -
- *
  * @returns {PositionInfo} A PositionInfo instance.
  */
-function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData, includeElements = false)
+function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData)
 {
-   /**
-    * @type {PositionInfo}
-    */
+   /** @type {PositionInfo} */
    const data = {
+      position: [],
       positionData: [],
+      elements: [],
       gsapData: void 0,
-      elements: includeElements ? [] : void 0
    };
 
    const positions = [];
@@ -550,7 +538,7 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData, includeE
       const positionData = position.get({ immediateElementUpdate: true }, s_POSITION_GET_OPTIONS);
 
       data.positionData.push(positionData);
-      if (includeElements) { data.elements.push(position.element); }
+      data.elements.push(position.element);
 
       positions.push(position);
    }
@@ -564,11 +552,6 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData, includeE
          {
             for (let cntr = 0; cntr < positions.length; cntr++)
             {
-               // const entry = positions[cntr];
-
-               // TODO SHOULD NOT NEED TO TEST INSTANCEOF HERE.
-               // const position = entry instanceof Position ? entry : entry.position;
-               // position.set(filter(data.positionData[cntr]));
                positions[cntr].set(filter(data.positionData[cntr]));
             }
             existingOnUpdate();
@@ -580,11 +563,6 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData, includeE
          {
             for (let cntr = 0; cntr < positions.length; cntr++)
             {
-               // const entry = positions[cntr];
-
-               // TODO SHOULD NOT NEED TO TEST INSTANCEOF HERE.
-               // const position = entry instanceof Position ? entry : entry.position;
-               // position.set(filter(data.positionData[cntr]));
                positions[cntr].set(filter(data.positionData[cntr]));
             }
          };
@@ -599,11 +577,6 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData, includeE
          {
             for (let cntr = 0; cntr < positions.length; cntr++)
             {
-               // const entry = positions[cntr];
-
-               // TODO SHOULD NOT NEED TO TEST INSTANCEOF HERE.
-               // const position = entry instanceof Position ? entry : entry.position;
-               // position.set(data.positionData[cntr]);
                positions[cntr].set(data.positionData[cntr]);
             }
             existingOnUpdate();
@@ -615,11 +588,6 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData, includeE
          {
             for (let cntr = 0; cntr < positions.length; cntr++)
             {
-               // const entry = positions[cntr];
-
-               // TODO SHOULD NOT NEED TO TEST INSTANCEOF HERE.
-               // const position = entry instanceof Position ? entry : entry.position;
-               // position.set(data.positionData[cntr]);
                positions[cntr].set(data.positionData[cntr]);
             }
          };
@@ -638,16 +606,16 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData, includeE
  *
  * @param {object[]|Function}    [gsapData] -
  *
- * @param {boolean}              [includeElements] -
- *
  * @returns {PositionInfo} A PositionInfo instance.
  */
-function s_GET_POSITIONINFO(tjsPosition, vars, filter, gsapData, includeElements = false)
+function s_GET_POSITIONINFO(tjsPosition, vars, filter, gsapData)
 {
+   /** @type {PositionInfo} */
    const data = {
+      position: [tjsPosition],
       positionData: [],
-      gsapData: void 0,
-      elements: includeElements ? [tjsPosition.element] : void 0
+      elements: [tjsPosition.element],
+      gsapData: void 0
    };
 
    // If gsapData is a function invoke it w/ the current Position instance and position data to retrieve a unique
@@ -719,7 +687,7 @@ function s_GET_POSITIONINFO(tjsPosition, vars, filter, gsapData, includeElements
 /**
  * Gets the target from GSAP data entry.
  *
- * @param {PositionInfo}   positionInfo - PositionInfo data.
+ * @param {PositionDataExtended|PositionDataExtended[]}  positionData - PositionInfo data.
  *
  * @param {object}         entry - Gsap data entry.
  *
@@ -741,40 +709,15 @@ function s_GET_TARGET(positionData, elements, entry, cntr)
          throw new Error(`GsapCompose.timeline error: 'gsapData[${cntr}]' unknown 'target' - '${target}'.`);
    }
 }
-// /**
-//  * Gets the target from GSAP data entry.
-//  *
-//  * @param {Position}             tjsPosition - Position instance.
-//  *
-//  * @param {PositionDataExtended|PositionDataExtended[]} positionData - Position data.
-//  *
-//  * @param {object}               entry - Gsap data entry.
-//  *
-//  * @param {number}               cntr - Current GSAP data entry index.
-//  *
-//  * @returns {PositionDataExtended|HTMLElement} The target object or HTMLElement.
-//  */
-// function s_GET_TARGET(tjsPosition, positionData, entry, cntr)
-// {
-//    const target = entry.target ?? 'position';
-//
-//    switch (target)
-//    {
-//       case 'position':
-//          return positionData;
-//       case 'element':
-//          return tjsPosition.element;
-//       default:
-//          throw new Error(`GsapCompose.timeline error: 'gsapData[${cntr}]' unknown 'target' - '${target}'.`);
-//    }
-// }
 
 /**
  * @typedef {object} PositionInfo
  *
- * @property {PositionDataExtended[]} positionData -
+ * @property {Position[]}                 position -
  *
- * @property {HTMLElement[]} elements -
+ * @property {PositionDataExtended[]}     positionData -
  *
- * @property {object[]|Array<object[]>} [gsapData] -
+ * @property {HTMLElement[]}              elements -
+ *
+ * @property {object[]|Array<object[]>}   [gsapData] -
  */
