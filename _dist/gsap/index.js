@@ -360,11 +360,10 @@ class GsapPosition
          throw new TypeError(`GsapCompose.timeline error: 'timelineOptions' is not an object.`);
       }
 
-      // TODO Figure out this check!
-      // if (!Array.isArray(gsapData) || typeof gsapData !== 'function')
-      // {
-      //    throw new TypeError(`GsapCompose.timeline error: 'gsapData' is not an array or function.`);
-      // }
+      if (!Array.isArray(gsapData) && typeof gsapData !== 'function')
+      {
+         throw new TypeError(`GsapCompose.timeline error: 'gsapData' is not an array or function.`);
+      }
 
       if (options !== void 0 && typeof options !== 'object')
       {
@@ -382,23 +381,25 @@ class GsapPosition
          for (const prop of initialProps) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionInfo = Array.isArray(tjsPosition) ?
-       s_GET_POSITIONINFO_ARRAY(tjsPosition, timelineOptions, filter, gsapData) :
-        s_GET_POSITIONINFO(tjsPosition, timelineOptions, filter, gsapData);
+      const positionInfo = s_GET_POSITIONINFO_ARRAY(tjsPosition, timelineOptions, filter, gsapData);
+
+      const optionPosition = options?.position;
 
       const timeline = gsap.timeline(timelineOptions);
 
-      // If the passed in gsapData is a function then we know we are working w/ individual positions.
+      // If the passed in gsapData is a function then we know we are working w/ individual positions, so create
+      // sub timelines for each position instance.
       if (typeof gsapData === 'function')
       {
-         const optionPosition = options?.position;
-
          if (typeof optionPosition === 'function')
          {
             const positionCallbackData = {
                index: void 0,
+               position: void 0,
                positionData: void 0,
-               element: void 0
+               data: void 0,
+               // element: void 0,
+               gsapData: void 0
             };
 
             for (let index = 0; index < positionInfo.gsapData.length; index++)
@@ -406,8 +407,11 @@ class GsapPosition
                const subTimeline = gsap.timeline();
 
                positionCallbackData.index = index;
+               positionCallbackData.position = positionInfo.position[index];
                positionCallbackData.positionData = positionInfo.positionData[index];
-               positionCallbackData.element = positionInfo.elements[index];
+               positionCallbackData.data = positionInfo.data[index];
+               // positionCallbackData.element = positionInfo.elements[index];
+               positionCallbackData.gsapData = positionInfo.gsapData[index];
 
                const positionTimeline = optionPosition(positionCallbackData);
 
@@ -432,7 +436,59 @@ class GsapPosition
       }
       else
       {
-         this.handleGSAPDATA(positionInfo.gsapData, timeline, positionInfo.positionData, positionInfo.elements);
+         const gsapDataSingle = positionInfo.gsapData[0];
+
+         // If `position` option is defined then handle each Position instance as a sub-timeline.
+         if (typeof optionPosition !== void 0)
+         {
+            let index = 0;
+
+            const positionCallbackData = {
+               index,
+               position: void 0,
+               positionData: void 0,
+               data: void 0,
+               element: void 0,
+               gsapData: void 0     // Note: When using JSON.stringify `gsapData` will cause a circular structure.
+            };
+
+            const isFunction = typeof optionPosition === 'function';
+
+            for (;index < positionInfo.position.length; index++)
+            {
+               if (isFunction)
+               {
+                  positionCallbackData.index = index;
+                  positionCallbackData.position = positionInfo.position[index];
+                  positionCallbackData.positionData = positionInfo.positionData[index];
+                  positionCallbackData.data = positionInfo.data[index];
+                  positionCallbackData.element = positionInfo.elements[index];
+                  positionCallbackData.gsapData = gsapDataSingle;
+
+                  const positionTimeline = optionPosition(positionCallbackData);
+
+                  const subTimeline = gsap.timeline();
+
+                  this.handleGSAPDATA(gsapDataSingle, subTimeline, positionInfo.positionData[index],
+                   positionInfo.elements[index]);
+
+                  timeline.add(subTimeline, positionTimeline);
+               }
+               else
+               {
+                  const subTimeline = gsap.timeline();
+
+                  this.handleGSAPDATA(gsapDataSingle, subTimeline, positionInfo.positionData[index],
+                   positionInfo.elements[index]);
+
+                  timeline.add(subTimeline, optionPosition);
+               }
+            }
+         }
+         else
+         {
+            this.handleGSAPDATA(gsapDataSingle, timeline, positionInfo.positionData, positionInfo.elements);
+         }
       }
 
       return timeline;
@@ -641,52 +697,93 @@ function s_VALIDATE_GSAP_DATA_ENTRY(gsapData)
 function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData)
 {
    /** @type {PositionInfo} */
-   const data = {
+   const positionInfo = {
       position: [],
       positionData: [],
+      data: [],
       elements: [],
-      gsapData: void 0,
+      gsapData: [],
    };
 
    // If gsapData is a function invoke it w/ the current Position instance and position data to retrieve a unique
    // gsapData object. If null / undefined is returned this entry is ignored.
    if (typeof gsapData === 'function')
    {
-      data.gsapData = [];
+      let index = 0;
 
-      let cntr = 0;
+      const gsapDataOptions = {
+         index,
+         position: void 0,
+         data: void 0
+      };
 
-      for (const entry of tjsPositions)
+      const populateData = (entry) =>
       {
-         const finalGsapData = gsapData(entry, cntr++);
+         const isPosition = entry instanceof Position;
+
+         gsapDataOptions.index = index++;
+         gsapDataOptions.position = isPosition ? entry : entry.position;
+         gsapDataOptions.data = isPosition ? void 0 : entry;
+
+         const finalGsapData = gsapData(gsapDataOptions);
 
          if (typeof finalGsapData !== 'object')
          {
-            throw new TypeError(`GsapCompose error: gsapData callback function failed to return an object.`);
+            throw new TypeError(
+             `GsapCompose error: gsapData callback function iteration(${index - 1}) failed to return an object.`);
          }
 
          s_VALIDATE_GSAP_DATA_ENTRY(finalGsapData);
 
-         data.gsapData.push(finalGsapData);
+         positionInfo.gsapData.push(finalGsapData);
+      };
+
+      if (isIterable(tjsPositions))
+      {
+         for (const entry of tjsPositions) { populateData(entry); }
+      }
+      else
+      {
+         populateData(tjsPositions);
       }
    }
    else if (Array.isArray(gsapData))
    {
       s_VALIDATE_GSAP_DATA_ENTRY(gsapData);
 
-      data.gsapData = gsapData;
+      positionInfo.gsapData.push(gsapData);
    }
 
    const existingOnUpdate = vars.onUpdate;
 
-   for (const entry of tjsPositions)
+   if (isIterable(tjsPositions))
    {
-      const position = entry instanceof Position ? entry : entry.position;
+      for (const entry of tjsPositions)
+      {
+         const isPosition = entry instanceof Position;
+
+         const position = isPosition ? entry : entry.position;
+         const data = isPosition ? void 0 : entry;
+         const positionData = position.get({ immediateElementUpdate: true }, s_POSITION_GET_OPTIONS);
+
+         positionInfo.position.push(position);
+         positionInfo.positionData.push(positionData);
+         positionInfo.data.push(data);
+         positionInfo.elements.push(position.element);
+      }
+   }
+   else
+   {
+      const isPosition = tjsPositions instanceof Position;
+
+      const position = isPosition ? tjsPositions : tjsPositions.position;
+      const data = isPosition ? void 0 : tjsPositions;
       const positionData = position.get({ immediateElementUpdate: true }, s_POSITION_GET_OPTIONS);
 
-      data.position.push(position);
-      data.positionData.push(positionData);
-      data.elements.push(position.element);
+      positionInfo.position.push(position);
+      positionInfo.positionData.push(positionData);
+      positionInfo.data.push(data);
+      positionInfo.elements.push(position.element);
    }
 
    if (typeof filter === 'function')
@@ -696,9 +793,9 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData)
       {
          vars.onUpdate = () =>
          {
-            for (let cntr = 0; cntr < data.position.length; cntr++)
+            for (let cntr = 0; cntr < positionInfo.position.length; cntr++)
             {
-               data.position[cntr].set(filter(data.positionData[cntr]));
+               positionInfo.position[cntr].set(filter(positionInfo.positionData[cntr]));
             }
             existingOnUpdate();
          };
@@ -707,9 +804,9 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData)
       {
          vars.onUpdate = () =>
          {
-            for (let cntr = 0; cntr < data.position.length; cntr++)
+            for (let cntr = 0; cntr < positionInfo.position.length; cntr++)
             {
-               data.position[cntr].set(filter(data.positionData[cntr]));
+               positionInfo.position[cntr].set(filter(positionInfo.positionData[cntr]));
             }
          };
       }
@@ -721,9 +818,9 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData)
       {
          vars.onUpdate = () =>
          {
-            for (let cntr = 0; cntr < data.position.length; cntr++)
+            for (let cntr = 0; cntr < positionInfo.position.length; cntr++)
             {
-               data.position[cntr].set(data.positionData[cntr]);
+               positionInfo.position[cntr].set(positionInfo.positionData[cntr]);
             }
             existingOnUpdate();
          };
@@ -732,15 +829,15 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData)
       {
          vars.onUpdate = () =>
          {
-            for (let cntr = 0; cntr < data.position.length; cntr++)
+            for (let cntr = 0; cntr < positionInfo.position.length; cntr++)
             {
-               data.position[cntr].set(data.positionData[cntr]);
+               positionInfo.position[cntr].set(positionInfo.positionData[cntr]);
             }
          };
       }
    }
 
-   return data;
+   return positionInfo;
 }
 
 /**
@@ -835,6 +932,8 @@ function s_GET_POSITIONINFO(tjsPosition, vars, filter, gsapData)
  *
  * @param {PositionDataExtended|PositionDataExtended[]}  positionData - PositionInfo data.
  *
+ * @param {HTMLElement|HTMLElement[]}  elements - One or more HTMLElements.
+ *
  * @param {object}         entry - Gsap data entry.
  *
  * @param {number}         cntr - Current GSAP data entry index.
@@ -859,13 +958,15 @@ function s_GET_TARGET(positionData, elements, entry, cntr)
 /**
  * @typedef {object} PositionInfo
  *
- * @property {Position[]}                 position -
+ * @property {Position[]}              position -
  *
- * @property {PositionDataExtended[]}     positionData -
+ * @property {PositionDataExtended[]}  positionData -
  *
- * @property {HTMLElement[]}              elements -
+ * @property {object[]}                data - Contains the full data object when a list of object w/ position is used.
  *
- * @property {object[]|Array<object[]>}   [gsapData] -
+ * @property {HTMLElement[]}           elements -
+ *
+ * @property {Array<object[]>}         gsapData -
  */
 
 /**
