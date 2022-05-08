@@ -498,8 +498,6 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData)
       gsapData: void 0,
    };
 
-   const positions = [];
-
    // If gsapData is a function invoke it w/ the current Position instance and position data to retrieve a unique
    // gsapData object. If null / undefined is returned this entry is ignored.
    if (typeof gsapData === 'function')
@@ -534,13 +532,11 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData)
    for (const entry of tjsPositions)
    {
       const position = entry instanceof Position ? entry : entry.position;
-
       const positionData = position.get({ immediateElementUpdate: true }, s_POSITION_GET_OPTIONS);
 
+      data.position.push(position);
       data.positionData.push(positionData);
       data.elements.push(position.element);
-
-      positions.push(position);
    }
 
    if (typeof filter === 'function')
@@ -550,9 +546,9 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData)
       {
          vars.onUpdate = () =>
          {
-            for (let cntr = 0; cntr < positions.length; cntr++)
+            for (let cntr = 0; cntr < data.position.length; cntr++)
             {
-               positions[cntr].set(filter(data.positionData[cntr]));
+               data.position[cntr].set(filter(data.positionData[cntr]));
             }
             existingOnUpdate();
          };
@@ -561,9 +557,9 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData)
       {
          vars.onUpdate = () =>
          {
-            for (let cntr = 0; cntr < positions.length; cntr++)
+            for (let cntr = 0; cntr < data.position.length; cntr++)
             {
-               positions[cntr].set(filter(data.positionData[cntr]));
+               data.position[cntr].set(filter(data.positionData[cntr]));
             }
          };
       }
@@ -575,9 +571,9 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData)
       {
          vars.onUpdate = () =>
          {
-            for (let cntr = 0; cntr < positions.length; cntr++)
+            for (let cntr = 0; cntr < data.position.length; cntr++)
             {
-               positions[cntr].set(data.positionData[cntr]);
+               data.position[cntr].set(data.positionData[cntr]);
             }
             existingOnUpdate();
          };
@@ -586,9 +582,9 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData)
       {
          vars.onUpdate = () =>
          {
-            for (let cntr = 0; cntr < positions.length; cntr++)
+            for (let cntr = 0; cntr < data.position.length; cntr++)
             {
-               positions[cntr].set(data.positionData[cntr]);
+               data.position[cntr].set(data.positionData[cntr]);
             }
          };
       }
