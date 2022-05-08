@@ -248,7 +248,7 @@ export class GsapPosition
                position: void 0,
                positionData: void 0,
                data: void 0,
-               // element: void 0,
+               element: void 0,
                gsapData: void 0
             };
 
@@ -260,7 +260,7 @@ export class GsapPosition
                positionCallbackData.position = positionInfo.position[index];
                positionCallbackData.positionData = positionInfo.positionData[index];
                positionCallbackData.data = positionInfo.data[index];
-               // positionCallbackData.element = positionInfo.elements[index];
+               positionCallbackData.element = positionInfo.elements[index];
                positionCallbackData.gsapData = positionInfo.gsapData[index];
 
                const positionTimeline = optionPosition(positionCallbackData);

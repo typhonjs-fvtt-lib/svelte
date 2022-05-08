@@ -87,6 +87,7 @@
     "deepmerge": "^4",
     "eslint": "^8",
     "fs-extra": "^10",
+    "gsap": "^3.10.4",
     "rollup": "^2",
     "rollup-plugin-sourcemaps": "^0.6.0",
     "rollup-plugin-svelte": "^7",
