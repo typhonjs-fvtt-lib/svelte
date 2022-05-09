@@ -202,9 +202,9 @@ export class GsapPosition
          throw new TypeError(`GsapCompose.timeline error: 'timelineOptions' is not an object.`);
       }
 
-      if (!Array.isArray(gsapData) && typeof gsapData !== 'function')
+      if (!isIterable(gsapData) && typeof gsapData !== 'function')
       {
-         throw new TypeError(`GsapCompose.timeline error: 'gsapData' is not an array or function.`);
+         throw new TypeError(`GsapCompose.timeline error: 'gsapData' is not an iterable list or function.`);
       }
 
       if (options !== void 0 && typeof options !== 'object')
@@ -411,50 +411,52 @@ class TimelinePositionImpl
 
    static handleGsapData(gsapData, timeline, positionData, elements)
    {
-      for (let cntr = 0; cntr < gsapData.length; cntr++)
-      {
-         const entry = gsapData[cntr];
+      let index = 0;
 
+      for (const entry of gsapData)
+      {
          const type = entry.type;
 
          switch (type)
          {
             case 'add':
-               TimelineImpl.add(timeline, entry, cntr);
+               TimelineImpl.add(timeline, entry, index);
                break;
 
             case 'addLabel':
-               TimelineImpl.addLabel(timeline, entry, cntr);
+               TimelineImpl.addLabel(timeline, entry, index);
                break;
 
             case 'addPause':
-               TimelineImpl.addPause(timeline, entry, cntr);
+               TimelineImpl.addPause(timeline, entry, index);
                break;
 
             case 'call':
-               TimelineImpl.call(timeline, entry, cntr);
+               TimelineImpl.call(timeline, entry, index);
                break;
 
             case 'from':
-               timeline.from(this.getTarget(positionData, elements, entry, cntr), entry.vars, entry.position);
+               timeline.from(this.getTarget(positionData, elements, entry, index), entry.vars, entry.position);
                break;
 
             case 'fromTo':
-               timeline.fromTo(this.getTarget(positionData, elements, entry, cntr), entry.fromVars, entry.toVars,
+               timeline.fromTo(this.getTarget(positionData, elements, entry, index), entry.fromVars, entry.toVars,
                 entry.position);
                break;
 
             case 'set':
-               timeline.set(this.getTarget(positionData, elements, entry, cntr), entry.vars, entry.position);
+               timeline.set(this.getTarget(positionData, elements, entry, index), entry.vars, entry.position);
                break;
 
             case 'to':
-               timeline.to(this.getTarget(positionData, elements, entry, cntr), entry.vars, entry.position);
+               timeline.to(this.getTarget(positionData, elements, entry, index), entry.vars, entry.position);
                break;
 
             default:
-               throw new Error(`GsapCompose.timeline error: gsapData[${cntr}] unknown 'type' - '${type}'`);
+               throw new Error(`GsapCompose.timeline error: gsapData[${index}] unknown 'type' - '${type}'`);
          }
+
+         index++;
       }
    }
 
@@ -595,7 +597,7 @@ function s_GET_POSITIONINFO(tjsPositions, vars, filter, gsapData)
          populateData(tjsPositions);
       }
    }
-   else if (Array.isArray(gsapData))
+   else if (isIterable(gsapData))
    {
       s_VALIDATE_GSAPDATA_ENTRY(gsapData);
 

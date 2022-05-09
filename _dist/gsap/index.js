@@ -325,13 +325,11 @@ class GsapPosition
    }
 
    /**
-    * @param {Position|Position[]}           tjsPosition - Position instance.
+    * @param {Position|Iterable<Position>}   tjsPosition - Position instance.
     *
-    * @param {object|object[]|Function}      arg1 - Either an object defining timelineOptions or an array of gsapData
-    *                                               entries.
+    * @param {object|GsapData}               arg1 - Either an object defining timelineOptions or GsapData.
     *
-    * @param {object[]|Function|GsapPositionOptions}  [arg2] - When arg1 is defined as an object; arg2 defines an array
-    *                                                          of gsapData entries.
+    * @param {GsapData|GsapPositionOptions}  [arg2] - When arg1 is defined as an object; arg2 defines GsapData.
     *
     * @param {GsapPositionOptions}           [arg3] - Options for filtering and initial data population.
     *
@@ -344,7 +342,7 @@ class GsapPosition
       const timelineOptions = typeof arg1 === 'object' ? arg1 : {};
 
       // If arg1 is an array then take it as `gsapData` otherwise select arg2.
-      const gsapData = Array.isArray(arg1) || typeof arg1 === 'function' ? arg1 : arg2;
+      const gsapData = isIterable(arg1) || typeof arg1 === 'function' ? arg1 : arg2;
 
       /** @type {GsapPositionOptions} */
       const options = gsapData === arg1 ? arg2 : arg3;
@@ -354,9 +352,9 @@ class GsapPosition
          throw new TypeError(`GsapCompose.timeline error: 'timelineOptions' is not an object.`);
       }
 
-      if (!Array.isArray(gsapData) && typeof gsapData !== 'function')
+      if (!isIterable(gsapData) && typeof gsapData !== 'function')
       {
-         throw new TypeError(`GsapCompose.timeline error: 'gsapData' is not an array or function.`);
+         throw new TypeError(`GsapCompose.timeline error: 'gsapData' is not an iterable list or function.`);
       }
 
       if (options !== void 0 && typeof options !== 'object')
@@ -563,50 +561,52 @@ class TimelinePositionImpl
 
    static handleGsapData(gsapData, timeline, positionData, elements)
    {
-      for (let cntr = 0; cntr < gsapData.length; cntr++)
-      {
-         const entry = gsapData[cntr];
+      let index = 0;
 
+      for (const entry of gsapData)
+      {
          const type = entry.type;
 
          switch (type)
          {
             case 'add':
-               TimelineImpl.add(timeline, entry, cntr);
+               TimelineImpl.add(timeline, entry, index);
                break;
 
             case 'addLabel':
-               TimelineImpl.addLabel(timeline, entry, cntr);
+               TimelineImpl.addLabel(timeline, entry, index);
                break;
 
             case 'addPause':
-               TimelineImpl.addPause(timeline, entry, cntr);
+               TimelineImpl.addPause(timeline, entry, index);
                break;
 
             case 'call':
-               TimelineImpl.call(timeline, entry, cntr);
+               TimelineImpl.call(timeline, entry, index);
                break;
 
             case 'from':
-               timeline.from(this.getTarget(positionData, elements, entry, cntr), entry.vars, entry.position);
+               timeline.from(this.getTarget(positionData, elements, entry, index), entry.vars, entry.position);
                break;
 
             case 'fromTo':
-               timeline.fromTo(this.getTarget(positionData, elements, entry, cntr), entry.fromVars, entry.toVars,
+               timeline.fromTo(this.getTarget(positionData, elements, entry, index), entry.fromVars, entry.toVars,
                 entry.position);
                break;
 
             case 'set':
-               timeline.set(this.getTarget(positionData, elements, entry, cntr), entry.vars, entry.position);
+               timeline.set(this.getTarget(positionData, elements, entry, index), entry.vars, entry.position);
                break;
 
             case 'to':
-               timeline.to(this.getTarget(positionData, elements, entry, cntr), entry.vars, entry.position);
+               timeline.to(this.getTarget(positionData, elements, entry, index), entry.vars, entry.position);
                break;
 
             default:
-               throw new Error(`GsapCompose.timeline error: gsapData[${cntr}] unknown 'type' - '${type}'`);
+               throw new Error(`GsapCompose.timeline error: gsapData[${index}] unknown 'type' - '${type}'`);
          }
+
+         index++;
       }
    }
 
@@ -684,13 +684,13 @@ class TimelinePositionImpl
 }
 
 /**
- * @param {Position|Position[]}  tjsPositions -
+ * @param {Position|Iterable<Position>}   tjsPositions -
  *
- * @param {object}               vars -
+ * @param {object}                        vars -
  *
- * @param {Function}             filter -
+ * @param {Function}                      filter -
  *
- * @param {object[]|Function}    [gsapData] -
+ * @param {object[]|Function}             [gsapData] -
  *
  * @returns {PositionInfo} A PositionInfo instance.
  */
@@ -747,7 +747,7 @@ function s_GET_POSITIONINFO(tjsPositions, vars, filter, gsapData)
          populateData(tjsPositions);
       }
    }
-   else if (Array.isArray(gsapData))
+   else if (isIterable(gsapData))
    {
       s_VALIDATE_GSAPDATA_ENTRY(gsapData);
 
@@ -843,17 +843,17 @@ function s_GET_POSITIONINFO(tjsPositions, vars, filter, gsapData)
 /**
  * Validates `gsapData` entries.
  *
- * @param {object[]} gsapData - GsapData array.
+ * @param {Iterable<object>} gsapData - GsapData array.
  */
 function s_VALIDATE_GSAPDATA_ENTRY(gsapData)
 {
-   for (let cntr = 0; cntr < gsapData.length; cntr++)
-   {
-      const entry = gsapData[cntr];
+   let index = 0;
 
+   for (const entry of gsapData)
+   {
       if (typeof entry !== 'object')
       {
-         throw new TypeError(`GsapCompose.timeline error: 'gsapData[${cntr}]' is not an object.`);
+         throw new TypeError(`GsapCompose.timeline error: 'gsapData[${index}]' is not an object.`);
       }
 
       // Determine if any of the entries has a position related type and targets position by explicit value or by
@@ -861,8 +861,10 @@ function s_VALIDATE_GSAPDATA_ENTRY(gsapData)
       // composability when animating multiple non-overlapping properties in a timeline.
       if (s_TYPES_POSITION.has(entry.type) && (entry.target === void 0 || entry.target === 'position'))
       {
-         TimelinePositionImpl.validatePositionProp(entry, cntr);
+         TimelinePositionImpl.validatePositionProp(entry, index);
       }
+
+      index++;
    }
 }
 
@@ -971,9 +973,9 @@ class GsapCompose
    /**
     * @param {GSAPTarget} target - A standard GSAP target or Position.
     *
-    * @param {object|object[]}   arg1 - Either an object defining timelineOptions or an array of gsapData entries.
+    * @param {object|GsapData}   arg1 - Either an object defining timelineOptions or GsapData.
     *
-    * @param {object[]|Function} [arg2] - When arg1 is defined as an object; arg2 defines an array of gsapData entries.
+    * @param {GsapData|GsapPositionOptions} [arg2] - When arg1 is defined as an object; arg2 defines GsapData.
     *
     * @param {GsapPositionOptions} [arg3] - Options for filtering and initial data population.
     *
@@ -990,7 +992,7 @@ class GsapCompose
       const timelineOptions = typeof arg1 === 'object' ? arg1 : {};
 
       // If arg1 is an array then take it as `gsapData` otherwise select arg2.
-      const gsapData = Array.isArray(arg1) ? arg1 : arg2;
+      const gsapData = isIterable(arg1) ? arg1 : arg2;
 
       /** @type {GsapPositionOptions} */
       const options = gsapData === arg1 ? arg2 : arg3;
@@ -1000,9 +1002,9 @@ class GsapCompose
          throw new TypeError(`GsapCompose.timeline error: 'timelineOptions' is not an object.`);
       }
 
-      if (!Array.isArray(gsapData))
+      if (!isIterable(gsapData))
       {
-         throw new TypeError(`GsapCompose.timeline error: 'gsapData' is not an array.`);
+         throw new TypeError(`GsapCompose.timeline error: 'gsapData' is not an iterable list.`);
       }
 
       if (options !== void 0 && typeof options !== 'object')
@@ -1011,42 +1013,44 @@ class GsapCompose
       }
 
       // Validate gsapData.
-      for (let cntr = 0; cntr < gsapData.length; cntr++)
-      {
-         const entry = gsapData[cntr];
+      let index = 0;
 
+      for (const entry of gsapData)
+      {
          if (typeof entry !== 'object')
          {
-            throw new TypeError(`GsapCompose.timeline error: 'gsapData[${cntr}]' is not an object.`);
+            throw new TypeError(`GsapCompose.timeline error: 'gsapData[${index}]' is not an object.`);
          }
 
-         s_VALIDATE_OPTIONS(entry, cntr);
+         s_VALIDATE_OPTIONS(entry, index);
+
+         index++;
       }
 
       const timeline = gsap.timeline(timelineOptions);
 
-      for (let cntr = 0; cntr < gsapData.length; cntr++)
-      {
-         const entry = gsapData[cntr];
+      index = 0;
 
+      for (const entry of gsapData)
+      {
          const type = entry.type;
 
          switch (type)
          {
             case 'add':
-               TimelineImpl.add(timeline, entry, cntr);
+               TimelineImpl.add(timeline, entry, index);
                break;
 
             case 'addLabel':
-               TimelineImpl.addLabel(timeline, entry, cntr);
+               TimelineImpl.addLabel(timeline, entry, index);
                break;
 
             case 'addPause':
-               TimelineImpl.addPause(timeline, entry, cntr);
+               TimelineImpl.addPause(timeline, entry, index);
                break;
 
             case 'call':
-               TimelineImpl.call(timeline, entry, cntr);
+               TimelineImpl.call(timeline, entry, index);
                break;
 
             case 'from':
@@ -1066,8 +1070,10 @@ class GsapCompose
                break;
 
             default:
-               throw new Error(`GsapCompose.timeline error: gsapData[${cntr}] unknown 'type' - '${type}'`);
+               throw new Error(`GsapCompose.timeline error: gsapData[${index}] unknown 'type' - '${type}'`);
          }
+
+         index++;
       }
 
       return timeline;
@@ -1106,7 +1112,7 @@ function s_DISPATCH_POSITION(operation, target, options, arg1, arg2)
    {
       return GsapPosition[operation](target.position, options, arg1, arg2);
    }
-   else if (Array.isArray(target))
+   else if (isIterable(target))
    {
       let hasPosition = false;
       let allPosition = true;
@@ -1192,6 +1198,10 @@ function s_VALIDATE_OPTIONS(entry, cntr)
 }
 
 /**
+ * @typedef {Iterable<object>|Function} GsapData
+ */
+
+/**
  * @typedef {object} GsapPositionOptions
  *
  * @property {Function} [filter] - An optional filter function to adjust position data in `onUpdate` callbacks. This is
@@ -1204,7 +1214,7 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  */
 
 /**
- * @typedef {string|object|Position|Position[]|Array<HTMLElement|object>} GSAPTarget
+ * @typedef {string|object|Position|Iterable<Position>|Array<HTMLElement|object>} GSAPTarget
  */
 
 export { CustomBounce, CustomEase, CustomWiggle, Draggable, DrawSVGPlugin, EasePack, GSDevTools, GsapCompose, InertiaPlugin, MorphSVGPlugin, MotionPathHelper, MotionPathPlugin, Physics2DPlugin, PhysicsPropsPlugin, PixiPlugin, ScrambleTextPlugin, ScrollToPlugin, ScrollTrigger, SplitText, TextPlugin, gsap };
