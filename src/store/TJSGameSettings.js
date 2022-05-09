@@ -23,7 +23,7 @@ export class TJSGameSettings
    {
       if (!this.#stores.has(key))
       {
-         console.warn(`TJSGameSettings - getStore: '${key}' is not a registered setting.`);
+         console.warn(`TJSGameSettings - getReadableStore: '${key}' is not a registered setting.`);
          return;
       }
 
@@ -39,11 +39,23 @@ export class TJSGameSettings
     *
     * @returns {GSWritableStore|undefined} The associated store for the given game setting key.
     */
+   getStore(key)
+   {
+      return this.getWritableStore(key);
+   }
+
+   /**
+    * Returns a writable Game Settings store for the associated key.
+    *
+    * @param {string}   key - Game setting key.
+    *
+    * @returns {GSWritableStore|undefined} The associated store for the given game setting key.
+    */
    getWritableStore(key)
    {
       if (!this.#stores.has(key))
       {
-         console.warn(`TJSGameSettings - getStore: '${key}' is not a registered setting.`);
+         console.warn(`TJSGameSettings - getWritableStore: '${key}' is not a registered setting.`);
          return;
       }
 
