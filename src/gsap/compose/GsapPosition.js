@@ -175,13 +175,11 @@ export class GsapPosition
    }
 
    /**
-    * @param {Position|Position[]}           tjsPosition - Position instance.
+    * @param {Position|Iterable<Position>}   tjsPosition - Position instance.
     *
-    * @param {object|object[]|Function}      arg1 - Either an object defining timelineOptions or an array of gsapData
-    *                                               entries.
+    * @param {object|GsapData}               arg1 - Either an object defining timelineOptions or GsapData.
     *
-    * @param {object[]|Function|GsapPositionOptions}  [arg2] - When arg1 is defined as an object; arg2 defines an array
-    *                                                          of gsapData entries.
+    * @param {GsapData|GsapPositionOptions}  [arg2] - When arg1 is defined as an object; arg2 defines GsapData.
     *
     * @param {GsapPositionOptions}           [arg3] - Options for filtering and initial data population.
     *
@@ -194,7 +192,7 @@ export class GsapPosition
       const timelineOptions = typeof arg1 === 'object' ? arg1 : {};
 
       // If arg1 is an array then take it as `gsapData` otherwise select arg2.
-      const gsapData = Array.isArray(arg1) || typeof arg1 === 'function' ? arg1 : arg2;
+      const gsapData = isIterable(arg1) || typeof arg1 === 'function' ? arg1 : arg2;
 
       /** @type {GsapPositionOptions} */
       const options = gsapData === arg1 ? arg2 : arg3;
@@ -534,13 +532,13 @@ class TimelinePositionImpl
 }
 
 /**
- * @param {Position|Position[]}  tjsPositions -
+ * @param {Position|Iterable<Position>}   tjsPositions -
  *
- * @param {object}               vars -
+ * @param {object}                        vars -
  *
- * @param {Function}             filter -
+ * @param {Function}                      filter -
  *
- * @param {object[]|Function}    [gsapData] -
+ * @param {object[]|Function}             [gsapData] -
  *
  * @returns {PositionInfo} A PositionInfo instance.
  */
@@ -693,17 +691,17 @@ function s_GET_POSITIONINFO(tjsPositions, vars, filter, gsapData)
 /**
  * Validates `gsapData` entries.
  *
- * @param {object[]} gsapData - GsapData array.
+ * @param {Iterable<object>} gsapData - GsapData array.
  */
 function s_VALIDATE_GSAPDATA_ENTRY(gsapData)
 {
-   for (let cntr = 0; cntr < gsapData.length; cntr++)
-   {
-      const entry = gsapData[cntr];
+   let index = 0;
 
+   for (const entry of gsapData)
+   {
       if (typeof entry !== 'object')
       {
-         throw new TypeError(`GsapCompose.timeline error: 'gsapData[${cntr}]' is not an object.`);
+         throw new TypeError(`GsapCompose.timeline error: 'gsapData[${index}]' is not an object.`);
       }
 
       // Determine if any of the entries has a position related type and targets position by explicit value or by
@@ -711,8 +709,10 @@ function s_VALIDATE_GSAPDATA_ENTRY(gsapData)
       // composability when animating multiple non-overlapping properties in a timeline.
       if (s_TYPES_POSITION.has(entry.type) && (entry.target === void 0 || entry.target === 'position'))
       {
-         TimelinePositionImpl.validatePositionProp(entry, cntr);
+         TimelinePositionImpl.validatePositionProp(entry, index);
       }
+
+      index++;
    }
 }
 

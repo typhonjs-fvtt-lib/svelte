@@ -97,9 +97,9 @@ export class GsapCompose
    /**
     * @param {GSAPTarget} target - A standard GSAP target or Position.
     *
-    * @param {object|object[]}   arg1 - Either an object defining timelineOptions or an array of gsapData entries.
+    * @param {object|GsapData}   arg1 - Either an object defining timelineOptions or GsapData.
     *
-    * @param {object[]|Function} [arg2] - When arg1 is defined as an object; arg2 defines an array of gsapData entries.
+    * @param {GsapData|GsapPositionOptions} [arg2] - When arg1 is defined as an object; arg2 defines GsapData.
     *
     * @param {GsapPositionOptions} [arg3] - Options for filtering and initial data population.
     *
@@ -318,6 +318,10 @@ function s_VALIDATE_OPTIONS(entry, cntr)
 }
 
 /**
+ * @typedef {Iterable<object>|Function} GsapData
+ */
+
+/**
  * @typedef {object} GsapPositionOptions
  *
  * @property {Function} [filter] - An optional filter function to adjust position data in `onUpdate` callbacks. This is
@@ -330,5 +334,5 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  */
 
 /**
- * @typedef {string|object|Position|Position[]|Array<HTMLElement|object>} GSAPTarget
+ * @typedef {string|object|Position|Iterable<Position>|Array<HTMLElement|object>} GSAPTarget
  */
