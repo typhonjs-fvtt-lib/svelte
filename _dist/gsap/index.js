@@ -234,9 +234,7 @@ class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionData = Array.isArray(tjsPosition) ?
-       s_GET_POSITIONINFO_ARRAY(tjsPosition, vars, filter).positionData :
-        s_GET_POSITIONINFO(tjsPosition, vars, filter).positionData;
+      const positionData = s_GET_POSITIONINFO(tjsPosition, vars, filter).positionData;
 
       return gsap.from(positionData, vars);
    }
@@ -281,9 +279,7 @@ class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionData = Array.isArray(tjsPosition) ?
-       s_GET_POSITIONINFO_ARRAY(tjsPosition, toVars, filter).positionData :
-        s_GET_POSITIONINFO(tjsPosition, toVars, filter).positionData;
+      const positionData = s_GET_POSITIONINFO(tjsPosition, toVars, filter).positionData;
 
       return gsap.fromTo(positionData, fromVars, toVars);
    }
@@ -323,9 +319,7 @@ class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionData = Array.isArray(tjsPosition) ?
-       s_GET_POSITIONINFO_ARRAY(tjsPosition, vars, filter).positionData :
-        s_GET_POSITIONINFO(tjsPosition, vars, filter).positionData;
+      const positionData = s_GET_POSITIONINFO(tjsPosition, vars, filter).positionData;
 
       return gsap.quickTo(positionData, key, vars);
    }
@@ -381,7 +375,7 @@ class GsapPosition
          for (const prop of initialProps) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionInfo = s_GET_POSITIONINFO_ARRAY(tjsPosition, timelineOptions, filter, gsapData);
+      const positionInfo = s_GET_POSITIONINFO(tjsPosition, timelineOptions, filter, gsapData);
 
       const optionPosition = options?.position;
 
@@ -398,7 +392,7 @@ class GsapPosition
                position: void 0,
                positionData: void 0,
                data: void 0,
-               // element: void 0,
+               element: void 0,
                gsapData: void 0
             };
 
@@ -410,13 +404,13 @@ class GsapPosition
                positionCallbackData.position = positionInfo.position[index];
                positionCallbackData.positionData = positionInfo.positionData[index];
                positionCallbackData.data = positionInfo.data[index];
-               // positionCallbackData.element = positionInfo.elements[index];
+               positionCallbackData.element = positionInfo.elements[index];
                positionCallbackData.gsapData = positionInfo.gsapData[index];
 
                const positionTimeline = optionPosition(positionCallbackData);
 
-               this.handleGSAPDATA(positionInfo.gsapData[index], subTimeline, positionInfo.positionData[index],
-                positionInfo.elements[index]);
+               TimelinePositionImpl.handleGsapData(positionInfo.gsapData[index], subTimeline,
+                positionInfo.positionData[index], positionInfo.elements[index]);
 
                timeline.add(subTimeline, positionTimeline);
             }
@@ -427,8 +421,8 @@ class GsapPosition
             {
                const subTimeline = gsap.timeline();
 
-               this.handleGSAPDATA(positionInfo.gsapData[index], subTimeline, positionInfo.positionData[index],
-                positionInfo.elements[index]);
+               TimelinePositionImpl.handleGsapData(positionInfo.gsapData[index], subTimeline,
+                positionInfo.positionData[index], positionInfo.elements[index]);
 
                timeline.add(subTimeline, optionPosition);
             }
@@ -469,7 +463,7 @@ class GsapPosition
 
                   const subTimeline = gsap.timeline();
 
-                  this.handleGSAPDATA(gsapDataSingle, subTimeline, positionInfo.positionData[index],
+                  TimelinePositionImpl.handleGsapData(gsapDataSingle, subTimeline, positionInfo.positionData[index],
                    positionInfo.elements[index]);
 
                   timeline.add(subTimeline, positionTimeline);
@@ -478,7 +472,7 @@ class GsapPosition
                {
                   const subTimeline = gsap.timeline();
 
-                  this.handleGSAPDATA(gsapDataSingle, subTimeline, positionInfo.positionData[index],
+                  TimelinePositionImpl.handleGsapData(gsapDataSingle, subTimeline, positionInfo.positionData[index],
                    positionInfo.elements[index]);
 
                   timeline.add(subTimeline, optionPosition);
@@ -487,60 +481,12 @@ class GsapPosition
          }
          else
          {
-            this.handleGSAPDATA(gsapDataSingle, timeline, positionInfo.positionData, positionInfo.elements);
+            TimelinePositionImpl.handleGsapData(gsapDataSingle, timeline, positionInfo.positionData,
+             positionInfo.elements);
          }
       }
 
       return timeline;
-   }
-
-   static handleGSAPDATA(gsapData, timeline, positionData, elements)
-   {
-      for (let cntr = 0; cntr < gsapData.length; cntr++)
-      {
-         const entry = gsapData[cntr];
-
-         const type = entry.type;
-
-         switch (type)
-         {
-            case 'add':
-               TimelineImpl.add(timeline, entry, cntr);
-               break;
-
-            case 'addLabel':
-               TimelineImpl.addLabel(timeline, entry, cntr);
-               break;
-
-            case 'addPause':
-               TimelineImpl.addPause(timeline, entry, cntr);
-               break;
-
-            case 'call':
-               TimelineImpl.call(timeline, entry, cntr);
-               break;
-
-            case 'from':
-               timeline.from(s_GET_TARGET(positionData, elements, entry, cntr), entry.vars, entry.position);
-               break;
-
-            case 'fromTo':
-               timeline.fromTo(s_GET_TARGET(positionData, elements, entry, cntr), entry.fromVars, entry.toVars,
-                entry.position);
-               break;
-
-            case 'set':
-               timeline.set(s_GET_TARGET(positionData, elements, entry, cntr), entry.vars, entry.position);
-               break;
-
-            case 'to':
-               timeline.to(s_GET_TARGET(positionData, elements, entry, cntr), entry.vars, entry.position);
-               break;
-
-            default:
-               throw new Error(`GsapCompose.timeline error: gsapData[${cntr}] unknown 'type' - '${type}'`);
-         }
-      }
    }
 
    /**
@@ -576,9 +522,7 @@ class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionData = Array.isArray(tjsPosition) ?
-       s_GET_POSITIONINFO_ARRAY(tjsPosition, vars, filter).positionData :
-        s_GET_POSITIONINFO(tjsPosition, vars, filter).positionData;
+      const positionData = s_GET_POSITIONINFO(tjsPosition, vars, filter).positionData;
 
       return gsap.to(positionData, vars);
    }
@@ -589,6 +533,83 @@ class GsapPosition
  */
 class TimelinePositionImpl
 {
+   /**
+    * Gets the target from GSAP data entry.
+    *
+    * @param {PositionDataExtended|PositionDataExtended[]}  positionData - PositionInfo data.
+    *
+    * @param {HTMLElement|HTMLElement[]}  elements - One or more HTMLElements.
+    *
+    * @param {object}         entry - Gsap data entry.
+    *
+    * @param {number}         cntr - Current GSAP data entry index.
+    *
+    * @returns {PositionDataExtended|PositionDataExtended[]|HTMLElement|HTMLElement[]} The target object or HTMLElement.
+    */
+   static getTarget(positionData, elements, entry, cntr)
+   {
+      const target = entry.target ?? 'position';
+
+      switch (target)
+      {
+         case 'position':
+            return positionData;
+         case 'element':
+            return elements;
+         default:
+            throw new Error(`GsapCompose.timeline error: 'gsapData[${cntr}]' unknown 'target' - '${target}'.`);
+      }
+   }
+
+   static handleGsapData(gsapData, timeline, positionData, elements)
+   {
+      for (let cntr = 0; cntr < gsapData.length; cntr++)
+      {
+         const entry = gsapData[cntr];
+
+         const type = entry.type;
+
+         switch (type)
+         {
+            case 'add':
+               TimelineImpl.add(timeline, entry, cntr);
+               break;
+
+            case 'addLabel':
+               TimelineImpl.addLabel(timeline, entry, cntr);
+               break;
+
+            case 'addPause':
+               TimelineImpl.addPause(timeline, entry, cntr);
+               break;
+
+            case 'call':
+               TimelineImpl.call(timeline, entry, cntr);
+               break;
+
+            case 'from':
+               timeline.from(this.getTarget(positionData, elements, entry, cntr), entry.vars, entry.position);
+               break;
+
+            case 'fromTo':
+               timeline.fromTo(this.getTarget(positionData, elements, entry, cntr), entry.fromVars, entry.toVars,
+                entry.position);
+               break;
+
+            case 'set':
+               timeline.set(this.getTarget(positionData, elements, entry, cntr), entry.vars, entry.position);
+               break;
+
+            case 'to':
+               timeline.to(this.getTarget(positionData, elements, entry, cntr), entry.vars, entry.position);
+               break;
+
+            default:
+               throw new Error(`GsapCompose.timeline error: gsapData[${cntr}] unknown 'type' - '${type}'`);
+         }
+      }
+   }
+
    /**
     * Validates data for Position related properties: 'from', 'fromTo', 'set', 'to'. Also adds all properties found
     * in Gsap entry data to s_POSITION_PROPS, so that just the properties being animated are added to animated
@@ -662,27 +683,6 @@ class TimelinePositionImpl
    }
 }
 
-function s_VALIDATE_GSAP_DATA_ENTRY(gsapData)
-{
-   for (let cntr = 0; cntr < gsapData.length; cntr++)
-   {
-      const entry = gsapData[cntr];
-
-      if (typeof entry !== 'object')
-      {
-         throw new TypeError(`GsapCompose.timeline error: 'gsapData[${cntr}]' is not an object.`);
-      }
-
-      // Determine if any of the entries has a position related type and targets position by explicit value or by
-      // default. Build up only the position properties that are being modified by all entries. This allows maximum
-      // composability when animating multiple non-overlapping properties in a timeline.
-      if (s_TYPES_POSITION.has(entry.type) && (entry.target === void 0 || entry.target === 'position'))
-      {
-         TimelinePositionImpl.validatePositionProp(entry, cntr);
-      }
-   }
-}
-
 /**
  * @param {Position|Position[]}  tjsPositions -
  *
@@ -694,7 +694,7 @@ function s_VALIDATE_GSAP_DATA_ENTRY(gsapData)
  *
  * @returns {PositionInfo} A PositionInfo instance.
  */
-function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData)
+function s_GET_POSITIONINFO(tjsPositions, vars, filter, gsapData)
 {
    /** @type {PositionInfo} */
    const positionInfo = {
@@ -733,7 +733,7 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData)
              `GsapCompose error: gsapData callback function iteration(${index - 1}) failed to return an object.`);
          }
 
-         s_VALIDATE_GSAP_DATA_ENTRY(finalGsapData);
+         s_VALIDATE_GSAPDATA_ENTRY(finalGsapData);
 
          positionInfo.gsapData.push(finalGsapData);
       };
@@ -749,7 +749,7 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData)
    }
    else if (Array.isArray(gsapData))
    {
-      s_VALIDATE_GSAP_DATA_ENTRY(gsapData);
+      s_VALIDATE_GSAPDATA_ENTRY(gsapData);
 
       positionInfo.gsapData.push(gsapData);
    }
@@ -841,117 +841,28 @@ function s_GET_POSITIONINFO_ARRAY(tjsPositions, vars, filter, gsapData)
 }
 
 /**
- * @param {Position}             tjsPosition -
+ * Validates `gsapData` entries.
  *
- * @param {object}               vars -
- *
- * @param {Function}             filter -
- *
- * @param {object[]|Function}    [gsapData] -
- *
- * @returns {PositionInfo} A PositionInfo instance.
+ * @param {object[]} gsapData - GsapData array.
  */
-function s_GET_POSITIONINFO(tjsPosition, vars, filter, gsapData)
+function s_VALIDATE_GSAPDATA_ENTRY(gsapData)
 {
-   /** @type {PositionInfo} */
-   const data = {
-      position: [tjsPosition],
-      positionData: [],
-      elements: [tjsPosition.element],
-      gsapData: void 0
-   };
-
-   // If gsapData is a function invoke it w/ the current Position instance and position data to retrieve a unique
-   // gsapData object. If null / undefined is returned this entry is ignored.
-   if (typeof gsapData === 'function')
+   for (let cntr = 0; cntr < gsapData.length; cntr++)
    {
-      data.gsapData = [];
+      const entry = gsapData[cntr];
 
-      const finalGsapData = gsapData(tjsPosition, 0);
-
-      if (typeof finalGsapData !== 'object')
+      if (typeof entry !== 'object')
       {
-         throw new TypeError(`GsapCompose error: gsapData callback function failed to return an object.`);
+         throw new TypeError(`GsapCompose.timeline error: 'gsapData[${cntr}]' is not an object.`);
       }
 
-      s_VALIDATE_GSAP_DATA_ENTRY(finalGsapData);
-
-      data.gsapData.push(finalGsapData);
-   }
-   else if (Array.isArray(gsapData))
-   {
-      s_VALIDATE_GSAP_DATA_ENTRY(gsapData);
-
-      data.gsapData = gsapData;
-   }
-
-   const positionData = tjsPosition.get({ immediateElementUpdate: true }, s_POSITION_GET_OPTIONS);
-
-   data.positionData.push(positionData);
-
-   const existingOnUpdate = vars.onUpdate;
-
-   if (typeof filter === 'function')
-   {
-      // Preserve invoking existing onUpdate function.
-      if (typeof existingOnUpdate === 'function')
+      // Determine if any of the entries has a position related type and targets position by explicit value or by
+      // default. Build up only the position properties that are being modified by all entries. This allows maximum
+      // composability when animating multiple non-overlapping properties in a timeline.
+      if (s_TYPES_POSITION.has(entry.type) && (entry.target === void 0 || entry.target === 'position'))
       {
-         vars.onUpdate = () =>
-         {
-            tjsPosition.set(filter(positionData));
-            existingOnUpdate();
-         };
+         TimelinePositionImpl.validatePositionProp(entry, cntr);
       }
-      else
-      {
-         vars.onUpdate = () => tjsPosition.set(filter(positionData));
-      }
-   }
-   else
-   {
-      // Preserve invoking existing onUpdate function.
-      if (typeof existingOnUpdate === 'function')
-      {
-         vars.onUpdate = () =>
-         {
-            tjsPosition.set(positionData);
-            existingOnUpdate();
-         };
-      }
-      else
-      {
-         vars.onUpdate = () => tjsPosition.set(positionData);
-      }
-   }
-
-   return data;
-}
-
-/**
- * Gets the target from GSAP data entry.
- *
- * @param {PositionDataExtended|PositionDataExtended[]}  positionData - PositionInfo data.
- *
- * @param {HTMLElement|HTMLElement[]}  elements - One or more HTMLElements.
- *
- * @param {object}         entry - Gsap data entry.
- *
- * @param {number}         cntr - Current GSAP data entry index.
- *
- * @returns {PositionDataExtended|PositionDataExtended[]|HTMLElement|HTMLElement[]} The target object or HTMLElement.
- */
-function s_GET_TARGET(positionData, elements, entry, cntr)
-{
-   const target = entry.target ?? 'position';
-
-   switch (target)
-   {
-      case 'position':
-         return positionData;
-      case 'element':
-         return elements;
-      default:
-         throw new Error(`GsapCompose.timeline error: 'gsapData[${cntr}]' unknown 'target' - '${target}'.`);
    }
 }
 
