@@ -4,7 +4,9 @@ import { lerp }                  from '@typhonjs-fvtt/svelte/math';
 import {
    propertyStore,
    subscribeIgnoreFirst }        from '@typhonjs-fvtt/svelte/store';
-import { isIterable }            from '@typhonjs-fvtt/svelte/util';
+import {
+   isIterable,
+   isPlainObject }               from '@typhonjs-fvtt/svelte/util';
 
 import { AnimationManager }      from './animation/AnimationManager.js';
 import * as constants            from './constants.js';
@@ -62,7 +64,7 @@ export class Position
    #options = {
       calculateTransform: false,
       initialHelper: void 0,
-      ortho: false,
+      ortho: true,
       transformSubscribed: false
    };
 
@@ -142,13 +144,22 @@ export class Position
    static get Validators() { return positionValidators; }
 
    /**
-    * @param {PositionParent} parent - The associated parent for positional data tracking. Used in validators.
+    * @param {PositionParent|PositionOptions}   [parent] - A potential parent element or object w/ `elementTarget`
+    *                                                      getter. May also be the PositionOptions object w/ 1 argument.
     *
-    * @param {object}         options - Default values.
+    * @param {PositionOptions}   options - Default values.
     */
-   constructor(parent, options = {})
+   constructor(parent, options)
    {
-      this.#parent = parent;
+      // Test if `parent` is a plain object; if so treat as options object.
+      if (isPlainObject(parent))
+      {
+         options = parent;
+      }
+      else
+      {
+         this.#parent = parent;
+      }
 
       const data = this.#data;
       const transforms = this.#transforms;
