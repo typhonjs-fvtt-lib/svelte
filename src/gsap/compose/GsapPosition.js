@@ -1,5 +1,5 @@
-import { gsap }         from '../gsap.js';
-// import { gsap }         from './gsapNPM.js';
+import { gsap }         from '../init-remote.js';
+// import { gsap }         from '../init-npm.js';
 
 import { Position }     from '@typhonjs-fvtt/svelte/application';
 import { isIterable }   from '@typhonjs-fvtt/svelte/util';
@@ -164,10 +164,8 @@ export class GsapPosition
          for (const prop of initialProps) { s_POSITION_PROPS.add(prop); }
       }
 
-      for (const prop in vars)
-      {
-         if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
-      }
+      // Add specific key specified to initial `positionData`.
+      if (s_POSITION_KEYS.has(key)) { s_POSITION_PROPS.add(key); }
 
       const positionData = s_GET_POSITIONINFO(tjsPosition, vars, filter).positionData;
 

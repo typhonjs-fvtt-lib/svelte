@@ -87,9 +87,13 @@ type GameSetting = {
     options: GameSettingOptions;
 };
 /**
- * - The backing Svelte store; a writable w/ get method attached.
+ * - The backing Svelte store; writable w/ get method attached.
  */
-type GSStore = svelte_store.Writable<any> & typeof get;
+type GSWritableStore = svelte_store.Writable<any>;
+/**
+ * - The backing Svelte store; readable w/ get method attached.
+ */
+type GSReadableStore = svelte_store.Readable<any>;
 declare class DynArrayReducer {
     /**
      * @type {AdapterFilters<T>}
@@ -363,13 +367,29 @@ declare class TJSDocumentCollection<T extends any> {
  */
 declare class TJSGameSettings {
     /**
-     * Returns the Game Settings store for the associated key.
+     * Returns a readable Game Settings store for the associated key.
      *
      * @param {string}   key - Game setting key.
      *
-     * @returns {GSStore|undefined} The associated store for the given game setting key.
+     * @returns {GSReadableStore|undefined} The associated store for the given game setting key.
      */
-    getStore(key: string): GSStore | undefined;
+    getReadableStore(key: string): svelte_store.Readable<any> | undefined;
+    /**
+     * Returns a writable Game Settings store for the associated key.
+     *
+     * @param {string}   key - Game setting key.
+     *
+     * @returns {GSWritableStore|undefined} The associated store for the given game setting key.
+     */
+    getStore(key: string): svelte_store.Writable<any> | undefined;
+    /**
+     * Returns a writable Game Settings store for the associated key.
+     *
+     * @param {string}   key - Game setting key.
+     *
+     * @returns {GSWritableStore|undefined} The associated store for the given game setting key.
+     */
+    getWritableStore(key: string): svelte_store.Writable<any> | undefined;
     /**
      * @param {GameSetting} setting - A GameSetting instance to set to Foundry game settings.
      */
@@ -549,4 +569,4 @@ declare class AdapterFilters<T> {
     removeById(...ids: any[]): void;
 }
 
-export { DynArrayReducer, GSStore, GameSetting, GameSettingOptions, GameState, LSStore, LocalStorage, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, TJSGameSettings, gameState, isReadableStore, isSettableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { DynArrayReducer, GSReadableStore, GSWritableStore, GameSetting, GameSettingOptions, GameState, LSStore, LocalStorage, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, TJSGameSettings, gameState, isReadableStore, isSettableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };

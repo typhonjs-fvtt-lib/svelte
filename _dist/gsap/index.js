@@ -4,53 +4,12 @@ import { isIterable } from '@typhonjs-fvtt/svelte/util';
 
 let gsap = void 0;
 
-// Plugins
-let CustomBounce = void 0;
-let CustomEase = void 0;
-let CustomWiggle = void 0;
-let Draggable = void 0;    // eslint-disable-line no-shadow
-let DrawSVGPlugin = void 0;
-let EasePack = void 0;
-let GSDevTools = void 0;
-let InertiaPlugin = void 0;
-let MorphSVGPlugin = void 0;
-let MotionPathHelper = void 0;
-let MotionPathPlugin = void 0;
-let Physics2DPlugin = void 0;
-let PhysicsPropsPlugin = void 0;
-let PixiPlugin = void 0;
-let ScrambleTextPlugin = void 0;
-let ScrollToPlugin = void 0;
-let ScrollTrigger = void 0;
-let SplitText = void 0;
-let TextPlugin = void 0;
-
-const modulePath = foundry.utils.getRoute('/scripts/greensock/esm/all.js');
+const modulePath = foundry.utils.getRoute('/scripts/greensock/esm/index.js');
 
 try
 {
    const module = await import(modulePath);
    gsap = module.gsap;
-
-   CustomBounce = module.CustomBounce;
-   CustomEase = module.CustomEase;
-   CustomWiggle = module.CustomWiggle;
-   Draggable = module.Draggable;
-   DrawSVGPlugin = module.DrawSVGPlugin;
-   EasePack = module.EasePack;
-   GSDevTools = module.GSDevTools;
-   InertiaPlugin = module.InertiaPlugin;
-   MorphSVGPlugin = module.MorphSVGPlugin;
-   MotionPathHelper = module.MotionPathHelper;
-   MotionPathPlugin = module.MotionPathPlugin;
-   Physics2DPlugin = module.Physics2DPlugin;
-   PhysicsPropsPlugin = module.PhysicsPropsPlugin;
-   PixiPlugin = module.PixiPlugin;
-   ScrambleTextPlugin = module.ScrambleTextPlugin;
-   ScrollToPlugin = module.ScrollToPlugin;
-   ScrollTrigger = module.ScrollTrigger;
-   SplitText = module.SplitText;
-   TextPlugin = module.TextPlugin;
 
    // Load Svelte easing functions by prepending them w/ `svelte-`; `linear` becomes `svelte-linear`, etc.
    for (const prop of Object.keys(easingFuncs))
@@ -63,6 +22,27 @@ catch (error)
 {
    console.error(`TyphonJS Runtime Library error; Could not load GSAP module from: '${modulePath}'`);
    console.error(error);
+}
+
+/**
+ * @param {string}   name - Name of GSAP plugin to load.
+ *
+ * @returns {Promise<*>} The loaded plugin.
+ */
+async function gsapLoadPlugin(name)
+{
+   const modulePath = foundry.utils.getRoute(`/scripts/greensock/esm/${name}.js`);
+
+   try
+   {
+      const module = await import(modulePath);
+      return module.default;
+   }
+   catch (err)
+   {
+      console.error(`TyphonJS Runtime Library error; Could not load ${name} plugin from: '${modulePath}'`);
+      console.error(err);
+   }
 }
 
 /**
@@ -314,10 +294,8 @@ class GsapPosition
          for (const prop of initialProps) { s_POSITION_PROPS.add(prop); }
       }
 
-      for (const prop in vars)
-      {
-         if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
-      }
+      // Add specific key specified to initial `positionData`.
+      if (s_POSITION_KEYS.has(key)) { s_POSITION_PROPS.add(key); }
 
       const positionData = s_GET_POSITIONINFO(tjsPosition, vars, filter).positionData;
 
@@ -1217,5 +1195,5 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  * @typedef {string|object|Position|Iterable<Position>|Array<HTMLElement|object>} GSAPTarget
  */
 
-export { CustomBounce, CustomEase, CustomWiggle, Draggable, DrawSVGPlugin, EasePack, GSDevTools, GsapCompose, InertiaPlugin, MorphSVGPlugin, MotionPathHelper, MotionPathPlugin, Physics2DPlugin, PhysicsPropsPlugin, PixiPlugin, ScrambleTextPlugin, ScrollToPlugin, ScrollTrigger, SplitText, TextPlugin, gsap };
+export { GsapCompose, gsap, gsapLoadPlugin };
 //# sourceMappingURL=index.js.map

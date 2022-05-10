@@ -2,12 +2,25 @@ type PositionInfo = {
     /**
      * -
      */
+    position: any[];
+    /**
+     * -
+     */
     positionData: any[];
+    /**
+     * - Contains the full data object when a list of object w/ position is used.
+     */
+    data: object[];
     /**
      * -
      */
     elements: HTMLElement[];
+    /**
+     * -
+     */
+    gsapData: Array<object[]>;
 };
+type GsapData = Iterable<object> | Function;
 type GsapPositionOptions = {
     /**
      * - An optional filter function to adjust position data in `onUpdate` callbacks. This is
@@ -22,20 +35,19 @@ type GsapPositionOptions = {
      */
     initialProps?: Iterable<string>;
 };
-type GSAPTarget = string | object | any | any[] | Array<HTMLElement | object>;
-declare let CustomBounce: any;
-declare let CustomEase: any;
-declare let CustomWiggle: any;
-declare let Draggable: any;
-declare let DrawSVGPlugin: any;
-declare let EasePack: any;
-declare let GSDevTools: any;
+type GSAPTarget = string | object | any | Iterable<any> | Array<HTMLElement | object>;
 /**
  * @typedef {object} PositionInfo
  *
- * @property {PositionDataExtended[]} positionData -
+ * @property {Position[]}              position -
  *
- * @property {HTMLElement[]} elements -
+ * @property {PositionDataExtended[]}  positionData -
+ *
+ * @property {object[]}                data - Contains the full data object when a list of object w/ position is used.
+ *
+ * @property {HTMLElement[]}           elements -
+ *
+ * @property {Array<object[]>}         gsapData -
  */
 /**
  * Provides a data driven ways to connect a {@link Position} instance with a GSAP timeline and tweens.
@@ -81,15 +93,15 @@ declare class GsapCompose {
     /**
      * @param {GSAPTarget} target - A standard GSAP target or Position.
      *
-     * @param {object|object[]}   arg1 - Either an object defining timelineOptions or an array of gsapData entries.
+     * @param {object|GsapData}   arg1 - Either an object defining timelineOptions or GsapData.
      *
-     * @param {object[]|Function} [arg2] - When arg1 is defined as an object; arg2 defines an array of gsapData entries.
+     * @param {GsapData|GsapPositionOptions} [arg2] - When arg1 is defined as an object; arg2 defines GsapData.
      *
      * @param {GsapPositionOptions} [arg3] - Options for filtering and initial data population.
      *
      * @returns {object} GSAP timeline
      */
-    static timeline(target: GSAPTarget, arg1: object | object[], arg2?: object[] | Function, arg3?: GsapPositionOptions): object;
+    static timeline(target: GSAPTarget, arg1: object | GsapData, arg2?: GsapData | GsapPositionOptions, arg3?: GsapPositionOptions): object;
     /**
      * @param {GSAPTarget} target - A standard GSAP target or Position.
      *
@@ -101,18 +113,12 @@ declare class GsapCompose {
      */
     static to(target: GSAPTarget, vars: object, options?: GsapPositionOptions): object;
 }
-declare let InertiaPlugin: any;
-declare let MorphSVGPlugin: any;
-declare let MotionPathHelper: any;
-declare let MotionPathPlugin: any;
-declare let Physics2DPlugin: any;
-declare let PhysicsPropsPlugin: any;
-declare let PixiPlugin: any;
-declare let ScrambleTextPlugin: any;
-declare let ScrollToPlugin: any;
-declare let ScrollTrigger: any;
-declare let SplitText: any;
-declare let TextPlugin: any;
 declare let gsap: any;
+/**
+ * @param {string}   name - Name of GSAP plugin to load.
+ *
+ * @returns {Promise<*>} The loaded plugin.
+ */
+declare function gsapLoadPlugin(name: string): Promise<any>;
 
-export { CustomBounce, CustomEase, CustomWiggle, Draggable, DrawSVGPlugin, EasePack, GSAPTarget, GSDevTools, GsapCompose, GsapPositionOptions, InertiaPlugin, MorphSVGPlugin, MotionPathHelper, MotionPathPlugin, Physics2DPlugin, PhysicsPropsPlugin, PixiPlugin, PositionInfo, ScrambleTextPlugin, ScrollToPlugin, ScrollTrigger, SplitText, TextPlugin, gsap };
+export { GSAPTarget, GsapCompose, GsapData, GsapPositionOptions, PositionInfo, gsap, gsapLoadPlugin };

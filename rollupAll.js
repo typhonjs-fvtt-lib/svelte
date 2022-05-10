@@ -158,9 +158,6 @@ const rollupConfigs = [
          output: {
             file: '_dist/gsap/index.js',
             format: 'es',
-            paths: {
-               gsap: '/scripts/greensock/esm/all.js'
-            },
             plugins: outputPlugins,
             preferConst: true,
             sourcemap,
@@ -330,10 +327,10 @@ for (const config of rollupConfigs)
    // closes the bundle
    await bundle.close();
 
-   // await generateTSDef({
-   //    main: config.output.output.file,
-   //    output: upath.changeExt(config.output.output.file, '.d.ts')
-   // });
+   await generateTSDef({
+      main: config.output.output.file,
+      output: upath.changeExt(config.output.output.file, '.d.ts')
+   });
 
    fs.writeJSONSync(`${upath.dirname(config.output.output.file)}/package.json`, {
       main: './index.js',
@@ -364,6 +361,11 @@ fs.writeJSONSync(`./_dist/application/legacy/package.json`, {
    module: './index.js',
    type: 'module'
 });
+
+// GSAP plugin loading code is also bespoke and must be copied over.
+
+fs.emptyDirSync('./_dist/gsap/plugin');
+fs.copySync('./src/gsap/plugin', './_dist/gsap/plugin');
 
 // TODO: DO NOT UNCOMMENT. These definitions are hand modified after initial generation.
 // await generateTSDef({
