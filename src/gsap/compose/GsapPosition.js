@@ -1,5 +1,4 @@
-import { gsap }         from '../init-remote.js';
-// import { gsap }         from '../init-npm.js';
+import { gsap }         from '../gsap.js';
 
 import { Position }     from '@typhonjs-fvtt/svelte/application';
 import { isIterable }   from '@typhonjs-fvtt/svelte/util';

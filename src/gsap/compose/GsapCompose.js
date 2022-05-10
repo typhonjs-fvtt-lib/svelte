@@ -1,5 +1,4 @@
-import { gsap }         from '../init-remote.js';
-// import { gsap }         from '../init-npm.js';
+import { gsap }         from '../gsap.js';
 
 import { Position }     from '@typhonjs-fvtt/svelte/application';
 import { isIterable }   from '@typhonjs-fvtt/svelte/util';
@@ -96,9 +95,31 @@ export class GsapCompose
    }
 
    /**
+    * Defers to `gsap` module to register an easing function.
+    *
+    * @param {string}   name - Easing name.
+    *
+    * @param {Function} ease - An easing function.
+    */
+   static registerEase(name, ease)
+   {
+      gsap.registerEase(name, ease);
+   }
+
+   /**
+    * Defers to `gsap` module to register a plugin.
+    *
+    * @param {...Function} args - A list of plugins.
+    */
+   static registerPlugin(...args)
+   {
+      gsap.registerPlugin(...args);
+   }
+
+   /**
     * @param {GSAPTarget} target - A standard GSAP target or Position.
     *
-    * @param {object|GsapData}   arg1 - Either an object defining timelineOptions or GsapData.
+    * @param {object|GsapData}   [arg1] - Either an object defining timeline options or GsapData.
     *
     * @param {GsapData|GsapPositionOptions} [arg2] - When arg1 is defined as an object; arg2 defines GsapData.
     *
@@ -108,6 +129,12 @@ export class GsapCompose
     */
    static timeline(target, arg1, arg2, arg3)
    {
+      // When an object and not iterable assume an object literal as timeline options.
+      if (target === void 0 || (typeof target === 'object' && !isIterable(target)))
+      {
+         return gsap.timeline(target);
+      }
+
       // If target is Position related attempt to dispatch to GsapPosition.
       const positionTimeline = s_DISPATCH_POSITION('timeline', target, arg1, arg2, arg3);
       if (positionTimeline !== void 0) { return positionTimeline; }
@@ -152,9 +179,9 @@ export class GsapCompose
          index++;
       }
 
-      const timeline = gsap.timeline(timelineOptions);
-
       index = 0;
+
+      const timeline = gsap.timeline(timelineOptions);
 
       for (const entry of gsapData)
       {
