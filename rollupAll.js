@@ -25,8 +25,6 @@ const s_LOCAL_EXTERNAL = [
    '@typhonjs-fvtt/svelte/handler', '@typhonjs-fvtt/svelte/helper', '@typhonjs-fvtt/svelte/math',
    '@typhonjs-fvtt/svelte/store', '@typhonjs-fvtt/svelte/transition', '@typhonjs-fvtt/svelte/util',
    '@typhonjs-fvtt/svelte/plugin/data', '@typhonjs-fvtt/svelte/plugin/system',
-
-   `foundry-gsap`  // Replaced by consumer for Foundry GSAP path.
 ];
 
 // Defines the node-resolve config.
