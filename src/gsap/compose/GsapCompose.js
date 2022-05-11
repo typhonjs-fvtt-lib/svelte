@@ -66,6 +66,19 @@ export class GsapCompose
    }
 
    /**
+    * Checks the `gsap` module instance for existence of a method and GsapCompose for the same method name. This
+    * is helpful to determine which new features are available. Ex. `quickTo` is not available until GSAP `3.10+`.
+    *
+    * @param {string}   name - Name of method to check.
+    *
+    * @returns {boolean} Gsap and GsapCompose support the given method.
+    */
+   static hasMethod(name)
+   {
+      return typeof gsap[name] === 'function' && typeof this[name] === 'function';
+   }
+
+   /**
     * @param {GSAPTarget} target - A standard GSAP target or Position.
     *
     * @param {string}   key - Property of position to manipulate.
