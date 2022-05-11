@@ -1,5 +1,7 @@
 import { GsapCompose } from '../compose/GsapCompose.js';
 
+const s_HAS_QUICK_TO = GsapCompose.hasMethod('quickTo');
+
 /**
  * Provides an action to enable pointer dragging of an HTMLElement using GSAP `quickTo` to invoke `position.set` on a
  * given {@link Position} instance provided. You may provide a `vars` object sent to `quickTo` to modify the duration /
@@ -21,7 +23,8 @@ import { GsapCompose } from '../compose/GsapCompose.js';
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-export function draggableEase(node, { position, vars = { duration: 0.4, ease: 'power3' }, active = true, storeDragging = void 0 })
+export function draggableEase(node, { position, vars = { duration: 0.4, ease: 'power3' }, active = true,
+ storeDragging = void 0 })
 {
    /**
     * Duplicate the app / Positionable starting position to track differences.
@@ -56,8 +59,14 @@ export function draggableEase(node, { position, vars = { duration: 0.4, ease: 'p
       dragUp: ['pointerup', (e) => onDragPointerUp(e), false]
    };
 
-   let quickLeft = GsapCompose.quickTo(position, 'left', vars);
-   let quickTop = GsapCompose.quickTo(position, 'top', vars);
+   let quickLeft, quickTop;
+   let tweenTo;
+
+   if (s_HAS_QUICK_TO)
+   {
+      quickLeft = GsapCompose.quickTo(position, 'left', vars);
+      quickTop = GsapCompose.quickTo(position, 'top', vars);
+   }
 
    /**
     * Activates listeners.
@@ -130,8 +139,17 @@ export function draggableEase(node, { position, vars = { duration: 0.4, ease: 'p
       const newTop = initialPosition.top + (event.clientY - initialDragPoint.y);
 
       // Update application position.
-      quickLeft(newLeft);
-      quickTop(newTop);
+      if (s_HAS_QUICK_TO)
+      {
+         quickLeft(newLeft);
+         quickTop(newTop);
+      }
+      else
+      {
+         if (tweenTo) { tweenTo.kill(); }
+
+         tweenTo = GsapCompose.to(position, { left: newLeft, top: newTop, ...vars });
+      }
    }
 
    /**
@@ -156,8 +174,11 @@ export function draggableEase(node, { position, vars = { duration: 0.4, ease: 'p
       {
          if (typeof vars === 'object')
          {
-            quickLeft = GsapCompose.quickTo(position, 'left', vars);
-            quickTop = GsapCompose.quickTo(position, 'top', vars);
+            if (s_HAS_QUICK_TO)
+            {
+               quickLeft = GsapCompose.quickTo(position, 'left', vars);
+               quickTop = GsapCompose.quickTo(position, 'top', vars);
+            }
          }
 
          if (active) { activateListeners(); }

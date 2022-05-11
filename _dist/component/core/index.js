@@ -927,7 +927,7 @@ function get_each_context$1(ctx, list, i) {
 	return child_ctx;
 }
 
-// (81:6) {#each buttons as button}
+// (78:6) {#each buttons as button}
 function create_each_block$1(ctx) {
 	let switch_instance;
 	let switch_instance_anchor;
@@ -1007,7 +1007,7 @@ function create_each_block$1(ctx) {
 	};
 }
 
-// (76:0) {#key draggable}
+// (73:0) {#key draggable}
 function create_key_block(ctx) {
 	let header;
 	let h4;
@@ -1237,13 +1237,9 @@ function instance$6($$self, $$props, $$invalidate) {
 
 	$$self.$$.update = () => {
 		if ($$self.$$.dirty & /*draggable*/ 1) {
-			{
-				$$invalidate(0, draggable$1 = typeof draggable$1 === 'function'
-				? draggable$1
-				: draggable);
-
-				console.log(`! TJSApplicationHeader - draggable: `, draggable$1);
-			}
+			$$invalidate(0, draggable$1 = typeof draggable$1 === 'function'
+			? draggable$1
+			: draggable);
 		}
 
 		if ($$self.$$.dirty & /*draggableOptions, $storeDraggable*/ 139264) {

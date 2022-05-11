@@ -900,6 +900,19 @@ class GsapCompose
    }
 
    /**
+    * Checks the `gsap` module instance for existence of a method and GsapCompose for the same method name. This
+    * is helpful to determine which new features are available. Ex. `quickTo` is not available until GSAP `3.10+`.
+    *
+    * @param {string}   name - Name of method to check.
+    *
+    * @returns {boolean} Gsap and GsapCompose support the given method.
+    */
+   static hasMethod(name)
+   {
+      return typeof gsap[name] === 'function' && typeof this[name] === 'function';
+   }
+
+   /**
     * @param {GSAPTarget} target - A standard GSAP target or Position.
     *
     * @param {string}   key - Property of position to manipulate.
@@ -1203,6 +1216,8 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  * @typedef {string|object|Position|Iterable<Position>|Array<HTMLElement|object>} GSAPTarget
  */
 
+const s_HAS_QUICK_TO = GsapCompose.hasMethod('quickTo');
+
 /**
  * Provides an action to enable pointer dragging of an HTMLElement using GSAP `quickTo` to invoke `position.set` on a
  * given {@link Position} instance provided. You may provide a `vars` object sent to `quickTo` to modify the duration /
@@ -1224,7 +1239,8 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-function draggableEase(node, { position, vars = { duration: 0.4, ease: 'power3' }, active = true, storeDragging = void 0 })
+function draggableEase(node, { position, vars = { duration: 0.4, ease: 'power3' }, active = true,
+ storeDragging = void 0 })
 {
    /**
     * Duplicate the app / Positionable starting position to track differences.
@@ -1259,8 +1275,14 @@ function draggableEase(node, { position, vars = { duration: 0.4, ease: 'power3' 
       dragUp: ['pointerup', (e) => onDragPointerUp(e), false]
    };
 
-   let quickLeft = GsapCompose.quickTo(position, 'left', vars);
-   let quickTop = GsapCompose.quickTo(position, 'top', vars);
+   let quickLeft, quickTop;
+   let tweenTo;
+
+   if (s_HAS_QUICK_TO)
+   {
+      quickLeft = GsapCompose.quickTo(position, 'left', vars);
+      quickTop = GsapCompose.quickTo(position, 'top', vars);
+   }
 
    /**
     * Activates listeners.
@@ -1333,8 +1355,17 @@ function draggableEase(node, { position, vars = { duration: 0.4, ease: 'power3' 
       const newTop = initialPosition.top + (event.clientY - initialDragPoint.y);
 
       // Update application position.
-      quickLeft(newLeft);
-      quickTop(newTop);
+      if (s_HAS_QUICK_TO)
+      {
+         quickLeft(newLeft);
+         quickTop(newTop);
+      }
+      else
+      {
+         if (tweenTo) { tweenTo.kill(); }
+
+         tweenTo = GsapCompose.to(position, { left: newLeft, top: newTop, ...vars });
+      }
    }
 
    /**
@@ -1359,8 +1390,11 @@ function draggableEase(node, { position, vars = { duration: 0.4, ease: 'power3' 
       {
          if (typeof vars === 'object')
          {
-            quickLeft = GsapCompose.quickTo(position, 'left', vars);
-            quickTop = GsapCompose.quickTo(position, 'top', vars);
+            if (s_HAS_QUICK_TO)
+            {
+               quickLeft = GsapCompose.quickTo(position, 'left', vars);
+               quickTop = GsapCompose.quickTo(position, 'top', vars);
+            }
          }
 
          if (active) { activateListeners(); }
