@@ -20,6 +20,10 @@
    export let elementContent;
    export let elementRoot;
 
+   // Allows custom draggable implementations to be forwarded to TJSApplicationHeader.
+   export let draggable;
+   export let draggableOptions;
+
    // The children array can be specified by a parent via prop or is read below from the external context.
    export let children = void 0;
 
@@ -201,7 +205,7 @@
     on:pointerdown|capture={bringToTop}
     use:applyStyles={stylesApp}
     use:appResizeObserver={resizeObservedApp}>
-   <TJSApplicationHeader />
+   <TJSApplicationHeader {draggable} {draggableOptions} />
    <section class=window-content
             bind:this={elementContent}
             use:applyStyles={stylesContent}
