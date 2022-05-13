@@ -7,6 +7,9 @@ export async function gsapLoadPlugin(name)
 {
    const modulePath = foundry.utils.getRoute(`/scripts/greensock/esm/${name}.js`);
 
+// TODO REMOVE
+console.log(`! loading gsap plugin, ${name} from: `, modulePath);
+
    try
    {
       const module = await import(modulePath);

@@ -1,19 +1,74 @@
-import * as easingFuncs from 'svelte/easing';
+import * as svelteEasingFunc from 'svelte/easing';
 
 let gsap = void 0;
 
 const modulePath = foundry.utils.getRoute('/scripts/greensock/esm/index.js');
+
+// TODO REMOVE
+console.log(`! loading gsap from: `, modulePath);
+
+// Basic core GSAP eases.
+const easingList = [
+   'back.in(1)',
+   'back.inOut(1)',
+   'back.out(1)',
+   'back.in(10)',
+   'back.inOut(10)',
+   'back.out(10)',
+   'bounce.in',
+   'bounce.inOut',
+   'bounce.out',
+   'circ.in',
+   'circ.inOut',
+   'circ.out',
+   'elastic.in(1, 0.5)',
+   'elastic.inOut(1, 0.5)',
+   'elastic.out(1, 0.5)',
+   'elastic.in(10, 5)',
+   'elastic.inOut(10, 5)',
+   'elastic.out(10, 5)',
+   'expo.in',
+   'expo.inOut',
+   'expo.out',
+   'linear', // same as 'none'
+   'power1.in',
+   'power1.inOut',
+   'power1.out',
+   'power2.in',
+   'power2.inOut',
+   'power2.out',
+   'power3.in',
+   'power3.inOut',
+   'power3.out',
+   'power4.in',
+   'power4.inOut',
+   'power4.out',
+   'sine.in',
+   'sine.inOut',
+   'sine.out',
+   'steps(10)',
+   'steps(100)'
+];
+
+const easingFunc = {};
 
 try
 {
    const module = await import(modulePath);
    gsap = module.gsap;
 
+   for (const entry of easingList)
+   {
+      easingFunc[entry] = entry === 'linear' ? (t) => t : gsap.parseEase(entry);
+   }
+
    // Load Svelte easing functions by prepending them w/ `svelte-`; `linear` becomes `svelte-linear`, etc.
-   for (const prop of Object.keys(easingFuncs))
+   for (const prop of Object.keys(svelteEasingFunc))
    {
       const name = `svelte-${prop}`;
-      gsap.registerEase(name, easingFuncs[prop]);
+      easingList.push(name);
+      easingFunc[name] = svelteEasingFunc[prop];
+      gsap.registerEase(name, svelteEasingFunc[prop]);
    }
 }
 catch (error)
@@ -22,4 +77,9 @@ catch (error)
    console.error(error);
 }
 
-export { gsap };
+easingList.sort();
+
+Object.freeze(easingFunc);
+Object.freeze(easingList);
+
+export { gsap, easingFunc, easingList };
