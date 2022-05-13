@@ -2,9 +2,14 @@ import { lerp }         from '@typhonjs-fvtt/svelte/math';
 
 import { GsapCompose }  from '../compose/GsapCompose.js';
 
+const s_HAS_QUICK_TO = GsapCompose.hasMethod('quickTo');
+
 /**
- * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on a given {@link Position}
- * instance provided. When the attached boolean store state changes the draggable action is enabled or disabled.
+ * Provides an action to enable pointer dragging of an HTMLElement using GSAP `quickTo` to invoke `position.set` on a
+ * given {@link Position} instance provided. You may provide a `vars` object sent to `quickTo` to modify the duration /
+ * easing. When the attached boolean store state changes the draggable action is enabled or disabled.
+ *
+ * Note: Requires GSAP `3.10+`.
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
@@ -16,19 +21,19 @@ import { GsapCompose }  from '../compose/GsapCompose.js';
  *
  * @param {Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging" state.
  *
- * @param {number|number[]|Function}   [params.tweenEnd] - Defines the tween end position.
+ * @param {boolean}           [params.ease=false] - When true easing is enabled.
  *
- * @param {number|{min: number, max: number}} [params.tweenDuration] Duration of inertia tween; constant or provide
- *                                                                   min / max object.
+ * @param {boolean}           [params.inertia=false] - When true inertia easing is enabled.
  *
- * @param {number}            [params.tweenResistance=1] - Resistance per second for the inertia tween.
+ * @param {object}            [params.easeOptions] - Gsap `to / `quickTo` vars object.
  *
- * @param {number}            [params.velScale=1] - Scales velocity calculation.
+ * @param {object}            [params.inertiaOptions] - Inertia Options.
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-export function draggableInertia(node, { position, active = true, storeDragging = void 0, tweenEnd,
- tweenDuration = { min: 0, max: 1 }, tweenResistance = 1, velScale = 1 })
+function draggableGsap(node, { position, active = true, storeDragging = void 0, ease = true, inertia = true,
+ easeOptions = { duration: 0.1, ease: 'power3' },
+  inertiaOptions = { end: void 0, duration: { min: 0, max: 1 }, resistance: 1, velocity: 1 } })
 {
    /**
     * Duplicate the app / Positionable starting position to track differences.
@@ -40,18 +45,9 @@ export function draggableInertia(node, { position, active = true, storeDragging 
    /**
     * Stores the initial X / Y on drag down.
     *
-    * @type {{x: number, y: number}}
+    * @type {object}
     */
-   const initialDragPoint = { x: 0, y: 0 };
-
-   // Used to track current velocity and the inertia tween.
-   let currentTween;
-   let lastDragTime;
-   const lastDragPoint = { x: 0, y: 0 };
-   const velInstant = { x: 0, y: 0 };
-   const velQuick = { x: 0, y: 0 };
-   const velSmooth = { x: 0, y: 0 };
-   const velUsed = { x: 0, y: 0 };
+   let initialDragPoint = {};
 
    /**
     * Stores the current dragging state and gates the move pointer as the dragging store is not
@@ -60,6 +56,45 @@ export function draggableInertia(node, { position, active = true, storeDragging 
     * @type {boolean}
     */
    let dragging = false;
+
+   // Used to track current velocity and the inertia tween.
+   let inertiaTween;
+   let lastDragTime;
+   const lastDragPoint = { x: 0, y: 0 };
+   const velInstant = { x: 0, y: 0 };
+   const velQuick = { x: 0, y: 0 };
+   const velSmooth = { x: 0, y: 0 };
+   const velUsed = { x: 0, y: 0 };
+
+   /**
+    * Remember event handlers associated with this action so they may be later unregistered.
+    *
+    * @type {object}
+    */
+   const handlers = {
+      dragDown: ['pointerdown', (e) => onDragPointerDown(e), false],
+      dragMove: ['pointermove', (e) => onDragPointerMove(e), false],
+      dragUp: ['pointerup', (e) => onDragPointerUp(e), false]
+   };
+
+   let quickLeft, quickTop;
+   let tweenTo;
+
+   if (s_HAS_QUICK_TO)
+   {
+      quickLeft = GsapCompose.quickTo(position, 'left', easeOptions);
+      quickTop = GsapCompose.quickTo(position, 'top', easeOptions);
+   }
+
+   /**
+    * Activates listeners.
+    */
+   function activateListeners()
+   {
+      // Drag handlers
+      node.addEventListener(...handlers.dragDown);
+      node.classList.add('draggable');
+   }
 
    /**
     * Calculates velocity of x / y while dragging.
@@ -106,27 +141,6 @@ export function draggableInertia(node, { position, active = true, storeDragging 
    }
 
    /**
-    * Remember event handlers associated with this action so they may be later unregistered.
-    *
-    * @type {object}
-    */
-   const handlers = {
-      dragDown: ['pointerdown', (e) => onDragPointerDown(e), false],
-      dragMove: ['pointermove', (e) => onDragPointerMove(e), false],
-      dragUp: ['pointerup', (e) => onDragPointerUp(e), false]
-   };
-
-   /**
-    * Activates listeners.
-    */
-   function activateListeners()
-   {
-      // Drag handlers
-      node.addEventListener(...handlers.dragDown);
-      node.classList.add('draggable');
-   }
-
-   /**
     * Removes listeners.
     */
    function removeListeners()
@@ -156,17 +170,9 @@ export function draggableInertia(node, { position, active = true, storeDragging 
 
       dragging = false;
 
-      if (currentTween !== void 0)
-      {
-         currentTween.kill();
-         currentTween = void 0;
-      }
-
       // Record initial position.
       initialPosition = position.get();
-
-      initialDragPoint.x = event.clientX;
-      initialDragPoint.y = event.clientY;
+      initialDragPoint = { x: event.clientX, y: event.clientY };
 
       // Reset velocity tracking variables.
       lastDragTime = performance.now();
@@ -198,13 +204,43 @@ export function draggableInertia(node, { position, active = true, storeDragging 
          storeDragging.set(true);
       }
 
-      calcVelocity(event.clientX, event.clientY);
+      /** @type {number} */
+      const newLeft = initialPosition.left + (event.clientX - initialDragPoint.x);
+      /** @type {number} */
+      const newTop = initialPosition.top + (event.clientY - initialDragPoint.y);
 
-      // Update application position.
-      position.set({
-         left: initialPosition.left + (event.clientX - initialDragPoint.x),
-         top: initialPosition.top + (event.clientY - initialDragPoint.y)
-      });
+      if (inertia)
+      {
+         if (inertiaTween)
+         {
+            inertiaTween.kill();
+            inertiaTween = void 0;
+         }
+
+         calcVelocity(event.clientX, event.clientY);
+      }
+
+      if (ease)
+      {
+         // Update application position.
+         if (s_HAS_QUICK_TO)
+         {
+            quickLeft(newLeft);
+            quickTop(newTop);
+         }
+         else
+         {
+            if (tweenTo) { tweenTo.kill(); }
+
+            // TODO: optimize w/ static object.
+            tweenTo = GsapCompose.to(position, { left: newLeft, top: newTop, ...easeOptions });
+         }
+      }
+      else
+      {
+         // TODO: optimize w/ static object.
+         position.set({ left: newLeft, top: newTop });
+      }
    }
 
    /**
@@ -222,25 +258,44 @@ export function draggableInertia(node, { position, active = true, storeDragging 
       node.removeEventListener(...handlers.dragMove);
       node.removeEventListener(...handlers.dragUp);
 
-      const velocity = calcVelocity(event.clientX, event.clientY, velScale * 1000); // Convert velScale to ms
+      if (inertia)
+      {
+         const opts = inertiaOptions;
 
-      currentTween = GsapCompose.to(position, {
-         inertia: {
-            left: Object.assign({ velocity: velocity.x }, tweenEnd ? { end: tweenEnd } : {}),
-            top: Object.assign({ velocity: velocity.y }, tweenEnd ? { end: tweenEnd } : {}),
-            duration: tweenDuration,
-            resistance: tweenResistance,
-            linkedProps: 'top,left'
-         }
-      }, {
-         initialProps: ['top', 'left']
-      });
+         const velScale = opts.velScale ?? 1;
+         const tweenDuration = opts.duration ?? { min: 0, max: 1 };
+         const tweenEnd = opts.end ?? void 0;
+         const tweenResistance = opts.resistance ?? 1;
+
+         const velocity = calcVelocity(event.clientX, event.clientY, velScale * 1000); // Convert velScale to ms
+
+         inertiaTween = GsapCompose.to(position, {
+            inertia: {
+               left: Object.assign({ velocity: velocity.x }, tweenEnd ? { end: tweenEnd } : {}),
+               top: Object.assign({ velocity: velocity.y }, tweenEnd ? { end: tweenEnd } : {}),
+               duration: tweenDuration,
+               resistance: tweenResistance,
+               linkedProps: 'top,left'
+            }
+         }, {
+            initialProps: ['top', 'left']
+         });
+      }
    }
 
    return {
       // The default of active being true won't automatically add listeners twice.
-      update: ({ active = true }) =>  // eslint-disable-line no-shadow
+      update: ({ active = true, easeOptions }) =>  // eslint-disable-line no-shadow
       {
+         if (typeof easeOptions === 'object')
+         {
+            if (s_HAS_QUICK_TO)
+            {
+               quickLeft = GsapCompose.quickTo(position, 'left', easeOptions);
+               quickTop = GsapCompose.quickTo(position, 'top', easeOptions);
+            }
+         }
+
          if (active) { activateListeners(); }
          else { removeListeners(); }
       },
@@ -248,3 +303,5 @@ export function draggableInertia(node, { position, active = true, storeDragging 
       destroy: () => removeListeners()
    };
 }
+
+export { draggableGsap };

@@ -1,2 +1,1 @@
-export * from './draggableEase.js';
-export * from './draggableInertia.js';
+export * from './draggableGsap.js';
