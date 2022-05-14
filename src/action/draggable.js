@@ -14,7 +14,7 @@
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-export function draggable(node, { position, active = true, storeDragging = void 0 })
+function draggable(node, { position, active = true, storeDragging = void 0 })
 {
    /**
     * Duplicate the app / Positionable starting position to track differences.
@@ -150,3 +150,71 @@ export function draggable(node, { position, active = true, storeDragging = void 
       destroy: () => removeListeners()
    };
 }
+
+class DraggableOptions
+{
+   #ease = false;
+
+   /**
+    * Stores the subscribers.
+    *
+    * @type {(function(DraggableOptions): void)[]}
+    */
+   #subscriptions = [];
+
+   constructor()
+   {
+      Object.defineProperty(this, 'ease', {
+         get: () => { return this.#ease; },
+         set: (ease) =>
+         {
+            if (typeof ease !== 'boolean') { throw new TypeError(`'ease' is not a boolean.`); }
+
+            this.#ease = ease;
+            this.#updateSubscribers();
+         },
+         enumerable: true
+      });
+   }
+
+   /**
+    *
+    * @param {function(DraggableOptions): void} handler - Callback function that is invoked on update / changes.
+    *                                                 Receives the DraggableOptions object / instance.
+    *
+    * @returns {(function(): void)} Unsubscribe function.
+    */
+   subscribe(handler)
+   {
+      this.#subscriptions.push(handler); // add handler to the array of subscribers
+
+      handler(this);                     // call handler with current value
+
+      // Return unsubscribe function.
+      return () =>
+      {
+         const index = this.#subscriptions.findIndex((sub) => sub === handler);
+         if (index >= 0) { this.#subscriptions.splice(index, 1); }
+      };
+   }
+
+   #updateSubscribers()
+   {
+      const subscriptions = this.#subscriptions;
+
+      // Early out if there are no subscribers.
+      if (subscriptions.length > 0)
+      {
+         for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](this); }
+      }
+   }
+}
+
+/**
+ * Define a function to get a DraggableOptions instance.
+ *
+ * @returns {DraggableOptions} A new options instance.
+ */
+draggable.options = () => new DraggableOptions();
+
+export { draggable };
