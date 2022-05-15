@@ -1,15 +1,17 @@
-import { lerp }         from '@typhonjs-fvtt/svelte/math';
+import { TJSVelocityTrack }   from '@typhonjs-fvtt/svelte/math';
 
-import { GsapCompose }  from '../compose/GsapCompose.js';
+import { GsapCompose }        from '../compose/GsapCompose.js';
 
-const s_HAS_QUICK_TO = GsapCompose.hasMethod('quickTo');
+// TODO: presently just use `to` instead of `quickTo`; more testing for `quickTo` required.
+const s_HAS_QUICK_TO = false;
+// const s_HAS_QUICK_TO = GsapCompose.hasMethod('quickTo');
 
 /**
- * Provides an action to enable pointer dragging of an HTMLElement using GSAP `quickTo` to invoke `position.set` on a
- * given {@link Position} instance provided. You may provide a `vars` object sent to `quickTo` to modify the duration /
- * easing. When the attached boolean store state changes the draggable action is enabled or disabled.
+ * Provides an action to enable pointer dragging of an HTMLElement using GSAP `to` or `quickTo` to invoke `position.set`
+ * on a given {@link Position} instance provided. You may provide a `easeOptions` object sent to the tween to modify the
+ * duration / easing. When the attached boolean store state changes the draggable action is enabled or disabled.
  *
- * Note: Requires GSAP `3.10+`.
+ * Note: Requires GSAP `3.10+` for `quickTo` support.
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
@@ -21,7 +23,7 @@ const s_HAS_QUICK_TO = GsapCompose.hasMethod('quickTo');
  *
  * @param {Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging" state.
  *
- * @param {boolean}           [params.ease=false] - When true easing is enabled.
+ * @param {boolean}           [params.ease=true] - When true easing is enabled.
  *
  * @param {boolean}           [params.inertia=false] - When true inertia easing is enabled.
  *
@@ -33,7 +35,7 @@ const s_HAS_QUICK_TO = GsapCompose.hasMethod('quickTo');
  */
 function draggableGsap(node, { position, active = true, storeDragging = void 0, ease = true, inertia = false,
  easeOptions = { duration: 0.1, ease: 'power3.out' },
-  inertiaOptions = { end: void 0, duration: { min: 0, max: 1 }, resistance: 1, velocity: 1 } })
+  inertiaOptions = { end: void 0, duration: { min: 0, max: 1 }, resistance: 1000, velocityScale: 1 } })
 {
    /**
     * Duplicate the app / Positionable starting position to track differences.
@@ -47,7 +49,7 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
     *
     * @type {object}
     */
-   let initialDragPoint = {};
+   const initialDragPoint = { x: 0, y: 0 };
 
    /**
     * Stores the current dragging state and gates the move pointer as the dragging store is not
@@ -57,17 +59,20 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
     */
    let dragging = false;
 
-   // Used to track current velocity and the inertia tween.
+   /**
+    * Stores the inertia GSAP tween.
+    *
+    * @type {object}
+    */
    let inertiaTween;
-   let lastDragTime;
-   const lastDragPoint = { x: 0, y: 0 };
-   const velInstant = { x: 0, y: 0 };
-   const velQuick = { x: 0, y: 0 };
-   const velSmooth = { x: 0, y: 0 };
-   const velUsed = { x: 0, y: 0 };
 
    /**
-    * Remember event handlers associated with this action so they may be later unregistered.
+    * Tracks velocity for inertia tween.
+    */
+   const velocityTrack = new TJSVelocityTrack(1000);
+
+   /**
+    * Event handlers associated with this action for addition / removal.
     *
     * @type {object}
     */
@@ -77,7 +82,18 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
       dragUp: ['pointerup', (e) => onDragPointerUp(e), false]
    };
 
+   /**
+    * Stores the `quickTo` functions.
+    *
+    * @type {Function}
+    */
    let quickLeft, quickTop;
+
+   /**
+    * Stores the ease tween.
+    *
+    * @type {object}
+    */
    let tweenTo;
 
    if (s_HAS_QUICK_TO)
@@ -94,50 +110,6 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
       // Drag handlers
       node.addEventListener(...handlers.dragDown);
       node.classList.add('draggable');
-   }
-
-   /**
-    * Calculates velocity of x / y while dragging.
-    *
-    * @param {number}   newX - New drag X
-    *
-    * @param {number}   newY - New drag Y
-    *
-    * @param {number}   scale - New scale
-    *
-    * @returns {{x: number, y: number}} current velocity.
-    */
-   function calcVelocity(newX, newY, scale = 1)
-   {
-      const currentTime = performance.now();
-      const dTime = currentTime - lastDragTime + Number.EPSILON;
-      lastDragTime = currentTime;
-
-      // Set velocity to 0 due to time difference.
-      if (dTime > 50)
-      {
-         velInstant.x = velQuick.x = velSmooth.x = velUsed.x = 0;
-         velInstant.y = velQuick.y = velSmooth.y = velUsed.y = 0;
-         lastDragPoint.x = newX;
-         lastDragPoint.y = newY;
-         return velUsed;
-      }
-
-      velInstant.x = (newX - lastDragPoint.x) / dTime;
-      velInstant.y = (newY - lastDragPoint.y) / dTime;
-
-      lastDragPoint.x = newX;
-      lastDragPoint.y = newY;
-
-      velQuick.x = lerp(velQuick.x, velInstant.x, 0.1);
-      velQuick.y = lerp(velQuick.y, velInstant.y, 0.1);
-      velSmooth.x = lerp(velSmooth.x, velInstant.x, 0.01);
-      velSmooth.y = lerp(velSmooth.y, velInstant.y, 0.01);
-
-      velUsed.x = lerp(velSmooth.x, velQuick.x, 0.5) * scale;
-      velUsed.y = lerp(velSmooth.y, velQuick.y, 0.5) * scale;
-
-      return velUsed;
    }
 
    /**
@@ -172,14 +144,21 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
 
       // Record initial position.
       initialPosition = position.get();
-      initialDragPoint = { x: event.clientX, y: event.clientY };
+      initialDragPoint.x = event.clientX;
+      initialDragPoint.y = event.clientY;
 
-      // Reset velocity tracking variables.
-      lastDragTime = performance.now();
-      lastDragPoint.x = event.clientX;
-      lastDragPoint.y = event.clientY;
-      velInstant.x = velQuick.x = velSmooth.x = velUsed.x = 0;
-      velInstant.y = velQuick.y = velSmooth.y = velUsed.y = 0;
+      // Reset velocity tracking when inertia is enabled.
+      if (inertia)
+      {
+         // Reset any existing inertia tween.
+         if (inertiaTween)
+         {
+            inertiaTween.kill();
+            inertiaTween = void 0;
+         }
+
+         velocityTrack.reset(event.clientX, event.clientY);
+      }
 
       // Add move and pointer up handlers.
       node.addEventListener(...handlers.dragMove);
@@ -209,16 +188,7 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
       /** @type {number} */
       const newTop = initialPosition.top + (event.clientY - initialDragPoint.y);
 
-      if (inertia)
-      {
-         if (inertiaTween)
-         {
-            inertiaTween.kill();
-            inertiaTween = void 0;
-         }
-
-         calcVelocity(event.clientX, event.clientY);
-      }
+      if (inertia) { velocityTrack.update(event.clientX, event.clientY); }
 
       if (ease)
       {
@@ -232,14 +202,15 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
          {
             if (tweenTo) { tweenTo.kill(); }
 
-            // TODO: optimize w/ static object.
             tweenTo = GsapCompose.to(position, { left: newLeft, top: newTop, ...easeOptions });
          }
       }
       else
       {
-         // TODO: optimize w/ static object.
-         position.set({ left: newLeft, top: newTop });
+         s_POSITION_DATA.left = newLeft;
+         s_POSITION_DATA.top = newTop;
+
+         position.set(s_POSITION_DATA);
       }
    }
 
@@ -260,26 +231,39 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
 
       if (inertia)
       {
+         // Kill any existing ease / tween before inertia tween.
+         if (s_HAS_QUICK_TO)
+         {
+            quickLeft.tween.kill();
+            quickTop.tween.kill();
+         }
+         else
+         {
+            if (tweenTo)
+            {
+               tweenTo.kill();
+               tweenTo = void 0;
+            }
+         }
+
          const opts = inertiaOptions;
 
-         const velScale = opts.velocity ?? 1;
+         const velScale = opts.velocityScale ?? 1;
          const tweenDuration = opts.duration ?? { min: 0, max: 1 };
          const tweenEnd = opts.end ?? void 0;
-         const tweenResistance = opts.resistance ?? 1;
+         const tweenResistance = opts.resistance ?? 1000;
 
-         const velocity = calcVelocity(event.clientX, event.clientY, velScale * 1000); // Convert velScale to ms
+         const velocity = velocityTrack.update(event.clientX, event.clientY);
 
          inertiaTween = GsapCompose.to(position, {
             inertia: {
-               left: Object.assign({ velocity: velocity.x }, tweenEnd ? { end: tweenEnd } : {}),
-               top: Object.assign({ velocity: velocity.y }, tweenEnd ? { end: tweenEnd } : {}),
+               left: Object.assign({ velocity: velocity.x * velScale }, tweenEnd ? { end: tweenEnd } : {}),
+               top: Object.assign({ velocity: velocity.y * velScale }, tweenEnd ? { end: tweenEnd } : {}),
                duration: tweenDuration,
                resistance: tweenResistance,
                linkedProps: 'top,left'
             }
-         }, {
-            initialProps: ['top', 'left']
-         });
+         }, s_INTERTIA_GC_OPTIONS);
       }
    }
 
@@ -318,6 +302,9 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
    };
 }
 
+/**
+ * Provides a store / object to make updating / setting draggableGsap options much easier.
+ */
 class DraggableGsapOptions
 {
    #ease = true;
@@ -325,7 +312,8 @@ class DraggableGsapOptions
    #inertia = false;
 
    #easeOptions = { duration: 0.1, ease: 'power3.out' };
-   #inertiaOptions = { end: void 0, duration: { min: 0, max: 1 }, resistance: 1, velocity: 1 };
+
+   #inertiaOptions = { end: void 0, duration: { min: 0, max: 1 }, resistance: 1000, velocityScale: 1 };
 
    /**
     * Stores the subscribers.
@@ -336,6 +324,9 @@ class DraggableGsapOptions
 
    constructor()
    {
+      // Define the following getters directly on this instance and make them enumerable. This allows them to be
+      // picked up w/ `Object.assign`.
+
       Object.defineProperty(this, 'ease', {
          get: () => { return this.#ease; },
          set: (ease) =>
@@ -374,15 +365,45 @@ class DraggableGsapOptions
       });
    }
 
+   /**
+    * @returns {number} Get ease duration
+    */
    get easeDuration() { return this.#easeOptions.duration; }
+
+   /**
+    * @returns {string} Get easing function value.
+    */
    get easeValue() { return this.#easeOptions.ease; }
 
+   /**
+    * @returns {number|Array|Function} Get inertia end.
+    * @see `end` {@link https://greensock.com/docs/v3/Plugins/InertiaPlugin}
+    */
    get inertiaEnd() { return this.#inertiaOptions.end; }
-   get inertiaDurationMin() { return this.#inertiaOptions.duration.min; }
-   get inertiaDurationMax() { return this.#inertiaOptions.duration.max; }
-   get inertiaResistance() { return this.#inertiaOptions.resistance; }
-   get inertiaVelocity() { return this.#inertiaOptions.velocity; }
 
+   /**
+    * @returns {number} Get inertia duration max time (seconds)
+    */
+   get inertiaDurationMax() { return this.#inertiaOptions.duration.max; }
+
+   /**
+    * @returns {number} Get inertia duration min time (seconds)
+    */
+   get inertiaDurationMin() { return this.#inertiaOptions.duration.min; }
+
+   /**
+    * @returns {number} Get inertia resistance (1000 is default).
+    */
+   get inertiaResistance() { return this.#inertiaOptions.resistance; }
+
+   /**
+    * @returns {number} Get inertia velocity scale.
+    */
+   get inertiaVelocityScale() { return this.#inertiaOptions.velocityScale; }
+
+   /**
+    * @param {number}   duration - Set ease duration.
+    */
    set easeDuration(duration)
    {
       if (!Number.isFinite(duration))
@@ -396,6 +417,9 @@ class DraggableGsapOptions
       this.#updateSubscribers();
    }
 
+   /**
+    * @param {string|Function} value - Get easing function value.
+    */
    set easeValue(value)
    {
       if (typeof value !== 'function' && typeof value !== 'string')
@@ -407,6 +431,12 @@ class DraggableGsapOptions
       this.#updateSubscribers();
    }
 
+
+   /**
+    * @param {number|Array|Function} end - Set inertia end.
+    *
+    * @see `end` {@link https://greensock.com/docs/v3/Plugins/InertiaPlugin}
+    */
    set inertiaEnd(end)
    {
       if (typeof end !== 'function' && end !== void 0) { throw new TypeError(`'end' is not a function or undefined.`); }
@@ -415,6 +445,9 @@ class DraggableGsapOptions
       this.#updateSubscribers();
    }
 
+   /**
+    * @param {{min: number, max: number}} duration - Set inertia duration min & max.
+    */
    set inertiaDuration(duration)
    {
       if (typeof duration !== 'object' && !Number.isFinite(duration.min) && !Number.isFinite(duration.max))
@@ -434,6 +467,9 @@ class DraggableGsapOptions
       this.#updateSubscribers();
    }
 
+   /**
+    * @param {number}   max - Set inertia duration max.
+    */
    set inertiaDurationMax(max)
    {
       if (!Number.isFinite(max)) { throw new TypeError(`'max' is not a finite number.`); }
@@ -445,6 +481,9 @@ class DraggableGsapOptions
       this.#updateSubscribers();
    }
 
+   /**
+    * @param {number}   min - Set inertia duration min.
+    */
    set inertiaDurationMin(min)
    {
       if (!Number.isFinite(min)) { throw new TypeError(`'min' is not a finite number.`); }
@@ -456,21 +495,27 @@ class DraggableGsapOptions
       this.#updateSubscribers();
    }
 
+   /**
+    * @param {number}   resistance - Set inertia resistance. Default: 1000
+    */
    set inertiaResistance(resistance)
    {
       if (!Number.isFinite(resistance)) { throw new TypeError(`'resistance' is not a finite number.`); }
-      // if (resistance < 0) { throw new Error(`'resistance' is less than 0.`); }
+      if (resistance < 0) { throw new Error(`'resistance' is less than 0.`); }
 
       this.#inertiaOptions.resistance = resistance;
       this.#updateSubscribers();
    }
 
-   set inertiaVelocity(velocity)
+   /**
+    * @param {number}   velocityScale - Set inertia velocity scale.
+    */
+   set inertiaVelocityScale(velocityScale)
    {
-      if (!Number.isFinite(velocity)) { throw new TypeError(`'velocity' is not a finite number.`); }
-      if (velocity < 0) { throw new Error(`'velocity' is less than 0.`); }
+      if (!Number.isFinite(velocityScale)) { throw new TypeError(`'velocityScale' is not a finite number.`); }
+      if (velocityScale < 0) { throw new Error(`'velocityScale' is less than 0.`); }
 
-      this.#inertiaOptions.velocity = velocity;
+      this.#inertiaOptions.velocityScale = velocityScale;
       this.#updateSubscribers();
    }
 
@@ -482,7 +527,7 @@ class DraggableGsapOptions
       this.#ease = true;
       this.#inertia = false;
       this.#easeOptions = { duration: 0.1, ease: 'power3.out' };
-      this.#inertiaOptions = { end: void 0, duration: { min: 0, max: 1 }, resistance: 1, velocity: 1 };
+      this.#inertiaOptions = { end: void 0, duration: { min: 0, max: 1 }, resistance: 1000, velocityScale: 1 };
       this.#updateSubscribers();
    }
 
@@ -491,7 +536,6 @@ class DraggableGsapOptions
     */
    resetEase()
    {
-      this.#ease = true;
       this.#easeOptions = { duration: 0.1, ease: 'power3.out' };
       this.#updateSubscribers();
    }
@@ -501,12 +545,12 @@ class DraggableGsapOptions
     */
    resetInertia()
    {
-      this.#inertia = false;
-      this.#inertiaOptions = { end: void 0, duration: { min: 0, max: 1 }, resistance: 1, velocity: 1 };
+      this.#inertiaOptions = { end: void 0, duration: { min: 0, max: 1 }, resistance: 1000, velocityScale: 1 };
       this.#updateSubscribers();
    }
 
    /**
+    * Store subscribe method.
     *
     * @param {function(DraggableGsapOptions): void} handler - Callback function that is invoked on update / changes.
     *                                                         Receives the DraggableOptions object / instance.
@@ -527,6 +571,9 @@ class DraggableGsapOptions
       };
    }
 
+   /**
+    * Update all subscribers.
+    */
    #updateSubscribers()
    {
       const subscriptions = this.#subscriptions;
@@ -549,9 +596,15 @@ draggableGsap.options = () => new DraggableGsapOptions();
 export { draggableGsap };
 
 /**
- * @typedef {object} DraggableInertiaOptions
+ * Extra options for GsapCompose.
  *
- * @property {Function} [end] -
- *
- * @property {Function} [end] -
+ * @type {{initialProps: string[]}}
  */
+const s_INTERTIA_GC_OPTIONS = { initialProps: ['top', 'left'] };
+
+/**
+ * Used for direct call to `position.set`.
+ *
+ * @type {{top: number, left: number}}
+ */
+const s_POSITION_DATA = { left: 0, top: 0 };
