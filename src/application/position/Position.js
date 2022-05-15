@@ -1529,7 +1529,43 @@ Object.seal(s_VALIDATION_DATA);
  */
 
 /**
- * @typedef {PositionData} PositionDataExtended
+ * @typedef {object} PositionDataExtended
+ *
+ * @property {number|'auto'|null} [height] -
+ *
+ * @property {number|null} [left] -
+ *
+ * @property {number|null} [maxHeight] -
+ *
+ * @property {number|null} [maxWidth] -
+ *
+ * @property {number|null} [minHeight] -
+ *
+ * @property {number|null} [minWidth] -
+ *
+ * @property {number|null} [rotateX] -
+ *
+ * @property {number|null} [rotateY] -
+ *
+ * @property {number|null} [rotateZ] -
+ *
+ * @property {number|null} [scale] -
+ *
+ * @property {number|null} [top] -
+ *
+ * @property {string|null} [transformOrigin] -
+ *
+ * @property {number|null} [translateX] -
+ *
+ * @property {number|null} [translateY] -
+ *
+ * @property {number|null} [translateZ] -
+ *
+ * @property {number|'auto'|null} [width] -
+ *
+ * @property {number|null} [zIndex] -
+ *
+ * Extended properties -----------------------------------------------------------------------------------------------
  *
  * @property {boolean} [immediateElementUpdate] - When true any associated element is updated immediately.
  *
