@@ -55,7 +55,7 @@ export class AnimationManager
             const data = s_ACTIVE_LIST[cntr];
 
             // Ensure that the element is still connected otherwise remove it from active list and continue.
-            if (!data.el.isConnected)
+            if (!data.el.isConnected || data.finished)
             {
                s_ACTIVE_LIST.splice(cntr, 1);
                data.currentAnimationKeys.clear();
@@ -80,6 +80,7 @@ export class AnimationManager
 
                s_ACTIVE_LIST.splice(cntr, 1);
 
+               data.finished = true;
                data.resolve();
                continue;
             }
@@ -107,7 +108,7 @@ export class AnimationManager
             {
                const data = s_ACTIVE_LIST[cntr];
 
-               if (!data.el.isConnected)
+               if (!data.el.isConnected || data.finished)
                {
                   data.currentAnimationKeys.clear();
                   data.resolve();
@@ -122,6 +123,7 @@ export class AnimationManager
                }
 
                data.position.set(data.newData);
+               data.finished = true;
                data.resolve();
             }
 

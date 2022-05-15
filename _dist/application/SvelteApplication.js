@@ -121,7 +121,7 @@ export class SvelteApplication extends Application
       /**
        * Define accessors to retrieve Position by `this.position`.
        *
-       * @member {PositionData} position - Adds accessors to SvelteApplication to get / set the position data.
+       * @member {Position} position - Adds accessors to SvelteApplication to get / set the position data.
        *
        * @memberof SvelteApplication#
        */
@@ -658,7 +658,7 @@ export class SvelteApplication extends Application
       if (animate)
       {
          // First await animation of height upward.
-         await this.position.animateTo({ height: headerOffsetHeight }, { duration: 100 });
+         await this.position.animateTo({ height: headerOffsetHeight }, { duration: 100 }).finished;
       }
 
       // Set all header buttons besides close and the window title to display none.
@@ -678,7 +678,7 @@ export class SvelteApplication extends Application
       if (animate)
       {
          // Await animation of width to the left / minimum width.
-         await this.position.animateTo({ width: MIN_WINDOW_WIDTH }, { duration: 100 });
+         await this.position.animateTo({ width: MIN_WINDOW_WIDTH }, { duration: 100 }).finished;
       }
 
       element.classList.add('minimized');

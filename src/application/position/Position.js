@@ -8,6 +8,7 @@ import {
    isIterable,
    isPlainObject }               from '@typhonjs-fvtt/svelte/util';
 
+import { AnimationControl }      from './animation/AnimationControl.js';
 import { AnimationManager }      from './animation/AnimationManager.js';
 import * as constants            from './constants.js';
 import * as positionInitial      from './initial/index.js';
@@ -684,9 +685,9 @@ export class Position
     *
     * @param {Function}       [opts.interpolate=lerp] - Interpolation function.
     *
-    * @returns {Promise<void>} Promise that is resolved when animation completes.
+    * @returns {TJSBasicAnimation}  A control object that can cancel animation and provides a `finished` Promise.
     */
-   async animateTo(position, { duration = 1000, easing = linear, interpolate = lerp } = {})
+   animateTo(position, { duration = 1000, easing = linear, interpolate = lerp } = {})
    {
       if (typeof position !== 'object')
       {
@@ -697,13 +698,13 @@ export class Position
       const parent = this.#parent;
       if (parent !== void 0 && typeof parent?.options?.positionable === 'boolean' && !parent?.options?.positionable)
       {
-         return;
+         return new AnimationControl(() => null, Promise.resolve());
       }
 
       const targetEl = parent instanceof HTMLElement ? parent : parent?.elementTarget;
       const el = targetEl instanceof HTMLElement && targetEl.isConnected ? targetEl : void 0;
 
-      if (!el) { return; }
+      if (!el) { return new AnimationControl(() => null, Promise.resolve()); }
 
       if (!Number.isInteger(duration) || duration < 0)
       {
@@ -764,7 +765,7 @@ export class Position
       const keys = Object.keys(newData);
 
       // Nothing to animate, so return now.
-      if (keys.length === 0) { return; }
+      if (keys.length === 0) { return new AnimationControl(() => null, Promise.resolve()); }
 
       const animationData = {
          current: 0,
@@ -773,6 +774,7 @@ export class Position
          duration,
          easing,
          el,
+         finished: false,
          initial,
          interpolate,
          keys,
@@ -785,7 +787,7 @@ export class Position
       AnimationManager.add(animationData);
 
       // Schedule w/ animation manager.
-      return promise;
+      return new AnimationControl(() => animationData.finished = true, promise);
    }
 
    /**
@@ -936,7 +938,7 @@ export class Position
     *
     * @param {Function}          [params.interpolate=lerp] - Interpolation function.
     *
-    * @returns {PositionData} Saved position data.
+    * @returns {PositionDataExtended|Promise<PositionDataExtended>} Saved position data.
     */
    restore({ name, remove = false, properties, silent = false, async = false, animateTo = false, duration = 100,
     easing = linear, interpolate = lerp })
@@ -974,7 +976,7 @@ export class Position
             // Return a Promise with saved data that resolves after animation ends.
             if (async)
             {
-               return this.animateTo(data, { duration, easing, interpolate }).then(() => dataSaved);
+               return this.animateTo(data, { duration, easing, interpolate }).finished.then(() => dataSaved);
             }
             else  // Animate synchronously.
             {

@@ -3,15 +3,14 @@ import { lerp }   from '@typhonjs-fvtt/svelte/math';
 
 export class ApplicationState
 {
+   /** @type {ApplicationShellExt} */
    #application;
 
-   /**
-    * @type {Map<string, ApplicationData>}
-    */
+   /** @type {Map<string, ApplicationData>} */
    #dataSaved = new Map();
 
    /**
-    * @param {{ reactive: SvelteReactive, options: object }}   application - The application.
+    * @param {ApplicationShellExt}   application - The application.
     */
    constructor(application)
    {
@@ -109,7 +108,7 @@ export class ApplicationState
       {
          if (remove) { this.#dataSaved.delete(name); }
 
-         return this.set(dataSaved, { async, animateTo, duration, easing, interpolate });
+         this.set(dataSaved, { async, animateTo, duration, easing, interpolate });
       }
 
       return dataSaved;
@@ -158,7 +157,8 @@ export class ApplicationState
     *
     * @param {Function}          [opts.interpolate=lerp] - Interpolation function.
     *
-    * @returns {Application} application.
+    * @returns {ApplicationShellExt|Promise<ApplicationShellExt>} When synchronous the application or Promise when
+    *                                                             animating resolving with application.
     */
    set(data, { async = false, animateTo = false, duration = 100, easing = linear, interpolate = lerp })
    {
@@ -206,7 +206,7 @@ export class ApplicationState
                // Return a Promise with saved data that resolves after animation ends.
                if (async)
                {
-                  return application.position.animateTo(data.position, { duration, easing, interpolate }).then(
+                  return application.position.animateTo(data.position, { duration, easing, interpolate }).finished.then(
                    () => application);
                }
                else  // Animate synchronously.
@@ -229,7 +229,7 @@ export class ApplicationState
 /**
  * @typedef {object} ApplicationData
  *
- * @property {PositionData}   position - Application position.
+ * @property {PositionDataExtended}   position - Application position.
  *
  * @property {object}         options - Application options.
  *
