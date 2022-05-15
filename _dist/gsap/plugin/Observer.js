@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const Observer = await gsapLoadPlugin('Observer');
+const Observer = await gsapLoadPlugin('Observer');
+
+gsap.registerPlugin(Observer);
+
+export { Observer };

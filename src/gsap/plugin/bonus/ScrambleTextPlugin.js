@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const ScrambleTextPlugin = await gsapLoadPlugin('ScrambleTextPlugin');
+const ScrambleTextPlugin = await gsapLoadPlugin('ScrambleTextPlugin');
+
+gsap.registerPlugin(ScrambleTextPlugin);
+
+export { ScrambleTextPlugin };

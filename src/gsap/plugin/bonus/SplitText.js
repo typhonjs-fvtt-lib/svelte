@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const SplitText = await gsapLoadPlugin('SplitText');
+const SplitText = await gsapLoadPlugin('SplitText');
+
+gsap.registerPlugin(SplitText);
+
+export { SplitText };

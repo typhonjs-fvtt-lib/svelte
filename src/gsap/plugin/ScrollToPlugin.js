@@ -1,3 +1,8 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const ScrollToPlugin = await gsapLoadPlugin('ScrollToPlugin');
+const ScrollToPlugin = await gsapLoadPlugin('ScrollToPlugin');
+
+gsap.registerPlugin(ScrollToPlugin);
+
+export { ScrollToPlugin };
+

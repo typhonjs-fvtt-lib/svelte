@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const MotionPathHelper = await gsapLoadPlugin('MotionPathHelper');
+const MotionPathHelper = await gsapLoadPlugin('MotionPathHelper');
+
+gsap.registerPlugin(MotionPathHelper);
+
+export { MotionPathHelper };

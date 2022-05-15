@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const Flip = await gsapLoadPlugin('Flip');
+const Flip = await gsapLoadPlugin('Flip');
+
+gsap.registerPlugin(Flip);
+
+export { Flip };

@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const InertiaPlugin = await gsapLoadPlugin('InertiaPlugin');
+const InertiaPlugin = await gsapLoadPlugin('InertiaPlugin');
+
+gsap.registerPlugin(InertiaPlugin);
+
+export { InertiaPlugin };

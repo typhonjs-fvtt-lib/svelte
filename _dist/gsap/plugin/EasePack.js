@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const EasePack = await gsapLoadPlugin('EasePack');
+const EasePack = await gsapLoadPlugin('EasePack');
+
+gsap.registerPlugin(EasePack);
+
+export { EasePack };

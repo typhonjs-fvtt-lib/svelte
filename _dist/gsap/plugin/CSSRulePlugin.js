@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const CSSRulePlugin = await gsapLoadPlugin('CSSRulePlugin');
+const CSSRulePlugin = await gsapLoadPlugin('CSSRulePlugin');
+
+gsap.registerPlugin(CSSRulePlugin);
+
+export { CSSRulePlugin };

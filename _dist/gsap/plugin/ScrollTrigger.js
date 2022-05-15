@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const ScrollTrigger = await gsapLoadPlugin('ScrollTrigger');
+const ScrollTrigger = await gsapLoadPlugin('ScrollTrigger');
+
+gsap.registerPlugin(ScrollTrigger);
+
+export { ScrollTrigger };

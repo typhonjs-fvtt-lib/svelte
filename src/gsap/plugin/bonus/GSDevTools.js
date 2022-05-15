@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const GSDevTools = await gsapLoadPlugin('GSDevTools');
+const GSDevTools = await gsapLoadPlugin('GSDevTools');
+
+gsap.registerPlugin(GSDevTools);
+
+export { GSDevTools };

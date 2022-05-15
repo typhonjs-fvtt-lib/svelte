@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const CustomEase = await gsapLoadPlugin('CustomEase');
+const CustomEase = await gsapLoadPlugin('CustomEase');
+
+gsap.registerPlugin(CustomEase);
+
+export { CustomEase };

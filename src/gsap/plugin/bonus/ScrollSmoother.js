@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const ScrollSmoother = await gsapLoadPlugin('ScrollSmoother');
+const ScrollSmoother = await gsapLoadPlugin('ScrollSmoother');
+
+gsap.registerPlugin(ScrollSmoother);
+
+export { ScrollSmoother };

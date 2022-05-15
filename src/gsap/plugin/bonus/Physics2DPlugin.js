@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const Physics2DPlugin = await gsapLoadPlugin('Physics2DPlugin');
+const Physics2DPlugin = await gsapLoadPlugin('Physics2DPlugin');
+
+gsap.registerPlugin(Physics2DPlugin);
+
+export { Physics2DPlugin };

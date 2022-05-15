@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const DrawSVGPlugin = await gsapLoadPlugin('DrawSVGPlugin');
+const DrawSVGPlugin = await gsapLoadPlugin('DrawSVGPlugin');
+
+gsap.registerPlugin(DrawSVGPlugin);
+
+export { DrawSVGPlugin };

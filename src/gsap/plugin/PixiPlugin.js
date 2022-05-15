@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const PixiPlugin = await gsapLoadPlugin('PixiPlugin');
+const PixiPlugin = await gsapLoadPlugin('PixiPlugin');
+
+gsap.registerPlugin(PixiPlugin);
+
+export { PixiPlugin };

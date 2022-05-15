@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const CustomBounce = await gsapLoadPlugin('CustomBounce');
+const CustomBounce = await gsapLoadPlugin('CustomBounce');
+
+gsap.registerPlugin(CustomBounce);
+
+export { CustomBounce };

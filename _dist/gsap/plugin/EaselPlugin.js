@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const EaselPlugin = await gsapLoadPlugin('EaselPlugin');
+const EaselPlugin = await gsapLoadPlugin('EaselPlugin');
+
+gsap.registerPlugin(EaselPlugin);
+
+export { EaselPlugin };

@@ -1,3 +1,7 @@
-import { gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
+import { gsap, gsapLoadPlugin } from '@typhonjs-fvtt/svelte/gsap';
 
-export const GsapDraggable = await gsapLoadPlugin('Draggable');
+const Draggable = await gsapLoadPlugin('Draggable'); // eslint-disable-line no-shadow
+
+gsap.registerPlugin(Draggable);
+
+export { Draggable };
