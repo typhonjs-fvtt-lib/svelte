@@ -137,4 +137,57 @@ export class AnimationManager
 
       s_PROMISE = void 0;
    }
+
+   /**
+    * Cancels any animation for given Position data.
+    *
+    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} data -
+    */
+   static cancel(data)
+   {
+
+   }
+
+   /**
+    * Cancels all Position animation.
+    */
+   static cancelAll()
+   {
+      for (let cntr = s_ACTIVE_LIST.length; --cntr >= 0;)
+      {
+         const data = s_ACTIVE_LIST[cntr];
+
+         data.currentAnimationKeys.clear();
+         data.finished = true;
+         data.resolve();
+      }
+
+      for (let cntr = s_NEW_LIST.length; --cntr >= 0;)
+      {
+         const data = s_NEW_LIST[cntr];
+
+         data.currentAnimationKeys.clear();
+         data.finished = true;
+         data.resolve();
+      }
+
+      s_ACTIVE_LIST.length = 0;
+      s_NEW_LIST.length = 0;
+   }
+
+   /**
+    * Animates one or more Position instances as a group.
+    *
+    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} data -
+    *
+    * @param {object|Function}   positionData -
+    *
+    * @param {object|Function}   options -
+    *
+    * @returns {TJSBasicAnimation} Basic animation control.
+    */
+   static to(data, positionData, options)
+   {
+      return void 0;
+   }
 }

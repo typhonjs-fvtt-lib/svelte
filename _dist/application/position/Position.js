@@ -10,6 +10,7 @@ import {
 
 import { AnimationControl }      from './animation/AnimationControl.js';
 import { AnimationManager }      from './animation/AnimationManager.js';
+import { AnimationPublicAPI }    from './animation/AnimationPublicAPI.js';
 import * as constants            from './constants.js';
 import * as positionInitial      from './initial/index.js';
 import { PositionChangeSet }     from './PositionChangeSet.js';
@@ -121,6 +122,11 @@ export class Position
     * @type {ValidatorData[]}
     */
    #validatorData;
+
+   /**
+    * @returns {AnimationPublicAPI} Public Animation API.
+    */
+   static get Animation() { return AnimationPublicAPI; }
 
    /**
     * @returns {{browserCentered?: Centered, Centered?: *}} Initial position helpers.
