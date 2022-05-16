@@ -704,13 +704,13 @@ export class Position
       const parent = this.#parent;
       if (parent !== void 0 && typeof parent?.options?.positionable === 'boolean' && !parent?.options?.positionable)
       {
-         return new AnimationControl(() => null, Promise.resolve());
+         return AnimationControl.voidControl;
       }
 
       const targetEl = parent instanceof HTMLElement ? parent : parent?.elementTarget;
       const el = targetEl instanceof HTMLElement && targetEl.isConnected ? targetEl : void 0;
 
-      if (!el) { return new AnimationControl(() => null, Promise.resolve()); }
+      if (!el) { return AnimationControl.voidControl; }
 
       if (!Number.isInteger(duration) || duration < 0)
       {
@@ -771,7 +771,7 @@ export class Position
       const keys = Object.keys(newData);
 
       // Nothing to animate, so return now.
-      if (keys.length === 0) { return new AnimationControl(() => null, Promise.resolve()); }
+      if (keys.length === 0) { return AnimationControl.voidControl; }
 
       const animationData = {
          current: 0,
@@ -788,12 +788,13 @@ export class Position
          position: this
       };
 
+      // Cache the finished Promise resolve method in animationData, so that it can be invoked by AnimationManager.
       const promise = new Promise((resolve) => animationData.resolve = resolve);
 
       AnimationManager.add(animationData);
 
       // Schedule w/ animation manager.
-      return new AnimationControl(() => animationData.finished = true, promise);
+      return new AnimationControl(animationData, promise);
    }
 
    /**
