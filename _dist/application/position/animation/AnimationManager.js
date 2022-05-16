@@ -100,7 +100,7 @@ export class AnimationManager
                continue;
             }
 
-            const easedTime = data.easing(data.current / data.duration);
+            const easedTime = data.ease(data.current / data.duration);
 
             for (let dataCntr = data.keys.length; --dataCntr >= 0;)
             {

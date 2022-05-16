@@ -687,13 +687,13 @@ export class Position
     *
     * @param {number}         [opts.duration] - Duration in milliseconds.
     *
-    * @param {Function}       [opts.easing=linear] - Easing function.
+    * @param {Function}       [opts.ease=linear] - Easing function.
     *
     * @param {Function}       [opts.interpolate=lerp] - Interpolation function.
     *
     * @returns {TJSBasicAnimation}  A control object that can cancel animation and provides a `finished` Promise.
     */
-   animateTo(position, { duration = 1000, easing = linear, interpolate = lerp } = {})
+   animateTo(position, { duration = 1000, ease = linear, interpolate = lerp } = {})
    {
       if (typeof position !== 'object')
       {
@@ -717,9 +717,9 @@ export class Position
          throw new TypeError(`Position - animateTo error: 'duration' is not a positive integer.`);
       }
 
-      if (typeof easing !== 'function')
+      if (typeof ease !== 'function')
       {
-         throw new TypeError(`Position - animateTo error: 'easing' is not a function.`);
+         throw new TypeError(`Position - animateTo error: 'ease' is not a function.`);
       }
 
       if (typeof interpolate !== 'function')
@@ -778,7 +778,7 @@ export class Position
          currentAnimationKeys,
          destination,
          duration,
-         easing,
+         ease,
          el,
          finished: false,
          initial,
@@ -941,14 +941,14 @@ export class Position
     *
     * @param {number}            [params.duration=100] - Duration in milliseconds.
     *
-    * @param {Function}          [params.easing=linear] - Easing function.
+    * @param {Function}          [params.ease=linear] - Easing function.
     *
     * @param {Function}          [params.interpolate=lerp] - Interpolation function.
     *
     * @returns {PositionDataExtended|Promise<PositionDataExtended>} Saved position data.
     */
    restore({ name, remove = false, properties, silent = false, async = false, animateTo = false, duration = 100,
-    easing = linear, interpolate = lerp })
+    ease = linear, interpolate = lerp })
    {
       if (typeof name !== 'string') { throw new TypeError(`Position - restore error: 'name' is not a string.`); }
 
@@ -983,11 +983,11 @@ export class Position
             // Return a Promise with saved data that resolves after animation ends.
             if (async)
             {
-               return this.animateTo(data, { duration, easing, interpolate }).finished.then(() => dataSaved);
+               return this.animateTo(data, { duration, ease, interpolate }).finished.then(() => dataSaved);
             }
             else  // Animate synchronously.
             {
-               this.animateTo(data, { duration, easing, interpolate });
+               this.animateTo(data, { duration, ease, interpolate });
             }
          }
          else
