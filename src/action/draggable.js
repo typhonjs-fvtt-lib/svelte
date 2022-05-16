@@ -116,11 +116,11 @@ function draggable(node, { position, active = true, storeDragging = void 0 })
          storeDragging.set(true);
       }
 
+      s_POSITION_DATA.left = initialPosition.left + (event.clientX - initialDragPoint.x);
+      s_POSITION_DATA.top = initialPosition.top + (event.clientY - initialDragPoint.y);
+
       // Update application position.
-      position.set({
-         left: initialPosition.left + (event.clientX - initialDragPoint.x),
-         top: initialPosition.top + (event.clientY - initialDragPoint.y)
-      });
+      position.set(s_POSITION_DATA);
    }
 
    /**
@@ -141,10 +141,14 @@ function draggable(node, { position, active = true, storeDragging = void 0 })
 
    return {
       // The default of active being true won't automatically add listeners twice.
-      update: ({ active = true }) =>  // eslint-disable-line no-shadow
+      update: (options) =>
       {
-         if (active) { activateListeners(); }
-         else { removeListeners(); }
+         if (typeof options.active === 'boolean')
+         {
+            active = options.active;
+            if (active) { activateListeners(); }
+            else { removeListeners(); }
+         }
       },
 
       destroy: () => removeListeners()
@@ -153,8 +157,6 @@ function draggable(node, { position, active = true, storeDragging = void 0 })
 
 class DraggableOptions
 {
-   #ease = false;
-
    /**
     * Stores the subscribers.
     *
@@ -164,17 +166,6 @@ class DraggableOptions
 
    constructor()
    {
-      Object.defineProperty(this, 'ease', {
-         get: () => { return this.#ease; },
-         set: (ease) =>
-         {
-            if (typeof ease !== 'boolean') { throw new TypeError(`'ease' is not a boolean.`); }
-
-            this.#ease = ease;
-            this.#updateSubscribers();
-         },
-         enumerable: true
-      });
    }
 
    /**
@@ -218,3 +209,10 @@ class DraggableOptions
 draggable.options = () => new DraggableOptions();
 
 export { draggable };
+
+/**
+ * Used for direct call to `position.set`.
+ *
+ * @type {{top: number, left: number}}
+ */
+const s_POSITION_DATA = { left: 0, top: 0 };
