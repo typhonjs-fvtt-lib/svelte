@@ -69,7 +69,7 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
    /**
     * Tracks velocity for inertia tween.
     */
-   const velocityTrack = new TJSVelocityTrack(1000);
+   const velocityTrack = new TJSVelocityTrack();
 
    /**
     * Event handlers associated with this action for addition / removal.
@@ -269,7 +269,7 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
 
    return {
       // The default of active being true won't automatically add listeners twice.
-      update: (options) =>  // eslint-disable-line no-shadow
+      update: (options) =>
       {
          if (typeof options.active === 'boolean')
          {
@@ -371,7 +371,7 @@ class DraggableGsapOptions
    get easeDuration() { return this.#easeOptions.duration; }
 
    /**
-    * @returns {string} Get easing function value.
+    * @returns {string|Function} Get easing function value.
     */
    get easeValue() { return this.#easeOptions.ease; }
 
