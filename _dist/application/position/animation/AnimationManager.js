@@ -55,10 +55,18 @@ export class AnimationManager
             const data = s_ACTIVE_LIST[cntr];
 
             // Ensure that the element is still connected otherwise remove it from active list and continue.
-            if (!data.el.isConnected || data.finished)
+            if (!data.el.isConnected)
             {
                s_ACTIVE_LIST.splice(cntr, 1);
                data.currentAnimationKeys.clear();
+               data.resolve();
+               continue;
+            }
+
+            // Handle any animations that have been canceled.
+            if (data.finished)
+            {
+               s_ACTIVE_LIST.splice(cntr, 1);
                data.resolve();
                continue;
             }
@@ -108,13 +116,23 @@ export class AnimationManager
             {
                const data = s_ACTIVE_LIST[cntr];
 
-               if (!data.el.isConnected || data.finished)
+               if (!data.el.isConnected)
                {
+                  s_ACTIVE_LIST.splice(cntr, 1);
                   data.currentAnimationKeys.clear();
                   data.resolve();
                   continue;
                }
 
+               // Handle any animations that have been canceled.
+               if (data.finished)
+               {
+                  s_ACTIVE_LIST.splice(cntr, 1);
+                  data.resolve();
+                  continue;
+               }
+
+               // Any remaining animations set the Position to the destination target.
                for (let dataCntr = data.keys.length; --dataCntr >= 0;)
                {
                   const key = data.keys[dataCntr];
