@@ -66,6 +66,13 @@ export class AnimationManager
             // Handle any animations that have been canceled.
             if (data.finished)
             {
+               // Remove animation keys.
+               for (let dataCntr = data.keys.length; --dataCntr >= 0;)
+               {
+                  const key = data.keys[dataCntr];
+                  data.currentAnimationKeys.delete(key);
+               }
+
                s_ACTIVE_LIST.splice(cntr, 1);
                data.resolve();
                continue;
@@ -127,6 +134,13 @@ export class AnimationManager
                // Handle any animations that have been canceled.
                if (data.finished)
                {
+                  // Remove animation keys.
+                  for (let dataCntr = data.keys.length; --dataCntr >= 0;)
+                  {
+                     const key = data.keys[dataCntr];
+                     data.currentAnimationKeys.delete(key);
+                  }
+
                   s_ACTIVE_LIST.splice(cntr, 1);
                   data.resolve();
                   continue;

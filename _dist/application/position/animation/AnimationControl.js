@@ -1,10 +1,12 @@
+/**
+ * Provides a basic {@link TJSBasicAnimation} implementation for Position animation.
+ */
 class AnimationControl
 {
+   /** @type {object} */
    #animationData;
 
-   /**
-    * @type {Promise<void>}
-    */
+   /** @type {Promise<void>} */
    #finishedPromise;
 
    /**
@@ -25,8 +27,16 @@ class AnimationControl
       this.#finishedPromise = animationData === null ? Promise.resolve() : finishedPromise;
    }
 
+   /**
+    * Get a promise that resolves when animation is finished.
+    *
+    * @returns {Promise<void>}
+    */
    get finished() { return this.#finishedPromise; }
 
+   /**
+    * Cancels the animation.
+    */
    cancel()
    {
       const animationData = this.#animationData;
@@ -52,29 +62,3 @@ class AnimationControl
 const s_VOID_CONTROL = new AnimationControl();
 
 export { AnimationControl };
-
-// export class AnimationControl
-// {
-//    /**
-//     * @type {Function}
-//     */
-//    #cancelCallback;
-//
-//    /**
-//     * @type {Promise<void>}
-//     */
-//    #finishedPromise;
-//
-//    constructor(cancelCallback, finishedPromise)
-//    {
-//       this.#cancelCallback = cancelCallback;
-//       this.#finishedPromise = finishedPromise;
-//    }
-//
-//    get finished() { return this.#finishedPromise; }
-//
-//    cancel()
-//    {
-//       this.#cancelCallback();
-//    }
-// }
