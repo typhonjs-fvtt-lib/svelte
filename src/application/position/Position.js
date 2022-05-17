@@ -685,7 +685,7 @@ export class Position
     *
     * @param {object}         [opts] - Optional parameters.
     *
-    * @param {number}         [opts.duration] - Duration in milliseconds.
+    * @param {number}         [opts.duration] - Duration in seconds.
     *
     * @param {Function}       [opts.ease=linear] - Easing function.
     *
@@ -693,7 +693,7 @@ export class Position
     *
     * @returns {TJSBasicAnimation}  A control object that can cancel animation and provides a `finished` Promise.
     */
-   animateTo(position, { duration = 1000, ease = linear, interpolate = lerp } = {})
+   animateTo(position, { duration = 1, ease = linear, interpolate = lerp } = {})
    {
       if (typeof position !== 'object')
       {
@@ -712,9 +712,9 @@ export class Position
 
       if (!el) { return AnimationControl.voidControl; }
 
-      if (!Number.isInteger(duration) || duration < 0)
+      if (!Number.isFinite(duration) || duration < 0)
       {
-         throw new TypeError(`Position - animateTo error: 'duration' is not a positive integer.`);
+         throw new TypeError(`Position - animateTo error: 'duration' is not a positive number.`);
       }
 
       if (typeof ease !== 'function')
@@ -777,7 +777,7 @@ export class Position
          current: 0,
          currentAnimationKeys,
          destination,
-         duration,
+         duration: duration * 1000, // Internally the AnimationManager works in ms.
          ease,
          el,
          finished: false,
@@ -939,7 +939,7 @@ export class Position
     *
     * @param {boolean}           [params.animateTo=false] - Animate to restore data.
     *
-    * @param {number}            [params.duration=100] - Duration in milliseconds.
+    * @param {number}            [params.duration=0.1] - Duration in seconds.
     *
     * @param {Function}          [params.ease=linear] - Easing function.
     *
@@ -947,7 +947,7 @@ export class Position
     *
     * @returns {PositionDataExtended|Promise<PositionDataExtended>} Saved position data.
     */
-   restore({ name, remove = false, properties, silent = false, async = false, animateTo = false, duration = 100,
+   restore({ name, remove = false, properties, silent = false, async = false, animateTo = false, duration = 0.1,
     ease = linear, interpolate = lerp })
    {
       if (typeof name !== 'string') { throw new TypeError(`Position - restore error: 'name' is not a string.`); }

@@ -86,15 +86,15 @@ export class ApplicationState
     *
     * @param {boolean}           [params.animateTo=false] - Animate to restore data.
     *
-    * @param {number}            [params.duration=100] - Duration in milliseconds.
+    * @param {number}            [params.duration=0.1] - Duration in seconds.
     *
-    * @param {Function}          [params.easing=linear] - Easing function.
+    * @param {Function}          [params.ease=linear] - Easing function.
     *
     * @param {Function}          [params.interpolate=lerp] - Interpolation function.
     *
     * @returns {ApplicationData} Saved application data.
     */
-   restore({ name, remove = false, async = false, animateTo = false, duration = 100, easing = linear,
+   restore({ name, remove = false, async = false, animateTo = false, duration = 0.1, ease = linear,
     interpolate = lerp })
    {
       if (typeof name !== 'string')
@@ -108,7 +108,7 @@ export class ApplicationState
       {
          if (remove) { this.#dataSaved.delete(name); }
 
-         this.set(dataSaved, { async, animateTo, duration, easing, interpolate });
+         this.set(dataSaved, { async, animateTo, duration, ease, interpolate });
       }
 
       return dataSaved;
@@ -151,16 +151,16 @@ export class ApplicationState
     *
     * @param {boolean}           [opts.animateTo=false] - Animate to restore data.
     *
-    * @param {number}            [opts.duration=100] - Duration in milliseconds.
+    * @param {number}            [opts.duration=0.1] - Duration in seconds.
     *
-    * @param {Function}          [opts.easing=linear] - Easing function.
+    * @param {Function}          [opts.ease=linear] - Easing function.
     *
     * @param {Function}          [opts.interpolate=lerp] - Interpolation function.
     *
     * @returns {ApplicationShellExt|Promise<ApplicationShellExt>} When synchronous the application or Promise when
     *                                                             animating resolving with application.
     */
-   set(data, { async = false, animateTo = false, duration = 100, easing = linear, interpolate = lerp })
+   set(data, { async = false, animateTo = false, duration = 0.1, ease = linear, interpolate = lerp })
    {
       if (typeof data !== 'object')
       {
@@ -206,12 +206,12 @@ export class ApplicationState
                // Return a Promise with saved data that resolves after animation ends.
                if (async)
                {
-                  return application.position.animateTo(data.position, { duration, easing, interpolate }).finished.then(
+                  return application.position.animateTo(data.position, { duration, ease, interpolate }).finished.then(
                    () => application);
                }
                else  // Animate synchronously.
                {
-                  application.position.animateTo(data.position, { duration, easing, interpolate });
+                  application.position.animateTo(data.position, { duration, ease, interpolate });
                }
             }
             else
