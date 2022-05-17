@@ -7,9 +7,6 @@ let gsap = void 0;
 
 const modulePath = foundry.utils.getRoute('/scripts/greensock/esm/index.js');
 
-// TODO REMOVE
-console.log(`! loading gsap from: `, modulePath);
-
 // Basic core GSAP eases.
 const easingList = [
    'back.in(1)',
@@ -1857,9 +1854,6 @@ const s_POSITION_DATA = { left: 0, top: 0 };
 async function gsapLoadPlugin(name)
 {
    const modulePath = foundry.utils.getRoute(`/scripts/greensock/esm/${name}.js`);
-
-// TODO REMOVE
-console.log(`! loading gsap plugin, ${name} from: `, modulePath);
 
    try
    {

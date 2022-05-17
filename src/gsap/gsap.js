@@ -4,9 +4,6 @@ let gsap = void 0;
 
 const modulePath = foundry.utils.getRoute('/scripts/greensock/esm/index.js');
 
-// TODO REMOVE
-console.log(`! loading gsap from: `, modulePath);
-
 // Basic core GSAP eases.
 const easingList = [
    'back.in(1)',
