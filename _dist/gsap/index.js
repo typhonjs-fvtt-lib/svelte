@@ -1,7 +1,7 @@
 import * as svelteEasingFunc from 'svelte/easing';
 import { TJSVelocityTrack } from '@typhonjs-fvtt/svelte/math';
 import { Position } from '@typhonjs-fvtt/svelte/application';
-import { isIterable } from '@typhonjs-fvtt/svelte/util';
+import { isIterable, isPlainObject } from '@typhonjs-fvtt/svelte/util';
 
 let gsap = void 0;
 
@@ -1037,7 +1037,8 @@ class GsapCompose
    static timeline(target, arg1, arg2, arg3)
    {
       // When an object and not iterable assume an object literal as timeline options.
-      if (target === void 0 || (typeof target === 'object' && !isIterable(target)))
+      // This allows through `GsapCompose.timeline()` and `GsapCompose.timeline({ <TIMELINE_OPTIONS> })`.
+      if (target === void 0 || (isPlainObject(target) && arg1 === void 0))
       {
          return gsap.timeline(target);
       }
