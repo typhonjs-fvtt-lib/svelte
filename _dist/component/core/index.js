@@ -923,17 +923,17 @@ class TJSHeaderButton extends SvelteComponent {
 
 function get_each_context$1(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[17] = list[i];
+	child_ctx[20] = list[i];
 	return child_ctx;
 }
 
-// (63:4) {#each buttons as button}
+// (78:6) {#each buttons as button}
 function create_each_block$1(ctx) {
 	let switch_instance;
 	let switch_instance_anchor;
 	let current;
-	const switch_instance_spread_levels = [/*button*/ ctx[17].props];
-	var switch_value = /*button*/ ctx[17].class;
+	const switch_instance_spread_levels = [/*button*/ ctx[20].props];
+	var switch_value = /*button*/ ctx[20].class;
 
 	function switch_props(ctx) {
 		let switch_instance_props = {};
@@ -963,11 +963,11 @@ function create_each_block$1(ctx) {
 			current = true;
 		},
 		p(ctx, dirty) {
-			const switch_instance_changes = (dirty & /*buttons*/ 2)
-			? get_spread_update(switch_instance_spread_levels, [get_spread_object(/*button*/ ctx[17].props)])
+			const switch_instance_changes = (dirty & /*buttons*/ 8)
+			? get_spread_update(switch_instance_spread_levels, [get_spread_object(/*button*/ ctx[20].props)])
 			: {};
 
-			if (switch_value !== (switch_value = /*button*/ ctx[17].class)) {
+			if (switch_value !== (switch_value = /*button*/ ctx[20].class)) {
 				if (switch_instance) {
 					group_outros();
 					const old_component = switch_instance;
@@ -1007,10 +1007,11 @@ function create_each_block$1(ctx) {
 	};
 }
 
-function create_fragment$6(ctx) {
+// (73:0) {#key draggable}
+function create_key_block(ctx) {
 	let header;
 	let h4;
-	let t0_value = localize(/*$storeTitle*/ ctx[4]) + "";
+	let t0_value = localize(/*$storeTitle*/ ctx[5]) + "";
 	let t0;
 	let t1;
 	let draggable_action;
@@ -1018,7 +1019,7 @@ function create_fragment$6(ctx) {
 	let current;
 	let mounted;
 	let dispose;
-	let each_value = /*buttons*/ ctx[1];
+	let each_value = /*buttons*/ ctx[3];
 	let each_blocks = [];
 
 	for (let i = 0; i < each_value.length; i += 1) {
@@ -1041,7 +1042,7 @@ function create_fragment$6(ctx) {
 			}
 
 			attr(h4, "class", "window-title");
-			set_style(h4, "display", /*displayHeaderTitle*/ ctx[0], false);
+			set_style(h4, "display", /*displayHeaderTitle*/ ctx[2], false);
 			attr(header, "class", "window-header flexrow");
 		},
 		m(target, anchor) {
@@ -1058,26 +1059,22 @@ function create_fragment$6(ctx) {
 
 			if (!mounted) {
 				dispose = [
-					action_destroyer(draggable_action = draggable.call(null, header, {
-						position: /*application*/ ctx[5].position,
-						active: /*$storeDraggable*/ ctx[2],
-						storeDragging: /*storeDragging*/ ctx[8]
-					})),
-					action_destroyer(minimizable_action = /*minimizable*/ ctx[13].call(null, header, /*$storeMinimizable*/ ctx[3]))
+					action_destroyer(draggable_action = /*draggable*/ ctx[0].call(null, header, /*dragOptions*/ ctx[1])),
+					action_destroyer(minimizable_action = /*minimizable*/ ctx[12].call(null, header, /*$storeMinimizable*/ ctx[4]))
 				];
 
 				mounted = true;
 			}
 		},
-		p(ctx, [dirty]) {
-			if ((!current || dirty & /*$storeTitle*/ 16) && t0_value !== (t0_value = localize(/*$storeTitle*/ ctx[4]) + "")) set_data(t0, t0_value);
+		p(ctx, dirty) {
+			if ((!current || dirty & /*$storeTitle*/ 32) && t0_value !== (t0_value = localize(/*$storeTitle*/ ctx[5]) + "")) set_data(t0, t0_value);
 
-			if (dirty & /*displayHeaderTitle*/ 1) {
-				set_style(h4, "display", /*displayHeaderTitle*/ ctx[0], false);
+			if (dirty & /*displayHeaderTitle*/ 4) {
+				set_style(h4, "display", /*displayHeaderTitle*/ ctx[2], false);
 			}
 
-			if (dirty & /*buttons*/ 2) {
-				each_value = /*buttons*/ ctx[1];
+			if (dirty & /*buttons*/ 8) {
+				each_value = /*buttons*/ ctx[3];
 				let i;
 
 				for (i = 0; i < each_value.length; i += 1) {
@@ -1103,13 +1100,8 @@ function create_fragment$6(ctx) {
 				check_outros();
 			}
 
-			if (draggable_action && is_function(draggable_action.update) && dirty & /*$storeDraggable*/ 4) draggable_action.update.call(null, {
-				position: /*application*/ ctx[5].position,
-				active: /*$storeDraggable*/ ctx[2],
-				storeDragging: /*storeDragging*/ ctx[8]
-			});
-
-			if (minimizable_action && is_function(minimizable_action.update) && dirty & /*$storeMinimizable*/ 8) minimizable_action.update.call(null, /*$storeMinimizable*/ ctx[3]);
+			if (draggable_action && is_function(draggable_action.update) && dirty & /*dragOptions*/ 2) draggable_action.update.call(null, /*dragOptions*/ ctx[1]);
+			if (minimizable_action && is_function(minimizable_action.update) && dirty & /*$storeMinimizable*/ 16) minimizable_action.update.call(null, /*$storeMinimizable*/ ctx[4]);
 		},
 		i(local) {
 			if (current) return;
@@ -1138,6 +1130,51 @@ function create_fragment$6(ctx) {
 	};
 }
 
+function create_fragment$6(ctx) {
+	let previous_key = /*draggable*/ ctx[0];
+	let key_block_anchor;
+	let current;
+	let key_block = create_key_block(ctx);
+
+	return {
+		c() {
+			key_block.c();
+			key_block_anchor = empty();
+		},
+		m(target, anchor) {
+			key_block.m(target, anchor);
+			insert(target, key_block_anchor, anchor);
+			current = true;
+		},
+		p(ctx, [dirty]) {
+			if (dirty & /*draggable*/ 1 && safe_not_equal(previous_key, previous_key = /*draggable*/ ctx[0])) {
+				group_outros();
+				transition_out(key_block, 1, 1, noop);
+				check_outros();
+				key_block = create_key_block(ctx);
+				key_block.c();
+				transition_in(key_block);
+				key_block.m(key_block_anchor.parentNode, key_block_anchor);
+			} else {
+				key_block.p(ctx, dirty);
+			}
+		},
+		i(local) {
+			if (current) return;
+			transition_in(key_block);
+			current = true;
+		},
+		o(local) {
+			transition_out(key_block);
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) detach(key_block_anchor);
+			key_block.d(detaching);
+		}
+	};
+}
+
 function instance$6($$self, $$props, $$invalidate) {
 	let $storeHeaderButtons;
 	let $storeMinimized;
@@ -1145,20 +1182,23 @@ function instance$6($$self, $$props, $$invalidate) {
 	let $storeDraggable;
 	let $storeMinimizable;
 	let $storeTitle;
+	let { draggable: draggable$1 } = $$props;
+	let { draggableOptions } = $$props;
 	const application = getContext('external').application;
 	const storeTitle = application.reactive.storeAppOptions.title;
-	component_subscribe($$self, storeTitle, value => $$invalidate(4, $storeTitle = value));
+	component_subscribe($$self, storeTitle, value => $$invalidate(5, $storeTitle = value));
 	const storeDraggable = application.reactive.storeAppOptions.draggable;
-	component_subscribe($$self, storeDraggable, value => $$invalidate(2, $storeDraggable = value));
+	component_subscribe($$self, storeDraggable, value => $$invalidate(17, $storeDraggable = value));
 	const storeDragging = application.reactive.storeUIState.dragging;
 	const storeHeaderButtons = application.reactive.storeUIState.headerButtons;
 	component_subscribe($$self, storeHeaderButtons, value => $$invalidate(14, $storeHeaderButtons = value));
 	const storeHeaderNoTitleMinimized = application.reactive.storeAppOptions.headerNoTitleMinimized;
 	component_subscribe($$self, storeHeaderNoTitleMinimized, value => $$invalidate(16, $storeHeaderNoTitleMinimized = value));
 	const storeMinimizable = application.reactive.storeAppOptions.minimizable;
-	component_subscribe($$self, storeMinimizable, value => $$invalidate(3, $storeMinimizable = value));
+	component_subscribe($$self, storeMinimizable, value => $$invalidate(4, $storeMinimizable = value));
 	const storeMinimized = application.reactive.storeUIState.minimized;
 	component_subscribe($$self, storeMinimized, value => $$invalidate(15, $storeMinimized = value));
+	let dragOptions;
 	let displayHeaderTitle;
 	let buttons;
 
@@ -1190,16 +1230,42 @@ function instance$6($$self, $$props, $$invalidate) {
 		};
 	}
 
+	$$self.$$set = $$props => {
+		if ('draggable' in $$props) $$invalidate(0, draggable$1 = $$props.draggable);
+		if ('draggableOptions' in $$props) $$invalidate(13, draggableOptions = $$props.draggableOptions);
+	};
+
 	$$self.$$.update = () => {
+		if ($$self.$$.dirty & /*draggable*/ 1) {
+			$$invalidate(0, draggable$1 = typeof draggable$1 === 'function'
+			? draggable$1
+			: draggable);
+		}
+
+		if ($$self.$$.dirty & /*draggableOptions, $storeDraggable*/ 139264) {
+			// Combines external options with defaults for TJSApplicationHeader.
+			$$invalidate(1, dragOptions = Object.assign(
+				{},
+				typeof draggableOptions === 'object'
+				? draggableOptions
+				: {},
+				{
+					position: application.position,
+					active: $storeDraggable,
+					storeDragging
+				}
+			));
+		}
+
 		if ($$self.$$.dirty & /*$storeHeaderNoTitleMinimized, $storeMinimized*/ 98304) {
-			$$invalidate(0, displayHeaderTitle = $storeHeaderNoTitleMinimized && $storeMinimized
+			$$invalidate(2, displayHeaderTitle = $storeHeaderNoTitleMinimized && $storeMinimized
 			? 'none'
 			: null);
 		}
 
 		if ($$self.$$.dirty & /*$storeHeaderButtons*/ 16384) {
 			{
-				$$invalidate(1, buttons = $storeHeaderButtons.reduce(
+				$$invalidate(3, buttons = $storeHeaderButtons.reduce(
 					(array, button) => {
 						// If the button is a SvelteComponent set it as the class otherwise use `TJSHeaderButton` w/ button as props.
 						array.push(isSvelteComponent(button)
@@ -1218,30 +1284,31 @@ function instance$6($$self, $$props, $$invalidate) {
 	};
 
 	return [
+		draggable$1,
+		dragOptions,
 		displayHeaderTitle,
 		buttons,
-		$storeDraggable,
 		$storeMinimizable,
 		$storeTitle,
-		application,
 		storeTitle,
 		storeDraggable,
-		storeDragging,
 		storeHeaderButtons,
 		storeHeaderNoTitleMinimized,
 		storeMinimizable,
 		storeMinimized,
 		minimizable,
+		draggableOptions,
 		$storeHeaderButtons,
 		$storeMinimized,
-		$storeHeaderNoTitleMinimized
+		$storeHeaderNoTitleMinimized,
+		$storeDraggable
 	];
 }
 
 class TJSApplicationHeader extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance$6, create_fragment$6, safe_not_equal, {});
+		init(this, options, instance$6, create_fragment$6, safe_not_equal, { draggable: 0, draggableOptions: 13 });
 	}
 }
 
@@ -1543,11 +1610,11 @@ function add_css$2(target) {
 	append_styles(target, "svelte-3vt5in", ".window-app.svelte-3vt5in{overflow:inherit}");
 }
 
-// (211:6) {:else}
+// (215:6) {:else}
 function create_else_block$3(ctx) {
 	let current;
-	const default_slot_template = /*#slots*/ ctx[25].default;
-	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[24], null);
+	const default_slot_template = /*#slots*/ ctx[27].default;
+	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[26], null);
 
 	return {
 		c() {
@@ -1562,15 +1629,15 @@ function create_else_block$3(ctx) {
 		},
 		p(ctx, dirty) {
 			if (default_slot) {
-				if (default_slot.p && (!current || dirty & /*$$scope*/ 16777216)) {
+				if (default_slot.p && (!current || dirty & /*$$scope*/ 67108864)) {
 					update_slot_base(
 						default_slot,
 						default_slot_template,
 						ctx,
-						/*$$scope*/ ctx[24],
+						/*$$scope*/ ctx[26],
 						!current
-						? get_all_dirty_from_scope(/*$$scope*/ ctx[24])
-						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[24], dirty, null),
+						? get_all_dirty_from_scope(/*$$scope*/ ctx[26])
+						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[26], dirty, null),
 						null
 					);
 				}
@@ -1591,13 +1658,13 @@ function create_else_block$3(ctx) {
 	};
 }
 
-// (209:6) {#if Array.isArray(allChildren)}
+// (213:6) {#if Array.isArray(allChildren)}
 function create_if_block$4(ctx) {
 	let tjscontainer;
 	let current;
 
 	tjscontainer = new TJSContainer({
-			props: { children: /*allChildren*/ ctx[12] }
+			props: { children: /*allChildren*/ ctx[14] }
 		});
 
 	return {
@@ -1643,12 +1710,19 @@ function create_fragment$4(ctx) {
 	let current;
 	let mounted;
 	let dispose;
-	tjsapplicationheader = new TJSApplicationHeader({});
+
+	tjsapplicationheader = new TJSApplicationHeader({
+			props: {
+				draggable: /*draggable*/ ctx[6],
+				draggableOptions: /*draggableOptions*/ ctx[7]
+			}
+		});
+
 	const if_block_creators = [create_if_block$4, create_else_block$3];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
-		if (Array.isArray(/*allChildren*/ ctx[12])) return 0;
+		if (Array.isArray(/*allChildren*/ ctx[14])) return 0;
 		return 1;
 	}
 
@@ -1666,9 +1740,9 @@ function create_fragment$4(ctx) {
 			t1 = space();
 			create_component(resizablehandle.$$.fragment);
 			attr(section, "class", "window-content");
-			attr(div, "id", div_id_value = /*application*/ ctx[8].id);
-			attr(div, "class", div_class_value = "app window-app " + /*application*/ ctx[8].options.classes.join(' ') + " svelte-3vt5in");
-			attr(div, "data-appid", div_data_appid_value = /*application*/ ctx[8].appId);
+			attr(div, "id", div_id_value = /*application*/ ctx[10].id);
+			attr(div, "class", div_class_value = "app window-app " + /*application*/ ctx[10].options.classes.join(' ') + " svelte-3vt5in");
+			attr(div, "data-appid", div_data_appid_value = /*application*/ ctx[10].appId);
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
@@ -1676,19 +1750,19 @@ function create_fragment$4(ctx) {
 			append(div, t0);
 			append(div, section);
 			if_blocks[current_block_type_index].m(section, null);
-			/*section_binding*/ ctx[26](section);
+			/*section_binding*/ ctx[28](section);
 			append(div, t1);
 			mount_component(resizablehandle, div, null);
-			/*div_binding*/ ctx[27](div);
+			/*div_binding*/ ctx[29](div);
 			current = true;
 
 			if (!mounted) {
 				dispose = [
-					action_destroyer(applyStyles_action = applyStyles.call(null, section, /*stylesContent*/ ctx[7])),
-					action_destroyer(/*contentResizeObserver*/ ctx[10].call(null, section, /*resizeObservedContent*/ ctx[13])),
-					listen(div, "pointerdown", /*bringToTop*/ ctx[11], true),
-					action_destroyer(applyStyles_action_1 = applyStyles.call(null, div, /*stylesApp*/ ctx[6])),
-					action_destroyer(/*appResizeObserver*/ ctx[9].call(null, div, /*resizeObservedApp*/ ctx[14]))
+					action_destroyer(applyStyles_action = applyStyles.call(null, section, /*stylesContent*/ ctx[9])),
+					action_destroyer(/*contentResizeObserver*/ ctx[12].call(null, section, /*resizeObservedContent*/ ctx[15])),
+					listen(div, "pointerdown", /*bringToTop*/ ctx[13], true),
+					action_destroyer(applyStyles_action_1 = applyStyles.call(null, div, /*stylesApp*/ ctx[8])),
+					action_destroyer(/*appResizeObserver*/ ctx[11].call(null, div, /*resizeObservedApp*/ ctx[16]))
 				];
 
 				mounted = true;
@@ -1696,22 +1770,26 @@ function create_fragment$4(ctx) {
 		},
 		p(new_ctx, [dirty]) {
 			ctx = new_ctx;
+			const tjsapplicationheader_changes = {};
+			if (dirty & /*draggable*/ 64) tjsapplicationheader_changes.draggable = /*draggable*/ ctx[6];
+			if (dirty & /*draggableOptions*/ 128) tjsapplicationheader_changes.draggableOptions = /*draggableOptions*/ ctx[7];
+			tjsapplicationheader.$set(tjsapplicationheader_changes);
 			if_block.p(ctx, dirty);
-			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*stylesContent*/ 128) applyStyles_action.update.call(null, /*stylesContent*/ ctx[7]);
+			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*stylesContent*/ 512) applyStyles_action.update.call(null, /*stylesContent*/ ctx[9]);
 
-			if (!current || dirty & /*application*/ 256 && div_id_value !== (div_id_value = /*application*/ ctx[8].id)) {
+			if (!current || dirty & /*application*/ 1024 && div_id_value !== (div_id_value = /*application*/ ctx[10].id)) {
 				attr(div, "id", div_id_value);
 			}
 
-			if (!current || dirty & /*application*/ 256 && div_class_value !== (div_class_value = "app window-app " + /*application*/ ctx[8].options.classes.join(' ') + " svelte-3vt5in")) {
+			if (!current || dirty & /*application*/ 1024 && div_class_value !== (div_class_value = "app window-app " + /*application*/ ctx[10].options.classes.join(' ') + " svelte-3vt5in")) {
 				attr(div, "class", div_class_value);
 			}
 
-			if (!current || dirty & /*application*/ 256 && div_data_appid_value !== (div_data_appid_value = /*application*/ ctx[8].appId)) {
+			if (!current || dirty & /*application*/ 1024 && div_data_appid_value !== (div_data_appid_value = /*application*/ ctx[10].appId)) {
 				attr(div, "data-appid", div_data_appid_value);
 			}
 
-			if (applyStyles_action_1 && is_function(applyStyles_action_1.update) && dirty & /*stylesApp*/ 64) applyStyles_action_1.update.call(null, /*stylesApp*/ ctx[6]);
+			if (applyStyles_action_1 && is_function(applyStyles_action_1.update) && dirty & /*stylesApp*/ 256) applyStyles_action_1.update.call(null, /*stylesApp*/ ctx[8]);
 		},
 		i(local) {
 			if (current) return;
@@ -1739,9 +1817,9 @@ function create_fragment$4(ctx) {
 			if (detaching) detach(div);
 			destroy_component(tjsapplicationheader);
 			if_blocks[current_block_type_index].d();
-			/*section_binding*/ ctx[26](null);
+			/*section_binding*/ ctx[28](null);
 			destroy_component(resizablehandle);
-			/*div_binding*/ ctx[27](null);
+			/*div_binding*/ ctx[29](null);
 			if (detaching && div_outro) div_outro.end();
 			mounted = false;
 			run_all(dispose);
@@ -1753,6 +1831,8 @@ function instance$4($$self, $$props, $$invalidate) {
 	let { $$slots: slots = {}, $$scope } = $$props;
 	let { elementContent } = $$props;
 	let { elementRoot } = $$props;
+	let { draggable } = $$props;
+	let { draggableOptions } = $$props;
 	let { children = void 0 } = $$props;
 	let { stylesApp } = $$props;
 	let { stylesContent } = $$props;
@@ -1824,8 +1904,8 @@ function instance$4($$self, $$props, $$invalidate) {
  * @param {number}   offsetHeight - Observed offsetHeight
  */
 	function resizeObservedContent(offsetWidth, offsetHeight) {
-		$$invalidate(18, contentOffsetWidth = offsetWidth);
-		$$invalidate(17, contentOffsetHeight = offsetHeight);
+		$$invalidate(20, contentOffsetWidth = offsetWidth);
+		$$invalidate(19, contentOffsetHeight = offsetHeight);
 	}
 
 	/**
@@ -1846,8 +1926,8 @@ function instance$4($$self, $$props, $$invalidate) {
 			return object;
 		});
 
-		$$invalidate(15, appOffsetHeight = offsetHeight);
-		$$invalidate(16, appOffsetWidth = offsetWidth);
+		$$invalidate(17, appOffsetHeight = offsetHeight);
+		$$invalidate(18, appOffsetWidth = offsetWidth);
 	}
 
 	function section_binding($$value) {
@@ -1867,20 +1947,22 @@ function instance$4($$self, $$props, $$invalidate) {
 	$$self.$$set = $$props => {
 		if ('elementContent' in $$props) $$invalidate(0, elementContent = $$props.elementContent);
 		if ('elementRoot' in $$props) $$invalidate(1, elementRoot = $$props.elementRoot);
-		if ('children' in $$props) $$invalidate(19, children = $$props.children);
-		if ('stylesApp' in $$props) $$invalidate(6, stylesApp = $$props.stylesApp);
-		if ('stylesContent' in $$props) $$invalidate(7, stylesContent = $$props.stylesContent);
-		if ('appOffsetHeight' in $$props) $$invalidate(15, appOffsetHeight = $$props.appOffsetHeight);
-		if ('appOffsetWidth' in $$props) $$invalidate(16, appOffsetWidth = $$props.appOffsetWidth);
-		if ('contentOffsetHeight' in $$props) $$invalidate(17, contentOffsetHeight = $$props.contentOffsetHeight);
-		if ('contentOffsetWidth' in $$props) $$invalidate(18, contentOffsetWidth = $$props.contentOffsetWidth);
-		if ('transition' in $$props) $$invalidate(20, transition = $$props.transition);
+		if ('draggable' in $$props) $$invalidate(6, draggable = $$props.draggable);
+		if ('draggableOptions' in $$props) $$invalidate(7, draggableOptions = $$props.draggableOptions);
+		if ('children' in $$props) $$invalidate(21, children = $$props.children);
+		if ('stylesApp' in $$props) $$invalidate(8, stylesApp = $$props.stylesApp);
+		if ('stylesContent' in $$props) $$invalidate(9, stylesContent = $$props.stylesContent);
+		if ('appOffsetHeight' in $$props) $$invalidate(17, appOffsetHeight = $$props.appOffsetHeight);
+		if ('appOffsetWidth' in $$props) $$invalidate(18, appOffsetWidth = $$props.appOffsetWidth);
+		if ('contentOffsetHeight' in $$props) $$invalidate(19, contentOffsetHeight = $$props.contentOffsetHeight);
+		if ('contentOffsetWidth' in $$props) $$invalidate(20, contentOffsetWidth = $$props.contentOffsetWidth);
+		if ('transition' in $$props) $$invalidate(22, transition = $$props.transition);
 		if ('inTransition' in $$props) $$invalidate(2, inTransition = $$props.inTransition);
 		if ('outTransition' in $$props) $$invalidate(3, outTransition = $$props.outTransition);
-		if ('transitionOptions' in $$props) $$invalidate(21, transitionOptions = $$props.transitionOptions);
+		if ('transitionOptions' in $$props) $$invalidate(23, transitionOptions = $$props.transitionOptions);
 		if ('inTransitionOptions' in $$props) $$invalidate(4, inTransitionOptions = $$props.inTransitionOptions);
 		if ('outTransitionOptions' in $$props) $$invalidate(5, outTransitionOptions = $$props.outTransitionOptions);
-		if ('$$scope' in $$props) $$invalidate(24, $$scope = $$props.$$scope);
+		if ('$$scope' in $$props) $$invalidate(26, $$scope = $$props.$$scope);
 	};
 
 	$$self.$$.update = () => {
@@ -1898,7 +1980,7 @@ function instance$4($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*oldTransition, transition*/ 5242880) {
+		if ($$self.$$.dirty & /*oldTransition, transition*/ 20971520) {
 			// Run this reactive block when the last transition state is not equal to the current state.
 			if (oldTransition !== transition) {
 				// If transition is defined and not the default transition then set it to both in and out transition otherwise
@@ -1909,11 +1991,11 @@ function instance$4($$self, $$props, $$invalidate) {
 
 				$$invalidate(2, inTransition = newTransition);
 				$$invalidate(3, outTransition = newTransition);
-				$$invalidate(22, oldTransition = newTransition);
+				$$invalidate(24, oldTransition = newTransition);
 			}
 		}
 
-		if ($$self.$$.dirty & /*oldTransitionOptions, transitionOptions*/ 10485760) {
+		if ($$self.$$.dirty & /*oldTransitionOptions, transitionOptions*/ 41943040) {
 			// Run this reactive block when the last transition options state is not equal to the current options state.
 			if (oldTransitionOptions !== transitionOptions) {
 				const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && typeof transitionOptions === 'object'
@@ -1922,7 +2004,7 @@ function instance$4($$self, $$props, $$invalidate) {
 
 				$$invalidate(4, inTransitionOptions = newOptions);
 				$$invalidate(5, outTransitionOptions = newOptions);
-				$$invalidate(23, oldTransitionOptions = newOptions);
+				$$invalidate(25, oldTransitionOptions = newOptions);
 			}
 		}
 
@@ -1933,7 +2015,7 @@ function instance$4($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*outTransition, application*/ 264) {
+		if ($$self.$$.dirty & /*outTransition, application*/ 1032) {
 			{
 				// Handle cases if outTransition is unset; assign noop default transition function.
 				if (typeof outTransition !== 'function') {
@@ -1942,7 +2024,7 @@ function instance$4($$self, $$props, $$invalidate) {
 
 				// Set jquery close animation to either run or not when an out transition is changed.
 				if (application && typeof application?.options?.defaultCloseAnimation === 'boolean') {
-					$$invalidate(8, application.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, application);
+					$$invalidate(10, application.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, application);
 				}
 			}
 		}
@@ -1969,6 +2051,8 @@ function instance$4($$self, $$props, $$invalidate) {
 		outTransition,
 		inTransitionOptions,
 		outTransitionOptions,
+		draggable,
+		draggableOptions,
 		stylesApp,
 		stylesContent,
 		application,
@@ -2007,17 +2091,19 @@ class ApplicationShell extends SvelteComponent {
 			{
 				elementContent: 0,
 				elementRoot: 1,
-				children: 19,
-				stylesApp: 6,
-				stylesContent: 7,
-				appOffsetHeight: 15,
-				appOffsetWidth: 16,
-				contentOffsetHeight: 17,
-				contentOffsetWidth: 18,
-				transition: 20,
+				draggable: 6,
+				draggableOptions: 7,
+				children: 21,
+				stylesApp: 8,
+				stylesContent: 9,
+				appOffsetHeight: 17,
+				appOffsetWidth: 18,
+				contentOffsetHeight: 19,
+				contentOffsetWidth: 20,
+				transition: 22,
 				inTransition: 2,
 				outTransition: 3,
-				transitionOptions: 21,
+				transitionOptions: 23,
 				inTransitionOptions: 4,
 				outTransitionOptions: 5
 			},
@@ -2043,8 +2129,26 @@ class ApplicationShell extends SvelteComponent {
 		flush();
 	}
 
+	get draggable() {
+		return this.$$.ctx[6];
+	}
+
+	set draggable(draggable) {
+		this.$$set({ draggable });
+		flush();
+	}
+
+	get draggableOptions() {
+		return this.$$.ctx[7];
+	}
+
+	set draggableOptions(draggableOptions) {
+		this.$$set({ draggableOptions });
+		flush();
+	}
+
 	get children() {
-		return this.$$.ctx[19];
+		return this.$$.ctx[21];
 	}
 
 	set children(children) {
@@ -2053,7 +2157,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get stylesApp() {
-		return this.$$.ctx[6];
+		return this.$$.ctx[8];
 	}
 
 	set stylesApp(stylesApp) {
@@ -2062,7 +2166,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get stylesContent() {
-		return this.$$.ctx[7];
+		return this.$$.ctx[9];
 	}
 
 	set stylesContent(stylesContent) {
@@ -2071,7 +2175,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get appOffsetHeight() {
-		return this.$$.ctx[15];
+		return this.$$.ctx[17];
 	}
 
 	set appOffsetHeight(appOffsetHeight) {
@@ -2080,7 +2184,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get appOffsetWidth() {
-		return this.$$.ctx[16];
+		return this.$$.ctx[18];
 	}
 
 	set appOffsetWidth(appOffsetWidth) {
@@ -2089,7 +2193,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get contentOffsetHeight() {
-		return this.$$.ctx[17];
+		return this.$$.ctx[19];
 	}
 
 	set contentOffsetHeight(contentOffsetHeight) {
@@ -2098,7 +2202,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get contentOffsetWidth() {
-		return this.$$.ctx[18];
+		return this.$$.ctx[20];
 	}
 
 	set contentOffsetWidth(contentOffsetWidth) {
@@ -2107,7 +2211,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get transition() {
-		return this.$$.ctx[20];
+		return this.$$.ctx[22];
 	}
 
 	set transition(transition) {
@@ -2134,7 +2238,7 @@ class ApplicationShell extends SvelteComponent {
 	}
 
 	get transitionOptions() {
-		return this.$$.ctx[21];
+		return this.$$.ctx[23];
 	}
 
 	set transitionOptions(transitionOptions) {
@@ -2611,11 +2715,11 @@ function add_css$1(target) {
 	append_styles(target, "svelte-9xueci", ".tjs-app{max-height:100%;background:url(/ui/denim075.png) repeat;border-radius:5px;box-shadow:0 0 20px #000;margin:3px 0;padding:0.5em;color:#f0f0e0;z-index:95;overflow:inherit}.tjs-window-app{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;position:absolute;box-shadow:0 0 20px #000;padding:0;z-index:95}.tjs-window-app > *{flex:1}.tjs-window-app > .flex0{display:block;flex:0}.tjs-window-app > .flex1{flex:1}.tjs-window-app > .flex2{flex:2}.tjs-window-app > .flex3{flex:3}.tjs-window-app .window-header{flex:0 0 30px;overflow:hidden;padding:0 8px;line-height:30px;border-bottom:1px solid #000}.tjs-window-app .window-header .window-title{margin:0;word-break:break-all}.tjs-window-app .window-header a{flex:none;margin:0 0 0 8px}.tjs-window-app .window-header i[class^=fa]{margin-right:3px}.tjs-window-app.minimized .window-header{border:1px solid #000}.tjs-window-app .window-content{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;padding:8px;color:#191813;overflow-y:auto;overflow-x:hidden}.window-app .window-content > *{flex:1}.window-app .window-content > .flex0{display:block;flex:0}.window-app .window-content > .flex1{flex:1}.window-app .window-content > .flex2{flex:2}.window-app .window-content > .flex3{flex:3}.window-app.zhover{z-index:calc(var(--z-index-window) + 1)}.tjs-window-app .window-resizable-handle{width:20px;height:20px;position:absolute;bottom:-1px;right:0;background:#444;padding:2px;border:1px solid #111;border-radius:4px 0 0 0}.tjs-window-app .window-resizable-handle i.fas{transform:rotate(45deg)}.window-app.minimized .window-resizable-handle{display:none}");
 }
 
-// (211:7) {:else}
+// (215:7) {:else}
 function create_else_block$1(ctx) {
 	let current;
-	const default_slot_template = /*#slots*/ ctx[25].default;
-	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[24], null);
+	const default_slot_template = /*#slots*/ ctx[27].default;
+	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[26], null);
 
 	return {
 		c() {
@@ -2630,15 +2734,15 @@ function create_else_block$1(ctx) {
 		},
 		p(ctx, dirty) {
 			if (default_slot) {
-				if (default_slot.p && (!current || dirty & /*$$scope*/ 16777216)) {
+				if (default_slot.p && (!current || dirty & /*$$scope*/ 67108864)) {
 					update_slot_base(
 						default_slot,
 						default_slot_template,
 						ctx,
-						/*$$scope*/ ctx[24],
+						/*$$scope*/ ctx[26],
 						!current
-						? get_all_dirty_from_scope(/*$$scope*/ ctx[24])
-						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[24], dirty, null),
+						? get_all_dirty_from_scope(/*$$scope*/ ctx[26])
+						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[26], dirty, null),
 						null
 					);
 				}
@@ -2659,13 +2763,13 @@ function create_else_block$1(ctx) {
 	};
 }
 
-// (209:7) {#if Array.isArray(allChildren)}
+// (213:7) {#if Array.isArray(allChildren)}
 function create_if_block$2(ctx) {
 	let tjscontainer;
 	let current;
 
 	tjscontainer = new TJSContainer({
-			props: { children: /*allChildren*/ ctx[12] }
+			props: { children: /*allChildren*/ ctx[14] }
 		});
 
 	return {
@@ -2711,12 +2815,19 @@ function create_fragment$2(ctx) {
 	let current;
 	let mounted;
 	let dispose;
-	tjsapplicationheader = new TJSApplicationHeader({});
+
+	tjsapplicationheader = new TJSApplicationHeader({
+			props: {
+				draggable: /*draggable*/ ctx[6],
+				draggableOptions: /*draggableOptions*/ ctx[7]
+			}
+		});
+
 	const if_block_creators = [create_if_block$2, create_else_block$1];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
-		if (Array.isArray(/*allChildren*/ ctx[12])) return 0;
+		if (Array.isArray(/*allChildren*/ ctx[14])) return 0;
 		return 1;
 	}
 
@@ -2734,9 +2845,9 @@ function create_fragment$2(ctx) {
 			t1 = space();
 			create_component(resizablehandle.$$.fragment);
 			attr(section, "class", "window-content");
-			attr(div, "id", div_id_value = /*application*/ ctx[8].id);
-			attr(div, "class", div_class_value = "tjs-app tjs-window-app " + /*application*/ ctx[8].options.classes.join(' '));
-			attr(div, "data-appid", div_data_appid_value = /*application*/ ctx[8].appId);
+			attr(div, "id", div_id_value = /*application*/ ctx[10].id);
+			attr(div, "class", div_class_value = "tjs-app tjs-window-app " + /*application*/ ctx[10].options.classes.join(' '));
+			attr(div, "data-appid", div_data_appid_value = /*application*/ ctx[10].appId);
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
@@ -2744,19 +2855,19 @@ function create_fragment$2(ctx) {
 			append(div, t0);
 			append(div, section);
 			if_blocks[current_block_type_index].m(section, null);
-			/*section_binding*/ ctx[26](section);
+			/*section_binding*/ ctx[28](section);
 			append(div, t1);
 			mount_component(resizablehandle, div, null);
-			/*div_binding*/ ctx[27](div);
+			/*div_binding*/ ctx[29](div);
 			current = true;
 
 			if (!mounted) {
 				dispose = [
-					action_destroyer(applyStyles_action = applyStyles.call(null, section, /*stylesContent*/ ctx[7])),
-					action_destroyer(/*contentResizeObserver*/ ctx[10].call(null, section, /*resizeObservedContent*/ ctx[13])),
-					listen(div, "pointerdown", /*bringToTop*/ ctx[11], true),
-					action_destroyer(applyStyles_action_1 = applyStyles.call(null, div, /*stylesApp*/ ctx[6])),
-					action_destroyer(/*appResizeObserver*/ ctx[9].call(null, div, /*resizeObservedApp*/ ctx[14]))
+					action_destroyer(applyStyles_action = applyStyles.call(null, section, /*stylesContent*/ ctx[9])),
+					action_destroyer(/*contentResizeObserver*/ ctx[12].call(null, section, /*resizeObservedContent*/ ctx[15])),
+					listen(div, "pointerdown", /*bringToTop*/ ctx[13], true),
+					action_destroyer(applyStyles_action_1 = applyStyles.call(null, div, /*stylesApp*/ ctx[8])),
+					action_destroyer(/*appResizeObserver*/ ctx[11].call(null, div, /*resizeObservedApp*/ ctx[16]))
 				];
 
 				mounted = true;
@@ -2764,22 +2875,26 @@ function create_fragment$2(ctx) {
 		},
 		p(new_ctx, [dirty]) {
 			ctx = new_ctx;
+			const tjsapplicationheader_changes = {};
+			if (dirty & /*draggable*/ 64) tjsapplicationheader_changes.draggable = /*draggable*/ ctx[6];
+			if (dirty & /*draggableOptions*/ 128) tjsapplicationheader_changes.draggableOptions = /*draggableOptions*/ ctx[7];
+			tjsapplicationheader.$set(tjsapplicationheader_changes);
 			if_block.p(ctx, dirty);
-			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*stylesContent*/ 128) applyStyles_action.update.call(null, /*stylesContent*/ ctx[7]);
+			if (applyStyles_action && is_function(applyStyles_action.update) && dirty & /*stylesContent*/ 512) applyStyles_action.update.call(null, /*stylesContent*/ ctx[9]);
 
-			if (!current || dirty & /*application*/ 256 && div_id_value !== (div_id_value = /*application*/ ctx[8].id)) {
+			if (!current || dirty & /*application*/ 1024 && div_id_value !== (div_id_value = /*application*/ ctx[10].id)) {
 				attr(div, "id", div_id_value);
 			}
 
-			if (!current || dirty & /*application*/ 256 && div_class_value !== (div_class_value = "tjs-app tjs-window-app " + /*application*/ ctx[8].options.classes.join(' '))) {
+			if (!current || dirty & /*application*/ 1024 && div_class_value !== (div_class_value = "tjs-app tjs-window-app " + /*application*/ ctx[10].options.classes.join(' '))) {
 				attr(div, "class", div_class_value);
 			}
 
-			if (!current || dirty & /*application*/ 256 && div_data_appid_value !== (div_data_appid_value = /*application*/ ctx[8].appId)) {
+			if (!current || dirty & /*application*/ 1024 && div_data_appid_value !== (div_data_appid_value = /*application*/ ctx[10].appId)) {
 				attr(div, "data-appid", div_data_appid_value);
 			}
 
-			if (applyStyles_action_1 && is_function(applyStyles_action_1.update) && dirty & /*stylesApp*/ 64) applyStyles_action_1.update.call(null, /*stylesApp*/ ctx[6]);
+			if (applyStyles_action_1 && is_function(applyStyles_action_1.update) && dirty & /*stylesApp*/ 256) applyStyles_action_1.update.call(null, /*stylesApp*/ ctx[8]);
 		},
 		i(local) {
 			if (current) return;
@@ -2807,9 +2922,9 @@ function create_fragment$2(ctx) {
 			if (detaching) detach(div);
 			destroy_component(tjsapplicationheader);
 			if_blocks[current_block_type_index].d();
-			/*section_binding*/ ctx[26](null);
+			/*section_binding*/ ctx[28](null);
 			destroy_component(resizablehandle);
-			/*div_binding*/ ctx[27](null);
+			/*div_binding*/ ctx[29](null);
 			if (detaching && div_outro) div_outro.end();
 			mounted = false;
 			run_all(dispose);
@@ -2821,6 +2936,8 @@ function instance$2($$self, $$props, $$invalidate) {
 	let { $$slots: slots = {}, $$scope } = $$props;
 	let { elementContent } = $$props;
 	let { elementRoot } = $$props;
+	let { draggable } = $$props;
+	let { draggableOptions } = $$props;
 	let { children = void 0 } = $$props;
 	let { stylesApp } = $$props;
 	let { stylesContent } = $$props;
@@ -2892,8 +3009,8 @@ function instance$2($$self, $$props, $$invalidate) {
  * @param {number}   offsetHeight - Observed offsetHeight
  */
 	function resizeObservedContent(offsetWidth, offsetHeight) {
-		$$invalidate(18, contentOffsetWidth = offsetWidth);
-		$$invalidate(17, contentOffsetHeight = offsetHeight);
+		$$invalidate(20, contentOffsetWidth = offsetWidth);
+		$$invalidate(19, contentOffsetHeight = offsetHeight);
 	}
 
 	/**
@@ -2914,8 +3031,8 @@ function instance$2($$self, $$props, $$invalidate) {
 			return object;
 		});
 
-		$$invalidate(15, appOffsetHeight = offsetHeight);
-		$$invalidate(16, appOffsetWidth = offsetWidth);
+		$$invalidate(17, appOffsetHeight = offsetHeight);
+		$$invalidate(18, appOffsetWidth = offsetWidth);
 	}
 
 	function section_binding($$value) {
@@ -2935,20 +3052,22 @@ function instance$2($$self, $$props, $$invalidate) {
 	$$self.$$set = $$props => {
 		if ('elementContent' in $$props) $$invalidate(0, elementContent = $$props.elementContent);
 		if ('elementRoot' in $$props) $$invalidate(1, elementRoot = $$props.elementRoot);
-		if ('children' in $$props) $$invalidate(19, children = $$props.children);
-		if ('stylesApp' in $$props) $$invalidate(6, stylesApp = $$props.stylesApp);
-		if ('stylesContent' in $$props) $$invalidate(7, stylesContent = $$props.stylesContent);
-		if ('appOffsetHeight' in $$props) $$invalidate(15, appOffsetHeight = $$props.appOffsetHeight);
-		if ('appOffsetWidth' in $$props) $$invalidate(16, appOffsetWidth = $$props.appOffsetWidth);
-		if ('contentOffsetHeight' in $$props) $$invalidate(17, contentOffsetHeight = $$props.contentOffsetHeight);
-		if ('contentOffsetWidth' in $$props) $$invalidate(18, contentOffsetWidth = $$props.contentOffsetWidth);
-		if ('transition' in $$props) $$invalidate(20, transition = $$props.transition);
+		if ('draggable' in $$props) $$invalidate(6, draggable = $$props.draggable);
+		if ('draggableOptions' in $$props) $$invalidate(7, draggableOptions = $$props.draggableOptions);
+		if ('children' in $$props) $$invalidate(21, children = $$props.children);
+		if ('stylesApp' in $$props) $$invalidate(8, stylesApp = $$props.stylesApp);
+		if ('stylesContent' in $$props) $$invalidate(9, stylesContent = $$props.stylesContent);
+		if ('appOffsetHeight' in $$props) $$invalidate(17, appOffsetHeight = $$props.appOffsetHeight);
+		if ('appOffsetWidth' in $$props) $$invalidate(18, appOffsetWidth = $$props.appOffsetWidth);
+		if ('contentOffsetHeight' in $$props) $$invalidate(19, contentOffsetHeight = $$props.contentOffsetHeight);
+		if ('contentOffsetWidth' in $$props) $$invalidate(20, contentOffsetWidth = $$props.contentOffsetWidth);
+		if ('transition' in $$props) $$invalidate(22, transition = $$props.transition);
 		if ('inTransition' in $$props) $$invalidate(2, inTransition = $$props.inTransition);
 		if ('outTransition' in $$props) $$invalidate(3, outTransition = $$props.outTransition);
-		if ('transitionOptions' in $$props) $$invalidate(21, transitionOptions = $$props.transitionOptions);
+		if ('transitionOptions' in $$props) $$invalidate(23, transitionOptions = $$props.transitionOptions);
 		if ('inTransitionOptions' in $$props) $$invalidate(4, inTransitionOptions = $$props.inTransitionOptions);
 		if ('outTransitionOptions' in $$props) $$invalidate(5, outTransitionOptions = $$props.outTransitionOptions);
-		if ('$$scope' in $$props) $$invalidate(24, $$scope = $$props.$$scope);
+		if ('$$scope' in $$props) $$invalidate(26, $$scope = $$props.$$scope);
 	};
 
 	$$self.$$.update = () => {
@@ -2966,7 +3085,7 @@ function instance$2($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*oldTransition, transition*/ 5242880) {
+		if ($$self.$$.dirty & /*oldTransition, transition*/ 20971520) {
 			// Run this reactive block when the last transition state is not equal to the current state.
 			if (oldTransition !== transition) {
 				// If transition is defined and not the default transition then set it to both in and out transition otherwise
@@ -2977,11 +3096,11 @@ function instance$2($$self, $$props, $$invalidate) {
 
 				$$invalidate(2, inTransition = newTransition);
 				$$invalidate(3, outTransition = newTransition);
-				$$invalidate(22, oldTransition = newTransition);
+				$$invalidate(24, oldTransition = newTransition);
 			}
 		}
 
-		if ($$self.$$.dirty & /*oldTransitionOptions, transitionOptions*/ 10485760) {
+		if ($$self.$$.dirty & /*oldTransitionOptions, transitionOptions*/ 41943040) {
 			// Run this reactive block when the last transition options state is not equal to the current options state.
 			if (oldTransitionOptions !== transitionOptions) {
 				const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && typeof transitionOptions === 'object'
@@ -2990,7 +3109,7 @@ function instance$2($$self, $$props, $$invalidate) {
 
 				$$invalidate(4, inTransitionOptions = newOptions);
 				$$invalidate(5, outTransitionOptions = newOptions);
-				$$invalidate(23, oldTransitionOptions = newOptions);
+				$$invalidate(25, oldTransitionOptions = newOptions);
 			}
 		}
 
@@ -3001,7 +3120,7 @@ function instance$2($$self, $$props, $$invalidate) {
 			}
 		}
 
-		if ($$self.$$.dirty & /*outTransition, application*/ 264) {
+		if ($$self.$$.dirty & /*outTransition, application*/ 1032) {
 			{
 				// Handle cases if outTransition is unset; assign noop default transition function.
 				if (typeof outTransition !== 'function') {
@@ -3010,7 +3129,7 @@ function instance$2($$self, $$props, $$invalidate) {
 
 				// Set jquery close animation to either run or not when an out transition is changed.
 				if (application && typeof application?.options?.defaultCloseAnimation === 'boolean') {
-					$$invalidate(8, application.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, application);
+					$$invalidate(10, application.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION, application);
 				}
 			}
 		}
@@ -3037,6 +3156,8 @@ function instance$2($$self, $$props, $$invalidate) {
 		outTransition,
 		inTransitionOptions,
 		outTransitionOptions,
+		draggable,
+		draggableOptions,
 		stylesApp,
 		stylesContent,
 		application,
@@ -3075,17 +3196,19 @@ class TJSApplicationShell extends SvelteComponent {
 			{
 				elementContent: 0,
 				elementRoot: 1,
-				children: 19,
-				stylesApp: 6,
-				stylesContent: 7,
-				appOffsetHeight: 15,
-				appOffsetWidth: 16,
-				contentOffsetHeight: 17,
-				contentOffsetWidth: 18,
-				transition: 20,
+				draggable: 6,
+				draggableOptions: 7,
+				children: 21,
+				stylesApp: 8,
+				stylesContent: 9,
+				appOffsetHeight: 17,
+				appOffsetWidth: 18,
+				contentOffsetHeight: 19,
+				contentOffsetWidth: 20,
+				transition: 22,
 				inTransition: 2,
 				outTransition: 3,
-				transitionOptions: 21,
+				transitionOptions: 23,
 				inTransitionOptions: 4,
 				outTransitionOptions: 5
 			},
@@ -3111,8 +3234,26 @@ class TJSApplicationShell extends SvelteComponent {
 		flush();
 	}
 
+	get draggable() {
+		return this.$$.ctx[6];
+	}
+
+	set draggable(draggable) {
+		this.$$set({ draggable });
+		flush();
+	}
+
+	get draggableOptions() {
+		return this.$$.ctx[7];
+	}
+
+	set draggableOptions(draggableOptions) {
+		this.$$set({ draggableOptions });
+		flush();
+	}
+
 	get children() {
-		return this.$$.ctx[19];
+		return this.$$.ctx[21];
 	}
 
 	set children(children) {
@@ -3121,7 +3262,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get stylesApp() {
-		return this.$$.ctx[6];
+		return this.$$.ctx[8];
 	}
 
 	set stylesApp(stylesApp) {
@@ -3130,7 +3271,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get stylesContent() {
-		return this.$$.ctx[7];
+		return this.$$.ctx[9];
 	}
 
 	set stylesContent(stylesContent) {
@@ -3139,7 +3280,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get appOffsetHeight() {
-		return this.$$.ctx[15];
+		return this.$$.ctx[17];
 	}
 
 	set appOffsetHeight(appOffsetHeight) {
@@ -3148,7 +3289,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get appOffsetWidth() {
-		return this.$$.ctx[16];
+		return this.$$.ctx[18];
 	}
 
 	set appOffsetWidth(appOffsetWidth) {
@@ -3157,7 +3298,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get contentOffsetHeight() {
-		return this.$$.ctx[17];
+		return this.$$.ctx[19];
 	}
 
 	set contentOffsetHeight(contentOffsetHeight) {
@@ -3166,7 +3307,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get contentOffsetWidth() {
-		return this.$$.ctx[18];
+		return this.$$.ctx[20];
 	}
 
 	set contentOffsetWidth(contentOffsetWidth) {
@@ -3175,7 +3316,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get transition() {
-		return this.$$.ctx[20];
+		return this.$$.ctx[22];
 	}
 
 	set transition(transition) {
@@ -3202,7 +3343,7 @@ class TJSApplicationShell extends SvelteComponent {
 	}
 
 	get transitionOptions() {
-		return this.$$.ctx[21];
+		return this.$$.ctx[23];
 	}
 
 	set transitionOptions(transitionOptions) {

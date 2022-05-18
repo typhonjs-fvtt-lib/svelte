@@ -121,7 +121,7 @@ export class SvelteApplication extends Application
       /**
        * Define accessors to retrieve Position by `this.position`.
        *
-       * @member {PositionData} position - Adds accessors to SvelteApplication to get / set the position data.
+       * @member {Position} position - Adds accessors to SvelteApplication to get / set the position data.
        *
        * @memberof SvelteApplication#
        */
@@ -522,15 +522,17 @@ export class SvelteApplication extends Application
     *
     * @param {boolean}  [opts.animate=true] - When true perform default maximizing animation.
     *
-    * @param {boolean}  [opts.duration=100] - Controls content area animation duration.
+    * @param {boolean}  [opts.duration=0.1] - Controls content area animation duration in seconds.
     */
-   async maximize({ animate = true, duration = 100 } = {})
+   async maximize({ animate = true, duration = 0.1 } = {})
    {
       if (!this.popOut || [false, null].includes(this._minimized)) { return; }
 
       this.#stores.uiOptionsUpdate((options) => deepMerge(options, { minimized: false }));
 
       this._minimized = null;
+
+      const durationMS = duration * 1000; // For WAAPI.
 
       // Get content
       const element = this.elementTarget;
@@ -559,7 +561,7 @@ export class SvelteApplication extends Application
             animateTo: true,
             properties: ['height'],
             remove: true,
-            duration: 100
+            duration: 0.1
          }));
       }
       else
@@ -572,7 +574,7 @@ export class SvelteApplication extends Application
          { maxHeight: 0, paddingTop: 0, paddingBottom: 0, offset: 0 },
          { ...constraints, offset: 1 },
          { maxHeight: '100%', offset: 1 },
-      ], { duration, fill: 'forwards' }).finished;
+      ], { duration: durationMS, fill: 'forwards' }).finished; // WAAPI in ms.
 
       // minHeight needs to be adjusted to options or Foundry default window height.
       this.position.minHeight = this.options?.minHeight ?? MIN_WINDOW_HEIGHT;
@@ -600,15 +602,17 @@ export class SvelteApplication extends Application
     *
     * @param {boolean}  [opts.animate=true] - When true perform default minimizing animation.
     *
-    * @param {boolean}  [opts.duration=100] - Controls content area animation duration.
+    * @param {boolean}  [opts.duration=0.1] - Controls content area animation duration in seconds.
     */
-   async minimize({ animate = true, duration = 100 } = {})
+   async minimize({ animate = true, duration = 0.1 } = {})
    {
       if (!this.rendered || !this.popOut || [true, null].includes(this._minimized)) { return; }
 
       this.#stores.uiOptionsUpdate((options) => deepMerge(options, { minimized: true }));
 
       this._minimized = null;
+
+      const durationMS = duration * 1000; // For WAAPI.
 
       const element = this.elementTarget;
 
@@ -637,14 +641,14 @@ export class SvelteApplication extends Application
          const animation = content.animate([
             constraints,
             { maxHeight: 0, paddingTop: 0, paddingBottom: 0 }
-         ], { duration, fill: 'forwards' });
+         ], { duration: durationMS, fill: 'forwards' }); // WAAPI in ms.
 
          // Set display style to none when animation finishes.
          animation.finished.then(() => content.style.display = 'none');
       }
       else
       {
-         setTimeout(() => content.style.display = 'none', duration);
+         setTimeout(() => content.style.display = 'none', durationMS);
       }
 
       // Save current position state and add the constraint data to use in `maximize`.
@@ -658,7 +662,7 @@ export class SvelteApplication extends Application
       if (animate)
       {
          // First await animation of height upward.
-         await this.position.animateTo({ height: headerOffsetHeight }, { duration: 100 });
+         await this.position.animateTo({ height: headerOffsetHeight }, { duration: 0.1 }).finished;
       }
 
       // Set all header buttons besides close and the window title to display none.
@@ -678,7 +682,7 @@ export class SvelteApplication extends Application
       if (animate)
       {
          // Await animation of width to the left / minimum width.
-         await this.position.animateTo({ width: MIN_WINDOW_WIDTH }, { duration: 100 });
+         await this.position.animateTo({ width: MIN_WINDOW_WIDTH }, { duration: 0.1 }).finished;
       }
 
       element.classList.add('minimized');

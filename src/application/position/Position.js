@@ -4,9 +4,13 @@ import { lerp }                  from '@typhonjs-fvtt/svelte/math';
 import {
    propertyStore,
    subscribeIgnoreFirst }        from '@typhonjs-fvtt/svelte/store';
-import { isIterable }            from '@typhonjs-fvtt/svelte/util';
+import {
+   isIterable,
+   isPlainObject }               from '@typhonjs-fvtt/svelte/util';
 
+import { AnimationControl }      from './animation/AnimationControl.js';
 import { AnimationManager }      from './animation/AnimationManager.js';
+import { AnimationPublicAPI }    from './animation/AnimationPublicAPI.js';
 import * as constants            from './constants.js';
 import * as positionInitial      from './initial/index.js';
 import { PositionChangeSet }     from './PositionChangeSet.js';
@@ -62,7 +66,7 @@ export class Position
    #options = {
       calculateTransform: false,
       initialHelper: void 0,
-      ortho: false,
+      ortho: true,
       transformSubscribed: false
    };
 
@@ -120,6 +124,11 @@ export class Position
    #validatorData;
 
    /**
+    * @returns {AnimationPublicAPI} Public Animation API.
+    */
+   static get Animation() { return AnimationPublicAPI; }
+
+   /**
     * @returns {{browserCentered?: Centered, Centered?: *}} Initial position helpers.
     */
    static get Initial() { return positionInitial; }
@@ -142,13 +151,22 @@ export class Position
    static get Validators() { return positionValidators; }
 
    /**
-    * @param {PositionParent} parent - The associated parent for positional data tracking. Used in validators.
+    * @param {PositionParent|PositionOptions}   [parent] - A potential parent element or object w/ `elementTarget`
+    *                                                      getter. May also be the PositionOptions object w/ 1 argument.
     *
-    * @param {object}         options - Default values.
+    * @param {PositionOptions}   options - Default values.
     */
-   constructor(parent, options = {})
+   constructor(parent, options)
    {
-      this.#parent = parent;
+      // Test if `parent` is a plain object; if so treat as options object.
+      if (isPlainObject(parent))
+      {
+         options = parent;
+      }
+      else
+      {
+         this.#parent = parent;
+      }
 
       const data = this.#data;
       const transforms = this.#transforms;
@@ -472,6 +490,11 @@ export class Position
    get rotateZ() { return this.#data.rotateZ; }
 
    /**
+    * @returns {number|null} alias for rotateZ
+    */
+   get rotation() { return this.#data.rotateZ; }
+
+   /**
     * @returns {number|null} scale
     */
    get scale() { return this.#data.scale; }
@@ -584,6 +607,14 @@ export class Position
    }
 
    /**
+    * @param {number|null} rotateZ - alias for rotateZ
+    */
+   set rotation(rotateZ)
+   {
+      this.#stores.rotateZ.set(rotateZ);
+   }
+
+   /**
     * @param {number|null} scale -
     */
    set scale(scale)
@@ -650,19 +681,19 @@ export class Position
    /**
     * Provides animation
     *
-    * @param {PositionData}   position - The destination position.
+    * @param {PositionDataExtended} position - The destination position.
     *
     * @param {object}         [opts] - Optional parameters.
     *
-    * @param {number}         [opts.duration] - Duration in milliseconds.
+    * @param {number}         [opts.duration] - Duration in seconds.
     *
-    * @param {Function}       [opts.easing=linear] - Easing function.
+    * @param {Function}       [opts.ease=linear] - Easing function.
     *
     * @param {Function}       [opts.interpolate=lerp] - Interpolation function.
     *
-    * @returns {Promise<void>} Promise that is resolved when animation completes.
+    * @returns {TJSBasicAnimation}  A control object that can cancel animation and provides a `finished` Promise.
     */
-   async animateTo(position, { duration = 1000, easing = linear, interpolate = lerp } = {})
+   animateTo(position, { duration = 1, ease = linear, interpolate = lerp } = {})
    {
       if (typeof position !== 'object')
       {
@@ -673,22 +704,22 @@ export class Position
       const parent = this.#parent;
       if (parent !== void 0 && typeof parent?.options?.positionable === 'boolean' && !parent?.options?.positionable)
       {
-         return;
+         return AnimationControl.voidControl;
       }
 
       const targetEl = parent instanceof HTMLElement ? parent : parent?.elementTarget;
       const el = targetEl instanceof HTMLElement && targetEl.isConnected ? targetEl : void 0;
 
-      if (!el) { return; }
+      if (!el) { return AnimationControl.voidControl; }
 
-      if (!Number.isInteger(duration) || duration < 0)
+      if (!Number.isFinite(duration) || duration < 0)
       {
-         throw new TypeError(`Position - animateTo error: 'duration' is not a positive integer.`);
+         throw new TypeError(`Position - animateTo error: 'duration' is not a positive number.`);
       }
 
-      if (typeof easing !== 'function')
+      if (typeof ease !== 'function')
       {
-         throw new TypeError(`Position - animateTo error: 'easing' is not a function.`);
+         throw new TypeError(`Position - animateTo error: 'ease' is not a function.`);
       }
 
       if (typeof interpolate !== 'function')
@@ -740,15 +771,16 @@ export class Position
       const keys = Object.keys(newData);
 
       // Nothing to animate, so return now.
-      if (keys.length === 0) { return; }
+      if (keys.length === 0) { return AnimationControl.voidControl; }
 
       const animationData = {
          current: 0,
          currentAnimationKeys,
          destination,
-         duration,
-         easing,
+         duration: duration * 1000, // Internally the AnimationManager works in ms.
+         ease,
          el,
+         finished: false,
          initial,
          interpolate,
          keys,
@@ -756,24 +788,56 @@ export class Position
          position: this
       };
 
+      // Cache the finished Promise resolve method in animationData, so that it can be invoked by AnimationManager.
       const promise = new Promise((resolve) => animationData.resolve = resolve);
 
       AnimationManager.add(animationData);
 
       // Schedule w/ animation manager.
-      return promise;
+      return new AnimationControl(animationData, promise);
    }
+
+   /**
+    * @typedef {object} PositionGetOptions
+    *
+    * @property {Iterable<string>} keys - When provided only these keys are copied.
+    *
+    * @property {boolean} numeric - When true any `null` values are converted into defaults.
+    */
+
 
    /**
     * Assigns current position to object passed into method.
     *
-    * @param {object|PositionData} [position] - Target to assign current position data.
+    * @param {object|PositionData}  [position] - Target to assign current position data.
+    *
+    * @param {PositionGetOptions}   [options] - Defines options for specific keys and substituting null for numeric
+    *                                           default values.
     *
     * @returns {PositionData} Passed in object with current position data.
     */
-   get(position = {})
+   get(position = {}, options)
    {
-      return Object.assign(position, this.#data);
+      const keys = options?.keys;
+
+      if (isIterable(options?.keys))
+      {
+         // Replace any null values potentially with numeric default values.
+         if (options?.numeric)
+         {
+            for (const key of keys) { position[key] = this[key] ?? constants.numericDefaults[key]; }
+         }
+         else // Accept current values.
+         {
+            for (const key of keys) { position[key] = this[key]; }
+         }
+
+         return position;
+      }
+      else
+      {
+         return Object.assign(position, this.#data);
+      }
    }
 
    /**
@@ -875,16 +939,16 @@ export class Position
     *
     * @param {boolean}           [params.animateTo=false] - Animate to restore data.
     *
-    * @param {number}            [params.duration=100] - Duration in milliseconds.
+    * @param {number}            [params.duration=0.1] - Duration in seconds.
     *
-    * @param {Function}          [params.easing=linear] - Easing function.
+    * @param {Function}          [params.ease=linear] - Easing function.
     *
     * @param {Function}          [params.interpolate=lerp] - Interpolation function.
     *
-    * @returns {PositionData} Saved position data.
+    * @returns {PositionDataExtended|Promise<PositionDataExtended>} Saved position data.
     */
-   restore({ name, remove = false, properties, silent = false, async = false, animateTo = false, duration = 100,
-    easing = linear, interpolate = lerp })
+   restore({ name, remove = false, properties, silent = false, async = false, animateTo = false, duration = 0.1,
+    ease = linear, interpolate = lerp })
    {
       if (typeof name !== 'string') { throw new TypeError(`Position - restore error: 'name' is not a string.`); }
 
@@ -919,11 +983,11 @@ export class Position
             // Return a Promise with saved data that resolves after animation ends.
             if (async)
             {
-               return this.animateTo(data, { duration, easing, interpolate }).then(() => dataSaved);
+               return this.animateTo(data, { duration, ease, interpolate }).finished.then(() => dataSaved);
             }
             else  // Animate synchronously.
             {
-               this.animateTo(data, { duration, easing, interpolate });
+               this.animateTo(data, { duration, ease, interpolate });
             }
          }
          else
@@ -977,7 +1041,7 @@ export class Position
     * Updates to any target element are decoupled from the underlying Position data. This method returns this instance
     * that you can then await on the target element inline style update by using {@link Position.elementUpdated}.
     *
-    * @param {PositionData}   [position] - Position data to set.
+    * @param {PositionDataExtended} [position] - Position data to set.
     *
     * @returns {Position} This Position instance.
     */
@@ -992,6 +1056,10 @@ export class Position
       {
          return this;
       }
+
+      // Callers can specify to immediately update an associated element. This is useful if set is called from
+      // requestAnimationFrame / rAF. Library integrations like GSAP invoke set from rAF.
+      const immediateElementUpdate = position.immediateElementUpdate === true;
 
       const data = this.#data;
       const transforms = this.#transforms;
@@ -1170,8 +1238,15 @@ export class Position
          // Set default data after first set operation that has a target element.
          if (typeof this.#defaultData !== 'object') { this.#defaultData = Object.assign({}, data); }
 
-         // Add update element data to UpdateElementManager if not already queued.
-         if (!this.#updateElementData.queued)
+         // If `immediateElementUpdate` is true in position data passed to `set` then update the element immediately.
+         // This is for rAF based library integrations like GSAP.
+         if (immediateElementUpdate)
+         {
+            UpdateElementManager.immediate(el, this.#updateElementData);
+            this.#updateElementPromise = Promise.resolve(performance.now());
+         }
+         // Else if not queued then queue an update for the next rAF callback.
+         else if (!this.#updateElementData.queued)
          {
             this.#updateElementPromise = UpdateElementManager.add(el, this.#updateElementData);
          }
@@ -1207,7 +1282,7 @@ export class Position
    }
 
    /**
-    * @param {object} opts -
+    * @param {PositionDataExtended} opts -
     *
     * @param {number|null} opts.left -
     *
@@ -1243,6 +1318,8 @@ export class Position
     *
     * @param {number|null} opts.zIndex -
     *
+    * @param {number|null} opts.rotation - alias for rotateZ
+    *
     * @param {*} opts.rest -
     *
     * @param {object} parent -
@@ -1253,8 +1330,16 @@ export class Position
     *
     * @returns {null|PositionData} Updated position data or null if validation fails.
     */
-   #updatePosition({ left, top, maxWidth, maxHeight, minWidth, minHeight, width, height, rotateX, rotateY, rotateZ,
-    scale, transformOrigin, translateX, translateY, translateZ, zIndex, ...rest } = {}, parent, el, styleCache)
+   #updatePosition({
+      // Directly supported parameters
+      left, top, maxWidth, maxHeight, minWidth, minHeight, width, height, rotateX, rotateY, rotateZ, scale,
+       transformOrigin, translateX, translateY, translateZ, zIndex,
+
+      // Aliased parameters
+      rotation,
+
+      ...rest
+   } = {}, parent, el, styleCache)
    {
       let currentPosition = s_DATA_UPDATE.copy(this.#data);
 
@@ -1344,7 +1429,17 @@ export class Position
       // Update rotate X/Y/Z, scale, z-index
       if (Number.isFinite(rotateX) || rotateX === null) { currentPosition.rotateX = rotateX; }
       if (Number.isFinite(rotateY) || rotateY === null) { currentPosition.rotateY = rotateY; }
-      if (Number.isFinite(rotateZ) || rotateZ === null) { currentPosition.rotateZ = rotateZ; }
+
+      // Handle alias for rotateZ. First check if `rotateZ` is valid and different from the current value. Next check if
+      // `rotation` is valid and use it for `rotateZ`.
+      if (rotateZ !== currentPosition.rotateZ && (Number.isFinite(rotateZ) || rotateZ === null))
+      {
+         currentPosition.rotateZ = rotateZ;
+      }
+      else if (rotation !== currentPosition.rotateZ && (Number.isFinite(rotation) || rotation === null))
+      {
+         currentPosition.rotateZ = rotation;
+      }
 
       if (Number.isFinite(translateX) || translateX === null) { currentPosition.translateX = translateX; }
       if (Number.isFinite(translateY) || translateY === null) { currentPosition.translateY = translateY; }
@@ -1440,6 +1535,50 @@ Object.seal(s_VALIDATION_DATA);
  * @property {Function} getLeft - A function that takes the width parameter and returns the left position.
  *
  * @property {Function} getTop - A function that takes the height parameter and returns the top position.
+ */
+
+/**
+ * @typedef {object} PositionDataExtended
+ *
+ * @property {number|'auto'|null} [height] -
+ *
+ * @property {number|null} [left] -
+ *
+ * @property {number|null} [maxHeight] -
+ *
+ * @property {number|null} [maxWidth] -
+ *
+ * @property {number|null} [minHeight] -
+ *
+ * @property {number|null} [minWidth] -
+ *
+ * @property {number|null} [rotateX] -
+ *
+ * @property {number|null} [rotateY] -
+ *
+ * @property {number|null} [rotateZ] -
+ *
+ * @property {number|null} [scale] -
+ *
+ * @property {number|null} [top] -
+ *
+ * @property {string|null} [transformOrigin] -
+ *
+ * @property {number|null} [translateX] -
+ *
+ * @property {number|null} [translateY] -
+ *
+ * @property {number|null} [translateZ] -
+ *
+ * @property {number|'auto'|null} [width] -
+ *
+ * @property {number|null} [zIndex] -
+ *
+ * Extended properties -----------------------------------------------------------------------------------------------
+ *
+ * @property {boolean} [immediateElementUpdate] - When true any associated element is updated immediately.
+ *
+ * @property {number|null} [rotation] - Alias for `rotateZ`.
  */
 
 /**

@@ -9,6 +9,16 @@
  */
 
 /**
+ * @typedef {ApplicationShell} ApplicationShellExt
+ *
+ * @property {SvelteReactive} reactive -
+ *
+ * @property {object} options -
+ *
+ * @property {Position} position -
+ */
+
+/**
  * @typedef {object} GameSetting - Defines a game setting.
  *
  * @property {string} moduleId - The ID of the module / system.

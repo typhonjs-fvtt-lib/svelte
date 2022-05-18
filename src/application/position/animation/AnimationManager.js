@@ -63,6 +63,21 @@ export class AnimationManager
                continue;
             }
 
+            // Handle any animations that have been canceled.
+            if (data.finished)
+            {
+               // Remove animation keys.
+               for (let dataCntr = data.keys.length; --dataCntr >= 0;)
+               {
+                  const key = data.keys[dataCntr];
+                  data.currentAnimationKeys.delete(key);
+               }
+
+               s_ACTIVE_LIST.splice(cntr, 1);
+               data.resolve();
+               continue;
+            }
+
             data.current = current - data.start;
 
             // Remove this animation instance.
@@ -80,11 +95,12 @@ export class AnimationManager
 
                s_ACTIVE_LIST.splice(cntr, 1);
 
+               data.finished = true;
                data.resolve();
                continue;
             }
 
-            const easedTime = data.easing(data.current / data.duration);
+            const easedTime = data.ease(data.current / data.duration);
 
             for (let dataCntr = data.keys.length; --dataCntr >= 0;)
             {
@@ -109,11 +125,28 @@ export class AnimationManager
 
                if (!data.el.isConnected)
                {
+                  s_ACTIVE_LIST.splice(cntr, 1);
                   data.currentAnimationKeys.clear();
                   data.resolve();
                   continue;
                }
 
+               // Handle any animations that have been canceled.
+               if (data.finished)
+               {
+                  // Remove animation keys.
+                  for (let dataCntr = data.keys.length; --dataCntr >= 0;)
+                  {
+                     const key = data.keys[dataCntr];
+                     data.currentAnimationKeys.delete(key);
+                  }
+
+                  s_ACTIVE_LIST.splice(cntr, 1);
+                  data.resolve();
+                  continue;
+               }
+
+               // Any remaining animations set the Position to the destination target.
                for (let dataCntr = data.keys.length; --dataCntr >= 0;)
                {
                   const key = data.keys[dataCntr];
@@ -122,6 +155,7 @@ export class AnimationManager
                }
 
                data.position.set(data.newData);
+               data.finished = true;
                data.resolve();
             }
 
@@ -134,5 +168,58 @@ export class AnimationManager
       }
 
       s_PROMISE = void 0;
+   }
+
+   /**
+    * Cancels any animation for given Position data.
+    *
+    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} data -
+    */
+   static cancel(data)
+   {
+
+   }
+
+   /**
+    * Cancels all Position animation.
+    */
+   static cancelAll()
+   {
+      for (let cntr = s_ACTIVE_LIST.length; --cntr >= 0;)
+      {
+         const data = s_ACTIVE_LIST[cntr];
+
+         data.currentAnimationKeys.clear();
+         data.finished = true;
+         data.resolve();
+      }
+
+      for (let cntr = s_NEW_LIST.length; --cntr >= 0;)
+      {
+         const data = s_NEW_LIST[cntr];
+
+         data.currentAnimationKeys.clear();
+         data.finished = true;
+         data.resolve();
+      }
+
+      s_ACTIVE_LIST.length = 0;
+      s_NEW_LIST.length = 0;
+   }
+
+   /**
+    * Animates one or more Position instances as a group.
+    *
+    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} data -
+    *
+    * @param {object|Function}   positionData -
+    *
+    * @param {object|Function}   options -
+    *
+    * @returns {TJSBasicAnimation} Basic animation control.
+    */
+   static to(data, positionData, options)
+   {
+      return void 0;
    }
 }

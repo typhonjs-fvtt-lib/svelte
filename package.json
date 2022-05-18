@@ -38,6 +38,12 @@
       "types": "./_dist/gsap/index.d.ts",
       "import": "./_dist/gsap/index.js"
     },
+    "./gsap/plugin/*": {
+      "import": "./_dist/gsap/plugin/*.js"
+    },
+    "./gsap/plugin/bonus/*": {
+      "import": "./_dist/gsap/plugin/bonus/*.js"
+    },
     "./handler": {
       "types": "./_dist/handler/index.d.ts",
       "import": "./_dist/handler/index.js"

@@ -1,11 +1,17 @@
 <script>
-   import { getContext }        from 'svelte';
+   import { getContext }            from 'svelte';
 
-   import { draggable }         from '@typhonjs-fvtt/svelte/action';
-   import { localize }          from '@typhonjs-fvtt/svelte/helper';
-   import { isSvelteComponent } from '@typhonjs-fvtt/svelte/util';
+   import {
+      draggable as dragDefault }    from '@typhonjs-fvtt/svelte/action';
 
-   import TJSHeaderButton       from './TJSHeaderButton.svelte';
+   import { localize }              from '@typhonjs-fvtt/svelte/helper';
+
+   import { isSvelteComponent }     from '@typhonjs-fvtt/svelte/util';
+
+   export let draggable
+   export let draggableOptions;
+
+   import TJSHeaderButton           from './TJSHeaderButton.svelte';
 
    const application = getContext('external').application;
 
@@ -16,6 +22,14 @@
    const storeHeaderNoTitleMinimized = application.reactive.storeAppOptions.headerNoTitleMinimized;
    const storeMinimizable = application.reactive.storeAppOptions.minimizable;
    const storeMinimized = application.reactive.storeUIState.minimized;
+
+   let dragOptions;
+
+   $: draggable = typeof draggable === 'function' ? draggable : dragDefault;
+
+   // Combines external options with defaults for TJSApplicationHeader.
+   $: dragOptions = Object.assign({}, typeof draggableOptions === 'object' ? draggableOptions : {},
+    { position: application.position, active: $storeDraggable, storeDragging });
 
    let displayHeaderTitle;
 
@@ -56,11 +70,13 @@
    }
 </script>
 
-<header class="window-header flexrow"
-        use:draggable={{ position: application.position, active: $storeDraggable, storeDragging }}
-        use:minimizable={$storeMinimizable}>
-    <h4 class=window-title style:display={displayHeaderTitle}>{localize($storeTitle)}</h4>
-    {#each buttons as button}
-        <svelte:component this={button.class} {...button.props} />
-    {/each}
-</header>
+{#key draggable}
+   <header class="window-header flexrow"
+           use:draggable={dragOptions}
+           use:minimizable={$storeMinimizable}>
+      <h4 class=window-title style:display={displayHeaderTitle}>{localize($storeTitle)}</h4>
+      {#each buttons as button}
+         <svelte:component this={button.class} {...button.props} />
+      {/each}
+   </header>
+{/key}

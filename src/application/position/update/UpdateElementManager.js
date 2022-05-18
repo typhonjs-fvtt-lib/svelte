@@ -18,7 +18,7 @@ export class UpdateElementManager
    static get promise() { return s_PROMISE; }
 
    /**
-    * Potentially adds the given element and callback to the map.
+    * Potentially adds the given element and internal updateData instance to the list.
     *
     * @param {HTMLElement}       el - An HTMLElement instance.
     *
@@ -48,7 +48,7 @@ export class UpdateElementManager
    }
 
    /**
-    * Await on `nextAnimationFrame` and iterate over map invoking callback function.s
+    * Await on `nextAnimationFrame` and iterate over list map invoking callback functions.
     *
     * @returns {Promise<number>} The next frame Promise / currentTime from nextAnimationFrame.
     */
@@ -99,6 +99,38 @@ export class UpdateElementManager
       s_LIST_CNTR = 0;
 
       return currentTime;
+   }
+
+   /**
+    * Potentially immediately updates the given element.
+    *
+    * @param {HTMLElement}       el - An HTMLElement instance.
+    *
+    * @param {UpdateElementData} updateData - An UpdateElementData instance.
+    */
+   static immediate(el, updateData)
+   {
+      // Early out if the element is no longer connected to the DOM / shadow root.
+      // if (!el.isConnected || !updateData.changeSet.hasChange()) { continue; }
+      if (!el.isConnected) { return; }
+
+      if (updateData.options.ortho)
+      {
+         s_UPDATE_ELEMENT_ORTHO(el, updateData);
+      }
+      else
+      {
+         s_UPDATE_ELEMENT(el, updateData);
+      }
+
+      // If calculate transform options is enabled then update the transform data and set the readable store.
+      if (updateData.options.calculateTransform || updateData.options.transformSubscribed)
+      {
+         s_UPDATE_TRANSFORM(el, updateData);
+      }
+
+      // Update all subscribers with changed data.
+      this.updateSubscribers(updateData);
    }
 
    /**

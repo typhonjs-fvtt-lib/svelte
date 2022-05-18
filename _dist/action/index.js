@@ -572,11 +572,11 @@ function draggable(node, { position, active = true, storeDragging = void 0 })
          storeDragging.set(true);
       }
 
+      s_POSITION_DATA.left = initialPosition.left + (event.clientX - initialDragPoint.x);
+      s_POSITION_DATA.top = initialPosition.top + (event.clientY - initialDragPoint.y);
+
       // Update application position.
-      position.set({
-         left: initialPosition.left + (event.clientX - initialDragPoint.x),
-         top: initialPosition.top + (event.clientY - initialDragPoint.y)
-      });
+      position.set(s_POSITION_DATA);
    }
 
    /**
@@ -597,15 +597,79 @@ function draggable(node, { position, active = true, storeDragging = void 0 })
 
    return {
       // The default of active being true won't automatically add listeners twice.
-      update: ({ active = true }) =>  // eslint-disable-line no-shadow
+      update: (options) =>
       {
-         if (active) { activateListeners(); }
-         else { removeListeners(); }
+         if (typeof options.active === 'boolean')
+         {
+            active = options.active;
+            if (active) { activateListeners(); }
+            else { removeListeners(); }
+         }
       },
 
       destroy: () => removeListeners()
    };
 }
+
+class DraggableOptions
+{
+   /**
+    * Stores the subscribers.
+    *
+    * @type {(function(DraggableOptions): void)[]}
+    */
+   #subscriptions = [];
+
+   constructor()
+   {
+   }
+
+   /**
+    *
+    * @param {function(DraggableOptions): void} handler - Callback function that is invoked on update / changes.
+    *                                                 Receives the DraggableOptions object / instance.
+    *
+    * @returns {(function(): void)} Unsubscribe function.
+    */
+   subscribe(handler)
+   {
+      this.#subscriptions.push(handler); // add handler to the array of subscribers
+
+      handler(this);                     // call handler with current value
+
+      // Return unsubscribe function.
+      return () =>
+      {
+         const index = this.#subscriptions.findIndex((sub) => sub === handler);
+         if (index >= 0) { this.#subscriptions.splice(index, 1); }
+      };
+   }
+
+   #updateSubscribers()
+   {
+      const subscriptions = this.#subscriptions;
+
+      // Early out if there are no subscribers.
+      if (subscriptions.length > 0)
+      {
+         for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](this); }
+      }
+   }
+}
+
+/**
+ * Define a function to get a DraggableOptions instance.
+ *
+ * @returns {DraggableOptions} A new options instance.
+ */
+draggable.options = () => new DraggableOptions();
+
+/**
+ * Used for direct call to `position.set`.
+ *
+ * @type {{top: number, left: number}}
+ */
+const s_POSITION_DATA = { left: 0, top: 0 };
 
 export { applyPosition, applyStyles, draggable, resizeObserver };
 //# sourceMappingURL=index.js.map

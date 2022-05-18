@@ -25,8 +25,6 @@ const s_LOCAL_EXTERNAL = [
    '@typhonjs-fvtt/svelte/handler', '@typhonjs-fvtt/svelte/helper', '@typhonjs-fvtt/svelte/math',
    '@typhonjs-fvtt/svelte/store', '@typhonjs-fvtt/svelte/transition', '@typhonjs-fvtt/svelte/util',
    '@typhonjs-fvtt/svelte/plugin/data', '@typhonjs-fvtt/svelte/plugin/system',
-
-   `foundry-gsap`  // Replaced by consumer for Foundry GSAP path.
 ];
 
 // Defines the node-resolve config.
@@ -158,9 +156,6 @@ const rollupConfigs = [
          output: {
             file: '_dist/gsap/index.js',
             format: 'es',
-            paths: {
-               gsap: '/scripts/greensock/esm/all.js'
-            },
             plugins: outputPlugins,
             preferConst: true,
             sourcemap,
@@ -364,6 +359,11 @@ fs.writeJSONSync(`./_dist/application/legacy/package.json`, {
    module: './index.js',
    type: 'module'
 });
+
+// GSAP plugin loading code is also bespoke and must be copied over.
+
+fs.emptyDirSync('./_dist/gsap/plugin');
+fs.copySync('./src/gsap/plugin', './_dist/gsap/plugin');
 
 // TODO: DO NOT UNCOMMENT. These definitions are hand modified after initial generation.
 // await generateTSDef({

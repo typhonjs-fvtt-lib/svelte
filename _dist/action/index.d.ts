@@ -45,6 +45,14 @@ declare function draggable(node: HTMLElement, { position, active, storeDragging 
     update: Function;
     destroy: Function;
 };
+declare namespace draggable {
+    /**
+     * Define a function to get a DraggableOptions instance.
+     *
+     * @returns {DraggableOptions} A new options instance.
+     */
+    function options(): DraggableOptions;
+}
 /**
  * Provides an action to monitor the given HTMLElement node with `ResizeObserver` posting width / height changes
  * to the target in various ways depending on the shape of the target. The target can be one of the following and the
@@ -86,6 +94,17 @@ declare namespace resizeObserver {
      * @param {HTMLElement} el - An HTML element.
      */
     function updateCache(el: HTMLElement): void;
+}
+declare class DraggableOptions {
+    /**
+     *
+     * @param {function(DraggableOptions): void} handler - Callback function that is invoked on update / changes.
+     *                                                 Receives the DraggableOptions object / instance.
+     *
+     * @returns {(function(): void)} Unsubscribe function.
+     */
+    subscribe(handler: (arg0: DraggableOptions) => void): (() => void);
+    #private;
 }
 
 export { applyPosition, applyStyles, draggable, resizeObserver };

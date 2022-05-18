@@ -6,6 +6,10 @@ declare class ApplicationShell extends SvelteComponent {
     get elementContent(): any;
     set elementRoot(arg: any);
     get elementRoot(): any;
+    set draggable(arg: any);
+    get draggable(): any;
+    set draggableOptions(arg: any);
+    get draggableOptions(): any;
     set children(arg: any);
     get children(): any;
     set stylesApp(arg: any);
@@ -77,6 +81,10 @@ declare class TJSApplicationShell extends SvelteComponent {
     get elementContent(): any;
     set elementRoot(arg: any);
     get elementRoot(): any;
+    set draggable(arg: any);
+    get draggable(): any;
+    set draggableOptions(arg: any);
+    get draggableOptions(): any;
     set children(arg: any);
     get children(): any;
     set stylesApp(arg: any);
