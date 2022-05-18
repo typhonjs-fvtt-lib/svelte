@@ -35,7 +35,7 @@ const s_HAS_QUICK_TO = false;
  */
 function draggableGsap(node, { position, active = true, storeDragging = void 0, ease = true, inertia = false,
  easeOptions = { duration: 0.1, ease: 'power3.out' },
-  inertiaOptions = { end: void 0, duration: { min: 0, max: 1 }, resistance: 1000, velocityScale: 1 } })
+  inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 } })
 {
    /**
     * Duplicate the app / Positionable starting position to track differences.
@@ -249,7 +249,7 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
          const opts = inertiaOptions;
 
          const velScale = opts.velocityScale ?? 1;
-         const tweenDuration = opts.duration ?? { min: 0, max: 1 };
+         const tweenDuration = opts.duration ?? { min: 0, max: 3 };
          const tweenEnd = opts.end ?? void 0;
          const tweenResistance = opts.resistance ?? 1000;
 
@@ -313,7 +313,7 @@ class DraggableGsapOptions
 
    #easeOptions = { duration: 0.1, ease: 'power3.out' };
 
-   #inertiaOptions = { end: void 0, duration: { min: 0, max: 1 }, resistance: 1000, velocityScale: 1 };
+   #inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 };
 
    /**
     * Stores the subscribers.
@@ -527,7 +527,7 @@ class DraggableGsapOptions
       this.#ease = true;
       this.#inertia = false;
       this.#easeOptions = { duration: 0.1, ease: 'power3.out' };
-      this.#inertiaOptions = { end: void 0, duration: { min: 0, max: 1 }, resistance: 1000, velocityScale: 1 };
+      this.#inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 };
       this.#updateSubscribers();
    }
 
@@ -545,7 +545,7 @@ class DraggableGsapOptions
     */
    resetInertia()
    {
-      this.#inertiaOptions = { end: void 0, duration: { min: 0, max: 1 }, resistance: 1000, velocityScale: 1 };
+      this.#inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 };
       this.#updateSubscribers();
    }
 
