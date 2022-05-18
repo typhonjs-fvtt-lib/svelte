@@ -103,27 +103,37 @@ declare function isApplicationShell(component: any): boolean;
 /**
  * Tests for whether an object is iterable.
  *
- * @param {object} object - An object.
+ * @param {*} value - Any value.
  *
  * @returns {boolean} Whether object is iterable.
  */
-declare function isIterable(object: object): boolean;
+declare function isIterable(value: any): boolean;
 /**
  * Tests for whether an object is async iterable.
  *
- * @param {object} object - An object.
+ * @param {*} value - Any value.
  *
- * @returns {boolean} Whether object is async iterable.
+ * @returns {boolean} Whether value is async iterable.
  */
-declare function isIterableAsync(object: object): boolean;
+declare function isIterableAsync(value: any): boolean;
 /**
  * Tests for whether object is not null and a typeof object.
  *
- * @param {object} object - An object.
+ * @param {*} value - Any value.
  *
  * @returns {boolean} Is it an object.
  */
-declare function isObject(object: object): boolean;
+declare function isObject(value: any): boolean;
+/**
+ * Tests for whether the given value is a plain object.
+ *
+ * An object is plain if it is created by either: {}, new Object() or Object.create(null).
+ *
+ * @param {*} value - Any value
+ *
+ * @returns {boolean} Is it a plain object.
+ */
+declare function isPlainObject(value: any): boolean;
 /**
  * Provides basic duck typing to determine if the provided function is a constructor function for a Svelte component.
  *
@@ -206,4 +216,4 @@ declare function styleParsePixels(value: string): number | undefined;
  */
 declare function uuidv4(): string;
 
-export { ParseDataTransferOptions, debounce, deepMerge, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };
+export { ParseDataTransferOptions, debounce, deepMerge, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };

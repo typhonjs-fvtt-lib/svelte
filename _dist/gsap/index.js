@@ -5,7 +5,13 @@ import { isIterable, isPlainObject } from '@typhonjs-fvtt/svelte/util';
 
 let gsap = void 0;
 
-const modulePath = foundry.utils.getRoute('/scripts/greensock/esm/index.js');
+/**
+ * Note usage of `globalThis.location.origin` as this is the origin of the importing location which is necessary for
+ * connecting to the Foundry server when the package is located on a CDN.
+ *
+ * @type {string}
+ */
+const modulePath = `${globalThis.location.origin}${foundry.utils.getRoute(`/scripts/greensock/esm/index.js`)}`;
 
 // Basic core GSAP eases.
 const easingList = [
@@ -1853,7 +1859,13 @@ const s_POSITION_DATA = { left: 0, top: 0 };
  */
 async function gsapLoadPlugin(name)
 {
-   const modulePath = foundry.utils.getRoute(`/scripts/greensock/esm/${name}.js`);
+   /**
+    * Note usage of `globalThis.location.origin` as this is the origin of the importing location which is necessary for
+    * connecting to the Foundry server when the package is located on a CDN.
+    *
+    * @type {string}
+    */
+   const modulePath = `${globalThis.location.origin}${foundry.utils.getRoute(`/scripts/greensock/esm/${name}.js`)}`;
 
    try
    {
