@@ -2,7 +2,13 @@ import * as svelteEasingFunc from 'svelte/easing';
 
 let gsap = void 0;
 
-const modulePath = foundry.utils.getRoute('/scripts/greensock/esm/index.js');
+/**
+ * Note usage of `globalThis.location.origin` as this is the origin of the importing location which is necessary for
+ * connecting to the Foundry server when the package is located on a CDN.
+ *
+ * @type {string}
+ */
+const modulePath = `${globalThis.location.origin}${foundry.utils.getRoute(`/scripts/greensock/esm/index.js`)}`;
 
 // Basic core GSAP eases.
 const easingList = [
