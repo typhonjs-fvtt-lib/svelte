@@ -1,4 +1,25 @@
 # Changelog
+## Release 0.0.12 (massive update / animation stage #1)
+- Full integration of GSAP 
+  - Proper module loading from remote source (requires top level await).
+  - GsapCompose (data oriented GSAP bridge for Position)
+  - draggableGsap; provides easing + inertia support.
+
+- Position system
+  - immediate element update support; from external rAF callback.
+  - animateTo 
+    - returns an object w/ cancel method and `finished` for the animation 
+      end Promise.
+    - ease instead of easing. duration is now specified in seconds instead of milliseconds.
+  - start of static public Animation API; support `cancelAll` -> `Position.Animation.cancelAll()`
+
+Demos
+  - position-app: cleaned up UI; upgraded w/ GSAP timeline / tween examples + draggable selection.
+  - position-box: upgraded w/ GSAP timeline example; draggableGsap
+  - position-carousel: upgraded for GSAP timeline / tween to control continuous updates.  
+
+## Skipped 0.0.11 (keep parity w/ TRL)
+
 ## Release 0.0.10 (large update)
 - Further refinement of position / Position system.
   - Orthographic mode
