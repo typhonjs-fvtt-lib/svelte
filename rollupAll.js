@@ -325,10 +325,10 @@ for (const config of rollupConfigs)
    // closes the bundle
    await bundle.close();
 
-   await generateTSDef({
-      main: config.output.output.file,
-      output: upath.changeExt(config.output.output.file, '.d.ts')
-   });
+   // await generateTSDef({
+   //    main: config.output.output.file,
+   //    output: upath.changeExt(config.output.output.file, '.d.ts')
+   // });
 
    fs.writeJSONSync(`${upath.dirname(config.output.output.file)}/package.json`, {
       main: './index.js',
