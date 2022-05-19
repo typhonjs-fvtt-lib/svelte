@@ -785,16 +785,14 @@ export class Position
          interpolate,
          keys,
          newData,
-         position: this
+         position: this,
+         resolve: void 0
       };
-
-      // Cache the finished Promise resolve method in animationData, so that it can be invoked by AnimationManager.
-      const promise = new Promise((resolve) => animationData.resolve = resolve);
 
       AnimationManager.add(animationData);
 
       // Schedule w/ animation manager.
-      return new AnimationControl(animationData, promise);
+      return new AnimationControl(animationData, true);
    }
 
    /**

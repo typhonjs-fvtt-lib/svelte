@@ -57,7 +57,7 @@ export class AnimationManager
             {
                s_ACTIVE_LIST.splice(cntr, 1);
                data.currentAnimationKeys.clear();
-               data.resolve();
+               if (typeof data.resolve === 'function') { data.resolve(); }
                continue;
             }
 
@@ -72,7 +72,7 @@ export class AnimationManager
                }
 
                s_ACTIVE_LIST.splice(cntr, 1);
-               data.resolve();
+               if (typeof data.resolve === 'function') { data.resolve(); }
                continue;
             }
 
@@ -94,7 +94,7 @@ export class AnimationManager
                s_ACTIVE_LIST.splice(cntr, 1);
 
                data.finished = true;
-               data.resolve();
+               if (typeof data.resolve === 'function') { data.resolve(); }
                continue;
             }
 
