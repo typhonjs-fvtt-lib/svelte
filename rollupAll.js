@@ -19,7 +19,7 @@ const s_LOCAL_EXTERNAL = [
    'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
    'svelte/types',
 
-   '@typhonjs-fvtt/svelte/action', '@typhonjs-fvtt/svelte/animation', '@typhonjs-fvtt/svelte/application',
+   '@typhonjs-fvtt/svelte/action', '@typhonjs-fvtt/svelte/animate', '@typhonjs-fvtt/svelte/application',
    '@typhonjs-fvtt/svelte/application/dialog', '@typhonjs-fvtt/svelte/application/legacy',
    '@typhonjs-fvtt/svelte/component/core', '@typhonjs-fvtt/svelte/component/dialog', '@typhonjs-fvtt/svelte/gsap',
    '@typhonjs-fvtt/svelte/handler', '@typhonjs-fvtt/svelte/helper', '@typhonjs-fvtt/svelte/math',
