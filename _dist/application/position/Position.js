@@ -767,7 +767,7 @@ export class Position
          else { currentAnimationKeys.add(key); }
       }
 
-      const newData = Object.assign({}, initial);
+      const newData = Object.assign({ immediateElementUpdate: true }, initial);
       const keys = Object.keys(newData);
 
       // Nothing to animate, so return now.
