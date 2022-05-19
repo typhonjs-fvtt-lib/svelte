@@ -1,14 +1,23 @@
-import { nextAnimationFrame }    from '@typhonjs-fvtt/svelte/animate';
-
-const s_ACTIVE_LIST = [];
-const s_NEW_LIST = [];
-let s_PROMISE;
-
 /**
  * Provides animation management and scheduling allowing all Position instances to utilize one micro-task.
  */
 export class AnimationManager
 {
+   /**
+    * @type {object[]}
+    */
+   static activeList = [];
+
+   /**
+    * @type {object[]}
+    */
+   static newList = [];
+
+   /**
+    * @type {boolean}
+    */
+   static animating = false;
+
    /**
     * Add animation data.
     *
@@ -16,101 +25,109 @@ export class AnimationManager
     */
    static add(data)
    {
-      s_NEW_LIST.push(data);
+      AnimationManager.newList.push(data);
 
-      if (!s_PROMISE) { s_PROMISE = this.animate(); }
+      if (!AnimationManager.animating)
+      {
+         AnimationManager.animating = true;
+
+         globalThis.requestAnimationFrame(AnimationManager.animate);
+      }
    }
 
    /**
     * Manage all animation
     *
-    * @returns {Promise<void>}
+    * @param {DOMHighResTimeStamp} current - Current time from rAF callback.
+    *
     */
-   static async animate()
+   static animate(current)
    {
-      while (s_ACTIVE_LIST.length || s_NEW_LIST.length)
+      if (AnimationManager.newList.length)
       {
-         const current = await nextAnimationFrame();
-
-         if (s_NEW_LIST.length)
+         // Process new data
+         for (let cntr = AnimationManager.newList.length; --cntr >= 0;)
          {
-            // Process new data
-            for (let cntr = s_NEW_LIST.length; --cntr >= 0;)
-            {
-               const data = s_NEW_LIST[cntr];
-               data.start = current;
-               data.current = 0;
+            const data = AnimationManager.newList[cntr];
+            data.start = current;
+            data.current = 0;
 
-               s_ACTIVE_LIST.push(data);
-            }
-
-            s_NEW_LIST.length = 0;
+            AnimationManager.activeList.push(data);
          }
 
-         // Process existing data.
-         for (let cntr = s_ACTIVE_LIST.length; --cntr >= 0;)
+         AnimationManager.newList.length = 0;
+      }
+
+      // Process existing data.
+      for (let cntr = AnimationManager.activeList.length; --cntr >= 0;)
+      {
+         const data = AnimationManager.activeList[cntr];
+
+         // Ensure that the element is still connected otherwise remove it from active list and continue.
+         if (!data.el.isConnected)
          {
-            const data = s_ACTIVE_LIST[cntr];
+            AnimationManager.activeList.splice(cntr, 1);
+            data.currentAnimationKeys.clear();
+            if (typeof data.resolve === 'function') { data.resolve(); }
+            continue;
+         }
 
-            // Ensure that the element is still connected otherwise remove it from active list and continue.
-            if (!data.el.isConnected)
-            {
-               s_ACTIVE_LIST.splice(cntr, 1);
-               data.currentAnimationKeys.clear();
-               if (typeof data.resolve === 'function') { data.resolve(); }
-               continue;
-            }
-
-            // Handle any animations that have been canceled.
-            if (data.finished)
-            {
-               // Remove animation keys.
-               for (let dataCntr = data.keys.length; --dataCntr >= 0;)
-               {
-                  const key = data.keys[dataCntr];
-                  data.currentAnimationKeys.delete(key);
-               }
-
-               s_ACTIVE_LIST.splice(cntr, 1);
-               if (typeof data.resolve === 'function') { data.resolve(); }
-               continue;
-            }
-
-            data.current = current - data.start;
-
-            // Remove this animation instance.
-            if (data.current >= data.duration)
-            {
-               // Prepare final update with end position data and remove keys from `currentAnimationKeys`.
-               for (let dataCntr = data.keys.length; --dataCntr >= 0;)
-               {
-                  const key = data.keys[dataCntr];
-                  data.newData[key] = data.destination[key];
-                  data.currentAnimationKeys.delete(key);
-               }
-
-               data.position.set(data.newData);
-
-               s_ACTIVE_LIST.splice(cntr, 1);
-
-               data.finished = true;
-               if (typeof data.resolve === 'function') { data.resolve(); }
-               continue;
-            }
-
-            const easedTime = data.ease(data.current / data.duration);
-
+         // Handle any animations that have been canceled.
+         if (data.finished)
+         {
+            // Remove animation keys.
             for (let dataCntr = data.keys.length; --dataCntr >= 0;)
             {
                const key = data.keys[dataCntr];
-               data.newData[key] = data.interpolate(data.initial[key], data.destination[key], easedTime);
+               data.currentAnimationKeys.delete(key);
+            }
+
+            AnimationManager.activeList.splice(cntr, 1);
+            if (typeof data.resolve === 'function') { data.resolve(); }
+            continue;
+         }
+
+         data.current = current - data.start;
+
+         // Remove this animation instance.
+         if (data.current >= data.duration)
+         {
+            // Prepare final update with end position data and remove keys from `currentAnimationKeys`.
+            for (let dataCntr = data.keys.length; --dataCntr >= 0;)
+            {
+               const key = data.keys[dataCntr];
+               data.newData[key] = data.destination[key];
+               data.currentAnimationKeys.delete(key);
             }
 
             data.position.set(data.newData);
+
+            AnimationManager.activeList.splice(cntr, 1);
+
+            data.finished = true;
+            if (typeof data.resolve === 'function') { data.resolve(); }
+            continue;
          }
+
+         const easedTime = data.ease(data.current / data.duration);
+
+         for (let dataCntr = data.keys.length; --dataCntr >= 0;)
+         {
+            const key = data.keys[dataCntr];
+            data.newData[key] = data.interpolate(data.initial[key], data.destination[key], easedTime);
+         }
+
+         data.position.set(data.newData);
       }
 
-      s_PROMISE = void 0;
+      if (AnimationManager.activeList.length || AnimationManager.newList.length)
+      {
+         globalThis.requestAnimationFrame(AnimationManager.animate);
+      }
+      else
+      {
+         AnimationManager.animating = false;
+      }
    }
 
    /**
@@ -128,26 +145,26 @@ export class AnimationManager
     */
    static cancelAll()
    {
-      for (let cntr = s_ACTIVE_LIST.length; --cntr >= 0;)
+      for (let cntr = AnimationManager.activeList.length; --cntr >= 0;)
       {
-         const data = s_ACTIVE_LIST[cntr];
+         const data = AnimationManager.activeList[cntr];
 
          data.currentAnimationKeys.clear();
          data.finished = true;
-         data.resolve();
+         if (typeof data.resolve === 'function') { data.resolve(); }
       }
 
-      for (let cntr = s_NEW_LIST.length; --cntr >= 0;)
+      for (let cntr = AnimationManager.newList.length; --cntr >= 0;)
       {
-         const data = s_NEW_LIST[cntr];
+         const data = AnimationManager.newList[cntr];
 
          data.currentAnimationKeys.clear();
          data.finished = true;
-         data.resolve();
+         if (typeof data.resolve === 'function') { data.resolve(); }
       }
 
-      s_ACTIVE_LIST.length = 0;
-      s_NEW_LIST.length = 0;
+      AnimationManager.activeList.length = 0;
+      AnimationManager.newList.length = 0;
    }
 
    /**

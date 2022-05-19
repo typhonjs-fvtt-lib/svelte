@@ -789,9 +789,6 @@ export class Position
          resolve: void 0
       };
 
-      // // Cache the finished Promise resolve method in animationData, so that it can be invoked by AnimationManager.
-      // const promise = new Promise((resolve) => animationData.resolve = resolve);
-
       AnimationManager.add(animationData);
 
       // Schedule w/ animation manager.
