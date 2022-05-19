@@ -1,10 +1,5 @@
 import { nextAnimationFrame }    from '@typhonjs-fvtt/svelte/animate';
 
-let s_PROMISE;
-
-const s_LIST = [];
-let s_LIST_CNTR = 0;
-
 /**
  * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link Position.elementUpdated} to await
  * on the returned promise that is resolved with the current render time via `nextAnimationFrame` /
@@ -15,7 +10,12 @@ let s_LIST_CNTR = 0;
  */
 export class UpdateElementManager
 {
-   static get promise() { return s_PROMISE; }
+   static list = [];
+   static listCntr = 0;
+
+   static updatePromise;
+
+   static get promise() { return this.updatePromise; }
 
    /**
     * Potentially adds the given element and internal updateData instance to the list.
@@ -28,23 +28,23 @@ export class UpdateElementManager
     */
    static add(el, updateData)
    {
-      if (s_LIST_CNTR < s_LIST.length)
+      if (this.listCntr < this.list.length)
       {
-         const entry = s_LIST[s_LIST_CNTR];
+         const entry = this.list[this.listCntr];
          entry[0] = el;
          entry[1] = updateData;
       }
       else
       {
-         s_LIST.push([el, updateData]);
+         this.list.push([el, updateData]);
       }
 
-      s_LIST_CNTR++;
+      this.listCntr++;
       updateData.queued = true;
 
-      if (!s_PROMISE) { s_PROMISE = this.wait(); }
+      if (!this.updatePromise) { this.updatePromise = this.wait(); }
 
-      return s_PROMISE;
+      return this.updatePromise;
    }
 
    /**
@@ -57,12 +57,12 @@ export class UpdateElementManager
       // Await the next animation frame. In the future this can be extended to multiple frames to divide update rate.
       const currentTime = await nextAnimationFrame();
 
-      s_PROMISE = void 0;
+      this.updatePromise = void 0;
 
-      for (let cntr = s_LIST_CNTR; --cntr >= 0;)
+      for (let cntr = this.listCntr; --cntr >= 0;)
       {
          // Obtain data for entry.
-         const entry = s_LIST[cntr];
+         const entry = this.list[cntr];
          const el = entry[0];
          const updateData = entry[1];
 
@@ -96,7 +96,7 @@ export class UpdateElementManager
          this.updateSubscribers(updateData);
       }
 
-      s_LIST_CNTR = 0;
+      this.listCntr = 0;
 
       return currentTime;
    }
