@@ -1,7 +1,5 @@
 import { nextAnimationFrame }    from '@typhonjs-fvtt/svelte/animate';
 
-import { UpdateElementManager }  from '../update/UpdateElementManager.js';
-
 const s_ACTIVE_LIST = [];
 const s_NEW_LIST = [];
 let s_PROMISE;
@@ -30,10 +28,10 @@ export class AnimationManager
     */
    static async animate()
    {
-      let current = await nextAnimationFrame();
-
       while (s_ACTIVE_LIST.length || s_NEW_LIST.length)
       {
+         const current = await nextAnimationFrame();
+
          if (s_NEW_LIST.length)
          {
             // Process new data
@@ -110,61 +108,6 @@ export class AnimationManager
 
             data.position.set(data.newData);
          }
-
-         const newCurrent = await UpdateElementManager.promise;
-
-         // Must check that time has passed otherwise likely the element has been removed.
-         if (newCurrent === void 0 || newCurrent <= current)
-         {
-            // TODO: Temporary warning message
-            // console.warn(`TRL - AnimationManager Warning - quitting animation: newCurrent <= current.`);
-
-            for (let cntr = s_ACTIVE_LIST.length; --cntr >= 0;)
-            {
-               const data = s_ACTIVE_LIST[cntr];
-
-               if (!data.el.isConnected)
-               {
-                  s_ACTIVE_LIST.splice(cntr, 1);
-                  data.currentAnimationKeys.clear();
-                  data.resolve();
-                  continue;
-               }
-
-               // Handle any animations that have been canceled.
-               if (data.finished)
-               {
-                  // Remove animation keys.
-                  for (let dataCntr = data.keys.length; --dataCntr >= 0;)
-                  {
-                     const key = data.keys[dataCntr];
-                     data.currentAnimationKeys.delete(key);
-                  }
-
-                  s_ACTIVE_LIST.splice(cntr, 1);
-                  data.resolve();
-                  continue;
-               }
-
-               // Any remaining animations set the Position to the destination target.
-               for (let dataCntr = data.keys.length; --dataCntr >= 0;)
-               {
-                  const key = data.keys[dataCntr];
-                  data.newData[key] = data.destination[key];
-                  data.currentAnimationKeys.delete(key);
-               }
-
-               data.position.set(data.newData);
-               data.finished = true;
-               data.resolve();
-            }
-
-            s_ACTIVE_LIST.length = 0;
-
-            break;
-         }
-
-         current = newCurrent;
       }
 
       s_PROMISE = void 0;
