@@ -1,6 +1,6 @@
 import {
    getUUIDFromDataTransfer,
-   isObject,
+   isPlainObject,
    uuidv4 } from '@typhonjs-fvtt/svelte/util';
 
 /**
@@ -24,7 +24,7 @@ export class TJSDocument
    #updateOptions;
 
    /**
-    * @param {T}                    [document] - Document to wrap.
+    * @param {T|TJSDocumentOptions} [document] - Document to wrap or TJSDocumentOptions.
     *
     * @param {TJSDocumentOptions}   [options] - TJSDocument options.
     */
@@ -32,8 +32,15 @@ export class TJSDocument
    {
       this.#uuidv4 = `tjs-document-${uuidv4()}`;
 
-      this.setOptions(options);
-      this.set(document);
+      if (isPlainObject(document)) // Handle case when only options are passed into ctor.
+      {
+         this.setOptions(document);
+      }
+      else
+      {
+         this.setOptions(options);
+         this.set(document);
+      }
    }
 
    /**
@@ -176,9 +183,9 @@ export class TJSDocument
     */
    setOptions(options)
    {
-      if (!isObject(options))
+      if (!isPlainObject(options))
       {
-         throw new TypeError(`TJSDocument error: 'options' is not an object.`);
+         throw new TypeError(`TJSDocument error: 'options' is not a plain object.`);
       }
 
       if (options.delete !== void 0 && typeof options.delete !== 'function')
@@ -223,9 +230,9 @@ export class TJSDocument
 }
 
 /**
- * @typedef TJSDocumentOptions
+ * @typedef {object} TJSDocumentOptions
  *
- * @property {Function} delete - Optional delete function to invoke when document is deleted.
+ * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
  *
- * @property {boolean} notifyOnDelete - When true a subscribers are notified of the deletion of the document.
+ * @property {boolean} [notifyOnDelete] - When true a subscribers are notified of the deletion of the document.
  */

@@ -1,6 +1,6 @@
 import { get, derived, writable as writable$2 } from 'svelte/store';
 import { noop, run_all, is_function } from 'svelte/internal';
-import { uuidv4, getUUIDFromDataTransfer, isObject, isIterable } from '@typhonjs-fvtt/svelte/util';
+import { uuidv4, isPlainObject, getUUIDFromDataTransfer, isIterable } from '@typhonjs-fvtt/svelte/util';
 
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
@@ -1759,7 +1759,7 @@ class TJSDocument
    #updateOptions;
 
    /**
-    * @param {T}                    [document] - Document to wrap.
+    * @param {T|TJSDocumentOptions} [document] - Document to wrap or TJSDocumentOptions.
     *
     * @param {TJSDocumentOptions}   [options] - TJSDocument options.
     */
@@ -1767,8 +1767,15 @@ class TJSDocument
    {
       this.#uuidv4 = `tjs-document-${uuidv4()}`;
 
-      this.setOptions(options);
-      this.set(document);
+      if (isPlainObject(document)) // Handle case when only options are passed into ctor.
+      {
+         this.setOptions(document);
+      }
+      else
+      {
+         this.setOptions(options);
+         this.set(document);
+      }
    }
 
    /**
@@ -1911,9 +1918,9 @@ class TJSDocument
     */
    setOptions(options)
    {
-      if (!isObject(options))
+      if (!isPlainObject(options))
       {
-         throw new TypeError(`TJSDocument error: 'options' is not an object.`);
+         throw new TypeError(`TJSDocument error: 'options' is not a plain object.`);
       }
 
       if (options.delete !== void 0 && typeof options.delete !== 'function')
@@ -1958,11 +1965,11 @@ class TJSDocument
 }
 
 /**
- * @typedef TJSDocumentOptions
+ * @typedef {object} TJSDocumentOptions
  *
- * @property {Function} delete - Optional delete function to invoke when document is deleted.
+ * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
  *
- * @property {boolean} notifyOnDelete - When true a subscribers are notified of the deletion of the document.
+ * @property {boolean} [notifyOnDelete] - When true a subscribers are notified of the deletion of the document.
  */
 
 /**
@@ -1987,21 +1994,23 @@ class TJSDocumentCollection
    #updateOptions;
 
    /**
-    * @param {T}                             [collection] - Collection to wrap.
+    * @param {T|TJSDocumentCollectionOptions}   [collection] - Collection to wrap or TJSDocumentCollectionOptions.
     *
-    * @param {TJSDocumentCollectionOptions}  [options] - TJSDocumentCollection options.
+    * @param {TJSDocumentCollectionOptions}     [options] - TJSDocumentCollection options.
     */
    constructor(collection, options = {})
    {
-      if (options?.delete !== void 0 && typeof options?.delete !== 'function')
-      {
-         throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
-      }
-
       this.#uuid = `tjs-collection-${uuidv4()}`;
 
-      this.setOptions(options);
-      this.set(collection);
+      if (isPlainObject(collection)) // Handle case when only options are passed into ctor.
+      {
+         this.setOptions(collection);
+      }
+      else
+      {
+         this.setOptions(options);
+         this.set(collection);
+      }
    }
 
    /**
@@ -2110,9 +2119,9 @@ class TJSDocumentCollection
     */
    setOptions(options)
    {
-      if (!isObject(options))
+      if (!isPlainObject(options))
       {
-         throw new TypeError(`TJSDocumentCollection error: 'options' is not an object.`);
+         throw new TypeError(`TJSDocumentCollection error: 'options' is not a plain object.`);
       }
 
       if (options.delete !== void 0 && typeof options.delete !== 'function')
@@ -2159,9 +2168,9 @@ class TJSDocumentCollection
 /**
  * @typedef TJSDocumentCollectionOptions
  *
- * @property {Function} delete - Optional delete function to invoke when document is deleted.
+ * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
  *
- * @property {boolean} notifyOnDelete - When true a subscribers are notified of the deletion of the document.
+ * @property {boolean} [notifyOnDelete] - When true a subscribers are notified of the deletion of the document.
  */
 
 const storeState = writable$2(void 0);

@@ -1,4 +1,4 @@
-import { isObject, uuidv4 } from '@typhonjs-fvtt/svelte/util';
+import { isPlainObject, uuidv4 } from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any DocumentCollection. This makes
@@ -22,21 +22,23 @@ export class TJSDocumentCollection
    #updateOptions;
 
    /**
-    * @param {T}                             [collection] - Collection to wrap.
+    * @param {T|TJSDocumentCollectionOptions}   [collection] - Collection to wrap or TJSDocumentCollectionOptions.
     *
-    * @param {TJSDocumentCollectionOptions}  [options] - TJSDocumentCollection options.
+    * @param {TJSDocumentCollectionOptions}     [options] - TJSDocumentCollection options.
     */
    constructor(collection, options = {})
    {
-      if (options?.delete !== void 0 && typeof options?.delete !== 'function')
-      {
-         throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
-      }
-
       this.#uuid = `tjs-collection-${uuidv4()}`;
 
-      this.setOptions(options);
-      this.set(collection);
+      if (isPlainObject(collection)) // Handle case when only options are passed into ctor.
+      {
+         this.setOptions(collection);
+      }
+      else
+      {
+         this.setOptions(options);
+         this.set(collection);
+      }
    }
 
    /**
@@ -145,9 +147,9 @@ export class TJSDocumentCollection
     */
    setOptions(options)
    {
-      if (!isObject(options))
+      if (!isPlainObject(options))
       {
-         throw new TypeError(`TJSDocumentCollection error: 'options' is not an object.`);
+         throw new TypeError(`TJSDocumentCollection error: 'options' is not a plain object.`);
       }
 
       if (options.delete !== void 0 && typeof options.delete !== 'function')
@@ -194,7 +196,7 @@ export class TJSDocumentCollection
 /**
  * @typedef TJSDocumentCollectionOptions
  *
- * @property {Function} delete - Optional delete function to invoke when document is deleted.
+ * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
  *
- * @property {boolean} notifyOnDelete - When true a subscribers are notified of the deletion of the document.
+ * @property {boolean} [notifyOnDelete] - When true a subscribers are notified of the deletion of the document.
  */
