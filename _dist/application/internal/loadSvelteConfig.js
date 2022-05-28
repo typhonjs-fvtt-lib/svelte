@@ -5,29 +5,33 @@ import {
 /**
  * Instantiates and attaches a Svelte component to the main inserted HTML.
  *
- * @param {SvelteFormApplication} app - The application
+ * @param {object}            opts - Optional parameters.
  *
- * @param {JQuery}            html - The inserted HTML.
+ * @param {object}            opts.app - The target application
  *
- * @param {object}            config - Svelte component options
+ * @param {HTMLElement}       opts.template - Any HTML template.
  *
- * @param {Function}          elementRootUpdate - A callback to assign to the external context.
+ * @param {object}            opts.config - Svelte component options
+ *
+ * @param {Function}          opts.elementRootUpdate - A callback to assign to the external context.
  *
  * @returns {SvelteData} The config + instantiated Svelte component.
  */
-export function loadSvelteConfig(app, html, config, elementRootUpdate)
+export function loadSvelteConfig({ app, template, config, elementRootUpdate } = {})
 {
    const svelteOptions = typeof config.options === 'object' ? config.options : {};
 
    let target;
 
-   if (config.target instanceof HTMLElement)       // A specific HTMLElement to append Svelte component.
+   // A specific HTMLElement to append Svelte component.
+   if (config.target instanceof HTMLElement)
    {
       target = config.target;
    }
-   else if (typeof config.target === 'string')     // A string target defines a selector to find in existing HTML.
+   // A string target defines a selector to find in existing HTML.
+   else if (template instanceof HTMLElement && typeof config.target === 'string')
    {
-      target = html.find(config.target).get(0);
+      target = template.querySelector(config.target);
    }
    else                                            // No target defined, create a document fragment.
    {
@@ -36,9 +40,11 @@ export function loadSvelteConfig(app, html, config, elementRootUpdate)
 
    if (target === void 0)
    {
-      throw new Error(
-       `SvelteFormApplication - s_LOAD_CONFIG - could not find target selector: ${config.target} for config:\n${
-        JSON.stringify(config)}`);
+      console.log(
+       `%c[TRL] loadSvelteConfig error - could not find target selector, '${config.target}', for config:\n`,
+       'background: rgb(57,34,34)', config);
+
+      throw new Error();
    }
 
    const NewSvelteComponent = config.class;
@@ -80,20 +86,24 @@ export function loadSvelteConfig(app, html, config, elementRootUpdate)
       element = component.elementRoot;
    }
 
-   // Detect if target is a synthesized DocumentFragment with an child element. Child elements will be present
+   // Detect if target is a synthesized DocumentFragment with a child element. Child elements will be present
    // if the Svelte component mounts and renders initial content into the document fragment.
-   if (config.target instanceof DocumentFragment && target.firstElementChild)
+   if (target instanceof DocumentFragment && target.firstElementChild)
    {
       if (element === void 0) { element = target.firstElementChild; }
-      html.append(target);
+      template.append(target);
    }
    else if (config.target instanceof HTMLElement && element === void 0)
    {
       if (config.target instanceof HTMLElement && typeof svelteOptions.selectorElement !== 'string')
       {
-         throw new Error(
-          `SvelteFormApplication - s_LOAD_CONFIG - HTMLElement target with no 'selectorElement' defined for config:\n${
-           JSON.stringify(config)}`);
+         console.log(
+          `%c[TRL] loadSvelteConfig error - HTMLElement target with no 'selectorElement' defined.\n` +
+          `Note: If configuring an application shell and directly targeting an HTMLElement did you bind an` +
+          `'elementRoot' and include '<svelte:options accessors={true}/>'?` +
+          `Offending config:\n`, 'background: rgb(57,34,34)', config);
+
+         throw new Error();
       }
 
       // The target is an HTMLElement so find the Application element from `selectorElement` option.
@@ -101,9 +111,12 @@ export function loadSvelteConfig(app, html, config, elementRootUpdate)
 
       if (element === null || element === void 0)
       {
-         throw new Error(
-          `SvelteFormApplication - s_LOAD_CONFIG - HTMLElement target - could not find 'selectorElement' for config:\n${
-           JSON.stringify(config)}`);
+         console.log(
+          `%c[TRL] loadSvelteConfig error - HTMLElement target with 'selectorElement', '${
+           svelteOptions.selectorElement}', not found for config:\n`,
+          'background: rgb(57,34,34)', config);
+
+         throw new Error();
       }
    }
 

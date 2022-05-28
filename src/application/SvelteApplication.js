@@ -410,7 +410,12 @@ export class SvelteApplication extends Application
       {
          for (const svelteConfig of this.options.svelte)
          {
-            const svelteData = loadSvelteConfig(this, html, svelteConfig, elementRootUpdate);
+            const svelteData = loadSvelteConfig({
+               app: this,
+               template: html[0],
+               config: svelteConfig,
+               elementRootUpdate
+            });
 
             if (isApplicationShell(svelteData.component))
             {
@@ -429,7 +434,12 @@ export class SvelteApplication extends Application
       }
       else if (typeof this.options.svelte === 'object')
       {
-         const svelteData = loadSvelteConfig(this, html, this.options.svelte, elementRootUpdate);
+         const svelteData = loadSvelteConfig({
+            app: this,
+            template: html[0],
+            config: this.options.svelte,
+            elementRootUpdate
+         });
 
          if (isApplicationShell(svelteData.component))
          {
