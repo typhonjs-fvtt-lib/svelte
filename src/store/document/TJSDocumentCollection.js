@@ -182,7 +182,10 @@ export class TJSDocumentCollection
    {
       this.#subscriptions.push(handler);              // Add handler to the array of subscribers.
 
-      handler(this.#collection, this.updateOptions);  // Call handler with current value and update options.
+      const updateOptions = this.updateOptions;
+      updateOptions.action = 'subscribe';
+
+      handler(this.#collection, updateOptions);  // Call handler with current value and update options.
 
       // Return unsubscribe function.
       return () =>

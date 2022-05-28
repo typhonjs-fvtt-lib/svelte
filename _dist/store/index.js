@@ -1951,9 +1951,12 @@ class TJSDocument
     */
    subscribe(handler)
    {
-      this.#subscriptions.push(handler);              // Add handler to the array of subscribers.
+      this.#subscriptions.push(handler);           // Add handler to the array of subscribers.
 
-      handler(this.#document, this.updateOptions);   // Call handler with current value and update options.
+      const updateOptions = this.updateOptions;
+      updateOptions.action = 'subscribe';
+
+      handler(this.#document, updateOptions);      // Call handler with current value and update options.
 
       // Return unsubscribe function.
       return () =>
@@ -2154,7 +2157,10 @@ class TJSDocumentCollection
    {
       this.#subscriptions.push(handler);              // Add handler to the array of subscribers.
 
-      handler(this.#collection, this.updateOptions);  // Call handler with current value and update options.
+      const updateOptions = this.updateOptions;
+      updateOptions.action = 'subscribe';
+
+      handler(this.#collection, updateOptions);  // Call handler with current value and update options.
 
       // Return unsubscribe function.
       return () =>
