@@ -14,9 +14,9 @@ export class AnimationManager
    static newList = [];
 
    /**
-    * @type {boolean}
+    * @type {number}
     */
-   static animating = false;
+   static current;
 
    /**
     * Add animation data.
@@ -25,31 +25,34 @@ export class AnimationManager
     */
    static add(data)
    {
+      const now = performance.now();
+
+      // Offset start time by delta between last rAF time.
+      data.start = now + (AnimationManager.current - now);
+
       AnimationManager.newList.push(data);
-
-      if (!AnimationManager.animating)
-      {
-         AnimationManager.animating = true;
-
-         globalThis.requestAnimationFrame(AnimationManager.animate);
-      }
    }
 
    /**
     * Manage all animation
-    *
-    * @param {DOMHighResTimeStamp} current - Current time from rAF callback.
-    *
     */
-   static animate(current)
+   static animate()
    {
+      const current = AnimationManager.current = performance.now();
+
+      // Early out of the rAF callback when there are no current animations.
+      if (AnimationManager.activeList.length === 0 && AnimationManager.newList.length === 0)
+      {
+         globalThis.requestAnimationFrame(AnimationManager.animate);
+         return;
+      }
+
       if (AnimationManager.newList.length)
       {
          // Process new data
          for (let cntr = AnimationManager.newList.length; --cntr >= 0;)
          {
             const data = AnimationManager.newList[cntr];
-            data.start = current;
             data.current = 0;
 
             AnimationManager.activeList.push(data);
@@ -83,7 +86,9 @@ export class AnimationManager
             }
 
             AnimationManager.activeList.splice(cntr, 1);
+
             if (typeof data.resolve === 'function') { data.resolve(); }
+
             continue;
          }
 
@@ -120,14 +125,7 @@ export class AnimationManager
          data.position.set(data.newData);
       }
 
-      if (AnimationManager.activeList.length || AnimationManager.newList.length)
-      {
-         globalThis.requestAnimationFrame(AnimationManager.animate);
-      }
-      else
-      {
-         AnimationManager.animating = false;
-      }
+      globalThis.requestAnimationFrame(AnimationManager.animate);
    }
 
    /**
@@ -183,3 +181,6 @@ export class AnimationManager
       return void 0;
    }
 }
+
+// Start animation manager immediately. It constantly is running in background.
+AnimationManager.animate();

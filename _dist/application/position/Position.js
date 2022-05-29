@@ -763,12 +763,14 @@ export class Position
       // Add all keys that pass to `currentAnimationKeys`.
       for (const key in initial)
       {
+         // if (!Number.isFinite(initial[key])) { delete initial[key]; }
+
          if (!Number.isFinite(initial[key]) || currentAnimationKeys.has(key)) { delete initial[key]; }
          else { currentAnimationKeys.add(key); }
       }
 
+      const keys = Object.keys(initial);
       const newData = Object.assign({ immediateElementUpdate: true }, initial);
-      const keys = Object.keys(newData);
 
       // Nothing to animate, so return now.
       if (keys.length === 0) { return AnimationControl.voidControl; }
@@ -786,7 +788,8 @@ export class Position
          keys,
          newData,
          position: this,
-         resolve: void 0
+         resolve: void 0,
+         start: void 0
       };
 
       AnimationManager.add(animationData);
@@ -1046,6 +1049,8 @@ export class Position
    set(position = {})
    {
       if (typeof position !== 'object') { throw new TypeError(`Position - set error: 'position' is not an object.`); }
+
+// console.log(`! Position - set - top: ${ position.top }; left: ${ position.left }`)
 
       const parent = this.#parent;
 
