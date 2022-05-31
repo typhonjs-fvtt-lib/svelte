@@ -35,13 +35,6 @@ export class Position
    #data = new PositionData();
 
    /**
-    * Stores current animation keys.
-    *
-    * @type {Set<string>}
-    */
-   #currentAnimationKeys = new Set();
-
-   /**
     * @type {Map<string, PositionData>}
     */
    #dataSaved = new Map();
@@ -728,7 +721,6 @@ export class Position
       }
 
       const data = this.#data;
-      const currentAnimationKeys = this.#currentAnimationKeys;
       const initial = {};
       const destination = {};
 
@@ -760,13 +752,9 @@ export class Position
       if (destination.scale === null) { destination.scale = 1; }
 
       // Reject all initial data that is not a number or is current animating.
-      // Add all keys that pass to `currentAnimationKeys`.
       for (const key in initial)
       {
-         // if (!Number.isFinite(initial[key])) { delete initial[key]; }
-
-         if (!Number.isFinite(initial[key]) || currentAnimationKeys.has(key)) { delete initial[key]; }
-         else { currentAnimationKeys.add(key); }
+         if (!Number.isFinite(initial[key])) { delete initial[key]; }
       }
 
       const keys = Object.keys(initial);
@@ -777,7 +765,6 @@ export class Position
 
       const animationData = {
          current: 0,
-         currentAnimationKeys,
          destination,
          duration: duration * 1000, // Internally the AnimationManager works in ms.
          ease,
@@ -878,16 +865,11 @@ export class Position
    {
       if (typeof this.#defaultData !== 'object') { return false; }
 
-      if (this.#currentAnimationKeys.size) { return false; }
-
       const zIndex = this.#data.zIndex;
 
       const data = Object.assign({}, this.#defaultData);
 
       if (keepZIndex) { data.zIndex = zIndex; }
-
-      // Remove any keys that are currently animating.
-      for (const key of this.#currentAnimationKeys) { delete data[key]; }
 
       // Reset the transform data.
       this.#transforms.reset(data);

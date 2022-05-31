@@ -61,16 +61,6 @@ export class AnimationControl
 
       if (animationData === null || animationData === void 0) { return; }
 
-      const keys = animationData.keys;
-      const currentAnimationKeys = animationData.currentAnimationKeys;
-
-      // Immediately remove any keys from currentAnimationKeys / #currentAnimationKeys.
-      for (let cntr = keys.length; --cntr >= 0;)
-      {
-         const key = keys[cntr];
-         currentAnimationKeys.delete(key);
-      }
-
       // Set finished state to true and this animation data instance will be removed from AnimationManager on next
       // update.
       animationData.finished = true;

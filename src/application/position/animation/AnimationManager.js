@@ -70,7 +70,6 @@ export class AnimationManager
          if (!data.el.isConnected)
          {
             AnimationManager.activeList.splice(cntr, 1);
-            data.currentAnimationKeys.clear();
             if (typeof data.resolve === 'function') { data.resolve(); }
             continue;
          }
@@ -78,17 +77,8 @@ export class AnimationManager
          // Handle any animations that have been canceled.
          if (data.finished)
          {
-            // Remove animation keys.
-            for (let dataCntr = data.keys.length; --dataCntr >= 0;)
-            {
-               const key = data.keys[dataCntr];
-               data.currentAnimationKeys.delete(key);
-            }
-
             AnimationManager.activeList.splice(cntr, 1);
-
             if (typeof data.resolve === 'function') { data.resolve(); }
-
             continue;
          }
 
@@ -97,12 +87,11 @@ export class AnimationManager
          // Remove this animation instance.
          if (data.current >= data.duration)
          {
-            // Prepare final update with end position data and remove keys from `currentAnimationKeys`.
+            // Prepare final update with end position data.
             for (let dataCntr = data.keys.length; --dataCntr >= 0;)
             {
                const key = data.keys[dataCntr];
                data.newData[key] = data.destination[key];
-               data.currentAnimationKeys.delete(key);
             }
 
             data.position.set(data.newData);
@@ -146,8 +135,6 @@ export class AnimationManager
       for (let cntr = AnimationManager.activeList.length; --cntr >= 0;)
       {
          const data = AnimationManager.activeList[cntr];
-
-         data.currentAnimationKeys.clear();
          data.finished = true;
          if (typeof data.resolve === 'function') { data.resolve(); }
       }
@@ -155,8 +142,6 @@ export class AnimationManager
       for (let cntr = AnimationManager.newList.length; --cntr >= 0;)
       {
          const data = AnimationManager.newList[cntr];
-
-         data.currentAnimationKeys.clear();
          data.finished = true;
          if (typeof data.resolve === 'function') { data.resolve(); }
       }
