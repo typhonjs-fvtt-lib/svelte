@@ -92,7 +92,7 @@ export class ApplicationState
     *
     * @param {Function}          [params.interpolate=lerp] - Interpolation function.
     *
-    * @returns {ApplicationData} Saved application data.
+    * @returns {ApplicationData|Promise<ApplicationData>} Saved application data.
     */
    restore({ name, remove = false, async = false, animateTo = false, duration = 0.1, ease = linear,
     interpolate = lerp })
@@ -108,7 +108,14 @@ export class ApplicationState
       {
          if (remove) { this.#dataSaved.delete(name); }
 
-         this.set(dataSaved, { async, animateTo, duration, ease, interpolate });
+         if (async)
+         {
+            return this.set(dataSaved, { async, animateTo, duration, ease, interpolate }).then(() => dataSaved);
+         }
+         else
+         {
+            this.set(dataSaved, { async, animateTo, duration, ease, interpolate });
+         }
       }
 
       return dataSaved;
