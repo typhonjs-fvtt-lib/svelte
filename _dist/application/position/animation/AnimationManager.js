@@ -149,22 +149,6 @@ export class AnimationManager
       AnimationManager.activeList.length = 0;
       AnimationManager.newList.length = 0;
    }
-
-   /**
-    * Animates one or more Position instances as a group.
-    *
-    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} data -
-    *
-    * @param {object|Function}   positionData -
-    *
-    * @param {object|Function}   options -
-    *
-    * @returns {TJSBasicAnimation} Basic animation control.
-    */
-   static to(data, positionData, options)
-   {
-      return void 0;
-   }
 }
 
 // Start animation manager immediately. It constantly is running in background.

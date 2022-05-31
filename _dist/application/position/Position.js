@@ -6,11 +6,11 @@ import {
    subscribeIgnoreFirst }        from '@typhonjs-fvtt/svelte/store';
 import {
    isIterable,
+   isObject,
    isPlainObject }               from '@typhonjs-fvtt/svelte/util';
 
 import { AnimationControl }      from './animation/AnimationControl.js';
 import { AnimationManager }      from './animation/AnimationManager.js';
-import { AnimationPublicAPI }    from './animation/AnimationPublicAPI.js';
 import * as constants            from './constants.js';
 import * as positionInitial      from './initial/index.js';
 import { PositionChangeSet }     from './PositionChangeSet.js';
@@ -22,6 +22,8 @@ import * as positionValidators   from './validators/index.js';
 import { Transforms }            from './transform/Transforms.js';
 import { UpdateElementData }     from './update/UpdateElementData.js';
 import { UpdateElementManager }  from './update/UpdateElementManager.js';
+
+import { AnimationGroupControl } from "./animation/AnimationGroupControl.js";
 
 /**
  * Provides a store for position following the subscriber protocol in addition to providing individual writable derived
@@ -1513,6 +1515,125 @@ const s_VALIDATION_DATA = {
 };
 
 Object.seal(s_VALIDATION_DATA);
+
+/**
+ * Provides a public API for AnimationManager.
+ */
+class AnimationPublicAPI
+{
+   /**
+    * Cancels any animation for given Position data.
+    *
+    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} data -
+    */
+   static cancel(data) { AnimationManager.cancel(data); }
+
+   /**
+    * Cancels all Position animation.
+    */
+   static cancelAll() { AnimationManager.cancelAll(); }
+
+   /**
+    * Animates one or more Position instances as a group.
+    *
+    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} data -
+    *
+    * @param {object|Function}   positionData -
+    *
+    * @param {object|Function}   options -
+    *
+    * @returns {TJSBasicAnimation} Basic animation control.
+    */
+   static to(data, positionData, options)
+   {
+      if (!isObject(positionData) && typeof positionData !== 'function')
+      {
+         throw new TypeError(`AnimationManager.to error: 'positionData' is not an object or function.`);
+      }
+
+      if (options !== void 0 && !isObject(options))
+      {
+         throw new TypeError(`AnimationManager.to error: 'options' is not an object.`);
+      }
+
+      /**
+       * @type {AnimationControl[]}
+       */
+      const animationControls = [];
+
+      // If positionData is a function invoke it w/ the current Position instance and position data to retrieve a unique
+      // positionData object. If null / undefined is returned this entry is ignored.
+      if (typeof positionData === 'function')
+      {
+         let index = 0;
+
+         const callbackOptions = {
+            index,
+            position: void 0,
+            data: void 0
+         };
+
+         const populateData = (position, entry) =>
+         {
+            callbackOptions.index = index++;
+            callbackOptions.position = position;
+            callbackOptions.data = entry instanceof Position ? void 0 : entry;
+
+            const finalPositionData = positionData(callbackOptions);
+
+            if (typeof finalPositionData !== 'object')
+            {
+               throw new TypeError(`AnimationManager.to error: positionData callback function iteration(${
+                index - 1}) failed to return an object.`);
+            }
+
+            return finalPositionData;
+         };
+
+         if (isIterable(data))
+         {
+            for (const entry of data)
+            {
+               const position = entry instanceof Position ? entry : entry.position;
+
+               // TODO: Add error checking for Position instance.
+
+               animationControls.push(position.animateTo(populateData(position, entry), options));
+            }
+         }
+         else
+         {
+            const position = data instanceof Position ? data : data.position;
+
+            // TODO: Add error checking for Position instance.
+
+            animationControls.push(position.animateTo(populateData(position, data), options));
+         }
+      }
+      else if (isObject(positionData))
+      {
+         if (isIterable(data))
+         {
+            for (const entry of data)
+            {
+               const position = entry instanceof Position ? entry : entry.position;
+
+               animationControls.push(position.animateTo(positionData, options));
+            }
+         }
+         else
+         {
+            const position = data instanceof Position ? data : data.position;
+
+            animationControls.push(position.animateTo(positionData, options));
+         }
+
+         // s_VALIDATE_GSAPDATA_ENTRY(gsapData);
+      }
+
+      return new AnimationGroupControl(animationControls);
+   }
+}
 
 /**
  * @typedef {object} InitialHelper
