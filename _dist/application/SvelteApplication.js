@@ -334,7 +334,7 @@ export class SvelteApplication extends Application
       el.remove();
 
       // Silently restore any width / height state before minimized as applicable.
-      this.position.restore({
+      this.position.state.restore({
          name: '#beforeMinimized',
          properties: ['width', 'height'],
          silent: true,
@@ -552,7 +552,12 @@ export class SvelteApplication extends Application
       // First animate / restore width / async.
       if (animate)
       {
-         await this.position.restore({ name: '#beforeMinimized', async: true, animateTo: true, properties: ['width'] });
+         await this.position.state.restore({
+            name: '#beforeMinimized',
+            async: true,
+            animateTo: true,
+            properties: ['width']
+         });
       }
 
       // Reset display none on all children of header.
@@ -566,7 +571,7 @@ export class SvelteApplication extends Application
       {
          // Next animate / restore height synchronously and remove key. Retrieve constraints data for slide up animation
          // below.
-         ({ constraints } = this.position.restore({
+         ({ constraints } = this.position.state.restore({
             name: '#beforeMinimized',
             animateTo: true,
             properties: ['height'],
@@ -576,7 +581,7 @@ export class SvelteApplication extends Application
       }
       else
       {
-         ({ constraints } = this.position.remove({ name: '#beforeMinimized' }));
+         ({ constraints } = this.position.state.remove({ name: '#beforeMinimized' }));
       }
 
       // Slide down content with stored constraints.
@@ -662,7 +667,7 @@ export class SvelteApplication extends Application
       }
 
       // Save current position state and add the constraint data to use in `maximize`.
-      this.position.save({ name: '#beforeMinimized', constraints });
+      this.position.state.save({ name: '#beforeMinimized', constraints });
 
       const headerOffsetHeight = header.offsetHeight;
 
@@ -803,9 +808,9 @@ export class SvelteApplication extends Application
     * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
     * to update to using the {@link Position.validators} functionality.
     *
-    * @param {PositionData}   [position] - Position data.
+    * @param {PositionDataExtended}   [position] - Position data.
     *
-    * @returns {PositionData} The updated position object for the application containing the new values
+    * @returns {Position} The updated position object for the application containing the new values
     */
    setPosition(position)
    {

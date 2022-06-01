@@ -8,6 +8,18 @@ import { AnimationManager }   from './AnimationManager.js';
 
 export class AnimationAPI
 {
+   /** @type {PositionData} */
+   #data;
+
+   /** @type {Position} */
+   #position;
+
+   constructor(position, data)
+   {
+      this.#position = position;
+      this.#data = data;
+   }
+
    /**
     * Provides animation
     *
@@ -23,12 +35,14 @@ export class AnimationAPI
     *
     * @returns {TJSBasicAnimation}  A control object that can cancel animation and provides a `finished` Promise.
     */
-   static to(position, parent, data, toData, { duration = 1, ease = linear, interpolate = lerp } = {})
+   to(toData, { duration = 1, ease = linear, interpolate = lerp } = {})
    {
       if (!isObject(toData))
       {
-         throw new TypeError(`Position - animateTo error: 'toData' is not an object.`);
+         throw new TypeError(`Position.animate.to error: 'toData' is not an object.`);
       }
+
+      const parent = this.#position.parent;
 
       // Early out if the application is not positionable.
       if (parent !== void 0 && typeof parent?.options?.positionable === 'boolean' && !parent?.options?.positionable)
@@ -43,21 +57,23 @@ export class AnimationAPI
 
       if (!Number.isFinite(duration) || duration < 0)
       {
-         throw new TypeError(`Position - animateTo error: 'duration' is not a positive number.`);
+         throw new TypeError(`Position.animate.to error: 'duration' is not a positive number.`);
       }
 
       if (typeof ease !== 'function')
       {
-         throw new TypeError(`Position - animateTo error: 'ease' is not a function.`);
+         throw new TypeError(`Position.animate.to error: 'ease' is not a function.`);
       }
 
       if (typeof interpolate !== 'function')
       {
-         throw new TypeError(`Position - animateTo error: 'interpolate' is not a function.`);
+         throw new TypeError(`Position.animate.to error: 'interpolate' is not a function.`);
       }
 
       const initial = {};
       const destination = {};
+
+      const data = this.#data;
 
       // Set initial data if the key / data is defined and the end position is not equal to current data.
       for (const key in toData)
@@ -109,7 +125,7 @@ export class AnimationAPI
          interpolate,
          keys,
          newData,
-         position,
+         position: this.#position,
          resolve: void 0,
          start: void 0
       };

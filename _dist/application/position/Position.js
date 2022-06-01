@@ -1,9 +1,7 @@
-import { linear }                from 'svelte/easing';
-
-import { lerp }                  from '@typhonjs-fvtt/svelte/math';
 import {
    propertyStore,
    subscribeIgnoreFirst }        from '@typhonjs-fvtt/svelte/store';
+
 import {
    isIterable,
    isObject,
@@ -16,6 +14,7 @@ import * as constants            from './constants.js';
 import * as positionInitial      from './initial/index.js';
 import { PositionChangeSet }     from './PositionChangeSet.js';
 import { PositionData }          from './PositionData.js';
+import { PositionStateAPI }      from './PositionStateAPI.js';
 import { StyleCache }            from './StyleCache.js';
 import { TransformData }         from './transform/TransformData.js';
 import { AdapterValidators }     from './validators/AdapterValidators.js';
@@ -36,19 +35,11 @@ export class Position
    #data = new PositionData();
 
    /**
-    * @type {Map<string, PositionData>}
+    * Provides the animation API.
+    *
+    * @type {AnimationAPI}
     */
-   #dataSaved = new Map();
-
-   /**
-    * @type {PositionData}
-    */
-   #defaultData;
-
-   // TODO document
-   #animate = {
-      to: (toData, options) => AnimationAPI.to(this, this.#parent, this.#data, toData, options)
-   };
+   #animate = new AnimationAPI(this, this.#data);
 
    /**
     * Stores the style attributes that changed on update.
@@ -121,6 +112,11 @@ export class Position
     * @type {ValidatorData[]}
     */
    #validatorData;
+
+   /**
+    * @type {PositionStateAPI}
+    */
+   #state = new PositionStateAPI(this, this.#data, this.#transforms);
 
    /**
     * @returns {AnimationGroupAPI} Public Animation API.
@@ -364,6 +360,11 @@ export class Position
       }
    }
 
+   /**
+    * Returns the animation API.
+    *
+    * @returns {AnimationAPI} Animation API.
+    */
    get animate()
    {
       return this.#animate;
@@ -407,6 +408,13 @@ export class Position
    get parent() { return this.#parent; }
 
    /**
+    * Returns the state API.
+    *
+    * @returns {PositionStateAPI} Position state API.
+    */
+   get state() { return this.#state; }
+
+   /**
     * Returns the derived writable stores for individual data variables.
     *
     * @returns {StorePosition} Derived / writable stores.
@@ -440,7 +448,7 @@ export class Position
       this.#parent = parent;
 
       // Reset any stored default data & the style cache.
-      this.#defaultData = void 0;
+      this.#state.remove({ name: '#defaultData' });
       this.#styleCache.reset();
 
       this.set(this.#data);
@@ -717,180 +725,11 @@ export class Position
    }
 
    /**
-    * Returns any stored save state by name.
-    *
-    * @param {string}   name - Saved data set name.
-    *
-    * @returns {PositionData} The saved data set.
-    */
-   getSave({ name })
-   {
-      if (typeof name !== 'string') { throw new TypeError(`Position - getSave error: 'name' is not a string.`); }
-
-      return this.#dataSaved.get(name);
-   }
-
-   /**
     * @returns {PositionData} Current position data.
     */
    toJSON()
    {
       return Object.assign({}, this.#data);
-   }
-
-   /**
-    * Resets data to default values and invokes set. Check options, but by default current z-index is maintained.
-    *
-    * @param {object}   [opts] - Optional parameters.
-    *
-    * @param {boolean}  [opts.keepZIndex=false] - When true keeps current z-index.
-    *
-    * @param {boolean}  [opts.invokeSet=true] - When true invokes set method.
-    *
-    * @returns {boolean} Operation successful.
-    */
-   reset({ keepZIndex = false, invokeSet = true } = {})
-   {
-      if (typeof this.#defaultData !== 'object') { return false; }
-
-      const zIndex = this.#data.zIndex;
-
-      const data = Object.assign({}, this.#defaultData);
-
-      if (keepZIndex) { data.zIndex = zIndex; }
-
-      // Reset the transform data.
-      this.#transforms.reset(data);
-
-      // If current minimized invoke `maximize`.
-      if (this.#parent?.reactive?.minimized) { this.#parent?.maximize?.({ animate: false, duration: 0 }); }
-
-      if (invokeSet) { this.set(data); }
-
-      return true;
-   }
-
-   /**
-    * Removes and returns any position state by name.
-    *
-    * @param {object}   options - Options.
-    *
-    * @param {string}   options.name - Name to remove and retrieve.
-    *
-    * @returns {PositionData} Saved position data.
-    */
-   remove({ name })
-   {
-      if (typeof name !== 'string') { throw new TypeError(`Position - remove: 'name' is not a string.`); }
-
-      const data = this.#dataSaved.get(name);
-      this.#dataSaved.delete(name);
-
-      return data;
-   }
-
-   /**
-    * Restores a saved positional state returning the data. Several optional parameters are available
-    * to control whether the restore action occurs silently (no store / inline styles updates), animates
-    * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
-    * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
-    * returned if awaiting the end of the animation.
-    *
-    * @param {object}            params - Parameters
-    *
-    * @param {string}            params.name - Saved data set name.
-    *
-    * @param {boolean}           [params.remove=false] - Remove data set.
-    *
-    * @param {Iterable<string>}  [params.properties] - Specific properties to set / animate.
-    *
-    * @param {boolean}           [params.silent] - Set position data directly; no store or style updates.
-    *
-    * @param {boolean}           [params.async=false] - If animating return a Promise that resolves with any saved data.
-    *
-    * @param {boolean}           [params.animateTo=false] - Animate to restore data.
-    *
-    * @param {number}            [params.duration=0.1] - Duration in seconds.
-    *
-    * @param {Function}          [params.ease=linear] - Easing function.
-    *
-    * @param {Function}          [params.interpolate=lerp] - Interpolation function.
-    *
-    * @returns {PositionDataExtended|Promise<PositionDataExtended>} Saved position data.
-    */
-   restore({ name, remove = false, properties, silent = false, async = false, animateTo = false, duration = 0.1,
-    ease = linear, interpolate = lerp })
-   {
-      if (typeof name !== 'string') { throw new TypeError(`Position - restore error: 'name' is not a string.`); }
-
-      const dataSaved = this.#dataSaved.get(name);
-
-      if (dataSaved)
-      {
-         if (remove) { this.#dataSaved.delete(name); }
-
-         let data = dataSaved;
-
-         if (isIterable(properties))
-         {
-            data = {};
-            for (const property of properties) { data[property] = dataSaved[property]; }
-         }
-
-         // Update data directly with no store or inline style updates.
-         if (silent)
-         {
-            for (const property in data) { this.#data[property] = data[property]; }
-            return dataSaved;
-         }
-         else if (animateTo)  // Animate to saved data.
-         {
-            // Provide special handling to potentially change transform origin as this parameter is not animated.
-            if (data.transformOrigin !== this.transformOrigin)
-            {
-               this.transformOrigin = data.transformOrigin;
-            }
-
-            // Return a Promise with saved data that resolves after animation ends.
-            if (async)
-            {
-               return this.animate.to(data, { duration, ease, interpolate }).finished.then(() => dataSaved);
-            }
-            else  // Animate synchronously.
-            {
-               this.animate.to(data, { duration, ease, interpolate });
-            }
-         }
-         else
-         {
-            // Default options is to set data for an immediate update.
-            this.set(data);
-         }
-      }
-
-      return dataSaved;
-   }
-
-   /**
-    * Saves current position state with the opportunity to add extra data to the saved state.
-    *
-    * @param {object}   options - Options.
-    *
-    * @param {string}   options.name - name to index this saved data.
-    *
-    * @param {...*}     [options.extra] - Extra data to add to saved data.
-    *
-    * @returns {PositionData} Current position data
-    */
-   save({ name, ...extra })
-   {
-      if (typeof name !== 'string') { throw new TypeError(`Position - save error: 'name' is not a string.`); }
-
-      const data = this.get(extra);
-
-      this.#dataSaved.set(name, data);
-
-      return data;
    }
 
    /**
@@ -919,8 +758,6 @@ export class Position
    set(position = {})
    {
       if (typeof position !== 'object') { throw new TypeError(`Position - set error: 'position' is not an object.`); }
-
-// console.log(`! Position - set - top: ${ position.top }; left: ${ position.left }`)
 
       const parent = this.#parent;
 
@@ -1108,8 +945,13 @@ export class Position
 
       if (el)
       {
+         const defaultData = this.#state.getDefault();
+
          // Set default data after first set operation that has a target element.
-         if (typeof this.#defaultData !== 'object') { this.#defaultData = Object.assign({}, data); }
+         if (typeof defaultData !== 'object')
+         {
+            this.#state.save({ name: '#defaultData', ...Object.assign({}, data) });
+         }
 
          // If `immediateElementUpdate` is true in position data passed to `set` then update the element immediately.
          // This is for rAF based library integrations like GSAP.

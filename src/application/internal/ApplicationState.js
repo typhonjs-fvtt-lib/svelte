@@ -57,11 +57,11 @@ export class ApplicationState
     *
     * @param {string}   options.name - Name to remove and retrieve.
     *
-    * @returns {ApplicationData} Saved position data.
+    * @returns {ApplicationData} Saved application data.
     */
    remove({ name })
    {
-      if (typeof name !== 'string') { throw new TypeError(`Position - remove: 'name' is not a string.`); }
+      if (typeof name !== 'string') { throw new TypeError(`ApplicationState - remove: 'name' is not a string.`); }
 
       const data = this.#dataSaved.get(name);
       this.#dataSaved.delete(name);
@@ -130,7 +130,7 @@ export class ApplicationState
     *
     * @param {...*}     [options.extra] - Extra data to add to saved data.
     *
-    * @returns {ApplicationData} Current position data
+    * @returns {ApplicationData} Current application data
     */
    save({ name, ...extra })
    {
@@ -144,9 +144,9 @@ export class ApplicationState
    }
 
    /**
-    * Restores a saved positional state returning the data. Several optional parameters are available
+    * Restores a saved application state returning the data. Several optional parameters are available
     * to control whether the restore action occurs silently (no store / inline styles updates), animates
-    * to the stored data, or simply sets the stored data. Restoring via {@link Position.animateTo} allows
+    * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
     * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
     * returned if awaiting the end of the animation.
     *
