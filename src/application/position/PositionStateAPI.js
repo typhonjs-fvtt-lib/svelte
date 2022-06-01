@@ -164,9 +164,9 @@ export class PositionStateAPI
          else if (animateTo)  // Animate to saved data.
          {
             // Provide special handling to potentially change transform origin as this parameter is not animated.
-            if (data.transformOrigin !== this.transformOrigin)
+            if (data.transformOrigin !== this.#position.transformOrigin)
             {
-               this.transformOrigin = data.transformOrigin;
+               this.#position.transformOrigin = data.transformOrigin;
             }
 
             // Return a Promise with saved data that resolves after animation ends.
