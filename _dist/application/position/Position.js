@@ -1201,9 +1201,15 @@ export class Position
 
          s_VALIDATION_DATA.maxWidth = styleCache.maxWidth ?? currentPosition.maxWidth;
 
+         // Given a parent w/ reactive state and is minimized ignore styleCache min-width/height.
+         const isMinimized = parent?.reactive?.minimized ?? false;
+
          // Note the use of || for accessing the style cache as the left hand is ignored w/ falsy values such as '0'.
-         s_VALIDATION_DATA.minHeight = styleCache.minHeight || (currentPosition.minHeight ?? 0);
-         s_VALIDATION_DATA.minWidth = styleCache.minWidth || (currentPosition.minWidth ?? 0);
+         s_VALIDATION_DATA.minHeight = isMinimized ? currentPosition.minHeight ?? 0 :
+          styleCache.minHeight || (currentPosition.minHeight ?? 0);
+
+         s_VALIDATION_DATA.minWidth = isMinimized ? currentPosition.minWidth ?? 0 :
+          styleCache.minWidth || (currentPosition.minWidth ?? 0);
 
          for (let cntr = 0; cntr < validatorData.length; cntr++)
          {
