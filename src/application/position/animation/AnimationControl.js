@@ -26,7 +26,7 @@ export class AnimationControl
    static get voidControl() { return this.#voidControl; }
 
    /**
-    * @param {object|null} [animationData] - Animation data from {@link Position.animateTo}.
+    * @param {object|null} [animationData] - Animation data from {@link AnimationImpl.to}.
     *
     * @param {boolean}     [willFinish] - Promise that tracks animation finished state.
     */

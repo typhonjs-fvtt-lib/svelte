@@ -139,7 +139,7 @@ function draggable(node, { position, active = true, storeDragging = void 0, ease
       {
          if (tweenTo) { tweenTo.cancel(); }
 
-         tweenTo = position.animateTo({ left: newLeft, top: newTop }, easeOptions);
+         tweenTo = position.animate.to({ left: newLeft, top: newTop }, easeOptions);
       }
       else
       {

@@ -672,7 +672,7 @@ export class SvelteApplication extends Application
       if (animate)
       {
          // First await animation of height upward.
-         await this.position.animateTo({ height: headerOffsetHeight }, { duration: 0.1 }).finished;
+         await this.position.animate.to({ height: headerOffsetHeight }, { duration: 0.1 }).finished;
       }
 
       // Set all header buttons besides close and the window title to display none.
@@ -692,7 +692,7 @@ export class SvelteApplication extends Application
       if (animate)
       {
          // Await animation of width to the left / minimum width.
-         await this.position.animateTo({ width: MIN_WINDOW_WIDTH }, { duration: 0.1 }).finished;
+         await this.position.animate.to({ width: MIN_WINDOW_WIDTH }, { duration: 0.1 }).finished;
       }
 
       element.classList.add('minimized');

@@ -9,7 +9,8 @@ import {
    isObject,
    isPlainObject }               from '@typhonjs-fvtt/svelte/util';
 
-import { AnimationControl }      from './animation/AnimationControl.js';
+import { AnimationGroupControl } from './animation/AnimationGroupControl.js';
+import { AnimationImpl }         from './animation/AnimationImpl.js';
 import { AnimationManager }      from './animation/AnimationManager.js';
 import * as constants            from './constants.js';
 import * as positionInitial      from './initial/index.js';
@@ -22,8 +23,6 @@ import * as positionValidators   from './validators/index.js';
 import { Transforms }            from './transform/Transforms.js';
 import { UpdateElementData }     from './update/UpdateElementData.js';
 import { UpdateElementManager }  from './update/UpdateElementManager.js';
-
-import { AnimationGroupControl } from "./animation/AnimationGroupControl.js";
 
 /**
  * Provides a store for position following the subscriber protocol in addition to providing individual writable derived
@@ -45,6 +44,10 @@ export class Position
     * @type {PositionData}
     */
    #defaultData;
+
+   #animate = {
+      to: (toData, options) => AnimationImpl.to(this, this.#parent, this.#data, toData, options)
+   };
 
    /**
     * Stores the style attributes that changed on update.
@@ -358,6 +361,11 @@ export class Position
          if (isIterable(options?.validator)) { this.validators.add(...options.validator); }
          else { this.validators.add(options.validator); }
       }
+   }
+
+   get animate()
+   {
+      return this.#animate;
    }
 
    /**
@@ -674,129 +682,6 @@ export class Position
    }
 
    /**
-    * Provides animation
-    *
-    * @param {PositionDataExtended} toData - The destination position.
-    *
-    * @param {object}         [opts] - Optional parameters.
-    *
-    * @param {number}         [opts.duration] - Duration in seconds.
-    *
-    * @param {Function}       [opts.ease=linear] - Easing function.
-    *
-    * @param {Function}       [opts.interpolate=lerp] - Interpolation function.
-    *
-    * @returns {TJSBasicAnimation}  A control object that can cancel animation and provides a `finished` Promise.
-    */
-   animateTo(toData, { duration = 1, ease = linear, interpolate = lerp } = {})
-   {
-      if (!isObject(toData))
-      {
-         throw new TypeError(`Position - animateTo error: 'toData' is not an object.`);
-      }
-
-      // Early out if the application is not positionable.
-      const parent = this.#parent;
-      if (parent !== void 0 && typeof parent?.options?.positionable === 'boolean' && !parent?.options?.positionable)
-      {
-         return AnimationControl.voidControl;
-      }
-
-      const targetEl = parent instanceof HTMLElement ? parent : parent?.elementTarget;
-      const el = targetEl instanceof HTMLElement && targetEl.isConnected ? targetEl : void 0;
-
-      if (!el) { return AnimationControl.voidControl; }
-
-      if (!Number.isFinite(duration) || duration < 0)
-      {
-         throw new TypeError(`Position - animateTo error: 'duration' is not a positive number.`);
-      }
-
-      if (typeof ease !== 'function')
-      {
-         throw new TypeError(`Position - animateTo error: 'ease' is not a function.`);
-      }
-
-      if (typeof interpolate !== 'function')
-      {
-         throw new TypeError(`Position - animateTo error: 'interpolate' is not a function.`);
-      }
-
-      const data = this.#data;
-      const initial = {};
-      const destination = {};
-
-      // Set initial data if the key / data is defined and the end position is not equal to current data.
-      for (const key in toData)
-      {
-         if (data[key] !== void 0 && toData[key] !== data[key])
-         {
-            destination[key] = toData[key];
-            initial[key] = data[key];
-         }
-      }
-
-      // Set initial data for transform values that are often null by default.
-      if (initial.rotateX === null) { initial.rotateX = 0; }
-      if (initial.rotateY === null) { initial.rotateY = 0; }
-      if (initial.rotateZ === null) { initial.rotateZ = 0; }
-      if (initial.translateX === null) { initial.translateX = 0; }
-      if (initial.translateY === null) { initial.translateY = 0; }
-      if (initial.translateZ === null) { initial.translateZ = 0; }
-      if (initial.scale === null) { initial.scale = 1; }
-
-      if (destination.rotateX === null) { destination.rotateX = 0; }
-      if (destination.rotateY === null) { destination.rotateY = 0; }
-      if (destination.rotateZ === null) { destination.rotateZ = 0; }
-      if (destination.translateX === null) { destination.translateX = 0; }
-      if (destination.translateY === null) { destination.translateY = 0; }
-      if (destination.translateZ === null) { destination.translateZ = 0; }
-      if (destination.scale === null) { destination.scale = 1; }
-
-      // Reject all initial data that is not a number or is current animating.
-      for (const key in initial)
-      {
-         if (!Number.isFinite(initial[key])) { delete initial[key]; }
-      }
-
-      const keys = Object.keys(initial);
-      const newData = Object.assign({ immediateElementUpdate: true }, initial);
-
-      // Nothing to animate, so return now.
-      if (keys.length === 0) { return AnimationControl.voidControl; }
-
-      const animationData = {
-         current: 0,
-         destination,
-         duration: duration * 1000, // Internally the AnimationManager works in ms.
-         ease,
-         el,
-         finished: false,
-         initial,
-         interpolate,
-         keys,
-         newData,
-         position: this,
-         resolve: void 0,
-         start: void 0
-      };
-
-      AnimationManager.add(animationData);
-
-      // Schedule w/ animation manager.
-      return new AnimationControl(animationData, true);
-   }
-
-   /**
-    * @typedef {object} PositionGetOptions
-    *
-    * @property {Iterable<string>} keys - When provided only these keys are copied.
-    *
-    * @property {boolean} numeric - When true any `null` values are converted into defaults.
-    */
-
-
-   /**
     * Assigns current position to object passed into method.
     *
     * @param {object|PositionData}  [position] - Target to assign current position data.
@@ -906,7 +791,7 @@ export class Position
    /**
     * Restores a saved positional state returning the data. Several optional parameters are available
     * to control whether the restore action occurs silently (no store / inline styles updates), animates
-    * to the stored data, or simply sets the stored data. Restoring via {@link Position.animateTo} allows
+    * to the stored data, or simply sets the stored data. Restoring via {@link AnimationImpl.to} allows
     * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
     * returned if awaiting the end of the animation.
     *
@@ -968,11 +853,11 @@ export class Position
             // Return a Promise with saved data that resolves after animation ends.
             if (async)
             {
-               return this.animateTo(data, { duration, ease, interpolate }).finished.then(() => dataSaved);
+               return this.animate.to(data, { duration, ease, interpolate }).finished.then(() => dataSaved);
             }
             else  // Animate synchronously.
             {
-               this.animateTo(data, { duration, ease, interpolate });
+               this.animate.to(data, { duration, ease, interpolate });
             }
          }
          else
@@ -1620,7 +1505,7 @@ class AnimationPublicAPI
                }
             }
 
-            animationControls.push(actualPosition.animateTo(actualToData, actualOptions));
+            animationControls.push(actualPosition.animate.to(actualToData, actualOptions));
 
             index++;
          }
@@ -1664,7 +1549,7 @@ class AnimationPublicAPI
             }
          }
 
-         animationControls.push(actualPosition.animateTo(actualToData, actualOptions));
+         animationControls.push(actualPosition.animate.to(actualToData, actualOptions));
       }
 
       return new AnimationGroupControl(animationControls);
@@ -1721,6 +1606,14 @@ class AnimationPublicAPI
  * @property {boolean} [immediateElementUpdate] - When true any associated element is updated immediately.
  *
  * @property {number|null} [rotation] - Alias for `rotateZ`.
+ */
+
+/**
+ * @typedef {object} PositionGetOptions
+ *
+ * @property {Iterable<string>} keys - When provided only these keys are copied.
+ *
+ * @property {boolean} numeric - When true any `null` values are converted into defaults.
  */
 
 /**
