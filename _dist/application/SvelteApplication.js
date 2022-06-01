@@ -528,17 +528,15 @@ export class SvelteApplication extends Application
     * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
     * to animate the content area.
     *
-    * @param {object} [opts] - Optional parameters.
+    * @param {object}   [opts] - Optional parameters.
     *
     * @param {boolean}  [opts.animate=true] - When true perform default maximizing animation.
     *
-    * @param {boolean}  [opts.duration=0.1] - Controls content area animation duration in seconds.
+    * @param {number}   [opts.duration=0.1] - Controls content area animation duration in seconds.
     */
    async maximize({ animate = true, duration = 0.1 } = {})
    {
       if (!this.popOut || [false, null].includes(this._minimized)) { return; }
-
-      this.#stores.uiOptionsUpdate((options) => deepMerge(options, { minimized: false }));
 
       this._minimized = null;
 
@@ -556,7 +554,8 @@ export class SvelteApplication extends Application
             name: '#beforeMinimized',
             async: true,
             animateTo: true,
-            properties: ['width']
+            properties: ['width'],
+            duration: 0.1
          });
       }
 
@@ -576,7 +575,7 @@ export class SvelteApplication extends Application
             animateTo: true,
             properties: ['height'],
             remove: true,
-            duration: 0.1
+            duration
          }));
       }
       else
@@ -601,8 +600,10 @@ export class SvelteApplication extends Application
       element.style.minWidth = null;
       element.style.minHeight = null;
 
-      // Using a 30ms timeout prevents any instantaneous display of scrollbars with the above maximize animation.
-      setTimeout(() => content.style.overflow = null, 30);
+      // Using a 50ms timeout prevents any instantaneous display of scrollbars with the above maximize animation.
+      setTimeout(() => content.style.overflow = null, 50);
+
+      this.#stores.uiOptionsUpdate((options) => deepMerge(options, { minimized: false }));
    }
 
    /**
@@ -613,11 +614,11 @@ export class SvelteApplication extends Application
     * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
     * to animate the content area.
     *
-    * @param {object} [opts] - Optional parameters
+    * @param {object}   [opts] - Optional parameters
     *
     * @param {boolean}  [opts.animate=true] - When true perform default minimizing animation.
     *
-    * @param {boolean}  [opts.duration=0.1] - Controls content area animation duration in seconds.
+    * @param {number}   [opts.duration=0.1] - Controls content area animation duration in seconds.
     */
    async minimize({ animate = true, duration = 0.1 } = {})
    {
@@ -677,7 +678,7 @@ export class SvelteApplication extends Application
       if (animate)
       {
          // First await animation of height upward.
-         await this.position.animate.to({ height: headerOffsetHeight }, { duration: 0.1 }).finished;
+         await this.position.animate.to({ height: headerOffsetHeight }, { duration }).finished;
       }
 
       // Set all header buttons besides close and the window title to display none.
