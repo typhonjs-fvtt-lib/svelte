@@ -10,7 +10,7 @@ import {
    isPlainObject }               from '@typhonjs-fvtt/svelte/util';
 
 import { AnimationGroupControl } from './animation/AnimationGroupControl.js';
-import { AnimationImpl }         from './animation/AnimationImpl.js';
+import { AnimationAPI }         from './animation/AnimationAPI.js';
 import { AnimationManager }      from './animation/AnimationManager.js';
 import * as constants            from './constants.js';
 import * as positionInitial      from './initial/index.js';
@@ -45,8 +45,9 @@ export class Position
     */
    #defaultData;
 
+   // TODO document
    #animate = {
-      to: (toData, options) => AnimationImpl.to(this, this.#parent, this.#data, toData, options)
+      to: (toData, options) => AnimationAPI.to(this, this.#parent, this.#data, toData, options)
    };
 
    /**
@@ -122,9 +123,9 @@ export class Position
    #validatorData;
 
    /**
-    * @returns {AnimationPublicAPI} Public Animation API.
+    * @returns {AnimationGroupAPI} Public Animation API.
     */
-   static get Animate() { return AnimationPublicAPI; }
+   static get Animate() { return AnimationGroupAPI; }
 
    /**
     * @returns {{browserCentered?: Centered, Centered?: *}} Initial position helpers.
@@ -791,7 +792,7 @@ export class Position
    /**
     * Restores a saved positional state returning the data. Several optional parameters are available
     * to control whether the restore action occurs silently (no store / inline styles updates), animates
-    * to the stored data, or simply sets the stored data. Restoring via {@link AnimationImpl.to} allows
+    * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
     * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
     * returned if awaiting the end of the animation.
     *
@@ -1402,9 +1403,9 @@ const s_VALIDATION_DATA = {
 Object.seal(s_VALIDATION_DATA);
 
 /**
- * Provides a public API for AnimationManager.
+ * Provides a public API for grouping multiple animations together with the AnimationManager.
  */
-class AnimationPublicAPI
+class AnimationGroupAPI
 {
    /**
     * Cancels any animation for given Position data.
@@ -1466,7 +1467,7 @@ class AnimationPublicAPI
 
             if (!(actualPosition instanceof Position))
             {
-               console.warn(`AnimationPublicAPI.to warning: No Position instance found at index: ${index}.`);
+               console.warn(`AnimationGroupAPI.to warning: No Position instance found at index: ${index}.`);
                continue;
             }
 
@@ -1516,7 +1517,7 @@ class AnimationPublicAPI
 
          if (!(actualPosition instanceof Position))
          {
-            console.warn(`AnimationPublicAPI.to warning: No Position instance found.`);
+            console.warn(`AnimationGroupAPI.to warning: No Position instance found.`);
             return AnimationGroupControl.voidControl;
          }
 
@@ -1534,7 +1535,7 @@ class AnimationPublicAPI
             if (typeof actualToData !== 'object')
             {
                throw new TypeError(
-                `AnimationManager.to error: toData callback function failed to return an object.`);
+                `AnimationGroupAPI.to error: toData callback function failed to return an object.`);
             }
          }
 
@@ -1545,7 +1546,7 @@ class AnimationPublicAPI
             if (typeof actualOptions !== 'object')
             {
                throw new TypeError(
-                `AnimationManager.to error: options callback function failed to return an object.`);
+                `AnimationGroupAPI.to error: options callback function failed to return an object.`);
             }
          }
 

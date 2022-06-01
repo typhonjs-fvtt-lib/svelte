@@ -6,7 +6,7 @@ import { isObject }           from '@typhonjs-fvtt/svelte/util';
 import { AnimationControl }   from './AnimationControl.js';
 import { AnimationManager }   from './AnimationManager.js';
 
-export class AnimationImpl
+export class AnimationAPI
 {
    /**
     * Provides animation
