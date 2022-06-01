@@ -10,6 +10,20 @@ export class AnimationGroupControl
    #finishedPromise;
 
    /**
+    * Defines a static empty / void animation control.
+    *
+    * @type {AnimationGroupControl}
+    */
+   static #voidControl = new AnimationGroupControl(null);
+
+   /**
+    * Provides a static void / undefined AnimationGroupControl that is automatically resolved.
+    *
+    * @returns {AnimationGroupControl} Void AnimationGroupControl
+    */
+   static get voidControl() { return this.#voidControl; }
+
+   /**
     * @param {AnimationControl[]} animationControls - An array of AnimationControl instances.
     */
    constructor(animationControls)

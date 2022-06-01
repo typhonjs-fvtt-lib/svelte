@@ -121,7 +121,7 @@ export class Position
    /**
     * @returns {AnimationPublicAPI} Public Animation API.
     */
-   static get Animation() { return AnimationPublicAPI; }
+   static get Animate() { return AnimationPublicAPI; }
 
    /**
     * @returns {{browserCentered?: Centered, Centered?: *}} Initial position helpers.
@@ -676,7 +676,7 @@ export class Position
    /**
     * Provides animation
     *
-    * @param {PositionDataExtended} position - The destination position.
+    * @param {PositionDataExtended} toData - The destination position.
     *
     * @param {object}         [opts] - Optional parameters.
     *
@@ -688,11 +688,11 @@ export class Position
     *
     * @returns {TJSBasicAnimation}  A control object that can cancel animation and provides a `finished` Promise.
     */
-   animateTo(position, { duration = 1, ease = linear, interpolate = lerp } = {})
+   animateTo(toData, { duration = 1, ease = linear, interpolate = lerp } = {})
    {
-      if (typeof position !== 'object')
+      if (!isObject(toData))
       {
-         throw new TypeError(`Position - animateTo error: 'position' is not an object.`);
+         throw new TypeError(`Position - animateTo error: 'toData' is not an object.`);
       }
 
       // Early out if the application is not positionable.
@@ -727,11 +727,11 @@ export class Position
       const destination = {};
 
       // Set initial data if the key / data is defined and the end position is not equal to current data.
-      for (const key in position)
+      for (const key in toData)
       {
-         if (data[key] !== void 0 && position[key] !== data[key])
+         if (data[key] !== void 0 && toData[key] !== data[key])
          {
-            destination[key] = position[key];
+            destination[key] = toData[key];
             initial[key] = data[key];
          }
       }
@@ -1536,24 +1536,24 @@ class AnimationPublicAPI
    /**
     * Animates one or more Position instances as a group.
     *
-    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} data -
+    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
     *
-    * @param {object|Function}   positionData -
+    * @param {object|Function}   toData -
     *
     * @param {object|Function}   options -
     *
     * @returns {TJSBasicAnimation} Basic animation control.
     */
-   static to(data, positionData, options)
+   static to(position, toData, options)
    {
-      if (!isObject(positionData) && typeof positionData !== 'function')
+      if (!isObject(toData) && typeof toData !== 'function')
       {
-         throw new TypeError(`AnimationManager.to error: 'positionData' is not an object or function.`);
+         throw new TypeError(`AnimationManager.to error: 'toData' is not an object or function.`);
       }
 
-      if (options !== void 0 && !isObject(options))
+      if (options !== void 0 && !isObject(options) && typeof options !== 'function')
       {
-         throw new TypeError(`AnimationManager.to error: 'options' is not an object.`);
+         throw new TypeError(`AnimationManager.to error: 'options' is not an object or function.`);
       }
 
       /**
@@ -1561,74 +1561,110 @@ class AnimationPublicAPI
        */
       const animationControls = [];
 
-      // If positionData is a function invoke it w/ the current Position instance and position data to retrieve a unique
-      // positionData object. If null / undefined is returned this entry is ignored.
-      if (typeof positionData === 'function')
+      let index = 0;
+      let callbackOptions;
+
+      const hasDataCallback = typeof toData === 'function';
+      const hasOptionCallback = typeof options === 'function';
+      const hasCallback = hasDataCallback || hasOptionCallback;
+
+      if (hasCallback) { callbackOptions = { index, position: void 0, data: void 0 }; }
+
+      let actualToData = toData;
+      let actualOptions = options;
+
+      if (isIterable(position))
       {
-         let index = 0;
+         for (const entry of position)
+         {
+            const actualPosition = entry instanceof Position ? entry : entry.position;
 
-         const callbackOptions = {
-            index,
-            position: void 0,
-            data: void 0
-         };
+            if (!(actualPosition instanceof Position))
+            {
+               console.warn(`AnimationPublicAPI.to warning: No Position instance found at index: ${index}.`);
+               continue;
+            }
 
-         const populateData = (position, entry) =>
+            if (hasCallback)
+            {
+               callbackOptions.index = index;
+               callbackOptions.position = position;
+               callbackOptions.data = entry instanceof Position ? void 0 : entry;
+            }
+
+            if (hasDataCallback)
+            {
+               actualToData = toData(callbackOptions);
+
+               // Returned data from callback is null / undefined, so skip this position instance.
+               if (actualToData === null || actualToData === void 0) { continue; }
+
+               if (typeof actualToData !== 'object')
+               {
+                  throw new TypeError(`AnimationManager.to error: toData callback function iteration(${
+                   index}) failed to return an object.`);
+               }
+            }
+
+            if (hasOptionCallback)
+            {
+               actualOptions = options(callbackOptions);
+
+               // Returned data from callback is null / undefined, so skip this position instance.
+               if (actualOptions === null || actualOptions === void 0) { continue; }
+
+               if (typeof actualOptions !== 'object')
+               {
+                  throw new TypeError(`AnimationManager.to error: options callback function iteration(${
+                   index}) failed to return an object.`);
+               }
+            }
+
+            animationControls.push(actualPosition.animateTo(actualToData, actualOptions));
+
+            index++;
+         }
+      }
+      else
+      {
+         const actualPosition = position instanceof Position ? position : position.position;
+
+         if (!(actualPosition instanceof Position))
+         {
+            console.warn(`AnimationPublicAPI.to warning: No Position instance found.`);
+            return AnimationGroupControl.voidControl;
+         }
+
+         if (hasCallback)
          {
             callbackOptions.index = index++;
             callbackOptions.position = position;
-            callbackOptions.data = entry instanceof Position ? void 0 : entry;
+            callbackOptions.data = position instanceof Position ? void 0 : position;
+         }
 
-            const finalPositionData = positionData(callbackOptions);
-
-            if (typeof finalPositionData !== 'object')
-            {
-               throw new TypeError(`AnimationManager.to error: positionData callback function iteration(${
-                index - 1}) failed to return an object.`);
-            }
-
-            return finalPositionData;
-         };
-
-         if (isIterable(data))
+         if (hasDataCallback)
          {
-            for (const entry of data)
+            actualToData = toData(callbackOptions);
+
+            if (typeof actualToData !== 'object')
             {
-               const position = entry instanceof Position ? entry : entry.position;
-
-               // TODO: Add error checking for Position instance.
-
-               animationControls.push(position.animateTo(populateData(position, entry), options));
+               throw new TypeError(
+                `AnimationManager.to error: toData callback function failed to return an object.`);
             }
          }
-         else
-         {
-            const position = data instanceof Position ? data : data.position;
 
-            // TODO: Add error checking for Position instance.
-
-            animationControls.push(position.animateTo(populateData(position, data), options));
-         }
-      }
-      else if (isObject(positionData))
-      {
-         if (isIterable(data))
+         if (hasOptionCallback)
          {
-            for (const entry of data)
+            actualOptions = options(callbackOptions);
+
+            if (typeof actualOptions !== 'object')
             {
-               const position = entry instanceof Position ? entry : entry.position;
-
-               animationControls.push(position.animateTo(positionData, options));
+               throw new TypeError(
+                `AnimationManager.to error: options callback function failed to return an object.`);
             }
          }
-         else
-         {
-            const position = data instanceof Position ? data : data.position;
 
-            animationControls.push(position.animateTo(positionData, options));
-         }
-
-         // s_VALIDATE_GSAPDATA_ENTRY(gsapData);
+         animationControls.push(actualPosition.animateTo(actualToData, actualOptions));
       }
 
       return new AnimationGroupControl(animationControls);
