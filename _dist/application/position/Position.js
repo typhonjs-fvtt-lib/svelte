@@ -1258,9 +1258,42 @@ class AnimationGroupAPI
    /**
     * Cancels any animation for given Position data.
     *
-    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} data -
+    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
     */
-   static cancel(data) { AnimationManager.cancel(data); }
+   static cancel(position)
+   {
+      if (isIterable(position))
+      {
+         let index = 0;
+
+         for (const entry of position)
+         {
+            const actualPosition = entry instanceof Position ? entry : entry.position;
+
+            if (!(actualPosition instanceof Position))
+            {
+               console.warn(`AnimationGroupAPI.cancel warning: No Position instance found at index: ${index}.`);
+               continue;
+            }
+
+            AnimationManager.cancel(actualPosition);
+
+            index++;
+         }
+      }
+      else
+      {
+         const actualPosition = position instanceof Position ? position : position.position;
+
+         if (!(actualPosition instanceof Position))
+         {
+            console.warn(`AnimationGroupAPI.cancel warning: No Position instance found.`);
+            return;
+         }
+
+         AnimationManager.cancel(actualPosition);
+      }
+   }
 
    /**
     * Cancels all Position animation.
