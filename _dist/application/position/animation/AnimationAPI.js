@@ -38,11 +38,11 @@ export class AnimationAPI
    }
 
    /**
-    * Returns whether there are active animation instances for this Position.
+    * Returns whether there are scheduled animations whether active or delayed for this Position.
     *
     * @returns {boolean} Are there active animation instances.
     */
-   get isActive()
+   get isScheduled()
    {
       return this.#instanceCount > 0;
    }
@@ -65,6 +65,7 @@ export class AnimationAPI
       this.#instanceCount--;
 
       data.active = false;
+      data.finished = true;
 
       if (typeof data.resolve === 'function') { data.resolve(data.cancelled); }
    }
@@ -179,6 +180,7 @@ export class AnimationAPI
          duration: duration * 1000, // Internally the AnimationManager works in ms.
          ease,
          el,
+         finished: false,
          initial,
          interpolate,
          keys,
@@ -326,6 +328,7 @@ export class AnimationAPI
          duration: duration * 1000, // Internally the AnimationManager works in ms.
          ease,
          el,
+         finished: false,
          initial,
          interpolate,
          keys,

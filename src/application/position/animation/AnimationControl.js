@@ -55,9 +55,19 @@ export class AnimationControl
    /**
     * Returns whether this animation is currently active / animating.
     *
+    * Note: a delayed animation may not be started / active yet. Use {@link AnimationControl.isFinished} to determine
+    * if an animation is actually finished.
+    *
     * @returns {boolean} Animation active state.
     */
    get isActive() { return this.#animationData.active; }
+
+   /**
+    * Returns whether this animation is completely finished.
+    *
+    * @returns {boolean} Animation finished state.
+    */
+   get isFinished() { return this.#animationData.finished; }
 
    /**
     * Cancels the animation.

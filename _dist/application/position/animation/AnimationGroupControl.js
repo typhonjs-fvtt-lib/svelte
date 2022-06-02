@@ -59,6 +59,9 @@ export class AnimationGroupControl
    /**
     * Returns whether there are active animation instances for this group.
     *
+    * Note: a delayed animation may not be started / active yet. Use {@link AnimationGroupControl.isFinished} to
+    * determine if all animations in the group are finished.
+    *
     * @returns {boolean} Are there active animation instances.
     */
    get isActive()
@@ -70,6 +73,25 @@ export class AnimationGroupControl
       for (let cntr = animationControls.length; --cntr >= 0;)
       {
          if (animationControls[cntr].isActive) { return true; }
+      }
+
+      return false;
+   }
+
+   /**
+    * Returns whether all animations in the group are finished.
+    *
+    * @returns {boolean} Are all animation instances finished.
+    */
+   get isFinished()
+   {
+      const animationControls = this.#animationControls;
+
+      if (animationControls === null || animationControls === void 0) { return true; }
+
+      for (let cntr = animationControls.length; --cntr >= 0;)
+      {
+         if (!animationControls[cntr].isFinished) { return false; }
       }
 
       return false;
