@@ -34,6 +34,12 @@ export class AnimationControl
    {
       this.#animationData = animationData;
       this.#willFinish = willFinish;
+
+      // Set this control to animation data.
+      if (animationData !== null && typeof animationData === 'object')
+      {
+         animationData.control = this;
+      }
    }
 
    /**

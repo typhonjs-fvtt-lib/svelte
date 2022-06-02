@@ -71,6 +71,16 @@ export class AnimationAPI
    }
 
    /**
+    * Returns all currently scheduled AnimationControl instances for this Position instance.
+    *
+    * @returns {AnimationControl[]} All currently scheduled animation controls for this Position instance.
+    */
+   getScheduled()
+   {
+      return AnimationManager.getScheduled(this.#position);
+   }
+
+   /**
     * Provides a tween from given position data to the current position.
     *
     * @param {PositionDataExtended} fromData - The starting position.
@@ -175,6 +185,7 @@ export class AnimationAPI
          active: true,
          cleanup: this.#cleanup,
          cancelled: false,
+         control: void 0,
          current: 0,
          destination,
          duration: duration * 1000, // Internally the AnimationManager works in ms.
@@ -323,6 +334,7 @@ export class AnimationAPI
          active: true,
          cleanup: this.#cleanup,
          cancelled: false,
+         control: void 0,
          current: 0,
          destination,
          duration: duration * 1000, // Internally the AnimationManager works in ms.

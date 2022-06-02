@@ -1301,6 +1301,58 @@ class AnimationGroupAPI
    static cancelAll() { AnimationManager.cancelAll(); }
 
    /**
+    * Gets all animation controls for the given position data.
+    *
+    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+    *
+    * @returns {{position: Position, data: object|void, controls: AnimationControl[]}[]} Results array.
+    */
+   static getScheduled(position)
+   {
+      const results = [];
+
+      if (isIterable(position))
+      {
+         let index = 0;
+
+         for (const entry of position)
+         {
+            const isPosition = entry instanceof Position;
+            const actualPosition = isPosition ? entry : entry.position;
+
+            if (!(actualPosition instanceof Position))
+            {
+               console.warn(`AnimationGroupAPI.getScheduled warning: No Position instance found at index: ${index}.`);
+               continue;
+            }
+
+            const controls = AnimationManager.getScheduled(actualPosition);
+
+            results.push({ position: actualPosition, data: isPosition ? void 0 : entry, controls });
+
+            index++;
+         }
+      }
+      else
+      {
+         const isPosition = position instanceof Position;
+         const actualPosition = isPosition ? position : position.position;
+
+         if (!(actualPosition instanceof Position))
+         {
+            console.warn(`AnimationGroupAPI.getScheduled warning: No Position instance found.`);
+            return results;
+         }
+
+         const controls = AnimationManager.getScheduled(actualPosition);
+
+         results.push({ position: actualPosition, data: isPosition ? void 0 : position, controls });
+      }
+
+      return results;
+   }
+
+   /**
     * Animates one or more Position instances as a group.
     *
     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -

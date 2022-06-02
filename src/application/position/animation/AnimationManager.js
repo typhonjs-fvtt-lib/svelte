@@ -174,6 +174,38 @@ export class AnimationManager
       AnimationManager.activeList.length = 0;
       AnimationManager.newList.length = 0;
    }
+
+   /**
+    * Gets all {@link AnimationControl} instances for a given Position instance.
+    *
+    * @param {Position} position - Position instance.
+    *
+    * @returns {AnimationControl[]} All scheduled AnimationControl instances for the given Position instance.
+    */
+   static getScheduled(position)
+   {
+      const results = [];
+
+      for (let cntr = AnimationManager.activeList.length; --cntr >= 0;)
+      {
+         const data = AnimationManager.activeList[cntr];
+         if (data.position === position)
+         {
+            results.push(data.control);
+         }
+      }
+
+      for (let cntr = AnimationManager.newList.length; --cntr >= 0;)
+      {
+         const data = AnimationManager.newList[cntr];
+         if (data.position === position)
+         {
+            results.push(data.control);
+         }
+      }
+
+      return results;
+   }
 }
 
 // Start animation manager immediately. It constantly is running in background.
