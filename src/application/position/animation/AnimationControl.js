@@ -53,6 +53,13 @@ export class AnimationControl
    }
 
    /**
+    * Returns whether this animation is active.
+    *
+    * @returns {boolean} Animation active state.
+    */
+   get isActive() { return this.#animationData.active; }
+
+   /**
     * Cancels the animation.
     */
    cancel()

@@ -57,6 +57,25 @@ export class AnimationGroupControl
    }
 
    /**
+    * Returns whether there are active animation instances for this group.
+    *
+    * @returns {boolean} Are there active animation instances.
+    */
+   get isActive()
+   {
+      const animationControls = this.#animationControls;
+
+      if (animationControls === null || animationControls === void 0) { return false; }
+
+      for (let cntr = animationControls.length; --cntr >= 0;)
+      {
+         if (animationControls[cntr].isActive) { return true; }
+      }
+
+      return false;
+   }
+
+   /**
     * Cancels the all animations.
     */
    cancel()

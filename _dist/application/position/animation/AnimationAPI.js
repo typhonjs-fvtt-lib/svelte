@@ -64,6 +64,8 @@ export class AnimationAPI
    {
       this.#instanceCount--;
 
+      data.active = false;
+
       if (typeof data.resolve === 'function') { data.resolve(data.cancelled); }
    }
 
@@ -162,6 +164,7 @@ export class AnimationAPI
       if (keys.length === 0) { return AnimationControl.voidControl; }
 
       const animationData = {
+         active: true,
          cleanup: this.#cleanup,
          cancelled: false,
          current: 0,
