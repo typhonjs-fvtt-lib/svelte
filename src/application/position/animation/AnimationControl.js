@@ -53,7 +53,7 @@ export class AnimationControl
    }
 
    /**
-    * Returns whether this animation is active.
+    * Returns whether this animation is currently active / animating.
     *
     * @returns {boolean} Animation active state.
     */

@@ -190,30 +190,27 @@ export class AnimationAPI
 
       if (delay > 0)
       {
+         animationData.active = false;
+
          // Delay w/ setTimeout and schedule w/ AnimationManager if not already canceled
          setTimeout(() =>
          {
             if (!animationData.cancelled)
             {
-               this.#instanceCount++;
-               AnimationManager.add(animationData);
-            }
-            else
-            {
-               // Need to increment instanceCount even though it was cancelled as cleanupInstance will decrement the
-               // count.
-               this.#instanceCount++;
+               animationData.active = true;
 
-               this.#cleanupInstance(animationData);
+               const now = performance.now();
+
+               // Offset start time by delta between last rAF time. This allows a delayed tween to start from the
+               // precise delayed time.
+               animationData.start = now + (AnimationManager.current - now);
             }
          }, delay * 1000);
       }
-      else
-      {
-         // Schedule immediately w/ AnimationManager
-         this.#instanceCount++;
-         AnimationManager.add(animationData);
-      }
+
+      // Schedule immediately w/ AnimationManager
+      this.#instanceCount++;
+      AnimationManager.add(animationData);
 
       // Create animation control
       return new AnimationControl(animationData, true);
@@ -340,30 +337,27 @@ export class AnimationAPI
 
       if (delay > 0)
       {
+         animationData.active = false;
+
          // Delay w/ setTimeout and schedule w/ AnimationManager if not already canceled
          setTimeout(() =>
          {
             if (!animationData.cancelled)
             {
-               this.#instanceCount++;
-               AnimationManager.add(animationData);
-            }
-            else
-            {
-               // Need to increment instanceCount even though it was cancelled as cleanupInstance will decrement the
-               // count.
-               this.#instanceCount++;
+               animationData.active = true;
 
-               this.#cleanupInstance(animationData);
+               const now = performance.now();
+
+               // Offset start time by delta between last rAF time. This allows a delayed tween to start from the
+               // precise delayed time.
+               animationData.start = now + (AnimationManager.current - now);
             }
          }, delay * 1000);
       }
-      else
-      {
-         // Schedule immediately w/ AnimationManager
-         this.#instanceCount++;
-         AnimationManager.add(animationData);
-      }
+
+      // Schedule immediately w/ AnimationManager
+      this.#instanceCount++;
+      AnimationManager.add(animationData);
 
       // Create animation control
       return new AnimationControl(animationData, true);
