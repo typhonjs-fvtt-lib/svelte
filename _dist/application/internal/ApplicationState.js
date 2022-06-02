@@ -178,27 +178,6 @@ export class ApplicationState
 
       if (data)
       {
-         // Merge in saved options to application.
-         if (typeof data?.options === 'object')
-         {
-            application?.reactive.mergeOptions(data.options);
-         }
-
-         if (typeof data?.ui === 'object')
-         {
-            const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
-
-            // Application is currently minimized and stored state is not, so reset minimized state without animationn.
-            if (application?.reactive?.minimized && !minimized)
-            {
-               application.maximize({ animate: false, duration: 0 });
-            }
-            else if (!application?.reactive?.minimized && minimized)
-            {
-               application.minimize({ animate: false, duration });
-            }
-         }
-
          if (typeof data?.position === 'object')
          {
             // Update data directly with no store or inline style updates.
@@ -210,19 +189,77 @@ export class ApplicationState
                   application.position.transformOrigin = data.position.transformOrigin;
                }
 
-               // Return a Promise with saved data that resolves after animation ends.
-               if (async)
+               if (typeof data?.ui === 'object')
                {
-                  return application.position.animate.to(data.position, { duration, ease, interpolate }).finished.then(
-                   () => application);
+                  const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
+
+                  if (application?.reactive?.minimized && !minimized)
+                  {
+                     application.maximize({ animate: false, duration: 0 });
+                  }
                }
-               else  // Animate synchronously.
+
+               const promise = application.position.animate.to(data.position,
+                { duration, ease, interpolate }).finished.then((cancelled) =>
                {
-                  application.position.animate.to(data.position, { duration, ease, interpolate });
-               }
+                  // Merge in saved options to application.
+                  if (!cancelled && typeof data?.options === 'object')
+                  {
+                     application?.reactive.mergeOptions(data.options);
+                  }
+
+                  if (!cancelled && typeof data?.ui === 'object')
+                  {
+                     const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
+
+                     // Application is currently minimized and stored state is not, so reset minimized state without
+                     // animation.
+                     if (!application?.reactive?.minimized && minimized)
+                     {
+                        application.minimize({ animate: false, duration: 0 });
+                     }
+
+                     // // Application is currently minimized and stored state is not, so reset minimized state without
+                     // // animation.
+                     // if (application?.reactive?.minimized && !minimized)
+                     // {
+                     //    application.maximize({ animate: false, duration: 0 });
+                     // }
+                     // else if (!application?.reactive?.minimized && minimized)
+                     // {
+                     //    application.minimize({ animate: false, duration: 0 });
+                     // }
+                  }
+
+                  return application;
+               });
+
+               // Return a Promise with the application that resolves after animation ends.
+               if (async) { return promise; }
             }
             else
             {
+               // Merge in saved options to application.
+               if (typeof data?.options === 'object')
+               {
+                  application?.reactive.mergeOptions(data.options);
+               }
+
+               if (typeof data?.ui === 'object')
+               {
+                  const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
+
+                  // Application is currently minimized and stored state is not, so reset minimized state without animationn.
+                  if (application?.reactive?.minimized && !minimized)
+                  {
+                     application.maximize({ animate: false, duration: 0 });
+                  }
+                  else if (!application?.reactive?.minimized && minimized)
+                  {
+                     application.minimize({ animate: false, duration });
+                  }
+               }
+
                // Default options is to set data for an immediate update.
                application.position.set(data.position);
             }

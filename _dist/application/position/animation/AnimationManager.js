@@ -65,7 +65,7 @@ export class AnimationManager
 
          // Handle any animations that have been canceled.
          // Ensure that the element is still connected otherwise remove it from active list and continue.
-         if (data.finished || !data.el.isConnected)
+         if (data.cancelled || !data.el.isConnected)
          {
             AnimationManager.activeList.splice(cntr, 1);
             data.cleanup(data);
@@ -109,11 +109,31 @@ export class AnimationManager
    /**
     * Cancels any animation for given Position data.
     *
-    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} data -
+    * @param {Position} position - Position instance.
     */
-   static cancel(data)
+   static cancel(position)
    {
+      for (let cntr = AnimationManager.activeList.length; --cntr >= 0;)
+      {
+         const data = AnimationManager.activeList[cntr];
+         if (data.position === position)
+         {
+            AnimationManager.activeList.splice(cntr, 1);
+            data.cancelled = true;
+            data.cleanup(data);
+         }
+      }
 
+      for (let cntr = AnimationManager.newList.length; --cntr >= 0;)
+      {
+         const data = AnimationManager.newList[cntr];
+         if (data.position === position)
+         {
+            AnimationManager.newList.splice(cntr, 1);
+            data.cancelled = true;
+            data.cleanup(data);
+         }
+      }
    }
 
    /**

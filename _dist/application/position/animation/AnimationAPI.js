@@ -38,6 +38,24 @@ export class AnimationAPI
    }
 
    /**
+    * Returns whether there are active animation instances for this Position.
+    *
+    * @returns {boolean} Are there active animation instances.
+    */
+   get isActive()
+   {
+      return this.#instanceCount > 0;
+   }
+
+   /**
+    * Cancels all animation instances for this Position instance.
+    */
+   cancel()
+   {
+      AnimationManager.cancel(this.#position);
+   }
+
+   /**
     * Cleans up an animation instance.
     *
     * @param {object}   data - Animation data for an animation instance.
@@ -46,19 +64,7 @@ export class AnimationAPI
    {
       this.#instanceCount--;
 
-      if (typeof data.resolve === 'function') { data.resolve(); }
-
-      console.log(`! Position animation - cleanup`);
-   }
-
-   /**
-    * Returns whether there are active animation instances for this Position.
-    *
-    * @returns {boolean} Are there active animation instances.
-    */
-   isActive()
-   {
-      return this.#instanceCount > 0;
+      if (typeof data.resolve === 'function') { data.resolve(data.cancelled); }
    }
 
    /**
@@ -157,12 +163,12 @@ export class AnimationAPI
 
       const animationData = {
          cleanup: this.#cleanup,
+         cancelled: false,
          current: 0,
          destination,
          duration: duration * 1000, // Internally the AnimationManager works in ms.
          ease,
          el,
-         finished: false,
          initial,
          interpolate,
          keys,

@@ -61,8 +61,8 @@ export class AnimationControl
 
       if (animationData === null || animationData === void 0) { return; }
 
-      // Set finished state to true and this animation data instance will be removed from AnimationManager on next
+      // Set cancelled state to true and this animation data instance will be removed from AnimationManager on next
       // update.
-      animationData.finished = true;
+      animationData.cancelled = true;
    }
 }
