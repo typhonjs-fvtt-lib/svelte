@@ -1420,7 +1420,7 @@ class AnimationGroupAPI
 
                if (typeof actualFromData !== 'object')
                {
-                  throw new TypeError(`AnimationManager.to error: fromData callback function iteration(${
+                  throw new TypeError(`AnimationGroupAPI.from error: fromData callback function iteration(${
                    index}) failed to return an object.`);
                }
             }
@@ -1434,7 +1434,7 @@ class AnimationGroupAPI
 
                if (typeof actualOptions !== 'object')
                {
-                  throw new TypeError(`AnimationManager.to error: options callback function iteration(${
+                  throw new TypeError(`AnimationGroupAPI.from error: options callback function iteration(${
                    index}) failed to return an object.`);
                }
             }
@@ -1484,6 +1484,177 @@ class AnimationGroupAPI
          }
 
          animationControls.push(actualPosition.animate.from(actualFromData, actualOptions));
+      }
+
+      return new AnimationGroupControl(animationControls);
+   }
+
+   /**
+    * Animates one or more Position instances as a group.
+    *
+    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+    *
+    * @param {object|Function}   fromData -
+    *
+    * @param {object|Function}   toData -
+    *
+    * @param {object|Function}   options -
+    *
+    * @returns {TJSBasicAnimation} Basic animation control.
+    */
+   static fromTo(position, fromData, toData, options)
+   {
+      if (!isObject(fromData) && typeof fromData !== 'function')
+      {
+         throw new TypeError(`AnimationGroupAPI.fromTo error: 'fromData' is not an object or function.`);
+      }
+
+      if (!isObject(toData) && typeof toData !== 'function')
+      {
+         throw new TypeError(`AnimationGroupAPI.fromTo error: 'toData' is not an object or function.`);
+      }
+
+      if (options !== void 0 && !isObject(options) && typeof options !== 'function')
+      {
+         throw new TypeError(`AnimationGroupAPI.fromTo error: 'options' is not an object or function.`);
+      }
+
+      /**
+       * @type {AnimationControl[]}
+       */
+      const animationControls = [];
+
+      let index = 0;
+      let callbackOptions;
+
+      const hasFromCallback = typeof fromData === 'function';
+      const hasToCallback = typeof toData === 'function';
+      const hasOptionCallback = typeof options === 'function';
+      const hasCallback = hasFromCallback || hasToCallback || hasOptionCallback;
+
+      if (hasCallback) { callbackOptions = { index, position: void 0, data: void 0 }; }
+
+      let actualFromData = fromData;
+      let actualToData = toData;
+      let actualOptions = options;
+
+      if (isIterable(position))
+      {
+         for (const entry of position)
+         {
+            const actualPosition = entry instanceof Position ? entry : entry.position;
+
+            if (!(actualPosition instanceof Position))
+            {
+               console.warn(`AnimationGroupAPI.fromTo warning: No Position instance found at index: ${index}.`);
+               continue;
+            }
+
+            if (hasCallback)
+            {
+               callbackOptions.index = index;
+               callbackOptions.position = position;
+               callbackOptions.data = entry instanceof Position ? void 0 : entry;
+            }
+
+            if (hasFromCallback)
+            {
+               actualFromData = fromData(callbackOptions);
+
+               // Returned data from callback is null / undefined, so skip this position instance.
+               if (actualFromData === null || actualFromData === void 0) { continue; }
+
+               if (typeof actualFromData !== 'object')
+               {
+                  throw new TypeError(`AnimationGroupAPI.fromTo error: fromData callback function iteration(${
+                   index}) failed to return an object.`);
+               }
+            }
+
+            if (hasToCallback)
+            {
+               actualToData = toData(callbackOptions);
+
+               // Returned data from callback is null / undefined, so skip this position instance.
+               if (actualToData === null || actualToData === void 0) { continue; }
+
+               if (typeof actualToData !== 'object')
+               {
+                  throw new TypeError(`AnimationGroupAPI.fromTo error: toData callback function iteration(${
+                   index}) failed to return an object.`);
+               }
+            }
+
+            if (hasOptionCallback)
+            {
+               actualOptions = options(callbackOptions);
+
+               // Returned data from callback is null / undefined, so skip this position instance.
+               if (actualOptions === null || actualOptions === void 0) { continue; }
+
+               if (typeof actualOptions !== 'object')
+               {
+                  throw new TypeError(`AnimationGroupAPI.fromTo error: options callback function iteration(${
+                   index}) failed to return an object.`);
+               }
+            }
+
+            animationControls.push(actualPosition.animate.fromTo(actualFromData, actualToData, actualOptions));
+
+            index++;
+         }
+      }
+      else
+      {
+         const actualPosition = position instanceof Position ? position : position.position;
+
+         if (!(actualPosition instanceof Position))
+         {
+            console.warn(`AnimationGroupAPI.fromTo warning: No Position instance found.`);
+            return AnimationGroupControl.voidControl;
+         }
+
+         if (hasCallback)
+         {
+            callbackOptions.index = index++;
+            callbackOptions.position = position;
+            callbackOptions.data = position instanceof Position ? void 0 : position;
+         }
+
+         if (hasFromCallback)
+         {
+            actualFromData = fromData(callbackOptions);
+
+            if (typeof actualFromData !== 'object')
+            {
+               throw new TypeError(
+                `AnimationGroupAPI.fromTo error: fromData callback function failed to return an object.`);
+            }
+         }
+
+         if (hasToCallback)
+         {
+            actualToData = toData(callbackOptions);
+
+            if (typeof actualToData !== 'object')
+            {
+               throw new TypeError(
+                `AnimationGroupAPI.fromTo error: toData callback function failed to return an object.`);
+            }
+         }
+
+         if (hasOptionCallback)
+         {
+            actualOptions = options(callbackOptions);
+
+            if (typeof actualOptions !== 'object')
+            {
+               throw new TypeError(
+                `AnimationGroupAPI.fromTo error: options callback function failed to return an object.`);
+            }
+         }
+
+         animationControls.push(actualPosition.animate.fromTo(actualFromData, actualToData, actualOptions));
       }
 
       return new AnimationGroupControl(animationControls);
