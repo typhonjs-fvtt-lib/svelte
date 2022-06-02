@@ -87,8 +87,8 @@ export class PositionStateAPI
       // Quit early if there is no saved default data.
       if (typeof defaultData !== 'object') { return false; }
 
-      // Cancel all animation for Position if currently active.
-      if (this.#position.animate.isActive)
+      // Cancel all animations for Position if there are currently any scheduled.
+      if (this.#position.animate.isScheduled)
       {
          this.#position.animate.cancel();
       }
