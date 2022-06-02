@@ -14,10 +14,51 @@ export class AnimationAPI
    /** @type {Position} */
    #position;
 
+   /**
+    * Tracks the number of animation control instances that are active.
+    *
+    * @type {number}
+    */
+   #instanceCount = 0;
+
+   /**
+    * Provides a bound function to pass as data to AnimationManager to invoke
+    *
+    * @type {Function}
+    * @see {AnimationAPI.#cleanupInstance}
+    */
+   #cleanup;
+
    constructor(position, data)
    {
       this.#position = position;
       this.#data = data;
+
+      this.#cleanup = this.#cleanupInstance.bind(this);
+   }
+
+   /**
+    * Cleans up an animation instance.
+    *
+    * @param {object}   data - Animation data for an animation instance.
+    */
+   #cleanupInstance(data)
+   {
+      this.#instanceCount--;
+
+      if (typeof data.resolve === 'function') { data.resolve(); }
+
+      console.log(`! Position animation - cleanup`);
+   }
+
+   /**
+    * Returns whether there are active animation instances for this Position.
+    *
+    * @returns {boolean} Are there active animation instances.
+    */
+   isActive()
+   {
+      return this.#instanceCount > 0;
    }
 
    /**
@@ -115,6 +156,7 @@ export class AnimationAPI
       if (keys.length === 0) { return AnimationControl.voidControl; }
 
       const animationData = {
+         cleanup: this.#cleanup,
          current: 0,
          destination,
          duration: duration * 1000, // Internally the AnimationManager works in ms.
@@ -129,6 +171,8 @@ export class AnimationAPI
          resolve: void 0,
          start: void 0
       };
+
+      this.#instanceCount++;
 
       AnimationManager.add(animationData);
 

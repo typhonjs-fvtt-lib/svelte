@@ -52,10 +52,7 @@ export class AnimationManager
          // Process new data
          for (let cntr = AnimationManager.newList.length; --cntr >= 0;)
          {
-            const data = AnimationManager.newList[cntr];
-            data.current = 0;
-
-            AnimationManager.activeList.push(data);
+            AnimationManager.activeList.push(AnimationManager.newList[cntr]);
          }
 
          AnimationManager.newList.length = 0;
@@ -66,19 +63,12 @@ export class AnimationManager
       {
          const data = AnimationManager.activeList[cntr];
 
-         // Ensure that the element is still connected otherwise remove it from active list and continue.
-         if (!data.el.isConnected)
-         {
-            AnimationManager.activeList.splice(cntr, 1);
-            if (typeof data.resolve === 'function') { data.resolve(); }
-            continue;
-         }
-
          // Handle any animations that have been canceled.
-         if (data.finished)
+         // Ensure that the element is still connected otherwise remove it from active list and continue.
+         if (data.finished || !data.el.isConnected)
          {
             AnimationManager.activeList.splice(cntr, 1);
-            if (typeof data.resolve === 'function') { data.resolve(); }
+            data.cleanup(data);
             continue;
          }
 
@@ -97,9 +87,8 @@ export class AnimationManager
             data.position.set(data.newData);
 
             AnimationManager.activeList.splice(cntr, 1);
+            data.cleanup(data);
 
-            data.finished = true;
-            if (typeof data.resolve === 'function') { data.resolve(); }
             continue;
          }
 
@@ -135,15 +124,13 @@ export class AnimationManager
       for (let cntr = AnimationManager.activeList.length; --cntr >= 0;)
       {
          const data = AnimationManager.activeList[cntr];
-         data.finished = true;
-         if (typeof data.resolve === 'function') { data.resolve(); }
+         data.cleanup(data);
       }
 
       for (let cntr = AnimationManager.newList.length; --cntr >= 0;)
       {
          const data = AnimationManager.newList[cntr];
-         data.finished = true;
-         if (typeof data.resolve === 'function') { data.resolve(); }
+         data.cleanup(data);
       }
 
       AnimationManager.activeList.length = 0;

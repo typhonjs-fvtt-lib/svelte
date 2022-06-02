@@ -84,7 +84,8 @@ export class PositionStateAPI
    {
       const defaultData = this.#dataSaved.get('#defaultData');
 
-      if (typeof defaultData !== 'object') { return false; }
+      // Quit early if the position is animating or there is no saved default data.
+      if (this.#position.animate.isActive() || typeof defaultData !== 'object') { return false; }
 
       const zIndex = this.#position.zIndex;
 
