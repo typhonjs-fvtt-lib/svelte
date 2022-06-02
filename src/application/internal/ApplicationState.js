@@ -28,6 +28,7 @@ export class ApplicationState
    {
       return Object.assign(extra, {
          position: this.#application?.position?.get(),
+         beforeMinimized: this.#application?.position?.state.get({ name: '#beforeMinimized' }),
          options: Object.assign({}, this.#application?.options),
          ui: { minimized: this.#application?.reactive?.minimized }
       });
@@ -218,17 +219,11 @@ export class ApplicationState
                      {
                         application.minimize({ animate: false, duration: 0 });
                      }
+                  }
 
-                     // // Application is currently minimized and stored state is not, so reset minimized state without
-                     // // animation.
-                     // if (application?.reactive?.minimized && !minimized)
-                     // {
-                     //    application.maximize({ animate: false, duration: 0 });
-                     // }
-                     // else if (!application?.reactive?.minimized && minimized)
-                     // {
-                     //    application.minimize({ animate: false, duration: 0 });
-                     // }
+                  if (!cancelled && typeof data?.beforeMinimized === 'object')
+                  {
+                     application.position.state.set({ name: '#beforeMinimized', ...data.beforeMinimized });
                   }
 
                   return application;
@@ -249,7 +244,8 @@ export class ApplicationState
                {
                   const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
 
-                  // Application is currently minimized and stored state is not, so reset minimized state without animationn.
+                  // Application is currently minimized and stored state is not, so reset minimized state without
+                  // animation.
                   if (application?.reactive?.minimized && !minimized)
                   {
                      application.maximize({ animate: false, duration: 0 });
@@ -258,6 +254,11 @@ export class ApplicationState
                   {
                      application.minimize({ animate: false, duration });
                   }
+               }
+
+               if (typeof data?.beforeMinimized === 'object')
+               {
+                  application.position.state.set({ name: '#beforeMinimized', ...data.beforeMinimized });
                }
 
                // Default options is to set data for an immediate update.
@@ -274,6 +275,8 @@ export class ApplicationState
  * @typedef {object} ApplicationData
  *
  * @property {PositionDataExtended}   position - Application position.
+ *
+ * @property {object}         beforeMinimized - Any application saved position state for #beforeMinimized
  *
  * @property {object}         options - Application options.
  *

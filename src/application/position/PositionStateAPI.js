@@ -199,22 +199,38 @@ export class PositionStateAPI
    /**
     * Saves current position state with the opportunity to add extra data to the saved state.
     *
-    * @param {object}   options - Options.
+    * @param {object}   opts - Options.
     *
-    * @param {string}   options.name - name to index this saved data.
+    * @param {string}   opts.name - name to index this saved data.
     *
-    * @param {...*}     [options.extra] - Extra data to add to saved data.
+    * @param {...*}     [opts.extra] - Extra data to add to saved data.
     *
     * @returns {PositionData} Current position data
     */
    save({ name, ...extra })
    {
-      if (typeof name !== 'string') { throw new TypeError(`Position - set error: 'name' is not a string.`); }
+      if (typeof name !== 'string') { throw new TypeError(`Position - save error: 'name' is not a string.`); }
 
       const data = this.#position.get(extra);
 
       this.#dataSaved.set(name, data);
 
       return data;
+   }
+
+   /**
+    * Directly sets a position state.
+    *
+    * @param {object}   opts - Options.
+    *
+    * @param {string}   opts.name - name to index this saved data.
+    *
+    * @param {...*}     [opts.data] - Position data to set.
+    */
+   set({ name, ...data })
+   {
+      if (typeof name !== 'string') { throw new TypeError(`Position - set error: 'name' is not a string.`); }
+
+      this.#dataSaved.set(name, data);
    }
 }
