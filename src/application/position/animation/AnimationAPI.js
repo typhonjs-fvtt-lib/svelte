@@ -76,6 +76,8 @@ export class AnimationAPI
     *
     * @param {object}         [opts] - Optional parameters.
     *
+    * @param {number}         [opts.delay] - Delay in seconds before animation starts.
+    *
     * @param {number}         [opts.duration] - Duration in seconds.
     *
     * @param {Function}       [opts.ease=linear] - Easing function.
@@ -84,7 +86,7 @@ export class AnimationAPI
     *
     * @returns {TJSBasicAnimation}  A control object that can cancel animation and provides a `finished` Promise.
     */
-   to(toData, { duration = 1, ease = linear, interpolate = lerp } = {})
+   to(toData, { delay = 0, duration = 1, ease = linear, interpolate = lerp } = {})
    {
       if (!isObject(toData))
       {
@@ -181,11 +183,34 @@ export class AnimationAPI
          start: void 0
       };
 
-      this.#instanceCount++;
+      if (Number.isFinite(delay) && delay > 0)
+      {
+         // Delay w/ setTimeout and schedule w/ AnimationManager if not already canceled
+         setTimeout(() =>
+         {
+            if (!animationData.cancelled)
+            {
+               this.#instanceCount++;
+               AnimationManager.add(animationData);
+            }
+            else
+            {
+               // Need to increment instanceCount even though it was cancelled as cleanupInstance will decrement the
+               // count.
+               this.#instanceCount++;
 
-      AnimationManager.add(animationData);
+               this.#cleanupInstance(animationData);
+            }
+         }, delay * 1000);
+      }
+      else
+      {
+         // Schedule immediately w/ AnimationManager
+         this.#instanceCount++;
+         AnimationManager.add(animationData);
+      }
 
-      // Schedule w/ animation manager.
+      // Create animation control
       return new AnimationControl(animationData, true);
    }
 }
