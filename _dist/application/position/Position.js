@@ -1252,6 +1252,9 @@ Object.seal(s_VALIDATION_DATA);
 
 /**
  * Provides a public API for grouping multiple animations together with the AnimationManager.
+ *
+ * Note: This is implemented in the same source file as Position to prevent a circular reference as instanceof checks
+ * are required for AnimationGroupAPI.
  */
 class AnimationGroupAPI
 {
@@ -1353,7 +1356,7 @@ class AnimationGroupAPI
    }
 
    /**
-    * Animates one or more Position instances as a group.
+    * Provides the `from` animation tween for one or more Position instances as a group.
     *
     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
     *
@@ -1490,7 +1493,7 @@ class AnimationGroupAPI
    }
 
    /**
-    * Animates one or more Position instances as a group.
+    * Provides the `fromTo` animation tween for one or more Position instances as a group.
     *
     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
     *
@@ -1506,17 +1509,17 @@ class AnimationGroupAPI
    {
       if (!isObject(fromData) && typeof fromData !== 'function')
       {
-         throw new TypeError(`AnimationGroupAPI.from error: 'fromData' is not an object or function.`);
+         throw new TypeError(`AnimationGroupAPI.fromTo error: 'fromData' is not an object or function.`);
       }
 
       if (!isObject(toData) && typeof toData !== 'function')
       {
-         throw new TypeError(`AnimationGroupAPI.from error: 'toData' is not an object or function.`);
+         throw new TypeError(`AnimationGroupAPI.fromTo error: 'toData' is not an object or function.`);
       }
 
       if (options !== void 0 && !isObject(options) && typeof options !== 'function')
       {
-         throw new TypeError(`AnimationGroupAPI.from error: 'options' is not an object or function.`);
+         throw new TypeError(`AnimationGroupAPI.fromTo error: 'options' is not an object or function.`);
       }
 
       /**
@@ -1546,7 +1549,7 @@ class AnimationGroupAPI
 
             if (!(actualPosition instanceof Position))
             {
-               console.warn(`AnimationGroupAPI.from warning: No Position instance found at index: ${index}.`);
+               console.warn(`AnimationGroupAPI.fromTo warning: No Position instance found at index: ${index}.`);
                continue;
             }
 
@@ -1566,7 +1569,7 @@ class AnimationGroupAPI
 
                if (typeof actualFromData !== 'object')
                {
-                  throw new TypeError(`AnimationGroupAPI.from error: fromData callback function iteration(${
+                  throw new TypeError(`AnimationGroupAPI.fromTo error: fromData callback function iteration(${
                    index}) failed to return an object.`);
                }
             }
@@ -1580,7 +1583,7 @@ class AnimationGroupAPI
 
                if (typeof actualToData !== 'object')
                {
-                  throw new TypeError(`AnimationGroupAPI.from error: toData callback function iteration(${
+                  throw new TypeError(`AnimationGroupAPI.fromTo error: toData callback function iteration(${
                    index}) failed to return an object.`);
                }
             }
@@ -1594,7 +1597,7 @@ class AnimationGroupAPI
 
                if (typeof actualOptions !== 'object')
                {
-                  throw new TypeError(`AnimationGroupAPI.from error: options callback function iteration(${
+                  throw new TypeError(`AnimationGroupAPI.fromTo error: options callback function iteration(${
                    index}) failed to return an object.`);
                }
             }
@@ -1610,7 +1613,7 @@ class AnimationGroupAPI
 
          if (!(actualPosition instanceof Position))
          {
-            console.warn(`AnimationGroupAPI.from warning: No Position instance found.`);
+            console.warn(`AnimationGroupAPI.fromTo warning: No Position instance found.`);
             return AnimationGroupControl.voidControl;
          }
 
@@ -1628,7 +1631,7 @@ class AnimationGroupAPI
             if (typeof actualFromData !== 'object')
             {
                throw new TypeError(
-                `AnimationGroupAPI.from error: fromData callback function failed to return an object.`);
+                `AnimationGroupAPI.fromTo error: fromData callback function failed to return an object.`);
             }
          }
 
@@ -1639,7 +1642,7 @@ class AnimationGroupAPI
             if (typeof actualToData !== 'object')
             {
                throw new TypeError(
-                `AnimationGroupAPI.from error: toData callback function failed to return an object.`);
+                `AnimationGroupAPI.fromTo error: toData callback function failed to return an object.`);
             }
          }
 
@@ -1650,7 +1653,7 @@ class AnimationGroupAPI
             if (typeof actualOptions !== 'object')
             {
                throw new TypeError(
-                `AnimationGroupAPI.from error: options callback function failed to return an object.`);
+                `AnimationGroupAPI.fromTo error: options callback function failed to return an object.`);
             }
          }
 
@@ -1661,7 +1664,7 @@ class AnimationGroupAPI
    }
 
    /**
-    * Animates one or more Position instances as a group.
+    * Provides the `to` animation tween for one or more Position instances as a group.
     *
     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
     *

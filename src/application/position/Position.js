@@ -1252,6 +1252,9 @@ Object.seal(s_VALIDATION_DATA);
 
 /**
  * Provides a public API for grouping multiple animations together with the AnimationManager.
+ *
+ * Note: This is implemented in the same source file as Position to prevent a circular reference as instanceof checks
+ * are required for AnimationGroupAPI.
  */
 class AnimationGroupAPI
 {
@@ -1353,7 +1356,7 @@ class AnimationGroupAPI
    }
 
    /**
-    * Animates one or more Position instances as a group.
+    * Provides the `from` animation tween for one or more Position instances as a group.
     *
     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
     *
@@ -1490,7 +1493,7 @@ class AnimationGroupAPI
    }
 
    /**
-    * Animates one or more Position instances as a group.
+    * Provides the `fromTo` animation tween for one or more Position instances as a group.
     *
     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
     *
@@ -1661,7 +1664,7 @@ class AnimationGroupAPI
    }
 
    /**
-    * Animates one or more Position instances as a group.
+    * Provides the `to` animation tween for one or more Position instances as a group.
     *
     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
     *
