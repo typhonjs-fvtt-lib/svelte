@@ -1,4 +1,18 @@
 /**
+ * Stores the PositionData properties that can be animated.
+ *
+ * @type {Set<string>}
+ */
+const animateKeys = new Set([
+   // Main keys
+   'left', 'top', 'maxWidth', 'maxHeight', 'minWidth', 'minHeight', 'width', 'height',
+   'rotateX', 'rotateY', 'rotateZ', 'scale', 'translateX', 'translateY', 'translateZ', 'zIndex',
+
+   // Aliases
+   'rotation'
+]);
+
+/**
  * Defines the keys of PositionData that are transform keys.
  *
  * @type {string[]}
@@ -73,4 +87,11 @@ const transformOrigins = ['top left', 'top center', 'top right', 'center left', 
 
 Object.freeze(transformOrigins);
 
-export { numericDefaults, transformKeys, transformKeysBitwise, transformOriginDefault, transformOrigins };
+export {
+   animateKeys,
+   numericDefaults,
+   transformKeys,
+   transformKeysBitwise,
+   transformOriginDefault,
+   transformOrigins
+};

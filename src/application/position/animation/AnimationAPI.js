@@ -6,6 +6,8 @@ import { isObject }           from '@typhonjs-fvtt/svelte/util';
 import { AnimationControl }   from './AnimationControl.js';
 import { AnimationManager }   from './AnimationManager.js';
 
+import { animateKeys }        from '../constants.js';
+
 export class AnimationAPI
 {
    /** @type {PositionData} */
@@ -415,5 +417,74 @@ export class AnimationAPI
       }
 
       return this.#addAnimation(initial, destination, duration, el, delay, ease, interpolate);
+   }
+
+   /**
+    * Returns a function that provides an optimized way to constantly update a to-tween.
+    *
+    * @param {Iterable<string>}  keys - The keys for quickTo.
+    *
+    * @param {object}            [options] - Optional parameters.
+    *
+    * @param {number}            [options.delay=0] - Delay in seconds before animation starts.
+    *
+    * @param {number}            [options.duration=1] - Duration in seconds.
+    *
+    * @param {Function}          [options.ease=linear] - Easing function.
+    *
+    * @param {Function}          [options.interpolate=lerp] - Interpolation function.
+    *
+    * @returns {Function} quick-to tween function.
+    */
+   quickTo(keys, options)
+   {
+      if (!Array.isArray(keys))
+      {
+         throw new TypeError(`AnimationAPI.quickTo error: 'keys' is not an array.`);
+      }
+
+      const toData = {};
+
+      for (const key of keys)
+      {
+         if (typeof key !== 'string')
+         {
+            throw new TypeError(`AnimationAPI.quickTo error: key is not a string.`);
+         }
+
+         if (!animateKeys.has(key))
+         {
+            throw new Error(`AnimationAPI.quickTo error: key ('${key}') is not animatable.`);
+         }
+
+         toData[key] = this.#data[key];
+      }
+
+      let tweenTo;
+
+      return (...args) =>
+      {
+         const length = args.length;
+
+         if (length === 0) { return; }
+
+         if (isObject(args[0]))
+         {
+            const objData = args[0];
+
+            for (const key in objData)
+            {
+               if (toData[key] !== void 0) { toData[key] = objData[key]; }
+            }
+         }
+         else
+         {
+
+         }
+
+         if (tweenTo) { tweenTo.cancel(); }
+
+         tweenTo = this.to(toData, options);
+      };
    }
 }
