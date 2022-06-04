@@ -6,7 +6,9 @@ import { isObject }           from '@typhonjs-fvtt/svelte/util';
 import { AnimationControl }   from './AnimationControl.js';
 import { AnimationManager }   from './AnimationManager.js';
 
-import { animateKeys }        from '../constants.js';
+import {
+   animateKeys,
+   setNumericDefaults }       from '../constants.js';
 
 export class AnimationAPI
 {
@@ -71,21 +73,8 @@ export class AnimationAPI
    #addAnimation(initial, destination, duration, el, delay, ease, interpolate)
    {
       // Set initial data for transform values that are often null by default.
-      if (initial.rotateX === null) { initial.rotateX = 0; }
-      if (initial.rotateY === null) { initial.rotateY = 0; }
-      if (initial.rotateZ === null) { initial.rotateZ = 0; }
-      if (initial.translateX === null) { initial.translateX = 0; }
-      if (initial.translateY === null) { initial.translateY = 0; }
-      if (initial.translateZ === null) { initial.translateZ = 0; }
-      if (initial.scale === null) { initial.scale = 1; }
-
-      if (destination.rotateX === null) { destination.rotateX = 0; }
-      if (destination.rotateY === null) { destination.rotateY = 0; }
-      if (destination.rotateZ === null) { destination.rotateZ = 0; }
-      if (destination.translateX === null) { destination.translateX = 0; }
-      if (destination.translateY === null) { destination.translateY = 0; }
-      if (destination.translateZ === null) { destination.translateZ = 0; }
-      if (destination.scale === null) { destination.scale = 1; }
+      setNumericDefaults(initial);
+      setNumericDefaults(destination);
 
       // Reject all initial data that is not a number.
       for (const key in initial)
@@ -212,10 +201,9 @@ export class AnimationAPI
          return AnimationControl.voidControl;
       }
 
+      // Cache any target element allowing AnimationManager to stop animation if it becomes disconnected from DOM.
       const targetEl = parent instanceof HTMLElement ? parent : parent?.elementTarget;
       const el = targetEl instanceof HTMLElement && targetEl.isConnected ? targetEl : void 0;
-
-      if (!el) { return AnimationControl.voidControl; }
 
       if (!Number.isFinite(delay) || delay < 0)
       {
@@ -294,10 +282,9 @@ export class AnimationAPI
          return AnimationControl.voidControl;
       }
 
+      // Cache any target element allowing AnimationManager to stop animation if it becomes disconnected from DOM.
       const targetEl = parent instanceof HTMLElement ? parent : parent?.elementTarget;
       const el = targetEl instanceof HTMLElement && targetEl.isConnected ? targetEl : void 0;
-
-      if (!el) { return AnimationControl.voidControl; }
 
       if (!Number.isFinite(delay) || delay < 0)
       {
@@ -376,10 +363,9 @@ export class AnimationAPI
          return AnimationControl.voidControl;
       }
 
+      // Cache any target element allowing AnimationManager to stop animation if it becomes disconnected from DOM.
       const targetEl = parent instanceof HTMLElement ? parent : parent?.elementTarget;
       const el = targetEl instanceof HTMLElement && targetEl.isConnected ? targetEl : void 0;
-
-      if (!el) { return AnimationControl.voidControl; }
 
       if (!Number.isFinite(delay) || delay < 0)
       {
@@ -424,27 +410,52 @@ export class AnimationAPI
     *
     * @param {Iterable<string>}  keys - The keys for quickTo.
     *
-    * @param {object}            [options] - Optional parameters.
+    * @param {object}            [opts] - Optional parameters.
     *
-    * @param {number}            [options.delay=0] - Delay in seconds before animation starts.
+    * @param {number}            [opts.duration=1] - Duration in seconds.
     *
-    * @param {number}            [options.duration=1] - Duration in seconds.
+    * @param {Function}          [opts.ease=linear] - Easing function.
     *
-    * @param {Function}          [options.ease=linear] - Easing function.
+    * @param {Function}          [opts.interpolate=lerp] - Interpolation function.
     *
-    * @param {Function}          [options.interpolate=lerp] - Interpolation function.
-    *
-    * @returns {Function} quick-to tween function.
+    * @returns {quickToCallback} quick-to tween function.
     */
-   quickTo(keys, options)
+   quickTo(keys, { duration = 1, ease = linear, interpolate = lerp } = {})
    {
       if (!Array.isArray(keys))
       {
          throw new TypeError(`AnimationAPI.quickTo error: 'keys' is not an array.`);
       }
 
-      const toData = {};
+      const parent = this.#position.parent;
 
+      // Early out if the application is not positionable.
+      if (parent !== void 0 && typeof parent?.options?.positionable === 'boolean' && !parent?.options?.positionable)
+      {
+         throw new Error(`AnimationAPI.quickTo error: 'parent' is not positionable.`);
+      }
+
+      if (!Number.isFinite(duration) || duration < 0)
+      {
+         throw new TypeError(`AnimationAPI.to error: 'duration' is not a positive number.`);
+      }
+
+      if (typeof ease !== 'function')
+      {
+         throw new TypeError(`AnimationAPI.to error: 'ease' is not a function.`);
+      }
+
+      if (typeof interpolate !== 'function')
+      {
+         throw new TypeError(`AnimationAPI.to error: 'interpolate' is not a function.`);
+      }
+
+      const initial = {};
+      const destination = {};
+
+      const data = this.#data;
+
+      // Set initial data if the key / data is defined and the end position is not equal to current data.
       for (const key of keys)
       {
          if (typeof key !== 'string')
@@ -457,34 +468,102 @@ export class AnimationAPI
             throw new Error(`AnimationAPI.quickTo error: key ('${key}') is not animatable.`);
          }
 
-         toData[key] = this.#data[key];
+         if (data[key] !== void 0)
+         {
+            destination[key] = data[key];
+            initial[key] = data[key];
+         }
       }
 
-      let tweenTo;
+      const keysArray = [...keys];
+
+      const newData = Object.assign({ immediateElementUpdate: true }, initial);
+
+      const animationData = {
+         active: true,
+         cleanup: this.#cleanup,
+         cancelled: false,
+         control: void 0,
+         current: 0,
+         destination,
+         duration: duration * 1000, // Internally the AnimationManager works in ms.
+         ease,
+         el: void 0,
+         finished: true, // Note: start in finished state to add to AnimationManager on first callback.
+         initial,
+         interpolate,
+         keys,
+         newData,
+         position: this.#position,
+         resolve: void 0,
+         start: void 0
+      };
 
       return (...args) =>
       {
-         const length = args.length;
+         const argsLength = args.length;
 
-         if (length === 0) { return; }
+         if (argsLength === 0) { return; }
 
+         for (let cntr = keysArray.length; --cntr >= 0;)
+         {
+            const key = keysArray[cntr];
+            if (data[key] !== void 0) { initial[key] = data[key]; }
+         }
+
+         // Handle case where the first arg is an object. Update all quickTo keys from data contained in the object.
          if (isObject(args[0]))
          {
             const objData = args[0];
 
             for (const key in objData)
             {
-               if (toData[key] !== void 0) { toData[key] = objData[key]; }
+               if (destination[key] !== void 0 && Number.isFinite(objData[key])) { destination[key] = objData[key]; }
             }
          }
-         else
+         else // Assign each variable argument to the key specified in the initial `keys` array above.
          {
-
+            for (let cntr = 0; cntr < argsLength && cntr < keysArray.length; cntr++)
+            {
+               const key = keysArray[cntr];
+               if (destination[key] !== void 0 && Number.isFinite(args[cntr])) { destination[key] = args[cntr]; }
+            }
          }
 
-         if (tweenTo) { tweenTo.cancel(); }
+         // Set initial data for transform values that are often null by default.
+         setNumericDefaults(initial);
+         setNumericDefaults(destination);
 
-         tweenTo = this.to(toData, options);
+         // Set target element to animation data to track if it is removed from the DOM hence ending the animation.
+         const targetEl = parent instanceof HTMLElement ? parent : parent?.elementTarget;
+         animationData.el = targetEl instanceof HTMLElement && targetEl.isConnected ? targetEl : void 0;
+
+         // Reschedule the quickTo animation with AnimationManager as it is finished.
+         if (animationData.finished)
+         {
+            animationData.finished = false;
+            animationData.active = true;
+            animationData.current = 0;
+
+            this.#instanceCount++;
+            AnimationManager.add(animationData);
+         }
+         else // QuickTo animation is currently scheduled w/ AnimationManager so reset start and current time.
+         {
+            const now = performance.now();
+
+            // Offset start time by delta between last rAF time. This allows a delayed tween to start from the
+            // precise delayed time.
+            animationData.start = now + (AnimationManager.current - now);
+            animationData.current = 0;
+         }
       };
    }
 }
+
+/**
+ * @callback quickToCallback
+ *
+ * @param {...number|object} args - Either individual numbers corresponding to the order in which keys are specified or
+ *                                  a single object with keys specified and numerical values.
+ */

@@ -46,11 +46,11 @@ function draggable(node, { position, active = true, storeDragging = void 0, ease
    let dragging = false;
 
    /**
-    * Stores the ease tween.
+    * Stores the quickTo callback to use for optimized tweening when easing is enabled.
     *
-    * @type {TJSBasicAnimation}
+    * @type {quickToCallback}
     */
-   let tweenTo;
+   let quickTo = position.animate.quickTo(['top', 'left'], easeOptions);
 
    /**
     * Remember event handlers associated with this action so they may be later unregistered.
@@ -137,9 +137,7 @@ function draggable(node, { position, active = true, storeDragging = void 0, ease
 
       if (ease)
       {
-         if (tweenTo) { tweenTo.cancel(); }
-
-         tweenTo = position.animate.to({ left: newLeft, top: newTop }, easeOptions);
+         quickTo(newTop, newLeft);
       }
       else
       {
@@ -182,6 +180,8 @@ function draggable(node, { position, active = true, storeDragging = void 0, ease
          if (typeof options.easeOptions === 'object')
          {
             easeOptions = options.easeOptions;
+
+            quickTo = position.animate.quickTo(['top', 'left'], easeOptions);
          }
       },
 

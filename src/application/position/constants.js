@@ -54,6 +54,26 @@ const numericDefaults = {
 Object.freeze(numericDefaults);
 
 /**
+ * Sets numeric defaults for a {@link PositionData} like object.
+ *
+ * @param {object}   data - A PositionData like object.
+ */
+function setNumericDefaults(data)
+{
+   // Transform keys
+   if (data.rotateX === null) { data.rotateX = 0; }
+   if (data.rotateY === null) { data.rotateY = 0; }
+   if (data.rotateZ === null) { data.rotateZ = 0; }
+   if (data.translateX === null) { data.translateX = 0; }
+   if (data.translateY === null) { data.translateY = 0; }
+   if (data.translateZ === null) { data.translateZ = 0; }
+   if (data.scale === null) { data.scale = 1; }
+
+   // Aliases
+   if (data.rotation === null) { data.rotation = 0; }
+}
+
+/**
  * Defines bitwise keys for transforms used in {@link Transforms.getMat4}.
  *
  * @type {object}
@@ -90,6 +110,7 @@ Object.freeze(transformOrigins);
 export {
    animateKeys,
    numericDefaults,
+   setNumericDefaults,
    transformKeys,
    transformKeysBitwise,
    transformOriginDefault,

@@ -80,7 +80,7 @@ export class AnimationManager
 
          // Remove any animations that have been canceled.
          // Ensure that the element is still connected otherwise remove it from active list and continue.
-         if (data.cancelled || !data.el.isConnected)
+         if (data.cancelled || (data.el !== void 0 && !data.el.isConnected))
          {
             AnimationManager.activeList.splice(cntr, 1);
             data.cleanup(data);
