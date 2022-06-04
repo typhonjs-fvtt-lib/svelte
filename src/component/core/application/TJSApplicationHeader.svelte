@@ -80,3 +80,11 @@
       {/each}
    </header>
 {/key}
+
+<style>
+   .window-title {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+   }
+</style>
