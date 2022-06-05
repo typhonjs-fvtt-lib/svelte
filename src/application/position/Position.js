@@ -334,8 +334,6 @@ export class Position
 
       this.#stores.transformOrigin.values = constants.transformOrigins;
 
-      Object.freeze(this.#stores);
-
       [this.#validators, this.#validatorData] = new AdapterValidators();
 
       if (options?.initial || options?.positionInitial)
