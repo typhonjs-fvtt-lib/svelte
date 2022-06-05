@@ -161,7 +161,7 @@ export class BasicBounds
       const boundsWidth = this.#width ?? this.#element?.offsetWidth ?? globalThis.innerWidth;
       const boundsHeight = this.#height ?? this.#element?.offsetHeight ?? globalThis.innerHeight;
 
-      if (valData.position.width !== 'auto')
+      if (typeof valData.position.width === 'number')
       {
          const maxW = valData.maxWidth ?? (this.#constrain ? boundsWidth : Number.MAX_SAFE_INTEGER);
          valData.position.width = valData.width = Math.clamped(valData.position.width, valData.minWidth, maxW);
@@ -172,7 +172,7 @@ export class BasicBounds
          }
       }
 
-      if (valData.position.height !== 'auto')
+      if (typeof valData.position.height === 'number')
       {
          const maxH = valData.maxHeight ?? (this.#constrain ? boundsHeight : Number.MAX_SAFE_INTEGER);
          valData.position.height = valData.height = Math.clamped(valData.position.height, valData.minHeight, maxH);

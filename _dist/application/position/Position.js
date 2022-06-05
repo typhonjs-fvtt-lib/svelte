@@ -144,10 +144,10 @@ export class Position
    static get Validators() { return positionValidators; }
 
    /**
-    * @param {PositionParent|PositionOptions}   [parent] - A potential parent element or object w/ `elementTarget`
+    * @param {PositionParent|PositionOptionsAll}   [parent] - A potential parent element or object w/ `elementTarget`
     *                                                      getter. May also be the PositionOptions object w/ 1 argument.
     *
-    * @param {PositionOptions}   options - Default values.
+    * @param {PositionOptionsAll}   options - Default values.
     */
    constructor(parent, options)
    {
@@ -192,7 +192,8 @@ export class Position
 
          // Set default values from options.
 
-         if (Number.isFinite(options.height) || options.height === 'auto' || options.height === null)
+         if (Number.isFinite(options.height) || options.height === 'auto' || options.height === 'inherit' ||
+          options.height === null)
          {
             data.height = updateData.dimensionData.height = typeof options.height === 'number' ?
              Math.round(options.height) : options.height;
@@ -269,7 +270,8 @@ export class Position
             transforms.translateZ = data.translateZ = options.translateZ;
          }
 
-         if (Number.isFinite(options.width) || options.width === 'auto' || options.width === null)
+         if (Number.isFinite(options.width) || options.width === 'auto' || options.width === 'inherit' ||
+          options.width === null)
          {
             data.width = updateData.dimensionData.width = typeof options.width === 'number' ?
              Math.round(options.width) : options.width;
@@ -925,14 +927,16 @@ export class Position
          if (data.zIndex !== position.zIndex) { data.zIndex = position.zIndex; changeSet.zIndex = true; }
       }
 
-      if (Number.isFinite(position.width) || position.width === 'auto' || position.width === null)
+      if (Number.isFinite(position.width) || position.width === 'auto' || position.width === 'inherit' ||
+       position.width === null)
       {
          position.width = typeof position.width === 'number' ? Math.round(position.width) : position.width;
 
          if (data.width !== position.width) { data.width = position.width; changeSet.width = true; }
       }
 
-      if (Number.isFinite(position.height) || position.height === 'auto' || position.height === null)
+      if (Number.isFinite(position.height) || position.height === 'auto' || position.height === 'inherit' ||
+       position.height === null)
       {
          position.height = typeof position.height === 'number' ? Math.round(position.height) : position.height;
 
@@ -1062,6 +1066,11 @@ export class Position
             currentPosition.width = 'auto';
             width = styleCache.offsetWidth;
          }
+         else if (width === 'inherit' || (currentPosition.width === 'inherit' && width !== null))
+         {
+            currentPosition.width = 'inherit';
+            width = styleCache.offsetWidth;
+         }
          else
          {
             const newWidth = Number.isFinite(width) ? width : currentPosition.width;
@@ -1079,6 +1088,11 @@ export class Position
          if (height === 'auto' || (currentPosition.height === 'auto' && height !== null))
          {
             currentPosition.height = 'auto';
+            height = styleCache.offsetHeight;
+         }
+         else if (height === 'inherit' || (currentPosition.height === 'inherit' && height !== null))
+         {
+            currentPosition.height = 'inherit';
             height = styleCache.offsetHeight;
          }
          else
@@ -1316,6 +1330,10 @@ Object.seal(s_VALIDATION_DATA);
  * @property {boolean} ortho - Sets Position to orthographic mode using just transform / matrix3d for positioning.
  *
  * @property {boolean} transformSubscribed - Set to true when there are subscribers to the readable transform store.
+ */
+
+/**
+ * @typedef {PositionOptions & PositionData} PositionOptionsAll
  */
 
 /**
