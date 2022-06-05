@@ -1,7 +1,9 @@
 import { linear }             from 'svelte/easing';
 
 import { lerp }               from '@typhonjs-fvtt/svelte/math';
-import { isObject }           from '@typhonjs-fvtt/svelte/util';
+import {
+   isIterable,
+   isObject }                 from '@typhonjs-fvtt/svelte/util';
 
 import { AnimationControl }   from './AnimationControl.js';
 import { AnimationManager }   from './AnimationManager.js';
@@ -422,9 +424,9 @@ export class AnimationAPI
     */
    quickTo(keys, { duration = 1, ease = linear, interpolate = lerp } = {})
    {
-      if (!Array.isArray(keys))
+      if (!isIterable(keys))
       {
-         throw new TypeError(`AnimationAPI.quickTo error: 'keys' is not an array.`);
+         throw new TypeError(`AnimationAPI.quickTo error: 'keys' is not an iterable list.`);
       }
 
       const parent = this.#position.parent;
@@ -437,17 +439,17 @@ export class AnimationAPI
 
       if (!Number.isFinite(duration) || duration < 0)
       {
-         throw new TypeError(`AnimationAPI.to error: 'duration' is not a positive number.`);
+         throw new TypeError(`AnimationAPI.quickTo error: 'duration' is not a positive number.`);
       }
 
       if (typeof ease !== 'function')
       {
-         throw new TypeError(`AnimationAPI.to error: 'ease' is not a function.`);
+         throw new TypeError(`AnimationAPI.quickTo error: 'ease' is not a function.`);
       }
 
       if (typeof interpolate !== 'function')
       {
-         throw new TypeError(`AnimationAPI.to error: 'interpolate' is not a function.`);
+         throw new TypeError(`AnimationAPI.quickTo error: 'interpolate' is not a function.`);
       }
 
       const initial = {};
@@ -477,6 +479,8 @@ export class AnimationAPI
 
       const keysArray = [...keys];
 
+      Object.freeze(keysArray);
+
       const newData = Object.assign({ immediateElementUpdate: true }, initial);
 
       const animationData = {
@@ -499,7 +503,7 @@ export class AnimationAPI
          start: void 0
       };
 
-      return (...args) =>
+      const quickToCB = (...args) =>
       {
          const argsLength = args.length;
 
@@ -558,6 +562,10 @@ export class AnimationAPI
             animationData.current = 0;
          }
       };
+
+      quickToCB.keys = keysArray;
+
+      return quickToCB;
    }
 }
 
