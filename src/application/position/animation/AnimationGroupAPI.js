@@ -781,6 +781,101 @@ export class AnimationGroupAPI
 
       quickToCB.keys = keysArray;
 
+      /**
+       * Sets options of quickTo tween.
+       *
+       * @param {object|Function}   [options] - Optional parameters.
+       *
+       * @param {number}            [options.duration] - Duration in seconds.
+       *
+       * @param {Function}          [options.ease] - Easing function.
+       *
+       * @param {Function}          [options.interpolate] - Interpolation function.
+       *
+       * @returns {quickToCallback} The quickTo callback.
+       */
+      quickToCB.options = (options) => // eslint-disable-line no-shadow
+      {
+         if (options !== void 0 && !isObject(options) && typeof options !== 'function')
+         {
+            throw new TypeError(`AnimationGroupAPI.quickTo error: 'options' is not an object or function.`);
+         }
+
+         // Set options object for each quickTo callback.
+         if (isObject(options))
+         {
+            for (let cntr = quickToCallbacks.length; --cntr >= 0;) { quickToCallbacks[cntr].options(options); }
+         }
+         else if (typeof options === 'function')
+         {
+            if (isIterable(position))
+            {
+               index = -1;
+               let cntr = 0;
+
+               for (const entry of position)
+               {
+                  index++;
+
+                  const isPosition = this.#isPosition(entry);
+                  const actualPosition = isPosition ? entry : entry.position;
+
+                  if (!this.#isPosition(actualPosition))
+                  {
+                     console.warn(
+                      `AnimationGroupAPI.quickTo.options warning: No Position instance found at index: ${index}.`);
+                     continue;
+                  }
+
+                  callbackOptions.index = index;
+                  callbackOptions.position = position;
+                  callbackOptions.data = isPosition ? void 0 : entry;
+
+                  actualOptions = options(callbackOptions);
+
+                  // Returned data from callback is null / undefined, so skip this position instance.
+                  if (actualOptions === null || actualOptions === void 0) { continue; }
+
+                  if (typeof actualOptions !== 'object')
+                  {
+                     throw new TypeError(
+                      `AnimationGroupAPI.quickTo.options error: options callback function iteration(${
+                       index}) failed to return an object.`);
+                  }
+
+                  quickToCallbacks[cntr++].options(actualOptions);
+               }
+            }
+            else
+            {
+               const isPosition = this.#isPosition(position);
+               const actualPosition = isPosition ? position : position.position;
+
+               if (!this.#isPosition(actualPosition))
+               {
+                  console.warn(`AnimationGroupAPI.quickTo.options warning: No Position instance found.`);
+                  return quickToCB;
+               }
+
+               callbackOptions.index = 0;
+               callbackOptions.position = position;
+               callbackOptions.data = isPosition ? void 0 : position;
+
+               actualOptions = options(callbackOptions);
+
+               if (typeof actualOptions !== 'object')
+               {
+                  throw new TypeError(
+                   `AnimationGroupAPI.quickTo error: options callback function failed to return an object.`);
+               }
+
+               quickToCallbacks[0].options(actualOptions);
+            }
+         }
+
+         return quickToCB;
+      };
+
       return quickToCB;
    }
 }

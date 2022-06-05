@@ -565,6 +565,43 @@ export class AnimationAPI
 
       quickToCB.keys = keysArray;
 
+      /**
+       * Sets options of quickTo tween.
+       *
+       * @param {object}            [opts] - Optional parameters.
+       *
+       * @param {number}            [opts.duration] - Duration in seconds.
+       *
+       * @param {Function}          [opts.ease] - Easing function.
+       *
+       * @param {Function}          [opts.interpolate] - Interpolation function.
+       *
+       * @returns {quickToCallback} The quickTo callback.
+       */
+      quickToCB.options = ({ duration, ease, interpolate } = {}) => // eslint-disable-line no-shadow
+      {
+         if (duration !== void 0 && (!Number.isFinite(duration) || duration < 0))
+         {
+            throw new TypeError(`AnimationAPI.quickTo.options error: 'duration' is not a positive number.`);
+         }
+
+         if (ease !== void 0 && typeof ease !== 'function')
+         {
+            throw new TypeError(`AnimationAPI.quickTo.options error: 'ease' is not a function.`);
+         }
+
+         if (interpolate !== void 0 && typeof interpolate !== 'function')
+         {
+            throw new TypeError(`AnimationAPI.quickTo.options error: 'interpolate' is not a function.`);
+         }
+
+         if (duration >= 0) { animationData.duration = duration * 1000; }
+         if (ease) { animationData.ease = ease; }
+         if (interpolate) { animationData.interpolate = interpolate; }
+
+         return quickToCB;
+      };
+
       return quickToCB;
    }
 }
@@ -574,4 +611,7 @@ export class AnimationAPI
  *
  * @param {...number|object} args - Either individual numbers corresponding to the order in which keys are specified or
  *                                  a single object with keys specified and numerical values.
+ *
+ * @property {({duration?: number, ease?: Function, interpolate?: Function}) => quickToCallback} options - A function
+ *                                  to update options for quickTo function.
  */

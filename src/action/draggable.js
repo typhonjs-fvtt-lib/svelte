@@ -175,13 +175,18 @@ function draggable(node, { position, active = true, storeDragging = void 0, ease
             else { removeListeners(); }
          }
 
+         if (options.position !== void 0 && options.position !== position)
+         {
+            position = options.position;
+            quickTo = position.animate.quickTo(['top', 'left'], easeOptions);
+         }
+
          if (typeof options.ease === 'boolean') { ease = options.ease; }
 
          if (typeof options.easeOptions === 'object')
          {
             easeOptions = options.easeOptions;
-
-            quickTo = position.animate.quickTo(['top', 'left'], easeOptions);
+            quickTo.options(easeOptions);
          }
       },
 
