@@ -3,6 +3,7 @@ import { getContext, setContext } from 'svelte';
 import { s_DEFAULT_TRANSITION, s_DEFAULT_TRANSITION_OPTIONS } from '@typhonjs-fvtt/svelte/transition';
 import { writable } from 'svelte/store';
 import { applyStyles, draggable, resizeObserver } from '@typhonjs-fvtt/svelte/action';
+import { cubicOut } from 'svelte/easing';
 import { localize } from '@typhonjs-fvtt/svelte/helper';
 import { isSvelteComponent, isObject, parseSvelteConfig } from '@typhonjs-fvtt/svelte/util';
 import { fade } from 'svelte/transition';
@@ -931,7 +932,7 @@ function get_each_context$1(ctx, list, i) {
 	return child_ctx;
 }
 
-// (78:6) {#each buttons as button}
+// (86:6) {#each buttons as button}
 function create_each_block$1(ctx) {
 	let switch_instance;
 	let switch_instance_anchor;
@@ -1011,7 +1012,7 @@ function create_each_block$1(ctx) {
 	};
 }
 
-// (73:0) {#key draggable}
+// (81:0) {#key draggable}
 function create_key_block(ctx) {
 	let header;
 	let h4;
@@ -1248,8 +1249,17 @@ function instance$6($$self, $$props, $$invalidate) {
 
 		if ($$self.$$.dirty & /*draggableOptions, $storeDraggable*/ 139264) {
 			// Combines external options with defaults for TJSApplicationHeader.
+			// $: dragOptions = Object.assign({}, typeof draggableOptions === 'object' ? draggableOptions : {},
+			//  { position: application.position, active: $storeDraggable, storeDragging });
+			// Combines external options with defaults for TJSApplicationHeader. By default, easing is turned on w/ duration of
+			// 0.1 and cubicOut, but can be overridden by any provided `draggableOptions`. `position`, `active`, and
+			// `storeDragging` are always overridden by application position / stores.
 			$$invalidate(1, dragOptions = Object.assign(
 				{},
+				{
+					ease: true,
+					easeOptions: { duration: 0.1, ease: cubicOut }
+				},
 				typeof draggableOptions === 'object'
 				? draggableOptions
 				: {},

@@ -1,5 +1,6 @@
 <script>
    import { getContext }            from 'svelte';
+   import { cubicOut }              from 'svelte/easing';
 
    import {
       draggable as dragDefault }    from '@typhonjs-fvtt/svelte/action';
@@ -28,8 +29,15 @@
    $: draggable = typeof draggable === 'function' ? draggable : dragDefault;
 
    // Combines external options with defaults for TJSApplicationHeader.
-   $: dragOptions = Object.assign({}, typeof draggableOptions === 'object' ? draggableOptions : {},
-    { position: application.position, active: $storeDraggable, storeDragging });
+   // $: dragOptions = Object.assign({}, typeof draggableOptions === 'object' ? draggableOptions : {},
+   //  { position: application.position, active: $storeDraggable, storeDragging });
+
+   // Combines external options with defaults for TJSApplicationHeader. By default, easing is turned on w/ duration of
+   // 0.1 and cubicOut, but can be overridden by any provided `draggableOptions`. `position`, `active`, and
+   // `storeDragging` are always overridden by application position / stores.
+   $: dragOptions = Object.assign({}, { ease: true, easeOptions: { duration: 0.1, ease: cubicOut } },
+    typeof draggableOptions === 'object' ? draggableOptions : {}, { position: application.position, active:
+     $storeDraggable, storeDragging });
 
    let displayHeaderTitle;
 

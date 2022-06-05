@@ -207,17 +207,17 @@ class DraggableOptions
     */
    #subscriptions = [];
 
-   constructor()
+   constructor({ ease, easeOptions } = {})
    {
       // Define the following getters directly on this instance and make them enumerable. This allows them to be
       // picked up w/ `Object.assign`.
       Object.defineProperty(this, 'ease', {
          get: () => { return this.#ease; },
-         set: (ease) =>
+         set: (newEase) =>
          {
-            if (typeof ease !== 'boolean') { throw new TypeError(`'ease' is not a boolean.`); }
+            if (typeof newEase !== 'boolean') { throw new TypeError(`'ease' is not a boolean.`); }
 
-            this.#ease = ease;
+            this.#ease = newEase;
             this.#updateSubscribers();
          },
          enumerable: true
@@ -225,9 +225,43 @@ class DraggableOptions
 
       Object.defineProperty(this, 'easeOptions', {
          get: () => { return this.#easeOptions; },
-         set: (easeOptions) => { this.#easeOptions = easeOptions; this.#updateSubscribers(); },
+         set: (newEaseOptions) =>
+         {
+            if (newEaseOptions === null || typeof newEaseOptions !== 'object')
+            {
+               throw new TypeError(`'easeOptions' is not an object.`);
+            }
+
+            if (newEaseOptions.duration !== void 0)
+            {
+               if (!Number.isFinite(newEaseOptions.duration))
+               {
+                  throw new TypeError(`'easeOptions.duration' is not a finite number.`);
+               }
+
+               if (newEaseOptions.duration < 0) { throw new Error(`'easeOptions.duration' is less than 0.`); }
+
+               this.#easeOptions.duration = newEaseOptions.duration;
+            }
+
+            if (newEaseOptions.ease !== void 0)
+            {
+               if (typeof newEaseOptions.ease !== 'function' && typeof newEaseOptions.ease !== 'string')
+               {
+                  throw new TypeError(`'easeOptions.ease' is not a function or string.`);
+               }
+
+               this.#easeOptions.ease = newEaseOptions.ease;
+            }
+
+            this.#updateSubscribers();
+         },
          enumerable: true
       });
+
+      // Set default options.
+      if (ease !== void 0) { this.ease = ease; }
+      if (easeOptions !== void 0) { this.easeOptions = easeOptions; }
    }
 
 
@@ -329,7 +363,7 @@ class DraggableOptions
  *
  * @returns {DraggableOptions} A new options instance.
  */
-draggable.options = () => new DraggableOptions();
+draggable.options = (options) => new DraggableOptions(options);
 
 export { draggable };
 
