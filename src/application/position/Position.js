@@ -147,7 +147,7 @@ export class Position
     * @param {PositionParent|PositionOptionsAll}   [parent] - A potential parent element or object w/ `elementTarget`
     *                                                      getter. May also be the PositionOptions object w/ 1 argument.
     *
-    * @param {PositionOptionsAll}   options - Default values.
+    * @param {PositionOptionsAll}   [options] - Default values.
     */
    constructor(parent, options)
    {
@@ -686,6 +686,23 @@ export class Position
    set zIndex(zIndex)
    {
       this.#stores.zIndex.set(zIndex);
+   }
+
+   /**
+    * Duplicates this position instance along with options and validators.
+    *
+    * @returns {Position} A duplicated position instance.
+    */
+   duplicate()
+   {
+      const newPosition = new Position();
+
+      newPosition.#options = Object.assign({}, this.#options);
+      newPosition.#validators.add(...this.#validators);
+
+      newPosition.set(this.#data);
+
+      return newPosition;
    }
 
    /**

@@ -25,61 +25,70 @@ function debounce(callback, delay)
 /**
  * Provides a method to determine if the passed in Svelte component has a getter accessor.
  *
- * @param {*}        component - Svelte component.
+ * @param {*}        object - An object.
  *
  * @param {string}   accessor - Accessor to test.
  *
  * @returns {boolean} Whether the component has the getter for accessor.
  */
-function hasGetter(component, accessor)
+function hasGetter(object, accessor)
 {
-   if (component === null || component === void 0) { return false; }
+   if (object === null || object === void 0) { return false; }
 
-   // Get the prototype which is the parent SvelteComponent that has any getter / setters.
-   const prototype = Object.getPrototypeOf(component);
-   const descriptor = Object.getOwnPropertyDescriptor(prototype, accessor);
+   // Walk parent prototype chain. Check for descriptor at each prototype level.
+   for (let o = Object.getPrototypeOf(object); o; o = Object.getPrototypeOf(o))
+   {
+      const descriptor = Object.getOwnPropertyDescriptor(o, accessor);
+      if (descriptor !== void 0 && descriptor.get !== void 0) { return true; }
+   }
 
-   return !(descriptor === void 0 || descriptor.get === void 0);
+   return false;
 }
 
 /**
  * Provides a method to determine if the passed in Svelte component has a getter & setter accessor.
  *
- * @param {*}        component - Svelte component.
+ * @param {*}        object - An object.
  *
  * @param {string}   accessor - Accessor to test.
  *
  * @returns {boolean} Whether the component has the getter and setter for accessor.
  */
-function hasAccessor(component, accessor)
+function hasAccessor(object, accessor)
 {
-   if (component === null || component === void 0) { return false; }
+   if (object === null || object === void 0) { return false; }
 
-   // Get the prototype which is the parent SvelteComponent that has any getter / setters.
-   const prototype = Object.getPrototypeOf(component);
-   const descriptor = Object.getOwnPropertyDescriptor(prototype, accessor);
+   // Walk parent prototype chain. Check for descriptor at each prototype level.
+   for (let o = Object.getPrototypeOf(object); o; o = Object.getPrototypeOf(o))
+   {
+      const descriptor = Object.getOwnPropertyDescriptor(o, accessor);
+      if (descriptor !== void 0 && descriptor.get !== void 0 && descriptor.set !== void 0) { return true; }
+   }
 
-   return !(descriptor === void 0 || descriptor.get === void 0 || descriptor.set === void 0);
+   return false;
 }
 
 /**
  * Provides a method to determine if the passed in Svelte component has a setter accessor.
  *
- * @param {*}        component - Svelte component.
+ * @param {*}        object - An object.
  *
  * @param {string}   accessor - Accessor to test.
  *
  * @returns {boolean} Whether the component has the setter for accessor.
  */
-function hasSetter(component, accessor)
+function hasSetter(object, accessor)
 {
-   if (component === null || component === void 0) { return false; }
+   if (object === null || object === void 0) { return false; }
 
-   // Get the prototype which is the parent SvelteComponent that has any getter / setters.
-   const prototype = Object.getPrototypeOf(component);
-   const descriptor = Object.getOwnPropertyDescriptor(prototype, accessor);
+   // Walk parent prototype chain. Check for descriptor at each prototype level.
+   for (let o = Object.getPrototypeOf(object); o; o = Object.getPrototypeOf(o))
+   {
+      const descriptor = Object.getOwnPropertyDescriptor(o, accessor);
+      if (descriptor !== void 0 && descriptor.set !== void 0) { return true; }
+   }
 
-   return !(descriptor === void 0 || descriptor.set === void 0);
+   return false;
 }
 
 /**
