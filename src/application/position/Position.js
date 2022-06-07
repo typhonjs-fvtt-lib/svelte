@@ -455,7 +455,7 @@ export class Position
 // Data accessors ----------------------------------------------------------------------------------------------------
 
    /**
-    * @returns {number|'auto'|null} height
+    * @returns {number|'auto'|'inherit'|null} height
     */
    get height() { return this.#data.height; }
 
@@ -535,7 +535,7 @@ export class Position
    get translateZ() { return this.#data.translateZ; }
 
    /**
-    * @returns {number|'auto'|null} width
+    * @returns {number|'auto'|'inherit'|null} width
     */
    get width() { return this.#data.width; }
 
@@ -545,7 +545,7 @@ export class Position
    get zIndex() { return this.#data.zIndex; }
 
    /**
-    * @param {number|'auto'|null} height -
+    * @param {number|string|null} height -
     */
    set height(height)
    {
@@ -553,7 +553,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} left -
+    * @param {number|string|null} left -
     */
    set left(left)
    {
@@ -561,7 +561,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} maxHeight -
+    * @param {number|string|null} maxHeight -
     */
    set maxHeight(maxHeight)
    {
@@ -569,7 +569,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} maxWidth -
+    * @param {number|string|null} maxWidth -
     */
    set maxWidth(maxWidth)
    {
@@ -577,7 +577,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} minHeight -
+    * @param {number|string|null} minHeight -
     */
    set minHeight(minHeight)
    {
@@ -585,7 +585,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} minWidth -
+    * @param {number|string|null} minWidth -
     */
    set minWidth(minWidth)
    {
@@ -593,7 +593,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} rotateX -
+    * @param {number|string|null} rotateX -
     */
    set rotateX(rotateX)
    {
@@ -601,7 +601,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} rotateY -
+    * @param {number|string|null} rotateY -
     */
    set rotateY(rotateY)
    {
@@ -609,7 +609,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} rotateZ -
+    * @param {number|string|null} rotateZ -
     */
    set rotateZ(rotateZ)
    {
@@ -617,7 +617,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} rotateZ - alias for rotateZ
+    * @param {number|string|null} rotateZ - alias for rotateZ
     */
    set rotation(rotateZ)
    {
@@ -625,7 +625,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} scale -
+    * @param {number|string|null} scale -
     */
    set scale(scale)
    {
@@ -633,7 +633,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} top -
+    * @param {number|string|null} top -
     */
    set top(top)
    {
@@ -649,7 +649,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} translateX -
+    * @param {number|string|null} translateX -
     */
    set translateX(translateX)
    {
@@ -657,7 +657,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} translateY -
+    * @param {number|string|null} translateY -
     */
    set translateY(translateY)
    {
@@ -665,7 +665,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} translateZ -
+    * @param {number|string|null} translateZ -
     */
    set translateZ(translateZ)
    {
@@ -673,7 +673,7 @@ export class Position
    }
 
    /**
-    * @param {number|'auto'|null} width -
+    * @param {number|string|null} width -
     */
    set width(width)
    {
@@ -681,7 +681,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} zIndex -
+    * @param {number|string|null} zIndex -
     */
    set zIndex(zIndex)
    {
@@ -689,10 +689,45 @@ export class Position
    }
 
    /**
-    * Duplicates this position instance along with options and validators.
+    * Converts any relative string values for animatable keys to actual updates performed against current data.
     *
-    * @returns {Position} A duplicated position instance.
+    * @param {PositionDataExtended} position - position data.
     */
+   #convertRelative(position)
+   {
+      for (const key in position)
+      {
+         // Key is animatable / numeric.
+         if (constants.animateKeys.has(key))
+         {
+            const value = position[key];
+
+            if (typeof value !== 'string') { continue; }
+
+            const regexResults = constants.relativeRegex.exec(value);
+
+            if (!regexResults)
+            {
+               throw new Error(
+                `Position.#convertRelative error: malformed relative key (${key}) with value (${value})`);
+            }
+
+            const current = this[key];
+
+            switch (regexResults[1])
+            {
+               case '-':
+                  position[key] = current - parseFloat(regexResults[2]);
+                  break;
+
+               case '+':
+                  position[key] = current + parseFloat(regexResults[2]);
+                  break;
+            }
+         }
+      }
+   }
+
    duplicate()
    {
       const newPosition = new Position();
@@ -813,6 +848,9 @@ export class Position
             changeSet.set(true);
             this.#updateElementData.queued = false;
          }
+
+         // Converts any relative string position data to numeric inputs.
+         this.#convertRelative(position);
 
          position = this.#updatePosition(position, parent, el, styleCache);
 
@@ -1288,39 +1326,39 @@ Object.seal(s_VALIDATION_DATA);
 /**
  * @typedef {object} PositionDataExtended
  *
- * @property {number|'auto'|null} [height] -
+ * @property {number|string|null} [height] -
  *
- * @property {number|null} [left] -
+ * @property {number|string|null} [left] -
  *
- * @property {number|null} [maxHeight] -
+ * @property {number|string|null} [maxHeight] -
  *
- * @property {number|null} [maxWidth] -
+ * @property {number|string|null} [maxWidth] -
  *
- * @property {number|null} [minHeight] -
+ * @property {number|string|null} [minHeight] -
  *
- * @property {number|null} [minWidth] -
+ * @property {number|string|null} [minWidth] -
  *
- * @property {number|null} [rotateX] -
+ * @property {number|string|null} [rotateX] -
  *
- * @property {number|null} [rotateY] -
+ * @property {number|string|null} [rotateY] -
  *
- * @property {number|null} [rotateZ] -
+ * @property {number|string|null} [rotateZ] -
  *
- * @property {number|null} [scale] -
+ * @property {number|string|null} [scale] -
  *
- * @property {number|null} [top] -
+ * @property {number|string|null} [top] -
  *
  * @property {string|null} [transformOrigin] -
  *
- * @property {number|null} [translateX] -
+ * @property {number|string|null} [translateX] -
  *
- * @property {number|null} [translateY] -
+ * @property {number|string|null} [translateY] -
  *
- * @property {number|null} [translateZ] -
+ * @property {number|string|null} [translateZ] -
  *
- * @property {number|'auto'|null} [width] -
+ * @property {number|string|null} [width] -
  *
- * @property {number|null} [zIndex] -
+ * @property {number|string|null} [zIndex] -
  *
  * Extended properties -----------------------------------------------------------------------------------------------
  *

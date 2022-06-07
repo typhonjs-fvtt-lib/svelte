@@ -22,6 +22,13 @@ const transformKeys = ['rotateX', 'rotateY', 'rotateZ', 'scale', 'translateX', '
 Object.freeze(transformKeys);
 
 /**
+ * Parses a relative value string in the form of '+' or '-' and float / numeric value. IE '+0.2'.
+ *
+ * @type {RegExp}
+ */
+const relativeRegex = /^([-+])([\d\.]+)$/;
+
+/**
  * Provides numeric defaults for all parameters. This is used by {@link Position.get} to optionally provide
  * numeric defaults.
  *
@@ -110,6 +117,7 @@ Object.freeze(transformOrigins);
 export {
    animateKeys,
    numericDefaults,
+   relativeRegex,
    setNumericDefaults,
    transformKeys,
    transformKeysBitwise,
