@@ -144,6 +144,31 @@ export class Position
    static get Validators() { return positionValidators; }
 
    /**
+    * Returns a duplicate of a given position instance copying any options and validators.
+    *
+    * // TODO: Consider more safety over options processing.
+    *
+    * @param {Position}          position - A position instance.
+    *
+    * @param {PositionOptions}   options - Position options.
+    *
+    * @returns {Position} A duplicate position instance.
+    */
+   static duplicate(position, options)
+   {
+      if (!(position instanceof Position)) { throw new TypeError(`'position' is not an instance of Position.`); }
+
+      const newPosition = new Position(options);
+
+      newPosition.#options = Object.assign({}, position.#options, options);
+      newPosition.#validators.add(...position.#validators);
+
+      newPosition.set(position.#data);
+
+      return newPosition;
+   }
+
+   /**
     * @param {PositionParent|PositionOptionsAll}   [parent] - A potential parent element or object w/ `elementTarget`
     *                                                      getter. May also be the PositionOptions object w/ 1 argument.
     *
@@ -729,18 +754,6 @@ export class Position
             }
          }
       }
-   }
-
-   duplicate()
-   {
-      const newPosition = new Position();
-
-      newPosition.#options = Object.assign({}, this.#options);
-      newPosition.#validators.add(...this.#validators);
-
-      newPosition.set(this.#data);
-
-      return newPosition;
    }
 
    /**
