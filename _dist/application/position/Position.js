@@ -704,6 +704,9 @@ export class Position
 
             if (typeof value !== 'string') { continue; }
 
+            // Ignore 'auto' and 'inherit' string values.
+            if (value === 'auto' || value === 'inherit') { continue; }
+
             const regexResults = constants.relativeRegex.exec(value);
 
             if (!regexResults)
