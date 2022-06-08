@@ -10,6 +10,7 @@ import {
 import { AnimationAPI }          from './animation/AnimationAPI.js';
 import { AnimationGroupAPI }     from './animation/AnimationGroupAPI.js';
 import * as constants            from './constants.js';
+import { convertRelative }       from './convertRelative.js';
 import * as positionInitial      from './initial/index.js';
 import { PositionChangeSet }     from './PositionChangeSet.js';
 import { PositionData }          from './PositionData.js';
@@ -721,49 +722,6 @@ export class Position
    }
 
    /**
-    * Converts any relative string values for animatable keys to actual updates performed against current data.
-    *
-    * @param {PositionDataExtended} position - position data.
-    */
-   #convertRelative(position)
-   {
-      for (const key in position)
-      {
-         // Key is animatable / numeric.
-         if (constants.animateKeys.has(key))
-         {
-            const value = position[key];
-
-            if (typeof value !== 'string') { continue; }
-
-            // Ignore 'auto' and 'inherit' string values.
-            if (value === 'auto' || value === 'inherit') { continue; }
-
-            const regexResults = constants.relativeRegex.exec(value);
-
-            if (!regexResults)
-            {
-               throw new Error(
-                `Position.#convertRelative error: malformed relative key (${key}) with value (${value})`);
-            }
-
-            const current = this[key];
-
-            switch (regexResults[1])
-            {
-               case '-':
-                  position[key] = current - parseFloat(regexResults[2]);
-                  break;
-
-               case '+':
-                  position[key] = current + parseFloat(regexResults[2]);
-                  break;
-            }
-         }
-      }
-   }
-
-   /**
     * Assigns current position to object passed into method.
     *
     * @param {object|PositionData}  [position] - Target to assign current position data.
@@ -873,7 +831,7 @@ export class Position
          }
 
          // Converts any relative string position data to numeric inputs.
-         this.#convertRelative(position);
+         convertRelative(position, this);
 
          position = this.#updatePosition(position, parent, el, styleCache);
 
