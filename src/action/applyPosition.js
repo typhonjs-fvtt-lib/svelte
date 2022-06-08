@@ -16,6 +16,9 @@ export function applyPosition(node, position)
    return {
       update: (newPosition) =>
       {
+         // Sanity case to short circuit update if positions are the same instance.
+         if (newPosition === position && newPosition.parent === position.parent) { return; }
+
          if (hasSetter(position)) { position.parent = void 0; }
 
          position = newPosition;

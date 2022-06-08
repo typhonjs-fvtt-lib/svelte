@@ -4,6 +4,7 @@ import {
 
 import {
    isIterable,
+   isObject,
    isPlainObject }               from '@typhonjs-fvtt/svelte/util';
 
 import { AnimationAPI }          from './animation/AnimationAPI.js';
@@ -464,17 +465,23 @@ export class Position
    /**
     * Sets the associated {@link PositionParent} instance. Resets the style cache and default data.
     *
-    * @param {PositionParent} parent - A PositionParent instance.
+    * @param {PositionParent|void} parent - A PositionParent instance.
     */
    set parent(parent)
    {
+      if (parent !== void 0 && !(parent instanceof HTMLElement) && !isObject(parent))
+      {
+         throw new TypeError(`'parent' is not an HTMLElement, object, or undefined.`);
+      }
+
       this.#parent = parent;
 
       // Reset any stored default data & the style cache.
       this.#state.remove({ name: '#defaultData' });
       this.#styleCache.reset();
 
-      this.set(this.#data);
+      // If a parent is defined then invoke set to update any parent element.
+      if (parent) { this.set(this.#data); }
    }
 
 // Data accessors ----------------------------------------------------------------------------------------------------
