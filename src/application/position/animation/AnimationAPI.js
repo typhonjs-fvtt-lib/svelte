@@ -1,4 +1,4 @@
-import { linear }             from 'svelte/easing';
+import { cubicOut }           from 'svelte/easing';
 
 import { lerp }               from '@typhonjs-fvtt/svelte/math';
 import {
@@ -7,6 +7,8 @@ import {
 
 import { AnimationControl }   from './AnimationControl.js';
 import { AnimationManager }   from './AnimationManager.js';
+
+import { convertRelative }    from '../convertRelative.js';
 
 import {
    animateKeys,
@@ -182,20 +184,21 @@ export class AnimationAPI
     *
     * @param {number}         [opts.duration=1] - Duration in seconds.
     *
-    * @param {Function}       [opts.ease=linear] - Easing function.
+    * @param {Function}       [opts.ease=cubicOut] - Easing function.
     *
     * @param {Function}       [opts.interpolate=lerp] - Interpolation function.
     *
     * @returns {AnimationControl}  A control object that can cancel animation and provides a `finished` Promise.
     */
-   from(fromData, { delay = 0, duration = 1, ease = linear, interpolate = lerp } = {})
+   from(fromData, { delay = 0, duration = 1, ease = cubicOut, interpolate = lerp } = {})
    {
       if (!isObject(fromData))
       {
          throw new TypeError(`AnimationAPI.from error: 'fromData' is not an object.`);
       }
 
-      const parent = this.#position.parent;
+      const position = this.#position;
+      const parent = position.parent;
 
       // Early out if the application is not positionable.
       if (parent !== void 0 && typeof parent?.options?.positionable === 'boolean' && !parent?.options?.positionable)
@@ -242,6 +245,8 @@ export class AnimationAPI
          }
       }
 
+      convertRelative(initial, data);
+
       return this.#addAnimation(initial, destination, duration, el, delay, ease, interpolate);
    }
 
@@ -258,13 +263,13 @@ export class AnimationAPI
     *
     * @param {number}         [opts.duration=1] - Duration in seconds.
     *
-    * @param {Function}       [opts.ease=linear] - Easing function.
+    * @param {Function}       [opts.ease=cubicOut] - Easing function.
     *
     * @param {Function}       [opts.interpolate=lerp] - Interpolation function.
     *
     * @returns {AnimationControl}  A control object that can cancel animation and provides a `finished` Promise.
     */
-   fromTo(fromData, toData, { delay = 0, duration = 1, ease = linear, interpolate = lerp } = {})
+   fromTo(fromData, toData, { delay = 0, duration = 1, ease = cubicOut, interpolate = lerp } = {})
    {
       if (!isObject(fromData))
       {
@@ -330,6 +335,9 @@ export class AnimationAPI
          }
       }
 
+      convertRelative(initial, data);
+      convertRelative(destination, data);
+
       return this.#addAnimation(initial, destination, duration, el, delay, ease, interpolate);
    }
 
@@ -344,13 +352,13 @@ export class AnimationAPI
     *
     * @param {number}         [opts.duration=1] - Duration in seconds.
     *
-    * @param {Function}       [opts.ease=linear] - Easing function.
+    * @param {Function}       [opts.ease=cubicOut] - Easing function.
     *
     * @param {Function}       [opts.interpolate=lerp] - Interpolation function.
     *
     * @returns {AnimationControl}  A control object that can cancel animation and provides a `finished` Promise.
     */
-   to(toData, { delay = 0, duration = 1, ease = linear, interpolate = lerp } = {})
+   to(toData, { delay = 0, duration = 1, ease = cubicOut, interpolate = lerp } = {})
    {
       if (!isObject(toData))
       {
@@ -404,6 +412,8 @@ export class AnimationAPI
          }
       }
 
+      convertRelative(destination, data);
+
       return this.#addAnimation(initial, destination, duration, el, delay, ease, interpolate);
    }
 
@@ -416,13 +426,13 @@ export class AnimationAPI
     *
     * @param {number}            [opts.duration=1] - Duration in seconds.
     *
-    * @param {Function}          [opts.ease=linear] - Easing function.
+    * @param {Function}          [opts.ease=cubicOut] - Easing function.
     *
     * @param {Function}          [opts.interpolate=lerp] - Interpolation function.
     *
     * @returns {quickToCallback} quick-to tween function.
     */
-   quickTo(keys, { duration = 1, ease = linear, interpolate = lerp } = {})
+   quickTo(keys, { duration = 1, ease = cubicOut, interpolate = lerp } = {})
    {
       if (!isIterable(keys))
       {
@@ -522,7 +532,7 @@ export class AnimationAPI
 
             for (const key in objData)
             {
-               if (destination[key] !== void 0 && Number.isFinite(objData[key])) { destination[key] = objData[key]; }
+               if (destination[key] !== void 0) { destination[key] = objData[key]; }
             }
          }
          else // Assign each variable argument to the key specified in the initial `keys` array above.
@@ -530,9 +540,11 @@ export class AnimationAPI
             for (let cntr = 0; cntr < argsLength && cntr < keysArray.length; cntr++)
             {
                const key = keysArray[cntr];
-               if (destination[key] !== void 0 && Number.isFinite(args[cntr])) { destination[key] = args[cntr]; }
+               if (destination[key] !== void 0) { destination[key] = args[cntr]; }
             }
          }
+
+         convertRelative(destination, data);
 
          // Set initial data for transform values that are often null by default.
          setNumericDefaults(initial);

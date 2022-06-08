@@ -3,9 +3,9 @@ import * as constants from './constants.js';
 /**
  * Converts any relative string values for animatable keys to actual updates performed against current data.
  *
- * @param {PositionDataExtended} positionData - position data.
+ * @param {PositionDataExtended}    positionData - position data.
  *
- * @param {Position}             position - The source position instance.
+ * @param {Position|PositionData}   position - The source position instance.
  */
 export function convertRelative(positionData, position)
 {
@@ -39,6 +39,10 @@ export function convertRelative(positionData, position)
 
             case '+':
                positionData[key] = current + parseFloat(regexResults[2]);
+               break;
+
+            case '*':
+               positionData[key] = current * parseFloat(regexResults[2]);
                break;
          }
       }
