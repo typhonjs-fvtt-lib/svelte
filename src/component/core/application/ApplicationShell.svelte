@@ -223,4 +223,9 @@
    .window-app {
       overflow: inherit;
    }
+
+   /* Note: this is different than stock Foundry that sets `flex: 1`. This greatly aids control of content */
+   .window-app .window-content > * {
+      flex: none;
+   }
 </style>

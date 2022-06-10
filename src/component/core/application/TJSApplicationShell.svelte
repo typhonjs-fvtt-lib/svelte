@@ -197,7 +197,7 @@
 <svelte:options accessors={true}/>
 
 <div id={application.id}
-    class="tjs-app tjs-window-app {application.options.classes.join(' ')}"
+    class="app window-app tjs-app tjs-window-app {application.options.classes.join(' ')}"
     data-appid={application.appId}
     bind:this={elementRoot}
     in:inTransition={inTransitionOptions}
@@ -301,14 +301,16 @@
         flex-direction: column;
         flex-wrap: nowrap;
         justify-content: flex-start;
+        background: none;
         padding: 8px;
         color: #191813;
         overflow-y: auto;
         overflow-x: hidden;
     }
 
+    /* Note: this is different than stock Foundry that sets `flex: 1`. This greatly aids control of content */
     :global(.window-app .window-content > *) {
-        flex: 1;
+        flex: none;
     }
 
     :global(.window-app .window-content > .flex0) {
