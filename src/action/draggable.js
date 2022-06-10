@@ -12,6 +12,8 @@ import { cubicOut } from 'svelte/easing';
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
+ * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
+ *
  * @param {Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging" state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.
@@ -20,7 +22,7 @@ import { cubicOut } from 'svelte/easing';
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-function draggable(node, { position, active = true, storeDragging = void 0, ease = false,
+function draggable(node, { position, active = true, button = 0, storeDragging = void 0, ease = false,
  easeOptions = { duration: 0.1, ease: cubicOut } })
 {
    /**
@@ -99,6 +101,8 @@ function draggable(node, { position, active = true, storeDragging = void 0, ease
     */
    function onDragPointerDown(event)
    {
+      if (event.button !== button || !event.isPrimary) { return; }
+
       event.preventDefault();
 
       dragging = false;
@@ -121,6 +125,8 @@ function draggable(node, { position, active = true, storeDragging = void 0, ease
     */
    function onDragPointerMove(event)
    {
+      if (event.button !== -1 || !event.isPrimary) { return; }
+
       event.preventDefault();
 
       // Only set store dragging on first move event.
@@ -155,6 +161,8 @@ function draggable(node, { position, active = true, storeDragging = void 0, ease
     */
    function onDragPointerUp(event)
    {
+      if (!event.isPrimary) { return; }
+
       event.preventDefault();
 
       dragging = false;
@@ -173,6 +181,11 @@ function draggable(node, { position, active = true, storeDragging = void 0, ease
             active = options.active;
             if (active) { activateListeners(); }
             else { removeListeners(); }
+         }
+
+         if (typeof options.button === 'number')
+         {
+            button = options.button;
          }
 
          if (options.position !== void 0 && options.position !== position)

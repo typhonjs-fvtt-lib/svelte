@@ -197,7 +197,7 @@
 <svelte:options accessors={true}/>
 
 <div id={application.id}
-    class="app window-app tjs-app tjs-window-app {application.options.classes.join(' ')}"
+    class="tjs-app tjs-window-app {application.options.classes.join(' ')}"
     data-appid={application.appId}
     bind:this={elementRoot}
     in:inTransition={inTransitionOptions}
@@ -309,28 +309,28 @@
     }
 
     /* Note: this is different than stock Foundry that sets `flex: 1`. This greatly aids control of content */
-    :global(.window-app .window-content > *) {
-        flex: none;
-    }
+    /*:global(.tjs-window-app .window-content > *) {*/
+    /*    flex: none;*/
+    /*}*/
 
-    :global(.window-app .window-content > .flex0) {
-        display: block;
-        flex: 0;
-    }
+    /*:global(.tjs-window-app .window-content > .flex0) {*/
+    /*    display: block;*/
+    /*    flex: 0;*/
+    /*}*/
 
-    :global(.window-app .window-content > .flex1) {
-        flex: 1;
-    }
+    /*:global(.tjs-window-app .window-content > .flex1) {*/
+    /*    flex: 1;*/
+    /*}*/
 
-    :global(.window-app .window-content > .flex2) {
-        flex: 2;
-    }
+    /*:global(.tjs-window-app .window-content > .flex2) {*/
+    /*    flex: 2;*/
+    /*}*/
 
-    :global(.window-app .window-content > .flex3) {
-        flex: 3;
-    }
+    /*:global(.tjs-window-app .window-content > .flex3) {*/
+    /*    flex: 3;*/
+    /*}*/
 
-    :global(.window-app.zhover) {
+    :global(.tjs-window-app.zhover) {
         z-index: calc(var(--z-index-window) + 1);
     }
 
@@ -350,7 +350,7 @@
         transform: rotate(45deg);
     }
 
-    :global(.window-app.minimized .window-resizable-handle) {
-        display: none;
-    }
+    /*:global(.tjs-window-app.minimized .window-resizable-handle) {*/
+    /*    display: none;*/
+    /*}*/
 </style>

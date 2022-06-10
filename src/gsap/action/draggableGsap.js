@@ -21,6 +21,8 @@ const s_HAS_QUICK_TO = false;
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
+ * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
+ *
  * @param {Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging" state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.
@@ -33,7 +35,7 @@ const s_HAS_QUICK_TO = false;
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-function draggableGsap(node, { position, active = true, storeDragging = void 0, ease = true, inertia = false,
+function draggableGsap(node, { position, active = true, button = 0, storeDragging = void 0, ease = true, inertia = false,
  easeOptions = { duration: 0.1, ease: 'power3.out' },
   inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 } })
 {
@@ -138,6 +140,8 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
     */
    function onDragPointerDown(event)
    {
+      if (event.button !== button || !event.isPrimary) { return; }
+
       event.preventDefault();
 
       dragging = false;
@@ -174,6 +178,8 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
     */
    function onDragPointerMove(event)
    {
+      if (event.button !== -1 || !event.isPrimary) { return; }
+
       event.preventDefault();
 
       // Only set store dragging on first move event.
@@ -221,6 +227,8 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
     */
    function onDragPointerUp(event)
    {
+      if (!event.isPrimary) { return; }
+
       event.preventDefault();
 
       dragging = false;
@@ -276,6 +284,11 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
             active = options.active;
             if (active) { activateListeners(); }
             else { removeListeners(); }
+         }
+
+         if (typeof options.button === 'number')
+         {
+            button = options.button;
          }
 
          if (typeof options.ease === 'boolean') { ease = options.ease; }
