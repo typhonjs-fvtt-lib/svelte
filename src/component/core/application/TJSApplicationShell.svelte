@@ -50,10 +50,20 @@
    // If the application is a popOut application then when clicked bring to top. Bound to on pointerdown.
    const bringToTop = () =>
    {
-      if (typeof application.options.popOut === 'boolean' && application.options.popOut &&
-       application !== ui?.activeWindow)
+      if (typeof application.options.popOut === 'boolean' && application.options.popOut)
       {
-         application.bringToTop.call(application);
+         if (application !== ui?.activeWindow) { application.bringToTop.call(application); }
+
+         // If the activeElement is not `document.body` then blur the current active element and make `document.body`
+         // focused. This allows <esc> key to close all open apps / windows.
+         if (document.activeElement !== document.body)
+         {
+            // Blur current active element.
+            if (document.activeElement instanceof HTMLElement) { document.activeElement.blur(); }
+
+            // Make document body focused.
+            document.body.focus();
+         }
       }
    }
 

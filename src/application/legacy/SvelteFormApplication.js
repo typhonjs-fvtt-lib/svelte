@@ -227,6 +227,17 @@ export class SvelteFormApplication extends FormApplication
    {
       if (force || this.popOut) { super.bringToTop(); }
 
+      // If the activeElement is not `document.body` then blur the current active element and make `document.body`
+      // focused. This allows <esc> key to close all open apps / windows.
+      if (document.activeElement !== document.body)
+      {
+         // Blur current active element.
+         if (document.activeElement instanceof HTMLElement) { document.activeElement.blur(); }
+
+         // Make document body focused.
+         document.body.focus();
+      }
+
       ui.activeWindow = this;
    }
 
