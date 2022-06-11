@@ -80,7 +80,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
     */
    const handlers = {
       dragDown: ['pointerdown', (e) => onDragPointerDown(e), false],
-      dragMove: ['pointermove', (e) => onDragPointerMove(e), false],
+      dragMove: ['pointermove', (e) => onDragPointerChange(e), false],
       dragUp: ['pointerup', (e) => onDragPointerUp(e), false]
    };
 
@@ -176,8 +176,17 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
     *
     * @param {PointerEvent} event - The pointer move event.
     */
-   function onDragPointerMove(event)
+   function onDragPointerChange(event)
    {
+      // See chorded button presses for pointer events:
+      // https://www.w3.org/TR/pointerevents3/#chorded-button-interactions
+      // TODO: Support different button configurations for PointerEvents.
+      if ((event.buttons & 1) === 0)
+      {
+         onDragPointerUp(event);
+         return;
+      }
+
       if (event.button !== -1 || !event.isPrimary) { return; }
 
       event.preventDefault();
@@ -227,8 +236,6 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
     */
    function onDragPointerUp(event)
    {
-      if (!event.isPrimary) { return; }
-
       event.preventDefault();
 
       dragging = false;
