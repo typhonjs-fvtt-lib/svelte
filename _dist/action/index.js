@@ -559,7 +559,6 @@ function draggable(node, { position, active = true, button = 0, storeDragging = 
     */
    function onDragPointerDown(event)
    {
-console.log(`! draggable - onDragPointerDown - button: ${event.button}; buttons: ${event.buttons}`);
       if (event.button !== button || !event.isPrimary) { return; }
 
       event.preventDefault();
@@ -584,7 +583,6 @@ console.log(`! draggable - onDragPointerDown - button: ${event.button}; buttons:
     */
    function onDragPointerChange(event)
    {
-console.log(`! draggable - onDragPointerMove - button: ${event.button}; buttons: ${event.buttons}`);
       // See chorded button presses for pointer events:
       // https://www.w3.org/TR/pointerevents3/#chorded-button-interactions
       // TODO: Support different button configurations for PointerEvents.
@@ -630,7 +628,6 @@ console.log(`! draggable - onDragPointerMove - button: ${event.button}; buttons:
     */
    function onDragPointerUp(event)
    {
-console.log(`! draggable - onDragPointerUp - button: ${event.button}; buttons: ${event.buttons}`);
       event.preventDefault();
 
       dragging = false;
