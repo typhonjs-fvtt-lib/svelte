@@ -97,7 +97,7 @@
     "rollup-plugin-sourcemaps": "^0.6.0",
     "rollup-plugin-svelte": "^7",
     "rollup-plugin-terser": "^7",
-    "svelte": "3.46.0",
+    "svelte": "^3.48.0",
     "upath": "^2"
   },
   "engines": {

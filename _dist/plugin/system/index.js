@@ -62,9 +62,13 @@ function generator(storage) {
     }
 
     if (storage) {
-      if (storage.getItem(key)) {
-        value = JSON.parse(storage.getItem(key));
-      }
+      const storageValue = storage.getItem(key);
+
+      try {
+        if (storageValue) {
+          value = JSON.parse(storageValue);
+        }
+      } catch (err) {}
 
       storage.setItem(key, JSON.stringify(value));
     }
@@ -99,7 +103,9 @@ function generator(storage) {
     const stores_array = single ? [stores] : stores;
 
     if (storage && storage.getItem(key)) {
-      initial_value = JSON.parse(storage.getItem(key));
+      try {
+        initial_value = JSON.parse(storage.getItem(key));
+      } catch (err) {}
     }
 
     return readable(key, initial_value, set => {
@@ -271,8 +277,10 @@ function s_GET_STORE$1(stores, key, defaultValue = void 0) {
 
 function s_CREATE_STORE$1(key, defaultValue = void 0) {
   try {
-    if (localStorage.getItem(key)) {
-      defaultValue = JSON.parse(localStorage.getItem(key));
+    const value = localStorage.getItem(key);
+
+    if (value) {
+      defaultValue = JSON.parse(value);
     }
   } catch (err) {
     /**/
@@ -405,8 +413,10 @@ function s_GET_STORE(stores, key, defaultValue = void 0) {
 
 function s_CREATE_STORE(key, defaultValue = void 0) {
   try {
-    if (sessionStorage.getItem(key)) {
-      defaultValue = JSON.parse(sessionStorage.getItem(key));
+    const value = sessionStorage.getItem(key);
+
+    if (value) {
+      defaultValue = JSON.parse(value);
     }
   } catch (err) {
     /**/
