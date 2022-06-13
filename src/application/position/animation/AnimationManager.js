@@ -1,16 +1,23 @@
-import { nextAnimationFrame }    from '@typhonjs-fvtt/svelte/animate';
-
-import { UpdateElementManager }  from '../update/UpdateElementManager.js';
-
-const s_ACTIVE_LIST = [];
-const s_NEW_LIST = [];
-let s_PROMISE;
-
 /**
  * Provides animation management and scheduling allowing all Position instances to utilize one micro-task.
  */
 export class AnimationManager
 {
+   /**
+    * @type {object[]}
+    */
+   static activeList = [];
+
+   /**
+    * @type {object[]}
+    */
+   static newList = [];
+
+   /**
+    * @type {number}
+    */
+   static current;
+
    /**
     * Add animation data.
     *
@@ -18,208 +25,188 @@ export class AnimationManager
     */
    static add(data)
    {
-      s_NEW_LIST.push(data);
+      const now = performance.now();
 
-      if (!s_PROMISE) { s_PROMISE = this.animate(); }
+      // Offset start time by delta between last rAF time. This allows continuous tween cycles to appear naturally as
+      // starting from the instant they are added to the AnimationManager. This is what makes `draggable` smooth when
+      // easing is enabled.
+      data.start = now + (AnimationManager.current - now);
+
+      AnimationManager.newList.push(data);
    }
 
    /**
     * Manage all animation
-    *
-    * @returns {Promise<void>}
     */
-   static async animate()
+   static animate()
    {
-      let current = await nextAnimationFrame();
+      const current = AnimationManager.current = performance.now();
 
-      while (s_ACTIVE_LIST.length || s_NEW_LIST.length)
+      // Early out of the rAF callback when there are no current animations.
+      if (AnimationManager.activeList.length === 0 && AnimationManager.newList.length === 0)
       {
-         if (s_NEW_LIST.length)
-         {
-            // Process new data
-            for (let cntr = s_NEW_LIST.length; --cntr >= 0;)
-            {
-               const data = s_NEW_LIST[cntr];
-               data.start = current;
-               data.current = 0;
+         globalThis.requestAnimationFrame(AnimationManager.animate);
+         return;
+      }
 
-               s_ACTIVE_LIST.push(data);
+      if (AnimationManager.newList.length)
+      {
+         // Process new data
+         for (let cntr = AnimationManager.newList.length; --cntr >= 0;)
+         {
+            const data = AnimationManager.newList[cntr];
+
+            // If animation instance has been cancelled before start then remove it from new list and cleanup.
+            if (data.cancelled)
+            {
+               AnimationManager.newList.splice(cntr, 1);
+               data.cleanup(data);
             }
 
-            s_NEW_LIST.length = 0;
+            // If data is active then process it now. Delayed animations start with `active` false.
+            if (data.active)
+            {
+               // Remove from new list and add to active list.
+               AnimationManager.newList.splice(cntr, 1);
+               AnimationManager.activeList.push(data);
+            }
+         }
+      }
+
+      // Process active animations.
+      for (let cntr = AnimationManager.activeList.length; --cntr >= 0;)
+      {
+         const data = AnimationManager.activeList[cntr];
+
+         // Remove any animations that have been canceled.
+         // Ensure that the element is still connected otherwise remove it from active list and continue.
+         if (data.cancelled || (data.el !== void 0 && !data.el.isConnected))
+         {
+            AnimationManager.activeList.splice(cntr, 1);
+            data.cleanup(data);
+            continue;
          }
 
-         // Process existing data.
-         for (let cntr = s_ACTIVE_LIST.length; --cntr >= 0;)
+         data.current = current - data.start;
+
+         // Remove this animation instance if current animating time exceeds duration.
+         if (data.current >= data.duration)
          {
-            const data = s_ACTIVE_LIST[cntr];
-
-            // Ensure that the element is still connected otherwise remove it from active list and continue.
-            if (!data.el.isConnected)
-            {
-               s_ACTIVE_LIST.splice(cntr, 1);
-               data.currentAnimationKeys.clear();
-               data.resolve();
-               continue;
-            }
-
-            // Handle any animations that have been canceled.
-            if (data.finished)
-            {
-               // Remove animation keys.
-               for (let dataCntr = data.keys.length; --dataCntr >= 0;)
-               {
-                  const key = data.keys[dataCntr];
-                  data.currentAnimationKeys.delete(key);
-               }
-
-               s_ACTIVE_LIST.splice(cntr, 1);
-               data.resolve();
-               continue;
-            }
-
-            data.current = current - data.start;
-
-            // Remove this animation instance.
-            if (data.current >= data.duration)
-            {
-               // Prepare final update with end position data and remove keys from `currentAnimationKeys`.
-               for (let dataCntr = data.keys.length; --dataCntr >= 0;)
-               {
-                  const key = data.keys[dataCntr];
-                  data.newData[key] = data.destination[key];
-                  data.currentAnimationKeys.delete(key);
-               }
-
-               data.position.set(data.newData);
-
-               s_ACTIVE_LIST.splice(cntr, 1);
-
-               data.finished = true;
-               data.resolve();
-               continue;
-            }
-
-            const easedTime = data.ease(data.current / data.duration);
-
+            // Prepare final update with end position data.
             for (let dataCntr = data.keys.length; --dataCntr >= 0;)
             {
                const key = data.keys[dataCntr];
-               data.newData[key] = data.interpolate(data.initial[key], data.destination[key], easedTime);
+               data.newData[key] = data.destination[key];
             }
 
             data.position.set(data.newData);
+
+            AnimationManager.activeList.splice(cntr, 1);
+            data.cleanup(data);
+
+            continue;
          }
 
-         const newCurrent = await UpdateElementManager.promise;
+         // Apply easing to create an eased time.
+         const easedTime = data.ease(data.current / data.duration);
 
-         // Must check that time has passed otherwise likely the element has been removed.
-         if (newCurrent === void 0 || newCurrent <= current)
+         for (let dataCntr = data.keys.length; --dataCntr >= 0;)
          {
-            // TODO: Temporary warning message
-            // console.warn(`TRL - AnimationManager Warning - quitting animation: newCurrent <= current.`);
-
-            for (let cntr = s_ACTIVE_LIST.length; --cntr >= 0;)
-            {
-               const data = s_ACTIVE_LIST[cntr];
-
-               if (!data.el.isConnected)
-               {
-                  s_ACTIVE_LIST.splice(cntr, 1);
-                  data.currentAnimationKeys.clear();
-                  data.resolve();
-                  continue;
-               }
-
-               // Handle any animations that have been canceled.
-               if (data.finished)
-               {
-                  // Remove animation keys.
-                  for (let dataCntr = data.keys.length; --dataCntr >= 0;)
-                  {
-                     const key = data.keys[dataCntr];
-                     data.currentAnimationKeys.delete(key);
-                  }
-
-                  s_ACTIVE_LIST.splice(cntr, 1);
-                  data.resolve();
-                  continue;
-               }
-
-               // Any remaining animations set the Position to the destination target.
-               for (let dataCntr = data.keys.length; --dataCntr >= 0;)
-               {
-                  const key = data.keys[dataCntr];
-                  data.newData[key] = data.destination[key];
-                  data.currentAnimationKeys.delete(key);
-               }
-
-               data.position.set(data.newData);
-               data.finished = true;
-               data.resolve();
-            }
-
-            s_ACTIVE_LIST.length = 0;
-
-            break;
+            const key = data.keys[dataCntr];
+            data.newData[key] = data.interpolate(data.initial[key], data.destination[key], easedTime);
          }
 
-         current = newCurrent;
+         data.position.set(data.newData);
       }
 
-      s_PROMISE = void 0;
+      globalThis.requestAnimationFrame(AnimationManager.animate);
    }
 
    /**
-    * Cancels any animation for given Position data.
+    * Cancels all animations for given Position instance.
     *
-    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} data -
+    * @param {Position} position - Position instance.
     */
-   static cancel(data)
+   static cancel(position)
    {
+      for (let cntr = AnimationManager.activeList.length; --cntr >= 0;)
+      {
+         const data = AnimationManager.activeList[cntr];
+         if (data.position === position)
+         {
+            AnimationManager.activeList.splice(cntr, 1);
+            data.cancelled = true;
+            data.cleanup(data);
+         }
+      }
 
+      for (let cntr = AnimationManager.newList.length; --cntr >= 0;)
+      {
+         const data = AnimationManager.newList[cntr];
+         if (data.position === position)
+         {
+            AnimationManager.newList.splice(cntr, 1);
+            data.cancelled = true;
+            data.cleanup(data);
+         }
+      }
    }
 
    /**
-    * Cancels all Position animation.
+    * Cancels all active and delayed animations.
     */
    static cancelAll()
    {
-      for (let cntr = s_ACTIVE_LIST.length; --cntr >= 0;)
+      for (let cntr = AnimationManager.activeList.length; --cntr >= 0;)
       {
-         const data = s_ACTIVE_LIST[cntr];
-
-         data.currentAnimationKeys.clear();
-         data.finished = true;
-         data.resolve();
+         const data = AnimationManager.activeList[cntr];
+         data.cancelled = true;
+         data.cleanup(data);
       }
 
-      for (let cntr = s_NEW_LIST.length; --cntr >= 0;)
+      for (let cntr = AnimationManager.newList.length; --cntr >= 0;)
       {
-         const data = s_NEW_LIST[cntr];
-
-         data.currentAnimationKeys.clear();
-         data.finished = true;
-         data.resolve();
+         const data = AnimationManager.newList[cntr];
+         data.cancelled = true;
+         data.cleanup(data);
       }
 
-      s_ACTIVE_LIST.length = 0;
-      s_NEW_LIST.length = 0;
+      AnimationManager.activeList.length = 0;
+      AnimationManager.newList.length = 0;
    }
 
    /**
-    * Animates one or more Position instances as a group.
+    * Gets all {@link AnimationControl} instances for a given Position instance.
     *
-    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} data -
+    * @param {Position} position - Position instance.
     *
-    * @param {object|Function}   positionData -
-    *
-    * @param {object|Function}   options -
-    *
-    * @returns {TJSBasicAnimation} Basic animation control.
+    * @returns {AnimationControl[]} All scheduled AnimationControl instances for the given Position instance.
     */
-   static to(data, positionData, options)
+   static getScheduled(position)
    {
-      return void 0;
+      const results = [];
+
+      for (let cntr = AnimationManager.activeList.length; --cntr >= 0;)
+      {
+         const data = AnimationManager.activeList[cntr];
+         if (data.position === position)
+         {
+            results.push(data.control);
+         }
+      }
+
+      for (let cntr = AnimationManager.newList.length; --cntr >= 0;)
+      {
+         const data = AnimationManager.newList[cntr];
+         if (data.position === position)
+         {
+            results.push(data.control);
+         }
+      }
+
+      return results;
    }
 }
+
+// Start animation manager immediately. It constantly is running in background.
+AnimationManager.animate();

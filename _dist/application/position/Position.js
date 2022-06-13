@@ -1,20 +1,20 @@
-import { linear }                from 'svelte/easing';
-
-import { lerp }                  from '@typhonjs-fvtt/svelte/math';
 import {
    propertyStore,
    subscribeIgnoreFirst }        from '@typhonjs-fvtt/svelte/store';
+
 import {
    isIterable,
+   isObject,
    isPlainObject }               from '@typhonjs-fvtt/svelte/util';
 
-import { AnimationControl }      from './animation/AnimationControl.js';
-import { AnimationManager }      from './animation/AnimationManager.js';
-import { AnimationPublicAPI }    from './animation/AnimationPublicAPI.js';
+import { AnimationAPI }          from './animation/AnimationAPI.js';
+import { AnimationGroupAPI }     from './animation/AnimationGroupAPI.js';
 import * as constants            from './constants.js';
+import { convertRelative }       from './convertRelative.js';
 import * as positionInitial      from './initial/index.js';
 import { PositionChangeSet }     from './PositionChangeSet.js';
 import { PositionData }          from './PositionData.js';
+import { PositionStateAPI }      from './PositionStateAPI.js';
 import { StyleCache }            from './StyleCache.js';
 import { TransformData }         from './transform/TransformData.js';
 import { AdapterValidators }     from './validators/AdapterValidators.js';
@@ -35,21 +35,11 @@ export class Position
    #data = new PositionData();
 
    /**
-    * Stores current animation keys.
+    * Provides the animation API.
     *
-    * @type {Set<string>}
+    * @type {AnimationAPI}
     */
-   #currentAnimationKeys = new Set();
-
-   /**
-    * @type {Map<string, PositionData>}
-    */
-   #dataSaved = new Map();
-
-   /**
-    * @type {PositionData}
-    */
-   #defaultData;
+   #animate = new AnimationAPI(this, this.#data);
 
    /**
     * Stores the style attributes that changed on update.
@@ -124,9 +114,14 @@ export class Position
    #validatorData;
 
    /**
-    * @returns {AnimationPublicAPI} Public Animation API.
+    * @type {PositionStateAPI}
     */
-   static get Animation() { return AnimationPublicAPI; }
+   #state = new PositionStateAPI(this, this.#data, this.#transforms);
+
+   /**
+    * @returns {AnimationGroupAPI} Public Animation API.
+    */
+   static get Animate() { return AnimationGroupAPI; }
 
    /**
     * @returns {{browserCentered?: Centered, Centered?: *}} Initial position helpers.
@@ -151,10 +146,35 @@ export class Position
    static get Validators() { return positionValidators; }
 
    /**
-    * @param {PositionParent|PositionOptions}   [parent] - A potential parent element or object w/ `elementTarget`
+    * Returns a duplicate of a given position instance copying any options and validators.
+    *
+    * // TODO: Consider more safety over options processing.
+    *
+    * @param {Position}          position - A position instance.
+    *
+    * @param {PositionOptions}   options - Position options.
+    *
+    * @returns {Position} A duplicate position instance.
+    */
+   static duplicate(position, options)
+   {
+      if (!(position instanceof Position)) { throw new TypeError(`'position' is not an instance of Position.`); }
+
+      const newPosition = new Position(options);
+
+      newPosition.#options = Object.assign({}, position.#options, options);
+      newPosition.#validators.add(...position.#validators);
+
+      newPosition.set(position.#data);
+
+      return newPosition;
+   }
+
+   /**
+    * @param {PositionParent|PositionOptionsAll}   [parent] - A potential parent element or object w/ `elementTarget`
     *                                                      getter. May also be the PositionOptions object w/ 1 argument.
     *
-    * @param {PositionOptions}   options - Default values.
+    * @param {PositionOptionsAll}   [options] - Default values.
     */
    constructor(parent, options)
    {
@@ -199,7 +219,8 @@ export class Position
 
          // Set default values from options.
 
-         if (Number.isFinite(options.height) || options.height === 'auto' || options.height === null)
+         if (Number.isFinite(options.height) || options.height === 'auto' || options.height === 'inherit' ||
+          options.height === null)
          {
             data.height = updateData.dimensionData.height = typeof options.height === 'number' ?
              Math.round(options.height) : options.height;
@@ -276,7 +297,8 @@ export class Position
             transforms.translateZ = data.translateZ = options.translateZ;
          }
 
-         if (Number.isFinite(options.width) || options.width === 'auto' || options.width === null)
+         if (Number.isFinite(options.width) || options.width === 'auto' || options.width === 'inherit' ||
+          options.width === null)
          {
             data.width = updateData.dimensionData.width = typeof options.width === 'number' ?
              Math.round(options.width) : options.width;
@@ -341,8 +363,6 @@ export class Position
 
       this.#stores.transformOrigin.values = constants.transformOrigins;
 
-      Object.freeze(this.#stores);
-
       [this.#validators, this.#validatorData] = new AdapterValidators();
 
       if (options?.initial || options?.positionInitial)
@@ -363,6 +383,16 @@ export class Position
          if (isIterable(options?.validator)) { this.validators.add(...options.validator); }
          else { this.validators.add(options.validator); }
       }
+   }
+
+   /**
+    * Returns the animation API.
+    *
+    * @returns {AnimationAPI} Animation API.
+    */
+   get animate()
+   {
+      return this.#animate;
    }
 
    /**
@@ -403,6 +433,13 @@ export class Position
    get parent() { return this.#parent; }
 
    /**
+    * Returns the state API.
+    *
+    * @returns {PositionStateAPI} Position state API.
+    */
+   get state() { return this.#state; }
+
+   /**
     * Returns the derived writable stores for individual data variables.
     *
     * @returns {StorePosition} Derived / writable stores.
@@ -429,23 +466,29 @@ export class Position
    /**
     * Sets the associated {@link PositionParent} instance. Resets the style cache and default data.
     *
-    * @param {PositionParent} parent - A PositionParent instance.
+    * @param {PositionParent|void} parent - A PositionParent instance.
     */
    set parent(parent)
    {
+      if (parent !== void 0 && !(parent instanceof HTMLElement) && !isObject(parent))
+      {
+         throw new TypeError(`'parent' is not an HTMLElement, object, or undefined.`);
+      }
+
       this.#parent = parent;
 
       // Reset any stored default data & the style cache.
-      this.#defaultData = void 0;
+      this.#state.remove({ name: '#defaultData' });
       this.#styleCache.reset();
 
-      this.set(this.#data);
+      // If a parent is defined then invoke set to update any parent element.
+      if (parent) { this.set(this.#data); }
    }
 
 // Data accessors ----------------------------------------------------------------------------------------------------
 
    /**
-    * @returns {number|'auto'|null} height
+    * @returns {number|'auto'|'inherit'|null} height
     */
    get height() { return this.#data.height; }
 
@@ -525,7 +568,7 @@ export class Position
    get translateZ() { return this.#data.translateZ; }
 
    /**
-    * @returns {number|'auto'|null} width
+    * @returns {number|'auto'|'inherit'|null} width
     */
    get width() { return this.#data.width; }
 
@@ -535,7 +578,7 @@ export class Position
    get zIndex() { return this.#data.zIndex; }
 
    /**
-    * @param {number|'auto'|null} height -
+    * @param {number|string|null} height -
     */
    set height(height)
    {
@@ -543,7 +586,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} left -
+    * @param {number|string|null} left -
     */
    set left(left)
    {
@@ -551,7 +594,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} maxHeight -
+    * @param {number|string|null} maxHeight -
     */
    set maxHeight(maxHeight)
    {
@@ -559,7 +602,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} maxWidth -
+    * @param {number|string|null} maxWidth -
     */
    set maxWidth(maxWidth)
    {
@@ -567,7 +610,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} minHeight -
+    * @param {number|string|null} minHeight -
     */
    set minHeight(minHeight)
    {
@@ -575,7 +618,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} minWidth -
+    * @param {number|string|null} minWidth -
     */
    set minWidth(minWidth)
    {
@@ -583,7 +626,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} rotateX -
+    * @param {number|string|null} rotateX -
     */
    set rotateX(rotateX)
    {
@@ -591,7 +634,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} rotateY -
+    * @param {number|string|null} rotateY -
     */
    set rotateY(rotateY)
    {
@@ -599,7 +642,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} rotateZ -
+    * @param {number|string|null} rotateZ -
     */
    set rotateZ(rotateZ)
    {
@@ -607,7 +650,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} rotateZ - alias for rotateZ
+    * @param {number|string|null} rotateZ - alias for rotateZ
     */
    set rotation(rotateZ)
    {
@@ -615,7 +658,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} scale -
+    * @param {number|string|null} scale -
     */
    set scale(scale)
    {
@@ -623,7 +666,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} top -
+    * @param {number|string|null} top -
     */
    set top(top)
    {
@@ -639,7 +682,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} translateX -
+    * @param {number|string|null} translateX -
     */
    set translateX(translateX)
    {
@@ -647,7 +690,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} translateY -
+    * @param {number|string|null} translateY -
     */
    set translateY(translateY)
    {
@@ -655,7 +698,7 @@ export class Position
    }
 
    /**
-    * @param {number|null} translateZ -
+    * @param {number|string|null} translateZ -
     */
    set translateZ(translateZ)
    {
@@ -663,7 +706,7 @@ export class Position
    }
 
    /**
-    * @param {number|'auto'|null} width -
+    * @param {number|string|null} width -
     */
    set width(width)
    {
@@ -671,140 +714,12 @@ export class Position
    }
 
    /**
-    * @param {number|null} zIndex -
+    * @param {number|string|null} zIndex -
     */
    set zIndex(zIndex)
    {
       this.#stores.zIndex.set(zIndex);
    }
-
-   /**
-    * Provides animation
-    *
-    * @param {PositionDataExtended} position - The destination position.
-    *
-    * @param {object}         [opts] - Optional parameters.
-    *
-    * @param {number}         [opts.duration] - Duration in seconds.
-    *
-    * @param {Function}       [opts.ease=linear] - Easing function.
-    *
-    * @param {Function}       [opts.interpolate=lerp] - Interpolation function.
-    *
-    * @returns {TJSBasicAnimation}  A control object that can cancel animation and provides a `finished` Promise.
-    */
-   animateTo(position, { duration = 1, ease = linear, interpolate = lerp } = {})
-   {
-      if (typeof position !== 'object')
-      {
-         throw new TypeError(`Position - animateTo error: 'position' is not an object.`);
-      }
-
-      // Early out if the application is not positionable.
-      const parent = this.#parent;
-      if (parent !== void 0 && typeof parent?.options?.positionable === 'boolean' && !parent?.options?.positionable)
-      {
-         return AnimationControl.voidControl;
-      }
-
-      const targetEl = parent instanceof HTMLElement ? parent : parent?.elementTarget;
-      const el = targetEl instanceof HTMLElement && targetEl.isConnected ? targetEl : void 0;
-
-      if (!el) { return AnimationControl.voidControl; }
-
-      if (!Number.isFinite(duration) || duration < 0)
-      {
-         throw new TypeError(`Position - animateTo error: 'duration' is not a positive number.`);
-      }
-
-      if (typeof ease !== 'function')
-      {
-         throw new TypeError(`Position - animateTo error: 'ease' is not a function.`);
-      }
-
-      if (typeof interpolate !== 'function')
-      {
-         throw new TypeError(`Position - animateTo error: 'interpolate' is not a function.`);
-      }
-
-      const data = this.#data;
-      const currentAnimationKeys = this.#currentAnimationKeys;
-      const initial = {};
-      const destination = {};
-
-      // Set initial data if the key / data is defined and the end position is not equal to current data.
-      for (const key in position)
-      {
-         if (data[key] !== void 0 && position[key] !== data[key])
-         {
-            destination[key] = position[key];
-            initial[key] = data[key];
-         }
-      }
-
-      // Set initial data for transform values that are often null by default.
-      if (initial.rotateX === null) { initial.rotateX = 0; }
-      if (initial.rotateY === null) { initial.rotateY = 0; }
-      if (initial.rotateZ === null) { initial.rotateZ = 0; }
-      if (initial.translateX === null) { initial.translateX = 0; }
-      if (initial.translateY === null) { initial.translateY = 0; }
-      if (initial.translateZ === null) { initial.translateZ = 0; }
-      if (initial.scale === null) { initial.scale = 1; }
-
-      if (destination.rotateX === null) { destination.rotateX = 0; }
-      if (destination.rotateY === null) { destination.rotateY = 0; }
-      if (destination.rotateZ === null) { destination.rotateZ = 0; }
-      if (destination.translateX === null) { destination.translateX = 0; }
-      if (destination.translateY === null) { destination.translateY = 0; }
-      if (destination.translateZ === null) { destination.translateZ = 0; }
-      if (destination.scale === null) { destination.scale = 1; }
-
-      // Reject all initial data that is not a number or is current animating.
-      // Add all keys that pass to `currentAnimationKeys`.
-      for (const key in initial)
-      {
-         if (!Number.isFinite(initial[key]) || currentAnimationKeys.has(key)) { delete initial[key]; }
-         else { currentAnimationKeys.add(key); }
-      }
-
-      const newData = Object.assign({}, initial);
-      const keys = Object.keys(newData);
-
-      // Nothing to animate, so return now.
-      if (keys.length === 0) { return AnimationControl.voidControl; }
-
-      const animationData = {
-         current: 0,
-         currentAnimationKeys,
-         destination,
-         duration: duration * 1000, // Internally the AnimationManager works in ms.
-         ease,
-         el,
-         finished: false,
-         initial,
-         interpolate,
-         keys,
-         newData,
-         position: this
-      };
-
-      // Cache the finished Promise resolve method in animationData, so that it can be invoked by AnimationManager.
-      const promise = new Promise((resolve) => animationData.resolve = resolve);
-
-      AnimationManager.add(animationData);
-
-      // Schedule w/ animation manager.
-      return new AnimationControl(animationData, promise);
-   }
-
-   /**
-    * @typedef {object} PositionGetOptions
-    *
-    * @property {Iterable<string>} keys - When provided only these keys are copied.
-    *
-    * @property {boolean} numeric - When true any `null` values are converted into defaults.
-    */
-
 
    /**
     * Assigns current position to object passed into method.
@@ -841,185 +756,11 @@ export class Position
    }
 
    /**
-    * Returns any stored save state by name.
-    *
-    * @param {string}   name - Saved data set name.
-    *
-    * @returns {PositionData} The saved data set.
-    */
-   getSave({ name })
-   {
-      if (typeof name !== 'string') { throw new TypeError(`Position - getSave error: 'name' is not a string.`); }
-
-      return this.#dataSaved.get(name);
-   }
-
-   /**
     * @returns {PositionData} Current position data.
     */
    toJSON()
    {
       return Object.assign({}, this.#data);
-   }
-
-   /**
-    * Resets data to default values and invokes set. Check options, but by default current z-index is maintained.
-    *
-    * @param {object}   [opts] - Optional parameters.
-    *
-    * @param {boolean}  [opts.keepZIndex=false] - When true keeps current z-index.
-    *
-    * @param {boolean}  [opts.invokeSet=true] - When true invokes set method.
-    *
-    * @returns {boolean} Operation successful.
-    */
-   reset({ keepZIndex = false, invokeSet = true } = {})
-   {
-      if (typeof this.#defaultData !== 'object') { return false; }
-
-      if (this.#currentAnimationKeys.size) { return false; }
-
-      const zIndex = this.#data.zIndex;
-
-      const data = Object.assign({}, this.#defaultData);
-
-      if (keepZIndex) { data.zIndex = zIndex; }
-
-      // Remove any keys that are currently animating.
-      for (const key of this.#currentAnimationKeys) { delete data[key]; }
-
-      // Reset the transform data.
-      this.#transforms.reset(data);
-
-      // If current minimized invoke `maximize`.
-      if (this.#parent?.reactive?.minimized) { this.#parent?.maximize?.({ animate: false, duration: 0 }); }
-
-      if (invokeSet) { this.set(data); }
-
-      return true;
-   }
-
-   /**
-    * Removes and returns any position state by name.
-    *
-    * @param {object}   options - Options.
-    *
-    * @param {string}   options.name - Name to remove and retrieve.
-    *
-    * @returns {PositionData} Saved position data.
-    */
-   remove({ name })
-   {
-      if (typeof name !== 'string') { throw new TypeError(`Position - remove: 'name' is not a string.`); }
-
-      const data = this.#dataSaved.get(name);
-      this.#dataSaved.delete(name);
-
-      return data;
-   }
-
-   /**
-    * Restores a saved positional state returning the data. Several optional parameters are available
-    * to control whether the restore action occurs silently (no store / inline styles updates), animates
-    * to the stored data, or simply sets the stored data. Restoring via {@link Position.animateTo} allows
-    * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
-    * returned if awaiting the end of the animation.
-    *
-    * @param {object}            params - Parameters
-    *
-    * @param {string}            params.name - Saved data set name.
-    *
-    * @param {boolean}           [params.remove=false] - Remove data set.
-    *
-    * @param {Iterable<string>}  [params.properties] - Specific properties to set / animate.
-    *
-    * @param {boolean}           [params.silent] - Set position data directly; no store or style updates.
-    *
-    * @param {boolean}           [params.async=false] - If animating return a Promise that resolves with any saved data.
-    *
-    * @param {boolean}           [params.animateTo=false] - Animate to restore data.
-    *
-    * @param {number}            [params.duration=0.1] - Duration in seconds.
-    *
-    * @param {Function}          [params.ease=linear] - Easing function.
-    *
-    * @param {Function}          [params.interpolate=lerp] - Interpolation function.
-    *
-    * @returns {PositionDataExtended|Promise<PositionDataExtended>} Saved position data.
-    */
-   restore({ name, remove = false, properties, silent = false, async = false, animateTo = false, duration = 0.1,
-    ease = linear, interpolate = lerp })
-   {
-      if (typeof name !== 'string') { throw new TypeError(`Position - restore error: 'name' is not a string.`); }
-
-      const dataSaved = this.#dataSaved.get(name);
-
-      if (dataSaved)
-      {
-         if (remove) { this.#dataSaved.delete(name); }
-
-         let data = dataSaved;
-
-         if (isIterable(properties))
-         {
-            data = {};
-            for (const property of properties) { data[property] = dataSaved[property]; }
-         }
-
-         // Update data directly with no store or inline style updates.
-         if (silent)
-         {
-            for (const property in data) { this.#data[property] = data[property]; }
-            return dataSaved;
-         }
-         else if (animateTo)  // Animate to saved data.
-         {
-            // Provide special handling to potentially change transform origin as this parameter is not animated.
-            if (data.transformOrigin !== this.transformOrigin)
-            {
-               this.transformOrigin = data.transformOrigin;
-            }
-
-            // Return a Promise with saved data that resolves after animation ends.
-            if (async)
-            {
-               return this.animateTo(data, { duration, ease, interpolate }).finished.then(() => dataSaved);
-            }
-            else  // Animate synchronously.
-            {
-               this.animateTo(data, { duration, ease, interpolate });
-            }
-         }
-         else
-         {
-            // Default options is to set data for an immediate update.
-            this.set(data);
-         }
-      }
-
-      return dataSaved;
-   }
-
-   /**
-    * Saves current position state with the opportunity to add extra data to the saved state.
-    *
-    * @param {object}   options - Options.
-    *
-    * @param {string}   options.name - name to index this saved data.
-    *
-    * @param {...*}     [options.extra] - Extra data to add to saved data.
-    *
-    * @returns {PositionData} Current position data
-    */
-   save({ name, ...extra })
-   {
-      if (typeof name !== 'string') { throw new TypeError(`Position - save error: 'name' is not a string.`); }
-
-      const data = this.get(extra);
-
-      this.#dataSaved.set(name, data);
-
-      return data;
    }
 
    /**
@@ -1088,6 +829,9 @@ export class Position
             changeSet.set(true);
             this.#updateElementData.queued = false;
          }
+
+         // Converts any relative string position data to numeric inputs.
+         convertRelative(position, this);
 
          position = this.#updatePosition(position, parent, el, styleCache);
 
@@ -1219,14 +963,16 @@ export class Position
          if (data.zIndex !== position.zIndex) { data.zIndex = position.zIndex; changeSet.zIndex = true; }
       }
 
-      if (Number.isFinite(position.width) || position.width === 'auto' || position.width === null)
+      if (Number.isFinite(position.width) || position.width === 'auto' || position.width === 'inherit' ||
+       position.width === null)
       {
          position.width = typeof position.width === 'number' ? Math.round(position.width) : position.width;
 
          if (data.width !== position.width) { data.width = position.width; changeSet.width = true; }
       }
 
-      if (Number.isFinite(position.height) || position.height === 'auto' || position.height === null)
+      if (Number.isFinite(position.height) || position.height === 'auto' || position.height === 'inherit' ||
+       position.height === null)
       {
          position.height = typeof position.height === 'number' ? Math.round(position.height) : position.height;
 
@@ -1235,8 +981,13 @@ export class Position
 
       if (el)
       {
+         const defaultData = this.#state.getDefault();
+
          // Set default data after first set operation that has a target element.
-         if (typeof this.#defaultData !== 'object') { this.#defaultData = Object.assign({}, data); }
+         if (typeof defaultData !== 'object')
+         {
+            this.#state.save({ name: '#defaultData', ...Object.assign({}, data) });
+         }
 
          // If `immediateElementUpdate` is true in position data passed to `set` then update the element immediately.
          // This is for rAF based library integrations like GSAP.
@@ -1351,6 +1102,11 @@ export class Position
             currentPosition.width = 'auto';
             width = styleCache.offsetWidth;
          }
+         else if (width === 'inherit' || (currentPosition.width === 'inherit' && width !== null))
+         {
+            currentPosition.width = 'inherit';
+            width = styleCache.offsetWidth;
+         }
          else
          {
             const newWidth = Number.isFinite(width) ? width : currentPosition.width;
@@ -1368,6 +1124,11 @@ export class Position
          if (height === 'auto' || (currentPosition.height === 'auto' && height !== null))
          {
             currentPosition.height = 'auto';
+            height = styleCache.offsetHeight;
+         }
+         else if (height === 'inherit' || (currentPosition.height === 'inherit' && height !== null))
+         {
+            currentPosition.height = 'inherit';
             height = styleCache.offsetHeight;
          }
          else
@@ -1486,9 +1247,15 @@ export class Position
 
          s_VALIDATION_DATA.maxWidth = styleCache.maxWidth ?? currentPosition.maxWidth;
 
+         // Given a parent w/ reactive state and is minimized ignore styleCache min-width/height.
+         const isMinimized = parent?.reactive?.minimized ?? false;
+
          // Note the use of || for accessing the style cache as the left hand is ignored w/ falsy values such as '0'.
-         s_VALIDATION_DATA.minHeight = styleCache.minHeight || (currentPosition.minHeight ?? 0);
-         s_VALIDATION_DATA.minWidth = styleCache.minWidth || (currentPosition.minWidth ?? 0);
+         s_VALIDATION_DATA.minHeight = isMinimized ? currentPosition.minHeight ?? 0 :
+          styleCache.minHeight || (currentPosition.minHeight ?? 0);
+
+         s_VALIDATION_DATA.minWidth = isMinimized ? currentPosition.minWidth ?? 0 :
+          styleCache.minWidth || (currentPosition.minWidth ?? 0);
 
          for (let cntr = 0; cntr < validatorData.length; cntr++)
          {
@@ -1540,45 +1307,53 @@ Object.seal(s_VALIDATION_DATA);
 /**
  * @typedef {object} PositionDataExtended
  *
- * @property {number|'auto'|null} [height] -
+ * @property {number|string|null} [height] -
  *
- * @property {number|null} [left] -
+ * @property {number|string|null} [left] -
  *
- * @property {number|null} [maxHeight] -
+ * @property {number|string|null} [maxHeight] -
  *
- * @property {number|null} [maxWidth] -
+ * @property {number|string|null} [maxWidth] -
  *
- * @property {number|null} [minHeight] -
+ * @property {number|string|null} [minHeight] -
  *
- * @property {number|null} [minWidth] -
+ * @property {number|string|null} [minWidth] -
  *
- * @property {number|null} [rotateX] -
+ * @property {number|string|null} [rotateX] -
  *
- * @property {number|null} [rotateY] -
+ * @property {number|string|null} [rotateY] -
  *
- * @property {number|null} [rotateZ] -
+ * @property {number|string|null} [rotateZ] -
  *
- * @property {number|null} [scale] -
+ * @property {number|string|null} [scale] -
  *
- * @property {number|null} [top] -
+ * @property {number|string|null} [top] -
  *
  * @property {string|null} [transformOrigin] -
  *
- * @property {number|null} [translateX] -
+ * @property {number|string|null} [translateX] -
  *
- * @property {number|null} [translateY] -
+ * @property {number|string|null} [translateY] -
  *
- * @property {number|null} [translateZ] -
+ * @property {number|string|null} [translateZ] -
  *
- * @property {number|'auto'|null} [width] -
+ * @property {number|string|null} [width] -
  *
- * @property {number|null} [zIndex] -
+ * @property {number|string|null} [zIndex] -
  *
  * Extended properties -----------------------------------------------------------------------------------------------
  *
  * @property {boolean} [immediateElementUpdate] - When true any associated element is updated immediately.
  *
  * @property {number|null} [rotation] - Alias for `rotateZ`.
+ */
+
+/**
+ * @typedef {object} PositionGetOptions
+ *
+ * @property {Iterable<string>} keys - When provided only these keys are copied.
+ *
+ * @property {boolean} numeric - When true any `null` values are converted into defaults.
  */
 
 /**
@@ -1591,6 +1366,10 @@ Object.seal(s_VALIDATION_DATA);
  * @property {boolean} ortho - Sets Position to orthographic mode using just transform / matrix3d for positioning.
  *
  * @property {boolean} transformSubscribed - Set to true when there are subscribers to the readable transform store.
+ */
+
+/**
+ * @typedef {PositionOptions & PositionData} PositionOptionsAll
  */
 
 /**

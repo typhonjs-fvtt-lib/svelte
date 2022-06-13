@@ -1,7 +1,7 @@
 /**
  * Provides a basic {@link TJSBasicAnimation} implementation for Position animation.
  */
-class AnimationControl
+export class AnimationControl
 {
    /** @type {object} */
    #animationData;
@@ -9,22 +9,37 @@ class AnimationControl
    /** @type {Promise<void>} */
    #finishedPromise;
 
+   #willFinish;
+
+   /**
+    * Defines a static empty / void animation control.
+    *
+    * @type {AnimationControl}
+    */
+   static #voidControl = new AnimationControl(null);
+
    /**
     * Provides a static void / undefined AnimationControl that is automatically resolved.
     *
     * @returns {AnimationControl} Void AnimationControl
     */
-   static get voidControl() { return s_VOID_CONTROL; }
+   static get voidControl() { return this.#voidControl; }
 
    /**
-    * @param {object|null} [animationData] - Animation data from {@link Position.animateTo}.
+    * @param {object|null} [animationData] - Animation data from {@link AnimationAPI}.
     *
-    * @param {Promise}     [finishedPromise] - Promise that tracks animation finished state.
+    * @param {boolean}     [willFinish] - Promise that tracks animation finished state.
     */
-   constructor(animationData, finishedPromise)
+   constructor(animationData, willFinish = false)
    {
-      this.#animationData = typeof animationData === 'object' ? animationData : null;
-      this.#finishedPromise = animationData === null ? Promise.resolve() : finishedPromise;
+      this.#animationData = animationData;
+      this.#willFinish = willFinish;
+
+      // Set this control to animation data.
+      if (animationData !== null && typeof animationData === 'object')
+      {
+         animationData.control = this;
+      }
    }
 
    /**
@@ -32,7 +47,33 @@ class AnimationControl
     *
     * @returns {Promise<void>}
     */
-   get finished() { return this.#finishedPromise; }
+   get finished()
+   {
+      if (!(this.#finishedPromise instanceof Promise))
+      {
+         this.#finishedPromise = this.#willFinish ? new Promise((resolve) => this.#animationData.resolve = resolve) :
+          Promise.resolve();
+      }
+
+      return this.#finishedPromise;
+   }
+
+   /**
+    * Returns whether this animation is currently active / animating.
+    *
+    * Note: a delayed animation may not be started / active yet. Use {@link AnimationControl.isFinished} to determine
+    * if an animation is actually finished.
+    *
+    * @returns {boolean} Animation active state.
+    */
+   get isActive() { return this.#animationData.active; }
+
+   /**
+    * Returns whether this animation is completely finished.
+    *
+    * @returns {boolean} Animation finished state.
+    */
+   get isFinished() { return this.#animationData.finished; }
 
    /**
     * Cancels the animation.
@@ -43,22 +84,8 @@ class AnimationControl
 
       if (animationData === null || animationData === void 0) { return; }
 
-      const keys = animationData.keys;
-      const currentAnimationKeys = animationData.currentAnimationKeys;
-
-      // Immediately remove any keys from currentAnimationKeys / #currentAnimationKeys.
-      for (let cntr = keys.length; --cntr >= 0;)
-      {
-         const key = keys[cntr];
-         currentAnimationKeys.delete(key);
-      }
-
-      // Set finished state to true and this animation data instance will be removed from AnimationManager on next
+      // Set cancelled state to true and this animation data instance will be removed from AnimationManager on next
       // update.
-      animationData.finished = true;
+      animationData.cancelled = true;
    }
 }
-
-const s_VOID_CONTROL = new AnimationControl();
-
-export { AnimationControl };

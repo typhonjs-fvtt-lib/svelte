@@ -50,10 +50,20 @@
    // If the application is a popOut application then when clicked bring to top. Bound to on pointerdown.
    const bringToTop = () =>
    {
-      if (typeof application.options.popOut === 'boolean' && application.options.popOut &&
-       application !== ui?.activeWindow)
+      if (typeof application.options.popOut === 'boolean' && application.options.popOut)
       {
-         application.bringToTop.call(application);
+         if (application !== ui?.activeWindow) { application.bringToTop.call(application); }
+
+         // If the activeElement is not `document.body` then blur the current active element and make `document.body`
+         // focused. This allows <esc> key to close all open apps / windows.
+         if (document.activeElement !== document.body)
+         {
+            // Blur current active element.
+            if (document.activeElement instanceof HTMLElement) { document.activeElement.blur(); }
+
+            // Make document body focused.
+            document.body.focus();
+         }
       }
    }
 
@@ -301,34 +311,36 @@
         flex-direction: column;
         flex-wrap: nowrap;
         justify-content: flex-start;
+        background: none;
         padding: 8px;
         color: #191813;
         overflow-y: auto;
         overflow-x: hidden;
     }
 
-    :global(.window-app .window-content > *) {
-        flex: 1;
-    }
+    /* Note: this is different than stock Foundry that sets `flex: 1`. This greatly aids control of content */
+    /*:global(.tjs-window-app .window-content > *) {*/
+    /*    flex: none;*/
+    /*}*/
 
-    :global(.window-app .window-content > .flex0) {
-        display: block;
-        flex: 0;
-    }
+    /*:global(.tjs-window-app .window-content > .flex0) {*/
+    /*    display: block;*/
+    /*    flex: 0;*/
+    /*}*/
 
-    :global(.window-app .window-content > .flex1) {
-        flex: 1;
-    }
+    /*:global(.tjs-window-app .window-content > .flex1) {*/
+    /*    flex: 1;*/
+    /*}*/
 
-    :global(.window-app .window-content > .flex2) {
-        flex: 2;
-    }
+    /*:global(.tjs-window-app .window-content > .flex2) {*/
+    /*    flex: 2;*/
+    /*}*/
 
-    :global(.window-app .window-content > .flex3) {
-        flex: 3;
-    }
+    /*:global(.tjs-window-app .window-content > .flex3) {*/
+    /*    flex: 3;*/
+    /*}*/
 
-    :global(.window-app.zhover) {
+    :global(.tjs-window-app.zhover) {
         z-index: calc(var(--z-index-window) + 1);
     }
 
@@ -348,7 +360,7 @@
         transform: rotate(45deg);
     }
 
-    :global(.window-app.minimized .window-resizable-handle) {
-        display: none;
-    }
+    /*:global(.tjs-window-app.minimized .window-resizable-handle) {*/
+    /*    display: none;*/
+    /*}*/
 </style>

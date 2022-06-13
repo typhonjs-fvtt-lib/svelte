@@ -1,20 +1,15 @@
 import { get, derived, writable as writable$2 } from 'svelte/store';
 import { noop, run_all, is_function } from 'svelte/internal';
-import { uuidv4, getUUIDFromDataTransfer, isObject, isIterable } from '@typhonjs-fvtt/svelte/util';
+import { uuidv4, isPlainObject, getUUIDFromDataTransfer, isIterable } from '@typhonjs-fvtt/svelte/util';
 
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
 
   if (Object.getOwnPropertySymbols) {
     var symbols = Object.getOwnPropertySymbols(object);
-
-    if (enumerableOnly) {
-      symbols = symbols.filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-      });
-    }
-
-    keys.push.apply(keys, symbols);
+    enumerableOnly && (symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    })), keys.push.apply(keys, symbols);
   }
 
   return keys;
@@ -22,19 +17,12 @@ function ownKeys(object, enumerableOnly) {
 
 function _objectSpread2(target) {
   for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i] != null ? arguments[i] : {};
-
-    if (i % 2) {
-      ownKeys(Object(source), true).forEach(function (key) {
-        _defineProperty(target, key, source[key]);
-      });
-    } else if (Object.getOwnPropertyDescriptors) {
-      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-    } else {
-      ownKeys(Object(source)).forEach(function (key) {
-        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-      });
-    }
+    var source = null != arguments[i] ? arguments[i] : {};
+    i % 2 ? ownKeys(Object(source), !0).forEach(function (key) {
+      _defineProperty(target, key, source[key]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) {
+      Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+    });
   }
 
   return target;
@@ -1057,30 +1045,6 @@ function isReadableStore(store) {
 }
 /**
  * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
- * function and a `set` function.
- *
- * Note: functions are also objects, so test that the variable might be a function w/ a `subscribe` function.
- *
- * @param {*}  store - variable to test that might be a store.
- *
- * @returns {boolean} Whether the variable tested has the shape of a store.
- */
-
-function isSettableStore(store) {
-  if (store === null || store === void 0) {
-    return false;
-  }
-
-  switch (typeof store) {
-    case 'function':
-    case 'object':
-      return typeof store.subscribe === 'function' && typeof store.set === 'function';
-  }
-
-  return false;
-}
-/**
- * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
  * function and an `update` function.
  *
  * Note: functions are also objects, so test that the variable might be a function w/ a `subscribe` function.
@@ -1122,7 +1086,7 @@ function isWritableStore(store) {
   switch (typeof store) {
     case 'function':
     case 'object':
-      return typeof store.subscribe === 'function' && typeof store.set === 'function' && typeof store.update === 'function';
+      return typeof store.subscribe === 'function' && typeof store.set === 'function';
   }
 
   return false;
@@ -1200,9 +1164,13 @@ function generator(storage) {
     }
 
     if (storage) {
-      if (storage.getItem(key)) {
-        value = JSON.parse(storage.getItem(key));
-      }
+      const storageValue = storage.getItem(key);
+
+      try {
+        if (storageValue) {
+          value = JSON.parse(storageValue);
+        }
+      } catch (err) {}
 
       storage.setItem(key, JSON.stringify(value));
     }
@@ -1237,7 +1205,9 @@ function generator(storage) {
     const stores_array = single ? [stores] : stores;
 
     if (storage && storage.getItem(key)) {
-      initial_value = JSON.parse(storage.getItem(key));
+      try {
+        initial_value = JSON.parse(storage.getItem(key));
+      } catch (err) {}
     }
 
     return readable(key, initial_value, set => {
@@ -1409,8 +1379,10 @@ function s_GET_STORE$1(stores, key, defaultValue = void 0) {
 
 function s_CREATE_STORE$1(key, defaultValue = void 0) {
   try {
-    if (localStorage.getItem(key)) {
-      defaultValue = JSON.parse(localStorage.getItem(key));
+    const value = localStorage.getItem(key);
+
+    if (value) {
+      defaultValue = JSON.parse(value);
     }
   } catch (err) {
     /**/
@@ -1543,8 +1515,10 @@ function s_GET_STORE$2(stores, key, defaultValue = void 0) {
 
 function s_CREATE_STORE$2(key, defaultValue = void 0) {
   try {
-    if (sessionStorage.getItem(key)) {
-      defaultValue = JSON.parse(sessionStorage.getItem(key));
+    const value = sessionStorage.getItem(key);
+
+    if (value) {
+      defaultValue = JSON.parse(value);
     }
   } catch (err) {
     /**/
@@ -1759,7 +1733,7 @@ class TJSDocument
    #updateOptions;
 
    /**
-    * @param {T}                    [document] - Document to wrap.
+    * @param {T|TJSDocumentOptions} [document] - Document to wrap or TJSDocumentOptions.
     *
     * @param {TJSDocumentOptions}   [options] - TJSDocument options.
     */
@@ -1767,8 +1741,15 @@ class TJSDocument
    {
       this.#uuidv4 = `tjs-document-${uuidv4()}`;
 
-      this.setOptions(options);
-      this.set(document);
+      if (isPlainObject(document)) // Handle case when only options are passed into ctor.
+      {
+         this.setOptions(document);
+      }
+      else
+      {
+         this.setOptions(options);
+         this.set(document);
+      }
    }
 
    /**
@@ -1911,9 +1892,9 @@ class TJSDocument
     */
    setOptions(options)
    {
-      if (!isObject(options))
+      if (!isPlainObject(options))
       {
-         throw new TypeError(`TJSDocument error: 'options' is not an object.`);
+         throw new TypeError(`TJSDocument error: 'options' is not a plain object.`);
       }
 
       if (options.delete !== void 0 && typeof options.delete !== 'function')
@@ -1944,9 +1925,12 @@ class TJSDocument
     */
    subscribe(handler)
    {
-      this.#subscriptions.push(handler);              // Add handler to the array of subscribers.
+      this.#subscriptions.push(handler);           // Add handler to the array of subscribers.
 
-      handler(this.#document, this.updateOptions);   // Call handler with current value and update options.
+      const updateOptions = this.updateOptions;
+      updateOptions.action = 'subscribe';
+
+      handler(this.#document, updateOptions);      // Call handler with current value and update options.
 
       // Return unsubscribe function.
       return () =>
@@ -1958,11 +1942,11 @@ class TJSDocument
 }
 
 /**
- * @typedef TJSDocumentOptions
+ * @typedef {object} TJSDocumentOptions
  *
- * @property {Function} delete - Optional delete function to invoke when document is deleted.
+ * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
  *
- * @property {boolean} notifyOnDelete - When true a subscribers are notified of the deletion of the document.
+ * @property {boolean} [notifyOnDelete] - When true a subscribers are notified of the deletion of the document.
  */
 
 /**
@@ -1987,21 +1971,23 @@ class TJSDocumentCollection
    #updateOptions;
 
    /**
-    * @param {T}                             [collection] - Collection to wrap.
+    * @param {T|TJSDocumentCollectionOptions}   [collection] - Collection to wrap or TJSDocumentCollectionOptions.
     *
-    * @param {TJSDocumentCollectionOptions}  [options] - TJSDocumentCollection options.
+    * @param {TJSDocumentCollectionOptions}     [options] - TJSDocumentCollection options.
     */
    constructor(collection, options = {})
    {
-      if (options?.delete !== void 0 && typeof options?.delete !== 'function')
-      {
-         throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
-      }
-
       this.#uuid = `tjs-collection-${uuidv4()}`;
 
-      this.setOptions(options);
-      this.set(collection);
+      if (isPlainObject(collection)) // Handle case when only options are passed into ctor.
+      {
+         this.setOptions(collection);
+      }
+      else
+      {
+         this.setOptions(options);
+         this.set(collection);
+      }
    }
 
    /**
@@ -2110,9 +2096,9 @@ class TJSDocumentCollection
     */
    setOptions(options)
    {
-      if (!isObject(options))
+      if (!isPlainObject(options))
       {
-         throw new TypeError(`TJSDocumentCollection error: 'options' is not an object.`);
+         throw new TypeError(`TJSDocumentCollection error: 'options' is not a plain object.`);
       }
 
       if (options.delete !== void 0 && typeof options.delete !== 'function')
@@ -2145,7 +2131,10 @@ class TJSDocumentCollection
    {
       this.#subscriptions.push(handler);              // Add handler to the array of subscribers.
 
-      handler(this.#collection, this.updateOptions);  // Call handler with current value and update options.
+      const updateOptions = this.updateOptions;
+      updateOptions.action = 'subscribe';
+
+      handler(this.#collection, updateOptions);  // Call handler with current value and update options.
 
       // Return unsubscribe function.
       return () =>
@@ -2159,9 +2148,9 @@ class TJSDocumentCollection
 /**
  * @typedef TJSDocumentCollectionOptions
  *
- * @property {Function} delete - Optional delete function to invoke when document is deleted.
+ * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
  *
- * @property {boolean} notifyOnDelete - When true a subscribers are notified of the deletion of the document.
+ * @property {boolean} [notifyOnDelete] - When true a subscribers are notified of the deletion of the document.
  */
 
 const storeState = writable$2(void 0);
@@ -2284,11 +2273,18 @@ class TJSGameSettings
          onchangeFunctions.push(options.onChange);
       }
 
+      // When true prevents local store subscription from a loop when values are object data.
+      let gateSet = false;
+
       // Provides an `onChange` callback to update the associated store.
       onchangeFunctions.push((value) =>
       {
          const store = s_GET_STORE(this.#stores, key);
-         if (store) { store.set(value); }
+         if (store)
+         {
+            gateSet = true;
+            store.set(value);
+         }
       });
 
       // Provides the final onChange callback that iterates over all the stored onChange callbacks.
@@ -2304,9 +2300,11 @@ class TJSGameSettings
 
       // Subscribe to self to set associated game setting on updates after verifying that the new value does not match
       // existing game setting.
-      newStore.subscribe((value) =>
+      subscribeIgnoreFirst(newStore, async (value) =>
       {
-         if (game.settings.get(moduleId, key) !== value) { game.settings.set(moduleId, key, value); }
+         if (!gateSet && game.settings.get(moduleId, key) !== value) { await game.settings.set(moduleId, key, value); }
+
+         gateSet = false;
       });
    }
 
@@ -2426,5 +2424,5 @@ function s_CREATE_STORE(initialValue)
  * @property {Function} get -
  */
 
-export { DynArrayReducer, LocalStorage, SessionStorage, TJSDocument, TJSDocumentCollection, TJSGameSettings, gameState, isReadableStore, isSettableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { DynArrayReducer, LocalStorage, SessionStorage, TJSDocument, TJSDocumentCollection, TJSGameSettings, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
 //# sourceMappingURL=index.js.map

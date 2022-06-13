@@ -21,6 +21,8 @@ const s_HAS_QUICK_TO = false;
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
+ * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
+ *
  * @param {Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging" state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.
@@ -33,7 +35,7 @@ const s_HAS_QUICK_TO = false;
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-function draggableGsap(node, { position, active = true, storeDragging = void 0, ease = true, inertia = false,
+function draggableGsap(node, { position, active = true, button = 0, storeDragging = void 0, ease = true, inertia = false,
  easeOptions = { duration: 0.1, ease: 'power3.out' },
   inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 } })
 {
@@ -78,7 +80,7 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
     */
    const handlers = {
       dragDown: ['pointerdown', (e) => onDragPointerDown(e), false],
-      dragMove: ['pointermove', (e) => onDragPointerMove(e), false],
+      dragMove: ['pointermove', (e) => onDragPointerChange(e), false],
       dragUp: ['pointerup', (e) => onDragPointerUp(e), false]
    };
 
@@ -138,6 +140,8 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
     */
    function onDragPointerDown(event)
    {
+      if (event.button !== button || !event.isPrimary) { return; }
+
       event.preventDefault();
 
       dragging = false;
@@ -172,8 +176,19 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
     *
     * @param {PointerEvent} event - The pointer move event.
     */
-   function onDragPointerMove(event)
+   function onDragPointerChange(event)
    {
+      // See chorded button presses for pointer events:
+      // https://www.w3.org/TR/pointerevents3/#chorded-button-interactions
+      // TODO: Support different button configurations for PointerEvents.
+      if ((event.buttons & 1) === 0)
+      {
+         onDragPointerUp(event);
+         return;
+      }
+
+      if (event.button !== -1 || !event.isPrimary) { return; }
+
       event.preventDefault();
 
       // Only set store dragging on first move event.
@@ -278,6 +293,11 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
             else { removeListeners(); }
          }
 
+         if (typeof options.button === 'number')
+         {
+            button = options.button;
+         }
+
          if (typeof options.ease === 'boolean') { ease = options.ease; }
          if (typeof options.inertia === 'boolean') { inertia = options.inertia; }
 
@@ -307,11 +327,11 @@ function draggableGsap(node, { position, active = true, storeDragging = void 0, 
  */
 class DraggableGsapOptions
 {
-   #ease = true;
-
-   #inertia = false;
+   #ease = false;
 
    #easeOptions = { duration: 0.1, ease: 'power3.out' };
+
+   #inertia = false;
 
    #inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 };
 
@@ -322,18 +342,18 @@ class DraggableGsapOptions
     */
    #subscriptions = [];
 
-   constructor()
+   constructor({ ease, easeOptions, inertia, inertiaOptions } = {})
    {
       // Define the following getters directly on this instance and make them enumerable. This allows them to be
       // picked up w/ `Object.assign`.
 
       Object.defineProperty(this, 'ease', {
          get: () => { return this.#ease; },
-         set: (ease) =>
+         set: (newEase) =>
          {
-            if (typeof ease !== 'boolean') { throw new TypeError(`'ease' is not a boolean.`); }
+            if (typeof newEase !== 'boolean') { throw new TypeError(`'ease' is not a boolean.`); }
 
-            this.#ease = ease;
+            this.#ease = newEase;
             this.#updateSubscribers();
          },
          enumerable: true
@@ -341,28 +361,156 @@ class DraggableGsapOptions
 
       Object.defineProperty(this, 'easeOptions', {
          get: () => { return this.#easeOptions; },
-         set: (easeOptions) => { this.#easeOptions = easeOptions; this.#updateSubscribers(); },
-         enumerable: true
-      });
-
-      Object.defineProperty(this, 'inertia', {
-         get: () => { return this.#inertia; },
-         set: (inertia) =>
+         set: (newEaseOptions) =>
          {
-            if (typeof inertia !== 'boolean') { throw new TypeError(`'inertia' is not a boolean.`); }
+            if (newEaseOptions === null || typeof newEaseOptions !== 'object')
+            {
+               throw new TypeError(`'easeOptions' is not an object.`);
+            }
 
-            this.#inertia = inertia;
+            if (newEaseOptions.duration !== void 0)
+            {
+               if (!Number.isFinite(newEaseOptions.duration))
+               {
+                  throw new TypeError(`'easeOptions.duration' is not a finite number.`);
+               }
+
+               if (newEaseOptions.duration < 0) { throw new Error(`'easeOptions.duration' is less than 0.`); }
+
+               this.#easeOptions.duration = newEaseOptions.duration;
+            }
+
+            if (newEaseOptions.ease !== void 0)
+            {
+               if (typeof newEaseOptions.ease !== 'function' && typeof newEaseOptions.ease !== 'string')
+               {
+                  throw new TypeError(`'easeOptions.ease' is not a function or string.`);
+               }
+
+               this.#easeOptions.ease = newEaseOptions.ease;
+            }
+
             this.#updateSubscribers();
          },
          enumerable: true
       });
 
+      Object.defineProperty(this, 'inertia', {
+         get: () => { return this.#inertia; },
+         set: (newInertia) =>
+         {
+            if (typeof newInertia !== 'boolean') { throw new TypeError(`'inertia' is not a boolean.`); }
+
+            this.#inertia = newInertia;
+            this.#updateSubscribers();
+         },
+         enumerable: true
+      });
 
       Object.defineProperty(this, 'inertiaOptions', {
          get: () => { return this.#inertiaOptions; },
-         set: (inertiaOptions) => { this.#inertiaOptions = inertiaOptions; this.#updateSubscribers(); },
+         set: (newInertiaOptions) =>
+         {
+            if (newInertiaOptions === null || typeof newInertiaOptions !== 'object')
+            {
+               throw new TypeError(`'inertiaOptions' is not an object.`);
+            }
+
+            if (newInertiaOptions.end !== void 0)
+            {
+               if (typeof newInertiaOptions.end !== 'function' && newInertiaOptions.end !== void 0)
+               {
+                  throw new TypeError(`'inertiaOptions.end' is not a function or undefined.`);
+               }
+
+               this.#inertiaOptions.end = newInertiaOptions.end;
+            }
+
+            if (newInertiaOptions.duration !== void 0)
+            {
+               if (newInertiaOptions.duration === null || typeof newInertiaOptions.duration !== 'object')
+               {
+                  throw new TypeError(`'inertiaOptions.duration' is not an object.`);
+               }
+
+               if (newInertiaOptions.duration.max !== void 0)
+               {
+                  if (!Number.isFinite(newInertiaOptions.duration.max))
+                  {
+                     throw new TypeError(`'inertiaOptions.duration.max' is not a finite number.`);
+                  }
+
+                  if (newInertiaOptions.duration.max < 0)
+                  {
+                     throw new Error(`'newInertiaOptions.duration.max' is less than 0.`);
+                  }
+
+                  this.#inertiaOptions.duration.max = newInertiaOptions.duration.max;
+               }
+
+               if (newInertiaOptions.duration.min !== void 0)
+               {
+                  if (!Number.isFinite(newInertiaOptions.duration.min))
+                  {
+                     throw new TypeError(`'inertiaOptions.duration.min' is not a finite number.`);
+                  }
+
+                  if (newInertiaOptions.duration.min < 0)
+                  {
+                     throw new Error(`'newInertiaOptions.duration.min' is less than 0.`);
+                  }
+
+                  this.#inertiaOptions.duration.min = newInertiaOptions.duration.min;
+               }
+
+               if (this.#inertiaOptions.duration.min > this.#inertiaOptions.duration.max)
+               {
+                  this.#inertiaOptions.duration.max = this.#inertiaOptions.duration.min;
+               }
+
+               if (this.#inertiaOptions.duration.max < this.#inertiaOptions.duration.min)
+               {
+                  this.#inertiaOptions.duration.min = this.#inertiaOptions.duration.max;
+               }
+            }
+
+            if (newInertiaOptions.resistance !== void 0)
+            {
+               if (!Number.isFinite(newInertiaOptions.resistance))
+               {
+                  throw new TypeError(`'inertiaOptions.resistance' is not a finite number.`);
+               }
+
+               if (newInertiaOptions.resistance < 0) { throw new Error(`'inertiaOptions.resistance' is less than 0.`); }
+
+               this.#inertiaOptions.resistance = newInertiaOptions.resistance;
+            }
+
+            if (newInertiaOptions.velocityScale !== void 0)
+            {
+               if (!Number.isFinite(newInertiaOptions.velocityScale))
+               {
+                  throw new TypeError(`'inertiaOptions.velocityScale' is not a finite number.`);
+               }
+
+               if (newInertiaOptions.velocityScale < 0)
+               {
+                  throw new Error(`'inertiaOptions.velocityScale' is less than 0.`);
+               }
+
+               this.#inertiaOptions.velocityScale = newInertiaOptions.velocityScale;
+            }
+
+            this.#updateSubscribers();
+         },
          enumerable: true
       });
+
+      // Set default options.
+      if (ease !== void 0) { this.ease = ease; }
+      if (easeOptions !== void 0) { this.easeOptions = easeOptions; }
+      if (inertia !== void 0) { this.inertia = inertia; }
+      if (inertiaOptions !== void 0) { this.inertiaOptions = inertiaOptions; }
    }
 
    /**
@@ -591,7 +739,7 @@ class DraggableGsapOptions
  *
  * @returns {DraggableGsapOptions} A new options instance.
  */
-draggableGsap.options = () => new DraggableGsapOptions();
+draggableGsap.options = (options) => new DraggableGsapOptions(options);
 
 export { draggableGsap };
 

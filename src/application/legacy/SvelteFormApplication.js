@@ -227,6 +227,17 @@ export class SvelteFormApplication extends FormApplication
    {
       if (force || this.popOut) { super.bringToTop(); }
 
+      // If the activeElement is not `document.body` then blur the current active element and make `document.body`
+      // focused. This allows <esc> key to close all open apps / windows.
+      if (document.activeElement !== document.body)
+      {
+         // Blur current active element.
+         if (document.activeElement instanceof HTMLElement) { document.activeElement.blur(); }
+
+         // Make document body focused.
+         document.body.focus();
+      }
+
       ui.activeWindow = this;
    }
 
@@ -359,7 +370,7 @@ export class SvelteFormApplication extends FormApplication
       el.remove();
 
       // Silently restore any width / height state before minimized as applicable.
-      this.position.restore({
+      this.position.state.restore({
          name: '#beforeMinimized',
          properties: ['width', 'height'],
          silent: true,
@@ -435,7 +446,12 @@ export class SvelteFormApplication extends FormApplication
       {
          for (const svelteConfig of this.options.svelte)
          {
-            const svelteData = loadSvelteConfig(this, html, svelteConfig, elementRootUpdate);
+            const svelteData = loadSvelteConfig({
+               app: this,
+               template: html[0],
+               config: svelteConfig,
+               elementRootUpdate
+            });
 
             if (isApplicationShell(svelteData.component))
             {
@@ -454,7 +470,12 @@ export class SvelteFormApplication extends FormApplication
       }
       else if (typeof this.options.svelte === 'object')
       {
-         const svelteData = loadSvelteConfig(this, html, this.options.svelte, elementRootUpdate);
+         const svelteData = loadSvelteConfig({
+            app: this,
+            template: html[0],
+            config: this.options.svelte,
+            elementRootUpdate
+         });
 
          if (isApplicationShell(svelteData.component))
          {
@@ -543,17 +564,15 @@ export class SvelteFormApplication extends FormApplication
     * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
     * to animate the content area.
     *
-    * @param {object} [opts] - Optional parameters.
+    * @param {object}   [opts] - Optional parameters.
     *
     * @param {boolean}  [opts.animate=true] - When true perform default maximizing animation.
     *
-    * @param {boolean}  [opts.duration=0.1] - Controls content area animation duration in seconds.
+    * @param {number}   [opts.duration=0.1] - Controls content area animation duration in seconds.
     */
    async maximize({ animate = true, duration = 0.1 } = {})
    {
       if (!this.popOut || [false, null].includes(this._minimized)) { return; }
-
-      this.#stores.uiOptionsUpdate((options) => deepMerge(options, { minimized: false }));
 
       this._minimized = null;
 
@@ -567,7 +586,13 @@ export class SvelteFormApplication extends FormApplication
       // First animate / restore width / async.
       if (animate)
       {
-         await this.position.restore({ name: '#beforeMinimized', async: true, animateTo: true, properties: ['width'] });
+         await this.position.state.restore({
+            name: '#beforeMinimized',
+            async: true,
+            animateTo: true,
+            properties: ['width'],
+            duration: 0.1
+         });
       }
 
       // Reset display none on all children of header.
@@ -581,17 +606,17 @@ export class SvelteFormApplication extends FormApplication
       {
          // Next animate / restore height synchronously and remove key. Retrieve constraints data for slide up animation
          // below.
-         ({ constraints } = this.position.restore({
+         ({ constraints } = this.position.state.restore({
             name: '#beforeMinimized',
             animateTo: true,
             properties: ['height'],
             remove: true,
-            duration: 0.1
+            duration
          }));
       }
       else
       {
-         ({ constraints } = this.position.remove({ name: '#beforeMinimized' }));
+         ({ constraints } = this.position.state.remove({ name: '#beforeMinimized' }));
       }
 
       // Slide down content with stored constraints.
@@ -611,8 +636,10 @@ export class SvelteFormApplication extends FormApplication
       element.style.minWidth = null;
       element.style.minHeight = null;
 
-      // Using a 30ms timeout prevents any instantaneous display of scrollbars with the above maximize animation.
-      setTimeout(() => content.style.overflow = null, 30);
+      // Using a 50ms timeout prevents any instantaneous display of scrollbars with the above maximize animation.
+      setTimeout(() => content.style.overflow = null, 50);
+
+      this.#stores.uiOptionsUpdate((options) => deepMerge(options, { minimized: false }));
    }
 
    /**
@@ -623,11 +650,11 @@ export class SvelteFormApplication extends FormApplication
     * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
     * to animate the content area.
     *
-    * @param {object} [opts] - Optional parameters.
+    * @param {object}   [opts] - Optional parameters.
     *
     * @param {boolean}  [opts.animate=true] - When true perform default minimizing animation.
     *
-    * @param {boolean}  [opts.duration=0.1] - Controls content area animation duration in seconds.
+    * @param {number}   [opts.duration=0.1] - Controls content area animation duration in seconds.
     */
    async minimize({ animate = true, duration = 0.1 } = {})
    {
@@ -677,7 +704,7 @@ export class SvelteFormApplication extends FormApplication
       }
 
       // Save current position state and add the constraint data to use in `maximize`.
-      this.position.save({ name: '#beforeMinimized', constraints });
+      this.position.state.save({ name: '#beforeMinimized', constraints });
 
       const headerOffsetHeight = header.offsetHeight;
 
@@ -687,7 +714,7 @@ export class SvelteFormApplication extends FormApplication
       if (animate)
       {
          // First await animation of height upward.
-         await this.position.animateTo({ height: headerOffsetHeight }, { duration: 0.1 }).finished;
+         await this.position.animate.to({ height: headerOffsetHeight }, { duration }).finished;
       }
 
       // Set all header buttons besides close and the window title to display none.
@@ -707,7 +734,7 @@ export class SvelteFormApplication extends FormApplication
       if (animate)
       {
          // Await animation of width to the left / minimum width.
-         await this.position.animateTo({ width: MIN_WINDOW_WIDTH }, { duration: 0.1 }).finished;
+         await this.position.animate.to({ width: MIN_WINDOW_WIDTH }, { duration: 0.1 }).finished;
       }
 
       element.classList.add('minimized');
@@ -818,9 +845,9 @@ export class SvelteFormApplication extends FormApplication
     * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
     * to update to using the {@link Position.validators} functionality.
     *
-    * @param {PositionData}   [position] - Position data.
+    * @param {PositionDataExtended}   [position] - Position data.
     *
-    * @returns {PositionData} The updated position object for the application containing the new values
+    * @returns {Position} The updated position object for the application containing the new values
     */
    setPosition(position)
    {

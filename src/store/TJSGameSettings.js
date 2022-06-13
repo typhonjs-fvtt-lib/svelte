@@ -1,5 +1,7 @@
-import { isIterable }      from '@typhonjs-fvtt/svelte/util';
-import { get, writable }   from 'svelte/store';
+import { get, writable }         from 'svelte/store';
+
+import { isIterable }            from '@typhonjs-fvtt/svelte/util';
+import { subscribeIgnoreFirst }  from '@typhonjs-svelte/lib/store';
 
 /**
  * Registers game settings and creates a backing Svelte store for each setting. It is possible to add multiple
@@ -97,11 +99,18 @@ export class TJSGameSettings
          onchangeFunctions.push(options.onChange);
       }
 
+      // When true prevents local store subscription from a loop when values are object data.
+      let gateSet = false;
+
       // Provides an `onChange` callback to update the associated store.
       onchangeFunctions.push((value) =>
       {
          const store = s_GET_STORE(this.#stores, key);
-         if (store) { store.set(value); }
+         if (store)
+         {
+            gateSet = true;
+            store.set(value);
+         }
       });
 
       // Provides the final onChange callback that iterates over all the stored onChange callbacks.
@@ -117,9 +126,11 @@ export class TJSGameSettings
 
       // Subscribe to self to set associated game setting on updates after verifying that the new value does not match
       // existing game setting.
-      newStore.subscribe((value) =>
+      subscribeIgnoreFirst(newStore, async (value) =>
       {
-         if (game.settings.get(moduleId, key) !== value) { game.settings.set(moduleId, key, value); }
+         if (!gateSet && game.settings.get(moduleId, key) !== value) { await game.settings.set(moduleId, key, value); }
+
+         gateSet = false;
       });
    }
 

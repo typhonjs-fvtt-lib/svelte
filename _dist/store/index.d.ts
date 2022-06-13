@@ -13,21 +13,21 @@ type TJSDocumentOptions = {
     /**
      * - Optional delete function to invoke when document is deleted.
      */
-    delete: Function;
+    delete?: Function;
     /**
      * - When true a subscribers are notified of the deletion of the document.
      */
-    notifyOnDelete: boolean;
+    notifyOnDelete?: boolean;
 };
 type TJSDocumentCollectionOptions = {
     /**
      * - Optional delete function to invoke when document is deleted.
      */
-    delete: Function;
+    delete?: Function;
     /**
      * - When true a subscribers are notified of the deletion of the document.
      */
-    notifyOnDelete: boolean;
+    notifyOnDelete?: boolean;
 };
 /**
  * - Provides a Svelte store wrapping the Foundry `game` global variable. It is initialized
@@ -234,11 +234,11 @@ declare class SessionStorage {
  */
 declare class TJSDocument<T extends any> {
     /**
-     * @param {T}                    [document] - Document to wrap.
+     * @param {T|TJSDocumentOptions} [document] - Document to wrap or TJSDocumentOptions.
      *
      * @param {TJSDocumentOptions}   [options] - TJSDocument options.
      */
-    constructor(document?: T, options?: TJSDocumentOptions);
+    constructor(document?: T | TJSDocumentOptions, options?: TJSDocumentOptions);
     /**
      * Returns the options passed on last update.
      *
@@ -296,11 +296,11 @@ declare class TJSDocument<T extends any> {
     #private;
 }
 /**
- * @typedef TJSDocumentOptions
+ * @typedef {object} TJSDocumentOptions
  *
- * @property {Function} delete - Optional delete function to invoke when document is deleted.
+ * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
  *
- * @property {boolean} notifyOnDelete - When true a subscribers are notified of the deletion of the document.
+ * @property {boolean} [notifyOnDelete] - When true a subscribers are notified of the deletion of the document.
  */
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any DocumentCollection. This makes
@@ -311,11 +311,11 @@ declare class TJSDocument<T extends any> {
  */
 declare class TJSDocumentCollection<T extends any> {
     /**
-     * @param {T}                             [collection] - Collection to wrap.
+     * @param {T|TJSDocumentCollectionOptions}   [collection] - Collection to wrap or TJSDocumentCollectionOptions.
      *
-     * @param {TJSDocumentCollectionOptions}  [options] - TJSDocumentCollection options.
+     * @param {TJSDocumentCollectionOptions}     [options] - TJSDocumentCollection options.
      */
-    constructor(collection?: T, options?: TJSDocumentCollectionOptions);
+    constructor(collection?: T | TJSDocumentCollectionOptions, options?: TJSDocumentCollectionOptions);
     /**
      * Returns the options passed on last update.
      *

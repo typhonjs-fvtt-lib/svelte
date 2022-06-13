@@ -1,6 +1,7 @@
 import 'svelte/store';
 import 'svelte/internal';
 import { hasSetter } from '@typhonjs-fvtt/svelte/util';
+import { cubicOut } from 'svelte/easing';
 
 /**
  * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
@@ -57,6 +58,25 @@ const applicationShellContract = ['elementRoot'];
 Object.freeze(applicationShellContract);
 
 /**
+ * Provides an action to always blur the element when any pointer up event occurs on the element.
+ *
+ * @param {HTMLElement}   node - The node to handle always blur on pointer up.
+ */
+function alwaysBlur(node)
+{
+   function blur()
+   {
+      setTimeout(() => { if (document.activeElement === node) { node.blur(); } }, 0);
+   }
+
+   node.addEventListener('pointerup', blur);
+
+   return {
+      destroy: () => node.removeEventListener('pointerup', blur)
+   };
+}
+
+/**
  * Provides an action to apply style properties provided as an object.
  *
  * @param {HTMLElement} node - Target element
@@ -85,6 +105,41 @@ function applyStyles(node, properties)
       {
          properties = newProperties;
          setProperties();
+      }
+   };
+}
+
+/**
+ * Provides an action to blur the element when any pointer down event occurs outside the element. This can be useful
+ * for input elements including select to blur / unfocus the element when any pointer down occurs outside the element.
+ *
+ * @param {HTMLElement}   node - The node to handle automatic blur on focus loss.
+ */
+function autoBlur(node)
+{
+   function blur() { document.body.removeEventListener('pointerdown', onPointerDown); }
+   function focus() { document.body.addEventListener('pointerdown', onPointerDown); }
+
+   /**
+    * Blur the node if a pointer down event happens outside the node.
+    * @param {PointerEvent} event
+    */
+   function onPointerDown(event)
+   {
+      if (event.target === node || node.contains(event.target)) { return; }
+
+      if (document.activeElement === node) { node.blur(); }
+   }
+
+   node.addEventListener('blur', blur);
+   node.addEventListener('focus', focus);
+
+   return {
+      destroy: () =>
+      {
+         document.body.removeEventListener('pointerdown', onPointerDown);
+         node.removeEventListener('blur', blur);
+         node.removeEventListener('focus', focus);
       }
    };
 }
@@ -443,6 +498,9 @@ function applyPosition(node, position)
    return {
       update: (newPosition) =>
       {
+         // Sanity case to short circuit update if positions are the same instance.
+         if (newPosition === position && newPosition.parent === position.parent) { return; }
+
          if (hasSetter(position)) { position.parent = void 0; }
 
          position = newPosition;
@@ -466,11 +524,18 @@ function applyPosition(node, position)
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
+ * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
+ *
  * @param {Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging" state.
+ *
+ * @param {boolean}           [params.ease=true] - When true easing is enabled.
+ *
+ * @param {object}            [params.easeOptions] - Gsap `to / `quickTo` vars object.
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-function draggable(node, { position, active = true, storeDragging = void 0 })
+function draggable(node, { position, active = true, button = 0, storeDragging = void 0, ease = false,
+ easeOptions = { duration: 0.1, ease: cubicOut } })
 {
    /**
     * Duplicate the app / Positionable starting position to track differences.
@@ -495,13 +560,20 @@ function draggable(node, { position, active = true, storeDragging = void 0 })
    let dragging = false;
 
    /**
+    * Stores the quickTo callback to use for optimized tweening when easing is enabled.
+    *
+    * @type {quickToCallback}
+    */
+   let quickTo = position.animate.quickTo(['top', 'left'], easeOptions);
+
+   /**
     * Remember event handlers associated with this action so they may be later unregistered.
     *
     * @type {object}
     */
    const handlers = {
       dragDown: ['pointerdown', (e) => onDragPointerDown(e), false],
-      dragMove: ['pointermove', (e) => onDragPointerMove(e), false],
+      dragMove: ['pointermove', (e) => onDragPointerChange(e), false],
       dragUp: ['pointerup', (e) => onDragPointerUp(e), false]
    };
 
@@ -541,6 +613,8 @@ function draggable(node, { position, active = true, storeDragging = void 0 })
     */
    function onDragPointerDown(event)
    {
+      if (event.button !== button || !event.isPrimary) { return; }
+
       event.preventDefault();
 
       dragging = false;
@@ -561,8 +635,19 @@ function draggable(node, { position, active = true, storeDragging = void 0 })
     *
     * @param {PointerEvent} event - The pointer move event.
     */
-   function onDragPointerMove(event)
+   function onDragPointerChange(event)
    {
+      // See chorded button presses for pointer events:
+      // https://www.w3.org/TR/pointerevents3/#chorded-button-interactions
+      // TODO: Support different button configurations for PointerEvents.
+      if ((event.buttons & 1) === 0)
+      {
+         onDragPointerUp(event);
+         return;
+      }
+
+      if (event.button !== -1 || !event.isPrimary) { return; }
+
       event.preventDefault();
 
       // Only set store dragging on first move event.
@@ -572,11 +657,22 @@ function draggable(node, { position, active = true, storeDragging = void 0 })
          storeDragging.set(true);
       }
 
-      s_POSITION_DATA.left = initialPosition.left + (event.clientX - initialDragPoint.x);
-      s_POSITION_DATA.top = initialPosition.top + (event.clientY - initialDragPoint.y);
+      /** @type {number} */
+      const newLeft = initialPosition.left + (event.clientX - initialDragPoint.x);
+      /** @type {number} */
+      const newTop = initialPosition.top + (event.clientY - initialDragPoint.y);
 
-      // Update application position.
-      position.set(s_POSITION_DATA);
+      if (ease)
+      {
+         quickTo(newTop, newLeft);
+      }
+      else
+      {
+         s_POSITION_DATA.left = newLeft;
+         s_POSITION_DATA.top = newTop;
+
+         position.set(s_POSITION_DATA);
+      }
    }
 
    /**
@@ -605,6 +701,25 @@ function draggable(node, { position, active = true, storeDragging = void 0 })
             if (active) { activateListeners(); }
             else { removeListeners(); }
          }
+
+         if (typeof options.button === 'number')
+         {
+            button = options.button;
+         }
+
+         if (options.position !== void 0 && options.position !== position)
+         {
+            position = options.position;
+            quickTo = position.animate.quickTo(['top', 'left'], easeOptions);
+         }
+
+         if (typeof options.ease === 'boolean') { ease = options.ease; }
+
+         if (typeof options.easeOptions === 'object')
+         {
+            easeOptions = options.easeOptions;
+            quickTo.options(easeOptions);
+         }
       },
 
       destroy: () => removeListeners()
@@ -613,6 +728,10 @@ function draggable(node, { position, active = true, storeDragging = void 0 })
 
 class DraggableOptions
 {
+   #ease = false;
+
+   #easeOptions = { duration: 0.1, ease: cubicOut };
+
    /**
     * Stores the subscribers.
     *
@@ -620,8 +739,122 @@ class DraggableOptions
     */
    #subscriptions = [];
 
-   constructor()
+   constructor({ ease, easeOptions } = {})
    {
+      // Define the following getters directly on this instance and make them enumerable. This allows them to be
+      // picked up w/ `Object.assign`.
+      Object.defineProperty(this, 'ease', {
+         get: () => { return this.#ease; },
+         set: (newEase) =>
+         {
+            if (typeof newEase !== 'boolean') { throw new TypeError(`'ease' is not a boolean.`); }
+
+            this.#ease = newEase;
+            this.#updateSubscribers();
+         },
+         enumerable: true
+      });
+
+      Object.defineProperty(this, 'easeOptions', {
+         get: () => { return this.#easeOptions; },
+         set: (newEaseOptions) =>
+         {
+            if (newEaseOptions === null || typeof newEaseOptions !== 'object')
+            {
+               throw new TypeError(`'easeOptions' is not an object.`);
+            }
+
+            if (newEaseOptions.duration !== void 0)
+            {
+               if (!Number.isFinite(newEaseOptions.duration))
+               {
+                  throw new TypeError(`'easeOptions.duration' is not a finite number.`);
+               }
+
+               if (newEaseOptions.duration < 0) { throw new Error(`'easeOptions.duration' is less than 0.`); }
+
+               this.#easeOptions.duration = newEaseOptions.duration;
+            }
+
+            if (newEaseOptions.ease !== void 0)
+            {
+               if (typeof newEaseOptions.ease !== 'function' && typeof newEaseOptions.ease !== 'string')
+               {
+                  throw new TypeError(`'easeOptions.ease' is not a function or string.`);
+               }
+
+               this.#easeOptions.ease = newEaseOptions.ease;
+            }
+
+            this.#updateSubscribers();
+         },
+         enumerable: true
+      });
+
+      // Set default options.
+      if (ease !== void 0) { this.ease = ease; }
+      if (easeOptions !== void 0) { this.easeOptions = easeOptions; }
+   }
+
+
+   /**
+    * @returns {number} Get ease duration
+    */
+   get easeDuration() { return this.#easeOptions.duration; }
+
+   /**
+    * @returns {string|Function} Get easing function value.
+    */
+   get easeValue() { return this.#easeOptions.ease; }
+
+
+   /**
+    * @param {number}   duration - Set ease duration.
+    */
+   set easeDuration(duration)
+   {
+      if (!Number.isFinite(duration))
+      {
+         throw new TypeError(`'duration' is not a finite number.`);
+      }
+
+      if (duration < 0) { throw new Error(`'duration' is less than 0.`); }
+
+      this.#easeOptions.duration = duration;
+      this.#updateSubscribers();
+   }
+
+   /**
+    * @param {string|Function} value - Get easing function value.
+    */
+   set easeValue(value)
+   {
+      if (typeof value !== 'function' && typeof value !== 'string')
+      {
+         throw new TypeError(`'value' is not a function or string.`);
+      }
+
+      this.#easeOptions.ease = value;
+      this.#updateSubscribers();
+   }
+
+   /**
+    * Resets all options data to default values.
+    */
+   reset()
+   {
+      this.#ease = false;
+      this.#easeOptions = { duration: 0.1, ease: cubicOut };
+      this.#updateSubscribers();
+   }
+
+   /**
+    * Resets easing options to default values.
+    */
+   resetEase()
+   {
+      this.#easeOptions = { duration: 0.1, ease: cubicOut };
+      this.#updateSubscribers();
    }
 
    /**
@@ -662,7 +895,7 @@ class DraggableOptions
  *
  * @returns {DraggableOptions} A new options instance.
  */
-draggable.options = () => new DraggableOptions();
+draggable.options = (options) => new DraggableOptions(options);
 
 /**
  * Used for direct call to `position.set`.
@@ -671,5 +904,5 @@ draggable.options = () => new DraggableOptions();
  */
 const s_POSITION_DATA = { left: 0, top: 0 };
 
-export { applyPosition, applyStyles, draggable, resizeObserver };
+export { alwaysBlur, applyPosition, applyStyles, autoBlur, draggable, resizeObserver };
 //# sourceMappingURL=index.js.map

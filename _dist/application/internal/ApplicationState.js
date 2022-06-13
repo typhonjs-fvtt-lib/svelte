@@ -28,6 +28,7 @@ export class ApplicationState
    {
       return Object.assign(extra, {
          position: this.#application?.position?.get(),
+         beforeMinimized: this.#application?.position?.state.get({ name: '#beforeMinimized' }),
          options: Object.assign({}, this.#application?.options),
          ui: { minimized: this.#application?.reactive?.minimized }
       });
@@ -57,11 +58,11 @@ export class ApplicationState
     *
     * @param {string}   options.name - Name to remove and retrieve.
     *
-    * @returns {ApplicationData} Saved position data.
+    * @returns {ApplicationData} Saved application data.
     */
    remove({ name })
    {
-      if (typeof name !== 'string') { throw new TypeError(`Position - remove: 'name' is not a string.`); }
+      if (typeof name !== 'string') { throw new TypeError(`ApplicationState - remove: 'name' is not a string.`); }
 
       const data = this.#dataSaved.get(name);
       this.#dataSaved.delete(name);
@@ -72,7 +73,7 @@ export class ApplicationState
    /**
     * Restores a saved application state returning the data. Several optional parameters are available
     * to control whether the restore action occurs silently (no store / inline styles updates), animates
-    * to the stored data, or simply sets the stored data. Restoring via {@link Position.animateTo} allows
+    * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
     * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
     * returned if awaiting the end of the animation.
     *
@@ -92,7 +93,7 @@ export class ApplicationState
     *
     * @param {Function}          [params.interpolate=lerp] - Interpolation function.
     *
-    * @returns {ApplicationData} Saved application data.
+    * @returns {ApplicationData|Promise<ApplicationData>} Saved application data.
     */
    restore({ name, remove = false, async = false, animateTo = false, duration = 0.1, ease = linear,
     interpolate = lerp })
@@ -108,7 +109,14 @@ export class ApplicationState
       {
          if (remove) { this.#dataSaved.delete(name); }
 
-         this.set(dataSaved, { async, animateTo, duration, ease, interpolate });
+         if (async)
+         {
+            return this.set(dataSaved, { async, animateTo, duration, ease, interpolate }).then(() => dataSaved);
+         }
+         else
+         {
+            this.set(dataSaved, { async, animateTo, duration, ease, interpolate });
+         }
       }
 
       return dataSaved;
@@ -123,7 +131,7 @@ export class ApplicationState
     *
     * @param {...*}     [options.extra] - Extra data to add to saved data.
     *
-    * @returns {ApplicationData} Current position data
+    * @returns {ApplicationData} Current application data
     */
    save({ name, ...extra })
    {
@@ -137,9 +145,9 @@ export class ApplicationState
    }
 
    /**
-    * Restores a saved positional state returning the data. Several optional parameters are available
+    * Restores a saved application state returning the data. Several optional parameters are available
     * to control whether the restore action occurs silently (no store / inline styles updates), animates
-    * to the stored data, or simply sets the stored data. Restoring via {@link Position.animateTo} allows
+    * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
     * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
     * returned if awaiting the end of the animation.
     *
@@ -171,27 +179,6 @@ export class ApplicationState
 
       if (data)
       {
-         // Merge in saved options to application.
-         if (typeof data?.options === 'object')
-         {
-            application?.reactive.mergeOptions(data.options);
-         }
-
-         if (typeof data?.ui === 'object')
-         {
-            const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
-
-            // Application is currently minimized and stored state is not, so reset minimized state without animationn.
-            if (application?.reactive?.minimized && !minimized)
-            {
-               application.maximize({ animate: false, duration: 0 });
-            }
-            else if (!application?.reactive?.minimized && minimized)
-            {
-               application.minimize({ animate: false, duration });
-            }
-         }
-
          if (typeof data?.position === 'object')
          {
             // Update data directly with no store or inline style updates.
@@ -203,19 +190,77 @@ export class ApplicationState
                   application.position.transformOrigin = data.position.transformOrigin;
                }
 
-               // Return a Promise with saved data that resolves after animation ends.
-               if (async)
+               if (typeof data?.ui === 'object')
                {
-                  return application.position.animateTo(data.position, { duration, ease, interpolate }).finished.then(
-                   () => application);
+                  const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
+
+                  if (application?.reactive?.minimized && !minimized)
+                  {
+                     application.maximize({ animate: false, duration: 0 });
+                  }
                }
-               else  // Animate synchronously.
+
+               const promise = application.position.animate.to(data.position,
+                { duration, ease, interpolate }).finished.then((cancelled) =>
                {
-                  application.position.animateTo(data.position, { duration, ease, interpolate });
-               }
+                  // Merge in saved options to application.
+                  if (!cancelled && typeof data?.options === 'object')
+                  {
+                     application?.reactive.mergeOptions(data.options);
+                  }
+
+                  if (!cancelled && typeof data?.ui === 'object')
+                  {
+                     const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
+
+                     // Application is currently minimized and stored state is not, so reset minimized state without
+                     // animation.
+                     if (!application?.reactive?.minimized && minimized)
+                     {
+                        application.minimize({ animate: false, duration: 0 });
+                     }
+                  }
+
+                  if (!cancelled && typeof data?.beforeMinimized === 'object')
+                  {
+                     application.position.state.set({ name: '#beforeMinimized', ...data.beforeMinimized });
+                  }
+
+                  return application;
+               });
+
+               // Return a Promise with the application that resolves after animation ends.
+               if (async) { return promise; }
             }
             else
             {
+               // Merge in saved options to application.
+               if (typeof data?.options === 'object')
+               {
+                  application?.reactive.mergeOptions(data.options);
+               }
+
+               if (typeof data?.ui === 'object')
+               {
+                  const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
+
+                  // Application is currently minimized and stored state is not, so reset minimized state without
+                  // animation.
+                  if (application?.reactive?.minimized && !minimized)
+                  {
+                     application.maximize({ animate: false, duration: 0 });
+                  }
+                  else if (!application?.reactive?.minimized && minimized)
+                  {
+                     application.minimize({ animate: false, duration });
+                  }
+               }
+
+               if (typeof data?.beforeMinimized === 'object')
+               {
+                  application.position.state.set({ name: '#beforeMinimized', ...data.beforeMinimized });
+               }
+
                // Default options is to set data for an immediate update.
                application.position.set(data.position);
             }
@@ -230,6 +275,8 @@ export class ApplicationState
  * @typedef {object} ApplicationData
  *
  * @property {PositionDataExtended}   position - Application position.
+ *
+ * @property {object}         beforeMinimized - Any application saved position state for #beforeMinimized
  *
  * @property {object}         options - Application options.
  *

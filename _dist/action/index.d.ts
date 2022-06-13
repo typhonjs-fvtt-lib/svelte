@@ -35,12 +35,18 @@ declare function applyStyles(node: HTMLElement, properties: object): Function;
  *
  * @param {Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging" state.
  *
+ * @param {boolean}           [params.ease=true] - When true easing is enabled.
+ *
+ * @param {object}            [params.easeOptions] - Gsap `to / `quickTo` vars object.
+ *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-declare function draggable(node: HTMLElement, { position, active, storeDragging }: {
+declare function draggable(node: HTMLElement, { position, active, storeDragging, ease, easeOptions }: {
     position: any;
     active?: boolean;
     storeDragging?: any;
+    ease?: boolean;
+    easeOptions?: object;
 }): {
     update: Function;
     destroy: Function;
@@ -96,6 +102,30 @@ declare namespace resizeObserver {
     function updateCache(el: HTMLElement): void;
 }
 declare class DraggableOptions {
+    /**
+     * @param {number}   duration - Set ease duration.
+     */
+    set easeDuration(arg: number);
+    /**
+     * @returns {number} Get ease duration
+     */
+    get easeDuration(): number;
+    /**
+     * @param {string|Function} value - Get easing function value.
+     */
+    set easeValue(arg: string | Function);
+    /**
+     * @returns {string|Function} Get easing function value.
+     */
+    get easeValue(): string | Function;
+    /**
+     * Resets all options data to default values.
+     */
+    reset(): void;
+    /**
+     * Resets easing options to default values.
+     */
+    resetEase(): void;
     /**
      *
      * @param {function(DraggableOptions): void} handler - Callback function that is invoked on update / changes.

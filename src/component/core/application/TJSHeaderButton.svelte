@@ -26,25 +26,27 @@
       styles = typeof button.styles === 'object' ? button.styles : void 0;
    }
 
-   function onClick()
+   function onClick(event)
    {
       // Accept either callback or onclick as the function / data to invoke.
       const invoke = button.callback ?? button.onclick;
 
       if (typeof invoke === 'function')
       {
-         invoke.call(button);
+         invoke.call(button, event);
          button = button; // This provides a reactive update if button data changes.
       }
    }
+
 </script>
 
 <svelte:options accessors={true}/>
 
 <!-- Need to capture pointerdown / dblclick to prevent further action by TJSApplicationHeader -->
-<a on:click|preventDefault|stopPropagation={onClick}
-   on:pointerdown|preventDefault|stopPropagation={()=>null}
-   on:dblclick|preventDefault|stopPropagation={()=>null}
+<a on:click|capture|preventDefault|stopPropagation={onClick}
+   on:pointerdown|capture|preventDefault|stopPropagation={()=>null}
+   on:mousedown|capture|preventDefault|stopPropagation={()=>null}
+   on:dblclick|capture|preventDefault|stopPropagation={()=>null}
    use:applyStyles={styles}
    class="header-button {button.class}">
     {@html icon}{label}

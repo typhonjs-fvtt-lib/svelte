@@ -1,4 +1,18 @@
 /**
+ * Stores the PositionData properties that can be animated.
+ *
+ * @type {Set<string>}
+ */
+const animateKeys = new Set([
+   // Main keys
+   'left', 'top', 'maxWidth', 'maxHeight', 'minWidth', 'minHeight', 'width', 'height',
+   'rotateX', 'rotateY', 'rotateZ', 'scale', 'translateX', 'translateY', 'translateZ', 'zIndex',
+
+   // Aliases
+   'rotation'
+]);
+
+/**
  * Defines the keys of PositionData that are transform keys.
  *
  * @type {string[]}
@@ -6,6 +20,13 @@
 const transformKeys = ['rotateX', 'rotateY', 'rotateZ', 'scale', 'translateX', 'translateY', 'translateZ'];
 
 Object.freeze(transformKeys);
+
+/**
+ * Parses a relative value string in the form of '+=', '-=', or '*=' and float / numeric value. IE '+=0.2'.
+ *
+ * @type {RegExp}
+ */
+const relativeRegex = /^([-+*])=(-?[\d]*\.?[\d]+)$/;
 
 /**
  * Provides numeric defaults for all parameters. This is used by {@link Position.get} to optionally provide
@@ -38,6 +59,26 @@ const numericDefaults = {
 };
 
 Object.freeze(numericDefaults);
+
+/**
+ * Sets numeric defaults for a {@link PositionData} like object.
+ *
+ * @param {object}   data - A PositionData like object.
+ */
+function setNumericDefaults(data)
+{
+   // Transform keys
+   if (data.rotateX === null) { data.rotateX = 0; }
+   if (data.rotateY === null) { data.rotateY = 0; }
+   if (data.rotateZ === null) { data.rotateZ = 0; }
+   if (data.translateX === null) { data.translateX = 0; }
+   if (data.translateY === null) { data.translateY = 0; }
+   if (data.translateZ === null) { data.translateZ = 0; }
+   if (data.scale === null) { data.scale = 1; }
+
+   // Aliases
+   if (data.rotation === null) { data.rotation = 0; }
+}
 
 /**
  * Defines bitwise keys for transforms used in {@link Transforms.getMat4}.
@@ -73,4 +114,13 @@ const transformOrigins = ['top left', 'top center', 'top right', 'center left', 
 
 Object.freeze(transformOrigins);
 
-export { numericDefaults, transformKeys, transformKeysBitwise, transformOriginDefault, transformOrigins };
+export {
+   animateKeys,
+   numericDefaults,
+   relativeRegex,
+   setNumericDefaults,
+   transformKeys,
+   transformKeysBitwise,
+   transformOriginDefault,
+   transformOrigins
+};

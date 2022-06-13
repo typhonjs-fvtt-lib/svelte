@@ -1,6 +1,5 @@
 <script>
    import { getContext }         from 'svelte';
-   import { nextAnimationFrame } from '@typhonjs-fvtt/svelte/animate';
 
    export let isResizable = false;
 
@@ -141,11 +140,9 @@
       /**
        * Sets the width / height of the positionable application.
        */
-      async function onResizePointerMove(event)
+      function onResizePointerMove(event)
       {
          event.preventDefault();
-
-         await nextAnimationFrame();
 
          if (!resizing && typeof storeResizing?.set === 'function')
          {

@@ -8,7 +8,7 @@ export class PositionData
      translateZ = null, top = null, transformOrigin = null, width = null, zIndex = null } = {})
    {
       /**
-       * @type {number|'auto'|null}
+       * @type {number|'auto'|'inherit'|null}
        */
       this.height = height;
 
@@ -83,7 +83,7 @@ export class PositionData
       this.translateZ = translateZ;
 
       /**
-       * @type {number|'auto'|null}
+       * @type {number|'auto'|'inherit'|null}
        */
       this.width = width;
 

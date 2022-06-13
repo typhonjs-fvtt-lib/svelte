@@ -267,11 +267,20 @@ export class SvelteReactive
    /**
     * Sets `this.options.title` which is reactive for application shells.
     *
-    * @param {string}   title - Application title; will be localized, so a translation key is fine.
+    * Note: Will set empty string if title is undefined or null.
+    *
+    * @param {string|undefined|null}   title - Application title; will be localized, so a translation key is fine.
     */
    set title(title)
    {
-      if (typeof title === 'string') { this.setOptions('title', title); }
+      if (typeof title === 'string')
+      {
+         this.setOptions('title', title);
+      }
+      else if (title === void 0 || title === null)
+      {
+         this.setOptions('title', '');
+      }
    }
 
    /**
