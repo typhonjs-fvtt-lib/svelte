@@ -168,6 +168,8 @@ declare class GsapCompose {
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
+ * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
+ *
  * @param {Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging" state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.
@@ -180,9 +182,10 @@ declare class GsapCompose {
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-declare function draggableGsap(node: HTMLElement, { position, active, storeDragging, ease, inertia, easeOptions, inertiaOptions }: {
+declare function draggableGsap(node: HTMLElement, { position, active, button, storeDragging, ease, inertia, easeOptions, inertiaOptions }: {
     position: any;
     active?: boolean;
+    button?: number;
     storeDragging?: any;
     ease?: boolean;
     inertia?: boolean;
@@ -198,7 +201,7 @@ declare namespace draggableGsap {
      *
      * @returns {DraggableGsapOptions} A new options instance.
      */
-    function options(): DraggableGsapOptions;
+    function options(options: any): DraggableGsapOptions;
 }
 declare const easingFunc: {};
 declare const easingList: string[];
@@ -213,6 +216,16 @@ declare function gsapLoadPlugin(name: string): Promise<any>;
  * Provides a store / object to make updating / setting draggableGsap options much easier.
  */
 declare class DraggableGsapOptions {
+    constructor({ ease, easeOptions, inertia, inertiaOptions }?: {
+        ease: any;
+        easeOptions: any;
+        inertia: any;
+        inertiaOptions: any;
+    });
+    ease: any;
+    easeOptions: any;
+    inertia: any;
+    inertiaOptions: any;
     /**
      * @param {number}   duration - Set ease duration.
      */

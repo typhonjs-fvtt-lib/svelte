@@ -53,33 +53,33 @@ declare function getUUIDFromDataTransfer(data: object, { actor, compendium, worl
 /**
  * Provides a method to determine if the passed in Svelte component has a getter & setter accessor.
  *
- * @param {*}        component - Svelte component.
+ * @param {*}        object - An object.
  *
  * @param {string}   accessor - Accessor to test.
  *
  * @returns {boolean} Whether the component has the getter and setter for accessor.
  */
-declare function hasAccessor(component: any, accessor: string): boolean;
+declare function hasAccessor(object: any, accessor: string): boolean;
 /**
  * Provides a method to determine if the passed in Svelte component has a getter accessor.
  *
- * @param {*}        component - Svelte component.
+ * @param {*}        object - An object.
  *
  * @param {string}   accessor - Accessor to test.
  *
  * @returns {boolean} Whether the component has the getter for accessor.
  */
-declare function hasGetter(component: any, accessor: string): boolean;
+declare function hasGetter(object: any, accessor: string): boolean;
 /**
  * Provides a method to determine if the passed in Svelte component has a setter accessor.
  *
- * @param {*}        component - Svelte component.
+ * @param {*}        object - An object.
  *
  * @param {string}   accessor - Accessor to test.
  *
  * @returns {boolean} Whether the component has the setter for accessor.
  */
-declare function hasSetter(component: any, accessor: string): boolean;
+declare function hasSetter(object: any, accessor: string): boolean;
 /**
  * Provides a solid string hashing algorithm.
  *

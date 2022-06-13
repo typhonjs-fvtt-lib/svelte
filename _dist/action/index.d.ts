@@ -1,4 +1,12 @@
 /**
+ * Provides an action to always blur the element when any pointer up event occurs on the element.
+ *
+ * @param {HTMLElement}   node - The node to handle always blur on pointer up.
+ */
+declare function alwaysBlur(node: HTMLElement): {
+    destroy: () => void;
+};
+/**
  * Provides an action to apply a Position instance to a HTMLElement and invoke `position.parent`
  *
  * @param {HTMLElement}       node - The node associated with the action.
@@ -22,6 +30,15 @@ declare function applyPosition(node: HTMLElement, position: any): {
  */
 declare function applyStyles(node: HTMLElement, properties: object): Function;
 /**
+ * Provides an action to blur the element when any pointer down event occurs outside the element. This can be useful
+ * for input elements including select to blur / unfocus the element when any pointer down occurs outside the element.
+ *
+ * @param {HTMLElement}   node - The node to handle automatic blur on focus loss.
+ */
+declare function autoBlur(node: HTMLElement): {
+    destroy: () => void;
+};
+/**
  * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on a given {@link Position}
  * instance provided. When the attached boolean store state changes the draggable action is enabled or disabled.
  *
@@ -33,6 +50,8 @@ declare function applyStyles(node: HTMLElement, properties: object): Function;
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
+ * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
+ *
  * @param {Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging" state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.
@@ -41,9 +60,10 @@ declare function applyStyles(node: HTMLElement, properties: object): Function;
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-declare function draggable(node: HTMLElement, { position, active, storeDragging, ease, easeOptions }: {
+declare function draggable(node: HTMLElement, { position, active, button, storeDragging, ease, easeOptions }: {
     position: any;
     active?: boolean;
+    button?: number;
     storeDragging?: any;
     ease?: boolean;
     easeOptions?: object;
@@ -57,7 +77,7 @@ declare namespace draggable {
      *
      * @returns {DraggableOptions} A new options instance.
      */
-    function options(): DraggableOptions;
+    function options(options: any): DraggableOptions;
 }
 /**
  * Provides an action to monitor the given HTMLElement node with `ResizeObserver` posting width / height changes
@@ -102,6 +122,12 @@ declare namespace resizeObserver {
     function updateCache(el: HTMLElement): void;
 }
 declare class DraggableOptions {
+    constructor({ ease, easeOptions }?: {
+        ease: any;
+        easeOptions: any;
+    });
+    ease: any;
+    easeOptions: any;
     /**
      * @param {number}   duration - Set ease duration.
      */
@@ -137,4 +163,4 @@ declare class DraggableOptions {
     #private;
 }
 
-export { applyPosition, applyStyles, draggable, resizeObserver };
+export { alwaysBlur, applyPosition, applyStyles, autoBlur, draggable, resizeObserver };
