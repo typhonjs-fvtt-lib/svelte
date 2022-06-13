@@ -1,4 +1,7 @@
 # Changelog
+## Release 0.0.14 (massive update / animation stage #2)
+- Notes forthcoming.
+
 ## Release 0.0.12 (massive update / animation stage #1)
 - Full integration of GSAP 
   - Proper module loading from remote source (requires top level await).
