@@ -99,9 +99,9 @@ export function loadSvelteConfig({ app, template, config, elementRootUpdate } = 
       {
          console.log(
           `%c[TRL] loadSvelteConfig error - HTMLElement target with no 'selectorElement' defined.\n` +
-          `Note: If configuring an application shell and directly targeting an HTMLElement did you bind an` +
-          `'elementRoot' and include '<svelte:options accessors={true}/>'?` +
-          `Offending config:\n`, 'background: rgb(57,34,34)', config);
+          `\nNote: If configuring an application shell and directly targeting a HTMLElement did you bind an` +
+          `'elementRoot' and include '<svelte:options accessors={true}/>'?\n` +
+          `\nOffending config:\n`, 'background: rgb(57,34,34)', config);
 
          throw new Error();
       }
