@@ -1,6 +1,34 @@
 # Changelog
 ## Release 0.0.14 (massive update / animation stage #2)
-- Notes forthcoming.
+- Better error messages for Svelte component mounting.
+
+- TJSApplicationHeader defines styles for .window-title for no-wrap, overflow hidden, and text-overlow as ellipsis.
+
+- TJSDocument / TJSDocumentCollection
+  - add a 'subscribe' action; first subscribe callback action will be subscribe.
+  - handle var args in constructor
+
+- Position
+  - Support for relative data; can use "+2.0", "-1.5", "*0.5" to adjust numeric position data relative to current values.
+
+- Position State API
+  - New location (position.state.<xxx>)
+  
+- AnimationAPI / AnimationManager
+  - Fully decoupled AnimationManager from UpdateElementManager.
+  - `position.animate.<xxx>` & Position.Animate.<xxx> for grouping multiple position instances in one animation.
+    - Animations can have delayed start.
+  - Implemented to, from, fromTo tweens
+  - `quickTo` function generation for fast restart of to tween.
+  - Ability to get all animation controls for a give Position instance.
+
+- AnimationControl / AnimationGroupControl
+  - isActive / isFinished getters to determine if animation is active or finished.
+  - Cancel implementation
+
+- Actions
+  - alwaysBlur; Applied to an element focus is always immediately blurred.
+  - autoBlur; Applied to an element focus is blurred when another pointer down event occurs outside the element.
 
 ## Release 0.0.12 (massive update / animation stage #1)
 - Full integration of GSAP 
