@@ -1,6 +1,6 @@
 import { get, derived, writable as writable$2 } from 'svelte/store';
 import { noop, run_all, is_function } from 'svelte/internal';
-import { uuidv4, isPlainObject, getUUIDFromDataTransfer, isIterable } from '@typhonjs-fvtt/svelte/util';
+import { uuidv4, isPlainObject, getUUIDFromDataTransfer } from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides the storage and sequencing of managed filters. Each filter added may be a bespoke function or a
@@ -463,9 +463,14 @@ class Indexer
     * @param {number[]}    oldIndex - Old index array.
     *
     * @param {number|null} oldHash - Old index hash value.
+    *
+    * @param {boolean}     [force=false] - When true forces an update to subscribers.
     */
-   calcHashUpdate(oldIndex, oldHash)
+   calcHashUpdate(oldIndex, oldHash, force = false)
    {
+      // Use force if a boolean otherwise default to false.
+      const actualForce = typeof force === 'boolean' ? force : /* c8 ignore next */ false;
+
       let newHash = null;
       const newIndex = this.indexAdapter.index;
 
@@ -479,7 +484,7 @@ class Indexer
 
       this.indexAdapter.hash = newHash;
 
-      if (oldHash === newHash ? !s_ARRAY_EQUALS(oldIndex, newIndex) : true) { this.hostUpdate(); }
+      if (actualForce || (oldHash === newHash ? !s_ARRAY_EQUALS(oldIndex, newIndex) : true)) { this.hostUpdate(); }
    }
 
    initAdapters(filtersAdapter, sortAdapter)
@@ -533,7 +538,13 @@ class Indexer
       return data;
    }
 
-   update()
+   /**
+    * Update the reducer indexes. If there are changes subscribers are notified. If data order is changed externally
+    * pass in true to force an update to subscribers.
+    *
+    * @param {boolean}  [force=false] - When true forces an update to subscribers.
+    */
+   update(force = false)
    {
       const oldIndex = this.indexAdapter.index;
       const oldHash = this.indexAdapter.hash;
@@ -556,7 +567,7 @@ class Indexer
          this.indexAdapter.index.sort(this.sortFn);
       }
 
-      this.calcHashUpdate(oldIndex, oldHash);
+      this.calcHashUpdate(oldIndex, oldHash, force);
    }
 }
 
@@ -690,6 +701,17 @@ class DynArrayReducer
    }
 
    /**
+    * Returns the internal data of this instance. Be careful!
+    *
+    * Note: if an array is set as initial data then that array is used as the internal data. If any changes are
+    * performed to the data externally do invoke {@link index.update} with `true` to recalculate the index and notify
+    * all subscribers.
+    *
+    * @returns {T[]} The internal data.
+    */
+   get data() { return this.#items; }
+
+   /**
     * @returns {AdapterFilters<T>} The filters adapter.
     */
    get filters() { return this.#filters; }
@@ -712,6 +734,41 @@ class DynArrayReducer
     * @returns {AdapterSort<T>} The sort adapter.
     */
    get sort() { return this.#sort; }
+
+   /**
+    * Removes internal data and pushes new data. This does not destroy any initial array set to internal data unless
+    * `replace` is set to true.
+    *
+    * @param {T[] | Iterable<T>} data - New data to set to internal data.
+    *
+    * @param {boolean} [replace=false] - New data to set to internal data.
+    */
+   setData(data, replace = false)
+   {
+      if (!s_IS_ITERABLE(data)) { throw new TypeError(`DynArrayReducer.setData error: 'data' is not iterable.`); }
+
+      if (typeof replace !== 'boolean')
+      {
+         throw new TypeError(`DynArrayReducer.setData error: 'replace' is not a boolean.`);
+      }
+
+      // Replace internal data with new array or create an array from an iterable.
+      if (replace)
+      {
+         this.#items = Array.isArray(data) ? data : [...data];
+      }
+      else
+      {
+         // Remove all entries in internal data. This will not replace any initially set array.
+         this.#items.length = 0;
+
+         // Add all new data.
+         this.#items.push(...data);
+      }
+
+      // Recalculate index and force an update to any subscribers.
+      this.index.update(true);
+   }
 
    /**
     *
@@ -905,6 +962,40 @@ function subscribeFirstRest(store, first, update)
          update(value);
       }
    })
+}
+
+/**
+ * Wraps a writable stores set method invoking a callback after the store is set. This allows parent / child
+ * relationships between stores to update directly without having to subscribe to the child store. This is a particular
+ * powerful pattern when the `setCallback` is a debounced function that syncs a parent store and / or serializes data.
+ *
+ * @param {import('svelte/store').Writable} store - A store to wrap.
+ *
+ * @param {(store?: import('svelte/store').Writable, value?: *) => void} setCallback - A callback to invoke after store
+ *                                                                                     set.
+ *
+ * @returns {import('svelte/store').Writable} Wrapped store.
+ */
+function storeCallback(store, setCallback)
+{
+   if (!isWritableStore(store)) { throw new TypeError(`'store' is not a writable store.`); }
+   if (typeof setCallback !== 'function') { throw new TypeError(`'setCallback' is not a function.`); }
+
+   /** @type {import('svelte/store').Writable} */
+   const wrapper = {
+      set: (value) => {
+         store.set(value);
+         setCallback(store, value);
+      },
+
+      subscribe: store.subscribe,
+
+      update: typeof store.update === 'function' ? store.update : void 0
+   };
+
+   Object.freeze(wrapper);
+
+   return wrapper;
 }
 
 // src/generator.ts
@@ -1895,6 +1986,30 @@ Hooks.once('ready', () => storeState.set(game));
  */
 
 /**
+ * Defines the application shell contract. If Svelte components export getter / setters for the following properties
+ * then that component is considered an application shell.
+ *
+ * @type {string[]}
+ */
+const applicationShellContract = ['elementRoot'];
+
+Object.freeze(applicationShellContract);
+
+/**
+ * Tests for whether an object is iterable.
+ *
+ * @param {*} value - Any value.
+ *
+ * @returns {boolean} Whether object is iterable.
+ */
+function isIterable(value)
+{
+   if (value === null || value === void 0 || typeof value !== 'object') { return false; }
+
+   return typeof value[Symbol.iterator] === 'function';
+}
+
+/**
  * Registers game settings and creates a backing Svelte store for each setting. It is possible to add multiple
  * `onChange` callbacks on registration.
  */
@@ -1960,15 +2075,25 @@ class TJSGameSettings
     */
    register(setting)
    {
-      if (typeof setting !== 'object') { throw new TypeError(`TJSGameSettings - register: setting is not an object.`); }
+      if (typeof setting !== 'object')
+      {
+         throw new TypeError(`TJSGameSettings - register: setting is not an object.`);
+      }
 
       if (typeof setting.options !== 'object')
       {
          throw new TypeError(`TJSGameSettings - register: 'options' attribute is not an object.`);
       }
 
+      if (setting.store !== void 0 && !isWritableStore(setting.store))
+      {
+         throw new TypeError(
+          `TJSGameSettings - register: 'setting.store' attribute is not a writable store.`);
+      }
+
       const moduleId = setting.moduleId;
       const key = setting.key;
+      const store = setting.store;
 
       /**
        * @type {GameSettingOptions}
@@ -1976,6 +2101,21 @@ class TJSGameSettings
       const options = setting.options;
 
       const onchangeFunctions = [];
+
+      // When true prevents local store subscription from a loop when values are object data.
+      let gateSet = false;
+
+      // Provides an `onChange` callback to update the associated store.
+      onchangeFunctions.push((value) =>
+      {
+         const callbackStore = s_GET_STORE(this.#stores, key);
+         if (callbackStore && !gateSet)
+         {
+            gateSet = true;
+            callbackStore.set(value);
+            gateSet = false;
+         }
+      });
 
       // Handle loading any existing `onChange` callbacks.
       if (isIterable(options?.onChange))
@@ -1990,20 +2130,6 @@ class TJSGameSettings
          onchangeFunctions.push(options.onChange);
       }
 
-      // When true prevents local store subscription from a loop when values are object data.
-      let gateSet = false;
-
-      // Provides an `onChange` callback to update the associated store.
-      onchangeFunctions.push((value) =>
-      {
-         const store = s_GET_STORE(this.#stores, key);
-         if (store)
-         {
-            gateSet = true;
-            store.set(value);
-         }
-      });
-
       // Provides the final onChange callback that iterates over all the stored onChange callbacks.
       const onChange = (value) =>
       {
@@ -2013,13 +2139,24 @@ class TJSGameSettings
       game.settings.register(moduleId, key, { ...options, onChange });
 
       // Set new store value with existing setting or default value.
-      const newStore = s_GET_STORE(this.#stores, key, game.settings.get(moduleId, key));
+      const targetStore = store ? store : s_GET_STORE(this.#stores, key, game.settings.get(moduleId, key));
+
+      // If a store instance is passed into register then initialize it with game settings data.
+      if (store)
+      {
+         this.#stores.set(key, targetStore);
+         store.set(game.settings.get(moduleId, key));
+      }
 
       // Subscribe to self to set associated game setting on updates after verifying that the new value does not match
       // existing game setting.
-      subscribeIgnoreFirst(newStore, async (value) =>
+      subscribeIgnoreFirst(targetStore, async (value) =>
       {
-         if (!gateSet && game.settings.get(moduleId, key) !== value) { await game.settings.set(moduleId, key, value); }
+         if (!gateSet && game.settings.get(moduleId, key) !== value)
+         {
+            gateSet = true;
+            await game.settings.set(moduleId, key, value);
+         }
 
          gateSet = false;
       });
@@ -2126,6 +2263,8 @@ function s_CREATE_STORE(initialValue)
  *
  * @property {string} key - The setting key to register.
  *
+ * @property {import('svelte/store').Writable} [store] - An existing store instance to use.
+ *
  * @property {GameSettingOptions} options - Configuration for setting data.
  */
 
@@ -2141,5 +2280,5 @@ function s_CREATE_STORE(initialValue)
  * @property {Function} get -
  */
 
-export { DynArrayReducer, LocalStorage, SessionStorage, TJSDocument, TJSDocumentCollection, TJSGameSettings, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { DynArrayReducer, LocalStorage, SessionStorage, TJSDocument, TJSDocumentCollection, TJSGameSettings, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, storeCallback, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
 //# sourceMappingURL=index.js.map

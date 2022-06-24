@@ -27,6 +27,52 @@ function isUpdatableStore(store)
    return false;
 }
 
+/**
+ * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
+ * `set`, and `update` functions.
+ *
+ * Note: functions are also objects, so test that the variable might be a function w/ `subscribe` & `set` functions.
+ *
+ * @param {*}  store - variable to test that might be a store.
+ *
+ * @returns {boolean} Whether the variable tested has the shape of a store.
+ */
+function isWritableStore(store)
+{
+   if (store === null || store === void 0) { return false; }
+
+   switch (typeof store)
+   {
+      case 'function':
+      case 'object':
+         return typeof store.subscribe === 'function' && typeof store.set === 'function';
+   }
+
+   return false;
+}
+
+/**
+ * Wraps a callback in a debounced timeout.
+ *
+ * Delay execution of the callback function until the function has not been called for the given delay in milliseconds.
+ *
+ * @param {Function} callback - A function to execute once the debounced threshold has been passed.
+ *
+ * @param {number}   delay - An amount of time in milliseconds to delay.
+ *
+ * @return {Function} A wrapped function that can be called to debounce execution.
+ */
+function debounce(callback, delay)
+{
+   let timeoutId;
+
+   return function(...args)
+   {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => { callback.apply(this, args); }, delay);
+   }
+}
+
 const s_REGEX = /(\d+)\s*px/;
 
 /**
@@ -72,74 +118,6 @@ function alwaysBlur(node)
 
    return {
       destroy: () => node.removeEventListener('pointerup', blur)
-   };
-}
-
-/**
- * Provides an action to apply style properties provided as an object.
- *
- * @param {HTMLElement} node - Target element
- *
- * @param {object}      properties - Key / value object of properties to set.
- *
- * @returns {Function} Update function.
- */
-function applyStyles(node, properties)
-{
-   /** Sets properties on node. */
-   function setProperties()
-   {
-      if (typeof properties !== 'object') { return; }
-
-      for (const prop of Object.keys(properties))
-      {
-         node.style.setProperty(`${prop}`, properties[prop]);
-      }
-   }
-
-   setProperties();
-
-   return {
-      update(newProperties)
-      {
-         properties = newProperties;
-         setProperties();
-      }
-   };
-}
-
-/**
- * Provides an action to blur the element when any pointer down event occurs outside the element. This can be useful
- * for input elements including select to blur / unfocus the element when any pointer down occurs outside the element.
- *
- * @param {HTMLElement}   node - The node to handle automatic blur on focus loss.
- */
-function autoBlur(node)
-{
-   function blur() { document.body.removeEventListener('pointerdown', onPointerDown); }
-   function focus() { document.body.addEventListener('pointerdown', onPointerDown); }
-
-   /**
-    * Blur the node if a pointer down event happens outside the node.
-    * @param {PointerEvent} event
-    */
-   function onPointerDown(event)
-   {
-      if (event.target === node || node.contains(event.target)) { return; }
-
-      if (document.activeElement === node) { node.blur(); }
-   }
-
-   node.addEventListener('blur', blur);
-   node.addEventListener('focus', focus);
-
-   return {
-      destroy: () =>
-      {
-         document.body.removeEventListener('pointerdown', onPointerDown);
-         node.removeEventListener('blur', blur);
-         node.removeEventListener('focus', focus);
-      }
    };
 }
 
@@ -479,6 +457,160 @@ function s_UPDATE_SUBSCRIBER(subscriber, contentWidth, contentHeight)
          });
          break;
    }
+}
+
+/**
+ * @typedef {object | Function} ResizeObserverTarget
+ *
+ * @property {number} [contentHeight] -
+ *
+ * @property {number} [contentWidth] -
+ *
+ * @property {number} [offsetHeight] -
+ *
+ * @property {number} [offsetWidth] -
+ *
+ * @property {Writable<object> | Function} [resizedObserver] - Either a function or a writable store.
+ *
+ * @property {Function} [setContentSize] - A function that is invoked with content width & height changes.
+ *
+ * @property {Function} [setDimension] - A function that is invoked with offset width & height changes.
+ *
+ * @property {{resizedObserver: Writable<object>}} [stores] - An object with a writable store.
+ */
+
+/**
+ * Provides an action to save `scrollTop` of an element with a vertical scrollbar. This action should be used on the
+ * scrollable element and must include a writable store that holds the active store for the current `scrollTop` value.
+ * You may switch the stores externally and this action will set the `scrollTop` based on the newly set store. This is
+ * useful for instance providing a select box that controls the scrollable container.
+ *
+ * @param {HTMLElement} element - The target scrollable HTML element.
+ *
+ * @param {import('svelte/store').Writable<number>}   store - A writable store that stores the element scrollTop.
+ */
+function applyScrolltop(element, store)
+{
+   if (!isWritableStore(store))
+   {
+      throw new TypeError(`applyScrolltop error: 'store' must be a writable Svelte store.`);
+   }
+
+   function storeUpdate(value)
+   {
+      if (!Number.isFinite(value)) { return; }
+
+      // For some reason for scrollTop to take on first update from a new element setTimeout is necessary.
+      setTimeout(() => element.scrollTop = value, 0);
+   }
+
+   let unsubscribe = store.subscribe(storeUpdate);
+
+   const resizeControl = resizeObserver(element, debounce(() => store.set(element.scrollTop), 500));
+
+   /**
+    * Save target `scrollTop` to the current set store.
+    *
+    * @param {Event} event -
+    */
+   function onScroll(event)
+   {
+      store.set(event.target.scrollTop);
+   }
+
+   const debounceFn = debounce((e) => onScroll(e), 500);
+
+   element.addEventListener('scroll', debounceFn);
+
+   return {
+      update: (newStore) =>
+      {
+         unsubscribe();
+         store = newStore;
+
+         if (!isWritableStore(store))
+         {
+            throw new TypeError(`applyScrolltop.update error: 'store' must be a writable Svelte store.`);
+         }
+
+         unsubscribe = store.subscribe(storeUpdate);
+      },
+
+      destroy: () =>
+      {
+         element.removeEventListener('scroll', debounceFn);
+         unsubscribe();
+         resizeControl.destroy();
+      }
+   };
+}
+
+/**
+ * Provides an action to apply style properties provided as an object.
+ *
+ * @param {HTMLElement} node - Target element
+ *
+ * @param {object}      properties - Key / value object of properties to set.
+ *
+ * @returns {Function} Update function.
+ */
+function applyStyles(node, properties)
+{
+   /** Sets properties on node. */
+   function setProperties()
+   {
+      if (typeof properties !== 'object') { return; }
+
+      for (const prop of Object.keys(properties))
+      {
+         node.style.setProperty(`${prop}`, properties[prop]);
+      }
+   }
+
+   setProperties();
+
+   return {
+      update(newProperties)
+      {
+         properties = newProperties;
+         setProperties();
+      }
+   };
+}
+
+/**
+ * Provides an action to blur the element when any pointer down event occurs outside the element. This can be useful
+ * for input elements including select to blur / unfocus the element when any pointer down occurs outside the element.
+ *
+ * @param {HTMLElement}   node - The node to handle automatic blur on focus loss.
+ */
+function autoBlur(node)
+{
+   function blur() { document.body.removeEventListener('pointerdown', onPointerDown); }
+   function focus() { document.body.addEventListener('pointerdown', onPointerDown); }
+
+   /**
+    * Blur the node if a pointer down event happens outside the node.
+    * @param {PointerEvent} event
+    */
+   function onPointerDown(event)
+   {
+      if (event.target === node || node.contains(event.target)) { return; }
+
+      if (document.activeElement === node) { node.blur(); }
+   }
+
+   node.addEventListener('blur', blur);
+   node.addEventListener('focus', focus);
+
+   return {
+      destroy: () =>
+      {
+         document.body.removeEventListener('pointerdown', onPointerDown);
+         node.removeEventListener('blur', blur);
+         node.removeEventListener('focus', focus);
+      }
+   };
 }
 
 /**
@@ -903,5 +1035,5 @@ draggable.options = (options) => new DraggableOptions(options);
  */
 const s_POSITION_DATA = { left: 0, top: 0 };
 
-export { alwaysBlur, applyPosition, applyStyles, autoBlur, draggable, resizeObserver };
+export { alwaysBlur, applyPosition, applyScrolltop, applyStyles, autoBlur, draggable, resizeObserver };
 //# sourceMappingURL=index.js.map

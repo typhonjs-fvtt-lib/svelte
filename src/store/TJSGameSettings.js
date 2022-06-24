@@ -1,7 +1,10 @@
-import { get, writable }         from 'svelte/store';
+import { get, writable }   from 'svelte/store';
 
-import { isIterable }            from '@typhonjs-fvtt/svelte/util';
-import { subscribeIgnoreFirst }  from '@typhonjs-svelte/lib/store';
+import { isIterable }      from '@typhonjs-svelte/lib/util';
+
+import {
+   isWritableStore,
+   subscribeIgnoreFirst }  from '@typhonjs-svelte/lib/store';
 
 /**
  * Registers game settings and creates a backing Svelte store for each setting. It is possible to add multiple
@@ -69,15 +72,25 @@ export class TJSGameSettings
     */
    register(setting)
    {
-      if (typeof setting !== 'object') { throw new TypeError(`TJSGameSettings - register: setting is not an object.`); }
+      if (typeof setting !== 'object')
+      {
+         throw new TypeError(`TJSGameSettings - register: setting is not an object.`);
+      }
 
       if (typeof setting.options !== 'object')
       {
          throw new TypeError(`TJSGameSettings - register: 'options' attribute is not an object.`);
       }
 
+      if (setting.store !== void 0 && !isWritableStore(setting.store))
+      {
+         throw new TypeError(
+          `TJSGameSettings - register: 'setting.store' attribute is not a writable store.`);
+      }
+
       const moduleId = setting.moduleId;
       const key = setting.key;
+      const store = setting.store;
 
       /**
        * @type {GameSettingOptions}
@@ -85,6 +98,21 @@ export class TJSGameSettings
       const options = setting.options;
 
       const onchangeFunctions = [];
+
+      // When true prevents local store subscription from a loop when values are object data.
+      let gateSet = false;
+
+      // Provides an `onChange` callback to update the associated store.
+      onchangeFunctions.push((value) =>
+      {
+         const callbackStore = s_GET_STORE(this.#stores, key);
+         if (callbackStore && !gateSet)
+         {
+            gateSet = true;
+            callbackStore.set(value);
+            gateSet = false;
+         }
+      });
 
       // Handle loading any existing `onChange` callbacks.
       if (isIterable(options?.onChange))
@@ -99,20 +127,6 @@ export class TJSGameSettings
          onchangeFunctions.push(options.onChange);
       }
 
-      // When true prevents local store subscription from a loop when values are object data.
-      let gateSet = false;
-
-      // Provides an `onChange` callback to update the associated store.
-      onchangeFunctions.push((value) =>
-      {
-         const store = s_GET_STORE(this.#stores, key);
-         if (store)
-         {
-            gateSet = true;
-            store.set(value);
-         }
-      });
-
       // Provides the final onChange callback that iterates over all the stored onChange callbacks.
       const onChange = (value) =>
       {
@@ -122,13 +136,24 @@ export class TJSGameSettings
       game.settings.register(moduleId, key, { ...options, onChange });
 
       // Set new store value with existing setting or default value.
-      const newStore = s_GET_STORE(this.#stores, key, game.settings.get(moduleId, key));
+      const targetStore = store ? store : s_GET_STORE(this.#stores, key, game.settings.get(moduleId, key));
+
+      // If a store instance is passed into register then initialize it with game settings data.
+      if (store)
+      {
+         this.#stores.set(key, targetStore);
+         store.set(game.settings.get(moduleId, key));
+      }
 
       // Subscribe to self to set associated game setting on updates after verifying that the new value does not match
       // existing game setting.
-      subscribeIgnoreFirst(newStore, async (value) =>
+      subscribeIgnoreFirst(targetStore, async (value) =>
       {
-         if (!gateSet && game.settings.get(moduleId, key) !== value) { await game.settings.set(moduleId, key, value); }
+         if (!gateSet && game.settings.get(moduleId, key) !== value)
+         {
+            gateSet = true;
+            await game.settings.set(moduleId, key, value);
+         }
 
          gateSet = false;
       });
@@ -234,6 +259,8 @@ function s_CREATE_STORE(initialValue)
  * @property {string} moduleId - The ID of the module / system.
  *
  * @property {string} key - The setting key to register.
+ *
+ * @property {import('svelte/store').Writable} [store] - An existing store instance to use.
  *
  * @property {GameSettingOptions} options - Configuration for setting data.
  */

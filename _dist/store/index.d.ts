@@ -82,6 +82,10 @@ type GameSetting = {
      */
     key: string;
     /**
+     * - An existing store instance to use.
+     */
+    store?: svelte_store.Writable<any>;
+    /**
      * - Configuration for setting data.
      */
     options: GameSettingOptions;
@@ -109,6 +113,16 @@ declare class DynArrayReducer<T> {
      */
     constructor(data?: Iterable<T> | any);
     /**
+     * Returns the internal data of this instance. Be careful!
+     *
+     * Note: if an array is set as initial data then that array is used as the internal data. If any changes are
+     * performed to the data externally do invoke {@link index.update} with `true` to recalculate the index and notify
+     * all subscribers.
+     *
+     * @returns {T[]} The internal data.
+     */
+    get data(): T[];
+    /**
      * @returns {AdapterFilters<T>} The filters adapter.
      */
     get filters(): AdapterFilters<T>;
@@ -128,6 +142,15 @@ declare class DynArrayReducer<T> {
      * @returns {AdapterSort<T>} The sort adapter.
      */
     get sort(): AdapterSort<T>;
+    /**
+     * Removes internal data and pushes new data. This does not destroy any initial array set to internal data unless
+     * `replace` is set to true.
+     *
+     * @param {T[] | Iterable<T>} data - New data to set to internal data.
+     *
+     * @param {boolean} [replace=false] - New data to set to internal data.
+     */
+    setData(data: T[] | Iterable<T>, replace?: boolean): void;
     /**
      *
      * @param {function(DynArrayReducer<T>): void} handler - Callback function that is invoked on update / changes.
@@ -363,15 +386,6 @@ declare class TJSDocumentCollection<T extends any> {
     #private;
 }
 /**
- * @typedef {import('svelte/store').Readable} GameState - Provides a Svelte store wrapping the Foundry `game` global variable. It is initialized
- * on the `ready` hook. You may use this store to access the global game state from a Svelte template. It is a read only
- * store and will receive no reactive updates during runtime.
- *
- * @property {import('svelte/store').Readable.subscribe} subscribe - Provides the Svelte store subscribe function.
- *
- * @property {Function} get - Provides a mechanism to directly access the Foundry game state without subscribing.
- */
-/**
  * Registers game settings and creates a backing Svelte store for each setting. It is possible to add multiple
  * `onChange` callbacks on registration.
  */
@@ -460,6 +474,19 @@ declare function isWritableStore(store: any): boolean;
  * @returns {Store} A writable store.
  */
 declare function propertyStore(origin: any, propName: string | number | symbol | Array<string | number | symbol>): any;
+/**
+ * Wraps a writable stores set method invoking a callback after the store is set. This allows parent / child
+ * relationships between stores to update directly without having to subscribe to the child store. This is a particular
+ * powerful pattern when the `setCallback` is a debounced function that syncs a parent store and / or serializes data.
+ *
+ * @param {import('svelte/store').Writable} store - A store to wrap.
+ *
+ * @param {(store?: import('svelte/store').Writable, value?: *) => void} setCallback - A callback to invoke after store
+ *                                                                                     set.
+ *
+ * @returns {import('svelte/store').Writable} Wrapped store.
+ */
+declare function storeCallback(store: svelte_store.Writable<any>, setCallback: (store?: svelte_store.Writable<any>, value?: any) => void): svelte_store.Writable<any>;
 /**
  * Subscribes to the given store with two update functions provided. The first function is invoked on the initial
  * subscription. All future updates are dispatched to the update function.
@@ -598,4 +625,4 @@ declare class AdapterSort<T> {
     #private;
 }
 
-export { DynArrayReducer, GSReadableStore, GSWritableStore, GameSetting, GameSettingOptions, GameState, LSStore, LocalStorage, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, TJSGameSettings, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { DynArrayReducer, GSReadableStore, GSWritableStore, GameSetting, GameSettingOptions, GameState, LSStore, LocalStorage, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, TJSGameSettings, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, storeCallback, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
