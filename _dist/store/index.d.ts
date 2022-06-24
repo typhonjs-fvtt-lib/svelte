@@ -94,19 +94,13 @@ type GSWritableStore = svelte_store.Writable<any>;
  * - The backing Svelte store; readable w/ get method attached.
  */
 type GSReadableStore = svelte_store.Readable<any>;
-declare class DynArrayReducer {
-    /**
-     * @type {AdapterFilters<T>}
-     */
-    /**
-     * @type {{filters: FilterFn<T>[]}}
-     */
-    /**
-     * @type {AdapterSort<T>}
-     */
-    /**
-     * @type {{compareFn: CompareFn<T>}}
-     */
+/**
+ * Provides a managed array with non-destructive reducing / filtering / sorting capabilities with subscription /
+ * Svelte store support.
+ *
+ * @template T
+ */
+declare class DynArrayReducer<T> {
     /**
      * Initializes DynArrayReducer. Any iterable is supported for initial data. Take note that if `data` is an array it
      * will be used as the host array and not copied. All non-array iterables otherwise create a new array / copy.
@@ -133,7 +127,7 @@ declare class DynArrayReducer {
     /**
      * @returns {AdapterSort<T>} The sort adapter.
      */
-    get sort(): any;
+    get sort(): AdapterSort<T>;
     /**
      *
      * @param {function(DynArrayReducer<T>): void} handler - Callback function that is invoked on update / changes.
@@ -142,7 +136,18 @@ declare class DynArrayReducer {
      * @returns {(function(): void)} Unsubscribe function.
      */
     subscribe(handler: (arg0: DynArrayReducer<T>) => void): (() => void);
+    /**
+     * Provides an iterator for data stored in DynArrayReducer.
+     *
+     * @returns {Generator<*, T, *>} Generator / iterator of all data.
+     * @yields {T}
+     */
+    [Symbol.iterator](): Generator<any, T, any>;
+    #private;
 }
+/**
+ * @typedef {import('svelte/store').Writable & import('svelte/store').get} LSStore - The backing Svelte store; a writable w/ get method attached.
+ */
 declare class LocalStorage {
     /**
      * Get value from the localstorage.
@@ -183,7 +188,11 @@ declare class LocalStorage {
      * @returns {boolean} The boolean swap for the given key.
      */
     swapItemBoolean(key: string, defaultValue?: boolean): boolean;
+    #private;
 }
+/**
+ * @typedef {import('svelte/store').Writable & import('svelte/store').get} SSStore - The backing Svelte store; a writable w/ get method attached.
+ */
 declare class SessionStorage {
     /**
      * Get value from the sessionstorage.
@@ -224,6 +233,7 @@ declare class SessionStorage {
      * @returns {boolean} The boolean swap for the given key.
      */
     swapItemBoolean(key: string, defaultValue?: boolean): boolean;
+    #private;
 }
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.
@@ -556,6 +566,36 @@ declare class AdapterFilters<T> {
      */
     removeBy(callback: (arg0: any, arg1: any, arg2: number) => boolean): void;
     removeById(...ids: any[]): void;
+    /**
+     * Provides an iterator for filters.
+     *
+     * @returns {Generator<number|undefined, FilterData<T>, *>} Generator / iterator of filters.
+     * @yields {FilterData<T>}
+     */
+    [Symbol.iterator](): Generator<number | undefined, any, any>;
+    #private;
+}
+/**
+ * @template T
+ */
+declare class AdapterSort<T> {
+    /**
+     * @param {Function} indexUpdate - Function to update indexer.
+     *
+     * @returns {[AdapterSort<T>, {compareFn: CompareFn<T>}]} This and the internal sort adapter data.
+     */
+    constructor(indexUpdate: Function);
+    /**
+     * @param {CompareFn<T>|SortData<T>}  data -
+     *
+     * A callback function that compares two values. Return > 0 to sort b before a;
+     * < 0 to sort a before b; or 0 to keep original order of a & b.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#parameters
+     */
+    set(data: any | any): void;
+    reset(): void;
+    #private;
 }
 
 export { DynArrayReducer, GSReadableStore, GSWritableStore, GameSetting, GameSettingOptions, GameState, LSStore, LocalStorage, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, TJSGameSettings, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };

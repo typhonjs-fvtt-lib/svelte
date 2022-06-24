@@ -13,19 +13,18 @@ import { cubicOut } from 'svelte/easing';
  *
  * @returns {boolean} Whether the variable tested has the shape of a store.
  */
+function isUpdatableStore(store)
+{
+   if (store === null || store === void 0) { return false; }
 
-function isUpdatableStore(store) {
-  if (store === null || store === void 0) {
-    return false;
-  }
+   switch (typeof store)
+   {
+      case 'function':
+      case 'object':
+         return typeof store.subscribe === 'function' && typeof store.update === 'function';
+   }
 
-  switch (typeof store) {
-    case 'function':
-    case 'object':
-      return typeof store.subscribe === 'function' && typeof store.update === 'function';
-  }
-
-  return false;
+   return false;
 }
 
 const s_REGEX = /(\d+)\s*px/;

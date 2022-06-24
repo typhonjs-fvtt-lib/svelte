@@ -762,8 +762,22 @@ function slideFade(node, options)
    };
 }
 
+/**
+ * Converts a Svelte transition to an animation. Both transitions & animations use the same CSS / styles solution and
+ * resulting data so wrap the transition function with the signature of an animation.
+ *
+ * @param {(node: Element, params?: object) => import('svelte/transition').TransitionConfig} fn - A Svelte transition
+ *                                                                                                function.
+ *
+ * @returns {(node: Element, { from: DOMRect, to: DOMRect }, params?: object) =>
+ *  import('svelte/transition').TransitionConfig} Transition function converted to an animation.
+ */
+function toAnimation(fn) {
+   return (node, animations, params = {}) => fn(node, params);
+}
+
 const s_DEFAULT_TRANSITION = () => void 0;
 const s_DEFAULT_TRANSITION_OPTIONS = {};
 
-export { rotate, rotateFade, s_DEFAULT_TRANSITION, s_DEFAULT_TRANSITION_OPTIONS, slideFade };
+export { rotate, rotateFade, s_DEFAULT_TRANSITION, s_DEFAULT_TRANSITION_OPTIONS, slideFade, toAnimation };
 //# sourceMappingURL=index.js.map
