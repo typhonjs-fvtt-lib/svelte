@@ -1601,7 +1601,7 @@ function add_css$2(target) {
 	append_styles(target, "svelte-are4no", ".window-app.svelte-are4no.svelte-are4no.svelte-are4no{overflow:inherit}.window-app.svelte-are4no .window-content.svelte-are4no>.svelte-are4no{flex:none}");
 }
 
-// (225:6) {:else}
+// (226:6) {:else}
 function create_else_block$3(ctx) {
 	let current;
 	const default_slot_template = /*#slots*/ ctx[27].default;
@@ -1649,7 +1649,7 @@ function create_else_block$3(ctx) {
 	};
 }
 
-// (223:6) {#if Array.isArray(allChildren)}
+// (224:6) {#if Array.isArray(allChildren)}
 function create_if_block$4(ctx) {
 	let tjscontainer;
 	let current;
@@ -1844,15 +1844,16 @@ function instance$4($$self, $$props, $$invalidate) {
 	: () => null;
 
 	// If the application is a popOut application then when clicked bring to top. Bound to on pointerdown.
-	const bringToTop = () => {
+	const bringToTop = event => {
 		if (typeof application.options.popOut === 'boolean' && application.options.popOut) {
 			if (application !== ui?.activeWindow) {
 				application.bringToTop.call(application);
 			}
 
-			// If the activeElement is not `document.body` then blur the current active element and make `document.body`
-			// focused. This allows <esc> key to close all open apps / windows.
-			if (document.activeElement !== document.body) {
+			// If the activeElement is not `document.body` and the event target isn't the activeElement then blur the
+			// current active element and make `document.body` focused. This allows <esc> key to close all open apps /
+			// windows.
+			if (document.activeElement !== document.body && event.target !== document.activeElement) {
 				// Blur current active element.
 				if (document.activeElement instanceof HTMLElement) {
 					document.activeElement.blur();
@@ -2720,7 +2721,7 @@ function add_css$1(target) {
 	append_styles(target, "svelte-d9hgzf", ".tjs-app{max-height:100%;background:url(/ui/denim075.png) repeat;border-radius:5px;box-shadow:0 0 20px #000;margin:3px 0;padding:0.5em;color:#f0f0e0;z-index:95;overflow:inherit}.tjs-window-app{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;position:absolute;box-shadow:0 0 20px #000;padding:0;z-index:95}.tjs-window-app > *{flex:1}.tjs-window-app > .flex0{display:block;flex:0}.tjs-window-app > .flex1{flex:1}.tjs-window-app > .flex2{flex:2}.tjs-window-app > .flex3{flex:3}.tjs-window-app .window-header{flex:0 0 30px;overflow:hidden;padding:0 8px;line-height:30px;border-bottom:1px solid #000}.tjs-window-app .window-header .window-title{margin:0;word-break:break-all}.tjs-window-app .window-header a{flex:none;margin:0 0 0 8px}.tjs-window-app .window-header i[class^=fa]{margin-right:3px}.tjs-window-app.minimized .window-header{border:1px solid #000}.tjs-window-app .window-content{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;background:none;padding:8px;color:#191813;overflow-y:auto;overflow-x:hidden}.tjs-window-app.zhover{z-index:calc(var(--z-index-window) + 1)}.tjs-window-app .window-resizable-handle{width:20px;height:20px;position:absolute;bottom:-1px;right:0;background:#444;padding:2px;border:1px solid #111;border-radius:4px 0 0 0}.tjs-window-app .window-resizable-handle i.fas{transform:rotate(45deg)}");
 }
 
-// (225:7) {:else}
+// (226:7) {:else}
 function create_else_block$1(ctx) {
 	let current;
 	const default_slot_template = /*#slots*/ ctx[27].default;
@@ -2768,7 +2769,7 @@ function create_else_block$1(ctx) {
 	};
 }
 
-// (223:7) {#if Array.isArray(allChildren)}
+// (224:7) {#if Array.isArray(allChildren)}
 function create_if_block$2(ctx) {
 	let tjscontainer;
 	let current;
@@ -2963,15 +2964,16 @@ function instance$2($$self, $$props, $$invalidate) {
 	: () => null;
 
 	// If the application is a popOut application then when clicked bring to top. Bound to on pointerdown.
-	const bringToTop = () => {
+	const bringToTop = event => {
 		if (typeof application.options.popOut === 'boolean' && application.options.popOut) {
 			if (application !== ui?.activeWindow) {
 				application.bringToTop.call(application);
 			}
 
-			// If the activeElement is not `document.body` then blur the current active element and make `document.body`
-			// focused. This allows <esc> key to close all open apps / windows.
-			if (document.activeElement !== document.body) {
+			// If the activeElement is not `document.body` and the event target isn't the activeElement then blur the
+			// current active element and make `document.body` focused. This allows <esc> key to close all open apps /
+			// windows.
+			if (document.activeElement !== document.body && event.target !== document.activeElement) {
 				// Blur current active element.
 				if (document.activeElement instanceof HTMLElement) {
 					document.activeElement.blur();
