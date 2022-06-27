@@ -568,6 +568,9 @@ export class SvelteApplication extends Application
       const header = element.querySelector('.window-header');
       const content = element.querySelector('.window-content');
 
+      // Get the complete position before minimized. Used to reset min width & height to initial values later.
+      const positionBefore = this.position.state.get({ name: '#beforeMinimized' });
+
       // First animate / restore width / async.
       if (animate)
       {
@@ -611,15 +614,19 @@ export class SvelteApplication extends Application
          { maxHeight: '100%', offset: 1 },
       ], { duration: durationMS, fill: 'forwards' }).finished; // WAAPI in ms.
 
-      // minHeight needs to be adjusted to options or Foundry default window height.
-      this.position.minHeight = this.options?.minHeight ?? MIN_WINDOW_HEIGHT;
+      // Restore previous min width & height from saved data, app options, or default Foundry values.
+      this.position.set({
+         minHeight: positionBefore.minHeight ?? this.options?.minHeight ?? MIN_WINDOW_HEIGHT,
+         minWidth: positionBefore.minWidth ?? this.options?.minWidth ?? MIN_WINDOW_WIDTH,
+      });
+
+      // Remove inline styles that override any styles assigned to the app.
+      element.style.minWidth = null;
+      element.style.minHeight = null;
 
       element.classList.remove('minimized');
 
       this._minimized = false;
-
-      element.style.minWidth = null;
-      element.style.minHeight = null;
 
       // Using a 50ms timeout prevents any instantaneous display of scrollbars with the above maximize animation.
       setTimeout(() =>
@@ -666,7 +673,14 @@ export class SvelteApplication extends Application
       const header = element.querySelector('.window-header');
       const content = element.querySelector('.window-content');
 
-      // Remove minimum width and height styling rules
+      // Save current max / min height & width.
+      const beforeMinWidth = this.position.minWidth;
+      const beforeMinHeight = this.position.minHeight;
+
+      // Set minimized min width & height for header bar.
+      this.position.set({ minWidth: 100, minHeight: 30 });
+
+      // Also set inline styles to override any styles scoped to the app.
       element.style.minWidth = '100px';
       element.style.minHeight = '30px';
 
@@ -708,7 +722,11 @@ export class SvelteApplication extends Application
       }
 
       // Save current position state and add the constraint data to use in `maximize`.
-      this.position.state.save({ name: '#beforeMinimized', constraints });
+      const saved = this.position.state.save({ name: '#beforeMinimized', constraints });
+
+      // Set the initial before min width & height.
+      saved.minWidth = beforeMinWidth;
+      saved.minHeight = beforeMinHeight;
 
       const headerOffsetHeight = header.offsetHeight;
 
