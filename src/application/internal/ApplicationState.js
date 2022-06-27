@@ -1,5 +1,6 @@
-import { linear } from "svelte/easing";
-import { lerp }   from '@typhonjs-fvtt/svelte/math';
+import { linear }    from "svelte/easing";
+import { lerp }      from '@typhonjs-fvtt/svelte/math';
+import { isObject }  from '@typhonjs-fvtt/svelte/util';
 
 export class ApplicationState
 {
@@ -153,7 +154,7 @@ export class ApplicationState
     *
     * @param {ApplicationData}   data - Saved data set name.
     *
-    * @param {object}            opts - Optional parameters
+    * @param {object}            [opts] - Optional parameters
     *
     * @param {boolean}           [opts.async=false] - If animating return a Promise that resolves with any saved data.
     *
@@ -168,9 +169,9 @@ export class ApplicationState
     * @returns {ApplicationShellExt|Promise<ApplicationShellExt>} When synchronous the application or Promise when
     *                                                             animating resolving with application.
     */
-   set(data, { async = false, animateTo = false, duration = 0.1, ease = linear, interpolate = lerp })
+   set(data, { async = false, animateTo = false, duration = 0.1, ease = linear, interpolate = lerp } = {})
    {
-      if (typeof data !== 'object')
+      if (!isObject(data))
       {
          throw new TypeError(`ApplicationState - restore error: 'data' is not an object.`);
       }
@@ -179,7 +180,7 @@ export class ApplicationState
 
       if (data)
       {
-         if (typeof data?.position === 'object')
+         if (isObject(data?.position))
          {
             // Update data directly with no store or inline style updates.
             if (animateTo)  // Animate to saved data.
@@ -190,7 +191,7 @@ export class ApplicationState
                   application.position.transformOrigin = data.position.transformOrigin;
                }
 
-               if (typeof data?.ui === 'object')
+               if (isObject(data?.ui))
                {
                   const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
 
@@ -204,12 +205,12 @@ export class ApplicationState
                 { duration, ease, interpolate }).finished.then((cancelled) =>
                {
                   // Merge in saved options to application.
-                  if (!cancelled && typeof data?.options === 'object')
+                  if (!cancelled && isObject(data?.options))
                   {
                      application?.reactive.mergeOptions(data.options);
                   }
 
-                  if (!cancelled && typeof data?.ui === 'object')
+                  if (!cancelled && isObject(data?.ui))
                   {
                      const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
 
@@ -221,7 +222,7 @@ export class ApplicationState
                      }
                   }
 
-                  if (!cancelled && typeof data?.beforeMinimized === 'object')
+                  if (!cancelled && isObject(data?.beforeMinimized))
                   {
                      application.position.state.set({ name: '#beforeMinimized', ...data.beforeMinimized });
                   }
@@ -235,12 +236,12 @@ export class ApplicationState
             else
             {
                // Merge in saved options to application.
-               if (typeof data?.options === 'object')
+               if (isObject(data?.options))
                {
                   application?.reactive.mergeOptions(data.options);
                }
 
-               if (typeof data?.ui === 'object')
+               if (isObject(data?.ui))
                {
                   const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
 
@@ -256,7 +257,7 @@ export class ApplicationState
                   }
                }
 
-               if (typeof data?.beforeMinimized === 'object')
+               if (isObject(data?.beforeMinimized))
                {
                   application.position.state.set({ name: '#beforeMinimized', ...data.beforeMinimized });
                }
