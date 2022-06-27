@@ -734,11 +734,13 @@ export class Position
    get(position = {}, options)
    {
       const keys = options?.keys;
+      const excludeKeys = options?.exclude;
+      const numeric = options?.numeric ?? false;
 
-      if (isIterable(options?.keys))
+      if (isIterable(keys))
       {
          // Replace any null values potentially with numeric default values.
-         if (options?.numeric)
+         if (numeric)
          {
             for (const key of keys) { position[key] = this[key] ?? constants.numericDefaults[key]; }
          }
@@ -747,11 +749,28 @@ export class Position
             for (const key of keys) { position[key] = this[key]; }
          }
 
+         // Remove any excluded keys.
+         if (isIterable(excludeKeys))
+         {
+            for (const key of excludeKeys) { delete position[key]; }
+         }
+
          return position;
       }
       else
       {
-         return Object.assign(position, this.#data);
+         const data = Object.assign(position, this.#data);
+
+         // Remove any excluded keys.
+         if (isIterable(excludeKeys))
+         {
+            for (const key of excludeKeys) { delete data[key]; }
+         }
+
+         // Potentially set numeric defaults.
+         if (numeric) { constants.setNumericDefaults(data); }
+
+         return data;
       }
    }
 
@@ -1352,6 +1371,8 @@ Object.seal(s_VALIDATION_DATA);
  * @typedef {object} PositionGetOptions
  *
  * @property {Iterable<string>} keys - When provided only these keys are copied.
+ *
+ * @property {Iterable<string>} exclude - When provided these keys are excluded.
  *
  * @property {boolean} numeric - When true any `null` values are converted into defaults.
  */
