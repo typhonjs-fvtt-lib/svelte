@@ -51,28 +51,6 @@ function isWritableStore(store)
    return false;
 }
 
-/**
- * Wraps a callback in a debounced timeout.
- *
- * Delay execution of the callback function until the function has not been called for the given delay in milliseconds.
- *
- * @param {Function} callback - A function to execute once the debounced threshold has been passed.
- *
- * @param {number}   delay - An amount of time in milliseconds to delay.
- *
- * @return {Function} A wrapped function that can be called to debounce execution.
- */
-function debounce(callback, delay)
-{
-   let timeoutId;
-
-   return function(...args)
-   {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => { callback.apply(this, args); }, delay);
-   }
-}
-
 const s_REGEX = /(\d+)\s*px/;
 
 /**
@@ -101,6 +79,28 @@ function styleParsePixels(value)
 const applicationShellContract = ['elementRoot'];
 
 Object.freeze(applicationShellContract);
+
+/**
+ * Wraps a callback in a debounced timeout.
+ *
+ * Delay execution of the callback function until the function has not been called for the given delay in milliseconds.
+ *
+ * @param {Function} callback - A function to execute once the debounced threshold has been passed.
+ *
+ * @param {number}   delay - An amount of time in milliseconds to delay.
+ *
+ * @return {Function} A wrapped function that can be called to debounce execution.
+ */
+function debounce(callback, delay)
+{
+   let timeoutId;
+
+   return function(...args)
+   {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => { callback.apply(this, args); }, delay);
+   }
+}
 
 /**
  * Provides an action to always blur the element when any pointer up event occurs on the element.

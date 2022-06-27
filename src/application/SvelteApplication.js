@@ -278,7 +278,17 @@ export class SvelteApplication extends Application
       // Make any window content overflow hidden to avoid any scrollbars appearing in default or Svelte outro
       // transitions.
       const content = el.querySelector('.window-content');
-      if (content) { content.style.overflow = 'hidden'; }
+      if (content)
+      {
+         content.style.overflow = 'hidden';
+
+         // Set all children of content to overflow hidden as if there is going to be additional scrolling elements
+         // they are likely one level deep.
+         for (let cntr = content.children.length; --cntr >= 0;)
+         {
+            content.children[cntr].style.overflow = 'hidden';
+         }
+      }
 
       // Dispatch Hooks for closing the base and subclass applications
       for (const cls of this.constructor._getInheritanceChain())
@@ -612,7 +622,16 @@ export class SvelteApplication extends Application
       element.style.minHeight = null;
 
       // Using a 50ms timeout prevents any instantaneous display of scrollbars with the above maximize animation.
-      setTimeout(() => content.style.overflow = null, 50);
+      setTimeout(() =>
+      {
+         content.style.overflow = null;
+
+         // Reset all children of content removing overflow hidden.
+         for (let cntr = content.children.length; --cntr >= 0;)
+         {
+            content.children[cntr].style.overflow = null;
+         }
+      }, 50);
 
       this.#stores.uiOptionsUpdate((options) => deepMerge(options, { minimized: false }));
    }
@@ -651,7 +670,17 @@ export class SvelteApplication extends Application
       element.style.minWidth = '100px';
       element.style.minHeight = '30px';
 
-      content.style.overflow = 'hidden';
+      if (content)
+      {
+         content.style.overflow = 'hidden';
+
+         // Set all children of content to overflow hidden as if there is going to be additional scrolling elements
+         // they are likely one level deep.
+         for (let cntr = content.children.length; --cntr >= 0;)
+         {
+            content.children[cntr].style.overflow = 'hidden';
+         }
+      }
 
       const { paddingBottom, paddingTop } = globalThis.getComputedStyle(content);
 

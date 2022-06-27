@@ -475,19 +475,6 @@ declare function isWritableStore(store: any): boolean;
  */
 declare function propertyStore(origin: any, propName: string | number | symbol | Array<string | number | symbol>): any;
 /**
- * Wraps a writable stores set method invoking a callback after the store is set. This allows parent / child
- * relationships between stores to update directly without having to subscribe to the child store. This is a particular
- * powerful pattern when the `setCallback` is a debounced function that syncs a parent store and / or serializes data.
- *
- * @param {import('svelte/store').Writable} store - A store to wrap.
- *
- * @param {(store?: import('svelte/store').Writable, value?: *) => void} setCallback - A callback to invoke after store
- *                                                                                     set.
- *
- * @returns {import('svelte/store').Writable} Wrapped store.
- */
-declare function storeCallback(store: svelte_store.Writable<any>, setCallback: (store?: svelte_store.Writable<any>, value?: any) => void): svelte_store.Writable<any>;
-/**
  * Subscribes to the given store with two update functions provided. The first function is invoked on the initial
  * subscription. All future updates are dispatched to the update function.
  *
@@ -625,4 +612,4 @@ declare class AdapterSort<T> {
     #private;
 }
 
-export { DynArrayReducer, GSReadableStore, GSWritableStore, GameSetting, GameSettingOptions, GameState, LSStore, LocalStorage, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, TJSGameSettings, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, storeCallback, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { DynArrayReducer, GSReadableStore, GSWritableStore, GameSetting, GameSettingOptions, GameState, LSStore, LocalStorage, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, TJSGameSettings, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };

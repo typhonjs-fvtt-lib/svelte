@@ -142,6 +142,17 @@ declare function isPlainObject(value: any): boolean;
  * @returns {boolean} Whether basic duck typing succeeds.
  */
 declare function isSvelteComponent(comp: any): boolean;
+declare function klona(x: any): any;
+/**
+ * Normalizes a string.
+ *
+ * @param {string}   query - A string to normalize for comparisons.
+ *
+ * @returns {string} Cleaned string.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
+ */
+declare function normalizeString(query: string): string;
 /**
  * Runs outro transition then destroys Svelte component.
  *
@@ -215,5 +226,15 @@ declare function styleParsePixels(value: string): number | undefined;
  * @returns {string} UUIDv4
  */
 declare function uuidv4(): string;
+declare namespace uuidv4 {
+    /**
+     * Validates that the given string is formatted as a UUIDv4 string.
+     *
+     * @param {string}   uuid - UUID string to test.
+     *
+     * @returns {boolean} Is UUIDv4 string.
+     */
+    function isValid(uuid: string): boolean;
+}
 
-export { ParseDataTransferOptions, debounce, deepMerge, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };
+export { ParseDataTransferOptions, debounce, deepMerge, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };
