@@ -152,6 +152,11 @@ export class ApplicationState
     * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
     * returned if awaiting the end of the animation.
     *
+    * Note: If serializing application state any minimized apps will use the before minimized state on initial render
+    * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
+    *
+    * TODO: THIS METHOD NEEDS TO BE REFACTORED WHEN TRL IS MADE INTO A STANDALONE FRAMEWORK.
+    *
     * @param {ApplicationData}   data - Saved data set name.
     *
     * @param {object}            [opts] - Optional parameters
@@ -178,93 +183,130 @@ export class ApplicationState
 
       const application = this.#application;
 
-      if (data)
+      if (!isObject(data?.position))
       {
-         if (isObject(data?.position))
+         console.warn(`ApplicationState.set warning: 'data.position' is not an object.`);
+         return application;
+      }
+
+      // TODO: TAKE NOTE THAT WE ARE ACCESSING A FOUNDRY APP v1 GETTER HERE TO DETERMINE IF APPLICATION IS RENDERED.
+      // TODO: THIS NEEDS TO BE REFACTORED WHEN CONVERTING TRL TO A GENERIC FRAMEWORK.
+      const rendered = application.rendered;
+
+      if (animateTo && !rendered)
+      {
+         console.warn(`ApplicationState.set warning: Application is not rendered and 'animateTo' is true.`);
+         return application;
+      }
+
+      // Update data directly with no store or inline style updates.
+      if (animateTo)  // Animate to saved data.
+      {
+         // Provide special handling to potentially change transform origin as this parameter is not animated.
+         if (data.position.transformOrigin !== application.position.transformOrigin)
          {
-            // Update data directly with no store or inline style updates.
-            if (animateTo)  // Animate to saved data.
+            application.position.transformOrigin = data.position.transformOrigin;
+         }
+
+         if (isObject(data?.ui))
+         {
+            const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
+
+            if (application?.reactive?.minimized && !minimized)
             {
-               // Provide special handling to potentially change transform origin as this parameter is not animated.
-               if (data.position.transformOrigin !== application.position.transformOrigin)
-               {
-                  application.position.transformOrigin = data.position.transformOrigin;
-               }
-
-               if (isObject(data?.ui))
-               {
-                  const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
-
-                  if (application?.reactive?.minimized && !minimized)
-                  {
-                     application.maximize({ animate: false, duration: 0 });
-                  }
-               }
-
-               const promise = application.position.animate.to(data.position,
-                { duration, ease, interpolate }).finished.then((cancelled) =>
-               {
-                  // Merge in saved options to application.
-                  if (!cancelled && isObject(data?.options))
-                  {
-                     application?.reactive.mergeOptions(data.options);
-                  }
-
-                  if (!cancelled && isObject(data?.ui))
-                  {
-                     const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
-
-                     // Application is currently minimized and stored state is not, so reset minimized state without
-                     // animation.
-                     if (!application?.reactive?.minimized && minimized)
-                     {
-                        application.minimize({ animate: false, duration: 0 });
-                     }
-                  }
-
-                  if (!cancelled && isObject(data?.beforeMinimized))
-                  {
-                     application.position.state.set({ name: '#beforeMinimized', ...data.beforeMinimized });
-                  }
-
-                  return application;
-               });
-
-               // Return a Promise with the application that resolves after animation ends.
-               if (async) { return promise; }
+               application.maximize({ animate: false, duration: 0 });
             }
-            else
+         }
+
+         const promise = application.position.animate.to(data.position,
+          { duration, ease, interpolate }).finished.then((cancelled) =>
+         {
+            if (cancelled) { return application; }
+
+            // Merge in saved options to application.
+            if (isObject(data?.options))
             {
-               // Merge in saved options to application.
-               if (isObject(data?.options))
-               {
-                  application?.reactive.mergeOptions(data.options);
-               }
-
-               if (isObject(data?.ui))
-               {
-                  const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
-
-                  // Application is currently minimized and stored state is not, so reset minimized state without
-                  // animation.
-                  if (application?.reactive?.minimized && !minimized)
-                  {
-                     application.maximize({ animate: false, duration: 0 });
-                  }
-                  else if (!application?.reactive?.minimized && minimized)
-                  {
-                     application.minimize({ animate: false, duration });
-                  }
-               }
-
-               if (isObject(data?.beforeMinimized))
-               {
-                  application.position.state.set({ name: '#beforeMinimized', ...data.beforeMinimized });
-               }
-
-               // Default options is to set data for an immediate update.
-               application.position.set(data.position);
+               application?.reactive.mergeOptions(data.options);
             }
+
+            if (isObject(data?.ui))
+            {
+               const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
+
+               // Application is currently minimized and stored state is not, so reset minimized state without
+               // animation.
+               if (!application?.reactive?.minimized && minimized)
+               {
+                  application.minimize({ animate: false, duration: 0 });
+               }
+            }
+
+            if (isObject(data?.beforeMinimized))
+            {
+               application.position.state.set({ name: '#beforeMinimized', ...data.beforeMinimized });
+            }
+
+            return application;
+         });
+
+         // Return a Promise with the application that resolves after animation ends.
+         if (async) { return promise; }
+      }
+      else
+      {
+         if (rendered)
+         {
+            // Merge in saved options to application.
+            if (isObject(data?.options))
+            {
+               application?.reactive.mergeOptions(data.options);
+            }
+
+            if (isObject(data?.ui))
+            {
+               const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
+
+               // Application is currently minimized and stored state is not, so reset minimized state without
+               // animation.
+               if (application?.reactive?.minimized && !minimized)
+               {
+                  application.maximize({ animate: false, duration: 0 });
+               }
+               else if (!application?.reactive?.minimized && minimized)
+               {
+                  application.minimize({ animate: false, duration });
+               }
+            }
+
+            if (isObject(data?.beforeMinimized))
+            {
+               application.position.state.set({ name: '#beforeMinimized', ...data.beforeMinimized });
+            }
+
+            // Default options is to set data for an immediate update.
+            application.position.set(data.position);
+         }
+         else
+         {
+            // When not rendered set position to the 'beforeMinimized' data if it exists otherwise set w/ 'position'.
+            // Currently w/ Foundry core Application API it is impossible to initially render an app in the minimized
+            // state.
+
+            let positionData = data.position;
+
+            if (isObject(data.beforeMinimized))
+            {
+               // Take before minimized data.
+               positionData = data.beforeMinimized;
+
+               // Apply position left / top to before minimized data. This covers the case when an app is minimized,
+               // but then moved. This allows restoration of the before minimized parameters w/ the last position
+               // location.
+               positionData.left = data.position.left;
+               positionData.top = data.position.top;
+            }
+
+            application.position.set(positionData);
          }
       }
 
