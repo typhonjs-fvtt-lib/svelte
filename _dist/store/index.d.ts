@@ -14,20 +14,12 @@ type TJSDocumentOptions = {
      * - Optional delete function to invoke when document is deleted.
      */
     delete?: Function;
-    /**
-     * - When true a subscribers are notified of the deletion of the document.
-     */
-    notifyOnDelete?: boolean;
 };
 type TJSDocumentCollectionOptions = {
     /**
      * - Optional delete function to invoke when document is deleted.
      */
     delete?: Function;
-    /**
-     * - When true a subscribers are notified of the deletion of the document.
-     */
-    notifyOnDelete?: boolean;
 };
 /**
  * - Provides a Svelte store wrapping the Foundry `game` global variable. It is initialized
@@ -285,6 +277,11 @@ declare class TJSDocument<T extends any> {
      */
     get uuidv4(): any;
     /**
+     * Completely removes all internal subscribers, any optional delete callback, and unregisters from the
+     * ClientDocumentMixin `apps` tracking object.
+     */
+    destroy(): void;
+    /**
      * @returns {T | undefined} Current document
      */
     get(): T | undefined;
@@ -332,8 +329,6 @@ declare class TJSDocument<T extends any> {
  * @typedef {object} TJSDocumentOptions
  *
  * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
- *
- * @property {boolean} [notifyOnDelete] - When true a subscribers are notified of the deletion of the document.
  */
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any DocumentCollection. This makes
@@ -361,6 +356,11 @@ declare class TJSDocumentCollection<T extends any> {
      * @returns {*} UUID
      */
     get uuid(): any;
+    /**
+     * Completely removes all internal subscribers, any optional delete callback, and unregisters from the
+     * DocumentCollection `apps` tracking array.
+     */
+    destroy(): void;
     /**
      * @returns {T | undefined} Current collection
      */

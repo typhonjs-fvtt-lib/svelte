@@ -1,5 +1,6 @@
 import {
    getUUIDFromDataTransfer,
+   isObject,
    isPlainObject,
    uuidv4 } from '@typhonjs-fvtt/svelte/util';
 
@@ -18,7 +19,7 @@ export class TJSDocument
    /**
     * @type {TJSDocumentOptions}
     */
-   #options = { delete: void 0, notifyOnDelete: false };
+   #options = { delete: void 0 };
 
    #subscriptions = [];
    #updateOptions;
@@ -64,17 +65,38 @@ export class TJSDocument
     */
    async #deleted()
    {
-      if (this.#document instanceof foundry.abstract.Document)
+      const doc = this.#document;
+
+      // Check to see if the document is still in the associated collection to determine if actually deleted.
+      if (doc instanceof foundry.abstract.Document && !doc?.collection?.has(doc.id))
       {
-         delete this.#document.apps[this.#uuidv4];
+         delete doc?.apps[this.#uuidv4];
+         this.#document = void 0;
+
+         this.#notify(false, { action: 'delete', data: void 0 });
+
+         if (typeof this.#options.delete === 'function') { await this.#options.delete(); }
+
+         this.#updateOptions = void 0;
+      }
+   }
+
+   /**
+    * Completely removes all internal subscribers, any optional delete callback, and unregisters from the
+    * ClientDocumentMixin `apps` tracking object.
+    */
+   destroy()
+   {
+      const doc = this.#document;
+
+      if (doc instanceof foundry.abstract.Document)
+      {
+         delete doc?.apps[this.#uuidv4];
          this.#document = void 0;
       }
 
-      this.#updateOptions = void 0;
-
-      if (typeof this.#options.delete === 'function') { await this.#options.delete(); }
-
-      if (this.#options.notifyOnDelete) { this.#notify(); }
+      this.#options.delete = void 0;
+      this.#subscriptions.length = 0;
    }
 
    /**
@@ -183,7 +205,7 @@ export class TJSDocument
     */
    setOptions(options)
    {
-      if (!isPlainObject(options))
+      if (!isObject(options))
       {
          throw new TypeError(`TJSDocument error: 'options' is not a plain object.`);
       }
@@ -193,19 +215,9 @@ export class TJSDocument
          throw new TypeError(`TJSDocument error: 'delete' attribute in options is not a function.`);
       }
 
-      if (options.notifyOnDelete !== void 0 && typeof options.notifyOnDelete !== 'boolean')
-      {
-         throw new TypeError(`TJSDocument error: 'notifyOnDelete' attribute in options is not a boolean.`);
-      }
-
       if (options.delete === void 0 || typeof options.delete === 'function')
       {
          this.#options.delete = options.delete;
-      }
-
-      if (typeof options.notifyOnDelete === 'boolean')
-      {
-         this.#options.notifyOnDelete = options.notifyOnDelete;
       }
    }
 
@@ -218,8 +230,7 @@ export class TJSDocument
    {
       this.#subscriptions.push(handler);           // Add handler to the array of subscribers.
 
-      const updateOptions = this.updateOptions;
-      updateOptions.action = 'subscribe';
+      const updateOptions = { action: 'subscribe', data: void 0 };
 
       handler(this.#document, updateOptions);      // Call handler with current value and update options.
 
@@ -236,6 +247,4 @@ export class TJSDocument
  * @typedef {object} TJSDocumentOptions
  *
  * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
- *
- * @property {boolean} [notifyOnDelete] - When true a subscribers are notified of the deletion of the document.
  */

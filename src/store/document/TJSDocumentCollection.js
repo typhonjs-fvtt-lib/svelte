@@ -1,4 +1,7 @@
-import { isPlainObject, uuidv4 } from '@typhonjs-fvtt/svelte/util';
+import {
+   isObject,
+   isPlainObject,
+   uuidv4 }       from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any DocumentCollection. This makes
@@ -16,7 +19,7 @@ export class TJSDocumentCollection
    /**
     * @type {TJSDocumentCollectionOptions}
     */
-   #options = { delete: void 0, notifyOnDelete: false };
+   #options = { delete: void 0 };
 
    #subscriptions = [];
    #updateOptions;
@@ -62,19 +65,41 @@ export class TJSDocumentCollection
     */
    async #deleted()
    {
-      if (this.#collection instanceof DocumentCollection)
+      const collection = this.#collection;
+
+      if (collection instanceof DocumentCollection)
       {
-         const index = this.#collection.apps.findIndex((sub) => sub === this.#collectionCallback);
-         if (index >= 0) { this.#collection.apps.splice(index, 1); }
+         const index = collection?.apps?.findIndex((sub) => sub === this.#collectionCallback);
+         if (index >= 0) { collection?.apps?.splice(index, 1); }
 
          this.#collection = void 0;
       }
 
-      this.#updateOptions = void 0;
+      this.#notify(false, { action: 'delete', documentType: collection.documentName, documents: [], data: [] });
 
       if (typeof this.#options.delete === 'function') { await this.#options.delete(); }
 
-      if (this.#options.notifyOnDelete) { this.#notify(); }
+      this.#updateOptions = void 0;
+   }
+
+   /**
+    * Completely removes all internal subscribers, any optional delete callback, and unregisters from the
+    * DocumentCollection `apps` tracking array.
+    */
+   destroy()
+   {
+      const collection = this.#collection;
+
+      if (collection instanceof DocumentCollection)
+      {
+         const index = collection?.apps?.findIndex((sub) => sub === this.#collectionCallback);
+         if (index >= 0) { collection?.apps?.splice(index, 1); }
+
+         this.#collection = void 0;
+      }
+
+      this.#options.delete = void 0;
+      this.#subscriptions.length = 0;
    }
 
    /**
@@ -120,7 +145,7 @@ export class TJSDocumentCollection
           `TJSDocumentCollection set error: 'collection' is not a valid DocumentCollection or undefined.`);
       }
 
-      if (options === null || typeof options !== 'object')
+      if (!isObject(options))
       {
          throw new TypeError(`TJSDocument set error: 'options' is not an object.`);
       }
@@ -132,7 +157,7 @@ export class TJSDocumentCollection
             render: this.#notify.bind(this)
          };
 
-         collection.apps.push(this.#collectionCallback);
+         collection?.apps?.push(this.#collectionCallback);
       }
 
       this.#collection = collection;
@@ -147,9 +172,9 @@ export class TJSDocumentCollection
     */
    setOptions(options)
    {
-      if (!isPlainObject(options))
+      if (!isObject(options))
       {
-         throw new TypeError(`TJSDocumentCollection error: 'options' is not a plain object.`);
+         throw new TypeError(`TJSDocumentCollection error: 'options' is not an object.`);
       }
 
       if (options.delete !== void 0 && typeof options.delete !== 'function')
@@ -157,19 +182,9 @@ export class TJSDocumentCollection
          throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
       }
 
-      if (options.notifyOnDelete !== void 0 && typeof options.notifyOnDelete !== 'boolean')
-      {
-         throw new TypeError(`TJSDocumentCollection error: 'notifyOnDelete' attribute in options is not a boolean.`);
-      }
-
       if (options.delete === void 0 || typeof options.delete === 'function')
       {
          this.#options.delete = options.delete;
-      }
-
-      if (typeof options.notifyOnDelete === 'boolean')
-      {
-         this.#options.notifyOnDelete = options.notifyOnDelete;
       }
    }
 
@@ -182,10 +197,13 @@ export class TJSDocumentCollection
    {
       this.#subscriptions.push(handler);              // Add handler to the array of subscribers.
 
-      const updateOptions = this.updateOptions;
-      updateOptions.action = 'subscribe';
+      const collection = this.#collection;
 
-      handler(this.#collection, updateOptions);  // Call handler with current value and update options.
+      const documentType = collection?.documentName ?? void 0;
+
+      const updateOptions = { action: 'subscribe', documentType, documents: [], data: [] };
+
+      handler(collection, updateOptions);  // Call handler with current value and update options.
 
       // Return unsubscribe function.
       return () =>
@@ -200,6 +218,4 @@ export class TJSDocumentCollection
  * @typedef TJSDocumentCollectionOptions
  *
  * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
- *
- * @property {boolean} [notifyOnDelete] - When true a subscribers are notified of the deletion of the document.
  */

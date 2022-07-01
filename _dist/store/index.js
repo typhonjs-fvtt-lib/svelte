@@ -1,6 +1,6 @@
 import { get, derived, writable as writable$2 } from 'svelte/store';
 import { noop, run_all, is_function } from 'svelte/internal';
-import { uuidv4, isPlainObject, getUUIDFromDataTransfer } from '@typhonjs-fvtt/svelte/util';
+import { uuidv4, isPlainObject, getUUIDFromDataTransfer, isObject } from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides the storage and sequencing of managed filters. Each filter added may be a bespoke function or a
@@ -1501,7 +1501,7 @@ class TJSDocument
    /**
     * @type {TJSDocumentOptions}
     */
-   #options = { delete: void 0, notifyOnDelete: false };
+   #options = { delete: void 0 };
 
    #subscriptions = [];
    #updateOptions;
@@ -1547,17 +1547,38 @@ class TJSDocument
     */
    async #deleted()
    {
-      if (this.#document instanceof foundry.abstract.Document)
+      const doc = this.#document;
+
+      // Check to see if the document is still in the associated collection to determine if actually deleted.
+      if (doc instanceof foundry.abstract.Document && !doc?.collection?.has(doc.id))
       {
-         delete this.#document.apps[this.#uuidv4];
+         delete doc?.apps[this.#uuidv4];
+         this.#document = void 0;
+
+         this.#notify(false, { action: 'delete', data: void 0 });
+
+         if (typeof this.#options.delete === 'function') { await this.#options.delete(); }
+
+         this.#updateOptions = void 0;
+      }
+   }
+
+   /**
+    * Completely removes all internal subscribers, any optional delete callback, and unregisters from the
+    * ClientDocumentMixin `apps` tracking object.
+    */
+   destroy()
+   {
+      const doc = this.#document;
+
+      if (doc instanceof foundry.abstract.Document)
+      {
+         delete doc?.apps[this.#uuidv4];
          this.#document = void 0;
       }
 
-      this.#updateOptions = void 0;
-
-      if (typeof this.#options.delete === 'function') { await this.#options.delete(); }
-
-      if (this.#options.notifyOnDelete) { this.#notify(); }
+      this.#options.delete = void 0;
+      this.#subscriptions.length = 0;
    }
 
    /**
@@ -1666,7 +1687,7 @@ class TJSDocument
     */
    setOptions(options)
    {
-      if (!isPlainObject(options))
+      if (!isObject(options))
       {
          throw new TypeError(`TJSDocument error: 'options' is not a plain object.`);
       }
@@ -1676,19 +1697,9 @@ class TJSDocument
          throw new TypeError(`TJSDocument error: 'delete' attribute in options is not a function.`);
       }
 
-      if (options.notifyOnDelete !== void 0 && typeof options.notifyOnDelete !== 'boolean')
-      {
-         throw new TypeError(`TJSDocument error: 'notifyOnDelete' attribute in options is not a boolean.`);
-      }
-
       if (options.delete === void 0 || typeof options.delete === 'function')
       {
          this.#options.delete = options.delete;
-      }
-
-      if (typeof options.notifyOnDelete === 'boolean')
-      {
-         this.#options.notifyOnDelete = options.notifyOnDelete;
       }
    }
 
@@ -1701,8 +1712,7 @@ class TJSDocument
    {
       this.#subscriptions.push(handler);           // Add handler to the array of subscribers.
 
-      const updateOptions = this.updateOptions;
-      updateOptions.action = 'subscribe';
+      const updateOptions = { action: 'subscribe', data: void 0 };
 
       handler(this.#document, updateOptions);      // Call handler with current value and update options.
 
@@ -1719,8 +1729,6 @@ class TJSDocument
  * @typedef {object} TJSDocumentOptions
  *
  * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
- *
- * @property {boolean} [notifyOnDelete] - When true a subscribers are notified of the deletion of the document.
  */
 
 /**
@@ -1739,7 +1747,7 @@ class TJSDocumentCollection
    /**
     * @type {TJSDocumentCollectionOptions}
     */
-   #options = { delete: void 0, notifyOnDelete: false };
+   #options = { delete: void 0 };
 
    #subscriptions = [];
    #updateOptions;
@@ -1785,19 +1793,41 @@ class TJSDocumentCollection
     */
    async #deleted()
    {
-      if (this.#collection instanceof DocumentCollection)
+      const collection = this.#collection;
+
+      if (collection instanceof DocumentCollection)
       {
-         const index = this.#collection.apps.findIndex((sub) => sub === this.#collectionCallback);
-         if (index >= 0) { this.#collection.apps.splice(index, 1); }
+         const index = collection?.apps?.findIndex((sub) => sub === this.#collectionCallback);
+         if (index >= 0) { collection?.apps?.splice(index, 1); }
 
          this.#collection = void 0;
       }
 
-      this.#updateOptions = void 0;
+      this.#notify(false, { action: 'delete', documentType: collection.documentName, documents: [], data: [] });
 
       if (typeof this.#options.delete === 'function') { await this.#options.delete(); }
 
-      if (this.#options.notifyOnDelete) { this.#notify(); }
+      this.#updateOptions = void 0;
+   }
+
+   /**
+    * Completely removes all internal subscribers, any optional delete callback, and unregisters from the
+    * DocumentCollection `apps` tracking array.
+    */
+   destroy()
+   {
+      const collection = this.#collection;
+
+      if (collection instanceof DocumentCollection)
+      {
+         const index = collection?.apps?.findIndex((sub) => sub === this.#collectionCallback);
+         if (index >= 0) { collection?.apps?.splice(index, 1); }
+
+         this.#collection = void 0;
+      }
+
+      this.#options.delete = void 0;
+      this.#subscriptions.length = 0;
    }
 
    /**
@@ -1843,7 +1873,7 @@ class TJSDocumentCollection
           `TJSDocumentCollection set error: 'collection' is not a valid DocumentCollection or undefined.`);
       }
 
-      if (options === null || typeof options !== 'object')
+      if (!isObject(options))
       {
          throw new TypeError(`TJSDocument set error: 'options' is not an object.`);
       }
@@ -1855,7 +1885,7 @@ class TJSDocumentCollection
             render: this.#notify.bind(this)
          };
 
-         collection.apps.push(this.#collectionCallback);
+         collection?.apps?.push(this.#collectionCallback);
       }
 
       this.#collection = collection;
@@ -1870,9 +1900,9 @@ class TJSDocumentCollection
     */
    setOptions(options)
    {
-      if (!isPlainObject(options))
+      if (!isObject(options))
       {
-         throw new TypeError(`TJSDocumentCollection error: 'options' is not a plain object.`);
+         throw new TypeError(`TJSDocumentCollection error: 'options' is not an object.`);
       }
 
       if (options.delete !== void 0 && typeof options.delete !== 'function')
@@ -1880,19 +1910,9 @@ class TJSDocumentCollection
          throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
       }
 
-      if (options.notifyOnDelete !== void 0 && typeof options.notifyOnDelete !== 'boolean')
-      {
-         throw new TypeError(`TJSDocumentCollection error: 'notifyOnDelete' attribute in options is not a boolean.`);
-      }
-
       if (options.delete === void 0 || typeof options.delete === 'function')
       {
          this.#options.delete = options.delete;
-      }
-
-      if (typeof options.notifyOnDelete === 'boolean')
-      {
-         this.#options.notifyOnDelete = options.notifyOnDelete;
       }
    }
 
@@ -1905,10 +1925,13 @@ class TJSDocumentCollection
    {
       this.#subscriptions.push(handler);              // Add handler to the array of subscribers.
 
-      const updateOptions = this.updateOptions;
-      updateOptions.action = 'subscribe';
+      const collection = this.#collection;
 
-      handler(this.#collection, updateOptions);  // Call handler with current value and update options.
+      const documentType = collection?.documentName ?? void 0;
+
+      const updateOptions = { action: 'subscribe', documentType, documents: [], data: [] };
+
+      handler(collection, updateOptions);  // Call handler with current value and update options.
 
       // Return unsubscribe function.
       return () =>
@@ -1923,8 +1946,6 @@ class TJSDocumentCollection
  * @typedef TJSDocumentCollectionOptions
  *
  * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
- *
- * @property {boolean} [notifyOnDelete] - When true a subscribers are notified of the deletion of the document.
  */
 
 const storeState = writable$2(void 0);
