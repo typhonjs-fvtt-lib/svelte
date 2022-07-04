@@ -1,3 +1,13 @@
+type StackingContext = {
+    /**
+     * A DOM Element
+     */
+    node: Element;
+    /**
+     * Reason for why a stacking context was created
+     */
+    reason: string;
+};
 type ParseDataTransferOptions = {
     /**
      * - Accept actor owned documents.
@@ -40,6 +50,19 @@ declare function debounce(callback: Function, delay: number): Function;
  * @returns {object}    Target object.
  */
 declare function deepMerge(target?: object, ...sourceObj: object[]): object;
+/**
+ * Recursive function that finds the closest parent stacking context.
+ * See also https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context
+ *
+ * Original author: Kerry Liu / https://github.com/gwwar
+ * @see: https://github.com/gwwar/z-context/blob/master/content-script.js
+ * @see: https://github.com/gwwar/z-context/blob/master/LICENSE
+ *
+ * @param {Element} node -
+ *
+ * @returns {StackingContext} The closest parent stacking context
+ */
+declare function getStackingContext(node: Element): StackingContext;
 /**
  * Attempts to create a Foundry UUID from standard drop data. This may not work for all systems.
  *
@@ -237,4 +260,4 @@ declare namespace uuidv4 {
     function isValid(uuid: string): boolean;
 }
 
-export { ParseDataTransferOptions, debounce, deepMerge, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };
+export { ParseDataTransferOptions, StackingContext, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };

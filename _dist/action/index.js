@@ -51,6 +51,13 @@ function isWritableStore(store)
    return false;
 }
 
+/**
+ * @typedef {Object} StackingContext
+ *
+ * @property {Element} node          A DOM Element
+ * @property {string}  reason        Reason for why a stacking context was created
+ */
+
 const s_REGEX = /(\d+)\s*px/;
 
 /**
