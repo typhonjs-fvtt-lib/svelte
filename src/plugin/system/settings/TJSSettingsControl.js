@@ -24,7 +24,7 @@ export class TJSSettingsControl
 
       if (loggingEnabled)
       {
-         console.log(`SettingsControl - handleDispatch - data:\n`, data);
+         console.log(`TJSSettingsControl - handleDispatch - data:\n`, data);
       }
 
       const dispatchFunction = this[data.setting];

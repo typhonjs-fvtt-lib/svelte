@@ -88,8 +88,29 @@ export class TJSGameSettings
           `TJSGameSettings - register: 'setting.store' attribute is not a writable store.`);
       }
 
-      const moduleId = setting.moduleId;
+      // TODO: Remove deprecation warning and fully remove support for `moduleId` in a future TRL release.
+      if (typeof setting.moduleId === 'string')
+      {
+         console.warn(
+          `TJSGameSettings - register deprecation warning: 'moduleId' should be replaced with 'namespace'.`);
+         console.warn(`'moduleId' will cease to work in a future update of TRL / TJSGameSettings.`);
+      }
+
+      // TODO: Remove nullish coalescing operator in a future TRL release.
+      const namespace = setting.namespace ?? setting.moduleId;
       const key = setting.key;
+
+      if (typeof namespace !== 'string')
+      {
+         throw new TypeError(`TJSGameSettings - register: 'namespace' attribute is not a string.`);
+      }
+
+      if (typeof key !== 'string')
+      {
+         throw new TypeError(`TJSGameSettings - register: 'key' attribute is not a string.`);
+      }
+
+
       const store = setting.store;
 
       /**
@@ -133,26 +154,26 @@ export class TJSGameSettings
          for (const entry of onchangeFunctions) { entry(value); }
       };
 
-      game.settings.register(moduleId, key, { ...options, onChange });
+      game.settings.register(namespace, key, { ...options, onChange });
 
       // Set new store value with existing setting or default value.
-      const targetStore = store ? store : s_GET_STORE(this.#stores, key, game.settings.get(moduleId, key));
+      const targetStore = store ? store : s_GET_STORE(this.#stores, key, game.settings.get(namespace, key));
 
       // If a store instance is passed into register then initialize it with game settings data.
       if (store)
       {
          this.#stores.set(key, targetStore);
-         store.set(game.settings.get(moduleId, key));
+         store.set(game.settings.get(namespace, key));
       }
 
       // Subscribe to self to set associated game setting on updates after verifying that the new value does not match
       // existing game setting.
       subscribeIgnoreFirst(targetStore, async (value) =>
       {
-         if (!gateSet && game.settings.get(moduleId, key) !== value)
+         if (!gateSet && game.settings.get(namespace, key) !== value)
          {
             gateSet = true;
-            await game.settings.set(moduleId, key, value);
+            await game.settings.set(namespace, key, value);
          }
 
          gateSet = false;
@@ -175,10 +196,11 @@ export class TJSGameSettings
             throw new TypeError(`TJSGameSettings - registerAll: entry in settings is not an object.`);
          }
 
-         if (typeof entry.moduleId !== 'string')
-         {
-            throw new TypeError(`TJSGameSettings - registerAll: entry in settings missing 'moduleId' attribute.`);
-         }
+         // TODO: Uncomment when switch to 'namespace' is complete in future TRL release.
+         // if (typeof entry.namespace !== 'string')
+         // {
+         //    throw new TypeError(`TJSGameSettings - registerAll: entry in settings missing 'namespace' attribute.`);
+         // }
 
          if (typeof entry.key !== 'string')
          {
@@ -256,7 +278,7 @@ function s_CREATE_STORE(initialValue)
 /**
  * @typedef {object} GameSetting - Defines a game setting.
  *
- * @property {string} moduleId - The ID of the module / system.
+ * @property {string} namespace - The setting namespace; usually the ID of the module / system.
  *
  * @property {string} key - The setting key to register.
  *

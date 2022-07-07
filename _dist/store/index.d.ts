@@ -66,9 +66,9 @@ type GameSettingOptions = {
  */
 type GameSetting = {
     /**
-     * - The ID of the module / system.
+     * - The setting namespace; usually the ID of the module / system.
      */
-    moduleId: string;
+    namespace: string;
     /**
      * - The setting key to register.
      */
