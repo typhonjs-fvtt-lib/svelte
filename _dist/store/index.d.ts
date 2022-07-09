@@ -1,14 +1,13 @@
 import * as svelte_store from 'svelte/store';
-import { get } from 'svelte/types/runtime/store';
 
 /**
  * - The backing Svelte store; a writable w/ get method attached.
  */
-type LSStore = svelte_store.Writable<any> & typeof get;
+type LSStore = svelte_store.Writable<any>;
 /**
  * - The backing Svelte store; a writable w/ get method attached.
  */
-type SSStore = svelte_store.Writable<any> & typeof get;
+type SSStore = svelte_store.Writable<any>;
 type TJSDocumentOptions = {
     /**
      * - Optional delete function to invoke when document is deleted.
@@ -161,58 +160,23 @@ declare class DynArrayReducer<T> {
     #private;
 }
 /**
- * @typedef {import('svelte/store').Writable & import('svelte/store').get} LSStore - The backing Svelte store; a writable w/ get method attached.
+ * @typedef {import('svelte/store').Writable} LSStore - The backing Svelte store; a writable w/ get method attached.
  */
 declare class LocalStorage {
     /**
-     * Get value from the localstorage.
+     * Creates a new LSStore for the given key.
      *
-     * @param {string}   key - Key to lookup in localstorage.
+     * @param {string}   key - Key to lookup in stores map.
      *
-     * @param {*}        [defaultValue] - A default value to return if key not present in local storage.
+     * @param {boolean}  [defaultValue] - A default value to set for the store.
      *
-     * @returns {*} Value from local storage or if not defined any default value provided.
+     * @returns {LSStore} The new LSStore.
      */
-    getItem(key: string, defaultValue?: any): any;
+    static "__#317521@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
-     * Returns the backing Svelte store for the given key; potentially sets a default value if the key
-     * is not already set.
+     * Get value from the localStorage.
      *
-     * @param {string}   key - Key to lookup in localstorage.
-     *
-     * @param {*}        [defaultValue] - A default value to return if key not present in local storage.
-     *
-     * @returns {LSStore} The Svelte store for this key.
-     */
-    getStore(key: string, defaultValue?: any): LSStore;
-    /**
-     * Sets the value for the given key in localstorage.
-     *
-     * @param {string}   key - Key to lookup in localstorage.
-     *
-     * @param {*}        value - A value to set for this key.
-     */
-    setItem(key: string, value: any): void;
-    /**
-     * Convenience method to swap a boolean value stored in local storage.
-     *
-     * @param {string}   key - Key to lookup in localstorage.
-     *
-     * @param {boolean}  [defaultValue] - A default value to return if key not present in local storage.
-     *
-     * @returns {boolean} The boolean swap for the given key.
-     */
-    swapItemBoolean(key: string, defaultValue?: boolean): boolean;
-    #private;
-}
-/**
- * @typedef {import('svelte/store').Writable & import('svelte/store').get} SSStore - The backing Svelte store; a writable w/ get method attached.
- */
-declare class SessionStorage {
-    /**
-     * Get value from the sessionstorage.
-     *
-     * @param {string}   key - Key to lookup in sessionstorage.
+     * @param {string}   key - Key to lookup in localStorage.
      *
      * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
      *
@@ -223,17 +187,17 @@ declare class SessionStorage {
      * Returns the backing Svelte store for the given key; potentially sets a default value if the key
      * is not already set.
      *
-     * @param {string}   key - Key to lookup in sessionstorage.
+     * @param {string}   key - Key to lookup in localStorage.
      *
      * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
      *
      * @returns {LSStore} The Svelte store for this key.
      */
-    getStore(key: string, defaultValue?: any): LSStore;
+    getStore(key: string, defaultValue?: any): svelte_store.Writable<any>;
     /**
-     * Sets the value for the given key in sessionstorage.
+     * Sets the value for the given key in localStorage.
      *
-     * @param {string}   key - Key to lookup in sessionstorage.
+     * @param {string}   key - Key to lookup in localStorage.
      *
      * @param {*}        value - A value to set for this key.
      */
@@ -241,7 +205,62 @@ declare class SessionStorage {
     /**
      * Convenience method to swap a boolean value stored in session storage.
      *
-     * @param {string}   key - Key to lookup in sessionstorage.
+     * @param {string}   key - Key to lookup in localStorage.
+     *
+     * @param {boolean}  [defaultValue] - A default value to return if key not present in session storage.
+     *
+     * @returns {boolean} The boolean swap for the given key.
+     */
+    swapItemBoolean(key: string, defaultValue?: boolean): boolean;
+    #private;
+}
+/**
+ * @typedef {import('svelte/store').Writable} SSStore - The backing Svelte store; a writable w/ get method attached.
+ */
+declare class SessionStorage {
+    /**
+     * Creates a new SSStore for the given key.
+     *
+     * @param {string}   key - Key to lookup in stores map.
+     *
+     * @param {boolean}  [defaultValue] - A default value to set for the store.
+     *
+     * @returns {LSStore} The new LSStore.
+     */
+    static "__#317522@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    /**
+     * Get value from the sessionStorage.
+     *
+     * @param {string}   key - Key to lookup in sessionStorage.
+     *
+     * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
+     *
+     * @returns {*} Value from session storage or if not defined any default value provided.
+     */
+    getItem(key: string, defaultValue?: any): any;
+    /**
+     * Returns the backing Svelte store for the given key; potentially sets a default value if the key
+     * is not already set.
+     *
+     * @param {string}   key - Key to lookup in sessionStorage.
+     *
+     * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
+     *
+     * @returns {LSStore} The Svelte store for this key.
+     */
+    getStore(key: string, defaultValue?: any): svelte_store.Writable<any>;
+    /**
+     * Sets the value for the given key in sessionStorage.
+     *
+     * @param {string}   key - Key to lookup in sessionStorage.
+     *
+     * @param {*}        value - A value to set for this key.
+     */
+    setItem(key: string, value: any): void;
+    /**
+     * Convenience method to swap a boolean value stored in session storage.
+     *
+     * @param {string}   key - Key to lookup in sessionStorage.
      *
      * @param {boolean}  [defaultValue] - A default value to return if key not present in session storage.
      *
@@ -502,29 +521,28 @@ declare function subscribeFirstRest(store: svelte_store.Readable<any> | svelte_s
 declare function subscribeIgnoreFirst(store: svelte_store.Readable<any> | svelte_store.Writable<any>, update: any): svelte_store.Unsubscriber;
 /**
  * @external Store
- * @see [Svelte stores](https://svelte.dev/docs#Store_contract)
+ * @see [Svelte stores](https://svelte.dev/docs#component-format-script-4-prefix-stores-with-$-to-access-their-values-store-contract)
  */
 /**
- * Create a store similar to [Svelte's `derived`](https://svelte.dev/docs#derived), but which
- * has its own `set` and `update` methods and can send values back to the origin stores.
+ * Create a store similar to [Svelte's `derived`](https://svelte.dev/docs#run-time-svelte-store-writable),
+ * but which has its own `set` and `update` methods and can send values back to the origin stores.
  * [Read more...](https://github.com/PixievoltNo1/svelte-writable-derived#default-export-writablederived)
  *
  * @param {Store|Store[]} origins One or more stores to derive from. Same as
- * [`derived`](https://svelte.dev/docs#derived)'s 1st parameter.
+ * [`derived`](https://svelte.dev/docs#run-time-svelte-store-writable)'s 1st parameter.
  * @param {!Function} derive The callback to determine the derived value. Same as
- * [`derived`](https://svelte.dev/docs#derived)'s 2nd parameter.
+ * [`derived`](https://svelte.dev/docs#run-time-svelte-store-writable)'s 2nd parameter.
  * @param {!Function|{withOld: !Function}} reflect Called when the
  * derived store gets a new value via its `set` or `update` methods, and determines new values for
  * the origin stores. [Read more...](https://github.com/PixievoltNo1/svelte-writable-derived#new-parameter-reflect)
  * @param [initial] The new store's initial value. Same as
- * [`derived`](https://svelte.dev/docs#derived)'s 3rd parameter.
+ * [`derived`](https://svelte.dev/docs#run-time-svelte-store-writable)'s 3rd parameter.
  *
  * @returns {Store} A writable store.
  */
 declare function writableDerived(origins: any | any[], derive: Function, reflect: Function | {
     withOld: Function;
 }, initial?: any): any;
-
 /**
  * Provides the storage and sequencing of managed filters. Each filter added may be a bespoke function or a
  * {@link FilterData} object containing an `id`, `filter`, and `weight` attributes; `filter` is the only required

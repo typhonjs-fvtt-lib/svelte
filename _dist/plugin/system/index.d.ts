@@ -1,14 +1,13 @@
 import * as svelte_store from 'svelte/store';
-import { get } from 'svelte/types/runtime/store';
 
 /**
  * - The backing Svelte store; a writable w/ get method attached.
  */
-type LSStore = svelte_store.Writable<any> & typeof get;
+type LSStore = svelte_store.Writable<any>;
 /**
  * - The backing Svelte store; a writable w/ get method attached.
  */
-type SSStore = svelte_store.Writable<any> & typeof get;
+type SSStore = svelte_store.Writable<any>;
 type GameSettingOptions = {
     /**
      * - If choices are defined, the resulting setting will be a select menu.

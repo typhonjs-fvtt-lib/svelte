@@ -1,4 +1,4 @@
-import { get, writable as writable$2 } from 'svelte/store';
+import { writable as writable$2, get } from 'svelte/store';
 import { noop, run_all, is_function } from 'svelte/internal';
 import { TJSGameSettings as TJSGameSettings$1 } from '@typhonjs-fvtt/svelte/store';
 import { isIterable } from '@typhonjs-fvtt/svelte/util';
@@ -105,7 +105,7 @@ var g$1 = generator(storage$1);
 var writable$1 = g$1.writable;
 
 /**
- * @typedef {import('svelte/store').Writable & import('svelte/store').get} LSStore - The backing Svelte store; a writable w/ get method attached.
+ * @typedef {import('svelte/store').Writable} LSStore - The backing Svelte store; a writable w/ get method attached.
  */
 
 class LocalStorage$1
@@ -116,13 +116,55 @@ class LocalStorage$1
    #stores = new Map();
 
    /**
-    * Get value from the localstorage.
+    * Creates a new LSStore for the given key.
     *
-    * @param {string}   key - Key to lookup in localstorage.
+    * @param {string}   key - Key to lookup in stores map.
     *
-    * @param {*}        [defaultValue] - A default value to return if key not present in local storage.
+    * @param {boolean}  [defaultValue] - A default value to set for the store.
     *
-    * @returns {*} Value from local storage or if not defined any default value provided.
+    * @returns {LSStore} The new LSStore.
+    */
+   static #createStore(key, defaultValue = void 0)
+   {
+      try
+      {
+         const value = localStorage.getItem(key);
+         if (value !== null) { defaultValue = JSON.parse(value); }
+      }
+      catch (err) { /**/ }
+
+      return writable$1(key, defaultValue);
+   }
+
+   /**
+    * Gets a store from the LSStore Map or creates a new store for the key and a given default value.
+    *
+    * @param {string}               key - Key to lookup in stores map.
+    *
+    * @param {boolean}              [defaultValue] - A default value to set for the store.
+    *
+    * @returns {LSStore} The store for the given key.
+    */
+   #getStore(key, defaultValue = void 0)
+   {
+      let store = this.#stores.get(key);
+      if (store === void 0)
+      {
+         store = LocalStorage$1.#createStore(key, defaultValue);
+         this.#stores.set(key, store);
+      }
+
+      return store;
+   }
+
+   /**
+    * Get value from the localStorage.
+    *
+    * @param {string}   key - Key to lookup in localStorage.
+    *
+    * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
+    *
+    * @returns {*} Value from session storage or if not defined any default value provided.
     */
    getItem(key, defaultValue)
    {
@@ -130,9 +172,14 @@ class LocalStorage$1
 
       const storageValue = localStorage.getItem(key);
 
-      if (storageValue !== void 0)
+      if (storageValue !== null)
       {
          value = JSON.parse(storageValue);
+      }
+      else if (defaultValue !== void 0)
+      {
+         // If there is no existing storage value and defaultValue is defined the storage value needs to be set.
+         localStorage.setItem(key, JSON.stringify(defaultValue));
       }
 
       return value;
@@ -142,97 +189,56 @@ class LocalStorage$1
     * Returns the backing Svelte store for the given key; potentially sets a default value if the key
     * is not already set.
     *
-    * @param {string}   key - Key to lookup in localstorage.
+    * @param {string}   key - Key to lookup in localStorage.
     *
-    * @param {*}        [defaultValue] - A default value to return if key not present in local storage.
+    * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
     *
     * @returns {LSStore} The Svelte store for this key.
     */
    getStore(key, defaultValue)
    {
-      return s_GET_STORE$1(this.#stores, key, defaultValue);
+      return this.#getStore(key, defaultValue);
    }
 
    /**
-    * Sets the value for the given key in localstorage.
+    * Sets the value for the given key in localStorage.
     *
-    * @param {string}   key - Key to lookup in localstorage.
+    * @param {string}   key - Key to lookup in localStorage.
     *
     * @param {*}        value - A value to set for this key.
     */
    setItem(key, value)
    {
-      const store = s_GET_STORE$1(this.#stores, key);
+      const store = this.#getStore(key);
       store.set(value);
    }
 
    /**
-    * Convenience method to swap a boolean value stored in local storage.
+    * Convenience method to swap a boolean value stored in session storage.
     *
-    * @param {string}   key - Key to lookup in localstorage.
+    * @param {string}   key - Key to lookup in localStorage.
     *
-    * @param {boolean}  [defaultValue] - A default value to return if key not present in local storage.
+    * @param {boolean}  [defaultValue] - A default value to return if key not present in session storage.
     *
     * @returns {boolean} The boolean swap for the given key.
     */
    swapItemBoolean(key, defaultValue)
    {
-      const store = s_GET_STORE$1(this.#stores, key, defaultValue);
-      const value = store.get();
-      const newValue = typeof value === 'boolean' ? !value : false;
+      const store = this.#getStore(key, defaultValue);
+
+      let currentValue = false;
+
+      try
+      {
+         currentValue = !!JSON.parse(localStorage.getItem(key));
+      }
+      catch (err) { /**/ }
+
+      const newValue = typeof currentValue === 'boolean' ? !currentValue : false;
 
       store.set(newValue);
       return newValue;
    }
-}
-
-/**
- * Gets a store from the LSStore Map or creates a new store for the key and a given default value.
- *
- * @param {Map<string, LSStore>} stores - Map containing Svelte stores.
- *
- * @param {string}               key - Key to lookup in stores map.
- *
- * @param {boolean}              [defaultValue] - A default value to set for the store.
- *
- * @returns {LSStore} The store for the given key.
- */
-function s_GET_STORE$1(stores, key, defaultValue = void 0)
-{
-   let store = stores.get(key);
-   if (store === void 0)
-   {
-      store = s_CREATE_STORE$1(key, defaultValue);
-      stores.set(key, store);
-   }
-
-   return store;
-}
-
-/**
- * Creates a new LSStore for the given key.
- *
- * @param {string}   key - Key to lookup in stores map.
- *
- * @param {boolean}  [defaultValue] - A default value to set for the store.
- *
- * @returns {LSStore} The new LSStore.
- */
-function s_CREATE_STORE$1(key, defaultValue = void 0)
-{
-   try
-   {
-      const value = localStorage.getItem(key);
-      if (value) { defaultValue = JSON.parse(value); }
-   }
-   catch (err) { /**/ }
-
-   const store = writable$1(key, defaultValue);
-
-
-   store.get = () => get(store);
-
-   return store;
 }
 
 // src/session.ts
@@ -241,7 +247,7 @@ var g = generator(storage);
 var writable = g.writable;
 
 /**
- * @typedef {import('svelte/store').Writable & import('svelte/store').get} SSStore - The backing Svelte store; a writable w/ get method attached.
+ * @typedef {import('svelte/store').Writable} SSStore - The backing Svelte store; a writable w/ get method attached.
  */
 
 class SessionStorage$1
@@ -252,9 +258,51 @@ class SessionStorage$1
    #stores = new Map();
 
    /**
-    * Get value from the sessionstorage.
+    * Creates a new SSStore for the given key.
     *
-    * @param {string}   key - Key to lookup in sessionstorage.
+    * @param {string}   key - Key to lookup in stores map.
+    *
+    * @param {boolean}  [defaultValue] - A default value to set for the store.
+    *
+    * @returns {LSStore} The new LSStore.
+    */
+   static #createStore(key, defaultValue = void 0)
+   {
+      try
+      {
+         const value = sessionStorage.getItem(key);
+         if (value !== null) { defaultValue = JSON.parse(value); }
+      }
+      catch (err) { /**/ }
+
+      return writable(key, defaultValue);
+   }
+
+   /**
+    * Gets a store from the SSStore Map or creates a new store for the key and a given default value.
+    *
+    * @param {string}               key - Key to lookup in stores map.
+    *
+    * @param {boolean}              [defaultValue] - A default value to set for the store.
+    *
+    * @returns {LSStore} The store for the given key.
+    */
+   #getStore(key, defaultValue = void 0)
+   {
+      let store = this.#stores.get(key);
+      if (store === void 0)
+      {
+         store = SessionStorage$1.#createStore(key, defaultValue);
+         this.#stores.set(key, store);
+      }
+
+      return store;
+   }
+
+   /**
+    * Get value from the sessionStorage.
+    *
+    * @param {string}   key - Key to lookup in sessionStorage.
     *
     * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
     *
@@ -266,9 +314,14 @@ class SessionStorage$1
 
       const storageValue = sessionStorage.getItem(key);
 
-      if (storageValue !== void 0)
+      if (storageValue !== null)
       {
          value = JSON.parse(storageValue);
+      }
+      else if (defaultValue !== void 0)
+      {
+         // If there is no existing storage value and defaultValue is defined the storage value needs to be set.
+         sessionStorage.setItem(key, JSON.stringify(defaultValue));
       }
 
       return value;
@@ -278,7 +331,7 @@ class SessionStorage$1
     * Returns the backing Svelte store for the given key; potentially sets a default value if the key
     * is not already set.
     *
-    * @param {string}   key - Key to lookup in sessionstorage.
+    * @param {string}   key - Key to lookup in sessionStorage.
     *
     * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
     *
@@ -286,26 +339,26 @@ class SessionStorage$1
     */
    getStore(key, defaultValue)
    {
-      return s_GET_STORE(this.#stores, key, defaultValue);
+      return this.#getStore(key, defaultValue);
    }
 
    /**
-    * Sets the value for the given key in sessionstorage.
+    * Sets the value for the given key in sessionStorage.
     *
-    * @param {string}   key - Key to lookup in sessionstorage.
+    * @param {string}   key - Key to lookup in sessionStorage.
     *
     * @param {*}        value - A value to set for this key.
     */
    setItem(key, value)
    {
-      const store = s_GET_STORE(this.#stores, key);
+      const store = this.#getStore(key);
       store.set(value);
    }
 
    /**
     * Convenience method to swap a boolean value stored in session storage.
     *
-    * @param {string}   key - Key to lookup in sessionstorage.
+    * @param {string}   key - Key to lookup in sessionStorage.
     *
     * @param {boolean}  [defaultValue] - A default value to return if key not present in session storage.
     *
@@ -313,60 +366,21 @@ class SessionStorage$1
     */
    swapItemBoolean(key, defaultValue)
    {
-      const store = s_GET_STORE(this.#stores, key, defaultValue);
-      const value = store.get();
-      const newValue = typeof value === 'boolean' ? !value : false;
+      const store = this.#getStore(key, defaultValue);
+
+      let currentValue = false;
+
+      try
+      {
+         currentValue = !!JSON.parse(sessionStorage.getItem(key));
+      }
+      catch (err) { /**/ }
+
+      const newValue = typeof currentValue === 'boolean' ? !currentValue : false;
 
       store.set(newValue);
       return newValue;
    }
-}
-
-/**
- * Gets a store from the SSStore Map or creates a new store for the key and a given default value.
- *
- * @param {Map<string, LSStore>} stores - Map containing Svelte stores.
- *
- * @param {string}               key - Key to lookup in stores map.
- *
- * @param {boolean}              [defaultValue] - A default value to set for the store.
- *
- * @returns {LSStore} The store for the given key.
- */
-function s_GET_STORE(stores, key, defaultValue = void 0)
-{
-   let store = stores.get(key);
-   if (store === void 0)
-   {
-      store = s_CREATE_STORE(key, defaultValue);
-      stores.set(key, store);
-   }
-
-   return store;
-}
-
-/**
- * Creates a new SSStore for the given key.
- *
- * @param {string}   key - Key to lookup in stores map.
- *
- * @param {boolean}  [defaultValue] - A default value to set for the store.
- *
- * @returns {LSStore} The new LSStore.
- */
-function s_CREATE_STORE(key, defaultValue = void 0)
-{
-   try
-   {
-      const value = sessionStorage.getItem(key);
-      if (value) { defaultValue = JSON.parse(value); }
-   }
-   catch (err) { /**/ }
-
-   const store = writable(key, defaultValue);
-   store.get = () => get(store);
-
-   return store;
 }
 
 class LocalStorage
