@@ -1,6 +1,7 @@
 import { derived, writable as writable$2, get } from 'svelte/store';
 import { noop, run_all, is_function } from 'svelte/internal';
 import { uuidv4, isPlainObject, getUUIDFromDataTransfer, isObject } from '@typhonjs-fvtt/svelte/util';
+import { isIterable } from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides the storage and sequencing of managed filters. Each filter added may be a bespoke function or a
@@ -1987,30 +1988,6 @@ Hooks.once('ready', () => storeState.set(game));
  *
  * @property {Function} get - Provides a mechanism to directly access the Foundry game state without subscribing.
  */
-
-/**
- * Defines the application shell contract. If Svelte components export getter / setters for the following properties
- * then that component is considered an application shell.
- *
- * @type {string[]}
- */
-const applicationShellContract = ['elementRoot'];
-
-Object.freeze(applicationShellContract);
-
-/**
- * Tests for whether an object is iterable.
- *
- * @param {*} value - Any value.
- *
- * @returns {boolean} Whether object is iterable.
- */
-function isIterable(value)
-{
-   if (value === null || value === void 0 || typeof value !== 'object') { return false; }
-
-   return typeof value[Symbol.iterator] === 'function';
-}
 
 /**
  * Registers game settings and creates a backing Svelte store for each setting. It is possible to add multiple

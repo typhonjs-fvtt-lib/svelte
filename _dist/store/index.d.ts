@@ -172,7 +172,7 @@ declare class LocalStorage {
      *
      * @returns {LSStore} The new LSStore.
      */
-    static "__#317521@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#317497@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the localStorage.
      *
@@ -227,7 +227,7 @@ declare class SessionStorage {
      *
      * @returns {LSStore} The new LSStore.
      */
-    static "__#317522@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#317498@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the sessionStorage.
      *
@@ -404,6 +404,15 @@ declare class TJSDocumentCollection<T extends any> {
     subscribe(handler: (arg0: T, arg1: object) => void): (() => void);
     #private;
 }
+/**
+ * @typedef {import('svelte/store').Readable} GameState - Provides a Svelte store wrapping the Foundry `game` global variable. It is initialized
+ * on the `ready` hook. You may use this store to access the global game state from a Svelte template. It is a read only
+ * store and will receive no reactive updates during runtime.
+ *
+ * @property {import('svelte/store').Readable.subscribe} subscribe - Provides the Svelte store subscribe function.
+ *
+ * @property {Function} get - Provides a mechanism to directly access the Foundry game state without subscribing.
+ */
 /**
  * Registers game settings and creates a backing Svelte store for each setting. It is possible to add multiple
  * `onChange` callbacks on registration.

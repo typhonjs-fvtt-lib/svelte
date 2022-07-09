@@ -1,16 +1,6 @@
 import * as svelte_store from 'svelte/store';
 
 type ResizeObserverTarget = object | Function;
-type StackingContext = {
-    /**
-     * A DOM Element
-     */
-    node: Element;
-    /**
-     * Reason for why a stacking context was created
-     */
-    reason: string;
-};
 /**
  * Provides an action to always blur the element when any pointer up event occurs on the element.
  *
@@ -209,4 +199,4 @@ declare class DraggableOptions {
     #private;
 }
 
-export { ResizeObserverTarget, StackingContext, alwaysBlur, applyPosition, applyScrolltop, applyStyles, autoBlur, draggable, resizeObserver };
+export { ResizeObserverTarget, alwaysBlur, applyPosition, applyScrolltop, applyStyles, autoBlur, draggable, resizeObserver };

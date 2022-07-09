@@ -1,29 +1,4 @@
-import 'svelte/store';
-import 'svelte/internal';
-
-/**
- * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
- * `set`, and `update` functions.
- *
- * Note: functions are also objects, so test that the variable might be a function w/ `subscribe` & `set` functions.
- *
- * @param {*}  store - variable to test that might be a store.
- *
- * @returns {boolean} Whether the variable tested has the shape of a store.
- */
-function isWritableStore(store)
-{
-   if (store === null || store === void 0) { return false; }
-
-   switch (typeof store)
-   {
-      case 'function':
-      case 'object':
-         return typeof store.subscribe === 'function' && typeof store.set === 'function';
-   }
-
-   return false;
-}
+import { isWritableStore } from '@typhonjs-fvtt/svelte/store';
 
 /**
  * Svelte doesn't provide any events for the animate directive.
