@@ -11,21 +11,10 @@ import { typhonjsRuntime } from './.rollup/local/index.js';
 
 import terserConfig        from './terser.config.mjs';
 
+import { externalPathsNPM } from './.rollup/local/externalPathsNPM.js';
+
 const s_COMPRESS = false;
 const s_SOURCEMAPS = true;
-
-// Defines Svelte and all local exports as external.
-const s_LOCAL_EXTERNAL = [
-   'svelte', 'svelte/easing', 'svelte/internal', 'svelte/motion', 'svelte/store', 'svelte/transition',
-   'svelte/types',
-
-   '@typhonjs-fvtt/svelte/action', '@typhonjs-fvtt/svelte/animate', '@typhonjs-fvtt/svelte/application',
-   '@typhonjs-fvtt/svelte/application/dialog', '@typhonjs-fvtt/svelte/application/legacy',
-   '@typhonjs-fvtt/svelte/component/core', '@typhonjs-fvtt/svelte/component/dialog', '@typhonjs-fvtt/svelte/gsap',
-   '@typhonjs-fvtt/svelte/handler', '@typhonjs-fvtt/svelte/helper', '@typhonjs-fvtt/svelte/math',
-   '@typhonjs-fvtt/svelte/store', '@typhonjs-fvtt/svelte/transition', '@typhonjs-fvtt/svelte/util',
-   '@typhonjs-fvtt/svelte/plugin/data', '@typhonjs-fvtt/svelte/plugin/system',
-];
 
 // Defines the node-resolve config.
 const s_RESOLVE_CONFIG = {
@@ -35,7 +24,7 @@ const s_RESOLVE_CONFIG = {
 
 // Defines potential output plugins to use conditionally if the .env file indicates the bundles should be
 // minified / mangled.
-const outputPlugins = s_COMPRESS ? [terser(terserConfig), typhonjsRuntime()] : [typhonjsRuntime()];
+const outputPlugins = s_COMPRESS ? [terser(terserConfig)] : [];
 
 // Defines whether source maps are generated / loaded from the .env file.
 const sourcemap = s_SOURCEMAPS;
@@ -44,8 +33,8 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/action/index.js',
-         external: s_LOCAL_EXTERNAL,
          plugins: [
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/action`] }),
             resolve(s_RESOLVE_CONFIG),
             sourcemaps()
          ]
@@ -54,6 +43,7 @@ const rollupConfigs = [
          output: {
             file: '_dist/action/index.js',
             format: 'es',
+            paths: externalPathsNPM,
             plugins: outputPlugins,
             preferConst: true,
             sourcemap,
@@ -64,8 +54,8 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/animate/index.js',
-         external: s_LOCAL_EXTERNAL,
          plugins: [
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/animate`] }),
             resolve(s_RESOLVE_CONFIG),
             sourcemaps()
          ]
@@ -74,6 +64,7 @@ const rollupConfigs = [
          output: {
             file: '_dist/animate/index.js',
             format: 'es',
+            paths: externalPathsNPM,
             plugins: outputPlugins,
             preferConst: true,
             sourcemap,
@@ -84,7 +75,6 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/component/core/index.js',
-         external: s_LOCAL_EXTERNAL,
          plugins: [
             svelte({
                emitCss: false,
@@ -107,6 +97,7 @@ const rollupConfigs = [
          output: {
             file: '_dist/component/core/index.js',
             format: 'es',
+            paths: externalPathsNPM,
             plugins: outputPlugins,
             preferConst: true,
             sourcemap,
@@ -117,7 +108,6 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/component/dialog/index.js',
-         external: s_LOCAL_EXTERNAL,
          plugins: [
             svelte({
                emitCss: false,
@@ -140,6 +130,7 @@ const rollupConfigs = [
          output: {
             file: '_dist/component/dialog/index.js',
             format: 'es',
+            paths: externalPathsNPM,
             plugins: outputPlugins,
             preferConst: true,
             sourcemap,
@@ -150,12 +141,16 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/gsap/index.js',
-         external: s_LOCAL_EXTERNAL
+         plugins: [
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/gsap`] }),
+            sourcemaps()
+         ]
       },
       output: {
          output: {
             file: '_dist/gsap/index.js',
             format: 'es',
+            paths: externalPathsNPM,
             plugins: outputPlugins,
             preferConst: true,
             sourcemap,
@@ -166,8 +161,8 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/handler/index.js',
-         external: s_LOCAL_EXTERNAL,
          plugins: [
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/handler`] }),
             resolve(s_RESOLVE_CONFIG),
             sourcemaps()
          ]
@@ -176,6 +171,7 @@ const rollupConfigs = [
          output: {
             file: '_dist/handler/index.js',
             format: 'es',
+            paths: externalPathsNPM,
             plugins: outputPlugins,
             preferConst: true,
             sourcemap,
@@ -186,12 +182,16 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/helper/index.js',
-         external: s_LOCAL_EXTERNAL
+         plugins: [
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/helper`] }),
+            sourcemaps()
+         ]
       },
       output: {
          output: {
             file: '_dist/helper/index.js',
             format: 'es',
+            paths: externalPathsNPM,
             plugins: outputPlugins,
             preferConst: true,
             sourcemap,
@@ -202,8 +202,8 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/math/index.js',
-         external: s_LOCAL_EXTERNAL,
          plugins: [
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/math`] }),
             resolve(s_RESOLVE_CONFIG),
             sourcemaps()
          ]
@@ -212,6 +212,7 @@ const rollupConfigs = [
          output: {
             file: '_dist/math/index.js',
             format: 'es',
+            paths: externalPathsNPM,
             plugins: outputPlugins,
             preferConst: true,
             sourcemap,
@@ -222,8 +223,8 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/store/index.js',
-         external: s_LOCAL_EXTERNAL,
          plugins: [
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/store`] }),
             resolve(s_RESOLVE_CONFIG),
             sourcemaps()
          ]
@@ -232,6 +233,7 @@ const rollupConfigs = [
          output: {
             file: '_dist/store/index.js',
             format: 'es',
+            paths: externalPathsNPM,
             plugins: outputPlugins,
             preferConst: true,
             sourcemap,
@@ -242,8 +244,8 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/transition/index.js',
-         external: s_LOCAL_EXTERNAL,
          plugins: [
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/transition`] }),
             resolve(s_RESOLVE_CONFIG),
             sourcemaps()
          ]
@@ -252,6 +254,7 @@ const rollupConfigs = [
          output: {
             file: '_dist/transition/index.js',
             format: 'es',
+            paths: externalPathsNPM,
             plugins: outputPlugins,
             preferConst: true,
             sourcemap,
@@ -262,8 +265,8 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/util/index.js',
-         external: s_LOCAL_EXTERNAL,
          plugins: [
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/util`] }),
             resolve(s_RESOLVE_CONFIG),
             sourcemaps()
          ]
@@ -272,6 +275,7 @@ const rollupConfigs = [
          output: {
             file: '_dist/util/index.js',
             format: 'es',
+            paths: externalPathsNPM,
             plugins: outputPlugins,
             preferConst: true,
             sourcemap,
@@ -282,12 +286,17 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/plugin/data/index.js',
-         external: s_LOCAL_EXTERNAL
+         plugins: [
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/plugin/data`] }),
+            resolve(s_RESOLVE_CONFIG),
+            sourcemaps()
+         ]
       },
       output: {
          output: {
             file: '_dist/plugin/data/index.js',
             format: 'es',
+            paths: externalPathsNPM,
             plugins: outputPlugins,
             preferConst: true,
             sourcemap,
@@ -298,8 +307,8 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/plugin/system/index.js',
-         external: s_LOCAL_EXTERNAL,
          plugins: [
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/plugin/system`] }),
             resolve(s_RESOLVE_CONFIG),
             sourcemaps()
          ]
@@ -308,6 +317,7 @@ const rollupConfigs = [
          output: {
             file: '_dist/plugin/system/index.js',
             format: 'es',
+            paths: externalPathsNPM,
             plugins: outputPlugins,
             preferConst: true,
             sourcemap,
