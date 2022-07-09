@@ -8,23 +8,7 @@ export function generatePlugin(externalPaths, exclude = [])
          const externalOpts = Object.keys(externalPaths).filter((entry) => !exclude.includes(entry))
 
          opts.external = Array.isArray(opts.external) ? [...externalOpts, ...opts.external] : externalOpts;
-
-         if (Array.isArray(opts.output))
-         {
-            for (const outputOpts of opts.output)
-            {
-               outputOpts.paths = typeof outputOpts.paths === 'object' ? { ...outputOpts.paths, ...externalPaths } :
-                externalPaths;
-            }
-         }
-         else if (typeof opts.output === 'object')
-         {
-            opts.output.paths = typeof opts.output.paths === 'object' ? { ...opts.output.paths, ...externalPaths } :
-             externalPaths;
-         }
       },
-
-      // TODO: THIS IS A TEST BELOW of setting output options.
       outputOptions(opts)
       {
          if (Array.isArray(opts))
