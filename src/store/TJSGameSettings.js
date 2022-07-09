@@ -1,4 +1,4 @@
-import { get, writable }   from 'svelte/store';
+import { writable }   from 'svelte/store';
 
 import { isIterable }      from '@typhonjs-svelte/lib/util';
 
@@ -18,6 +18,39 @@ export class TJSGameSettings
    #stores = new Map();
 
    /**
+    * Creates a new GSWritableStore for the given key.
+    *
+    * @param {string}   initialValue - An initial value to set to new stores.
+    *
+    * @returns {GSWritableStore} The new GSWritableStore.
+    */
+   static #createStore(initialValue)
+   {
+      return writable(initialValue);
+   }
+
+   /**
+    * Gets a store from the GSWritableStore Map or creates a new store for the key.
+    *
+    * @param {string}   key - Key to lookup in stores map.
+    *
+    * @param {string}   [initialValue] - An initial value to set to new stores.
+    *
+    * @returns {GSWritableStore} The store for the given key.
+    */
+   #getStore(key, initialValue)
+   {
+      let store = this.#stores.get(key);
+      if (store === void 0)
+      {
+         store = TJSGameSettings.#createStore(initialValue);
+         this.#stores.set(key, store);
+      }
+
+      return store;
+   }
+
+   /**
     * Returns a readable Game Settings store for the associated key.
     *
     * @param {string}   key - Game setting key.
@@ -32,7 +65,7 @@ export class TJSGameSettings
          return;
       }
 
-      const store = s_GET_STORE(this.#stores, key);
+      const store = this.#getStore(key);
 
       return { subscribe: store.subscribe, get: store.get };
    }
@@ -64,7 +97,7 @@ export class TJSGameSettings
          return;
       }
 
-      return s_GET_STORE(this.#stores, key);
+      return this.#getStore(key);
    }
 
    /**
@@ -110,7 +143,6 @@ export class TJSGameSettings
          throw new TypeError(`TJSGameSettings - register: 'key' attribute is not a string.`);
       }
 
-
       const store = setting.store;
 
       /**
@@ -126,7 +158,7 @@ export class TJSGameSettings
       // Provides an `onChange` callback to update the associated store.
       onchangeFunctions.push((value) =>
       {
-         const callbackStore = s_GET_STORE(this.#stores, key);
+         const callbackStore = this.#getStore(key);
          if (callbackStore && !gateSet)
          {
             gateSet = true;
@@ -157,7 +189,7 @@ export class TJSGameSettings
       game.settings.register(namespace, key, { ...options, onChange });
 
       // Set new store value with existing setting or default value.
-      const targetStore = store ? store : s_GET_STORE(this.#stores, key, game.settings.get(namespace, key));
+      const targetStore = store ? store : this.#getStore(key, game.settings.get(namespace, key));
 
       // If a store instance is passed into register then initialize it with game settings data.
       if (store)
@@ -196,7 +228,7 @@ export class TJSGameSettings
             throw new TypeError(`TJSGameSettings - registerAll: entry in settings is not an object.`);
          }
 
-         // TODO: Uncomment when switch to 'namespace' is complete in future TRL release.
+         // TODO: Uncomment when deprecation for 'moduleId' is removed in future TRL release.
          // if (typeof entry.namespace !== 'string')
          // {
          //    throw new TypeError(`TJSGameSettings - registerAll: entry in settings missing 'namespace' attribute.`);
@@ -215,44 +247,6 @@ export class TJSGameSettings
          this.register(entry);
       }
    }
-}
-
-/**
- * Gets a store from the GSWritableStore Map or creates a new store for the key.
- *
- * @param {Map<string, GSWritableStore>} stores - Map containing Svelte stores.
- *
- * @param {string}               key - Key to lookup in stores map.
- *
- * @param {string}               [initialValue] - An initial value to set to new stores.
- *
- * @returns {GSWritableStore} The store for the given key.
- */
-function s_GET_STORE(stores, key, initialValue)
-{
-   let store = stores.get(key);
-   if (store === void 0)
-   {
-      store = s_CREATE_STORE(initialValue);
-      stores.set(key, store);
-   }
-
-   return store;
-}
-
-/**
- * Creates a new GSWritableStore for the given key.
- *
- * @param {string}   initialValue - An initial value to set to new stores.
- *
- * @returns {GSWritableStore} The new GSWritableStore.
- */
-function s_CREATE_STORE(initialValue)
-{
-   const store = writable(initialValue);
-   store.get = () => get(store);
-
-   return store;
 }
 
 /**
@@ -289,12 +283,8 @@ function s_CREATE_STORE(initialValue)
 
 /**
  * @typedef {import('svelte/store').Writable} GSWritableStore - The backing Svelte store; writable w/ get method attached.
- *
- * @property {Function} get -
  */
 
 /**
  * @typedef {import('svelte/store').Readable} GSReadableStore - The backing Svelte store; readable w/ get method attached.
- *
- * @property {Function} get -
  */

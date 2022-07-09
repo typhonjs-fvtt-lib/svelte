@@ -419,6 +419,14 @@ declare class TJSDocumentCollection<T extends any> {
  */
 declare class TJSGameSettings {
     /**
+     * Creates a new GSWritableStore for the given key.
+     *
+     * @param {string}   initialValue - An initial value to set to new stores.
+     *
+     * @returns {GSWritableStore} The new GSWritableStore.
+     */
+    static "__#317501@#createStore"(initialValue: string): svelte_store.Writable<any>;
+    /**
      * Returns a readable Game Settings store for the associated key.
      *
      * @param {string}   key - Game setting key.
