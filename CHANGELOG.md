@@ -1,4 +1,30 @@
 # Changelog
+## Release 0.0.15 (medium update / 1 deprecation)
+- `action`
+  - Added 'applyScrolltop'; stores and applies scrollTop to associated element.
+  
+
+- `application`
+  - SvelteApplication; fixed application minHeight / minWidth issues.
+
+
+- `animate`
+  - Added 'animateEvents'; provides a wrapper around animate functions (IE flip) providing events for animation start / finish.
+    This is useful when needing to alter characteristics / CSS values of the container during animation.
+   
+
+- `store`
+  - TJSGameSettings
+    - External stores may be assigned instead of default basic writable stores created.
+    - (deprecation) register options requires 'namespace' instead of 'moduleId'; this will be permanent in a future
+      release. A log statement is currently generated.
+
+  - SessionStorage / LocalStorage; refined edge cases / fixed issue w/ 'getItem' and default values.
+
+
+- Build issues: fixed Rollup build process that mistakenly included source referenced across modules.
+
+
 ## Release 0.0.14 (massive update / animation stage #2)
 - Better error messages for Svelte component mounting.
 
