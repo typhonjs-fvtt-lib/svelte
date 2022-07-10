@@ -1,152 +1,7 @@
-import { get, derived, writable as writable$2 } from 'svelte/store';
+import { derived, writable as writable$2, get } from 'svelte/store';
 import { noop, run_all, is_function } from 'svelte/internal';
-import { uuidv4, isPlainObject, getUUIDFromDataTransfer, isIterable } from '@typhonjs-fvtt/svelte/util';
-
-function ownKeys(object, enumerableOnly) {
-  var keys = Object.keys(object);
-
-  if (Object.getOwnPropertySymbols) {
-    var symbols = Object.getOwnPropertySymbols(object);
-    enumerableOnly && (symbols = symbols.filter(function (sym) {
-      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-    })), keys.push.apply(keys, symbols);
-  }
-
-  return keys;
-}
-
-function _objectSpread2(target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = null != arguments[i] ? arguments[i] : {};
-    i % 2 ? ownKeys(Object(source), !0).forEach(function (key) {
-      _defineProperty(target, key, source[key]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) {
-      Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-    });
-  }
-
-  return target;
-}
-
-function _defineProperty(obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-}
-
-function _classPrivateFieldGet(receiver, privateMap) {
-  var descriptor = _classExtractFieldDescriptor(receiver, privateMap, "get");
-
-  return _classApplyDescriptorGet(receiver, descriptor);
-}
-
-function _classPrivateFieldSet(receiver, privateMap, value) {
-  var descriptor = _classExtractFieldDescriptor(receiver, privateMap, "set");
-
-  _classApplyDescriptorSet(receiver, descriptor, value);
-
-  return value;
-}
-
-function _classPrivateFieldDestructureSet(receiver, privateMap) {
-  var descriptor = _classExtractFieldDescriptor(receiver, privateMap, "set");
-
-  return _classApplyDescriptorDestructureSet(receiver, descriptor);
-}
-
-function _classExtractFieldDescriptor(receiver, privateMap, action) {
-  if (!privateMap.has(receiver)) {
-    throw new TypeError("attempted to " + action + " private field on non-instance");
-  }
-
-  return privateMap.get(receiver);
-}
-
-function _classApplyDescriptorGet(receiver, descriptor) {
-  if (descriptor.get) {
-    return descriptor.get.call(receiver);
-  }
-
-  return descriptor.value;
-}
-
-function _classApplyDescriptorSet(receiver, descriptor, value) {
-  if (descriptor.set) {
-    descriptor.set.call(receiver, value);
-  } else {
-    if (!descriptor.writable) {
-      throw new TypeError("attempted to set read only private field");
-    }
-
-    descriptor.value = value;
-  }
-}
-
-function _classApplyDescriptorDestructureSet(receiver, descriptor) {
-  if (descriptor.set) {
-    if (!("__destrObj" in descriptor)) {
-      descriptor.__destrObj = {
-        set value(v) {
-          descriptor.set.call(receiver, v);
-        }
-
-      };
-    }
-
-    return descriptor.__destrObj;
-  } else {
-    if (!descriptor.writable) {
-      throw new TypeError("attempted to set read only private field");
-    }
-
-    return descriptor;
-  }
-}
-
-function _classPrivateMethodGet(receiver, privateSet, fn) {
-  if (!privateSet.has(receiver)) {
-    throw new TypeError("attempted to get private field on non-instance");
-  }
-
-  return fn;
-}
-
-function _checkPrivateRedeclaration(obj, privateCollection) {
-  if (privateCollection.has(obj)) {
-    throw new TypeError("Cannot initialize the same private elements twice on an object");
-  }
-}
-
-function _classPrivateFieldInitSpec(obj, privateMap, value) {
-  _checkPrivateRedeclaration(obj, privateMap);
-
-  privateMap.set(obj, value);
-}
-
-function _classPrivateMethodInitSpec(obj, privateSet) {
-  _checkPrivateRedeclaration(obj, privateSet);
-
-  privateSet.add(obj);
-}
-
-let _Symbol$iterator, _Symbol$iterator2;
-
-var _filtersAdapter = /*#__PURE__*/new WeakMap();
-
-var _indexUpdate = /*#__PURE__*/new WeakMap();
-
-var _mapUnsubscribe = /*#__PURE__*/new WeakMap();
-
-_Symbol$iterator = Symbol.iterator;
+import { uuidv4, isPlainObject, getUUIDFromDataTransfer, isObject } from '@typhonjs-fvtt/svelte/util';
+import { isIterable } from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides the storage and sequencing of managed filters. Each filter added may be a bespoke function or a
@@ -175,557 +30,548 @@ _Symbol$iterator = Symbol.iterator;
  *
  * @template T
  */
-class AdapterFilters {
-  /**
-   * @param {Function} indexUpdate - update function for the indexer.
-   *
-   * @returns {[AdapterFilters<T>, {filters: FilterData<T>[]}]} Returns this and internal storage for filter adapters.
-   */
-  constructor(indexUpdate) {
-    _classPrivateFieldInitSpec(this, _filtersAdapter, {
-      writable: true,
-      value: void 0
-    });
+class AdapterFilters
+{
+   #filtersAdapter;
+   #indexUpdate;
+   #mapUnsubscribe = new Map();
 
-    _classPrivateFieldInitSpec(this, _indexUpdate, {
-      writable: true,
-      value: void 0
-    });
+   /**
+    * @param {Function} indexUpdate - update function for the indexer.
+    *
+    * @returns {[AdapterFilters<T>, {filters: FilterData<T>[]}]} Returns this and internal storage for filter adapters.
+    */
+   constructor(indexUpdate)
+   {
+      this.#indexUpdate = indexUpdate;
 
-    _classPrivateFieldInitSpec(this, _mapUnsubscribe, {
-      writable: true,
-      value: new Map()
-    });
+      this.#filtersAdapter = { filters: [] };
 
-    _classPrivateFieldSet(this, _indexUpdate, indexUpdate);
+      Object.seal(this);
 
-    _classPrivateFieldSet(this, _filtersAdapter, {
-      filters: []
-    });
+      return [this, this.#filtersAdapter];
+   }
 
-    Object.seal(this);
-    return [this, _classPrivateFieldGet(this, _filtersAdapter)];
-  }
-  /**
-   * @returns {number} Returns the length of the
-   */
+   /**
+    * @returns {number} Returns the length of the
+    */
+   get length() { return this.#filtersAdapter.filters.length; }
 
+   /**
+    * Provides an iterator for filters.
+    *
+    * @returns {Generator<number|undefined, FilterData<T>, *>} Generator / iterator of filters.
+    * @yields {FilterData<T>}
+    */
+   *[Symbol.iterator]()
+   {
+      if (this.#filtersAdapter.filters.length === 0) { return; }
 
-  get length() {
-    return _classPrivateFieldGet(this, _filtersAdapter).filters.length;
-  }
-  /**
-   * Provides an iterator for filters.
-   *
-   * @returns {Generator<number|undefined, FilterData<T>, *>} Generator / iterator of filters.
-   * @yields {FilterData<T>}
-   */
+      for (const entry of this.#filtersAdapter.filters)
+      {
+         yield { ...entry };
+      }
+   }
 
+   /**
+    * @param {...(FilterFn<T>|FilterData<T>)}   filters -
+    */
+   add(...filters)
+   {
+      /**
+       * Tracks the number of filters added that have subscriber functionality.
+       *
+       * @type {number}
+       */
+      let subscribeCount = 0;
 
-  *[_Symbol$iterator]() {
-    if (_classPrivateFieldGet(this, _filtersAdapter).filters.length === 0) {
-      return;
-    }
+      for (const filter of filters)
+      {
+         const filterType = typeof filter;
 
-    for (const entry of _classPrivateFieldGet(this, _filtersAdapter).filters) {
-      yield _objectSpread2({}, entry);
-    }
-  }
-  /**
-   * @param {...(FilterFn<T>|FilterData<T>)}   filters -
-   */
+         if (filterType !== 'function' && filterType !== 'object' || filter === null)
+         {
+            throw new TypeError(`DynArrayReducer error: 'filter' is not a function or object.`);
+         }
 
+         let data = void 0;
+         let subscribeFn = void 0;
 
-  add(...filters) {
-    var _filter$filter$subscr;
+         switch (filterType)
+         {
+            case 'function':
+               data = {
+                  id: void 0,
+                  filter,
+                  weight: 1
+               };
 
-    /**
-     * Tracks the number of filters added that have subscriber functionality.
-     *
-     * @type {number}
-     */
-    let subscribeCount = 0;
+               subscribeFn = filter.subscribe;
+               break;
 
-    for (const filter of filters) {
-      const filterType = typeof filter;
+            case 'object':
+               if (typeof filter.filter !== 'function')
+               {
+                  throw new TypeError(`DynArrayReducer error: 'filter' attribute is not a function.`);
+               }
 
-      if (filterType !== 'function' && filterType !== 'object' || filter === null) {
-        throw new TypeError(`DynArrayReducer error: 'filter' is not a function or object.`);
+               if (filter.weight !== void 0 && typeof filter.weight !== 'number' ||
+                (filter.weight < 0 || filter.weight > 1))
+               {
+                  throw new TypeError(
+                   `DynArrayReducer error: 'weight' attribute is not a number between '0 - 1' inclusive.`);
+               }
+
+               data = {
+                  id: filter.id !== void 0 ? filter.id : void 0,
+                  filter: filter.filter,
+                  weight: filter.weight || 1
+               };
+
+               subscribeFn = filter.filter.subscribe ?? filter.subscribe;
+               break;
+         }
+
+         // Find the index to insert where data.weight is less than existing values weight.
+         const index = this.#filtersAdapter.filters.findIndex((value) =>
+         {
+            return data.weight < value.weight;
+         });
+
+         // If an index was found insert at that location.
+         if (index >= 0)
+         {
+            this.#filtersAdapter.filters.splice(index, 0, data);
+         }
+         else // push to end of filters.
+         {
+            this.#filtersAdapter.filters.push(data);
+         }
+
+         if (typeof subscribeFn === 'function')
+         {
+            const unsubscribe = subscribeFn(this.#indexUpdate);
+
+            // Ensure that unsubscribe is a function.
+            if (typeof unsubscribe !== 'function')
+            {
+               throw new TypeError(
+                'DynArrayReducer error: Filter has subscribe function, but no unsubscribe function is returned.');
+            }
+
+            // Ensure that the same filter is not subscribed to multiple times.
+            if (this.#mapUnsubscribe.has(data.filter))
+            {
+               throw new Error(
+                'DynArrayReducer error: Filter added already has an unsubscribe function registered.');
+            }
+
+            this.#mapUnsubscribe.set(data.filter, unsubscribe);
+            subscribeCount++;
+         }
       }
 
-      let data = void 0;
-      let subscribeFn = void 0;
+      // Filters with subscriber functionality are assumed to immediately invoke the `subscribe` callback. If the
+      // subscriber count is less than the amount of filters added then automatically trigger an index update manually.
+      if (subscribeCount < filters.length) { this.#indexUpdate(); }
+   }
 
-      switch (filterType) {
-        case 'function':
-          data = {
-            id: void 0,
-            filter,
-            weight: 1
-          };
-          subscribeFn = filter.subscribe;
-          break;
+   clear()
+   {
+      this.#filtersAdapter.filters.length = 0;
 
-        case 'object':
-          if (typeof filter.filter !== 'function') {
-            throw new TypeError(`DynArrayReducer error: 'filter' attribute is not a function.`);
-          }
-
-          if (filter.weight !== void 0 && typeof filter.weight !== 'number' || filter.weight < 0 || filter.weight > 1) {
-            throw new TypeError(`DynArrayReducer error: 'weight' attribute is not a number between '0 - 1' inclusive.`);
-          }
-
-          data = {
-            id: filter.id !== void 0 ? filter.id : void 0,
-            filter: filter.filter,
-            weight: filter.weight || 1
-          };
-          subscribeFn = (_filter$filter$subscr = filter.filter.subscribe) !== null && _filter$filter$subscr !== void 0 ? _filter$filter$subscr : filter.subscribe;
-          break;
-      } // Find the index to insert where data.weight is less than existing values weight.
-
-
-      const index = _classPrivateFieldGet(this, _filtersAdapter).filters.findIndex(value => {
-        return data.weight < value.weight;
-      }); // If an index was found insert at that location.
-
-
-      if (index >= 0) {
-        _classPrivateFieldGet(this, _filtersAdapter).filters.splice(index, 0, data);
-      } else // push to end of filters.
-        {
-          _classPrivateFieldGet(this, _filtersAdapter).filters.push(data);
-        }
-
-      if (typeof subscribeFn === 'function') {
-        const unsubscribe = subscribeFn(_classPrivateFieldGet(this, _indexUpdate)); // Ensure that unsubscribe is a function.
-
-        if (typeof unsubscribe !== 'function') {
-          throw new TypeError('DynArrayReducer error: Filter has subscribe function, but no unsubscribe function is returned.');
-        } // Ensure that the same filter is not subscribed to multiple times.
-
-
-        if (_classPrivateFieldGet(this, _mapUnsubscribe).has(data.filter)) {
-          throw new Error('DynArrayReducer error: Filter added already has an unsubscribe function registered.');
-        }
-
-        _classPrivateFieldGet(this, _mapUnsubscribe).set(data.filter, unsubscribe);
-
-        subscribeCount++;
-      }
-    } // Filters with subscriber functionality are assumed to immediately invoke the `subscribe` callback. If the
-    // subscriber count is less than the amount of filters added then automatically trigger an index update manually.
-
-
-    if (subscribeCount < filters.length) {
-      _classPrivateFieldGet(this, _indexUpdate).call(this);
-    }
-  }
-
-  clear() {
-    _classPrivateFieldGet(this, _filtersAdapter).filters.length = 0; // Unsubscribe from all filters with subscription support.
-
-    for (const unsubscribe of _classPrivateFieldGet(this, _mapUnsubscribe).values()) {
-      unsubscribe();
-    }
-
-    _classPrivateFieldGet(this, _mapUnsubscribe).clear();
-
-    _classPrivateFieldGet(this, _indexUpdate).call(this);
-  }
-  /**
-   * @param {...(FilterFn<T>|FilterData<T>)}   filters -
-   */
-
-
-  remove(...filters) {
-    const length = _classPrivateFieldGet(this, _filtersAdapter).filters.length;
-
-    if (length === 0) {
-      return;
-    }
-
-    for (const data of filters) {
-      // Handle the case that the filter may either be a function or a filter entry / object.
-      const actualFilter = typeof data === 'function' ? data : data !== null && typeof data === 'object' ? data.filter : void 0;
-
-      if (!actualFilter) {
-        continue;
+      // Unsubscribe from all filters with subscription support.
+      for (const unsubscribe of this.#mapUnsubscribe.values())
+      {
+         unsubscribe();
       }
 
-      for (let cntr = _classPrivateFieldGet(this, _filtersAdapter).filters.length; --cntr >= 0;) {
-        if (_classPrivateFieldGet(this, _filtersAdapter).filters[cntr].filter === actualFilter) {
-          _classPrivateFieldGet(this, _filtersAdapter).filters.splice(cntr, 1); // Invoke any unsubscribe function for given filter then remove from tracking.
+      this.#mapUnsubscribe.clear();
 
+      this.#indexUpdate();
+   }
 
-          let unsubscribe = void 0;
+   /**
+    * @param {...(FilterFn<T>|FilterData<T>)}   filters -
+    */
+   remove(...filters)
+   {
+      const length = this.#filtersAdapter.filters.length;
 
-          if (typeof (unsubscribe = _classPrivateFieldGet(this, _mapUnsubscribe).get(actualFilter)) === 'function') {
-            unsubscribe();
+      if (length === 0) { return; }
 
-            _classPrivateFieldGet(this, _mapUnsubscribe).delete(actualFilter);
-          }
-        }
-      }
-    } // Update the index a filter was removed.
+      for (const data of filters)
+      {
+         // Handle the case that the filter may either be a function or a filter entry / object.
+         const actualFilter = typeof data === 'function' ? data : data !== null && typeof data === 'object' ?
+          data.filter : void 0;
 
+         if (!actualFilter) { continue; }
 
-    if (length !== _classPrivateFieldGet(this, _filtersAdapter).filters.length) {
-      _classPrivateFieldGet(this, _indexUpdate).call(this);
-    }
-  }
-  /**
-   * Remove filters by the provided callback. The callback takes 3 parameters: `id`, `filter`, and `weight`.
-   * Any truthy value returned will remove that filter.
-   *
-   * @param {function(*, FilterFn<T>, number): boolean} callback - Callback function to evaluate each filter entry.
-   */
+         for (let cntr = this.#filtersAdapter.filters.length; --cntr >= 0;)
+         {
+            if (this.#filtersAdapter.filters[cntr].filter === actualFilter)
+            {
+               this.#filtersAdapter.filters.splice(cntr, 1);
 
-
-  removeBy(callback) {
-    const length = _classPrivateFieldGet(this, _filtersAdapter).filters.length;
-
-    if (length === 0) {
-      return;
-    }
-
-    if (typeof callback !== 'function') {
-      throw new TypeError(`DynArrayReducer error: 'callback' is not a function.`);
-    }
-
-    _classPrivateFieldGet(this, _filtersAdapter).filters = _classPrivateFieldGet(this, _filtersAdapter).filters.filter(data => {
-      const remove = callback.call(callback, _objectSpread2({}, data));
-
-      if (remove) {
-        let unsubscribe;
-
-        if (typeof (unsubscribe = _classPrivateFieldGet(this, _mapUnsubscribe).get(data.filter)) === 'function') {
-          unsubscribe();
-
-          _classPrivateFieldGet(this, _mapUnsubscribe).delete(data.filter);
-        }
-      } // Reverse remove boolean to properly filter / remove this filter.
-
-
-      return !remove;
-    });
-
-    if (length !== _classPrivateFieldGet(this, _filtersAdapter).filters.length) {
-      _classPrivateFieldGet(this, _indexUpdate).call(this);
-    }
-  }
-
-  removeById(...ids) {
-    const length = _classPrivateFieldGet(this, _filtersAdapter).filters.length;
-
-    if (length === 0) {
-      return;
-    }
-
-    _classPrivateFieldGet(this, _filtersAdapter).filters = _classPrivateFieldGet(this, _filtersAdapter).filters.filter(data => {
-      let remove = false;
-
-      for (const id of ids) {
-        remove |= data.id === id;
-      } // If not keeping invoke any unsubscribe function for given filter then remove from tracking.
-
-
-      if (remove) {
-        let unsubscribe;
-
-        if (typeof (unsubscribe = _classPrivateFieldGet(this, _mapUnsubscribe).get(data.filter)) === 'function') {
-          unsubscribe();
-
-          _classPrivateFieldGet(this, _mapUnsubscribe).delete(data.filter);
-        }
+               // Invoke any unsubscribe function for given filter then remove from tracking.
+               let unsubscribe = void 0;
+               if (typeof (unsubscribe = this.#mapUnsubscribe.get(actualFilter)) === 'function')
+               {
+                  unsubscribe();
+                  this.#mapUnsubscribe.delete(actualFilter);
+               }
+            }
+         }
       }
 
-      return !remove; // Swap here to actually remove the item via array filter method.
-    });
+      // Update the index a filter was removed.
+      if (length !== this.#filtersAdapter.filters.length) { this.#indexUpdate(); }
+   }
 
-    if (length !== _classPrivateFieldGet(this, _filtersAdapter).filters.length) {
-      _classPrivateFieldGet(this, _indexUpdate).call(this);
-    }
-  }
+   /**
+    * Remove filters by the provided callback. The callback takes 3 parameters: `id`, `filter`, and `weight`.
+    * Any truthy value returned will remove that filter.
+    *
+    * @param {function(*, FilterFn<T>, number): boolean} callback - Callback function to evaluate each filter entry.
+    */
+   removeBy(callback)
+   {
+      const length = this.#filtersAdapter.filters.length;
 
+      if (length === 0) { return; }
+
+      if (typeof callback !== 'function')
+      {
+         throw new TypeError(`DynArrayReducer error: 'callback' is not a function.`);
+      }
+
+      this.#filtersAdapter.filters = this.#filtersAdapter.filters.filter((data) =>
+      {
+         const remove = callback.call(callback, { ...data });
+
+         if (remove)
+         {
+            let unsubscribe;
+            if (typeof (unsubscribe = this.#mapUnsubscribe.get(data.filter)) === 'function')
+            {
+               unsubscribe();
+               this.#mapUnsubscribe.delete(data.filter);
+            }
+         }
+
+         // Reverse remove boolean to properly filter / remove this filter.
+         return !remove;
+      });
+
+      if (length !== this.#filtersAdapter.filters.length) { this.#indexUpdate(); }
+   }
+
+   removeById(...ids)
+   {
+      const length = this.#filtersAdapter.filters.length;
+
+      if (length === 0) { return; }
+
+      this.#filtersAdapter.filters = this.#filtersAdapter.filters.filter((data) =>
+      {
+         let remove = false;
+
+         for (const id of ids) { remove |= data.id === id; }
+
+         // If not keeping invoke any unsubscribe function for given filter then remove from tracking.
+         if (remove)
+         {
+            let unsubscribe;
+            if (typeof (unsubscribe = this.#mapUnsubscribe.get(data.filter)) === 'function')
+            {
+               unsubscribe();
+               this.#mapUnsubscribe.delete(data.filter);
+            }
+         }
+
+         return !remove; // Swap here to actually remove the item via array filter method.
+      });
+
+      if (length !== this.#filtersAdapter.filters.length) { this.#indexUpdate(); }
+   }
 }
+
 /**
  * @template T
  */
+class AdapterSort
+{
+   #sortAdapter;
+   #indexUpdate;
+   #unsubscribe;
 
+   /**
+    * @param {Function} indexUpdate - Function to update indexer.
+    *
+    * @returns {[AdapterSort<T>, {compareFn: CompareFn<T>}]} This and the internal sort adapter data.
+    */
+   constructor(indexUpdate)
+   {
+      this.#indexUpdate = indexUpdate;
 
-var _sortAdapter = /*#__PURE__*/new WeakMap();
+      this.#sortAdapter = { compareFn: null };
 
-var _indexUpdate2 = /*#__PURE__*/new WeakMap();
+      Object.seal(this);
 
-var _unsubscribe = /*#__PURE__*/new WeakMap();
+      return [this, this.#sortAdapter];
+   }
 
-class AdapterSort {
-  /**
-   * @param {Function} indexUpdate - Function to update indexer.
-   *
-   * @returns {[AdapterSort<T>, {compareFn: CompareFn<T>}]} This and the internal sort adapter data.
-   */
-  constructor(indexUpdate) {
-    _classPrivateFieldInitSpec(this, _sortAdapter, {
-      writable: true,
-      value: void 0
-    });
-
-    _classPrivateFieldInitSpec(this, _indexUpdate2, {
-      writable: true,
-      value: void 0
-    });
-
-    _classPrivateFieldInitSpec(this, _unsubscribe, {
-      writable: true,
-      value: void 0
-    });
-
-    _classPrivateFieldSet(this, _indexUpdate2, indexUpdate);
-
-    _classPrivateFieldSet(this, _sortAdapter, {
-      compareFn: null
-    });
-
-    Object.seal(this);
-    return [this, _classPrivateFieldGet(this, _sortAdapter)];
-  }
-  /**
-   * @param {CompareFn<T>|SortData<T>}  data -
-   *
-   * A callback function that compares two values. Return > 0 to sort b before a;
-   * < 0 to sort a before b; or 0 to keep original order of a & b.
-   *
-   * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#parameters
-   */
-
-
-  set(data) {
-    var _data$compare$subscri;
-
-    if (typeof _classPrivateFieldGet(this, _unsubscribe) === 'function') {
-      _classPrivateFieldGet(this, _unsubscribe).call(this);
-
-      _classPrivateFieldSet(this, _unsubscribe, void 0);
-    }
-
-    let compareFn = void 0;
-    let subscribeFn = void 0;
-
-    switch (typeof data) {
-      case 'function':
-        compareFn = data;
-        subscribeFn = data.subscribe;
-        break;
-
-      case 'object':
-        // Early out if data is null / noop.
-        if (data === null) {
-          break;
-        }
-
-        if (typeof data.compare !== 'function') {
-          throw new TypeError(`DynArrayReducer error: 'compare' attribute is not a function.`);
-        }
-
-        compareFn = data.compare;
-        subscribeFn = (_data$compare$subscri = data.compare.subscribe) !== null && _data$compare$subscri !== void 0 ? _data$compare$subscri : data.subscribe;
-        break;
-    }
-
-    if (typeof compareFn === 'function') {
-      _classPrivateFieldGet(this, _sortAdapter).compareFn = compareFn;
-    } else {
-      const oldCompareFn = _classPrivateFieldGet(this, _sortAdapter).compareFn;
-
-      _classPrivateFieldGet(this, _sortAdapter).compareFn = null; // Update index if the old compare function exists.
-
-      if (typeof oldCompareFn === 'function') {
-        _classPrivateFieldGet(this, _indexUpdate2).call(this);
+   /**
+    * @param {CompareFn<T>|SortData<T>}  data -
+    *
+    * A callback function that compares two values. Return > 0 to sort b before a;
+    * < 0 to sort a before b; or 0 to keep original order of a & b.
+    *
+    * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#parameters
+    */
+   set(data)
+   {
+      if (typeof this.#unsubscribe === 'function')
+      {
+         this.#unsubscribe();
+         this.#unsubscribe = void 0;
       }
 
-      return;
-    }
+      let compareFn = void 0;
+      let subscribeFn = void 0;
 
-    if (typeof subscribeFn === 'function') {
-      _classPrivateFieldSet(this, _unsubscribe, subscribeFn(_classPrivateFieldGet(this, _indexUpdate2))); // Ensure that unsubscribe is a function.
+      switch (typeof data)
+      {
+         case 'function':
+            compareFn = data;
+            subscribeFn = data.subscribe;
+            break;
 
+         case 'object':
+            // Early out if data is null / noop.
+            if (data === null) { break; }
 
-      if (typeof _classPrivateFieldGet(this, _unsubscribe) !== 'function') {
-        throw new Error(`DynArrayReducer error: sort has 'subscribe' function, but no 'unsubscribe' function is returned.`);
+            if (typeof data.compare !== 'function')
+            {
+               throw new TypeError(`DynArrayReducer error: 'compare' attribute is not a function.`);
+            }
+
+            compareFn = data.compare;
+            subscribeFn = data.compare.subscribe ?? data.subscribe;
+            break;
       }
-    } else {
-      // A sort function with subscriber functionality are assumed to immediately invoke the `subscribe` callback.
-      // Only manually update the index if there is no subscriber functionality.
-      _classPrivateFieldGet(this, _indexUpdate2).call(this);
-    }
-  }
 
-  reset() {
-    const oldCompareFn = _classPrivateFieldGet(this, _sortAdapter).compareFn;
+      if (typeof compareFn === 'function')
+      {
+         this.#sortAdapter.compareFn = compareFn;
+      }
+      else
+      {
+         const oldCompareFn = this.#sortAdapter.compareFn;
+         this.#sortAdapter.compareFn = null;
 
-    _classPrivateFieldGet(this, _sortAdapter).compareFn = null;
+         // Update index if the old compare function exists.
+         if (typeof oldCompareFn === 'function') { this.#indexUpdate(); }
+         return;
+      }
 
-    if (typeof _classPrivateFieldGet(this, _unsubscribe) === 'function') {
-      _classPrivateFieldGet(this, _unsubscribe).call(this);
+      if (typeof subscribeFn === 'function')
+      {
+         this.#unsubscribe = subscribeFn(this.#indexUpdate);
 
-      _classPrivateFieldSet(this, _unsubscribe, void 0);
-    } // Only update index if an old compare function is set.
+         // Ensure that unsubscribe is a function.
+         if (typeof this.#unsubscribe !== 'function')
+         {
+            throw new Error(
+             `DynArrayReducer error: sort has 'subscribe' function, but no 'unsubscribe' function is returned.`);
+         }
+      }
+      else
+      {
+         // A sort function with subscriber functionality are assumed to immediately invoke the `subscribe` callback.
+         // Only manually update the index if there is no subscriber functionality.
+         this.#indexUpdate();
+      }
+   }
 
+   reset()
+   {
+      const oldCompareFn = this.#sortAdapter.compareFn;
 
-    if (typeof oldCompareFn === 'function') {
-      _classPrivateFieldGet(this, _indexUpdate2).call(this);
-    }
-  }
+      this.#sortAdapter.compareFn = null;
 
+      if (typeof this.#unsubscribe === 'function')
+      {
+         this.#unsubscribe();
+         this.#unsubscribe = void 0;
+      }
+
+      // Only update index if an old compare function is set.
+      if (typeof oldCompareFn === 'function') { this.#indexUpdate(); }
+   }
 }
 
-class Indexer {
-  constructor(hostItems, hostUpdate) {
-    this.hostItems = hostItems;
-    this.hostUpdate = hostUpdate;
-    const indexAdapter = {
-      index: null,
-      hash: null
-    };
-    const publicAPI = {
-      update: this.update.bind(this),
+class Indexer
+{
+   constructor(hostItems, hostUpdate)
+   {
+      this.hostItems = hostItems;
+      this.hostUpdate = hostUpdate;
 
-      /**
-       * Provides an iterator over the index array.
-       *
-       * @returns {Generator<any, void, *>} Iterator.
-       * @yields
-       */
-      [Symbol.iterator]: function* () {
-        if (!indexAdapter.index) {
-          return;
-        }
+      const indexAdapter = { index: null, hash: null };
 
-        for (const index of indexAdapter.index) {
-          yield index;
-        }
-      }
-    }; // Define a getter on the public API to get the length / count of index array.
+      const publicAPI = {
+         update: this.update.bind(this),
 
-    Object.defineProperties(publicAPI, {
-      hash: {
-        get: () => indexAdapter.hash
-      },
-      isActive: {
-        get: () => this.isActive()
-      },
-      length: {
-        get: () => Array.isArray(indexAdapter.index) ? indexAdapter.index.length : 0
-      }
-    });
-    Object.freeze(publicAPI);
-    indexAdapter.publicAPI = publicAPI;
-    this.indexAdapter = indexAdapter;
-    return [this, indexAdapter];
-  }
-  /**
-   * Calculates a new hash value for the new index array if any. If the new index array is null then the hash value
-   * is set to null. Set calculated new hash value to the index adapter hash value.
-   *
-   * After hash generation compare old and new hash values and perform an update if they are different. If they are
-   * equal check for array equality between the old and new index array and perform an update if they are not equal.
-   *
-   * @param {number[]}    oldIndex - Old index array.
-   *
-   * @param {number|null} oldHash - Old index hash value.
-   */
+         /**
+          * Provides an iterator over the index array.
+          *
+          * @returns {Generator<any, void, *>} Iterator.
+          * @yields
+          */
+         [Symbol.iterator]: function *()
+         {
+            if (!indexAdapter.index) { return; }
 
+            for (const index of indexAdapter.index) { yield index; }
+         }
+      };
 
-  calcHashUpdate(oldIndex, oldHash) {
-    let newHash = null;
-    const newIndex = this.indexAdapter.index;
+      // Define a getter on the public API to get the length / count of index array.
+      Object.defineProperties(publicAPI, {
+         hash: { get: () => indexAdapter.hash },
+         isActive: { get: () => this.isActive() },
+         length: { get: () => Array.isArray(indexAdapter.index) ? indexAdapter.index.length : 0 }
+      });
 
-    if (newIndex) {
-      for (let cntr = newIndex.length; --cntr >= 0;) {
-        newHash ^= newIndex[cntr] + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
-      }
-    }
+      Object.freeze(publicAPI);
 
-    this.indexAdapter.hash = newHash;
+      indexAdapter.publicAPI = publicAPI;
 
-    if (oldHash === newHash ? !s_ARRAY_EQUALS(oldIndex, newIndex) : true) {
-      this.hostUpdate();
-    }
-  }
+      this.indexAdapter = indexAdapter;
 
-  initAdapters(filtersAdapter, sortAdapter) {
-    this.filtersAdapter = filtersAdapter;
-    this.sortAdapter = sortAdapter;
+      return [this, indexAdapter];
+   }
 
-    this.sortFn = (a, b) => {
-      return this.sortAdapter.compareFn(this.hostItems[a], this.hostItems[b]);
-    };
-  }
+   /**
+    * Calculates a new hash value for the new index array if any. If the new index array is null then the hash value
+    * is set to null. Set calculated new hash value to the index adapter hash value.
+    *
+    * After hash generation compare old and new hash values and perform an update if they are different. If they are
+    * equal check for array equality between the old and new index array and perform an update if they are not equal.
+    *
+    * @param {number[]}    oldIndex - Old index array.
+    *
+    * @param {number|null} oldHash - Old index hash value.
+    *
+    * @param {boolean}     [force=false] - When true forces an update to subscribers.
+    */
+   calcHashUpdate(oldIndex, oldHash, force = false)
+   {
+      // Use force if a boolean otherwise default to false.
+      const actualForce = typeof force === 'boolean' ? force : /* c8 ignore next */ false;
 
-  isActive() {
-    return this.filtersAdapter.filters.length > 0 || this.sortAdapter.compareFn !== null;
-  }
-  /**
-   * Provides the custom filter / reduce step that is ~25-40% faster than implementing with `Array.reduce`.
-   *
-   * Note: Other loop unrolling techniques like Duff's Device gave a slight faster lower bound on large data sets,
-   * but the maintenance factor is not worth the extra complication.
-   *
-   * @returns {number[]} New filtered index array.
-   */
+      let newHash = null;
+      const newIndex = this.indexAdapter.index;
 
-
-  reduceImpl() {
-    const data = [];
-    const filters = this.filtersAdapter.filters;
-    let include = true;
-
-    for (let cntr = 0, length = this.hostItems.length; cntr < length; cntr++) {
-      include = true;
-
-      for (let filCntr = 0, filLength = filters.length; filCntr < filLength; filCntr++) {
-        if (!filters[filCntr].filter(this.hostItems[cntr])) {
-          include = false;
-          break;
-        }
+      if (newIndex)
+      {
+         for (let cntr = newIndex.length; --cntr >= 0;)
+         {
+            newHash ^= newIndex[cntr] + 0x9e3779b9 + (newHash << 6) + (newHash >> 2);
+         }
       }
 
-      if (include) {
-        data.push(cntr);
+      this.indexAdapter.hash = newHash;
+
+      if (actualForce || (oldHash === newHash ? !s_ARRAY_EQUALS(oldIndex, newIndex) : true)) { this.hostUpdate(); }
+   }
+
+   initAdapters(filtersAdapter, sortAdapter)
+   {
+      this.filtersAdapter = filtersAdapter;
+      this.sortAdapter = sortAdapter;
+
+      this.sortFn = (a, b) =>
+      {
+         return this.sortAdapter.compareFn(this.hostItems[a], this.hostItems[b]);
+      };
+   }
+
+   isActive()
+   {
+      return this.filtersAdapter.filters.length > 0 || this.sortAdapter.compareFn !== null;
+   }
+
+   /**
+    * Provides the custom filter / reduce step that is ~25-40% faster than implementing with `Array.reduce`.
+    *
+    * Note: Other loop unrolling techniques like Duff's Device gave a slight faster lower bound on large data sets,
+    * but the maintenance factor is not worth the extra complication.
+    *
+    * @returns {number[]} New filtered index array.
+    */
+   reduceImpl()
+   {
+      const data = [];
+
+      const filters = this.filtersAdapter.filters;
+
+      let include = true;
+
+      for (let cntr = 0, length = this.hostItems.length; cntr < length; cntr++)
+      {
+         include = true;
+
+         for (let filCntr = 0, filLength = filters.length; filCntr < filLength; filCntr++)
+         {
+            if (!filters[filCntr].filter(this.hostItems[cntr]))
+            {
+               include = false;
+               break;
+            }
+         }
+
+         if (include) { data.push(cntr); }
       }
-    }
 
-    return data;
-  }
+      return data;
+   }
 
-  update() {
-    const oldIndex = this.indexAdapter.index;
-    const oldHash = this.indexAdapter.hash; // Clear index if there are no filters and no sort function or the index length doesn't match the item length.
+   /**
+    * Update the reducer indexes. If there are changes subscribers are notified. If data order is changed externally
+    * pass in true to force an update to subscribers.
+    *
+    * @param {boolean}  [force=false] - When true forces an update to subscribers.
+    */
+   update(force = false)
+   {
+      const oldIndex = this.indexAdapter.index;
+      const oldHash = this.indexAdapter.hash;
 
-    if (this.filtersAdapter.filters.length === 0 && !this.sortAdapter.compareFn || this.indexAdapter.index && this.hostItems.length !== this.indexAdapter.index.length) {
-      this.indexAdapter.index = null;
-    } // If there are filters build new index.
-
-
-    if (this.filtersAdapter.filters.length > 0) {
-      this.indexAdapter.index = this.reduceImpl();
-    }
-
-    if (this.sortAdapter.compareFn) {
-      // If there is no index then create one with keys matching host item length.
-      if (!this.indexAdapter.index) {
-        this.indexAdapter.index = [...Array(this.hostItems.length).keys()];
+      // Clear index if there are no filters and no sort function or the index length doesn't match the item length.
+      if ((this.filtersAdapter.filters.length === 0 && !this.sortAdapter.compareFn) ||
+       (this.indexAdapter.index && this.hostItems.length !== this.indexAdapter.index.length))
+      {
+         this.indexAdapter.index = null;
       }
 
-      this.indexAdapter.index.sort(this.sortFn);
-    }
+      // If there are filters build new index.
+      if (this.filtersAdapter.filters.length > 0) { this.indexAdapter.index = this.reduceImpl(); }
 
-    this.calcHashUpdate(oldIndex, oldHash);
-  }
+      if (this.sortAdapter.compareFn)
+      {
+         // If there is no index then create one with keys matching host item length.
+         if (!this.indexAdapter.index) { this.indexAdapter.index = [...Array(this.hostItems.length).keys()]; }
 
+         this.indexAdapter.index.sort(this.sortFn);
+      }
+
+      this.calcHashUpdate(oldIndex, oldHash, force);
+   }
 }
+
 /**
  * Checks for array equality between two arrays of numbers.
  *
@@ -735,268 +581,251 @@ class Indexer {
  *
  * @returns {boolean} Arrays equal
  */
+function s_ARRAY_EQUALS(a, b)
+{
+   if (a === b) { return true; }
+   if (a === null || b === null) { return false; }
 
+   /* c8 ignore next */
+   if (a.length !== b.length) { return false; }
 
-function s_ARRAY_EQUALS(a, b) {
-  if (a === b) {
-    return true;
-  }
+   for (let cntr = a.length; --cntr >= 0;)
+   {
+      /* c8 ignore next */
+      if (a[cntr] !== b[cntr]) { return false; }
+   }
 
-  if (a === null || b === null) {
-    return false;
-  }
-  /* c8 ignore next */
-
-
-  if (a.length !== b.length) {
-    return false;
-  }
-
-  for (let cntr = a.length; --cntr >= 0;) {
-    /* c8 ignore next */
-    if (a[cntr] !== b[cntr]) {
-      return false;
-    }
-  }
-
-  return true;
+   return true;
 }
+
 /**
  * Provides a managed array with non-destructive reducing / filtering / sorting capabilities with subscription /
  * Svelte store support.
  *
  * @template T
  */
+class DynArrayReducer
+{
+   #items;
 
+   #index;
+   #indexAdapter;
 
-var _items = /*#__PURE__*/new WeakMap();
+   /**
+    * @type {AdapterFilters<T>}
+    */
+   #filters;
 
-var _index = /*#__PURE__*/new WeakMap();
+   /**
+    * @type {{filters: FilterFn<T>[]}}
+    */
+   #filtersAdapter;
 
-var _indexAdapter = /*#__PURE__*/new WeakMap();
+   /**
+    * @type {AdapterSort<T>}
+    */
+   #sort;
 
-var _filters = /*#__PURE__*/new WeakMap();
+   /**
+    * @type {{compareFn: CompareFn<T>}}
+    */
+   #sortAdapter;
 
-var _filtersAdapter2 = /*#__PURE__*/new WeakMap();
+   #subscriptions = [];
 
-var _sort = /*#__PURE__*/new WeakMap();
+   /**
+    * Initializes DynArrayReducer. Any iterable is supported for initial data. Take note that if `data` is an array it
+    * will be used as the host array and not copied. All non-array iterables otherwise create a new array / copy.
+    *
+    * @param {Iterable<T>|DynData<T>}   data - Data iterable to store if array or copy otherwise.
+    */
+   constructor(data = void 0)
+   {
+      let dataIterable = void 0;
+      let filters = void 0;
+      let sort = void 0;
 
-var _sortAdapter2 = /*#__PURE__*/new WeakMap();
+      // Potentially working with DynData.
+      if (!s_IS_ITERABLE(data) && typeof data === 'object')
+      {
+         if (!s_IS_ITERABLE(data.data))
+         {
+            throw new TypeError(`DynArrayReducer error (DynData): 'data' attribute is not iterable.`);
+         }
 
-var _subscriptions = /*#__PURE__*/new WeakMap();
+         dataIterable = data.data;
 
-var _notify = /*#__PURE__*/new WeakSet();
+         if (data.filters !== void 0)
+         {
+            if (s_IS_ITERABLE(data.filters))
+            {
+               filters = data.filters;
+            }
+            else
+            {
+               throw new TypeError(`DynArrayReducer error (DynData): 'filters' attribute is not iterable.`);
+            }
+         }
 
-_Symbol$iterator2 = Symbol.iterator;
+         if (data.sort !== void 0)
+         {
+            if (typeof data.sort === 'function')
+            {
+               sort = data.sort;
+            }
+            else
+            {
+               throw new TypeError(`DynArrayReducer error (DynData): 'sort' attribute is not a function.`);
+            }
+         }
+      }
+      else
+      {
+         if (!s_IS_ITERABLE(data)) { throw new TypeError(`DynArrayReducer error: 'data' is not iterable.`); }
 
-class DynArrayReducer {
-  /**
-   * @type {AdapterFilters<T>}
-   */
-
-  /**
-   * @type {{filters: FilterFn<T>[]}}
-   */
-
-  /**
-   * @type {AdapterSort<T>}
-   */
-
-  /**
-   * @type {{compareFn: CompareFn<T>}}
-   */
-
-  /**
-   * Initializes DynArrayReducer. Any iterable is supported for initial data. Take note that if `data` is an array it
-   * will be used as the host array and not copied. All non-array iterables otherwise create a new array / copy.
-   *
-   * @param {Iterable<T>|DynData<T>}   data - Data iterable to store if array or copy otherwise.
-   */
-  constructor(data = void 0) {
-    _classPrivateMethodInitSpec(this, _notify);
-
-    _classPrivateFieldInitSpec(this, _items, {
-      writable: true,
-      value: void 0
-    });
-
-    _classPrivateFieldInitSpec(this, _index, {
-      writable: true,
-      value: void 0
-    });
-
-    _classPrivateFieldInitSpec(this, _indexAdapter, {
-      writable: true,
-      value: void 0
-    });
-
-    _classPrivateFieldInitSpec(this, _filters, {
-      writable: true,
-      value: void 0
-    });
-
-    _classPrivateFieldInitSpec(this, _filtersAdapter2, {
-      writable: true,
-      value: void 0
-    });
-
-    _classPrivateFieldInitSpec(this, _sort, {
-      writable: true,
-      value: void 0
-    });
-
-    _classPrivateFieldInitSpec(this, _sortAdapter2, {
-      writable: true,
-      value: void 0
-    });
-
-    _classPrivateFieldInitSpec(this, _subscriptions, {
-      writable: true,
-      value: []
-    });
-
-    let dataIterable = void 0;
-    let filters = void 0;
-    let sort = void 0; // Potentially working with DynData.
-
-    if (!s_IS_ITERABLE(data) && typeof data === 'object') {
-      if (!s_IS_ITERABLE(data.data)) {
-        throw new TypeError(`DynArrayReducer error (DynData): 'data' attribute is not iterable.`);
+         dataIterable = data;
       }
 
-      dataIterable = data.data;
+      // In the case of the main data being an array directly use the array otherwise create a copy.
+      this.#items = Array.isArray(dataIterable) ? dataIterable : [...dataIterable];
 
-      if (data.filters !== void 0) {
-        if (s_IS_ITERABLE(data.filters)) {
-          filters = data.filters;
-        } else {
-          throw new TypeError(`DynArrayReducer error (DynData): 'filters' attribute is not iterable.`);
-        }
+      [this.#index, this.#indexAdapter] = new Indexer(this.#items, this.#notify.bind(this));
+
+      [this.#filters, this.#filtersAdapter] = new AdapterFilters(this.#indexAdapter.publicAPI.update);
+      [this.#sort, this.#sortAdapter] = new AdapterSort(this.#indexAdapter.publicAPI.update);
+
+      this.#index.initAdapters(this.#filtersAdapter, this.#sortAdapter);
+
+      // Add any filters and sort function defined by DynData.
+      if (filters) { this.filters.add(...filters); }
+      if (sort) { this.sort.set(sort); }
+   }
+
+   /**
+    * Returns the internal data of this instance. Be careful!
+    *
+    * Note: if an array is set as initial data then that array is used as the internal data. If any changes are
+    * performed to the data externally do invoke {@link index.update} with `true` to recalculate the index and notify
+    * all subscribers.
+    *
+    * @returns {T[]} The internal data.
+    */
+   get data() { return this.#items; }
+
+   /**
+    * @returns {AdapterFilters<T>} The filters adapter.
+    */
+   get filters() { return this.#filters; }
+
+   /**
+    * Returns the Indexer public API.
+    *
+    * @returns {IndexerAPI & Iterable<number>} Indexer API - is also iterable.
+    */
+   get index() { return this.#indexAdapter.publicAPI; }
+
+   /**
+    * Gets the main data / items length.
+    *
+    * @returns {number} Main data / items length.
+    */
+   get length() { return this.#items.length; }
+
+   /**
+    * @returns {AdapterSort<T>} The sort adapter.
+    */
+   get sort() { return this.#sort; }
+
+   /**
+    * Removes internal data and pushes new data. This does not destroy any initial array set to internal data unless
+    * `replace` is set to true.
+    *
+    * @param {T[] | Iterable<T>} data - New data to set to internal data.
+    *
+    * @param {boolean} [replace=false] - New data to set to internal data.
+    */
+   setData(data, replace = false)
+   {
+      if (!s_IS_ITERABLE(data)) { throw new TypeError(`DynArrayReducer.setData error: 'data' is not iterable.`); }
+
+      if (typeof replace !== 'boolean')
+      {
+         throw new TypeError(`DynArrayReducer.setData error: 'replace' is not a boolean.`);
       }
 
-      if (data.sort !== void 0) {
-        if (typeof data.sort === 'function') {
-          sort = data.sort;
-        } else {
-          throw new TypeError(`DynArrayReducer error (DynData): 'sort' attribute is not a function.`);
-        }
+      // Replace internal data with new array or create an array from an iterable.
+      if (replace)
+      {
+         this.#items = Array.isArray(data) ? data : [...data];
       }
-    } else {
-      if (!s_IS_ITERABLE(data)) {
-        throw new TypeError(`DynArrayReducer error: 'data' is not iterable.`);
+      else
+      {
+         // Remove all entries in internal data. This will not replace any initially set array.
+         this.#items.length = 0;
+
+         // Add all new data.
+         this.#items.push(...data);
       }
 
-      dataIterable = data;
-    } // In the case of the main data being an array directly use the array otherwise create a copy.
+      // Recalculate index and force an update to any subscribers.
+      this.index.update(true);
+   }
 
+   /**
+    *
+    * @param {function(DynArrayReducer<T>): void} handler - Callback function that is invoked on update / changes.
+    *                                                       Receives `this` reference.
+    *
+    * @returns {(function(): void)} Unsubscribe function.
+    */
+   subscribe(handler)
+   {
+      this.#subscriptions.push(handler); // add handler to the array of subscribers
 
-    _classPrivateFieldSet(this, _items, Array.isArray(dataIterable) ? dataIterable : [...dataIterable]);
+      handler(this);                     // call handler with current value
 
-    [_classPrivateFieldDestructureSet(this, _index).value, _classPrivateFieldDestructureSet(this, _indexAdapter).value] = new Indexer(_classPrivateFieldGet(this, _items), _classPrivateMethodGet(this, _notify, _notify2).bind(this));
-    [_classPrivateFieldDestructureSet(this, _filters).value, _classPrivateFieldDestructureSet(this, _filtersAdapter2).value] = new AdapterFilters(_classPrivateFieldGet(this, _indexAdapter).publicAPI.update);
-    [_classPrivateFieldDestructureSet(this, _sort).value, _classPrivateFieldDestructureSet(this, _sortAdapter2).value] = new AdapterSort(_classPrivateFieldGet(this, _indexAdapter).publicAPI.update);
+      // Return unsubscribe function.
+      return () =>
+      {
+         const index = this.#subscriptions.findIndex((sub) => sub === handler);
+         if (index >= 0) { this.#subscriptions.splice(index, 1); }
+      };
+   }
 
-    _classPrivateFieldGet(this, _index).initAdapters(_classPrivateFieldGet(this, _filtersAdapter2), _classPrivateFieldGet(this, _sortAdapter2)); // Add any filters and sort function defined by DynData.
+   /**
+    *
+    */
+   #notify()
+   {
+      // Subscriptions are stored locally as on the browser Babel is still used for private class fields / Babel
+      // support until 2023. IE not doing this will require several extra method calls otherwise.
+      const subscriptions = this.#subscriptions;
+      for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](this); }
+   }
 
+   /**
+    * Provides an iterator for data stored in DynArrayReducer.
+    *
+    * @returns {Generator<*, T, *>} Generator / iterator of all data.
+    * @yields {T}
+    */
+   *[Symbol.iterator]()
+   {
+      const items = this.#items;
 
-    if (filters) {
-      this.filters.add(...filters);
-    }
+      if (items.length === 0) { return; }
 
-    if (sort) {
-      this.sort.set(sort);
-    }
-  }
-  /**
-   * @returns {AdapterFilters<T>} The filters adapter.
-   */
-
-
-  get filters() {
-    return _classPrivateFieldGet(this, _filters);
-  }
-  /**
-   * Returns the Indexer public API.
-   *
-   * @returns {IndexerAPI & Iterable<number>} Indexer API - is also iterable.
-   */
-
-
-  get index() {
-    return _classPrivateFieldGet(this, _indexAdapter).publicAPI;
-  }
-  /**
-   * Gets the main data / items length.
-   *
-   * @returns {number} Main data / items length.
-   */
-
-
-  get length() {
-    return _classPrivateFieldGet(this, _items).length;
-  }
-  /**
-   * @returns {AdapterSort<T>} The sort adapter.
-   */
-
-
-  get sort() {
-    return _classPrivateFieldGet(this, _sort);
-  }
-  /**
-   *
-   * @param {function(DynArrayReducer<T>): void} handler - Callback function that is invoked on update / changes.
-   *                                                       Receives `this` reference.
-   *
-   * @returns {(function(): void)} Unsubscribe function.
-   */
-
-
-  subscribe(handler) {
-    _classPrivateFieldGet(this, _subscriptions).push(handler); // add handler to the array of subscribers
-
-
-    handler(this); // call handler with current value
-    // Return unsubscribe function.
-
-    return () => {
-      const index = _classPrivateFieldGet(this, _subscriptions).findIndex(sub => sub === handler);
-
-      if (index >= 0) {
-        _classPrivateFieldGet(this, _subscriptions).splice(index, 1);
+      if (this.#index.isActive())
+      {
+         for (const entry of this.index) { yield items[entry]; }
       }
-    };
-  }
-  /**
-   *
-   */
-
-
-  /**
-   * Provides an iterator for data stored in DynArrayReducer.
-   *
-   * @returns {Generator<*, T, *>} Generator / iterator of all data.
-   * @yields {T}
-   */
-  *[_Symbol$iterator2]() {
-    const items = _classPrivateFieldGet(this, _items);
-
-    if (items.length === 0) {
-      return;
-    }
-
-    if (_classPrivateFieldGet(this, _index).isActive()) {
-      for (const entry of this.index) {
-        yield items[entry];
+      else
+      {
+         for (const entry of items) { yield entry; }
       }
-    } else {
-      for (const entry of items) {
-        yield entry;
-      }
-    }
-  }
-
+   }
 }
+
 /**
  * Provides a utility method to determine if the given data is iterable / implements iterator protocol.
  *
@@ -1004,20 +833,9 @@ class DynArrayReducer {
  *
  * @returns {boolean} Is data iterable.
  */
-
-
-function _notify2() {
-  // Subscriptions are stored locally as on the browser Babel is still used for private class fields / Babel
-  // support until 2023. IE not doing this will require several extra method calls otherwise.
-  const subscriptions = _classPrivateFieldGet(this, _subscriptions);
-
-  for (let cntr = 0; cntr < subscriptions.length; cntr++) {
-    subscriptions[cntr](this);
-  }
-}
-
-function s_IS_ITERABLE(data) {
-  return data !== null && data !== void 0 && typeof data === 'object' && typeof data[Symbol.iterator] === 'function';
+function s_IS_ITERABLE(data)
+{
+   return data !== null && data !== void 0 && typeof data === 'object' && typeof data[Symbol.iterator] === 'function';
 }
 
 /**
@@ -1030,19 +848,20 @@ function s_IS_ITERABLE(data) {
  *
  * @returns {boolean} Whether the variable tested has the shape of a store.
  */
-function isReadableStore(store) {
-  if (store === null || store === void 0) {
-    return false;
-  }
+function isReadableStore(store)
+{
+   if (store === null || store === void 0) { return false; }
 
-  switch (typeof store) {
-    case 'function':
-    case 'object':
-      return typeof store.subscribe === 'function';
-  }
+   switch (typeof store)
+   {
+      case 'function':
+      case 'object':
+         return typeof store.subscribe === 'function';
+   }
 
-  return false;
+   return false;
 }
+
 /**
  * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
  * function and an `update` function.
@@ -1053,20 +872,20 @@ function isReadableStore(store) {
  *
  * @returns {boolean} Whether the variable tested has the shape of a store.
  */
+function isUpdatableStore(store)
+{
+   if (store === null || store === void 0) { return false; }
 
-function isUpdatableStore(store) {
-  if (store === null || store === void 0) {
-    return false;
-  }
+   switch (typeof store)
+   {
+      case 'function':
+      case 'object':
+         return typeof store.subscribe === 'function' && typeof store.update === 'function';
+   }
 
-  switch (typeof store) {
-    case 'function':
-    case 'object':
-      return typeof store.subscribe === 'function' && typeof store.update === 'function';
-  }
-
-  return false;
+   return false;
 }
+
 /**
  * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
  * `set`, and `update` functions.
@@ -1077,20 +896,20 @@ function isUpdatableStore(store) {
  *
  * @returns {boolean} Whether the variable tested has the shape of a store.
  */
+function isWritableStore(store)
+{
+   if (store === null || store === void 0) { return false; }
 
-function isWritableStore(store) {
-  if (store === null || store === void 0) {
-    return false;
-  }
+   switch (typeof store)
+   {
+      case 'function':
+      case 'object':
+         return typeof store.subscribe === 'function' && typeof store.set === 'function';
+   }
 
-  switch (typeof store) {
-    case 'function':
-    case 'object':
-      return typeof store.subscribe === 'function' && typeof store.set === 'function';
-  }
-
-  return false;
+   return false;
 }
+
 /**
  * Subscribes to the given store with the update function provided and ignores the first automatic
  * update. All future updates are dispatched to the update function.
@@ -1102,17 +921,21 @@ function isWritableStore(store) {
  *
  * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
  */
+function subscribeIgnoreFirst(store, update)
+{
+   let firedFirst = false;
 
-function subscribeIgnoreFirst(store, update) {
-  let firedFirst = false;
-  return store.subscribe(value => {
-    if (!firedFirst) {
-      firedFirst = true;
-    } else {
-      update(value);
-    }
-  });
+   return store.subscribe((value) => {
+      if (!firedFirst)
+      {
+         firedFirst = true;
+      }
+      else {
+         update(value);
+      }
+   })
 }
+
 /**
  * Subscribes to the given store with two update functions provided. The first function is invoked on the initial
  * subscription. All future updates are dispatched to the update function.
@@ -1126,104 +949,86 @@ function subscribeIgnoreFirst(store, update) {
  *
  * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
  */
+function subscribeFirstRest(store, first, update)
+{
+   let firedFirst = false;
 
-function subscribeFirstRest(store, first, update) {
-  let firedFirst = false;
-  return store.subscribe(value => {
-    if (!firedFirst) {
-      firedFirst = true;
-      first(value);
-    } else {
-      update(value);
-    }
-  });
+   return store.subscribe((value) => {
+      if (!firedFirst)
+      {
+         firedFirst = true;
+         first(value);
+      }
+      else {
+         update(value);
+      }
+   })
 }
 
 // src/generator.ts
-
 function isSimpleDeriver(deriver) {
   return deriver.length < 2;
 }
-
 function generator(storage) {
   function readable(key, value, start) {
     return {
       subscribe: writable(key, value, start).subscribe
     };
   }
-
   function writable(key, value, start = noop) {
     function wrap_start(ogSet) {
       return start(function wrap_set(new_value) {
         if (storage) {
           storage.setItem(key, JSON.stringify(new_value));
         }
-
         return ogSet(new_value);
       });
     }
-
     if (storage) {
       const storageValue = storage.getItem(key);
-
       try {
         if (storageValue) {
           value = JSON.parse(storageValue);
         }
-      } catch (err) {}
-
+      } catch (err) {
+      }
       storage.setItem(key, JSON.stringify(value));
     }
-
     const ogStore = writable$2(value, start ? wrap_start : void 0);
-
     function set(new_value) {
       if (storage) {
         storage.setItem(key, JSON.stringify(new_value));
       }
-
       ogStore.set(new_value);
     }
-
     function update(fn) {
       set(fn(get(ogStore)));
     }
-
     function subscribe(run, invalidate = noop) {
       return ogStore.subscribe(run, invalidate);
     }
-
-    return {
-      set,
-      update,
-      subscribe
-    };
+    return {set, update, subscribe};
   }
-
   function derived(key, stores, fn, initial_value) {
     const single = !Array.isArray(stores);
     const stores_array = single ? [stores] : stores;
-
     if (storage && storage.getItem(key)) {
       try {
         initial_value = JSON.parse(storage.getItem(key));
-      } catch (err) {}
+      } catch (err) {
+      }
     }
-
-    return readable(key, initial_value, set => {
+    return readable(key, initial_value, (set) => {
       let inited = false;
       const values = [];
       let pending = 0;
       let cleanup = noop;
-
       const sync = () => {
         if (pending) {
           return;
         }
-
         cleanup();
         const input = single ? values[0] : values;
-
         if (isSimpleDeriver(fn)) {
           set(fn(input));
         } else {
@@ -1231,11 +1036,9 @@ function generator(storage) {
           cleanup = is_function(result) ? result : noop;
         }
       };
-
-      const unsubscribers = stores_array.map((store, i) => store.subscribe(value => {
+      const unsubscribers = stores_array.map((store, i) => store.subscribe((value) => {
         values[i] = value;
         pending &= ~(1 << i);
-
         if (inited) {
           sync();
         }
@@ -1250,7 +1053,6 @@ function generator(storage) {
       };
     });
   }
-
   return {
     readable,
     writable,
@@ -1259,415 +1061,406 @@ function generator(storage) {
   };
 }
 
+// src/local.ts
 var storage$1 = typeof window !== "undefined" ? window.localStorage : void 0;
 var g$1 = generator(storage$1);
 var writable$1 = g$1.writable;
 
 /**
- * @typedef {import('svelte/store').Writable & import('svelte/store').get} LSStore - The backing Svelte store; a writable w/ get method attached.
+ * @typedef {import('svelte/store').Writable} LSStore - The backing Svelte store; a writable w/ get method attached.
  */
 
-var _stores$1 = /*#__PURE__*/new WeakMap();
+class LocalStorage
+{
+   /**
+    * @type {Map<string, LSStore>}
+    */
+   #stores = new Map();
 
-class LocalStorage {
-  constructor() {
-    _classPrivateFieldInitSpec(this, _stores$1, {
-      writable: true,
-      value: new Map()
-    });
-  }
+   /**
+    * Creates a new LSStore for the given key.
+    *
+    * @param {string}   key - Key to lookup in stores map.
+    *
+    * @param {boolean}  [defaultValue] - A default value to set for the store.
+    *
+    * @returns {LSStore} The new LSStore.
+    */
+   static #createStore(key, defaultValue = void 0)
+   {
+      try
+      {
+         const value = localStorage.getItem(key);
+         if (value !== null) { defaultValue = JSON.parse(value); }
+      }
+      catch (err) { /**/ }
 
-  /**
-   * Get value from the localstorage.
-   *
-   * @param {string}   key - Key to lookup in localstorage.
-   *
-   * @param {*}        [defaultValue] - A default value to return if key not present in local storage.
-   *
-   * @returns {*} Value from local storage or if not defined any default value provided.
-   */
-  getItem(key, defaultValue) {
-    let value = defaultValue;
-    const storageValue = localStorage.getItem(key);
+      return writable$1(key, defaultValue);
+   }
 
-    if (storageValue !== void 0) {
-      value = JSON.parse(storageValue);
-    }
+   /**
+    * Gets a store from the LSStore Map or creates a new store for the key and a given default value.
+    *
+    * @param {string}               key - Key to lookup in stores map.
+    *
+    * @param {boolean}              [defaultValue] - A default value to set for the store.
+    *
+    * @returns {LSStore} The store for the given key.
+    */
+   #getStore(key, defaultValue = void 0)
+   {
+      let store = this.#stores.get(key);
+      if (store === void 0)
+      {
+         store = LocalStorage.#createStore(key, defaultValue);
+         this.#stores.set(key, store);
+      }
 
-    return value;
-  }
-  /**
-   * Returns the backing Svelte store for the given key; potentially sets a default value if the key
-   * is not already set.
-   *
-   * @param {string}   key - Key to lookup in localstorage.
-   *
-   * @param {*}        [defaultValue] - A default value to return if key not present in local storage.
-   *
-   * @returns {LSStore} The Svelte store for this key.
-   */
+      return store;
+   }
 
+   /**
+    * Get value from the localStorage.
+    *
+    * @param {string}   key - Key to lookup in localStorage.
+    *
+    * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
+    *
+    * @returns {*} Value from session storage or if not defined any default value provided.
+    */
+   getItem(key, defaultValue)
+   {
+      let value = defaultValue;
 
-  getStore(key, defaultValue) {
-    return s_GET_STORE$1(_classPrivateFieldGet(this, _stores$1), key, defaultValue);
-  }
-  /**
-   * Sets the value for the given key in localstorage.
-   *
-   * @param {string}   key - Key to lookup in localstorage.
-   *
-   * @param {*}        value - A value to set for this key.
-   */
+      const storageValue = localStorage.getItem(key);
 
+      if (storageValue !== null)
+      {
+         value = JSON.parse(storageValue);
+      }
+      else if (defaultValue !== void 0)
+      {
+         // If there is no existing storage value and defaultValue is defined the storage value needs to be set.
+         localStorage.setItem(key, JSON.stringify(defaultValue));
+      }
 
-  setItem(key, value) {
-    const store = s_GET_STORE$1(_classPrivateFieldGet(this, _stores$1), key);
-    store.set(value);
-  }
-  /**
-   * Convenience method to swap a boolean value stored in local storage.
-   *
-   * @param {string}   key - Key to lookup in localstorage.
-   *
-   * @param {boolean}  [defaultValue] - A default value to return if key not present in local storage.
-   *
-   * @returns {boolean} The boolean swap for the given key.
-   */
+      return value;
+   }
 
+   /**
+    * Returns the backing Svelte store for the given key; potentially sets a default value if the key
+    * is not already set.
+    *
+    * @param {string}   key - Key to lookup in localStorage.
+    *
+    * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
+    *
+    * @returns {LSStore} The Svelte store for this key.
+    */
+   getStore(key, defaultValue)
+   {
+      return this.#getStore(key, defaultValue);
+   }
 
-  swapItemBoolean(key, defaultValue) {
-    const store = s_GET_STORE$1(_classPrivateFieldGet(this, _stores$1), key, defaultValue);
-    const value = store.get();
-    const newValue = typeof value === 'boolean' ? !value : false;
-    store.set(newValue);
-    return newValue;
-  }
+   /**
+    * Sets the value for the given key in localStorage.
+    *
+    * @param {string}   key - Key to lookup in localStorage.
+    *
+    * @param {*}        value - A value to set for this key.
+    */
+   setItem(key, value)
+   {
+      const store = this.#getStore(key);
+      store.set(value);
+   }
 
+   /**
+    * Convenience method to swap a boolean value stored in session storage.
+    *
+    * @param {string}   key - Key to lookup in localStorage.
+    *
+    * @param {boolean}  [defaultValue] - A default value to return if key not present in session storage.
+    *
+    * @returns {boolean} The boolean swap for the given key.
+    */
+   swapItemBoolean(key, defaultValue)
+   {
+      const store = this.#getStore(key, defaultValue);
+
+      let currentValue = false;
+
+      try
+      {
+         currentValue = !!JSON.parse(localStorage.getItem(key));
+      }
+      catch (err) { /**/ }
+
+      const newValue = typeof currentValue === 'boolean' ? !currentValue : false;
+
+      store.set(newValue);
+      return newValue;
+   }
 }
-/**
- * Gets a store from the LSStore Map or creates a new store for the key and a given default value.
- *
- * @param {Map<string, LSStore>} stores - Map containing Svelte stores.
- *
- * @param {string}               key - Key to lookup in stores map.
- *
- * @param {boolean}              [defaultValue] - A default value to set for the store.
- *
- * @returns {LSStore} The store for the given key.
- */
 
-function s_GET_STORE$1(stores, key, defaultValue = void 0) {
-  let store = stores.get(key);
-
-  if (store === void 0) {
-    store = s_CREATE_STORE$1(key, defaultValue);
-    stores.set(key, store);
-  }
-
-  return store;
-}
-/**
- * Creates a new LSStore for the given key.
- *
- * @param {string}   key - Key to lookup in stores map.
- *
- * @param {boolean}  [defaultValue] - A default value to set for the store.
- *
- * @returns {LSStore} The new LSStore.
- */
-
-
-function s_CREATE_STORE$1(key, defaultValue = void 0) {
-  try {
-    const value = localStorage.getItem(key);
-
-    if (value) {
-      defaultValue = JSON.parse(value);
-    }
-  } catch (err) {
-    /**/
-  }
-
-  const store = writable$1(key, defaultValue);
-
-  store.get = () => get(store);
-
-  return store;
-}
-
+// src/session.ts
 var storage = typeof window !== "undefined" ? window.sessionStorage : void 0;
 var g = generator(storage);
 var writable = g.writable;
 
 /**
- * @typedef {import('svelte/store').Writable & import('svelte/store').get} SSStore - The backing Svelte store; a writable w/ get method attached.
+ * @typedef {import('svelte/store').Writable} SSStore - The backing Svelte store; a writable w/ get method attached.
  */
 
-var _stores = /*#__PURE__*/new WeakMap();
+class SessionStorage
+{
+   /**
+    * @type {Map<string, SSStore>}
+    */
+   #stores = new Map();
 
-class SessionStorage {
-  constructor() {
-    _classPrivateFieldInitSpec(this, _stores, {
-      writable: true,
-      value: new Map()
-    });
-  }
+   /**
+    * Creates a new SSStore for the given key.
+    *
+    * @param {string}   key - Key to lookup in stores map.
+    *
+    * @param {boolean}  [defaultValue] - A default value to set for the store.
+    *
+    * @returns {LSStore} The new LSStore.
+    */
+   static #createStore(key, defaultValue = void 0)
+   {
+      try
+      {
+         const value = sessionStorage.getItem(key);
+         if (value !== null) { defaultValue = JSON.parse(value); }
+      }
+      catch (err) { /**/ }
 
-  /**
-   * Get value from the sessionstorage.
-   *
-   * @param {string}   key - Key to lookup in sessionstorage.
-   *
-   * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
-   *
-   * @returns {*} Value from session storage or if not defined any default value provided.
-   */
-  getItem(key, defaultValue) {
-    let value = defaultValue;
-    const storageValue = sessionStorage.getItem(key);
+      return writable(key, defaultValue);
+   }
 
-    if (storageValue !== void 0) {
-      value = JSON.parse(storageValue);
-    }
+   /**
+    * Gets a store from the SSStore Map or creates a new store for the key and a given default value.
+    *
+    * @param {string}               key - Key to lookup in stores map.
+    *
+    * @param {boolean}              [defaultValue] - A default value to set for the store.
+    *
+    * @returns {LSStore} The store for the given key.
+    */
+   #getStore(key, defaultValue = void 0)
+   {
+      let store = this.#stores.get(key);
+      if (store === void 0)
+      {
+         store = SessionStorage.#createStore(key, defaultValue);
+         this.#stores.set(key, store);
+      }
 
-    return value;
-  }
-  /**
-   * Returns the backing Svelte store for the given key; potentially sets a default value if the key
-   * is not already set.
-   *
-   * @param {string}   key - Key to lookup in sessionstorage.
-   *
-   * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
-   *
-   * @returns {LSStore} The Svelte store for this key.
-   */
+      return store;
+   }
 
+   /**
+    * Get value from the sessionStorage.
+    *
+    * @param {string}   key - Key to lookup in sessionStorage.
+    *
+    * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
+    *
+    * @returns {*} Value from session storage or if not defined any default value provided.
+    */
+   getItem(key, defaultValue)
+   {
+      let value = defaultValue;
 
-  getStore(key, defaultValue) {
-    return s_GET_STORE$2(_classPrivateFieldGet(this, _stores), key, defaultValue);
-  }
-  /**
-   * Sets the value for the given key in sessionstorage.
-   *
-   * @param {string}   key - Key to lookup in sessionstorage.
-   *
-   * @param {*}        value - A value to set for this key.
-   */
+      const storageValue = sessionStorage.getItem(key);
 
+      if (storageValue !== null)
+      {
+         value = JSON.parse(storageValue);
+      }
+      else if (defaultValue !== void 0)
+      {
+         // If there is no existing storage value and defaultValue is defined the storage value needs to be set.
+         sessionStorage.setItem(key, JSON.stringify(defaultValue));
+      }
 
-  setItem(key, value) {
-    const store = s_GET_STORE$2(_classPrivateFieldGet(this, _stores), key);
-    store.set(value);
-  }
-  /**
-   * Convenience method to swap a boolean value stored in session storage.
-   *
-   * @param {string}   key - Key to lookup in sessionstorage.
-   *
-   * @param {boolean}  [defaultValue] - A default value to return if key not present in session storage.
-   *
-   * @returns {boolean} The boolean swap for the given key.
-   */
+      return value;
+   }
 
+   /**
+    * Returns the backing Svelte store for the given key; potentially sets a default value if the key
+    * is not already set.
+    *
+    * @param {string}   key - Key to lookup in sessionStorage.
+    *
+    * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
+    *
+    * @returns {LSStore} The Svelte store for this key.
+    */
+   getStore(key, defaultValue)
+   {
+      return this.#getStore(key, defaultValue);
+   }
 
-  swapItemBoolean(key, defaultValue) {
-    const store = s_GET_STORE$2(_classPrivateFieldGet(this, _stores), key, defaultValue);
-    const value = store.get();
-    const newValue = typeof value === 'boolean' ? !value : false;
-    store.set(newValue);
-    return newValue;
-  }
+   /**
+    * Sets the value for the given key in sessionStorage.
+    *
+    * @param {string}   key - Key to lookup in sessionStorage.
+    *
+    * @param {*}        value - A value to set for this key.
+    */
+   setItem(key, value)
+   {
+      const store = this.#getStore(key);
+      store.set(value);
+   }
 
-}
-/**
- * Gets a store from the SSStore Map or creates a new store for the key and a given default value.
- *
- * @param {Map<string, LSStore>} stores - Map containing Svelte stores.
- *
- * @param {string}               key - Key to lookup in stores map.
- *
- * @param {boolean}              [defaultValue] - A default value to set for the store.
- *
- * @returns {LSStore} The store for the given key.
- */
+   /**
+    * Convenience method to swap a boolean value stored in session storage.
+    *
+    * @param {string}   key - Key to lookup in sessionStorage.
+    *
+    * @param {boolean}  [defaultValue] - A default value to return if key not present in session storage.
+    *
+    * @returns {boolean} The boolean swap for the given key.
+    */
+   swapItemBoolean(key, defaultValue)
+   {
+      const store = this.#getStore(key, defaultValue);
 
-function s_GET_STORE$2(stores, key, defaultValue = void 0) {
-  let store = stores.get(key);
+      let currentValue = false;
 
-  if (store === void 0) {
-    store = s_CREATE_STORE$2(key, defaultValue);
-    stores.set(key, store);
-  }
+      try
+      {
+         currentValue = !!JSON.parse(sessionStorage.getItem(key));
+      }
+      catch (err) { /**/ }
 
-  return store;
-}
-/**
- * Creates a new SSStore for the given key.
- *
- * @param {string}   key - Key to lookup in stores map.
- *
- * @param {boolean}  [defaultValue] - A default value to set for the store.
- *
- * @returns {LSStore} The new LSStore.
- */
+      const newValue = typeof currentValue === 'boolean' ? !currentValue : false;
 
-
-function s_CREATE_STORE$2(key, defaultValue = void 0) {
-  try {
-    const value = sessionStorage.getItem(key);
-
-    if (value) {
-      defaultValue = JSON.parse(value);
-    }
-  } catch (err) {
-    /**/
-  }
-
-  const store = writable(key, defaultValue);
-
-  store.get = () => get(store);
-
-  return store;
+      store.set(newValue);
+      return newValue;
+   }
 }
 
 /**
  * @external Store
- * @see [Svelte stores](https://svelte.dev/docs#Store_contract)
+ * @see [Svelte stores](https://svelte.dev/docs#component-format-script-4-prefix-stores-with-$-to-access-their-values-store-contract)
  */
 
 /**
- * Create a store similar to [Svelte's `derived`](https://svelte.dev/docs#derived), but which
- * has its own `set` and `update` methods and can send values back to the origin stores.
+ * Create a store similar to [Svelte's `derived`](https://svelte.dev/docs#run-time-svelte-store-writable),
+ * but which has its own `set` and `update` methods and can send values back to the origin stores.
  * [Read more...](https://github.com/PixievoltNo1/svelte-writable-derived#default-export-writablederived)
  * 
  * @param {Store|Store[]} origins One or more stores to derive from. Same as
- * [`derived`](https://svelte.dev/docs#derived)'s 1st parameter.
+ * [`derived`](https://svelte.dev/docs#run-time-svelte-store-writable)'s 1st parameter.
  * @param {!Function} derive The callback to determine the derived value. Same as
- * [`derived`](https://svelte.dev/docs#derived)'s 2nd parameter.
+ * [`derived`](https://svelte.dev/docs#run-time-svelte-store-writable)'s 2nd parameter.
  * @param {!Function|{withOld: !Function}} reflect Called when the
  * derived store gets a new value via its `set` or `update` methods, and determines new values for
  * the origin stores. [Read more...](https://github.com/PixievoltNo1/svelte-writable-derived#new-parameter-reflect)
  * @param [initial] The new store's initial value. Same as
- * [`derived`](https://svelte.dev/docs#derived)'s 3rd parameter.
+ * [`derived`](https://svelte.dev/docs#run-time-svelte-store-writable)'s 3rd parameter.
  * 
  * @returns {Store} A writable store.
  */
-
 function writableDerived(origins, derive, reflect, initial) {
-  var childDerivedSetter,
-      originValues,
-      allowDerive = true;
-  var reflectOldValues = ("withOld" in reflect);
+	var childDerivedSetter, originValues, blockNextDerive = false;
+	var reflectOldValues = "withOld" in reflect;
+	var wrappedDerive = (got, set) => {
+		childDerivedSetter = set;
+		if (reflectOldValues) {
+			originValues = got;
+		}
+		if (!blockNextDerive) {
+			let returned = derive(got, set);
+			if (derive.length < 2) {
+				set(returned);
+			} else {
+				return returned;
+			}
+		}
+		blockNextDerive = false;
+	};
+	var childDerived = derived(origins, wrappedDerive, initial);
+	
+	var singleOrigin = !Array.isArray(origins);
+	var sendUpstream = (setWith) => {
+		if (singleOrigin) {
+			blockNextDerive = true;
+			origins.set(setWith);
+		} else {
+			setWith.forEach( (value, i) => {
+				blockNextDerive = true;
+				origins[i].set(value);
+			} );
+		}
+		blockNextDerive = false;
+	};
+	if (reflectOldValues) {
+		reflect = reflect.withOld;
+	}
+	var reflectIsAsync = reflect.length >= (reflectOldValues ? 3 : 2);
+	var cleanup = null;
+	function doReflect(reflecting) {
+		if (cleanup) {
+			cleanup();
+			cleanup = null;
+		}
 
-  var wrappedDerive = (got, set) => {
-    childDerivedSetter = set;
-
-    if (reflectOldValues) {
-      originValues = got;
-    }
-
-    if (allowDerive) {
-      let returned = derive(got, set);
-
-      if (derive.length < 2) {
-        set(returned);
-      } else {
-        return returned;
-      }
-    }
-  };
-
-  var childDerived = derived(origins, wrappedDerive, initial);
-  var singleOrigin = !Array.isArray(origins);
-
-  var sendUpstream = setWith => {
-    allowDerive = false;
-
-    if (singleOrigin) {
-      origins.set(setWith);
-    } else {
-      setWith.forEach((value, i) => {
-        origins[i].set(value);
-      });
-    }
-
-    allowDerive = true;
-  };
-
-  if (reflectOldValues) {
-    reflect = reflect.withOld;
-  }
-
-  var reflectIsAsync = reflect.length >= (reflectOldValues ? 3 : 2);
-  var cleanup = null;
-
-  function doReflect(reflecting) {
-    if (cleanup) {
-      cleanup();
-      cleanup = null;
-    }
-
-    if (reflectOldValues) {
-      var returned = reflect(reflecting, originValues, sendUpstream);
-    } else {
-      var returned = reflect(reflecting, sendUpstream);
-    }
-
-    if (reflectIsAsync) {
-      if (typeof returned == "function") {
-        cleanup = returned;
-      }
-    } else {
-      sendUpstream(returned);
-    }
-  }
-
-  var tryingSet = false;
-
-  function update(fn) {
-    var isUpdated, mutatedBySubscriptions, oldValue, newValue;
-
-    if (tryingSet) {
-      newValue = fn(get(childDerived));
-      childDerivedSetter(newValue);
-      return;
-    }
-
-    var unsubscribe = childDerived.subscribe(value => {
-      if (!tryingSet) {
-        oldValue = value;
-      } else if (!isUpdated) {
-        isUpdated = true;
-      } else {
-        mutatedBySubscriptions = true;
-      }
-    });
-    newValue = fn(oldValue);
-    tryingSet = true;
-    childDerivedSetter(newValue);
-    unsubscribe();
-    tryingSet = false;
-
-    if (mutatedBySubscriptions) {
-      newValue = get(childDerived);
-    }
-
-    if (isUpdated) {
-      doReflect(newValue);
-    }
-  }
-
-  return {
-    subscribe: childDerived.subscribe,
-
-    set(value) {
-      update(() => value);
-    },
-
-    update
-  };
+		if (reflectOldValues) {
+			var returned = reflect(reflecting, originValues, sendUpstream);
+		} else {
+			var returned = reflect(reflecting, sendUpstream);
+		}
+		if (reflectIsAsync) {
+			if (typeof returned == "function") {
+				cleanup = returned;
+			}
+		} else {
+			sendUpstream(returned);
+		}
+	}
+	
+	var tryingSet = false;
+	function update(fn) {
+		var isUpdated, mutatedBySubscriptions, oldValue, newValue;
+		if (tryingSet) {
+			newValue = fn( get(childDerived) );
+			childDerivedSetter(newValue);
+			return;
+		}
+		var unsubscribe = childDerived.subscribe( (value) => {
+			if (!tryingSet) {
+				oldValue = value;
+			} else if (!isUpdated) {
+				isUpdated = true;
+			} else {
+				mutatedBySubscriptions = true;
+			}
+		} );
+		newValue = fn(oldValue);
+		tryingSet = true;
+		childDerivedSetter(newValue);
+		unsubscribe();
+		tryingSet = false;
+		if (mutatedBySubscriptions) {
+			newValue = get(childDerived);
+		}
+		if (isUpdated) {
+			doReflect(newValue);
+		}
+	}
+	return {
+		subscribe: childDerived.subscribe,
+		set(value) { update( () => value ); },
+		update,
+	};
 }
+
 /**
  * Create a store for a property value in an object contained in another store.
  * [Read more...](https://github.com/PixievoltNo1/svelte-writable-derived#named-export-propertystore)
@@ -1678,38 +1471,36 @@ function writableDerived(origins, derive, reflect, initial) {
  *
  * @returns {Store} A writable store.
  */
-
 function propertyStore(origin, propName) {
-  if (!Array.isArray(propName)) {
-    return writableDerived(origin, object => object[propName], {
-      withOld(reflecting, object) {
-        object[propName] = reflecting;
-        return object;
-      }
-
-    });
-  } else {
-    let props = propName.concat();
-    return writableDerived(origin, value => {
-      for (let i = 0; i < props.length; ++i) {
-        value = value[props[i]];
-      }
-
-      return value;
-    }, {
-      withOld(reflecting, object) {
-        let target = object;
-
-        for (let i = 0; i < props.length - 1; ++i) {
-          target = target[props[i]];
-        }
-
-        target[props[props.length - 1]] = reflecting;
-        return object;
-      }
-
-    });
-  }
+	if (!Array.isArray(propName)) {
+		return writableDerived(
+			origin,
+			(object) => object[propName],
+			{ withOld(reflecting, object) {
+				object[propName] = reflecting;
+				return object;
+			} }
+		);
+	} else {
+		let props = propName.concat();
+		return writableDerived(
+			origin,
+			(value) => {
+				for (let i = 0; i < props.length; ++i) {
+					value = value[ props[i] ];
+				}
+				return value;
+			},
+			{ withOld(reflecting, object) {
+				let target = object;
+				for (let i = 0; i < props.length - 1; ++i) {
+					target = target[ props[i] ];
+				}
+				target[ props[props.length - 1] ] = reflecting;
+				return object;
+			} }
+		);
+	}
 }
 
 /**
@@ -1727,7 +1518,7 @@ class TJSDocument
    /**
     * @type {TJSDocumentOptions}
     */
-   #options = { delete: void 0, notifyOnDelete: false };
+   #options = { delete: void 0 };
 
    #subscriptions = [];
    #updateOptions;
@@ -1773,17 +1564,38 @@ class TJSDocument
     */
    async #deleted()
    {
-      if (this.#document instanceof foundry.abstract.Document)
+      const doc = this.#document;
+
+      // Check to see if the document is still in the associated collection to determine if actually deleted.
+      if (doc instanceof foundry.abstract.Document && !doc?.collection?.has(doc.id))
       {
-         delete this.#document.apps[this.#uuidv4];
+         delete doc?.apps[this.#uuidv4];
+         this.#document = void 0;
+
+         this.#notify(false, { action: 'delete', data: void 0 });
+
+         if (typeof this.#options.delete === 'function') { await this.#options.delete(); }
+
+         this.#updateOptions = void 0;
+      }
+   }
+
+   /**
+    * Completely removes all internal subscribers, any optional delete callback, and unregisters from the
+    * ClientDocumentMixin `apps` tracking object.
+    */
+   destroy()
+   {
+      const doc = this.#document;
+
+      if (doc instanceof foundry.abstract.Document)
+      {
+         delete doc?.apps[this.#uuidv4];
          this.#document = void 0;
       }
 
-      this.#updateOptions = void 0;
-
-      if (typeof this.#options.delete === 'function') { await this.#options.delete(); }
-
-      if (this.#options.notifyOnDelete) { this.#notify(); }
+      this.#options.delete = void 0;
+      this.#subscriptions.length = 0;
    }
 
    /**
@@ -1892,7 +1704,7 @@ class TJSDocument
     */
    setOptions(options)
    {
-      if (!isPlainObject(options))
+      if (!isObject(options))
       {
          throw new TypeError(`TJSDocument error: 'options' is not a plain object.`);
       }
@@ -1902,19 +1714,9 @@ class TJSDocument
          throw new TypeError(`TJSDocument error: 'delete' attribute in options is not a function.`);
       }
 
-      if (options.notifyOnDelete !== void 0 && typeof options.notifyOnDelete !== 'boolean')
-      {
-         throw new TypeError(`TJSDocument error: 'notifyOnDelete' attribute in options is not a boolean.`);
-      }
-
       if (options.delete === void 0 || typeof options.delete === 'function')
       {
          this.#options.delete = options.delete;
-      }
-
-      if (typeof options.notifyOnDelete === 'boolean')
-      {
-         this.#options.notifyOnDelete = options.notifyOnDelete;
       }
    }
 
@@ -1927,8 +1729,7 @@ class TJSDocument
    {
       this.#subscriptions.push(handler);           // Add handler to the array of subscribers.
 
-      const updateOptions = this.updateOptions;
-      updateOptions.action = 'subscribe';
+      const updateOptions = { action: 'subscribe', data: void 0 };
 
       handler(this.#document, updateOptions);      // Call handler with current value and update options.
 
@@ -1945,8 +1746,6 @@ class TJSDocument
  * @typedef {object} TJSDocumentOptions
  *
  * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
- *
- * @property {boolean} [notifyOnDelete] - When true a subscribers are notified of the deletion of the document.
  */
 
 /**
@@ -1965,7 +1764,7 @@ class TJSDocumentCollection
    /**
     * @type {TJSDocumentCollectionOptions}
     */
-   #options = { delete: void 0, notifyOnDelete: false };
+   #options = { delete: void 0 };
 
    #subscriptions = [];
    #updateOptions;
@@ -2011,19 +1810,41 @@ class TJSDocumentCollection
     */
    async #deleted()
    {
-      if (this.#collection instanceof DocumentCollection)
+      const collection = this.#collection;
+
+      if (collection instanceof DocumentCollection)
       {
-         const index = this.#collection.apps.findIndex((sub) => sub === this.#collectionCallback);
-         if (index >= 0) { this.#collection.apps.splice(index, 1); }
+         const index = collection?.apps?.findIndex((sub) => sub === this.#collectionCallback);
+         if (index >= 0) { collection?.apps?.splice(index, 1); }
 
          this.#collection = void 0;
       }
 
-      this.#updateOptions = void 0;
+      this.#notify(false, { action: 'delete', documentType: collection.documentName, documents: [], data: [] });
 
       if (typeof this.#options.delete === 'function') { await this.#options.delete(); }
 
-      if (this.#options.notifyOnDelete) { this.#notify(); }
+      this.#updateOptions = void 0;
+   }
+
+   /**
+    * Completely removes all internal subscribers, any optional delete callback, and unregisters from the
+    * DocumentCollection `apps` tracking array.
+    */
+   destroy()
+   {
+      const collection = this.#collection;
+
+      if (collection instanceof DocumentCollection)
+      {
+         const index = collection?.apps?.findIndex((sub) => sub === this.#collectionCallback);
+         if (index >= 0) { collection?.apps?.splice(index, 1); }
+
+         this.#collection = void 0;
+      }
+
+      this.#options.delete = void 0;
+      this.#subscriptions.length = 0;
    }
 
    /**
@@ -2069,7 +1890,7 @@ class TJSDocumentCollection
           `TJSDocumentCollection set error: 'collection' is not a valid DocumentCollection or undefined.`);
       }
 
-      if (options === null || typeof options !== 'object')
+      if (!isObject(options))
       {
          throw new TypeError(`TJSDocument set error: 'options' is not an object.`);
       }
@@ -2081,7 +1902,7 @@ class TJSDocumentCollection
             render: this.#notify.bind(this)
          };
 
-         collection.apps.push(this.#collectionCallback);
+         collection?.apps?.push(this.#collectionCallback);
       }
 
       this.#collection = collection;
@@ -2096,9 +1917,9 @@ class TJSDocumentCollection
     */
    setOptions(options)
    {
-      if (!isPlainObject(options))
+      if (!isObject(options))
       {
-         throw new TypeError(`TJSDocumentCollection error: 'options' is not a plain object.`);
+         throw new TypeError(`TJSDocumentCollection error: 'options' is not an object.`);
       }
 
       if (options.delete !== void 0 && typeof options.delete !== 'function')
@@ -2106,19 +1927,9 @@ class TJSDocumentCollection
          throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
       }
 
-      if (options.notifyOnDelete !== void 0 && typeof options.notifyOnDelete !== 'boolean')
-      {
-         throw new TypeError(`TJSDocumentCollection error: 'notifyOnDelete' attribute in options is not a boolean.`);
-      }
-
       if (options.delete === void 0 || typeof options.delete === 'function')
       {
          this.#options.delete = options.delete;
-      }
-
-      if (typeof options.notifyOnDelete === 'boolean')
-      {
-         this.#options.notifyOnDelete = options.notifyOnDelete;
       }
    }
 
@@ -2131,10 +1942,13 @@ class TJSDocumentCollection
    {
       this.#subscriptions.push(handler);              // Add handler to the array of subscribers.
 
-      const updateOptions = this.updateOptions;
-      updateOptions.action = 'subscribe';
+      const collection = this.#collection;
 
-      handler(this.#collection, updateOptions);  // Call handler with current value and update options.
+      const documentType = collection?.documentName ?? void 0;
+
+      const updateOptions = { action: 'subscribe', documentType, documents: [], data: [] };
+
+      handler(collection, updateOptions);  // Call handler with current value and update options.
 
       // Return unsubscribe function.
       return () =>
@@ -2149,8 +1963,6 @@ class TJSDocumentCollection
  * @typedef TJSDocumentCollectionOptions
  *
  * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
- *
- * @property {boolean} [notifyOnDelete] - When true a subscribers are notified of the deletion of the document.
  */
 
 const storeState = writable$2(void 0);
@@ -2189,6 +2001,39 @@ class TJSGameSettings
    #stores = new Map();
 
    /**
+    * Creates a new GSWritableStore for the given key.
+    *
+    * @param {string}   initialValue - An initial value to set to new stores.
+    *
+    * @returns {GSWritableStore} The new GSWritableStore.
+    */
+   static #createStore(initialValue)
+   {
+      return writable$2(initialValue);
+   }
+
+   /**
+    * Gets a store from the GSWritableStore Map or creates a new store for the key.
+    *
+    * @param {string}   key - Key to lookup in stores map.
+    *
+    * @param {string}   [initialValue] - An initial value to set to new stores.
+    *
+    * @returns {GSWritableStore} The store for the given key.
+    */
+   #getStore(key, initialValue)
+   {
+      let store = this.#stores.get(key);
+      if (store === void 0)
+      {
+         store = TJSGameSettings.#createStore(initialValue);
+         this.#stores.set(key, store);
+      }
+
+      return store;
+   }
+
+   /**
     * Returns a readable Game Settings store for the associated key.
     *
     * @param {string}   key - Game setting key.
@@ -2203,7 +2048,7 @@ class TJSGameSettings
          return;
       }
 
-      const store = s_GET_STORE(this.#stores, key);
+      const store = this.#getStore(key);
 
       return { subscribe: store.subscribe, get: store.get };
    }
@@ -2235,7 +2080,7 @@ class TJSGameSettings
          return;
       }
 
-      return s_GET_STORE(this.#stores, key);
+      return this.#getStore(key);
    }
 
    /**
@@ -2243,15 +2088,45 @@ class TJSGameSettings
     */
    register(setting)
    {
-      if (typeof setting !== 'object') { throw new TypeError(`TJSGameSettings - register: setting is not an object.`); }
+      if (typeof setting !== 'object')
+      {
+         throw new TypeError(`TJSGameSettings - register: setting is not an object.`);
+      }
 
       if (typeof setting.options !== 'object')
       {
          throw new TypeError(`TJSGameSettings - register: 'options' attribute is not an object.`);
       }
 
-      const moduleId = setting.moduleId;
+      if (setting.store !== void 0 && !isWritableStore(setting.store))
+      {
+         throw new TypeError(
+          `TJSGameSettings - register: 'setting.store' attribute is not a writable store.`);
+      }
+
+      // TODO: Remove deprecation warning and fully remove support for `moduleId` in a future TRL release.
+      if (typeof setting.moduleId === 'string')
+      {
+         console.warn(
+          `TJSGameSettings - register deprecation warning: 'moduleId' should be replaced with 'namespace'.`);
+         console.warn(`'moduleId' will cease to work in a future update of TRL / TJSGameSettings.`);
+      }
+
+      // TODO: Remove nullish coalescing operator in a future TRL release.
+      const namespace = setting.namespace ?? setting.moduleId;
       const key = setting.key;
+
+      if (typeof namespace !== 'string')
+      {
+         throw new TypeError(`TJSGameSettings - register: 'namespace' attribute is not a string.`);
+      }
+
+      if (typeof key !== 'string')
+      {
+         throw new TypeError(`TJSGameSettings - register: 'key' attribute is not a string.`);
+      }
+
+      const store = setting.store;
 
       /**
        * @type {GameSettingOptions}
@@ -2259,6 +2134,21 @@ class TJSGameSettings
       const options = setting.options;
 
       const onchangeFunctions = [];
+
+      // When true prevents local store subscription from a loop when values are object data.
+      let gateSet = false;
+
+      // Provides an `onChange` callback to update the associated store.
+      onchangeFunctions.push((value) =>
+      {
+         const callbackStore = this.#getStore(key);
+         if (callbackStore && !gateSet)
+         {
+            gateSet = true;
+            callbackStore.set(value);
+            gateSet = false;
+         }
+      });
 
       // Handle loading any existing `onChange` callbacks.
       if (isIterable(options?.onChange))
@@ -2273,36 +2163,33 @@ class TJSGameSettings
          onchangeFunctions.push(options.onChange);
       }
 
-      // When true prevents local store subscription from a loop when values are object data.
-      let gateSet = false;
-
-      // Provides an `onChange` callback to update the associated store.
-      onchangeFunctions.push((value) =>
-      {
-         const store = s_GET_STORE(this.#stores, key);
-         if (store)
-         {
-            gateSet = true;
-            store.set(value);
-         }
-      });
-
       // Provides the final onChange callback that iterates over all the stored onChange callbacks.
       const onChange = (value) =>
       {
          for (const entry of onchangeFunctions) { entry(value); }
       };
 
-      game.settings.register(moduleId, key, { ...options, onChange });
+      game.settings.register(namespace, key, { ...options, onChange });
 
       // Set new store value with existing setting or default value.
-      const newStore = s_GET_STORE(this.#stores, key, game.settings.get(moduleId, key));
+      const targetStore = store ? store : this.#getStore(key, game.settings.get(namespace, key));
+
+      // If a store instance is passed into register then initialize it with game settings data.
+      if (store)
+      {
+         this.#stores.set(key, targetStore);
+         store.set(game.settings.get(namespace, key));
+      }
 
       // Subscribe to self to set associated game setting on updates after verifying that the new value does not match
       // existing game setting.
-      subscribeIgnoreFirst(newStore, async (value) =>
+      subscribeIgnoreFirst(targetStore, async (value) =>
       {
-         if (!gateSet && game.settings.get(moduleId, key) !== value) { await game.settings.set(moduleId, key, value); }
+         if (!gateSet && game.settings.get(namespace, key) !== value)
+         {
+            gateSet = true;
+            await game.settings.set(namespace, key, value);
+         }
 
          gateSet = false;
       });
@@ -2324,10 +2211,11 @@ class TJSGameSettings
             throw new TypeError(`TJSGameSettings - registerAll: entry in settings is not an object.`);
          }
 
-         if (typeof entry.moduleId !== 'string')
-         {
-            throw new TypeError(`TJSGameSettings - registerAll: entry in settings missing 'moduleId' attribute.`);
-         }
+         // TODO: Uncomment when deprecation for 'moduleId' is removed in future TRL release.
+         // if (typeof entry.namespace !== 'string')
+         // {
+         //    throw new TypeError(`TJSGameSettings - registerAll: entry in settings missing 'namespace' attribute.`);
+         // }
 
          if (typeof entry.key !== 'string')
          {
@@ -2342,44 +2230,6 @@ class TJSGameSettings
          this.register(entry);
       }
    }
-}
-
-/**
- * Gets a store from the GSWritableStore Map or creates a new store for the key.
- *
- * @param {Map<string, GSWritableStore>} stores - Map containing Svelte stores.
- *
- * @param {string}               key - Key to lookup in stores map.
- *
- * @param {string}               [initialValue] - An initial value to set to new stores.
- *
- * @returns {GSWritableStore} The store for the given key.
- */
-function s_GET_STORE(stores, key, initialValue)
-{
-   let store = stores.get(key);
-   if (store === void 0)
-   {
-      store = s_CREATE_STORE(initialValue);
-      stores.set(key, store);
-   }
-
-   return store;
-}
-
-/**
- * Creates a new GSWritableStore for the given key.
- *
- * @param {string}   initialValue - An initial value to set to new stores.
- *
- * @returns {GSWritableStore} The new GSWritableStore.
- */
-function s_CREATE_STORE(initialValue)
-{
-   const store = writable$2(initialValue);
-   store.get = () => get(store);
-
-   return store;
 }
 
 /**
@@ -2405,23 +2255,21 @@ function s_CREATE_STORE(initialValue)
 /**
  * @typedef {object} GameSetting - Defines a game setting.
  *
- * @property {string} moduleId - The ID of the module / system.
+ * @property {string} namespace - The setting namespace; usually the ID of the module / system.
  *
  * @property {string} key - The setting key to register.
+ *
+ * @property {import('svelte/store').Writable} [store] - An existing store instance to use.
  *
  * @property {GameSettingOptions} options - Configuration for setting data.
  */
 
 /**
  * @typedef {import('svelte/store').Writable} GSWritableStore - The backing Svelte store; writable w/ get method attached.
- *
- * @property {Function} get -
  */
 
 /**
  * @typedef {import('svelte/store').Readable} GSReadableStore - The backing Svelte store; readable w/ get method attached.
- *
- * @property {Function} get -
  */
 
 export { DynArrayReducer, LocalStorage, SessionStorage, TJSDocument, TJSDocumentCollection, TJSGameSettings, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };

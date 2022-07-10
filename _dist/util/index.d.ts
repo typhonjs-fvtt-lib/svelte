@@ -1,3 +1,13 @@
+type StackingContext = {
+    /**
+     * A DOM Element
+     */
+    node: Element;
+    /**
+     * Reason for why a stacking context was created
+     */
+    reason: string;
+};
 type ParseDataTransferOptions = {
     /**
      * - Accept actor owned documents.
@@ -40,6 +50,19 @@ declare function debounce(callback: Function, delay: number): Function;
  * @returns {object}    Target object.
  */
 declare function deepMerge(target?: object, ...sourceObj: object[]): object;
+/**
+ * Recursive function that finds the closest parent stacking context.
+ * See also https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context
+ *
+ * Original author: Kerry Liu / https://github.com/gwwar
+ * @see: https://github.com/gwwar/z-context/blob/master/content-script.js
+ * @see: https://github.com/gwwar/z-context/blob/master/LICENSE
+ *
+ * @param {Element} node -
+ *
+ * @returns {StackingContext} The closest parent stacking context
+ */
+declare function getStackingContext(node: Element): StackingContext;
 /**
  * Attempts to create a Foundry UUID from standard drop data. This may not work for all systems.
  *
@@ -142,6 +165,17 @@ declare function isPlainObject(value: any): boolean;
  * @returns {boolean} Whether basic duck typing succeeds.
  */
 declare function isSvelteComponent(comp: any): boolean;
+declare function klona(x: any): any;
+/**
+ * Normalizes a string.
+ *
+ * @param {string}   query - A string to normalize for comparisons.
+ *
+ * @returns {string} Cleaned string.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
+ */
+declare function normalizeString(query: string): string;
 /**
  * Runs outro transition then destroys Svelte component.
  *
@@ -215,5 +249,15 @@ declare function styleParsePixels(value: string): number | undefined;
  * @returns {string} UUIDv4
  */
 declare function uuidv4(): string;
+declare namespace uuidv4 {
+    /**
+     * Validates that the given string is formatted as a UUIDv4 string.
+     *
+     * @param {string}   uuid - UUID string to test.
+     *
+     * @returns {boolean} Is UUIDv4 string.
+     */
+    function isValid(uuid: string): boolean;
+}
 
-export { ParseDataTransferOptions, debounce, deepMerge, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };
+export { ParseDataTransferOptions, StackingContext, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };

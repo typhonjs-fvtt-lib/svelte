@@ -221,9 +221,9 @@ export class SvelteApplication extends Application
    {
       if (force || this.popOut) { super.bringToTop(); }
 
-      // If the activeElement is not `document.body` then blur the current active element and make `document.body`
-      // focused. This allows <esc> key to close all open apps / windows.
-      if (document.activeElement !== document.body)
+      // If the activeElement is not `document.body` and not contained in this app via elementTarget then blur the
+      // current active element and make `document.body`focused. This allows <esc> key to close all open apps / windows.
+      if (document.activeElement !== document.body && !this.elementTarget.contains(document.activeElement))
       {
          // Blur current active element.
          if (document.activeElement instanceof HTMLElement) { document.activeElement.blur(); }
@@ -278,7 +278,17 @@ export class SvelteApplication extends Application
       // Make any window content overflow hidden to avoid any scrollbars appearing in default or Svelte outro
       // transitions.
       const content = el.querySelector('.window-content');
-      if (content) { content.style.overflow = 'hidden'; }
+      if (content)
+      {
+         content.style.overflow = 'hidden';
+
+         // Set all children of content to overflow hidden as if there is going to be additional scrolling elements
+         // they are likely one level deep.
+         for (let cntr = content.children.length; --cntr >= 0;)
+         {
+            content.children[cntr].style.overflow = 'hidden';
+         }
+      }
 
       // Dispatch Hooks for closing the base and subclass applications
       for (const cls of this.constructor._getInheritanceChain())
@@ -558,6 +568,9 @@ export class SvelteApplication extends Application
       const header = element.querySelector('.window-header');
       const content = element.querySelector('.window-content');
 
+      // Get the complete position before minimized. Used to reset min width & height to initial values later.
+      const positionBefore = this.position.state.get({ name: '#beforeMinimized' });
+
       // First animate / restore width / async.
       if (animate)
       {
@@ -601,18 +614,31 @@ export class SvelteApplication extends Application
          { maxHeight: '100%', offset: 1 },
       ], { duration: durationMS, fill: 'forwards' }).finished; // WAAPI in ms.
 
-      // minHeight needs to be adjusted to options or Foundry default window height.
-      this.position.minHeight = this.options?.minHeight ?? MIN_WINDOW_HEIGHT;
+      // Restore previous min width & height from saved data, app options, or default Foundry values.
+      this.position.set({
+         minHeight: positionBefore.minHeight ?? this.options?.minHeight ?? MIN_WINDOW_HEIGHT,
+         minWidth: positionBefore.minWidth ?? this.options?.minWidth ?? MIN_WINDOW_WIDTH,
+      });
+
+      // Remove inline styles that override any styles assigned to the app.
+      element.style.minWidth = null;
+      element.style.minHeight = null;
 
       element.classList.remove('minimized');
 
       this._minimized = false;
 
-      element.style.minWidth = null;
-      element.style.minHeight = null;
-
       // Using a 50ms timeout prevents any instantaneous display of scrollbars with the above maximize animation.
-      setTimeout(() => content.style.overflow = null, 50);
+      setTimeout(() =>
+      {
+         content.style.overflow = null;
+
+         // Reset all children of content removing overflow hidden.
+         for (let cntr = content.children.length; --cntr >= 0;)
+         {
+            content.children[cntr].style.overflow = null;
+         }
+      }, 50);
 
       this.#stores.uiOptionsUpdate((options) => deepMerge(options, { minimized: false }));
    }
@@ -647,11 +673,28 @@ export class SvelteApplication extends Application
       const header = element.querySelector('.window-header');
       const content = element.querySelector('.window-content');
 
-      // Remove minimum width and height styling rules
+      // Save current max / min height & width.
+      const beforeMinWidth = this.position.minWidth;
+      const beforeMinHeight = this.position.minHeight;
+
+      // Set minimized min width & height for header bar.
+      this.position.set({ minWidth: 100, minHeight: 30 });
+
+      // Also set inline styles to override any styles scoped to the app.
       element.style.minWidth = '100px';
       element.style.minHeight = '30px';
 
-      content.style.overflow = 'hidden';
+      if (content)
+      {
+         content.style.overflow = 'hidden';
+
+         // Set all children of content to overflow hidden as if there is going to be additional scrolling elements
+         // they are likely one level deep.
+         for (let cntr = content.children.length; --cntr >= 0;)
+         {
+            content.children[cntr].style.overflow = 'hidden';
+         }
+      }
 
       const { paddingBottom, paddingTop } = globalThis.getComputedStyle(content);
 
@@ -679,7 +722,11 @@ export class SvelteApplication extends Application
       }
 
       // Save current position state and add the constraint data to use in `maximize`.
-      this.position.state.save({ name: '#beforeMinimized', constraints });
+      const saved = this.position.state.save({ name: '#beforeMinimized', constraints });
+
+      // Set the initial before min width & height.
+      saved.minWidth = beforeMinWidth;
+      saved.minHeight = beforeMinHeight;
 
       const headerOffsetHeight = header.offsetHeight;
 

@@ -21,7 +21,7 @@
 /**
  * @typedef {object} GameSetting - Defines a game setting.
  *
- * @property {string} moduleId - The ID of the module / system.
+ * @property {string} namespace - The setting namespace; usually the ID of the module / system.
  *
  * @property {string} key - The setting key to register.
  *

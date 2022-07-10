@@ -1,97 +1,6 @@
 import { group_outros, transition_out, check_outros } from 'svelte/internal';
 
 /**
- * Wraps a callback in a debounced timeout.
- *
- * Delay execution of the callback function until the function has not been called for the given delay in milliseconds.
- *
- * @param {Function} callback - A function to execute once the debounced threshold has been passed.
- *
- * @param {number}   delay - An amount of time in milliseconds to delay.
- *
- * @return {Function} A wrapped function that can be called to debounce execution.
- */
-function debounce(callback, delay)
-{
-   let timeoutId;
-
-   return function(...args)
-   {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => { callback.apply(this, args); }, delay);
-   }
-}
-
-/**
- * Provides a method to determine if the passed in Svelte component has a getter accessor.
- *
- * @param {*}        object - An object.
- *
- * @param {string}   accessor - Accessor to test.
- *
- * @returns {boolean} Whether the component has the getter for accessor.
- */
-function hasGetter(object, accessor)
-{
-   if (object === null || object === void 0) { return false; }
-
-   // Walk parent prototype chain. Check for descriptor at each prototype level.
-   for (let o = Object.getPrototypeOf(object); o; o = Object.getPrototypeOf(o))
-   {
-      const descriptor = Object.getOwnPropertyDescriptor(o, accessor);
-      if (descriptor !== void 0 && descriptor.get !== void 0) { return true; }
-   }
-
-   return false;
-}
-
-/**
- * Provides a method to determine if the passed in Svelte component has a getter & setter accessor.
- *
- * @param {*}        object - An object.
- *
- * @param {string}   accessor - Accessor to test.
- *
- * @returns {boolean} Whether the component has the getter and setter for accessor.
- */
-function hasAccessor(object, accessor)
-{
-   if (object === null || object === void 0) { return false; }
-
-   // Walk parent prototype chain. Check for descriptor at each prototype level.
-   for (let o = Object.getPrototypeOf(object); o; o = Object.getPrototypeOf(o))
-   {
-      const descriptor = Object.getOwnPropertyDescriptor(o, accessor);
-      if (descriptor !== void 0 && descriptor.get !== void 0 && descriptor.set !== void 0) { return true; }
-   }
-
-   return false;
-}
-
-/**
- * Provides a method to determine if the passed in Svelte component has a setter accessor.
- *
- * @param {*}        object - An object.
- *
- * @param {string}   accessor - Accessor to test.
- *
- * @returns {boolean} Whether the component has the setter for accessor.
- */
-function hasSetter(object, accessor)
-{
-   if (object === null || object === void 0) { return false; }
-
-   // Walk parent prototype chain. Check for descriptor at each prototype level.
-   for (let o = Object.getPrototypeOf(object); o; o = Object.getPrototypeOf(o))
-   {
-      const descriptor = Object.getOwnPropertyDescriptor(o, accessor);
-      if (descriptor !== void 0 && descriptor.set !== void 0) { return true; }
-   }
-
-   return false;
-}
-
-/**
  * Provides a solid string hashing algorithm.
  *
  * Sourced from: https://stackoverflow.com/a/52171480
@@ -121,6 +30,8 @@ function hashCode(str, seed = 0)
    return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 }
 
+const s_UUIDV4_REGEX = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
+
 /**
  * Generates a UUID v4 compliant ID. Please use a complete UUID generation package for guaranteed compliance.
  *
@@ -137,6 +48,189 @@ function uuidv4()
    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
     (c ^ (globalThis.crypto || globalThis.msCrypto).getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
 }
+
+/**
+ * Validates that the given string is formatted as a UUIDv4 string.
+ *
+ * @param {string}   uuid - UUID string to test.
+ *
+ * @returns {boolean} Is UUIDv4 string.
+ */
+uuidv4.isValid = (uuid) => s_UUIDV4_REGEX.test(uuid);
+
+/**
+ * Normalizes a string.
+ *
+ * @param {string}   query - A string to normalize for comparisons.
+ *
+ * @returns {string} Cleaned string.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
+ */
+function normalizeString(query)
+{
+   return query.trim().normalize('NFD').replace(/[\x00-\x1F]/gm, '');
+}
+
+/**
+ * Recursive function that finds the closest parent stacking context.
+ * See also https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context
+ *
+ * Original author: Kerry Liu / https://github.com/gwwar
+ * @see: https://github.com/gwwar/z-context/blob/master/content-script.js
+ * @see: https://github.com/gwwar/z-context/blob/master/LICENSE
+ *
+ * @param {Element} node -
+ *
+ * @returns {StackingContext} The closest parent stacking context
+ */
+function getStackingContext(node)
+{
+   // the root element (HTML).
+   if (!node || node.nodeName === 'HTML')
+   {
+      return { node: document.documentElement, reason: 'root' };
+   }
+
+   // handle shadow root elements.
+   if (node.nodeName === '#document-fragment')
+   {
+      return getStackingContext(node.host);
+   }
+
+   const computedStyle = globalThis.getComputedStyle(node);
+
+   // position: fixed or sticky.
+   if (computedStyle.position === 'fixed' || computedStyle.position === 'sticky')
+   {
+      return { node: node, reason: `position: ${computedStyle.position}` };
+   }
+
+   // positioned (absolutely or relatively) with a z-index value other than "auto".
+   if (computedStyle.zIndex !== 'auto' && computedStyle.position !== 'static')
+   {
+      return { node: node, reason: `position: ${computedStyle.position}; z-index: ${computedStyle.zIndex}` };
+   }
+
+   // elements with an opacity value less than 1.
+   if (computedStyle.opacity !== '1')
+   {
+      return { node: node, reason: `opacity: ${computedStyle.opacity}` };
+   }
+
+   // elements with a transform value other than "none".
+   if (computedStyle.transform !== 'none')
+   {
+      return { node: node, reason: `transform: ${computedStyle.transform}` };
+   }
+
+   // elements with a mix-blend-mode value other than "normal".
+   if (computedStyle.mixBlendMode !== 'normal')
+   {
+      return { node: node, reason: `mixBlendMode: ${computedStyle.mixBlendMode}` };
+   }
+
+   // elements with a filter value other than "none".
+   if (computedStyle.filter !== 'none')
+   {
+      return { node: node, reason: `filter: ${computedStyle.filter}` };
+   }
+
+   // elements with a perspective value other than "none".
+   if (computedStyle.perspective !== 'none')
+   {
+      return { node: node, reason: `perspective: ${computedStyle.perspective}` };
+   }
+
+   // elements with a clip-path value other than "none".
+   if (computedStyle.clipPath !== 'none')
+   {
+      return { node: node, reason: `clip-path: ${computedStyle.clipPath} ` };
+   }
+
+   // elements with a mask value other than "none".
+   const mask = computedStyle.mask || computedStyle.webkitMask;
+   if (mask !== 'none' && mask !== undefined)
+   {
+      return { node: node, reason: `mask:  ${mask}` };
+   }
+
+   // elements with a mask-image value other than "none".
+   const maskImage = computedStyle.maskImage || computedStyle.webkitMaskImage;
+   if (maskImage !== 'none' && maskImage !== undefined)
+   {
+      return { node: node, reason: `mask-image: ${maskImage}` };
+   }
+
+   // elements with a mask-border value other than "none".
+   const maskBorder = computedStyle.maskBorder || computedStyle.webkitMaskBorder;
+   if (maskBorder !== 'none' && maskBorder !== undefined)
+   {
+      return { node: node, reason: `mask-border: ${maskBorder}` };
+   }
+
+   // elements with isolation set to "isolate".
+   if (computedStyle.isolation === 'isolate')
+   {
+      return { node: node, reason: `isolation: ${computedStyle.isolation}` };
+   }
+
+   // transform or opacity in will-change even if you don't specify values for these attributes directly.
+   if (computedStyle.willChange === 'transform' || computedStyle.willChange === 'opacity')
+   {
+      return { node: node, reason: `willChange: ${computedStyle.willChange}` };
+   }
+
+   // elements with -webkit-overflow-scrolling set to "touch".
+   if (computedStyle.webkitOverflowScrolling === 'touch')
+   {
+      return { node: node, reason: '-webkit-overflow-scrolling: touch' };
+   }
+
+   // an item with a z-index value other than "auto".
+   if (computedStyle.zIndex !== 'auto')
+   {
+      const parentStyle = globalThis.getComputedStyle(node.parentNode);
+      // with a flex|inline-flex parent.
+      if (parentStyle.display === 'flex' || parentStyle.display === 'inline-flex')
+      {
+         return {
+            node: node,
+            reason: `flex-item; z-index: ${computedStyle.zIndex}`,
+         };
+         // with a grid parent.
+      }
+      else if (parentStyle.grid !== 'none / none / none / row / auto / auto')
+      {
+         return {
+            node: node,
+            reason: `child of grid container; z-index: ${computedStyle.zIndex}`,
+         };
+      }
+   }
+
+   // contain with a value of layout, or paint, or a composite value that includes either of them
+   const contain = computedStyle.contain;
+   if (['layout', 'paint', 'strict', 'content'].indexOf(contain) > -1 ||
+    contain.indexOf('paint') > -1 ||
+    contain.indexOf('layout') > -1
+   )
+   {
+      return {
+         node: node,
+         reason: `contain: ${contain}`,
+      };
+   }
+
+   return getStackingContext(node.parentNode);
+}
+
+/**
+ * @typedef {Object} StackingContext
+ *
+ * @property {Element} node          A DOM Element
+ * @property {string}  reason        Reason for why a stacking context was created
+ */
 
 const s_REGEX = /(\d+)\s*px/;
 
@@ -467,6 +561,151 @@ function s_PROCESS_PROPS(props, thisArg, config)
 }
 
 /**
+ * Wraps a callback in a debounced timeout.
+ *
+ * Delay execution of the callback function until the function has not been called for the given delay in milliseconds.
+ *
+ * @param {Function} callback - A function to execute once the debounced threshold has been passed.
+ *
+ * @param {number}   delay - An amount of time in milliseconds to delay.
+ *
+ * @return {Function} A wrapped function that can be called to debounce execution.
+ */
+function debounce(callback, delay)
+{
+   let timeoutId;
+
+   return function(...args)
+   {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => { callback.apply(this, args); }, delay);
+   }
+}
+
+/**
+ * Provides a method to determine if the passed in Svelte component has a getter accessor.
+ *
+ * @param {*}        object - An object.
+ *
+ * @param {string}   accessor - Accessor to test.
+ *
+ * @returns {boolean} Whether the component has the getter for accessor.
+ */
+function hasGetter(object, accessor)
+{
+   if (object === null || object === void 0) { return false; }
+
+   // Walk parent prototype chain. Check for descriptor at each prototype level.
+   for (let o = Object.getPrototypeOf(object); o; o = Object.getPrototypeOf(o))
+   {
+      const descriptor = Object.getOwnPropertyDescriptor(o, accessor);
+      if (descriptor !== void 0 && descriptor.get !== void 0) { return true; }
+   }
+
+   return false;
+}
+
+/**
+ * Provides a method to determine if the passed in Svelte component has a getter & setter accessor.
+ *
+ * @param {*}        object - An object.
+ *
+ * @param {string}   accessor - Accessor to test.
+ *
+ * @returns {boolean} Whether the component has the getter and setter for accessor.
+ */
+function hasAccessor(object, accessor)
+{
+   if (object === null || object === void 0) { return false; }
+
+   // Walk parent prototype chain. Check for descriptor at each prototype level.
+   for (let o = Object.getPrototypeOf(object); o; o = Object.getPrototypeOf(o))
+   {
+      const descriptor = Object.getOwnPropertyDescriptor(o, accessor);
+      if (descriptor !== void 0 && descriptor.get !== void 0 && descriptor.set !== void 0) { return true; }
+   }
+
+   return false;
+}
+
+/**
+ * Provides a method to determine if the passed in Svelte component has a setter accessor.
+ *
+ * @param {*}        object - An object.
+ *
+ * @param {string}   accessor - Accessor to test.
+ *
+ * @returns {boolean} Whether the component has the setter for accessor.
+ */
+function hasSetter(object, accessor)
+{
+   if (object === null || object === void 0) { return false; }
+
+   // Walk parent prototype chain. Check for descriptor at each prototype level.
+   for (let o = Object.getPrototypeOf(object); o; o = Object.getPrototypeOf(o))
+   {
+      const descriptor = Object.getOwnPropertyDescriptor(o, accessor);
+      if (descriptor !== void 0 && descriptor.set !== void 0) { return true; }
+   }
+
+   return false;
+}
+
+function set(obj, key, val) {
+	if (typeof val.value === 'object') val.value = klona(val.value);
+	if (!val.enumerable || val.get || val.set || !val.configurable || !val.writable || key === '__proto__') {
+		Object.defineProperty(obj, key, val);
+	} else obj[key] = val.value;
+}
+
+function klona(x) {
+	if (typeof x !== 'object') return x;
+
+	var i=0, k, list, tmp, str=Object.prototype.toString.call(x);
+
+	if (str === '[object Object]') {
+		tmp = Object.create(x.__proto__ || null);
+	} else if (str === '[object Array]') {
+		tmp = Array(x.length);
+	} else if (str === '[object Set]') {
+		tmp = new Set;
+		x.forEach(function (val) {
+			tmp.add(klona(val));
+		});
+	} else if (str === '[object Map]') {
+		tmp = new Map;
+		x.forEach(function (val, key) {
+			tmp.set(klona(key), klona(val));
+		});
+	} else if (str === '[object Date]') {
+		tmp = new Date(+x);
+	} else if (str === '[object RegExp]') {
+		tmp = new RegExp(x.source, x.flags);
+	} else if (str === '[object DataView]') {
+		tmp = new x.constructor( klona(x.buffer) );
+	} else if (str === '[object ArrayBuffer]') {
+		tmp = x.slice(0);
+	} else if (str.slice(-6) === 'Array]') {
+		// ArrayBuffer.isView(x)
+		// ~> `new` bcuz `Buffer.slice` => ref
+		tmp = new x.constructor(x);
+	}
+
+	if (tmp) {
+		for (list=Object.getOwnPropertySymbols(x); i < list.length; i++) {
+			set(tmp, list[i], Object.getOwnPropertyDescriptor(x, list[i]));
+		}
+
+		for (i=0, list=Object.getOwnPropertyNames(x); i < list.length; i++) {
+			if (Object.hasOwnProperty.call(tmp, k=list[i]) && tmp[k] === x[k]) continue;
+			set(tmp, k, Object.getOwnPropertyDescriptor(x, k));
+		}
+	}
+
+	return tmp || x;
+}
+
+/**
  * Provides common object manipulation utilities including depth traversal, obtaining accessors, safely setting values /
  * equality tests, and validation.
  */
@@ -758,5 +997,5 @@ function getUUIDFromDataTransfer(data, { actor = true, compendium = true, world 
  * @property {string[]|undefined}   [types] - Require the `data.type` to match entry in `types`.
  */
 
-export { debounce, deepMerge, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };
+export { debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };
 //# sourceMappingURL=index.js.map

@@ -1,33 +1,24 @@
 import * as svelte_store from 'svelte/store';
-import { get } from 'svelte/types/runtime/store';
 
 /**
  * - The backing Svelte store; a writable w/ get method attached.
  */
-type LSStore = svelte_store.Writable<any> & typeof get;
+type LSStore = svelte_store.Writable<any>;
 /**
  * - The backing Svelte store; a writable w/ get method attached.
  */
-type SSStore = svelte_store.Writable<any> & typeof get;
+type SSStore = svelte_store.Writable<any>;
 type TJSDocumentOptions = {
     /**
      * - Optional delete function to invoke when document is deleted.
      */
     delete?: Function;
-    /**
-     * - When true a subscribers are notified of the deletion of the document.
-     */
-    notifyOnDelete?: boolean;
 };
 type TJSDocumentCollectionOptions = {
     /**
      * - Optional delete function to invoke when document is deleted.
      */
     delete?: Function;
-    /**
-     * - When true a subscribers are notified of the deletion of the document.
-     */
-    notifyOnDelete?: boolean;
 };
 /**
  * - Provides a Svelte store wrapping the Foundry `game` global variable. It is initialized
@@ -74,13 +65,17 @@ type GameSettingOptions = {
  */
 type GameSetting = {
     /**
-     * - The ID of the module / system.
+     * - The setting namespace; usually the ID of the module / system.
      */
-    moduleId: string;
+    namespace: string;
     /**
      * - The setting key to register.
      */
     key: string;
+    /**
+     * - An existing store instance to use.
+     */
+    store?: svelte_store.Writable<any>;
     /**
      * - Configuration for setting data.
      */
@@ -94,19 +89,13 @@ type GSWritableStore = svelte_store.Writable<any>;
  * - The backing Svelte store; readable w/ get method attached.
  */
 type GSReadableStore = svelte_store.Readable<any>;
-declare class DynArrayReducer {
-    /**
-     * @type {AdapterFilters<T>}
-     */
-    /**
-     * @type {{filters: FilterFn<T>[]}}
-     */
-    /**
-     * @type {AdapterSort<T>}
-     */
-    /**
-     * @type {{compareFn: CompareFn<T>}}
-     */
+/**
+ * Provides a managed array with non-destructive reducing / filtering / sorting capabilities with subscription /
+ * Svelte store support.
+ *
+ * @template T
+ */
+declare class DynArrayReducer<T> {
     /**
      * Initializes DynArrayReducer. Any iterable is supported for initial data. Take note that if `data` is an array it
      * will be used as the host array and not copied. All non-array iterables otherwise create a new array / copy.
@@ -114,6 +103,16 @@ declare class DynArrayReducer {
      * @param {Iterable<T>|DynData<T>}   data - Data iterable to store if array or copy otherwise.
      */
     constructor(data?: Iterable<T> | any);
+    /**
+     * Returns the internal data of this instance. Be careful!
+     *
+     * Note: if an array is set as initial data then that array is used as the internal data. If any changes are
+     * performed to the data externally do invoke {@link index.update} with `true` to recalculate the index and notify
+     * all subscribers.
+     *
+     * @returns {T[]} The internal data.
+     */
+    get data(): T[];
     /**
      * @returns {AdapterFilters<T>} The filters adapter.
      */
@@ -133,7 +132,16 @@ declare class DynArrayReducer {
     /**
      * @returns {AdapterSort<T>} The sort adapter.
      */
-    get sort(): any;
+    get sort(): AdapterSort<T>;
+    /**
+     * Removes internal data and pushes new data. This does not destroy any initial array set to internal data unless
+     * `replace` is set to true.
+     *
+     * @param {T[] | Iterable<T>} data - New data to set to internal data.
+     *
+     * @param {boolean} [replace=false] - New data to set to internal data.
+     */
+    setData(data: T[] | Iterable<T>, replace?: boolean): void;
     /**
      *
      * @param {function(DynArrayReducer<T>): void} handler - Callback function that is invoked on update / changes.
@@ -142,53 +150,33 @@ declare class DynArrayReducer {
      * @returns {(function(): void)} Unsubscribe function.
      */
     subscribe(handler: (arg0: DynArrayReducer<T>) => void): (() => void);
+    /**
+     * Provides an iterator for data stored in DynArrayReducer.
+     *
+     * @returns {Generator<*, T, *>} Generator / iterator of all data.
+     * @yields {T}
+     */
+    [Symbol.iterator](): Generator<any, T, any>;
+    #private;
 }
+/**
+ * @typedef {import('svelte/store').Writable} LSStore - The backing Svelte store; a writable w/ get method attached.
+ */
 declare class LocalStorage {
     /**
-     * Get value from the localstorage.
+     * Creates a new LSStore for the given key.
      *
-     * @param {string}   key - Key to lookup in localstorage.
+     * @param {string}   key - Key to lookup in stores map.
      *
-     * @param {*}        [defaultValue] - A default value to return if key not present in local storage.
+     * @param {boolean}  [defaultValue] - A default value to set for the store.
      *
-     * @returns {*} Value from local storage or if not defined any default value provided.
+     * @returns {LSStore} The new LSStore.
      */
-    getItem(key: string, defaultValue?: any): any;
+    static "__#317768@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
-     * Returns the backing Svelte store for the given key; potentially sets a default value if the key
-     * is not already set.
+     * Get value from the localStorage.
      *
-     * @param {string}   key - Key to lookup in localstorage.
-     *
-     * @param {*}        [defaultValue] - A default value to return if key not present in local storage.
-     *
-     * @returns {LSStore} The Svelte store for this key.
-     */
-    getStore(key: string, defaultValue?: any): LSStore;
-    /**
-     * Sets the value for the given key in localstorage.
-     *
-     * @param {string}   key - Key to lookup in localstorage.
-     *
-     * @param {*}        value - A value to set for this key.
-     */
-    setItem(key: string, value: any): void;
-    /**
-     * Convenience method to swap a boolean value stored in local storage.
-     *
-     * @param {string}   key - Key to lookup in localstorage.
-     *
-     * @param {boolean}  [defaultValue] - A default value to return if key not present in local storage.
-     *
-     * @returns {boolean} The boolean swap for the given key.
-     */
-    swapItemBoolean(key: string, defaultValue?: boolean): boolean;
-}
-declare class SessionStorage {
-    /**
-     * Get value from the sessionstorage.
-     *
-     * @param {string}   key - Key to lookup in sessionstorage.
+     * @param {string}   key - Key to lookup in localStorage.
      *
      * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
      *
@@ -199,17 +187,17 @@ declare class SessionStorage {
      * Returns the backing Svelte store for the given key; potentially sets a default value if the key
      * is not already set.
      *
-     * @param {string}   key - Key to lookup in sessionstorage.
+     * @param {string}   key - Key to lookup in localStorage.
      *
      * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
      *
      * @returns {LSStore} The Svelte store for this key.
      */
-    getStore(key: string, defaultValue?: any): LSStore;
+    getStore(key: string, defaultValue?: any): svelte_store.Writable<any>;
     /**
-     * Sets the value for the given key in sessionstorage.
+     * Sets the value for the given key in localStorage.
      *
-     * @param {string}   key - Key to lookup in sessionstorage.
+     * @param {string}   key - Key to lookup in localStorage.
      *
      * @param {*}        value - A value to set for this key.
      */
@@ -217,13 +205,69 @@ declare class SessionStorage {
     /**
      * Convenience method to swap a boolean value stored in session storage.
      *
-     * @param {string}   key - Key to lookup in sessionstorage.
+     * @param {string}   key - Key to lookup in localStorage.
      *
      * @param {boolean}  [defaultValue] - A default value to return if key not present in session storage.
      *
      * @returns {boolean} The boolean swap for the given key.
      */
     swapItemBoolean(key: string, defaultValue?: boolean): boolean;
+    #private;
+}
+/**
+ * @typedef {import('svelte/store').Writable} SSStore - The backing Svelte store; a writable w/ get method attached.
+ */
+declare class SessionStorage {
+    /**
+     * Creates a new SSStore for the given key.
+     *
+     * @param {string}   key - Key to lookup in stores map.
+     *
+     * @param {boolean}  [defaultValue] - A default value to set for the store.
+     *
+     * @returns {LSStore} The new LSStore.
+     */
+    static "__#317769@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    /**
+     * Get value from the sessionStorage.
+     *
+     * @param {string}   key - Key to lookup in sessionStorage.
+     *
+     * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
+     *
+     * @returns {*} Value from session storage or if not defined any default value provided.
+     */
+    getItem(key: string, defaultValue?: any): any;
+    /**
+     * Returns the backing Svelte store for the given key; potentially sets a default value if the key
+     * is not already set.
+     *
+     * @param {string}   key - Key to lookup in sessionStorage.
+     *
+     * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
+     *
+     * @returns {LSStore} The Svelte store for this key.
+     */
+    getStore(key: string, defaultValue?: any): svelte_store.Writable<any>;
+    /**
+     * Sets the value for the given key in sessionStorage.
+     *
+     * @param {string}   key - Key to lookup in sessionStorage.
+     *
+     * @param {*}        value - A value to set for this key.
+     */
+    setItem(key: string, value: any): void;
+    /**
+     * Convenience method to swap a boolean value stored in session storage.
+     *
+     * @param {string}   key - Key to lookup in sessionStorage.
+     *
+     * @param {boolean}  [defaultValue] - A default value to return if key not present in session storage.
+     *
+     * @returns {boolean} The boolean swap for the given key.
+     */
+    swapItemBoolean(key: string, defaultValue?: boolean): boolean;
+    #private;
 }
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.
@@ -251,6 +295,11 @@ declare class TJSDocument<T extends any> {
      * @returns {*} UUID
      */
     get uuidv4(): any;
+    /**
+     * Completely removes all internal subscribers, any optional delete callback, and unregisters from the
+     * ClientDocumentMixin `apps` tracking object.
+     */
+    destroy(): void;
     /**
      * @returns {T | undefined} Current document
      */
@@ -299,8 +348,6 @@ declare class TJSDocument<T extends any> {
  * @typedef {object} TJSDocumentOptions
  *
  * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
- *
- * @property {boolean} [notifyOnDelete] - When true a subscribers are notified of the deletion of the document.
  */
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any DocumentCollection. This makes
@@ -328,6 +375,11 @@ declare class TJSDocumentCollection<T extends any> {
      * @returns {*} UUID
      */
     get uuid(): any;
+    /**
+     * Completely removes all internal subscribers, any optional delete callback, and unregisters from the
+     * DocumentCollection `apps` tracking array.
+     */
+    destroy(): void;
     /**
      * @returns {T | undefined} Current collection
      */
@@ -366,6 +418,14 @@ declare class TJSDocumentCollection<T extends any> {
  * `onChange` callbacks on registration.
  */
 declare class TJSGameSettings {
+    /**
+     * Creates a new GSWritableStore for the given key.
+     *
+     * @param {string}   initialValue - An initial value to set to new stores.
+     *
+     * @returns {GSWritableStore} The new GSWritableStore.
+     */
+    static "__#317772@#createStore"(initialValue: string): svelte_store.Writable<any>;
     /**
      * Returns a readable Game Settings store for the associated key.
      *
@@ -478,29 +538,28 @@ declare function subscribeFirstRest(store: svelte_store.Readable<any> | svelte_s
 declare function subscribeIgnoreFirst(store: svelte_store.Readable<any> | svelte_store.Writable<any>, update: any): svelte_store.Unsubscriber;
 /**
  * @external Store
- * @see [Svelte stores](https://svelte.dev/docs#Store_contract)
+ * @see [Svelte stores](https://svelte.dev/docs#component-format-script-4-prefix-stores-with-$-to-access-their-values-store-contract)
  */
 /**
- * Create a store similar to [Svelte's `derived`](https://svelte.dev/docs#derived), but which
- * has its own `set` and `update` methods and can send values back to the origin stores.
+ * Create a store similar to [Svelte's `derived`](https://svelte.dev/docs#run-time-svelte-store-writable),
+ * but which has its own `set` and `update` methods and can send values back to the origin stores.
  * [Read more...](https://github.com/PixievoltNo1/svelte-writable-derived#default-export-writablederived)
  *
  * @param {Store|Store[]} origins One or more stores to derive from. Same as
- * [`derived`](https://svelte.dev/docs#derived)'s 1st parameter.
+ * [`derived`](https://svelte.dev/docs#run-time-svelte-store-writable)'s 1st parameter.
  * @param {!Function} derive The callback to determine the derived value. Same as
- * [`derived`](https://svelte.dev/docs#derived)'s 2nd parameter.
+ * [`derived`](https://svelte.dev/docs#run-time-svelte-store-writable)'s 2nd parameter.
  * @param {!Function|{withOld: !Function}} reflect Called when the
  * derived store gets a new value via its `set` or `update` methods, and determines new values for
  * the origin stores. [Read more...](https://github.com/PixievoltNo1/svelte-writable-derived#new-parameter-reflect)
  * @param [initial] The new store's initial value. Same as
- * [`derived`](https://svelte.dev/docs#derived)'s 3rd parameter.
+ * [`derived`](https://svelte.dev/docs#run-time-svelte-store-writable)'s 3rd parameter.
  *
  * @returns {Store} A writable store.
  */
 declare function writableDerived(origins: any | any[], derive: Function, reflect: Function | {
     withOld: Function;
 }, initial?: any): any;
-
 /**
  * Provides the storage and sequencing of managed filters. Each filter added may be a bespoke function or a
  * {@link FilterData} object containing an `id`, `filter`, and `weight` attributes; `filter` is the only required
@@ -556,6 +615,36 @@ declare class AdapterFilters<T> {
      */
     removeBy(callback: (arg0: any, arg1: any, arg2: number) => boolean): void;
     removeById(...ids: any[]): void;
+    /**
+     * Provides an iterator for filters.
+     *
+     * @returns {Generator<number|undefined, FilterData<T>, *>} Generator / iterator of filters.
+     * @yields {FilterData<T>}
+     */
+    [Symbol.iterator](): Generator<number | undefined, any, any>;
+    #private;
+}
+/**
+ * @template T
+ */
+declare class AdapterSort<T> {
+    /**
+     * @param {Function} indexUpdate - Function to update indexer.
+     *
+     * @returns {[AdapterSort<T>, {compareFn: CompareFn<T>}]} This and the internal sort adapter data.
+     */
+    constructor(indexUpdate: Function);
+    /**
+     * @param {CompareFn<T>|SortData<T>}  data -
+     *
+     * A callback function that compares two values. Return > 0 to sort b before a;
+     * < 0 to sort a before b; or 0 to keep original order of a & b.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#parameters
+     */
+    set(data: any | any): void;
+    reset(): void;
+    #private;
 }
 
 export { DynArrayReducer, GSReadableStore, GSWritableStore, GameSetting, GameSettingOptions, GameState, LSStore, LocalStorage, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, TJSGameSettings, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };

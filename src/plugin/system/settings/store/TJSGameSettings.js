@@ -28,9 +28,12 @@ export class TJSGameSettings
    {
       if (typeof setting !== 'object') { throw new TypeError(`TJSGameSettings - register: setting is not an object.`); }
 
-      if (typeof setting.moduleId !== 'string')
+      // TODO: Remove deprecation warning and fully remove support for `moduleId` in a future TRL release.
+      if (typeof setting.moduleId === 'string')
       {
-         throw new TypeError(`TJSGameSettings - register: 'moduleId' attribute is not a string.`);
+         console.warn(
+          `TJSGameSettings - register deprecation warning: 'moduleId' should be replaced with 'namespace'.`);
+         console.warn(`'moduleId' will cease to work in a future update of TRL / TJSGameSettings.`);
       }
 
       if (typeof setting.key !== 'string')
@@ -43,8 +46,14 @@ export class TJSGameSettings
          throw new TypeError(`TJSGameSettings - register: 'options' attribute is not an object.`);
       }
 
-      const moduleId = setting.moduleId;
+      // TODO: Remove nullish coalescing operator in a future TRL release.
+      const namespace = setting.namespace ?? setting.moduleId;
       const key = setting.key;
+
+      if (typeof namespace !== 'string')
+      {
+         throw new TypeError(`TJSGameSettings - register: 'namespace' attribute is not a string.`);
+      }
 
       /**
        * @type {GameSettingOptions}
@@ -62,7 +71,7 @@ export class TJSGameSettings
          }
       });
 
-      this.#gameSettings.register({ moduleId, key, options: { ...options, onChange } });
+      this.#gameSettings.register({ namespace, key, options: { ...options, onChange } });
    }
 
    /**
@@ -121,7 +130,7 @@ export class TJSGameSettings
 /**
  * @typedef {object} GameSetting - Defines a game setting.
  *
- * @property {string} moduleId - The ID of the module / system.
+ * @property {string} namespace - The setting namespoce; usually the ID of the module / system.
  *
  * @property {string} key - The setting key to register.
  *

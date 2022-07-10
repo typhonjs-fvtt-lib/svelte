@@ -1,14 +1,3 @@
-import * as svelte_store from 'svelte/store';
-import { get } from 'svelte/types/runtime/store';
-
-/**
- * - The backing Svelte store; a writable w/ get method attached.
- */
-type LSStore = svelte_store.Writable<any> & typeof get;
-/**
- * - The backing Svelte store; a writable w/ get method attached.
- */
-type SSStore = svelte_store.Writable<any> & typeof get;
 type GameSettingOptions = {
     /**
      * - If choices are defined, the resulting setting will be a select menu.
@@ -48,9 +37,9 @@ type GameSettingOptions = {
  */
 type GameSetting = {
     /**
-     * - The ID of the module / system.
+     * - The setting namespoce; usually the ID of the module / system.
      */
-    moduleId: string;
+    namespace: string;
     /**
      * - The setting key to register.
      */
@@ -116,4 +105,4 @@ declare class TJSSettingsControl {
     #private;
 }
 
-export { GameSetting, GameSettingOptions, LSStore, LocalStorage, SSStore, SessionStorage, TJSGameSettings, TJSSettingsControl };
+export { GameSetting, GameSettingOptions, LocalStorage, SessionStorage, TJSGameSettings, TJSSettingsControl };
