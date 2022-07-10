@@ -2126,7 +2126,6 @@ class TJSGameSettings
          throw new TypeError(`TJSGameSettings - register: 'key' attribute is not a string.`);
       }
 
-
       const store = setting.store;
 
       /**
