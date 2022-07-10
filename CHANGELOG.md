@@ -24,6 +24,7 @@
 
 - Build issues: fixed Rollup build process that mistakenly included source referenced across modules.
 
+- Svelte updated to `3.49.0`
 
 ## Release 0.0.14 (massive update / animation stage #2)
 - Better error messages for Svelte component mounting.
