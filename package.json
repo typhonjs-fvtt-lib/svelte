@@ -1,6 +1,6 @@
 {
   "name": "@typhonjs-fvtt/svelte",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Provides resources to integrate Svelte w/ Foundry VTT.",
   "type": "module",
   "author": "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)",
@@ -97,7 +97,7 @@
     "rollup-plugin-sourcemaps": "^0.6.0",
     "rollup-plugin-svelte": "^7",
     "rollup-plugin-terser": "^7",
-    "svelte": "^3.48.0",
+    "svelte": "^3.49.0",
     "upath": "^2"
   },
   "engines": {
