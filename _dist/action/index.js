@@ -407,7 +407,9 @@ function applyScrolltop(element, store)
 
    let unsubscribe = store.subscribe(storeUpdate);
 
-   const resizeControl = resizeObserver(element, debounce(() => store.set(element.scrollTop), 500));
+   const resizeControl = resizeObserver(element, debounce(() => {
+      if (element.isConnected) { store.set(element.scrollTop); }
+   }, 500));
 
    /**
     * Save target `scrollTop` to the current set store.

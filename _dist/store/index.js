@@ -777,6 +777,11 @@ class DynArrayReducer
     */
    set reversed(reversed)
    {
+      if (typeof reversed !== 'boolean')
+      {
+         throw new TypeError(`DynArrayReducer.reversed error: 'reversed' is not a boolean.`);
+      }
+
       this.#reversed = reversed;
 
       // Recalculate index and force an update to any subscribers.
