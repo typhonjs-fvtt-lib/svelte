@@ -414,7 +414,7 @@ class AdapterSort
 
 class Indexer
 {
-   constructor(hostItems, hostUpdate)
+   constructor(host, hostItems, hostUpdate)
    {
       this.hostItems = hostItems;
       this.hostUpdate = hostUpdate;
@@ -434,7 +434,17 @@ class Indexer
          {
             if (!indexAdapter.index) { return; }
 
-            for (const index of indexAdapter.index) { yield index; }
+            const reversed = host.reversed;
+            const length = indexAdapter.index.length;
+
+            if (reversed)
+            {
+               for (let cntr = length; --cntr >= 0;) { yield indexAdapter.index[cntr]; }
+            }
+            else
+            {
+               for (let cntr = 0; cntr < length; cntr++) { yield indexAdapter.index[cntr]; }
+            }
          }
       };
 
@@ -622,6 +632,11 @@ class DynArrayReducer
    #filtersAdapter;
 
    /**
+    * @type {boolean}
+    */
+   #reversed = false;
+
+   /**
     * @type {AdapterSort<T>}
     */
    #sort;
@@ -637,18 +652,18 @@ class DynArrayReducer
     * Initializes DynArrayReducer. Any iterable is supported for initial data. Take note that if `data` is an array it
     * will be used as the host array and not copied. All non-array iterables otherwise create a new array / copy.
     *
-    * @param {Iterable<T>|DynData<T>}   data - Data iterable to store if array or copy otherwise.
+    * @param {Iterable<T>|DynData<T>}   [data=[]] - Data iterable to store if array or copy otherwise.
     */
-   constructor(data = void 0)
+   constructor(data = [])
    {
       let dataIterable = void 0;
       let filters = void 0;
       let sort = void 0;
 
       // Potentially working with DynData.
-      if (!s_IS_ITERABLE(data) && typeof data === 'object')
+      if (!DynArrayReducer.#isIterable(data) && data !== null && typeof data === 'object')
       {
-         if (!s_IS_ITERABLE(data.data))
+         if (!DynArrayReducer.#isIterable(data.data))
          {
             throw new TypeError(`DynArrayReducer error (DynData): 'data' attribute is not iterable.`);
          }
@@ -657,7 +672,7 @@ class DynArrayReducer
 
          if (data.filters !== void 0)
          {
-            if (s_IS_ITERABLE(data.filters))
+            if (DynArrayReducer.#isIterable(data.filters))
             {
                filters = data.filters;
             }
@@ -681,7 +696,7 @@ class DynArrayReducer
       }
       else
       {
-         if (!s_IS_ITERABLE(data)) { throw new TypeError(`DynArrayReducer error: 'data' is not iterable.`); }
+         if (!DynArrayReducer.#isIterable(data)) { throw new TypeError(`DynArrayReducer error: 'data' is not iterable.`); }
 
          dataIterable = data;
       }
@@ -689,7 +704,7 @@ class DynArrayReducer
       // In the case of the main data being an array directly use the array otherwise create a copy.
       this.#items = Array.isArray(dataIterable) ? dataIterable : [...dataIterable];
 
-      [this.#index, this.#indexAdapter] = new Indexer(this.#items, this.#notify.bind(this));
+      [this.#index, this.#indexAdapter] = new Indexer(this, this.#items, this.#notify.bind(this));
 
       [this.#filters, this.#filtersAdapter] = new AdapterFilters(this.#indexAdapter.publicAPI.update);
       [this.#sort, this.#sortAdapter] = new AdapterSort(this.#indexAdapter.publicAPI.update);
@@ -699,6 +714,18 @@ class DynArrayReducer
       // Add any filters and sort function defined by DynData.
       if (filters) { this.filters.add(...filters); }
       if (sort) { this.sort.set(sort); }
+   }
+
+   /**
+    * Provides a utility method to determine if the given data is iterable / implements iterator protocol.
+    *
+    * @param {*}  data - Data to verify as iterable.
+    *
+    * @returns {boolean} Is data iterable.
+    */
+   static #isIterable(data)
+   {
+      return data !== null && data !== void 0 && typeof data === 'object' && typeof data[Symbol.iterator] === 'function';
    }
 
    /**
@@ -732,9 +759,29 @@ class DynArrayReducer
    get length() { return this.#items.length; }
 
    /**
+    * Gets current reversed state.
+    *
+    * @returns {boolean} Reversed state.
+    */
+   get reversed() { return this.#reversed; }
+
+   /**
     * @returns {AdapterSort<T>} The sort adapter.
     */
    get sort() { return this.#sort; }
+
+   /**
+    * Sets reversed state and notifies subscribers.
+    *
+    * @param {boolean} reversed - New reversed state.
+    */
+   set reversed(reversed)
+   {
+      this.#reversed = reversed;
+
+      // Recalculate index and force an update to any subscribers.
+      this.index.update(true);
+   }
 
    /**
     * Removes internal data and pushes new data. This does not destroy any initial array set to internal data unless
@@ -746,7 +793,10 @@ class DynArrayReducer
     */
    setData(data, replace = false)
    {
-      if (!s_IS_ITERABLE(data)) { throw new TypeError(`DynArrayReducer.setData error: 'data' is not iterable.`); }
+      if (!DynArrayReducer.#isIterable(data))
+      {
+         throw new TypeError(`DynArrayReducer.setData error: 'data' is not iterable.`);
+      }
 
       if (typeof replace !== 'boolean')
       {
@@ -821,21 +871,16 @@ class DynArrayReducer
       }
       else
       {
-         for (const entry of items) { yield entry; }
+         if (this.reversed)
+         {
+            for (let cntr = items.length; --cntr >= 0;) { yield items[cntr]; }
+         }
+         else
+         {
+            for (let cntr = 0; cntr < items.length; cntr++) { yield items[cntr]; }
+         }
       }
    }
-}
-
-/**
- * Provides a utility method to determine if the given data is iterable / implements iterator protocol.
- *
- * @param {*}  data - Data to verify as iterable.
- *
- * @returns {boolean} Is data iterable.
- */
-function s_IS_ITERABLE(data)
-{
-   return data !== null && data !== void 0 && typeof data === 'object' && typeof data[Symbol.iterator] === 'function';
 }
 
 /**

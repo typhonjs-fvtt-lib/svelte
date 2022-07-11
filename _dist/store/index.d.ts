@@ -97,10 +97,18 @@ type GSReadableStore = svelte_store.Readable<any>;
  */
 declare class DynArrayReducer<T> {
     /**
+     * Provides a utility method to determine if the given data is iterable / implements iterator protocol.
+     *
+     * @param {*}  data - Data to verify as iterable.
+     *
+     * @returns {boolean} Is data iterable.
+     */
+    static "__#317767@#isIterable"(data: any): boolean;
+    /**
      * Initializes DynArrayReducer. Any iterable is supported for initial data. Take note that if `data` is an array it
      * will be used as the host array and not copied. All non-array iterables otherwise create a new array / copy.
      *
-     * @param {Iterable<T>|DynData<T>}   data - Data iterable to store if array or copy otherwise.
+     * @param {Iterable<T>|DynData<T>}   [data=[]] - Data iterable to store if array or copy otherwise.
      */
     constructor(data?: Iterable<T> | any);
     /**
@@ -129,6 +137,18 @@ declare class DynArrayReducer<T> {
      * @returns {number} Main data / items length.
      */
     get length(): number;
+    /**
+     * Sets reversed state and notifies subscribers.
+     *
+     * @param {boolean} reversed - New reversed state.
+     */
+    set reversed(arg: boolean);
+    /**
+     * Gets current reversed state.
+     *
+     * @returns {boolean} Reversed state.
+     */
+    get reversed(): boolean;
     /**
      * @returns {AdapterSort<T>} The sort adapter.
      */
