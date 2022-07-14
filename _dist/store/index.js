@@ -1141,7 +1141,7 @@ class LocalStorage
       try
       {
          const value = localStorage.getItem(key);
-         if (value !== null) { defaultValue = JSON.parse(value); }
+         if (value !== null) { defaultValue = value === 'undefined' ? void 0 : JSON.parse(value); }
       }
       catch (err) { /**/ }
 
@@ -1186,12 +1186,24 @@ class LocalStorage
 
       if (storageValue !== null)
       {
-         value = JSON.parse(storageValue);
+         try
+         {
+            value = storageValue === 'undefined' ? void 0 : JSON.parse(storageValue);
+         } catch (err)
+         {
+            value = defaultValue;
+         }
       }
       else if (defaultValue !== void 0)
       {
-         // If there is no existing storage value and defaultValue is defined the storage value needs to be set.
-         localStorage.setItem(key, JSON.stringify(defaultValue));
+         try
+         {
+            const newValue = JSON.stringify(defaultValue);
+
+            // If there is no existing storage value and defaultValue is defined the storage value needs to be set.
+            localStorage.setItem(key, newValue === 'undefined' ? void 0 : newValue);
+         }
+         catch (err) { /* */ }
       }
 
       return value;
@@ -1283,7 +1295,7 @@ class SessionStorage
       try
       {
          const value = sessionStorage.getItem(key);
-         if (value !== null) { defaultValue = JSON.parse(value); }
+         if (value !== null) { defaultValue = value === 'undefined' ? void 0 : JSON.parse(value); }
       }
       catch (err) { /**/ }
 
@@ -1328,12 +1340,24 @@ class SessionStorage
 
       if (storageValue !== null)
       {
-         value = JSON.parse(storageValue);
+         try
+         {
+            value = storageValue === 'undefined' ? void 0 : JSON.parse(storageValue);
+         } catch (err)
+         {
+            value = defaultValue;
+         }
       }
       else if (defaultValue !== void 0)
       {
-         // If there is no existing storage value and defaultValue is defined the storage value needs to be set.
-         sessionStorage.setItem(key, JSON.stringify(defaultValue));
+         try
+         {
+            const newValue = JSON.stringify(defaultValue);
+
+            // If there is no existing storage value and defaultValue is defined the storage value needs to be set.
+            sessionStorage.setItem(key, newValue === 'undefined' ? void 0 : newValue);
+         }
+         catch (err) { /* */ }
       }
 
       return value;
