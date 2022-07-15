@@ -1,4 +1,10 @@
 # Changelog
+## Release 0.0.16 (small update) 
+- Updated `DynArrayReducer` from @typhonjs-svelte/lib to be able to dynamically reverse iteration. Useful for table 
+  sorting.
+ 
+- Fixed corner case issues in `SessionStorage` / `LocalStorage`. 
+
 ## Release 0.0.15 (medium update / 1 deprecation)
 - `action`
   - Added 'applyScrolltop'; stores and applies scrollTop to associated element.
