@@ -103,7 +103,7 @@ declare class DynArrayReducer<T> {
      *
      * @returns {boolean} Is data iterable.
      */
-    static "__#317767@#isIterable"(data: any): boolean;
+    static "__#319511@#isIterable"(data: any): boolean;
     /**
      * Initializes DynArrayReducer. Any iterable is supported for initial data. Take note that if `data` is an array it
      * will be used as the host array and not copied. All non-array iterables otherwise create a new array / copy.
@@ -192,7 +192,7 @@ declare class LocalStorage {
      *
      * @returns {LSStore} The new LSStore.
      */
-    static "__#317768@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#319512@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the localStorage.
      *
@@ -247,7 +247,7 @@ declare class SessionStorage {
      *
      * @returns {LSStore} The new LSStore.
      */
-    static "__#317769@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#319513@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the sessionStorage.
      *
@@ -445,7 +445,7 @@ declare class TJSGameSettings {
      *
      * @returns {GSWritableStore} The new GSWritableStore.
      */
-    static "__#317772@#createStore"(initialValue: string): svelte_store.Writable<any>;
+    static "__#319516@#createStore"(initialValue: string): svelte_store.Writable<any>;
     /**
      * Returns a readable Game Settings store for the associated key.
      *

@@ -1,6 +1,6 @@
 {
   "name": "@typhonjs-fvtt/svelte",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Provides resources to integrate Svelte w/ Foundry VTT.",
   "type": "module",
   "author": "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)",
@@ -10,7 +10,7 @@
   "svelte": "src/index-svelte.js",
   "exports": {
     "./action": {
-      "types": "./_dist/action/index.d.ts",
+      "types": "./_distaction/index.d.ts",
       "import": "./_dist/action/index.js"
     },
     "./animate": {
