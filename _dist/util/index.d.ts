@@ -129,7 +129,7 @@ declare function hashCode(str: string, seed?: number): number;
  */
 declare function isApplicationShell(component: any): boolean;
 /**
- * Provides basic duck typing to determine if the provided object is a HMR ProxyComponent instance.
+ * Provides basic duck typing to determine if the provided object is a HMR ProxyComponent instance or class.
  *
  * @param {*}  comp - Data to check as a HMR proxy component.
  *

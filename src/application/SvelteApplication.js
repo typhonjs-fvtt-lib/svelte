@@ -5,7 +5,7 @@ import {
    deepMerge,
    hasGetter,
    isApplicationShell,
-   // isHMRProxy,
+   isHMRProxy,
    outroAndDestroy }          from '@typhonjs-fvtt/svelte/util';
 
 import {
@@ -449,6 +449,15 @@ export class SvelteApplication extends Application
                }
 
                this.#applicationShellHolder[0] = svelteData.component;
+
+               // If Vite / HMR / svelte_hmr is enabled then add a hook to receive callbacks when the ProxyComponent
+               // refreshes. Update the element root accordingly and force and update to Position by resetting `parent`.
+               // See this issue for info about `on_hmr`:
+               // https://github.com/sveltejs/svelte-hmr/issues/57
+               if (isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
+               {
+                  svelteData.component.$$.on_hmr.push(() => () => this.#updateApplicationShell());
+               }
             }
 
             this.#svelteData.push(svelteData);
@@ -463,28 +472,6 @@ export class SvelteApplication extends Application
             elementRootUpdate
          });
 
-         // TODO: pending PR for svelte-hmr to add callback support for ProxyComponent:
-         //
-         // if (isHMRProxy(svelteData.component))
-         // {
-         //    svelteData.component.subscribe((newComponent) =>
-         //    {
-         //       svelteData.component = newComponent;
-         //
-         //       this._element = $(svelteData.component.elementRoot);
-         //
-         //       // Detect if the application shell exports an `elementContent` accessor.
-         //       this.#elementContent = hasGetter(svelteData.component, 'elementContent') ?
-         //        svelteData.component.elementContent : null;
-         //
-         //       // Detect if the application shell exports an `elementTarget` accessor.
-         //       this.#elementTarget = hasGetter(svelteData.component, 'elementTarget') ?
-         //        svelteData.component.elementTarget : svelteData.component.elementRoot;
-         //
-         //       this.#position.parent = this;
-         //    });
-         // }
-
          if (isApplicationShell(svelteData.component))
          {
             // A sanity check as shouldn't hit this case as only one component is being mounted.
@@ -496,6 +483,15 @@ export class SvelteApplication extends Application
             }
 
             this.#applicationShellHolder[0] = svelteData.component;
+
+            // If Vite / HMR / svelte_hmr is enabled then add a hook to receive callbacks when the ProxyComponent
+            // refreshes. Update the element root accordingly and force and update to Position by resetting `parent`.
+            // See this issue for info about `on_hmr`:
+            // https://github.com/sveltejs/svelte-hmr/issues/57
+            if (isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
+            {
+               svelteData.component.$$.on_hmr.push(() => () => this.#updateApplicationShell());
+            }
          }
 
          this.#svelteData.push(svelteData);
@@ -801,6 +797,21 @@ export class SvelteApplication extends Application
    onSvelteMount({ element, elementContent, elementTarget } = {}) {} // eslint-disable-line no-unused-vars
 
    /**
+    * Provides a callback after the main application shell is remounted. This may occur during HMR / hot module
+    * replacement or directly invoked from the `elementRootUpdate` callback passed to the application shell component
+    * context.
+    *
+    * @param {object}      [opts] - Optional parameters.
+    *
+    * @param {HTMLElement} [opts.element] - HTMLElement container for main application element.
+    *
+    * @param {HTMLElement} [opts.elementContent] - HTMLElement container for content area of application shells.
+    *
+    * @param {HTMLElement} [opts.elementTarget] - HTMLElement container for main application target element.
+    */
+   onSvelteRemount({ element, elementContent, elementTarget } = {}) {} // eslint-disable-line no-unused-vars
+
+   /**
     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
     * application frame / title for pop-out applications.
     *
@@ -900,8 +911,10 @@ export class SvelteApplication extends Application
    }
 
    /**
-    * This method is only invoked by the `elementRootUpdate` callback that is added to the external context passed to
+    * This method is invoked by the `elementRootUpdate` callback that is added to the external context passed to
     * Svelte components. When invoked it updates the local element roots tracked by SvelteApplication.
+    *
+    * This method may also be invoked by HMR / hot module replacement via `svelte-hmr`.
     */
    #updateApplicationShell()
    {
@@ -942,7 +955,7 @@ export class SvelteApplication extends Application
 
          super._activateCoreListeners([this.#elementTarget]);
 
-         this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent, elementTarget:
+         this.onSvelteRemount({ element: this._element[0], elementContent: this.#elementContent, elementTarget:
           this.#elementTarget });
       }
    }
