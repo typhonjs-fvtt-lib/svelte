@@ -5,6 +5,7 @@ import {
    deepMerge,
    hasGetter,
    isApplicationShell,
+   isHMRProxy,
    outroAndDestroy }          from '@typhonjs-fvtt/svelte/util';
 
 import {
@@ -461,6 +462,22 @@ export class SvelteApplication extends Application
             config: this.options.svelte,
             elementRootUpdate
          });
+
+         if (isHMRProxy(svelteData.component))
+         {
+            svelteData.component.subscribe(() =>
+            {
+               this._element = $(svelteData.component.elementRoot);
+
+               // Detect if the application shell exports an `elementContent` accessor.
+               this.#elementContent = hasGetter(svelteData.component, 'elementContent') ?
+                svelteData.component.elementContent : null;
+
+               // Detect if the application shell exports an `elementTarget` accessor.
+               this.#elementTarget = hasGetter(svelteData.component, 'elementTarget') ?
+                svelteData.component.elementTarget : null;
+            });
+         }
 
          if (isApplicationShell(svelteData.component))
          {
