@@ -60,7 +60,7 @@ const easingFunc = {};
 
 try
 {
-   const module = await import(modulePath);
+   const module = await import(/* @vite-ignore */modulePath);
    gsap = module.gsap;
 
    for (const entry of easingList)
@@ -2017,7 +2017,7 @@ async function gsapLoadPlugin(name)
 
    try
    {
-      const module = await import(modulePath);
+      const module = await import(/* @vite-ignore */modulePath);
       return module.default;
    }
    catch (err)

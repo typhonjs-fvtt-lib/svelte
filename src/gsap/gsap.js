@@ -57,7 +57,7 @@ const easingFunc = {};
 
 try
 {
-   const module = await import(modulePath);
+   const module = await import(/* @vite-ignore */modulePath);
    gsap = module.gsap;
 
    for (const entry of easingList)

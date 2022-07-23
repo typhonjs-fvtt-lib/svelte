@@ -15,7 +15,7 @@ export async function gsapLoadPlugin(name)
 
    try
    {
-      const module = await import(modulePath);
+      const module = await import(/* @vite-ignore */modulePath);
       return module.default;
    }
    catch (err)
