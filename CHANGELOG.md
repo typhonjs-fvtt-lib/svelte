@@ -1,4 +1,7 @@
 # Changelog
+## Release 0.0.18 (minor)
+- Fixed teething issues w/ Vite. 
+
 ## Release 0.0.17 (major dependency update)
 - Vite is now the recommended bundler / dev setup
 - Full support for Svelte HMR in Vite developer mode.
