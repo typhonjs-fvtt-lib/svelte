@@ -1,4 +1,8 @@
 # Changelog
+## Release 0.0.17 (major dependency update)
+- Vite is now the recommended bundler / dev setup
+- Full support for Svelte HMR in Vite developer mode.
+
 ## Release 0.0.16 (small update) 
 - Updated `DynArrayReducer` from @typhonjs-svelte/lib to be able to dynamically reverse iteration. Useful for table 
   sorting.

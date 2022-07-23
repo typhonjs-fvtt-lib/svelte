@@ -262,7 +262,12 @@ const applicationShellContract = ['elementRoot'];
 Object.freeze(applicationShellContract);
 
 /**
- * Provides a method to determine if the passed in object is ApplicationShell or TJSApplicationShell.
+ * Provides a method to determine if the passed in object / Svelte component follows the application shell contract.
+ * This involves ensuring that the accessors defined in `applicationShellContract`.
+ *
+ * Note: A caveat is that when using Vite in a developer build components are wrapped in a proxy / ProxyComponent that
+ * defines instance accessors versus on the prototype, so the check below ensures that all accessors in the contract are
+ * either available on the prototype or directly on the instance.
  *
  * @param {*}  component - Object / component to test.
  *
@@ -272,6 +277,16 @@ function isApplicationShell(component)
 {
    if (component === null || component === void 0) { return false; }
 
+   let compHasContract = true;
+   let protoHasContract = true;
+
+   // Check for accessors on the instance.
+   for (const accessor of applicationShellContract)
+   {
+      const descriptor = Object.getOwnPropertyDescriptor(component, accessor);
+      if (descriptor === void 0 || descriptor.get === void 0 || descriptor.set === void 0) { compHasContract = false; }
+   }
+
    // Get the prototype which is the parent SvelteComponent that has any getter / setters.
    const prototype = Object.getPrototypeOf(component);
 
@@ -280,10 +295,30 @@ function isApplicationShell(component)
    for (const accessor of applicationShellContract)
    {
       const descriptor = Object.getOwnPropertyDescriptor(prototype, accessor);
-      if (descriptor === void 0 || descriptor.get === void 0 || descriptor.set === void 0) { return false; }
+      if (descriptor === void 0 || descriptor.get === void 0 || descriptor.set === void 0) { protoHasContract = false; }
    }
 
-   return true;
+   return compHasContract || protoHasContract;
+}
+
+/**
+ * Provides basic duck typing to determine if the provided object is a HMR ProxyComponent instance or class.
+ *
+ * @param {*}  comp - Data to check as a HMR proxy component.
+ *
+ * @returns {boolean} Whether basic duck typing succeeds.
+ */
+function isHMRProxy(comp)
+{
+   const instanceName = comp?.constructor?.name;
+   if (typeof instanceName === 'string' && (instanceName.startsWith('Proxy<') || instanceName === 'ProxyComponent'))
+   {
+      return true;
+   }
+
+   const prototypeName = comp?.prototype?.constructor?.name;
+   return typeof prototypeName === 'string' && (prototypeName.startsWith('Proxy<') ||
+    prototypeName === 'ProxyComponent');
 }
 
 /**
@@ -296,6 +331,15 @@ function isApplicationShell(component)
 function isSvelteComponent(comp)
 {
    if (comp === null || comp === void 0 || typeof comp !== 'function') { return false; }
+
+   // When using Vite in a developer build the SvelteComponent is wrapped in a ProxyComponent class.
+   // This class doesn't define methods on the prototype, so we must check if the constructor name
+   // starts with `Proxy<` as it provides the wrapped component as `Proxy<_wrapped component name_>`.
+   const prototypeName = comp?.prototype?.constructor?.name;
+   if (typeof prototypeName === 'string' && (prototypeName.startsWith('Proxy<') || prototypeName === 'ProxyComponent'))
+   {
+      return true;
+   }
 
    return typeof window !== void 0 ?
     typeof comp.prototype.$destroy === 'function' && typeof comp.prototype.$on === 'function' : // client-side
@@ -595,6 +639,10 @@ function hasGetter(object, accessor)
 {
    if (object === null || object === void 0) { return false; }
 
+   // Check for instance accessor.
+   const iDescriptor = Object.getOwnPropertyDescriptor(object, accessor);
+   if (iDescriptor !== void 0 && iDescriptor.get !== void 0) { return true; }
+
    // Walk parent prototype chain. Check for descriptor at each prototype level.
    for (let o = Object.getPrototypeOf(object); o; o = Object.getPrototypeOf(o))
    {
@@ -618,6 +666,10 @@ function hasAccessor(object, accessor)
 {
    if (object === null || object === void 0) { return false; }
 
+   // Check for instance accessor.
+   const iDescriptor = Object.getOwnPropertyDescriptor(object, accessor);
+   if (iDescriptor !== void 0 && iDescriptor.get !== void 0 && iDescriptor.set !== void 0) { return true; }
+
    // Walk parent prototype chain. Check for descriptor at each prototype level.
    for (let o = Object.getPrototypeOf(object); o; o = Object.getPrototypeOf(o))
    {
@@ -640,6 +692,10 @@ function hasAccessor(object, accessor)
 function hasSetter(object, accessor)
 {
    if (object === null || object === void 0) { return false; }
+
+   // Check for instance accessor.
+   const iDescriptor = Object.getOwnPropertyDescriptor(object, accessor);
+   if (iDescriptor !== void 0 && iDescriptor.set !== void 0) { return true; }
 
    // Walk parent prototype chain. Check for descriptor at each prototype level.
    for (let o = Object.getPrototypeOf(object); o; o = Object.getPrototypeOf(o))
@@ -997,5 +1053,5 @@ function getUUIDFromDataTransfer(data, { actor = true, compendium = true, world 
  * @property {string[]|undefined}   [types] - Require the `data.type` to match entry in `types`.
  */
 
-export { debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };
+export { debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isHMRProxy, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };
 //# sourceMappingURL=index.js.map

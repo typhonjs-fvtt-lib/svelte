@@ -116,13 +116,26 @@ declare function hasSetter(object: any, accessor: string): boolean;
  */
 declare function hashCode(str: string, seed?: number): number;
 /**
- * Provides a method to determine if the passed in object is ApplicationShell or TJSApplicationShell.
+ * Provides a method to determine if the passed in object / Svelte component follows the application shell contract.
+ * This involves ensuring that the accessors defined in `applicationShellContract`.
+ *
+ * Note: A caveat is that when using Vite in a developer build components are wrapped in a proxy / ProxyComponent that
+ * defines instance accessors versus on the prototype, so the check below ensures that all accessors in the contract are
+ * either available on the prototype or directly on the instance.
  *
  * @param {*}  component - Object / component to test.
  *
  * @returns {boolean} Whether the component is a ApplicationShell or TJSApplicationShell.
  */
 declare function isApplicationShell(component: any): boolean;
+/**
+ * Provides basic duck typing to determine if the provided object is a HMR ProxyComponent instance or class.
+ *
+ * @param {*}  comp - Data to check as a HMR proxy component.
+ *
+ * @returns {boolean} Whether basic duck typing succeeds.
+ */
+declare function isHMRProxy(comp: any): boolean;
 /**
  * Tests for whether an object is iterable.
  *
@@ -260,4 +273,4 @@ declare namespace uuidv4 {
     function isValid(uuid: string): boolean;
 }
 
-export { ParseDataTransferOptions, StackingContext, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };
+export { ParseDataTransferOptions, StackingContext, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isHMRProxy, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };
