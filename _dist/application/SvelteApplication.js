@@ -451,7 +451,7 @@ export class SvelteApplication extends Application
                this.#applicationShellHolder[0] = svelteData.component;
 
                // If Vite / HMR / svelte_hmr is enabled then add a hook to receive callbacks when the ProxyComponent
-               // refreshes. Update the element root accordingly and force and update to Position by resetting `parent`.
+               // refreshes. Update the element root accordingly and force an update to Position.
                // See this issue for info about `on_hmr`:
                // https://github.com/sveltejs/svelte-hmr/issues/57
                if (isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
@@ -485,7 +485,7 @@ export class SvelteApplication extends Application
             this.#applicationShellHolder[0] = svelteData.component;
 
             // If Vite / HMR / svelte_hmr is enabled then add a hook to receive callbacks when the ProxyComponent
-            // refreshes. Update the element root accordingly and force and update to Position by resetting `parent`.
+            // refreshes. Update the element root accordingly and force an update to Position.
             // See this issue for info about `on_hmr`:
             // https://github.com/sveltejs/svelte-hmr/issues/57
             if (isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))

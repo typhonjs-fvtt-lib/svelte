@@ -1,4 +1,4 @@
-import { SvelteComponent, init, safe_not_equal, flush, element, space, attr, insert, append, detach, add_render_callback, select_option, listen, text, set_data, destroy_each, prevent_default, noop, select_value, binding_callbacks, component_subscribe, set_input_value, run_all, update_keyed_each, destroy_block, toggle_class } from 'svelte/internal';
+import { SvelteComponent, init, safe_not_equal, flush, element, space, attr, insert, append, listen, prevent_default, noop, detach, add_render_callback, select_option, destroy_each, text, set_data, select_value, binding_callbacks, component_subscribe, set_input_value, run_all, update_keyed_each, destroy_block, toggle_class } from 'svelte/internal';
 import { getContext } from 'svelte';
 import { localize, selectOptions, radioBoxes } from '@typhonjs-fvtt/svelte/helper';
 import { TJSDocument } from '@typhonjs-fvtt/svelte/store';
@@ -1177,7 +1177,6 @@ function create_each_block$1(key_1, ctx) {
 	let option;
 	let t_value = /*pack*/ ctx[13].title + "";
 	let t;
-	let option_value_value;
 
 	return {
 		key: key_1,
@@ -1185,7 +1184,7 @@ function create_each_block$1(key_1, ctx) {
 		c() {
 			option = element("option");
 			t = text(t_value);
-			option.__value = option_value_value = /*pack*/ ctx[13].metadata.name;
+			option.__value = /*pack*/ ctx[13].metadata.name;
 			option.value = option.__value;
 			this.first = option;
 		},
