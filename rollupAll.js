@@ -3,7 +3,6 @@ import { generateTSDef }   from '@typhonjs-build-test/esm-d-ts';
 import fs                  from 'fs-extra';
 import { rollup }          from 'rollup';
 import sourcemaps          from 'rollup-plugin-sourcemaps';
-import svelte              from 'rollup-plugin-svelte';
 import { terser }          from 'rollup-plugin-terser';
 import upath               from 'upath';
 
@@ -63,72 +62,6 @@ const rollupConfigs = [
       output: {
          output: {
             file: '_dist/animate/index.js',
-            format: 'es',
-            paths: externalPathsNPM,
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
-      }
-   },
-   {
-      input: {
-         input: 'src/component/core/index.js',
-         plugins: [
-            svelte({
-               emitCss: false,
-               onwarn: (warning, handler) =>
-               {
-                  // Suppress `a11y-missing-attribute` for missing href in <a> links.
-                  if (warning.message.includes(`<a> element should have an href attribute`)) { return; }
-                  // Suppress a11y form label not associated w/ a control.
-                  if (warning.message.includes(`A form label must be associated with a control`)) { return; }
-
-                  // Let Rollup handle all other warnings normally.
-                  handler(warning);
-               }
-            }),
-            typhonjsRuntime({ exclude: ['@typhonjs-svelte/lib/component/core'] }),
-            resolve(s_RESOLVE_CONFIG)
-         ]
-      },
-      output: {
-         output: {
-            file: '_dist/component/core/index.js',
-            format: 'es',
-            paths: externalPathsNPM,
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
-      }
-   },
-   {
-      input: {
-         input: 'src/component/dialog/index.js',
-         plugins: [
-            svelte({
-               emitCss: false,
-               onwarn: (warning, handler) =>
-               {
-                  // Suppress `a11y-missing-attribute` for missing href in <a> links.
-                  if (warning.message.includes(`<a> element should have an href attribute`)) { return; }
-                  // Suppress a11y form label not associated w/ a control.
-                  if (warning.message.includes(`A form label must be associated with a control`)) { return; }
-
-                  // Let Rollup handle all other warnings normally.
-                  handler(warning);
-               }
-            }),
-            typhonjsRuntime({ exclude: ['@typhonjs-svelte/lib/component/dialog'] }),
-            resolve(s_RESOLVE_CONFIG)
-         ]
-      },
-      output: {
-         output: {
-            file: '_dist/component/dialog/index.js',
             format: 'es',
             paths: externalPathsNPM,
             plugins: outputPlugins,
@@ -365,6 +298,23 @@ fs.writeJSONSync(`./_dist/application/dialog/package.json`, {
 });
 
 fs.writeJSONSync(`./_dist/application/legacy/package.json`, {
+   main: './index.js',
+   module: './index.js',
+   type: 'module'
+});
+
+// Copy component core / dialog
+
+fs.emptyDirSync('./_dist/component');
+fs.copySync('./src/component', './_dist/component');
+
+fs.writeJSONSync(`./_dist/component/core/package.json`, {
+   main: './index.js',
+   module: './index.js',
+   type: 'module'
+});
+
+fs.writeJSONSync(`./_dist/component/dialog/package.json`, {
    main: './index.js',
    module: './index.js',
    type: 'module'
