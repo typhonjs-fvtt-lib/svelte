@@ -1,16 +1,4 @@
 /**
- * Localize a string including variable formatting for input arguments. Provide a string ID which defines the localized
- * template. Variables can be included in the template enclosed in braces and will be substituted using those named
- * keys.
- *
- * @param {string}   stringId - The string ID to translate.
- *
- * @param {object}   [data] - Provided input data.
- *
- * @returns {string} The translated and formatted string
- */
-declare function localize(stringId: string, data?: object): string;
-/**
  * A helper to create a set of radio checkbox input elements in a named set.
  * The provided keys are the possible radio values while the provided values are human readable labels.
  *
@@ -43,6 +31,7 @@ declare function radioBoxes(name: string, choices: object, options: {
     checked: string;
     localize: boolean;
 }): string;
+
 /**
  * Converts the `selectOptions` Handlebars helper to be Svelte compatible. This is useful when initially converting
  * over an app to Svelte and for essential usage to several dialogs that mirror the core Foundry experience. For
@@ -121,5 +110,18 @@ declare function selectOptions(choices: object, options: {
     labelAttr?: string;
     inverted?: boolean;
 }): string;
+
+/**
+ * Localize a string including variable formatting for input arguments. Provide a string ID which defines the localized
+ * template. Variables can be included in the template enclosed in braces and will be substituted using those named
+ * keys.
+ *
+ * @param {string}   stringId - The string ID to translate.
+ *
+ * @param {object}   [data] - Provided input data.
+ *
+ * @returns {string} The translated and formatted string
+ */
+declare function localize(stringId: string, data?: object): string;
 
 export { localize, radioBoxes, selectOptions };

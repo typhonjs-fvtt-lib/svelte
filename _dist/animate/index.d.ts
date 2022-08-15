@@ -51,6 +51,7 @@ declare function animateEvents(fn: (node: Element, { from: DOMRect, to: DOMRect 
     from: any;
     to: any;
 }, params?: any) => svelte_animate.AnimationConfig;
+
 /**
  * Awaits `requestAnimationFrame` calls by the counter specified. This allows asynchronous applications for direct /
  * inline style modification amongst other direct animation techniques.
@@ -61,4 +62,26 @@ declare function animateEvents(fn: (node: Element, { from: DOMRect, to: DOMRect 
  */
 declare function nextAnimationFrame(cntr?: number): Promise<number>;
 
-export { animateEvents, nextAnimationFrame };
+/**
+ * - Defines a type for basic animation control.
+ */
+type TJSBasicAnimation = {
+    /**
+     * - True if animation is active; note: delayed animations are not active until start.
+     */
+    isActive: boolean;
+    /**
+     * - True if animation is completely finished.
+     */
+    isFinished: boolean;
+    /**
+     * - A Promise that is resolved when animation is finished.
+     */
+    finished: Promise<void>;
+    /**
+     * - A function that cancels animation.
+     */
+    cancel: Function;
+};
+
+export { TJSBasicAnimation, animateEvents, nextAnimationFrame };
