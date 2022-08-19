@@ -91,6 +91,9 @@
    // Store Foundry Application reference.
    const application = context.application;
 
+   // Calculate background image w/ route prefix to set to '--tjs-app-background' CSS variable.
+   const backgroundImg = `url(${foundry.utils.getRoute('/ui/denim075.png')})`;
+
    // This component can host multiple children defined via props or in the TyphonJS SvelteData configuration object
    // that are potentially mounted in the content area. If no children defined then this component mounts any slotted
    // child.
@@ -215,7 +218,8 @@
     out:outTransition={outTransitionOptions}
     on:pointerdown|capture={bringToTop}
     use:applyStyles={stylesApp}
-    use:appResizeObserver={resizeObservedApp}>
+    use:appResizeObserver={resizeObservedApp}
+    style:--tjs-app-background={backgroundImg}>
    <TJSApplicationHeader {draggable} {draggableOptions} />
    <section class=window-content
             bind:this={elementContent}
@@ -238,8 +242,9 @@
      * separate and unique styles to be given to this application regardless of game system / module modifications.
      */
     :global(.tjs-app) {
+        --tjs-app-background: "url(/ui/denim075.png)";
         max-height: 100%;
-        background: url(/ui/denim075.png) repeat;
+        background: var(--tjs-app-background) repeat;
         border-radius: 5px;
         box-shadow: 0 0 20px #000;
         margin: 3px 0;
