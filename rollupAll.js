@@ -262,14 +262,18 @@ const rollupConfigs = [
 
 for (const config of rollupConfigs)
 {
+   console.log(`Generating bundle: ${config.input.input}`);
+
    const bundle = await rollup(config.input);
    await bundle.write(config.output);
 
    // closes the bundle
    await bundle.close();
 
+   console.log(`Generating TS Declaration: ${config.input.input}`);
+
    await generateTSDef({
-      main: config.output.output.file,
+      main: config.input.input,
       output: upath.changeExt(config.output.output.file, '.d.ts')
    });
 

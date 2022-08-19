@@ -707,6 +707,31 @@ function hasSetter(object, accessor)
    return false;
 }
 
+/**
+ * Returns whether the target is or has the given prototype walking up the prototype chain.
+ *
+ * @param {*}  target - Any target to test.
+ *
+ * @param {Function} Prototype - Prototype function / class constructor to find.
+ *
+ * @returns {boolean} Target matches prototype.
+ */
+function hasPrototype(target, Prototype)
+{
+   /* c8 ignore next */
+   if (typeof target !== 'function') { return false; }
+
+   if (target === Prototype) { return true; }
+
+   // Walk parent prototype chain. Check for descriptor at each prototype level.
+   for (let proto = Object.getPrototypeOf(target); proto; proto = Object.getPrototypeOf(proto))
+   {
+      if (proto === Prototype) { return true; }
+   }
+
+   return false;
+}
+
 function set(obj, key, val) {
 	if (typeof val.value === 'object') val.value = klona(val.value);
 	if (!val.enumerable || val.get || val.set || !val.configurable || !val.writable || key === '__proto__') {
@@ -1021,20 +1046,35 @@ function getUUIDFromDataTransfer(data, { actor = true, compendium = true, world 
 
    let uuid = void 0;
 
-   // TODO: v10 will change the `data.data._id` relationship possibly.
-   if (actor && world && data.actorId && data.type)
+   if (typeof data.uuid === 'string') // v10 and above provides a full UUID.
    {
-      uuid = `Actor.${data.actorId}.${data.type}.${data.data._id}`;
-   }
-   else if (data.id)
-   {
-      if (compendium && typeof data.pack === 'string')
+      const isCompendium = data.uuid.startsWith('Compendium');
+
+      if (isCompendium && compendium)
       {
-         uuid = `Compendium.${data.pack}.${data.id}`;
+         uuid = data.uuid;
       }
       else if (world)
       {
-         uuid = `${data.type}.${data.id}`;
+         uuid = data.uuid;
+      }
+   }
+   else // v9 and below parsing.
+   {
+      if (actor && world && data.actorId && data.type)
+      {
+         uuid = `Actor.${data.actorId}.${data.type}.${data.data._id}`;
+      }
+      else if (typeof data.id === 'string') // v9 and below uses `id`
+      {
+         if (compendium && typeof data.pack === 'string')
+         {
+            uuid = `Compendium.${data.pack}.${data.id}`;
+         }
+         else if (world)
+         {
+            uuid = `${data.type}.${data.id}`;
+         }
       }
    }
 
@@ -1053,5 +1093,5 @@ function getUUIDFromDataTransfer(data, { actor = true, compendium = true, world 
  * @property {string[]|undefined}   [types] - Require the `data.type` to match entry in `types`.
  */
 
-export { debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasSetter, hashCode, isApplicationShell, isHMRProxy, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };
+export { debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, styleParsePixels, uuidv4 };
 //# sourceMappingURL=index.js.map

@@ -1,6 +1,5 @@
 import * as svelte_store from 'svelte/store';
 
-type ResizeObserverTarget = object | Function;
 /**
  * Provides an action to always blur the element when any pointer up event occurs on the element.
  *
@@ -9,38 +8,7 @@ type ResizeObserverTarget = object | Function;
 declare function alwaysBlur(node: HTMLElement): {
     destroy: () => void;
 };
-/**
- * Provides an action to apply a Position instance to a HTMLElement and invoke `position.parent`
- *
- * @param {HTMLElement}       node - The node associated with the action.
- *
- * @param {Position}          position - A position instance.
- *
- * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
- */
-declare function applyPosition(node: HTMLElement, position: any): {
-    update: Function;
-    destroy: Function;
-};
-/**
- * @typedef {object | Function} ResizeObserverTarget
- *
- * @property {number} [contentHeight] -
- *
- * @property {number} [contentWidth] -
- *
- * @property {number} [offsetHeight] -
- *
- * @property {number} [offsetWidth] -
- *
- * @property {Writable<object> | Function} [resizedObserver] - Either a function or a writable store.
- *
- * @property {Function} [setContentSize] - A function that is invoked with content width & height changes.
- *
- * @property {Function} [setDimension] - A function that is invoked with offset width & height changes.
- *
- * @property {{resizedObserver: Writable<object>}} [stores] - An object with a writable store.
- */
+
 /**
  * Provides an action to save `scrollTop` of an element with a vertical scrollbar. This action should be used on the
  * scrollable element and must include a writable store that holds the active store for the current `scrollTop` value.
@@ -55,6 +23,7 @@ declare function applyScrolltop(element: HTMLElement, store: svelte_store.Writab
     update: (newStore: any) => void;
     destroy: () => void;
 };
+
 /**
  * Provides an action to apply style properties provided as an object.
  *
@@ -65,6 +34,7 @@ declare function applyScrolltop(element: HTMLElement, store: svelte_store.Writab
  * @returns {Function} Update function.
  */
 declare function applyStyles(node: HTMLElement, properties: object): Function;
+
 /**
  * Provides an action to blur the element when any pointer down event occurs outside the element. This can be useful
  * for input elements including select to blur / unfocus the element when any pointer down occurs outside the element.
@@ -74,47 +44,8 @@ declare function applyStyles(node: HTMLElement, properties: object): Function;
 declare function autoBlur(node: HTMLElement): {
     destroy: () => void;
 };
-/**
- * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on a given {@link Position}
- * instance provided. When the attached boolean store state changes the draggable action is enabled or disabled.
- *
- * @param {HTMLElement}       node - The node associated with the action.
- *
- * @param {object}            params - Required parameters.
- *
- * @param {Position}          params.position - A position instance.
- *
- * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
- *
- * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
- *
- * @param {Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging" state.
- *
- * @param {boolean}           [params.ease=true] - When true easing is enabled.
- *
- * @param {object}            [params.easeOptions] - Gsap `to / `quickTo` vars object.
- *
- * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
- */
-declare function draggable(node: HTMLElement, { position, active, button, storeDragging, ease, easeOptions }: {
-    position: any;
-    active?: boolean;
-    button?: number;
-    storeDragging?: any;
-    ease?: boolean;
-    easeOptions?: object;
-}): {
-    update: Function;
-    destroy: Function;
-};
-declare namespace draggable {
-    /**
-     * Define a function to get a DraggableOptions instance.
-     *
-     * @returns {DraggableOptions} A new options instance.
-     */
-    function options(options: any): DraggableOptions;
-}
+
+type ResizeObserverTarget = object | Function;
 /**
  * Provides an action to monitor the given HTMLElement node with `ResizeObserver` posting width / height changes
  * to the target in various ways depending on the shape of the target. The target can be one of the following and the
@@ -156,6 +87,62 @@ declare namespace resizeObserver {
      * @param {HTMLElement} el - An HTML element.
      */
     function updateCache(el: HTMLElement): void;
+}
+
+/**
+ * Provides an action to apply a Position instance to a HTMLElement and invoke `position.parent`
+ *
+ * @param {HTMLElement}       node - The node associated with the action.
+ *
+ * @param {Position}          position - A position instance.
+ *
+ * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
+ */
+declare function applyPosition(node: HTMLElement, position: Position): {
+    update: Function;
+    destroy: Function;
+};
+
+/**
+ * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on a given {@link Position}
+ * instance provided. When the attached boolean store state changes the draggable action is enabled or disabled.
+ *
+ * @param {HTMLElement}       node - The node associated with the action.
+ *
+ * @param {object}            params - Required parameters.
+ *
+ * @param {Position}          params.position - A position instance.
+ *
+ * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
+ *
+ * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
+ *
+ * @param {Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging" state.
+ *
+ * @param {boolean}           [params.ease=true] - When true easing is enabled.
+ *
+ * @param {object}            [params.easeOptions] - Gsap `to / `quickTo` vars object.
+ *
+ * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
+ */
+declare function draggable(node: HTMLElement, { position, active, button, storeDragging, ease, easeOptions }: {
+    position: Position;
+    active?: boolean;
+    button?: number;
+    storeDragging?: Writable<boolean>;
+    ease?: boolean;
+    easeOptions?: object;
+}): {
+    update: Function;
+    destroy: Function;
+};
+declare namespace draggable {
+    /**
+     * Define a function to get a DraggableOptions instance.
+     *
+     * @returns {DraggableOptions} A new options instance.
+     */
+    function options(options: any): DraggableOptions;
 }
 declare class DraggableOptions {
     constructor({ ease, easeOptions }?: {

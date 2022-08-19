@@ -1,4 +1,9 @@
 # Changelog
+## Release 0.0.19 (medium)
+- Added new reactive embedded collections capability to TJSDocument. 
+- DynArrayReducer / DynMapReducer / DerivedArrayReducer / DerivedMapReducer stores added.
+- Fixed compatibility aspects w/ Foundry v10.
+
 ## Release 0.0.18 (minor)
 - Fixed teething issues w/ Vite. 
 

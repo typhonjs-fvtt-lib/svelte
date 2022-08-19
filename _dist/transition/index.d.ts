@@ -36,6 +36,7 @@ declare function rotate(node: HTMLElement, options: {
     delay: number;
     easing: (x: number) => number;
 };
+
 /**
  * Combines rotate & fade transitions into a single transition. For options `easing` this is applied to both transitions,
  * however if provided `easingRotate` and / or `easingFade` will take precedence. The default easing is linear.
@@ -78,8 +79,7 @@ declare function rotateFade(node: HTMLElement, options: {
     delay: number;
     easing: (x: number) => number;
 };
-declare function s_DEFAULT_TRANSITION(): any;
-declare const s_DEFAULT_TRANSITION_OPTIONS: {};
+
 /**
  * Combines slide & fade transitions into a single transition. For options `easing` this is applied to both transitions,
  * however if provided `easingSlide` and / or `easingFade` will take precedence. The default easing is linear.
@@ -113,6 +113,7 @@ declare function slideFade(node: HTMLElement, options: {
     delay: number;
     easing: (x: number) => number;
 };
+
 /**
  * Converts a Svelte transition to an animation. Both transitions & animations use the same CSS / styles solution and
  * resulting data so wrap the transition function with the signature of an animation.
@@ -127,5 +128,8 @@ declare function toAnimation(fn: (node: Element, params?: object) => svelte_tran
     from: any;
     to: any;
 }, params?: object) => svelte_transition.TransitionConfig;
+
+declare function s_DEFAULT_TRANSITION(): any;
+declare const s_DEFAULT_TRANSITION_OPTIONS: {};
 
 export { rotate, rotateFade, s_DEFAULT_TRANSITION, s_DEFAULT_TRANSITION_OPTIONS, slideFade, toAnimation };

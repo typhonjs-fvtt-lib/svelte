@@ -82,11 +82,11 @@
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13",
-    "@typhonjs-build-test/esm-d-ts": "^0.0.2",
+    "@typhonjs-build-test/esm-d-ts": "github:typhonjs-node-build-test/esm-d-ts",
     "@typhonjs-config/eslint-config": "^0.3.0",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "@typhonjs-svelte/lib": "github:typhonjs-svelte/lib",
-    "@typhonjs-utils/file-util": "^0.0.5",
+    "@typhonjs-utils/file-util": "^0.0.6",
     "deepmerge": "^4",
     "eslint": "^8",
     "fs-extra": "^10",

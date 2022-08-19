@@ -4,16 +4,29 @@ import {
    isPlainObject,
    uuidv4 } from '@typhonjs-fvtt/svelte/util';
 
+import { EmbeddedStoreManager } from './EmbeddedStoreManager.js';
+
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.
  * This makes documents reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
- *
- * @template {foundry.abstract.Document} T
  */
 export class TJSDocument
 {
-   #document;
+   /**
+    * @type {foundry.abstract.Document[]}
+    */
+   #document = [void 0];
+
+   /**
+    * @type {EmbeddedStoreManager}
+    */
+   #embeddedStoreManager;
+   #embeddedAPI;
+
+   /**
+    * @type {string}
+    */
    #uuidv4;
 
    /**
@@ -25,9 +38,9 @@ export class TJSDocument
    #updateOptions;
 
    /**
-    * @param {T|TJSDocumentOptions} [document] - Document to wrap or TJSDocumentOptions.
+    * @param {foundry.abstract.Document | TJSDocumentOptions}  [document] - Document to wrap or TJSDocumentOptions.
     *
-    * @param {TJSDocumentOptions}   [options] - TJSDocument options.
+    * @param {TJSDocumentOptions}      [options] - TJSDocument options.
     */
    constructor(document, options = {})
    {
@@ -45,6 +58,24 @@ export class TJSDocument
    }
 
    /**
+    * @returns {EmbeddedAPI} Embedded store manager.
+    */
+   get embedded()
+   {
+      if (!this.#embeddedAPI)
+      {
+         this.#embeddedStoreManager = new EmbeddedStoreManager(this.#document);
+         this.#embeddedAPI = {
+            create: (embeddedName, options) => this.#embeddedStoreManager.create(embeddedName, options),
+            destroy: (embeddedName, storeName) => this.#embeddedStoreManager.destroy(embeddedName, storeName),
+            get: (embeddedName, storeName) => this.#embeddedStoreManager.get(embeddedName, storeName)
+         };
+      }
+
+      return this.#embeddedAPI;
+   }
+
+   /**
     * Returns the options passed on last update.
     *
     * @returns {object} Last update options.
@@ -54,7 +85,7 @@ export class TJSDocument
    /**
     * Returns the UUID assigned to this store.
     *
-    * @returns {*} UUID
+    * @returns {string} UUID
     */
    get uuidv4() { return this.#uuidv4; }
 
@@ -65,15 +96,15 @@ export class TJSDocument
     */
    async #deleted()
    {
-      const doc = this.#document;
+      const doc = this.#document[0];
 
       // Check to see if the document is still in the associated collection to determine if actually deleted.
       if (doc instanceof foundry.abstract.Document && !doc?.collection?.has(doc.id))
       {
          delete doc?.apps[this.#uuidv4];
-         this.#document = void 0;
+         this.#setDocument(void 0);
 
-         this.#notify(false, { action: 'delete', data: void 0 });
+         this.#updateSubscribers(false, { action: 'delete', data: void 0 });
 
          if (typeof this.#options.delete === 'function') { await this.#options.delete(); }
 
@@ -87,12 +118,19 @@ export class TJSDocument
     */
    destroy()
    {
-      const doc = this.#document;
+      const doc = this.#document[0];
+
+      if (this.#embeddedStoreManager)
+      {
+         this.#embeddedStoreManager.destroy();
+         this.#embeddedStoreManager = void 0;
+         this.#embeddedAPI = void 0;
+      }
 
       if (doc instanceof foundry.abstract.Document)
       {
          delete doc?.apps[this.#uuidv4];
-         this.#document = void 0;
+         this.#setDocument(void 0);
       }
 
       this.#options.delete = void 0;
@@ -104,33 +142,35 @@ export class TJSDocument
     *
     * @param {object}   [options] - Options from render call; will have document update context.
     */
-   #notify(force = false, options = {}) // eslint-disable-line no-unused-vars
+   #updateSubscribers(force = false, options = {}) // eslint-disable-line no-unused-vars
    {
       this.#updateOptions = options;
 
-      // Subscriptions are stored locally as on the browser Babel is still used for private class fields / Babel
-      // support until 2023. IE not doing this will require several extra method calls otherwise.
-      const subscriptions = this.#subscriptions;
-      const document = this.#document;
+      const doc = this.#document[0];
 
-      for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](document, options); }
+      for (let cntr = 0; cntr < this.#subscriptions.length; cntr++) { this.#subscriptions[cntr](doc, options); }
+
+      if (this.#embeddedStoreManager)
+      {
+         this.#embeddedStoreManager.handleUpdate(options.renderContext);
+      }
    }
 
    /**
-    * @returns {T | undefined} Current document
+    * @returns {foundry.abstract.Document | undefined} Current document
     */
-   get() { return this.#document; }
+   get() { return this.#document[0]; }
 
    /**
-    * @param {T | undefined}  document - New document to set.
+    * @param {foundry.abstract.Document | undefined}  document - New document to set.
     *
     * @param {object}         [options] - New document update options to set.
     */
    set(document, options = {})
    {
-      if (this.#document)
+      if (this.#document[0])
       {
-         delete this.#document.apps[this.#uuidv4];
+         delete this.#document[0].apps[this.#uuidv4];
       }
 
       if (document !== void 0 && !(document instanceof foundry.abstract.Document))
@@ -147,13 +187,24 @@ export class TJSDocument
       {
          document.apps[this.#uuidv4] = {
             close: this.#deleted.bind(this),
-            render: this.#notify.bind(this)
+            render: this.#updateSubscribers.bind(this)
          };
       }
 
-      this.#document = document;
+      this.#setDocument(document);
       this.#updateOptions = options;
-      this.#notify();
+      this.#updateSubscribers();
+   }
+
+   /**
+    *
+    * @param {foundry.abstract.Document | undefined} doc -
+    */
+   #setDocument(doc)
+   {
+      this.#document[0] = doc;
+
+      if (this.#embeddedStoreManager) { this.#embeddedStoreManager.handleDocChange(); }
    }
 
    /**
@@ -222,7 +273,7 @@ export class TJSDocument
    }
 
    /**
-    * @param {function(T, object): void} handler - Callback function that is invoked on update / changes.
+    * @param {function(foundry.abstract.Document, object): void} handler - Callback function that is invoked on update / changes.
     *
     * @returns {(function(): void)} Unsubscribe function.
     */
@@ -232,7 +283,7 @@ export class TJSDocument
 
       const updateOptions = { action: 'subscribe', data: void 0 };
 
-      handler(this.#document, updateOptions);      // Call handler with current value and update options.
+      handler(this.#document[0], updateOptions);      // Call handler with current value and update options.
 
       // Return unsubscribe function.
       return () =>
@@ -247,4 +298,14 @@ export class TJSDocument
  * @typedef {object} TJSDocumentOptions
  *
  * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
+ */
+
+/**
+ * @typedef {object} EmbeddedAPI
+ *
+ * @property {(embeddedName: string, options: import('@typhonjs-fvtt/runtime/svelte/store').OptionsDynMapCreate<string, any>) => import('@typhonjs-fvtt/runtime/svelte/store').DynMapReducer<string, T>} create - Creates an embedded collection store.
+ *
+ * @property {(embeddedName?: string, storeName?: string) => boolean} destroy - Destroys one or more embedded collection stores.
+ *
+ * @property {(embeddedName: string, storeName: string) => import('@typhonjs-fvtt/runtime/svelte/store').DynMapReducer<string, T>} get - Returns a specific existing embedded collection store.
  */
