@@ -1,7 +1,7 @@
 import { derived, get, writable as writable$2 } from 'svelte/store';
 import { noop, run_all, is_function } from 'svelte/internal';
 import { uuidv4, isPlainObject, getUUIDFromDataTransfer, isObject } from '@typhonjs-fvtt/svelte/util';
-import { isIterable } from '@typhonjs-fvtt/svelte/util';
+import { hasPrototype, isIterable } from '@typhonjs-fvtt/svelte/util';
 
 class DynReducerUtils {
     /**
@@ -245,9 +245,8 @@ class AdapterDerived {
      * @param [force] - Force an update to subscribers.
      */
     update(force = false) {
-        /* c8 ignore next */
         if (this.#destroyed) {
-            throw Error(`AdapterDerived.update error: this instance has been destroyed.`);
+            return;
         }
         for (const reducer of this.#derived.values()) {
             reducer.index.update(force);
@@ -1050,13 +1049,15 @@ class DerivedArrayReducer {
      */
     destroy() {
         this.#destroyed = true;
+        // Remove any external data reference and perform a final update.
+        this.#array = [null];
+        this.#index.update(true);
         // Remove all subscriptions.
         this.#subscriptions.length = 0;
         this.#derived.destroy();
         this.#index.destroy();
         this.#filters.clear();
         this.#sort.clear();
-        this.#array = [null];
     }
     /**
      * Provides a callback for custom derived reducers to initialize any data / custom configuration. This allows
@@ -1272,13 +1273,15 @@ class DynArrayReducer {
             return;
         }
         this.#destroyed = true;
+        this.#derived.destroy();
+        // Set the backing data to null and provide a final update.
+        this.#array = [null];
+        this.index.update(true);
         // Remove all subscriptions.
         this.#subscriptions.length = 0;
-        this.#derived.destroy();
         this.#index.destroy();
         this.#filters.clear();
         this.#sort.clear();
-        this.#array = [null];
     }
     /**
      * Provides a callback for custom reducers to initialize any data / custom configuration. This allows
@@ -1607,13 +1610,15 @@ class DerivedMapReducer {
      */
     destroy() {
         this.#destroyed = true;
+        // Remove any external data reference and perform a final update.
+        this.#map = [null];
+        this.#index.update(true);
         // Remove all subscriptions.
         this.#subscriptions.length = 0;
         this.#derived.destroy();
         this.#index.destroy();
         this.#filters.clear();
         this.#sort.clear();
-        this.#map = [null];
     }
     /**
      * Provides a callback for custom derived reducers to initialize any data / custom configuration. This allows
@@ -1831,13 +1836,15 @@ class DynMapReducer {
             return;
         }
         this.#destroyed = true;
+        this.#derived.destroy();
+        // Set the backing data to null and provide a final update.
+        this.#map = [null];
+        this.index.update(true);
         // Remove all subscriptions.
         this.#subscriptions.length = 0;
-        this.#derived.destroy();
         this.#index.destroy();
         this.#filters.clear();
         this.#sort.clear();
-        this.#map = [null];
     }
     /**
      * Provides a callback for custom reducers to initialize any data / custom configuration. This allows
@@ -2636,15 +2643,343 @@ function propertyStore(origin, propName) {
 }
 
 /**
+ */
+class EmbeddedStoreManager
+{
+   /**
+    * RegExp for detecting CRUD updates for renderContext.
+    *
+    * @type {RegExp}
+    */
+   static #renderContextRegex = /(create|delete|update)(\w+)/;
+
+   /**
+    * @type {Map<string, EmbeddedCollectionData>}
+    */
+   #name = new Map();
+
+   /**
+    * @type {foundry.abstract.Document[]}
+    */
+   #document;
+
+   /**
+    * @type {Set<string>}
+    */
+   #embeddedNames = new Set();
+
+   /**
+    * @param {foundry.abstract.Document[]} document - The associated document holder.
+    */
+   constructor(document)
+   {
+      this.#document = document;
+
+      this.handleDocChange();
+   }
+
+   /**
+    * @template T
+    *
+    * @param {string} embeddedName -
+    *
+    * @param {import('@typhonjs-fvtt/svelte/store').OptionsDynMapCreate<string, T>} options -
+    *
+    * @returns {import('@typhonjs-fvtt/svelte/store').DynMapReducer<string, T>} DynMapReducer instance
+    */
+   create(embeddedName, options)
+   {
+      /** @type {foundry.abstract.Document} */
+      const doc = this.#document[0];
+
+      let collection = null;
+
+      if (doc)
+      {
+         try
+         {
+            collection = doc.getEmbeddedCollection(embeddedName);
+         }
+         catch (err)
+         {
+            console.warn(`EmbeddedStoreManager.create error: No valid embedded collection for: ${embeddedName}`);
+         }
+      }
+
+      let embeddedData;
+
+      if (!this.#name.has(embeddedName))
+      {
+         embeddedData = {
+            collection,
+            stores: new Map()
+         };
+
+         this.#name.set(embeddedName, embeddedData);
+      }
+      else
+      {
+         embeddedData = this.#name.get(embeddedName);
+      }
+
+      /** @type {string} */
+      let name;
+
+      /** @type {import('@typhonjs-fvtt/svelte/store').DataOptions<T>} */
+      let rest = {};
+
+      /** @type {import('@typhonjs-fvtt/svelte/store').IDynMapReducerCtor<string, T>} */
+      let ctor;
+
+      if (typeof options === 'string')
+      {
+         name = options;
+         ctor = DynMapReducer;
+      }
+      else if (typeof options === 'function' && hasPrototype(options, DynMapReducer))
+      {
+         ctor = options;
+      }
+      else if (typeof options === 'object' && options !== null)
+      {
+         ({ name, ctor = DynMapReducer, ...rest } = options);
+      }
+      else
+      {
+         throw new TypeError(`EmbeddedStoreManager.create error: 'options' does not conform to allowed parameters.`);
+      }
+
+      if (!hasPrototype(ctor, DynMapReducer))
+      {
+         throw new TypeError(`EmbeddedStoreManager.create error: 'ctor' is not a 'DynMapReducer'.`);
+      }
+
+      name = name ?? ctor?.name;
+
+      if (typeof name !== 'string') { throw new TypeError(`EmbeddedStoreManager.create error: 'name' is not a string.`); }
+
+      if (embeddedData.stores.has(name))
+      {
+         return embeddedData.stores.get(name);
+      }
+      else
+      {
+         const storeOptions = collection ? { data: collection, ...rest } : { ...rest };
+         const store = new ctor(storeOptions);
+         embeddedData.stores.set(name, store);
+         return store;
+      }
+   }
+
+   /**
+    * Destroys and removes embedded collection stores. Invoking this method with no parameters destroys all stores.
+    * Invoking with an embedded name destroys all stores for that particular collection. If you provide an embedded and
+    * store name just that particular store is destroyed and removed.
+    *
+    * @param {string}   [embeddedName] - Specific embedded collection name.
+    *
+    * @param {string}   [storeName] - Specific store name.
+    *
+    * @returns {boolean} One or more stores destroyed?
+    */
+   destroy(embeddedName, storeName)
+   {
+      let count = 0;
+
+      // Destroy all embedded stores
+      if (embeddedName === void 0)
+      {
+         for (const embeddedData of this.#name.values())
+         {
+            embeddedData.collection = null;
+            for (const store of embeddedData.stores.values())
+            {
+               store.destroy();
+               count++;
+            }
+         }
+
+         this.#name.clear();
+      }
+      else if (typeof embeddedName === 'string' && storeName === void 0)
+      {
+         const embeddedData = this.#name.get(embeddedName);
+         if (embeddedData)
+         {
+            embeddedData.collection = null;
+            for (const store of embeddedData.stores.values())
+            {
+               store.destroy();
+               count++;
+            }
+         }
+
+         this.#name.delete(embeddedName);
+      }
+      else if (typeof embeddedName === 'string' && storeName === 'string')
+      {
+         const embeddedData = this.#name.get(embeddedName);
+         if (embeddedData)
+         {
+            const store = embeddedData.stores.get(storeName);
+            if (store)
+            {
+               store.destroy();
+               count++;
+            }
+         }
+      }
+
+      return count > 0;
+   }
+
+   /**
+    * @template T
+    *
+    * @param {string} embeddedName -
+    *
+    * @param {string} storeName -
+    *
+    * @returns {import('@typhonjs-fvtt/svelte/store').DynMapReducer<string, T>} DynMapReducer instance.
+    */
+   get(embeddedName, storeName)
+   {
+      if (!this.#name.has(embeddedName)) { return void 0; }
+
+      return this.#name.get(embeddedName).stores.get(storeName);
+   }
+
+   /**
+    * Updates all existing embedded collection stores with the associated embedded collection
+    */
+   handleDocChange()
+   {
+      const doc = this.#document[0];
+
+      if (doc instanceof foundry.abstract.Document)
+      {
+         const existingEmbeddedNames = new Set(this.#name.keys());
+
+         /** @type {string[]} */
+         const embeddedNames = Object.keys(doc.constructor?.metadata?.embedded ?? []);
+
+         // Remove all previously stored embedded name CRUD keys.
+         this.#embeddedNames.clear();
+
+         for (const embeddedName of embeddedNames)
+         {
+            // Remove processed embedded name from existingEmbeddedNames set.
+            existingEmbeddedNames.delete(embeddedName);
+
+            // Update CRUD keys.
+            this.#embeddedNames.add(`create${embeddedName}`);
+            this.#embeddedNames.add(`delete${embeddedName}`);
+            this.#embeddedNames.add(`update${embeddedName}`);
+
+            let collection = null;
+
+            try
+            {
+               // Update any existing stores with the actual collection.
+               collection = doc.getEmbeddedCollection(embeddedName);
+            }
+            catch (err)
+            {
+               console.warn(`EmbeddedStoreManager.handleDocUpdate error: No valid embedded collection for: ${
+                embeddedName}`);
+            }
+
+            // Update EmbeddedData for new collection.
+            const embeddedData = this.#name.get(embeddedName);
+            if (embeddedData)
+            {
+               embeddedData.collection = collection;
+
+               // Update all existing stores.
+               for (const store of embeddedData.stores.values()) { store.setData(collection, true); }
+            }
+         }
+
+         // Update all existing embedded collections with null data that aren't processed above.
+         for (const embeddedName of existingEmbeddedNames)
+         {
+            const embeddedData = this.#name.get(embeddedName);
+            if (embeddedData)
+            {
+               embeddedData.collection = null;
+
+               for (const store of embeddedData.stores.values()) { store.setData(null, true); }
+            }
+         }
+      }
+      else // Reset all embedded reducer stores to null data.
+      {
+         this.#embeddedNames.clear();
+
+         for (const embeddedData of this.#name.values())
+         {
+            embeddedData.collection = null;
+
+            for (const store of embeddedData.stores.values()) { store.setData(null, true); }
+         }
+      }
+   }
+
+   /**
+    * Handles updates to embedded stores parsing the render context for valid embedded store types.
+    *
+    * On create, delete, update parse the type being modified then force index updates for the embedded type.
+    *
+    * @param {string}   renderContext - render context update from document.
+    */
+   handleUpdate(renderContext)
+   {
+      if (!this.#embeddedNames.has(renderContext)) { return; }
+
+      const match = EmbeddedStoreManager.#renderContextRegex.exec(renderContext);
+
+      if (match)
+      {
+         const embeddedName = match[2];
+         if (!this.#name.has(embeddedName)) { return; }
+
+         for (const store of this.#name.get(embeddedName).stores.values())
+         {
+            store.index.update(true);
+         }
+      }
+   }
+}
+
+/**
+ * @typedef {object} EmbeddedCollectionData
+ *
+ * @property {foundry.abstract.Collection} collection -
+ *
+ * @property {Map<string, import('@typhonjs-fvtt/svelte/store').DynMapReducer<string, T>>} stores -
+ */
+
+/**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.
  * This makes documents reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
- *
- * @template {foundry.abstract.Document} T
  */
 class TJSDocument
 {
-   #document;
+   /**
+    * @type {foundry.abstract.Document[]}
+    */
+   #document = [void 0];
+
+   /**
+    * @type {EmbeddedStoreManager}
+    */
+   #embeddedStoreManager;
+   #embeddedAPI;
+
+   /**
+    * @type {string}
+    */
    #uuidv4;
 
    /**
@@ -2656,9 +2991,9 @@ class TJSDocument
    #updateOptions;
 
    /**
-    * @param {T|TJSDocumentOptions} [document] - Document to wrap or TJSDocumentOptions.
+    * @param {foundry.abstract.Document | TJSDocumentOptions}  [document] - Document to wrap or TJSDocumentOptions.
     *
-    * @param {TJSDocumentOptions}   [options] - TJSDocument options.
+    * @param {TJSDocumentOptions}      [options] - TJSDocument options.
     */
    constructor(document, options = {})
    {
@@ -2676,6 +3011,24 @@ class TJSDocument
    }
 
    /**
+    * @returns {EmbeddedAPI} Embedded store manager.
+    */
+   get embedded()
+   {
+      if (!this.#embeddedAPI)
+      {
+         this.#embeddedStoreManager = new EmbeddedStoreManager(this.#document);
+         this.#embeddedAPI = {
+            create: (embeddedName, options) => this.#embeddedStoreManager.create(embeddedName, options),
+            destroy: (embeddedName, storeName) => this.#embeddedStoreManager.destroy(embeddedName, storeName),
+            get: (embeddedName, storeName) => this.#embeddedStoreManager.get(embeddedName, storeName)
+         };
+      }
+
+      return this.#embeddedAPI;
+   }
+
+   /**
     * Returns the options passed on last update.
     *
     * @returns {object} Last update options.
@@ -2685,7 +3038,7 @@ class TJSDocument
    /**
     * Returns the UUID assigned to this store.
     *
-    * @returns {*} UUID
+    * @returns {string} UUID
     */
    get uuidv4() { return this.#uuidv4; }
 
@@ -2696,15 +3049,15 @@ class TJSDocument
     */
    async #deleted()
    {
-      const doc = this.#document;
+      const doc = this.#document[0];
 
       // Check to see if the document is still in the associated collection to determine if actually deleted.
       if (doc instanceof foundry.abstract.Document && !doc?.collection?.has(doc.id))
       {
          delete doc?.apps[this.#uuidv4];
-         this.#document = void 0;
+         this.#setDocument(void 0);
 
-         this.#notify(false, { action: 'delete', data: void 0 });
+         this.#updateSubscribers(false, { action: 'delete', data: void 0 });
 
          if (typeof this.#options.delete === 'function') { await this.#options.delete(); }
 
@@ -2718,12 +3071,19 @@ class TJSDocument
     */
    destroy()
    {
-      const doc = this.#document;
+      const doc = this.#document[0];
+
+      if (this.#embeddedStoreManager)
+      {
+         this.#embeddedStoreManager.destroy();
+         this.#embeddedStoreManager = void 0;
+         this.#embeddedAPI = void 0;
+      }
 
       if (doc instanceof foundry.abstract.Document)
       {
          delete doc?.apps[this.#uuidv4];
-         this.#document = void 0;
+         this.#setDocument(void 0);
       }
 
       this.#options.delete = void 0;
@@ -2735,33 +3095,35 @@ class TJSDocument
     *
     * @param {object}   [options] - Options from render call; will have document update context.
     */
-   #notify(force = false, options = {}) // eslint-disable-line no-unused-vars
+   #updateSubscribers(force = false, options = {}) // eslint-disable-line no-unused-vars
    {
       this.#updateOptions = options;
 
-      // Subscriptions are stored locally as on the browser Babel is still used for private class fields / Babel
-      // support until 2023. IE not doing this will require several extra method calls otherwise.
-      const subscriptions = this.#subscriptions;
-      const document = this.#document;
+      const doc = this.#document[0];
 
-      for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](document, options); }
+      for (let cntr = 0; cntr < this.#subscriptions.length; cntr++) { this.#subscriptions[cntr](doc, options); }
+
+      if (this.#embeddedStoreManager)
+      {
+         this.#embeddedStoreManager.handleUpdate(options.renderContext);
+      }
    }
 
    /**
-    * @returns {T | undefined} Current document
+    * @returns {foundry.abstract.Document | undefined} Current document
     */
-   get() { return this.#document; }
+   get() { return this.#document[0]; }
 
    /**
-    * @param {T | undefined}  document - New document to set.
+    * @param {foundry.abstract.Document | undefined}  document - New document to set.
     *
     * @param {object}         [options] - New document update options to set.
     */
    set(document, options = {})
    {
-      if (this.#document)
+      if (this.#document[0])
       {
-         delete this.#document.apps[this.#uuidv4];
+         delete this.#document[0].apps[this.#uuidv4];
       }
 
       if (document !== void 0 && !(document instanceof foundry.abstract.Document))
@@ -2778,13 +3140,24 @@ class TJSDocument
       {
          document.apps[this.#uuidv4] = {
             close: this.#deleted.bind(this),
-            render: this.#notify.bind(this)
+            render: this.#updateSubscribers.bind(this)
          };
       }
 
-      this.#document = document;
+      this.#setDocument(document);
       this.#updateOptions = options;
-      this.#notify();
+      this.#updateSubscribers();
+   }
+
+   /**
+    *
+    * @param {foundry.abstract.Document | undefined} doc -
+    */
+   #setDocument(doc)
+   {
+      this.#document[0] = doc;
+
+      if (this.#embeddedStoreManager) { this.#embeddedStoreManager.handleDocChange(); }
    }
 
    /**
@@ -2853,7 +3226,7 @@ class TJSDocument
    }
 
    /**
-    * @param {function(T, object): void} handler - Callback function that is invoked on update / changes.
+    * @param {function(foundry.abstract.Document, object): void} handler - Callback function that is invoked on update / changes.
     *
     * @returns {(function(): void)} Unsubscribe function.
     */
@@ -2863,7 +3236,7 @@ class TJSDocument
 
       const updateOptions = { action: 'subscribe', data: void 0 };
 
-      handler(this.#document, updateOptions);      // Call handler with current value and update options.
+      handler(this.#document[0], updateOptions);      // Call handler with current value and update options.
 
       // Return unsubscribe function.
       return () =>
@@ -2878,6 +3251,16 @@ class TJSDocument
  * @typedef {object} TJSDocumentOptions
  *
  * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
+ */
+
+/**
+ * @typedef {object} EmbeddedAPI
+ *
+ * @property {(embeddedName: string, options: import('@typhonjs-fvtt/runtime/svelte/store').OptionsDynMapCreate<string, any>) => import('@typhonjs-fvtt/runtime/svelte/store').DynMapReducer<string, T>} create - Creates an embedded collection store.
+ *
+ * @property {(embeddedName?: string, storeName?: string) => boolean} destroy - Destroys one or more embedded collection stores.
+ *
+ * @property {(embeddedName: string, storeName: string) => import('@typhonjs-fvtt/runtime/svelte/store').DynMapReducer<string, T>} get - Returns a specific existing embedded collection store.
  */
 
 /**

@@ -1032,7 +1032,7 @@ declare class LocalStorage {
      *
      * @returns {LSStore} The new LSStore.
      */
-    static "__#9@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#215674@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the localStorage.
      *
@@ -1092,7 +1092,7 @@ declare class SessionStorage {
      *
      * @returns {SSStore} The new SSStore.
      */
-    static "__#10@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#215675@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the sessionStorage.
      *
@@ -1286,16 +1286,18 @@ declare function propertyStore(
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.
  * This makes documents reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
- *
- * @template {foundry.abstract.Document} T
  */
-declare class TJSDocument<T extends foundry.abstract.Document> {
+declare class TJSDocument {
     /**
-     * @param {T|TJSDocumentOptions} [document] - Document to wrap or TJSDocumentOptions.
+     * @param {foundry.abstract.Document | TJSDocumentOptions}  [document] - Document to wrap or TJSDocumentOptions.
      *
-     * @param {TJSDocumentOptions}   [options] - TJSDocument options.
+     * @param {TJSDocumentOptions}      [options] - TJSDocument options.
      */
-    constructor(document?: T | TJSDocumentOptions, options?: TJSDocumentOptions);
+    constructor(document?: foundry.abstract.Document | TJSDocumentOptions, options?: TJSDocumentOptions);
+    /**
+     * @returns {EmbeddedAPI} Embedded store manager.
+     */
+    get embedded(): EmbeddedAPI;
     /**
      * Returns the options passed on last update.
      *
@@ -1305,24 +1307,24 @@ declare class TJSDocument<T extends foundry.abstract.Document> {
     /**
      * Returns the UUID assigned to this store.
      *
-     * @returns {*} UUID
+     * @returns {string} UUID
      */
-    get uuidv4(): any;
+    get uuidv4(): string;
     /**
      * Completely removes all internal subscribers, any optional delete callback, and unregisters from the
      * ClientDocumentMixin `apps` tracking object.
      */
     destroy(): void;
     /**
-     * @returns {T | undefined} Current document
+     * @returns {foundry.abstract.Document | undefined} Current document
      */
-    get(): T | undefined;
+    get(): foundry.abstract.Document | undefined;
     /**
-     * @param {T | undefined}  document - New document to set.
+     * @param {foundry.abstract.Document | undefined}  document - New document to set.
      *
      * @param {object}         [options] - New document update options to set.
      */
-    set(document: T | undefined, options?: object): void;
+    set(document: foundry.abstract.Document | undefined, options?: object): void;
     /**
      * Potentially sets new document from data transfer object.
      *
@@ -1350,11 +1352,11 @@ declare class TJSDocument<T extends foundry.abstract.Document> {
      */
     setOptions(options: TJSDocumentOptions): void;
     /**
-     * @param {function(T, object): void} handler - Callback function that is invoked on update / changes.
+     * @param {function(foundry.abstract.Document, object): void} handler - Callback function that is invoked on update / changes.
      *
      * @returns {(function(): void)} Unsubscribe function.
      */
-    subscribe(handler: (arg0: T, arg1: object) => void): (() => void);
+    subscribe(handler: (arg0: foundry.abstract.Document, arg1: object) => void): (() => void);
     #private;
 }
 type TJSDocumentOptions = {
@@ -1362,6 +1364,20 @@ type TJSDocumentOptions = {
      * - Optional delete function to invoke when document is deleted.
      */
     delete?: Function;
+};
+type EmbeddedAPI = {
+    /**
+     * - Creates an embedded collection store.
+     */
+    create: (embeddedName: string, options: any) => any;
+    /**
+     * - Destroys one or more embedded collection stores.
+     */
+    destroy: (embeddedName?: string, storeName?: string) => boolean;
+    /**
+     * - Returns a specific existing embedded collection store.
+     */
+    get: (embeddedName: string, storeName: string) => any;
 };
 
 /**
@@ -1449,7 +1465,7 @@ declare class TJSGameSettings {
      *
      * @returns {GSWritableStore} The new GSWritableStore.
      */
-    static "__#240690@#createStore"(initialValue: string): svelte_store.Writable<any>;
+    static "__#241080@#createStore"(initialValue: string): svelte_store.Writable<any>;
     /**
      * Returns a readable Game Settings store for the associated key.
      *
@@ -1550,4 +1566,4 @@ type GSWritableStore = svelte_store.Writable<any>;
  */
 type GSReadableStore = svelte_store.Readable<any>;
 
-export { CompareFn, DataDerivedCreate, DataDynArray, DataDynArrayCreate, DataDynMap, DataDynMapCreate, DataFilter, DataOptions, DataSort, DerivedArrayReducer, DerivedMapReducer, DynArrayReducer, DynMapReducer, FilterFn, GSReadableStore, GSWritableStore, GameSetting, GameSettingOptions, GameState, IDerivedReducer, IDerivedReducerCtor, IDynArrayReducerCtor, IDynMapReducerCtor, LSStore, LocalStorage, OptionsDerivedCreate, OptionsDynArrayCreate, OptionsDynMapCreate, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, TJSGameSettings, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { CompareFn, DataDerivedCreate, DataDynArray, DataDynArrayCreate, DataDynMap, DataDynMapCreate, DataFilter, DataOptions, DataSort, DerivedArrayReducer, DerivedMapReducer, DynArrayReducer, DynMapReducer, EmbeddedAPI, FilterFn, GSReadableStore, GSWritableStore, GameSetting, GameSettingOptions, GameState, IDerivedReducer, IDerivedReducerCtor, IDynArrayReducerCtor, IDynMapReducerCtor, LSStore, LocalStorage, OptionsDerivedCreate, OptionsDynArrayCreate, OptionsDynMapCreate, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, TJSGameSettings, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
