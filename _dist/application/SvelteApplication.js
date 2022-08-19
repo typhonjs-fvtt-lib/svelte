@@ -763,9 +763,13 @@ export class SvelteApplication extends Application
       {
          const className = header.children[cntr].className;
 
-         if (className.includes('window-title') || className.includes('close') ||
-          className.includes('keep-minimized'))
+         if (className.includes('window-title') || className.includes('close')) { continue; }
+
+         // v10+ of Foundry core styles automatically hides anything besides the window title and close button, so
+         // explicitly set display to block.
+         if (className.includes('keep-minimized'))
          {
+            header.children[cntr].style.display = 'block';
             continue;
          }
 
