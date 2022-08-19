@@ -14,20 +14,35 @@ export function getUUIDFromDataTransfer(data, { actor = true, compendium = true,
 
    let uuid = void 0;
 
-   // TODO: v10 will change the `data.data._id` relationship possibly.
-   if (actor && world && data.actorId && data.type)
+   if (typeof data.uuid === 'string') // v10 and above provides a full UUID.
    {
-      uuid = `Actor.${data.actorId}.${data.type}.${data.data._id}`;
-   }
-   else if (data.id)
-   {
-      if (compendium && typeof data.pack === 'string')
+      const isCompendium = data.uuid.startsWith('Compendium');
+
+      if (isCompendium && compendium)
       {
-         uuid = `Compendium.${data.pack}.${data.id}`;
+         uuid = data.uuid;
       }
       else if (world)
       {
-         uuid = `${data.type}.${data.id}`;
+         uuid = data.uuid;
+      }
+   }
+   else // v9 and below parsing.
+   {
+      if (actor && world && data.actorId && data.type)
+      {
+         uuid = `Actor.${data.actorId}.${data.type}.${data.data._id}`;
+      }
+      else if (typeof data.id === 'string') // v9 and below uses `id`
+      {
+         if (compendium && typeof data.pack === 'string')
+         {
+            uuid = `Compendium.${data.pack}.${data.id}`;
+         }
+         else if (world)
+         {
+            uuid = `${data.type}.${data.id}`;
+         }
       }
    }
 
