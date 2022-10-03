@@ -186,6 +186,14 @@ declare function hasSetter(object: any, accessor: string): boolean;
  */
 declare function hasPrototype(target: any, Prototype: Function): boolean;
 
+interface StateMachineOptions {
+    readonly allowedTags?: Set<string>;
+    readonly disallowedTags?: Set<string>;
+    readonly tagReplacementText: string;
+    readonly encodePlaintextTagDelimiters: boolean;
+}
+declare function striptags(text: string, options?: Partial<StateMachineOptions>): string;
+
 /**
  * Attempts to create a Foundry UUID from standard drop data. This may not work for all systems.
  *
@@ -215,4 +223,4 @@ type ParseDataTransferOptions = {
     types?: string[] | undefined;
 };
 
-export { ParseDataTransferOptions, StackingContext, debounce, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isSvelteComponent, normalizeString, outroAndDestroy, parseSvelteConfig, styleParsePixels, uuidv4 };
+export { ParseDataTransferOptions, StackingContext, debounce, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isSvelteComponent, normalizeString, outroAndDestroy, parseSvelteConfig, striptags, styleParsePixels, uuidv4 };

@@ -1032,7 +1032,7 @@ declare class LocalStorage {
      *
      * @returns {LSStore} The new LSStore.
      */
-    static "__#215674@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#202377@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the localStorage.
      *
@@ -1092,7 +1092,7 @@ declare class SessionStorage {
      *
      * @returns {SSStore} The new SSStore.
      */
-    static "__#215675@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#202378@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the sessionStorage.
      *
@@ -1465,7 +1465,7 @@ declare class TJSGameSettings {
      *
      * @returns {GSWritableStore} The new GSWritableStore.
      */
-    static "__#241080@#createStore"(initialValue: string): svelte_store.Writable<any>;
+    static "__#241620@#createStore"(initialValue: string): svelte_store.Writable<any>;
     /**
      * Returns a readable Game Settings store for the associated key.
      *
