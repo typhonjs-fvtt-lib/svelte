@@ -91,6 +91,7 @@
    // Store Foundry Application reference.
    const application = context.application;
 
+   // TODO: Make this generic / not Foundry specific.
    // Calculate background image w/ route prefix to set to '--tjs-app-background' CSS variable.
    const backgroundImg = `url(${foundry.utils.getRoute('/ui/denim075.png')})`;
 
