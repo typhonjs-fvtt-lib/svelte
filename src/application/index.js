@@ -1,8 +1,27 @@
+import { SvelteApplication } from './SvelteApplication.js';
+
 export * from './SvelteApplication.js';
 export * from './TJSDialog.js';
 
 // TODO: temporary
 export * from './position/Position.js';
+
+// Handle `PopOut!` module hooks to allow applications to popout to their own browser window -------------------------
+
+Hooks.on('PopOut:loading', (app) =>
+{
+   if (app instanceof SvelteApplication) { app.position.enabled = false; }
+});
+
+Hooks.on('PopOut:popin', (app) =>
+{
+   if (app instanceof SvelteApplication) { app.position.enabled = true; }
+});
+
+Hooks.on('PopOut:close', (app) =>
+{
+   if (app instanceof SvelteApplication) { app.position.enabled = true; }
+});
 
 /**
  * @typedef {object} MountedAppShell - Application shell contract for Svelte components.
