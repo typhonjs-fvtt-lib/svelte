@@ -42,6 +42,13 @@ export class Position
    #animate = new AnimationAPI(this, this.#data);
 
    /**
+    * Provides a way to turn on / off the position handling.
+    *
+    * @type {boolean}
+    */
+   #enabled = true;
+
+   /**
     * Stores the style attributes that changed on update.
     *
     * @type {PositionChangeSet}
@@ -406,6 +413,16 @@ export class Position
    }
 
    /**
+    * Returns the enabled state.
+    *
+    * @returns {boolean} Enabled state.
+    */
+   get enabled()
+   {
+      return this.#enabled;
+   }
+
+   /**
     * Returns the current HTMLElement being positioned.
     *
     * @returns {HTMLElement|undefined} Current HTMLElement being positioned.
@@ -462,6 +479,21 @@ export class Position
     * @returns {AdapterValidators} validators.
     */
    get validators() { return this.#validators; }
+
+   /**
+    * Sets the enabled state.
+    *
+    * @param {boolean}  enabled - New enabled state.
+    */
+   set enabled(enabled)
+   {
+      if (typeof enabled !== 'boolean')
+      {
+         throw new TypeError(`'enabled' is not a boolean.`);
+      }
+
+      this.#enabled = enabled;
+   }
 
    /**
     * Sets the associated {@link PositionParent} instance. Resets the style cache and default data.
@@ -810,6 +842,12 @@ export class Position
       if (typeof position !== 'object') { throw new TypeError(`Position - set error: 'position' is not an object.`); }
 
       const parent = this.#parent;
+
+      // An early out to prevent `set` from taking effect if not enabled.
+      if (!this.#enabled)
+      {
+         return this;
+      }
 
       // An early out to prevent `set` from taking effect if options `positionable` is false.
       if (parent !== void 0 && typeof parent?.options?.positionable === 'boolean' && !parent?.options?.positionable)

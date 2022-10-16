@@ -142,6 +142,9 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
    {
       if (event.button !== button || !event.isPrimary) { return; }
 
+      // Do not process if the position system is not enabled.
+      if (!position.enabled) { return; }
+
       event.preventDefault();
 
       dragging = false;
