@@ -104,9 +104,9 @@ export class TJSDocument
          delete doc?.apps[this.#uuidv4];
          this.#setDocument(void 0);
 
-         this.#updateSubscribers(false, { action: 'delete', data: void 0 });
-
          if (typeof this.#options.delete === 'function') { await this.#options.delete(); }
+
+         this.#updateSubscribers(false, { action: 'delete', data: void 0 });
 
          this.#updateOptions = void 0;
       }
