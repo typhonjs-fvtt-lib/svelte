@@ -1,4 +1,9 @@
 # Changelog
+## Release 0.0.20 (minor)
+- Added `enabled` option to `Position` to turn on / off Position control instantly. Used in forthcoming `PopOut` module support.
+- Moved delete callback in TJSDocument before final update subscribers
+- Moved TJSGameSettings to `svelte-standard`.
+
 ## Release 0.0.19 (medium)
 - Added new reactive embedded collections capability to TJSDocument. 
 - DynArrayReducer / DynMapReducer / DerivedArrayReducer / DerivedMapReducer stores added.
