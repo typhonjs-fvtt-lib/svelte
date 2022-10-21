@@ -89,7 +89,7 @@ if (!Math.hypot) Math.hypot = function () {
   return Math.sqrt(y);
 };
 
-var common = /*#__PURE__*/Object.freeze({
+const common = /*#__PURE__*/Object.freeze({
    __proto__: null,
    EPSILON: EPSILON,
    get ARRAY_TYPE () { return ARRAY_TYPE; },
@@ -531,7 +531,7 @@ var mul$8 = multiply$8;
 
 var sub$6 = subtract$6;
 
-var mat2 = /*#__PURE__*/Object.freeze({
+const mat2 = /*#__PURE__*/Object.freeze({
    __proto__: null,
    create: create$8,
    clone: clone$8,
@@ -1047,7 +1047,7 @@ var mul$7 = multiply$7;
 
 var sub$5 = subtract$5;
 
-var mat2d = /*#__PURE__*/Object.freeze({
+const mat2d = /*#__PURE__*/Object.freeze({
    __proto__: null,
    create: create$7,
    clone: clone$7,
@@ -1854,7 +1854,7 @@ var mul$6 = multiply$6;
 
 var sub$4 = subtract$4;
 
-var mat3 = /*#__PURE__*/Object.freeze({
+const mat3 = /*#__PURE__*/Object.freeze({
    __proto__: null,
    create: create$6,
    fromMat4: fromMat4$1,
@@ -3800,7 +3800,7 @@ var mul$5 = multiply$5;
 
 var sub$3 = subtract$3;
 
-var mat4 = /*#__PURE__*/Object.freeze({
+const mat4 = /*#__PURE__*/Object.freeze({
    __proto__: null,
    create: create$5,
    clone: clone$5,
@@ -4642,7 +4642,7 @@ var forEach$2 = function () {
   };
 }();
 
-var vec3 = /*#__PURE__*/Object.freeze({
+const vec3 = /*#__PURE__*/Object.freeze({
    __proto__: null,
    create: create$4,
    clone: clone$4,
@@ -5357,7 +5357,7 @@ var forEach$1 = function () {
   };
 }();
 
-var vec4 = /*#__PURE__*/Object.freeze({
+const vec4 = /*#__PURE__*/Object.freeze({
    __proto__: null,
    create: create$3,
    clone: clone$3,
@@ -6109,7 +6109,7 @@ var setAxes = function () {
   };
 }();
 
-var quat = /*#__PURE__*/Object.freeze({
+const quat = /*#__PURE__*/Object.freeze({
    __proto__: null,
    create: create$2,
    identity: identity$1,
@@ -6985,7 +6985,7 @@ function equals$1(a, b) {
   return Math.abs(a0 - b0) <= EPSILON * Math.max(1.0, Math.abs(a0), Math.abs(b0)) && Math.abs(a1 - b1) <= EPSILON * Math.max(1.0, Math.abs(a1), Math.abs(b1)) && Math.abs(a2 - b2) <= EPSILON * Math.max(1.0, Math.abs(a2), Math.abs(b2)) && Math.abs(a3 - b3) <= EPSILON * Math.max(1.0, Math.abs(a3), Math.abs(b3)) && Math.abs(a4 - b4) <= EPSILON * Math.max(1.0, Math.abs(a4), Math.abs(b4)) && Math.abs(a5 - b5) <= EPSILON * Math.max(1.0, Math.abs(a5), Math.abs(b5)) && Math.abs(a6 - b6) <= EPSILON * Math.max(1.0, Math.abs(a6), Math.abs(b6)) && Math.abs(a7 - b7) <= EPSILON * Math.max(1.0, Math.abs(a7), Math.abs(b7));
 }
 
-var quat2 = /*#__PURE__*/Object.freeze({
+const quat2 = /*#__PURE__*/Object.freeze({
    __proto__: null,
    create: create$1,
    clone: clone$1,
@@ -7652,7 +7652,7 @@ var forEach = function () {
   };
 }();
 
-var vec2 = /*#__PURE__*/Object.freeze({
+const vec2 = /*#__PURE__*/Object.freeze({
    __proto__: null,
    create: create,
    clone: clone,

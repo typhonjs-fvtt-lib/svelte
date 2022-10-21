@@ -118,11 +118,11 @@ declare function slideFade(node: HTMLElement, options: {
  * Converts a Svelte transition to an animation. Both transitions & animations use the same CSS / styles solution and
  * resulting data so wrap the transition function with the signature of an animation.
  *
- * @param {(node: Element, params?: object) => import('svelte/transition').TransitionConfig} fn - A Svelte transition
- *                                                                                                function.
+ * @param {(node: Element, params?: object) => import('svelte/transition').TransitionConfig} fn -
+ *        A Svelte transition function.
  *
- * @returns {(node: Element, { from: DOMRect, to: DOMRect }, params?: object) =>
- *  import('svelte/transition').TransitionConfig} Transition function converted to an animation.
+ * @returns {(node: Element, { from: DOMRect, to: DOMRect }, params?: object) => import('svelte/transition').TransitionConfig} -
+ *          Transition function converted to an animation.
  */
 declare function toAnimation(fn: (node: Element, params?: object) => svelte_transition.TransitionConfig): (node: Element, { from: DOMRect, to: DOMRect }: {
     from: any;

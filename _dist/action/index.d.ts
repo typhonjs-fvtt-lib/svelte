@@ -4,9 +4,11 @@ import * as svelte_store from 'svelte/store';
  * Provides an action to always blur the element when any pointer up event occurs on the element.
  *
  * @param {HTMLElement}   node - The node to handle always blur on pointer up.
+ *
+ * @returns {{destroy: Function}} Lifecycle functions.
  */
 declare function alwaysBlur(node: HTMLElement): {
-    destroy: () => void;
+    destroy: Function;
 };
 
 /**
@@ -18,10 +20,12 @@ declare function alwaysBlur(node: HTMLElement): {
  * @param {HTMLElement} element - The target scrollable HTML element.
  *
  * @param {import('svelte/store').Writable<number>}   store - A writable store that stores the element scrollTop.
+ *
+ * @returns {{destroy: Function, update: Function}} Lifecycle functions.
  */
 declare function applyScrolltop(element: HTMLElement, store: svelte_store.Writable<number>): {
-    update: (newStore: any) => void;
-    destroy: () => void;
+    destroy: Function;
+    update: Function;
 };
 
 /**
@@ -40,9 +44,11 @@ declare function applyStyles(node: HTMLElement, properties: object): Function;
  * for input elements including select to blur / unfocus the element when any pointer down occurs outside the element.
  *
  * @param {HTMLElement}   node - The node to handle automatic blur on focus loss.
+ *
+ * @returns {{destroy: Function}} Lifecycle functions.
  */
 declare function autoBlur(node: HTMLElement): {
-    destroy: () => void;
+    destroy: Function;
 };
 
 type ResizeObserverTarget = object | Function;

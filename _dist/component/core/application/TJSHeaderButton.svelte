@@ -48,6 +48,7 @@
    on:mousedown|capture|preventDefault|stopPropagation={()=>null}
    on:dblclick|capture|preventDefault|stopPropagation={()=>null}
    use:applyStyles={styles}
-   class="header-button {button.class}">
+   class="header-button {button.class}"
+   role=presentation>
     {@html icon}{label}
 </a>

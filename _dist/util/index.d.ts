@@ -50,8 +50,9 @@ declare function normalizeString(query: string): string;
  * See also https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context
  *
  * Original author: Kerry Liu / https://github.com/gwwar
- * @see: https://github.com/gwwar/z-context/blob/master/content-script.js
- * @see: https://github.com/gwwar/z-context/blob/master/LICENSE
+ *
+ * @see https://github.com/gwwar/z-context/blob/master/content-script.js
+ * @see https://github.com/gwwar/z-context/blob/master/LICENSE
  *
  * @param {Element} node -
  *
@@ -60,11 +61,11 @@ declare function normalizeString(query: string): string;
 declare function getStackingContext(node: Element): StackingContext;
 type StackingContext = {
     /**
-     * A DOM Element
+     * - A DOM Element.
      */
     node: Element;
     /**
-     * Reason for why a stacking context was created
+     * - Reason for why a stacking context was created.
      */
     reason: string;
 };
@@ -140,7 +141,7 @@ declare function parseSvelteConfig(config: object, thisArg?: any): object;
  *
  * @param {number}   delay - An amount of time in milliseconds to delay.
  *
- * @return {Function} A wrapped function that can be called to debounce execution.
+ * @returns {Function} A wrapped function that can be called to debounce execution.
  */
 declare function debounce(callback: Function, delay: number): Function;
 

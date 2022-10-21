@@ -1032,7 +1032,7 @@ declare class LocalStorage {
      *
      * @returns {LSStore} The new LSStore.
      */
-    static "__#202377@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#116207@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the localStorage.
      *
@@ -1092,7 +1092,7 @@ declare class SessionStorage {
      *
      * @returns {SSStore} The new SSStore.
      */
-    static "__#202378@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#116208@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the sessionStorage.
      *
@@ -1453,117 +1453,4 @@ type GameState = svelte_store.Readable<any>;
  */
 declare const gameState: svelte_store.Readable<any>;
 
-/**
- * Registers game settings and creates a backing Svelte store for each setting. It is possible to add multiple
- * `onChange` callbacks on registration.
- */
-declare class TJSGameSettings {
-    /**
-     * Creates a new GSWritableStore for the given key.
-     *
-     * @param {string}   initialValue - An initial value to set to new stores.
-     *
-     * @returns {GSWritableStore} The new GSWritableStore.
-     */
-    static "__#241620@#createStore"(initialValue: string): svelte_store.Writable<any>;
-    /**
-     * Returns a readable Game Settings store for the associated key.
-     *
-     * @param {string}   key - Game setting key.
-     *
-     * @returns {GSReadableStore|undefined} The associated store for the given game setting key.
-     */
-    getReadableStore(key: string): svelte_store.Readable<any> | undefined;
-    /**
-     * Returns a writable Game Settings store for the associated key.
-     *
-     * @param {string}   key - Game setting key.
-     *
-     * @returns {GSWritableStore|undefined} The associated store for the given game setting key.
-     */
-    getStore(key: string): svelte_store.Writable<any> | undefined;
-    /**
-     * Returns a writable Game Settings store for the associated key.
-     *
-     * @param {string}   key - Game setting key.
-     *
-     * @returns {GSWritableStore|undefined} The associated store for the given game setting key.
-     */
-    getWritableStore(key: string): svelte_store.Writable<any> | undefined;
-    /**
-     * @param {GameSetting} setting - A GameSetting instance to set to Foundry game settings.
-     */
-    register(setting: GameSetting): void;
-    /**
-     * Registers multiple settings.
-     *
-     * @param {Iterable<GameSetting>} settings - An iterable list of game setting configurations to register.
-     */
-    registerAll(settings: Iterable<GameSetting>): void;
-    #private;
-}
-type GameSettingOptions = {
-    /**
-     * - If choices are defined, the resulting setting will be a select menu.
-     */
-    choices?: object;
-    /**
-     * - Specifies that the setting appears in the configuration view.
-     */
-    config?: boolean;
-    /**
-     * - A description of the registered setting and its behavior.
-     */
-    hint?: string;
-    /**
-     * - The displayed name of the setting.
-     */
-    name: string;
-    /**
-     * - An onChange callback to directly receive callbacks from Foundry on setting change.
-     */
-    onChange?: Function;
-    /**
-     * - If range is specified, the resulting setting will be a range slider.
-     */
-    range?: object;
-    /**
-     * - Scope for setting.
-     */
-    scope?: ('client' | 'world');
-    /**
-     * - A constructable object or function.
-     */
-    type: any | Function;
-};
-/**
- * - Defines a game setting.
- */
-type GameSetting = {
-    /**
-     * - The setting namespace; usually the ID of the module / system.
-     */
-    namespace: string;
-    /**
-     * - The setting key to register.
-     */
-    key: string;
-    /**
-     * - An existing store instance to use.
-     */
-    store?: svelte_store.Writable<any>;
-    /**
-     * - Configuration for setting data.
-     */
-    options: GameSettingOptions;
-};
-/**
- * - The backing Svelte store; writable w/ get method attached.
- */
-type GSWritableStore = svelte_store.Writable<any>;
-/**
- * - The backing Svelte store; readable w/ get method attached.
- */
-type GSReadableStore = svelte_store.Readable<any>;
-
-export { CompareFn, DataDerivedCreate, DataDynArray, DataDynArrayCreate, DataDynMap, DataDynMapCreate, DataFilter, DataOptions, DataSort, DerivedArrayReducer, DerivedMapReducer, DynArrayReducer, DynMapReducer, EmbeddedAPI, FilterFn, GSReadableStore, GSWritableStore, GameSetting, GameSettingOptions, GameState, IDerivedReducer, IDerivedReducerCtor, IDynArrayReducerCtor, IDynMapReducerCtor, LSStore, LocalStorage, OptionsDerivedCreate, OptionsDynArrayCreate, OptionsDynMapCreate, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, TJSGameSettings, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { CompareFn, DataDerivedCreate, DataDynArray, DataDynArrayCreate, DataDynMap, DataDynMapCreate, DataFilter, DataOptions, DataSort, DerivedArrayReducer, DerivedMapReducer, DynArrayReducer, DynMapReducer, EmbeddedAPI, FilterFn, GameState, IDerivedReducer, IDerivedReducerCtor, IDynArrayReducerCtor, IDynMapReducerCtor, LSStore, LocalStorage, OptionsDerivedCreate, OptionsDynArrayCreate, OptionsDynMapCreate, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };

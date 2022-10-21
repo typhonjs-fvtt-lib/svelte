@@ -7,18 +7,23 @@ import { cubicOut } from 'svelte/easing';
  * Provides an action to always blur the element when any pointer up event occurs on the element.
  *
  * @param {HTMLElement}   node - The node to handle always blur on pointer up.
+ *
+ * @returns {{destroy: Function}} Lifecycle functions.
  */
 function alwaysBlur(node)
 {
-   function blur()
+   /**
+    * Blurs node if active element.
+    */
+   function blurNode()
    {
       setTimeout(() => { if (document.activeElement === node) { node.blur(); } }, 0);
    }
 
-   node.addEventListener('pointerup', blur);
+   node.addEventListener('pointerup', blurNode);
 
    return {
-      destroy: () => node.removeEventListener('pointerup', blur)
+      destroy: () => node.removeEventListener('pointerup', blurNode)
    };
 }
 
@@ -389,6 +394,8 @@ function s_UPDATE_SUBSCRIBER(subscriber, contentWidth, contentHeight)
  * @param {HTMLElement} element - The target scrollable HTML element.
  *
  * @param {import('svelte/store').Writable<number>}   store - A writable store that stores the element scrollTop.
+ *
+ * @returns {{destroy: Function, update: Function}} Lifecycle functions.
  */
 function applyScrolltop(element, store)
 {
@@ -397,6 +404,11 @@ function applyScrolltop(element, store)
       throw new TypeError(`applyScrolltop error: 'store' must be a writable Svelte store.`);
    }
 
+   /**
+    * Updates element `scrollTop`.
+    *
+    * @param {number}   value -
+    */
    function storeUpdate(value)
    {
       if (!Number.isFinite(value)) { return; }
@@ -407,7 +419,8 @@ function applyScrolltop(element, store)
 
    let unsubscribe = store.subscribe(storeUpdate);
 
-   const resizeControl = resizeObserver(element, debounce(() => {
+   const resizeControl = resizeObserver(element, debounce(() =>
+   {
       if (element.isConnected) { store.set(element.scrollTop); }
    }, 500));
 
@@ -486,15 +499,25 @@ function applyStyles(node, properties)
  * for input elements including select to blur / unfocus the element when any pointer down occurs outside the element.
  *
  * @param {HTMLElement}   node - The node to handle automatic blur on focus loss.
+ *
+ * @returns {{destroy: Function}} Lifecycle functions.
  */
 function autoBlur(node)
 {
-   function blur() { document.body.removeEventListener('pointerdown', onPointerDown); }
-   function focus() { document.body.addEventListener('pointerdown', onPointerDown); }
+   /**
+    * Removes listener on blur.
+    */
+   function onBlur() { document.body.removeEventListener('pointerdown', onPointerDown); }
+
+   /**
+    * Adds listener on focus.
+    */
+   function onFocus() { document.body.addEventListener('pointerdown', onPointerDown); }
 
    /**
     * Blur the node if a pointer down event happens outside the node.
-    * @param {PointerEvent} event
+    *
+    * @param {PointerEvent} event -
     */
    function onPointerDown(event)
    {
@@ -503,15 +526,15 @@ function autoBlur(node)
       if (document.activeElement === node) { node.blur(); }
    }
 
-   node.addEventListener('blur', blur);
-   node.addEventListener('focus', focus);
+   node.addEventListener('blur', onBlur);
+   node.addEventListener('focus', onFocus);
 
    return {
       destroy: () =>
       {
          document.body.removeEventListener('pointerdown', onPointerDown);
-         node.removeEventListener('blur', blur);
-         node.removeEventListener('focus', focus);
+         node.removeEventListener('blur', onBlur);
+         node.removeEventListener('focus', onFocus);
       }
    };
 }
@@ -648,6 +671,9 @@ function draggable(node, { position, active = true, button = 0, storeDragging = 
    function onDragPointerDown(event)
    {
       if (event.button !== button || !event.isPrimary) { return; }
+
+      // Do not process if the position system is not enabled.
+      if (!position.enabled) { return; }
 
       event.preventDefault();
 
