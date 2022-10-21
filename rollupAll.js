@@ -2,17 +2,12 @@ import resolve             from '@rollup/plugin-node-resolve';
 import { generateTSDef }   from '@typhonjs-build-test/esm-d-ts';
 import fs                  from 'fs-extra';
 import { rollup }          from 'rollup';
-import sourcemaps          from 'rollup-plugin-sourcemaps';
-import { terser }          from 'rollup-plugin-terser';
 import upath               from 'upath';
 
 import { typhonjsRuntime } from './.rollup/local/index.js';
 
-import terserConfig        from './terser.config.mjs';
-
 import { externalPathsNPM } from './.rollup/local/externalPathsNPM.js';
 
-const s_COMPRESS = false;
 const s_SOURCEMAPS = true;
 
 // Defines the node-resolve config.
@@ -23,7 +18,7 @@ const s_RESOLVE_CONFIG = {
 
 // Defines potential output plugins to use conditionally if the .env file indicates the bundles should be
 // minified / mangled.
-const outputPlugins = s_COMPRESS ? [terser(terserConfig)] : [];
+const outputPlugins = [];
 
 // Defines whether source maps are generated / loaded from the .env file.
 const sourcemap = s_SOURCEMAPS;
@@ -34,20 +29,17 @@ const rollupConfigs = [
          input: 'src/action/index.js',
          plugins: [
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/action`] }),
-            resolve(s_RESOLVE_CONFIG),
-            sourcemaps()
+            resolve(s_RESOLVE_CONFIG)
          ]
       },
       output: {
-         output: {
-            file: '_dist/action/index.js',
-            format: 'es',
-            paths: externalPathsNPM,
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
+         file: '_dist/action/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
    },
    {
@@ -55,40 +47,34 @@ const rollupConfigs = [
          input: 'src/animate/index.js',
          plugins: [
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/animate`] }),
-            resolve(s_RESOLVE_CONFIG),
-            sourcemaps()
+            resolve(s_RESOLVE_CONFIG)
          ]
       },
       output: {
-         output: {
-            file: '_dist/animate/index.js',
-            format: 'es',
-            paths: externalPathsNPM,
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
+         file: '_dist/animate/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
    },
    {
       input: {
          input: 'src/gsap/index.js',
          plugins: [
-            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/gsap`] }),
-            sourcemaps()
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/gsap`] })
          ]
       },
       output: {
-         output: {
-            file: '_dist/gsap/index.js',
-            format: 'es',
-            paths: externalPathsNPM,
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
+         file: '_dist/gsap/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
    },
    {
@@ -96,40 +82,34 @@ const rollupConfigs = [
          input: 'src/handler/index.js',
          plugins: [
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/handler`] }),
-            resolve(s_RESOLVE_CONFIG),
-            sourcemaps()
+            resolve(s_RESOLVE_CONFIG)
          ]
       },
       output: {
-         output: {
-            file: '_dist/handler/index.js',
-            format: 'es',
-            paths: externalPathsNPM,
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
+         file: '_dist/handler/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
    },
    {
       input: {
          input: 'src/helper/index.js',
          plugins: [
-            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/helper`] }),
-            sourcemaps()
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/helper`] })
          ]
       },
       output: {
-         output: {
-            file: '_dist/helper/index.js',
-            format: 'es',
-            paths: externalPathsNPM,
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
+         file: '_dist/helper/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
    },
    {
@@ -137,20 +117,17 @@ const rollupConfigs = [
          input: 'src/math/index.js',
          plugins: [
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/math`] }),
-            resolve(s_RESOLVE_CONFIG),
-            sourcemaps()
+            resolve(s_RESOLVE_CONFIG)
          ]
       },
       output: {
-         output: {
-            file: '_dist/math/index.js',
-            format: 'es',
-            paths: externalPathsNPM,
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
+         file: '_dist/math/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
    },
    {
@@ -158,20 +135,17 @@ const rollupConfigs = [
          input: 'src/store/index.js',
          plugins: [
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/store`] }),
-            resolve(s_RESOLVE_CONFIG),
-            sourcemaps()
+            resolve(s_RESOLVE_CONFIG)
          ]
       },
       output: {
-         output: {
-            file: '_dist/store/index.js',
-            format: 'es',
-            paths: externalPathsNPM,
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
+         file: '_dist/store/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
    },
    {
@@ -179,20 +153,17 @@ const rollupConfigs = [
          input: 'src/transition/index.js',
          plugins: [
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/transition`] }),
-            resolve(s_RESOLVE_CONFIG),
-            sourcemaps()
+            resolve(s_RESOLVE_CONFIG)
          ]
       },
       output: {
-         output: {
-            file: '_dist/transition/index.js',
-            format: 'es',
-            paths: externalPathsNPM,
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
+         file: '_dist/transition/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
    },
    {
@@ -200,20 +171,17 @@ const rollupConfigs = [
          input: 'src/util/index.js',
          plugins: [
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/util`] }),
-            resolve(s_RESOLVE_CONFIG),
-            sourcemaps()
+            resolve(s_RESOLVE_CONFIG)
          ]
       },
       output: {
-         output: {
-            file: '_dist/util/index.js',
-            format: 'es',
-            paths: externalPathsNPM,
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
+         file: '_dist/util/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
    },
    {
@@ -221,20 +189,17 @@ const rollupConfigs = [
          input: 'src/plugin/data/index.js',
          plugins: [
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/plugin/data`] }),
-            resolve(s_RESOLVE_CONFIG),
-            sourcemaps()
+            resolve(s_RESOLVE_CONFIG)
          ]
       },
       output: {
-         output: {
-            file: '_dist/plugin/data/index.js',
-            format: 'es',
-            paths: externalPathsNPM,
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
+         file: '_dist/plugin/data/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
    },
    {
@@ -242,20 +207,17 @@ const rollupConfigs = [
          input: 'src/plugin/system/index.js',
          plugins: [
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/plugin/system`] }),
-            resolve(s_RESOLVE_CONFIG),
-            sourcemaps()
+            resolve(s_RESOLVE_CONFIG)
          ]
       },
       output: {
-         output: {
-            file: '_dist/plugin/system/index.js',
-            format: 'es',
-            paths: externalPathsNPM,
-            plugins: outputPlugins,
-            preferConst: true,
-            sourcemap,
-            // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
-         }
+         file: '_dist/plugin/system/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap,
+         // sourcemapPathTransform: (sourcePath) => sourcePath.replace(relativePath, `.`)
       }
    }
 ];
@@ -274,10 +236,10 @@ for (const config of rollupConfigs)
 
    await generateTSDef({
       main: config.input.input,
-      output: upath.changeExt(config.output.output.file, '.d.ts')
+      output: upath.changeExt(config.output.file, '.d.ts')
    });
 
-   fs.writeJSONSync(`${upath.dirname(config.output.output.file)}/package.json`, {
+   fs.writeJSONSync(`${upath.dirname(config.output.file)}/package.json`, {
       main: './index.js',
       module: './index.js',
       type: 'module',

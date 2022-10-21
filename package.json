@@ -81,8 +81,8 @@
   "dependencies": {
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^14",
-    "@typhonjs-build-test/esm-d-ts": "^0.0.5",
+    "@rollup/plugin-node-resolve": "^15",
+    "@typhonjs-build-test/esm-d-ts": "^0.0.6",
     "@typhonjs-config/eslint-config": "^0.3.0",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "@typhonjs-svelte/lib": "github:typhonjs-svelte/lib",
@@ -90,15 +90,12 @@
     "deepmerge": "^4",
     "eslint": "^8",
     "fs-extra": "^10",
-    "rollup": "^2",
-    "rollup-plugin-sourcemaps": "^0.6.0",
-    "rollup-plugin-svelte": "^7",
-    "rollup-plugin-terser": "^7",
-    "svelte": "^3.50.0",
+    "rollup": "^3",
+    "svelte": "^3.52.0",
     "upath": "^2"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=14.18"
   },
   "homepage": "https://github.com/typhonjs-fvtt/svelte#readme",
   "keywords": [
