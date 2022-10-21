@@ -1,6 +1,6 @@
 {
   "name": "@typhonjs-fvtt/svelte",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "Provides resources to integrate Svelte w/ Foundry VTT.",
   "type": "module",
   "author": "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)",
