@@ -102,7 +102,6 @@
 
 <div id={id}
      bind:this={glassPane}
-     tabindex=0
      class=tjs-glass-pane
      in:inTransition={inTransitionOptions}
      out:outTransition={outTransitionOptions}
