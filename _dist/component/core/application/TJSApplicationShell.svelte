@@ -236,6 +236,10 @@
 </div>
 
 <style>
+    .tjs-window-app {
+        overflow: hidden;
+    }
+
     /**
      * Defines styles that mimic a Foundry popout Application. `:global` is used to preserve the unused CSS in the
      * template above. A primary benefit of a separate application shell implementation is that the styles are not
@@ -264,10 +268,6 @@
         box-shadow: 0 0 20px #000;
         padding: 0;
         z-index: 95;
-    }
-
-    :global(.tjs-window-app > *) {
-        flex: 1;
     }
 
     :global(.tjs-window-app > .flex0) {

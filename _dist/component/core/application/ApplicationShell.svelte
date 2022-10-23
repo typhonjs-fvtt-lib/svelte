@@ -231,12 +231,13 @@
 </div>
 
 <style>
+   /* Note: this is different than stock Foundry and allows rounded corners from .app core styles */
    .window-app {
-      overflow: inherit;
+      overflow: hidden;
    }
 
    /* Note: this is different than stock Foundry that sets `flex: 1`. This greatly aids control of content */
    .window-app .window-content > * {
-      flex: none;
+      flex: unset;
    }
 </style>
