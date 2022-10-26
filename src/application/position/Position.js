@@ -879,7 +879,11 @@ export class Position
             // Add will-change property if not already set in inline or computed styles.
             if (!styleCache.hasWillChange)
             {
-               el.style.willChange = this.#options.ortho ? 'transform' : 'top, left, transform';
+               // TODO: This is commented out as there is a Chrome bug that reduces quality / blurs
+               // child elements when `will-change: transform` is set.
+               // https://bugs.chromium.org/p/chromium/issues/detail?id=1343711#c4
+
+               // el.style.willChange = this.#options.ortho ? 'transform' : 'top, left, transform';
             }
 
             // Update all properties / clear queued state.
