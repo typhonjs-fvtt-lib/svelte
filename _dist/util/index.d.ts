@@ -71,6 +71,90 @@ type StackingContext = {
 };
 
 /**
+ * First pass at a system to create a unique style sheet for the UI library that loads default values for all CSS
+ * variables.
+ */
+declare class StyleManager {
+    /**
+     *
+     * @param {object}   opts - Options.
+     *
+     * @param {string}   opts.docKey - Required key providing a link to a specific style sheet element.
+     *
+     * @param {string}   [opts.selector=:root] - Selector element.
+     *
+     * @param {Document} [opts.document] - Target document to load styles into.
+     *
+     */
+    constructor({ docKey, selector, document }?: {
+        docKey: string;
+        selector?: string;
+        document?: Document;
+    });
+    /**
+     * Provides an accessor to get the `cssText` for the style sheet.
+     *
+     * @returns {string}
+     */
+    get cssText(): string;
+    /**
+     * Provides a copy constructor to duplicate an existing StyleManager instance into a new document.
+     *
+     * Note: This is used to support the `PopOut` module.
+     *
+     * @param [document] Target browser document to clone into.
+     *
+     * @returns {StyleManager} New style manager instance.
+     */
+    clone(document?: Document): StyleManager;
+    get(): {};
+    /**
+     * Gets a particular CSS variable.
+     *
+     * @param {string}   key - CSS variable property key.
+     *
+     * @returns {string} Returns CSS variable value.
+     */
+    getProperty(key: string): string;
+    /**
+     * Set rules by property / value; useful for CSS variables.
+     *
+     * @param {Object<string, string>}  rules - An object with property / value string pairs to load.
+     *
+     * @param {boolean}                 [overwrite=true] - When true overwrites any existing values.
+     */
+    setProperties(rules: {
+        [x: string]: string;
+    }, overwrite?: boolean): void;
+    /**
+     * Sets a particular property.
+     *
+     * @param {string}   key - CSS variable property key.
+     *
+     * @param {string}   value - CSS variable value.
+     *
+     * @param {boolean}  [overwrite=true] - Overwrite any existing value.
+     */
+    setProperty(key: string, value: string, overwrite?: boolean): void;
+    /**
+     * Removes the property keys specified. If `keys` is a string a single property is removed. Or if `keys` is an
+     * iterable list then all property keys in the list are removed.
+     *
+     * @param {string|Iterable<string>} keys - The property keys to remove.
+     */
+    removeProperties(keys: string | Iterable<string>): void;
+    /**
+     * Removes a particular CSS variable.
+     *
+     * @param {string}   key - CSS variable property key.
+     *
+     * @returns {string} CSS variable value when removed.
+     */
+    removeProperty(key: string): string;
+    #private;
+}
+
+/**
  * Parses a pixel string / computed styles. Ex. `100px` returns `100`.
  *
  * @param {string}   value - Value to parse.
@@ -224,4 +308,4 @@ type ParseDataTransferOptions = {
     types?: string[] | undefined;
 };
 
-export { ParseDataTransferOptions, StackingContext, debounce, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isSvelteComponent, normalizeString, outroAndDestroy, parseSvelteConfig, striptags, styleParsePixels, uuidv4 };
+export { ParseDataTransferOptions, StackingContext, StyleManager, debounce, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isSvelteComponent, normalizeString, outroAndDestroy, parseSvelteConfig, striptags, styleParsePixels, uuidv4 };
