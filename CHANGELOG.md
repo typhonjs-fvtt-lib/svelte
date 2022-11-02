@@ -1,4 +1,8 @@
 # Changelog
+## Release 0.0.21 (minor)
+- Updated @typhonjs-svelte/lib to latest.
+- New utility class to manage CSS variable called `StyleManager` added to `util` subpackage export.
+
 ## Release 0.0.20 (minor)
 - Added `enabled` option to `Position` to turn on / off Position control instantly. Used in forthcoming `PopOut` module support.
 - Moved delete callback in TJSDocument before final update subscribers
