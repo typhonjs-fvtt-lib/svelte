@@ -56,6 +56,7 @@ export function loadSvelteConfig({ app, template, config, elementRootUpdate } = 
    // Inject the Foundry application instance and `elementRootUpdate` to the external context.
    externalContext.application = app;
    externalContext.elementRootUpdate = elementRootUpdate;
+   externalContext.sessionStorage = app.state.sessionStorage;
 
    let eventbus;
 

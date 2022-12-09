@@ -155,6 +155,7 @@ export class SvelteFormApplication extends FormApplication
          positionInitial: Position.Initial.browserCentered,      // A helper for initial position placement.
          positionOrtho: true,             // When true Position is optimized for orthographic use.
          positionValidator: Position.Validators.transformWindow, // A function providing the default validator.
+         sessionStorage: void 0,          // An instance of SessionStorage to share across SvelteApplications.
          suppressFormInit: false,         // If true automatic suppression of core FormApplication methods is enabled.
          transformOrigin: 'top left'      // By default, 'top / left' respects rotation when minimizing.
       });
