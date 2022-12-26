@@ -960,64 +960,118 @@ declare class DerivedArrayReducer<T> implements IDerivedReducer<T[], number, T> 
 }
 
 /**
- * Provides a basic test for a given variable to test if it has the shape of a readable store by having a `subscribe`
- * function.
- *
- * Note: functions are also objects, so test that the variable might be a function w/ a `subscribe` function.
- *
- * @param {*}  store - variable to test that might be a store.
- *
- * @returns {boolean} Whether the variable tested has the shape of a store.
+ * Provides a readable store to track keys actively pressed. KeyStore is designed to be used with the {@link keyforward}
+ * action.
  */
-declare function isReadableStore(store: any): boolean;
-/**
- * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
- * function and an `update` function.
- *
- * Note: functions are also objects, so test that the variable might be a function w/ a `subscribe` function.
- *
- * @param {*}  store - variable to test that might be a store.
- *
- * @returns {boolean} Whether the variable tested has the shape of a store.
- */
-declare function isUpdatableStore(store: any): boolean;
-/**
- * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
- * `set`, and `update` functions.
- *
- * Note: functions are also objects, so test that the variable might be a function w/ `subscribe` & `set` functions.
- *
- * @param {*}  store - variable to test that might be a store.
- *
- * @returns {boolean} Whether the variable tested has the shape of a store.
- */
-declare function isWritableStore(store: any): boolean;
-/**
- * Subscribes to the given store with the update function provided and ignores the first automatic
- * update. All future updates are dispatched to the update function.
- *
- * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
- *  Store to subscribe to...
- *
- * @param {import('svelte/store').Updater} update - function to receive future updates.
- *
- * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
- */
-declare function subscribeIgnoreFirst(store: svelte_store.Readable<any> | svelte_store.Writable<any>, update: any): svelte_store.Unsubscriber;
-/**
- * Subscribes to the given store with two update functions provided. The first function is invoked on the initial
- * subscription. All future updates are dispatched to the update function.
- *
- * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
- *  Store to subscribe to...
- *
- * @param {import('svelte/store').Updater} first - Function to receive first update.
- *
- * @param {import('svelte/store').Updater} update - Function to receive future updates.
- *
- * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
- */
-declare function subscribeFirstRest(store: svelte_store.Readable<any> | svelte_store.Writable<any>, first: any, update: any): svelte_store.Unsubscriber;
+declare class KeyStore {
+    /**
+     * @param {Iterable<string>}  [keyNames] -
+     *
+     * @param {KeyStoreOptions}   [options] - Optional parameters
+     */
+    constructor(keyNames?: Iterable<string>, options?: KeyStoreOptions);
+    /**
+     * Add given key to the tracking key set.
+     *
+     * @param {string}   key - Key to add.
+     */
+    addKey(key: string): void;
+    /**
+     * @returns {boolean} True if any keys in the key set are pressed.
+     */
+    /**
+     * Returns true if any of given keys are pressed. If `keys` is undefined then the result is true if any keys being
+     * tracked are pressed.
+     *
+     * @param {string|Iterable<string>|undefined} keys - Zero or more key strings or list to verify if any pressed.
+     *
+     * @returns {boolean} True if any keys set are pressed.
+     */
+    anyPressed(keys: string | Iterable<string> | undefined): boolean;
+    /**
+     * Is the given key in the tracking key set.
+     *
+     * @param {string}   key - Key to check.
+     */
+    hasKey(key: string): void;
+    /**
+     * Returns true if all given keys are pressed.
+     *
+     * @param {string|Iterable<string>} keys - One or more key strings to verify if pressed.
+     *
+     * @returns {boolean} Are all keys pressed.
+     */
+    isPressed(keys: string | Iterable<string>): boolean;
+    /**
+     * Handle keydown event adding any key from the tracked key set.
+     *
+     * @param {KeyboardEvent}  event - KeyboardEvent.
+     */
+    keydown(event: KeyboardEvent): void;
+    /**
+     * Returns current pressed keys iterator.
+     *
+     * @returns {IterableIterator<string>}
+     */
+    keysPressed(): IterableIterator<string>;
+    /**
+     * Returns currently tracked keys iterator.
+     *
+     * @returns {IterableIterator<string>}
+     */
+    keysTracked(): IterableIterator<string>;
+    /**
+     * Handle keyup event removing any key from the tracked key set.
+     *
+     * @param {KeyboardEvent}  event - KeyboardEvent.
+     */
+    keyup(event: KeyboardEvent): void;
+    /**
+     * Remove the given key from the tracking key set.
+     *
+     * @param {string}   key - Key to remove.
+     */
+    removeKey(key: string): void;
+    /**
+     * Update options.
+     *
+     * @param {KeyStoreOptions}   options - Options to set.
+     */
+    setOptions(options: KeyStoreOptions): void;
+    /**
+     * @param {string}   key - key or key code to lookup.
+     *
+     * @returns {number} 1 if currently pressed and 0 if not pressed.
+     */
+    value(key: string): number;
+    /**
+     * @param {function(KeyStore): void} handler - Callback function that is invoked on update / changes.
+     *
+     * @returns {(function(): void)} Unsubscribe function.
+     */
+    subscribe(handler: (arg0: KeyStore) => void): (() => void);
+    /**
+     * Updates subscribers.
+     *
+     * @protected
+     */
+    protected _updateSubscribers(): void;
+    #private;
+}
+type KeyStoreOptions = {
+    /**
+     * - Invoke `preventDefault` on key events.
+     */
+    preventDefault?: boolean;
+    /**
+     * - When true use `event.code` otherwise use `event.key` to get active key.
+     */
+    useCode?: boolean;
+    /**
+     * - Invoke `stopPropagation` on key events.
+     */
+    stopPropagation?: boolean;
+};
 
 /**
  * @typedef {import('svelte/store').Writable} LSStore - The backing Svelte store; a writable w/ get method attached.
@@ -1032,7 +1086,7 @@ declare class LocalStorage {
      *
      * @returns {LSStore} The new LSStore.
      */
-    static "__#116234@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#116339@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the localStorage.
      *
@@ -1092,7 +1146,7 @@ declare class SessionStorage {
      *
      * @returns {SSStore} The new SSStore.
      */
-    static "__#116235@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#116340@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the sessionStorage.
      *
@@ -1138,6 +1192,66 @@ declare class SessionStorage {
  * - The backing Svelte store; a writable w/ get method attached.
  */
 type SSStore = svelte_store.Writable<any>;
+
+/**
+ * Provides a basic test for a given variable to test if it has the shape of a readable store by having a `subscribe`
+ * function.
+ *
+ * Note: functions are also objects, so test that the variable might be a function w/ a `subscribe` function.
+ *
+ * @param {*}  store - variable to test that might be a store.
+ *
+ * @returns {boolean} Whether the variable tested has the shape of a store.
+ */
+declare function isReadableStore(store: any): boolean;
+/**
+ * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
+ * function and an `update` function.
+ *
+ * Note: functions are also objects, so test that the variable might be a function w/ a `subscribe` function.
+ *
+ * @param {*}  store - variable to test that might be a store.
+ *
+ * @returns {boolean} Whether the variable tested has the shape of a store.
+ */
+declare function isUpdatableStore(store: any): boolean;
+/**
+ * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
+ * `set`, and `update` functions.
+ *
+ * Note: functions are also objects, so test that the variable might be a function w/ `subscribe` & `set` functions.
+ *
+ * @param {*}  store - variable to test that might be a store.
+ *
+ * @returns {boolean} Whether the variable tested has the shape of a store.
+ */
+declare function isWritableStore(store: any): boolean;
+/**
+ * Subscribes to the given store with the update function provided and ignores the first automatic
+ * update. All future updates are dispatched to the update function.
+ *
+ * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
+ *  Store to subscribe to...
+ *
+ * @param {import('svelte/store').Updater} update - function to receive future updates.
+ *
+ * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
+ */
+declare function subscribeIgnoreFirst(store: svelte_store.Readable<any> | svelte_store.Writable<any>, update: any): svelte_store.Unsubscriber;
+/**
+ * Subscribes to the given store with two update functions provided. The first function is invoked on the initial
+ * subscription. All future updates are dispatched to the update function.
+ *
+ * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
+ *  Store to subscribe to...
+ *
+ * @param {import('svelte/store').Updater} first - Function to receive first update.
+ *
+ * @param {import('svelte/store').Updater} update - Function to receive future updates.
+ *
+ * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
+ */
+declare function subscribeFirstRest(store: svelte_store.Readable<any> | svelte_store.Writable<any>, first: any, update: any): svelte_store.Unsubscriber;
 
 /** The minimal requirements of the
  * [writable store contract](https://svelte.dev/docs#component-format-script-4-prefix-stores-with-$-to-access-their-values-store-contract).
@@ -1453,4 +1567,4 @@ type GameState = svelte_store.Readable<any>;
  */
 declare const gameState: svelte_store.Readable<any>;
 
-export { CompareFn, DataDerivedCreate, DataDynArray, DataDynArrayCreate, DataDynMap, DataDynMapCreate, DataFilter, DataOptions, DataSort, DerivedArrayReducer, DerivedMapReducer, DynArrayReducer, DynMapReducer, EmbeddedAPI, FilterFn, GameState, IDerivedReducer, IDerivedReducerCtor, IDynArrayReducerCtor, IDynMapReducerCtor, LSStore, LocalStorage, OptionsDerivedCreate, OptionsDynArrayCreate, OptionsDynMapCreate, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { CompareFn, DataDerivedCreate, DataDynArray, DataDynArrayCreate, DataDynMap, DataDynMapCreate, DataFilter, DataOptions, DataSort, DerivedArrayReducer, DerivedMapReducer, DynArrayReducer, DynMapReducer, EmbeddedAPI, FilterFn, GameState, IDerivedReducer, IDerivedReducerCtor, IDynArrayReducerCtor, IDynMapReducerCtor, KeyStore, KeyStoreOptions, LSStore, LocalStorage, OptionsDerivedCreate, OptionsDynArrayCreate, OptionsDynMapCreate, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };

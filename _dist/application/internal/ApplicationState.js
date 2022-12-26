@@ -1,6 +1,9 @@
-import { linear }    from "svelte/easing";
-import { lerp }      from '@typhonjs-fvtt/svelte/math';
-import { isObject }  from '@typhonjs-fvtt/svelte/util';
+import { linear }          from 'svelte/easing';
+
+import { lerp }            from '@typhonjs-fvtt/svelte/math';
+import { isObject }        from '@typhonjs-fvtt/svelte/util';
+
+import { SessionStorage }  from '@typhonjs-fvtt/svelte/store';
 
 export class ApplicationState
 {
@@ -10,12 +13,25 @@ export class ApplicationState
    /** @type {Map<string, ApplicationData>} */
    #dataSaved = new Map();
 
+   #sessionStorage;
+
    /**
     * @param {ApplicationShellExt}   application - The application.
     */
    constructor(application)
    {
       this.#application = application;
+
+      this.#sessionStorage = application?.options?.sessionStorage !== void 0 ? application.options.sessionStorage :
+       new SessionStorage();
+   }
+
+   /**
+    * @returns {SessionStorage} Returns SessionStorage instance.
+    */
+   get sessionStorage()
+   {
+      return this.#sessionStorage;
    }
 
    /**

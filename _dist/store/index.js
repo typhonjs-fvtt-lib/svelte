@@ -1,7 +1,7 @@
+import { isIterable, hasPrototype } from '@typhonjs-fvtt/svelte/util';
 import { derived, get, writable as writable$2 } from 'svelte/store';
 import { noop, run_all, is_function } from 'svelte/internal';
 import { uuidv4, isPlainObject, getUUIDFromDataTransfer, isObject } from '@typhonjs-fvtt/svelte/util';
-import { hasPrototype } from '@typhonjs-fvtt/svelte/util';
 
 class DynReducerUtils {
     /**
@@ -1954,135 +1954,301 @@ class DynMapReducer {
 }
 
 /**
- * Provides a basic test for a given variable to test if it has the shape of a readable store by having a `subscribe`
- * function.
- *
- * Note: functions are also objects, so test that the variable might be a function w/ a `subscribe` function.
- *
- * @param {*}  store - variable to test that might be a store.
- *
- * @returns {boolean} Whether the variable tested has the shape of a store.
+ * Provides a readable store to track keys actively pressed. KeyStore is designed to be used with the {@link keyforward}
+ * action.
  */
-function isReadableStore(store)
+class KeyStore
 {
-   if (store === null || store === void 0) { return false; }
+   #keySet;
 
-   switch (typeof store)
+   /**
+    * @type {Map<string, number>}
+    */
+   #keyMap = new Map();
+
+   /**
+    * @type {KeyStoreOptions}
+    */
+   #options = { preventDefault: true, useCode: true, stopPropagation: true };
+
+   /**
+    * Stores the subscribers.
+    *
+    * @type {(function(KeyStore): void)[]}
+    */
+   #subscriptions = [];
+
+   /**
+    * @param {Iterable<string>}  [keyNames] -
+    *
+    * @param {KeyStoreOptions}   [options] - Optional parameters
+    */
+   constructor(keyNames, options)
    {
-      case 'function':
-      case 'object':
-         return typeof store.subscribe === 'function';
-   }
-
-   return false;
-}
-
-/**
- * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
- * function and an `update` function.
- *
- * Note: functions are also objects, so test that the variable might be a function w/ a `subscribe` function.
- *
- * @param {*}  store - variable to test that might be a store.
- *
- * @returns {boolean} Whether the variable tested has the shape of a store.
- */
-function isUpdatableStore(store)
-{
-   if (store === null || store === void 0) { return false; }
-
-   switch (typeof store)
-   {
-      case 'function':
-      case 'object':
-         return typeof store.subscribe === 'function' && typeof store.update === 'function';
-   }
-
-   return false;
-}
-
-/**
- * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
- * `set`, and `update` functions.
- *
- * Note: functions are also objects, so test that the variable might be a function w/ `subscribe` & `set` functions.
- *
- * @param {*}  store - variable to test that might be a store.
- *
- * @returns {boolean} Whether the variable tested has the shape of a store.
- */
-function isWritableStore(store)
-{
-   if (store === null || store === void 0) { return false; }
-
-   switch (typeof store)
-   {
-      case 'function':
-      case 'object':
-         return typeof store.subscribe === 'function' && typeof store.set === 'function';
-   }
-
-   return false;
-}
-
-/**
- * Subscribes to the given store with the update function provided and ignores the first automatic
- * update. All future updates are dispatched to the update function.
- *
- * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
- *  Store to subscribe to...
- *
- * @param {import('svelte/store').Updater} update - function to receive future updates.
- *
- * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
- */
-function subscribeIgnoreFirst(store, update)
-{
-   let firedFirst = false;
-
-   return store.subscribe((value) =>
-   {
-      if (!firedFirst)
+      if (!isIterable(keyNames))
       {
-         firedFirst = true;
+         throw new TypeError(`'keyNames' is not an iterable list.`);
+      }
+
+      this.setOptions(options);
+
+      this.#keySet = new Set(keyNames);
+   }
+
+   /**
+    * Add given key to the tracking key set.
+    *
+    * @param {string}   key - Key to add.
+    */
+   addKey(key)
+   {
+      if (typeof key !== 'string') { throw new TypeError(`'key' is not a string.`); }
+
+      this.#keySet.add(key);
+   }
+
+   /**
+    * @returns {boolean} True if any keys in the key set are pressed.
+    */
+
+   /**
+    * Returns true if any of given keys are pressed. If `keys` is undefined then the result is true if any keys being
+    * tracked are pressed.
+    *
+    * @param {string|Iterable<string>|undefined} keys - Zero or more key strings or list to verify if any pressed.
+    *
+    * @returns {boolean} True if any keys set are pressed.
+    */
+   anyPressed(keys)
+   {
+      // When no keys given then check if any key is pressed.
+      if (keys === void 0) { return this.#keyMap.size > 0; }
+
+      const isList = isIterable(keys);
+
+      if (typeof keys !== 'string' && !isList)
+      {
+         throw new TypeError(`'keys' is not a string or iterable list of strings.`);
+      }
+
+      let result = false;
+
+      if (isList)
+      {
+         for (const key of keys)
+         {
+            if (this.#keyMap.has(key))
+            {
+               result = true;
+               break;
+            }
+         }
       }
       else
       {
-         update(value);
+         if (this.#keyMap.has(keys)) { result = true; }
       }
-   });
-}
 
-/**
- * Subscribes to the given store with two update functions provided. The first function is invoked on the initial
- * subscription. All future updates are dispatched to the update function.
- *
- * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
- *  Store to subscribe to...
- *
- * @param {import('svelte/store').Updater} first - Function to receive first update.
- *
- * @param {import('svelte/store').Updater} update - Function to receive future updates.
- *
- * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
- */
-function subscribeFirstRest(store, first, update)
-{
-   let firedFirst = false;
+      return result;
+   }
 
-   return store.subscribe((value) =>
+   /**
+    * Is the given key in the tracking key set.
+    *
+    * @param {string}   key - Key to check.
+    */
+   hasKey(key)
    {
-      if (!firedFirst)
+      if (typeof key !== 'string') { throw new TypeError(`'key' is not a string.`); }
+
+      this.#keySet.has(key);
+   }
+
+   /**
+    * Returns true if all given keys are pressed.
+    *
+    * @param {string|Iterable<string>} keys - One or more key strings to verify if pressed.
+    *
+    * @returns {boolean} Are all keys pressed.
+    */
+   isPressed(keys)
+   {
+      const isList = isIterable(keys);
+
+      if (typeof keys !== 'string' && !isList)
       {
-         firedFirst = true;
-         first(value);
+         throw new TypeError(`'keys' is not a string or iterable list of strings.`);
+      }
+
+      let result = true;
+
+      if (isList)
+      {
+         for (const key of keys)
+         {
+            if (!this.#keyMap.has(key))
+            {
+               result = false;
+               break;
+            }
+         }
       }
       else
       {
-         update(value);
+         if (!this.#keyMap.has(keys)) { result = false; }
       }
-   });
+
+      return result;
+   }
+
+   /**
+    * Handle keydown event adding any key from the tracked key set.
+    *
+    * @param {KeyboardEvent}  event - KeyboardEvent.
+    */
+   keydown(event)
+   {
+      const key = this.#options.useCode ? event.code : event.key;
+
+      if (this.#keySet.has(key))
+      {
+         if (!this.#keyMap.has(key))
+         {
+            this.#keyMap.set(key, 1);
+            this._updateSubscribers();
+         }
+
+         if (this.#options.preventDefault) { event.preventDefault(); }
+         if (this.#options.stopPropagation) { event.stopPropagation(); }
+      }
+   }
+
+   /**
+    * Returns current pressed keys iterator.
+    *
+    * @returns {IterableIterator<string>}
+    */
+   keysPressed()
+   {
+      return this.#keyMap.keys();
+   }
+
+   /**
+    * Returns currently tracked keys iterator.
+    *
+    * @returns {IterableIterator<string>}
+    */
+   keysTracked()
+   {
+      return this.#keySet.keys();
+   }
+
+   /**
+    * Handle keyup event removing any key from the tracked key set.
+    *
+    * @param {KeyboardEvent}  event - KeyboardEvent.
+    */
+   keyup(event)
+   {
+      const key = this.#options.useCode ? event.code : event.key;
+
+      if (this.#keySet.has(key))
+      {
+         if (this.#keyMap.has(key))
+         {
+            this.#keyMap.delete(key);
+            this._updateSubscribers();
+         }
+
+         if (this.#options.preventDefault) { event.preventDefault(); }
+         if (this.#options.stopPropagation) { event.stopPropagation(); }
+      }
+   }
+
+   /**
+    * Remove the given key from the tracking key set.
+    *
+    * @param {string}   key - Key to remove.
+    */
+   removeKey(key)
+   {
+      if (typeof key !== 'string') { throw new TypeError(`'key' is not a string.`); }
+
+      if (this.#keySet.has(key))
+      {
+         this.#keySet.delete(key);
+
+         if (this.#keyMap.has(key))
+         {
+            this.#keyMap.delete(key);
+            this._updateSubscribers();
+         }
+      }
+   }
+
+   /**
+    * Update options.
+    *
+    * @param {KeyStoreOptions}   options - Options to set.
+    */
+   setOptions(options)
+   {
+      if (typeof options?.preventDefault === 'boolean') { this.#options.preventDefault = options.preventDefault; }
+      if (typeof options?.useCode === 'boolean') { this.#options.useCode = options.useCode; }
+      if (typeof options?.stopPropagation === 'boolean') { this.#options.stopPropagation = options.stopPropagation; }
+   }
+
+   /**
+    * @param {string}   key - key or key code to lookup.
+    *
+    * @returns {number} 1 if currently pressed and 0 if not pressed.
+    */
+   value(key)
+   {
+      return this.#keyMap.has(key) ? 1 : 0;
+   }
+
+   // Store subscriber implementation --------------------------------------------------------------------------------
+
+   /**
+    * @param {function(KeyStore): void} handler - Callback function that is invoked on update / changes.
+    *
+    * @returns {(function(): void)} Unsubscribe function.
+    */
+   subscribe(handler)
+   {
+      this.#subscriptions.push(handler); // add handler to the array of subscribers
+
+      handler(this);                     // call handler with current value
+
+      // Return unsubscribe function.
+      return () =>
+      {
+         const index = this.#subscriptions.findIndex((sub) => sub === handler);
+         if (index >= 0) { this.#subscriptions.splice(index, 1); }
+      };
+   }
+
+   /**
+    * Updates subscribers.
+    *
+    * @protected
+    */
+   _updateSubscribers()
+   {
+      for (let cntr = 0; cntr < this.#subscriptions.length; cntr++) { this.#subscriptions[cntr](this); }
+   }
 }
+
+/**
+ * @typedef {object} KeyStoreOptions
+ *
+ * @property {boolean}  [preventDefault=true] - Invoke `preventDefault` on key events.
+ *
+ * @property {boolean}  [useCode=true] - When true use `event.code` otherwise use `event.key` to get active key.
+ *
+ * @property {boolean}  [stopPropagation=true] - Invoke `stopPropagation` on key events.
+ */
 
 // src/generator.ts
 function isSimpleDeriver(deriver) {
@@ -2488,6 +2654,137 @@ class SessionStorage
       store.set(newValue);
       return newValue;
    }
+}
+
+/**
+ * Provides a basic test for a given variable to test if it has the shape of a readable store by having a `subscribe`
+ * function.
+ *
+ * Note: functions are also objects, so test that the variable might be a function w/ a `subscribe` function.
+ *
+ * @param {*}  store - variable to test that might be a store.
+ *
+ * @returns {boolean} Whether the variable tested has the shape of a store.
+ */
+function isReadableStore(store)
+{
+   if (store === null || store === void 0) { return false; }
+
+   switch (typeof store)
+   {
+      case 'function':
+      case 'object':
+         return typeof store.subscribe === 'function';
+   }
+
+   return false;
+}
+
+/**
+ * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
+ * function and an `update` function.
+ *
+ * Note: functions are also objects, so test that the variable might be a function w/ a `subscribe` function.
+ *
+ * @param {*}  store - variable to test that might be a store.
+ *
+ * @returns {boolean} Whether the variable tested has the shape of a store.
+ */
+function isUpdatableStore(store)
+{
+   if (store === null || store === void 0) { return false; }
+
+   switch (typeof store)
+   {
+      case 'function':
+      case 'object':
+         return typeof store.subscribe === 'function' && typeof store.update === 'function';
+   }
+
+   return false;
+}
+
+/**
+ * Provides a basic test for a given variable to test if it has the shape of a writable store by having a `subscribe`
+ * `set`, and `update` functions.
+ *
+ * Note: functions are also objects, so test that the variable might be a function w/ `subscribe` & `set` functions.
+ *
+ * @param {*}  store - variable to test that might be a store.
+ *
+ * @returns {boolean} Whether the variable tested has the shape of a store.
+ */
+function isWritableStore(store)
+{
+   if (store === null || store === void 0) { return false; }
+
+   switch (typeof store)
+   {
+      case 'function':
+      case 'object':
+         return typeof store.subscribe === 'function' && typeof store.set === 'function';
+   }
+
+   return false;
+}
+
+/**
+ * Subscribes to the given store with the update function provided and ignores the first automatic
+ * update. All future updates are dispatched to the update function.
+ *
+ * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
+ *  Store to subscribe to...
+ *
+ * @param {import('svelte/store').Updater} update - function to receive future updates.
+ *
+ * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
+ */
+function subscribeIgnoreFirst(store, update)
+{
+   let firedFirst = false;
+
+   return store.subscribe((value) =>
+   {
+      if (!firedFirst)
+      {
+         firedFirst = true;
+      }
+      else
+      {
+         update(value);
+      }
+   });
+}
+
+/**
+ * Subscribes to the given store with two update functions provided. The first function is invoked on the initial
+ * subscription. All future updates are dispatched to the update function.
+ *
+ * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
+ *  Store to subscribe to...
+ *
+ * @param {import('svelte/store').Updater} first - Function to receive first update.
+ *
+ * @param {import('svelte/store').Updater} update - Function to receive future updates.
+ *
+ * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
+ */
+function subscribeFirstRest(store, first, update)
+{
+   let firedFirst = false;
+
+   return store.subscribe((value) =>
+   {
+      if (!firedFirst)
+      {
+         firedFirst = true;
+         first(value);
+      }
+      else
+      {
+         update(value);
+      }
+   });
 }
 
 /**
@@ -3510,5 +3807,5 @@ Hooks.once('ready', () => storeState.set(game));
  * @property {Function} get - Provides a mechanism to directly access the Foundry game state without subscribing.
  */
 
-export { DerivedArrayReducer, DerivedMapReducer, DynArrayReducer, DynMapReducer, LocalStorage, SessionStorage, TJSDocument, TJSDocumentCollection, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { DerivedArrayReducer, DerivedMapReducer, DynArrayReducer, DynMapReducer, KeyStore, LocalStorage, SessionStorage, TJSDocument, TJSDocumentCollection, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
 //# sourceMappingURL=index.js.map

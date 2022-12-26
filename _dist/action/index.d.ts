@@ -29,17 +29,6 @@ declare function applyScrolltop(element: HTMLElement, store: svelte_store.Writab
 };
 
 /**
- * Provides an action to apply style properties provided as an object.
- *
- * @param {HTMLElement} node - Target element
- *
- * @param {object}      properties - Key / value object of properties to set.
- *
- * @returns {Function} Update function.
- */
-declare function applyStyles(node: HTMLElement, properties: object): Function;
-
-/**
  * Provides an action to blur the element when any pointer down event occurs outside the element. This can be useful
  * for input elements including select to blur / unfocus the element when any pointer down occurs outside the element.
  *
@@ -50,6 +39,51 @@ declare function applyStyles(node: HTMLElement, properties: object): Function;
 declare function autoBlur(node: HTMLElement): {
     destroy: Function;
 };
+
+/**
+ * Provides an action to monitor focus state of a given element and set an associated store with current focus state.
+ *
+ * This action is usable with any writable store.
+ *
+ * @param {HTMLElement} node - Target element.
+ *
+ * @param {import('svelte/store').Writable<boolean>}  storeFocused - Update store for focus changes.
+ *
+ * @returns {{update: update, destroy: (function(): void)}} Action lifecycle methods.
+ */
+declare function isFocused(node: HTMLElement, storeFocused: svelte_store.Writable<boolean>): {
+    update: update;
+    destroy: (() => void);
+};
+
+/**
+ * Provides an action to forward on key down & up events. This can be any object that has associated `keydown` and
+ * `keyup` methods. See {@link KeyStore} for a store implementation.
+ *
+ * @param {HTMLElement} node - Target element.
+ *
+ * @param {{keydown: Function, keyup: Function}}   keyStore - Object to forward events key down / up events to...
+ *
+ * @returns {{update: update, destroy: (function(): void)}} Action lifecycle methods.
+ */
+declare function keyforward(node: HTMLElement, keyStore: {
+    keydown: Function;
+    keyup: Function;
+}): {
+    update: update;
+    destroy: (() => void);
+};
+
+/**
+ * Provides an action to apply style properties provided as an object.
+ *
+ * @param {HTMLElement} node - Target element
+ *
+ * @param {object}      properties - Key / value object of properties to set.
+ *
+ * @returns {Function} Update function.
+ */
+declare function applyStyles(node: HTMLElement, properties: object): Function;
 
 type ResizeObserverTarget = object | Function;
 /**
@@ -192,4 +226,4 @@ declare class DraggableOptions {
     #private;
 }
 
-export { ResizeObserverTarget, alwaysBlur, applyPosition, applyScrolltop, applyStyles, autoBlur, draggable, resizeObserver };
+export { ResizeObserverTarget, alwaysBlur, applyPosition, applyScrolltop, applyStyles, autoBlur, draggable, isFocused, keyforward, resizeObserver };

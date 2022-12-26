@@ -462,39 +462,6 @@ function applyScrolltop(element, store)
 }
 
 /**
- * Provides an action to apply style properties provided as an object.
- *
- * @param {HTMLElement} node - Target element
- *
- * @param {object}      properties - Key / value object of properties to set.
- *
- * @returns {Function} Update function.
- */
-function applyStyles(node, properties)
-{
-   /** Sets properties on node. */
-   function setProperties()
-   {
-      if (typeof properties !== 'object') { return; }
-
-      for (const prop of Object.keys(properties))
-      {
-         node.style.setProperty(`${prop}`, properties[prop]);
-      }
-   }
-
-   setProperties();
-
-   return {
-      update(newProperties)
-      {
-         properties = newProperties;
-         setProperties();
-      }
-   };
-}
-
-/**
  * Provides an action to blur the element when any pointer down event occurs outside the element. This can be useful
  * for input elements including select to blur / unfocus the element when any pointer down occurs outside the element.
  *
@@ -535,6 +502,159 @@ function autoBlur(node)
          document.body.removeEventListener('pointerdown', onPointerDown);
          node.removeEventListener('blur', onBlur);
          node.removeEventListener('focus', onFocus);
+      }
+   };
+}
+
+/**
+ * Provides an action to monitor focus state of a given element and set an associated store with current focus state.
+ *
+ * This action is usable with any writable store. 
+ *
+ * @param {HTMLElement} node - Target element.
+ *
+ * @param {import('svelte/store').Writable<boolean>}  storeFocused - Update store for focus changes.
+ *
+ * @returns {{update: update, destroy: (function(): void)}} Action lifecycle methods.
+ */
+function isFocused(node, storeFocused)
+{
+   let localFocused = false;
+
+   function setFocused(current)
+   {
+      localFocused = current;
+
+      if (isWritableStore(storeFocused)) { storeFocused.set(localFocused); }
+   }
+
+   function onFocus()
+   {
+      setFocused(true);
+   }
+
+   function onBlur()
+   {
+      setFocused(false);
+   }
+
+   function activateListeners()
+   {
+      node.addEventListener('focus', onFocus);
+      node.addEventListener('blur', onBlur);
+   }
+
+   function removeListeners()
+   {
+      node.removeEventListener('focus', onFocus);
+      node.removeEventListener('blur', onBlur);
+   }
+
+   activateListeners();
+
+   return {
+      update: (newStoreFocused) =>  // eslint-disable-line no-shadow
+      {
+         storeFocused = newStoreFocused;
+         setFocused(localFocused);
+      },
+
+      destroy: () => removeListeners()
+   };
+}
+
+/**
+ * Provides an action to forward on key down & up events. This can be any object that has associated `keydown` and
+ * `keyup` methods. See {@link KeyStore} for a store implementation.
+ *
+ * @param {HTMLElement} node - Target element.
+ *
+ * @param {{keydown: Function, keyup: Function}}   keyStore - Object to forward events key down / up events to...
+ *
+ * @returns {{update: update, destroy: (function(): void)}} Action lifecycle methods.
+ */
+function keyforward(node, keyStore)
+{
+
+   if (typeof keyStore?.keydown !== 'function' || typeof keyStore.keyup !== 'function')
+   {
+      throw new TypeError(`'keyStore' doesn't have required 'keydown' or 'keyup' methods.`);
+   }
+
+   /**
+    * @param {KeyboardEvent} event -
+    */
+   function onKeydown(event)
+   {
+      keyStore.keydown(event);
+   }
+
+   /**
+    * @param {KeyboardEvent} event -
+    */
+   function onKeyup(event)
+   {
+      keyStore.keyup(event);
+   }
+
+   function activateListeners()
+   {
+      node.addEventListener('keydown', onKeydown);
+      node.addEventListener('keyup', onKeyup);
+   }
+
+   function removeListeners()
+   {
+      node.removeEventListener('keydown', onKeydown);
+      node.removeEventListener('keyup', onKeyup);
+   }
+
+   activateListeners();
+
+   return {
+      update: (newKeyStore) =>  // eslint-disable-line no-shadow
+      {
+         keyStore = newKeyStore;
+
+         if (typeof keyStore?.keydown !== 'function' || typeof keyStore.keyup !== 'function')
+         {
+            throw new TypeError(`'newKeyStore' doesn't have required 'keydown' or 'keyup' methods.`);
+         }
+      },
+
+      destroy: () => removeListeners()
+   };
+}
+
+/**
+ * Provides an action to apply style properties provided as an object.
+ *
+ * @param {HTMLElement} node - Target element
+ *
+ * @param {object}      properties - Key / value object of properties to set.
+ *
+ * @returns {Function} Update function.
+ */
+function applyStyles(node, properties)
+{
+   /** Sets properties on node. */
+   function setProperties()
+   {
+      if (typeof properties !== 'object') { return; }
+
+      for (const prop of Object.keys(properties))
+      {
+         node.style.setProperty(`${prop}`, properties[prop]);
+      }
+   }
+
+   setProperties();
+
+   return {
+      update(newProperties)
+      {
+         properties = newProperties;
+         setProperties();
       }
    };
 }
@@ -964,5 +1084,5 @@ draggable.options = (options) => new DraggableOptions(options);
  */
 const s_POSITION_DATA = { left: 0, top: 0 };
 
-export { alwaysBlur, applyPosition, applyScrolltop, applyStyles, autoBlur, draggable, resizeObserver };
+export { alwaysBlur, applyPosition, applyScrolltop, applyStyles, autoBlur, draggable, isFocused, keyforward, resizeObserver };
 //# sourceMappingURL=index.js.map

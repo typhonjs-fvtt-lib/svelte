@@ -156,6 +156,7 @@ export class SvelteApplication extends Application
          positionInitial: Position.Initial.browserCentered,      // A helper for initial position placement.
          positionOrtho: true,             // When true Position is optimized for orthographic use.
          positionValidator: Position.Validators.transformWindow, // A function providing the default validator.
+         sessionStorage: void 0,          // An instance of SessionStorage to share across SvelteApplications.
          transformOrigin: 'top left'      // By default, 'top / left' respects rotation when minimizing.
       });
    }

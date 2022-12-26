@@ -43,6 +43,7 @@
 <svelte:options accessors={true}/>
 
 <!-- Need to capture pointerdown / dblclick to prevent further action by TJSApplicationHeader -->
+<!-- svelte-ignore a11y-missing-attribute -->
 <a on:click|capture|preventDefault|stopPropagation={onClick}
    on:pointerdown|capture|preventDefault|stopPropagation={()=>null}
    on:mousedown|capture|preventDefault|stopPropagation={()=>null}
