@@ -29,17 +29,18 @@
  */
 export function radioBoxes(name, choices, options)
 {
-   const checked = options['checked'] || null;
-   const localize = options['localize'] || false;
+   const checked = options.hash['checked'] || null;
+
+   const localize = options.hash['localize'] || false;
+
    let html = '';
 
    for (let [key, label] of Object.entries(choices)) // eslint-disable-line prefer-const
    {
       if (localize) { label = game.i18n.localize(label); }
       const isChecked = checked === key;
-      html += `<label class="checkbox"><input type="radio" name="${name}" value="${key}" ${
-       isChecked ? 'checked' : ''}> ${label}</label>`;
+      html += `<label class="checkbox"><input type="radio" name="${name}" value="${key}" ${isChecked ? "checked" : ""}> ${label}</label>`;
    }
 
-   return html;
+   return new Handlebars.SafeString(html);
 }

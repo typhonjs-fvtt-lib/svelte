@@ -70,45 +70,106 @@
  */
 export function selectOptions(choices, options)
 {
-   const localize = options['localize'] ?? false;
-   let selected = options['selected'] ?? null;
-   const blank = options['blank'] ?? null;
-   const nameAttr = options['nameAttr'];
-   const labelAttr = options['labelAttr'];
-   const inverted = !!options['inverted'];
+   const { localize = false, blank = null, sort = false, nameAttr, labelAttr, inverted } = options;
+   let { selected = null } = options;
 
    selected = selected instanceof Array ? selected.map(String) : [String(selected)];
 
-   // Create an option
-   const option = (name, label) =>
-   {
-      if (localize) { label = game.i18n.localize(label); }
-      const isSelected = selected.includes(String(name));
+console.log(`!! selectOptions - 0 - choices: `, choices);
+console.log(`!! selectOptions - 1 - options: `, options);
 
-      html += `<option value="${name}" ${isSelected ? "selected" : ""}>${label}</option>`;
-   };
+   // Prepare the choices as an array of objects
+   const selectChoices = [];
 
-   // Create the options
-   let html = '';
-   if (blank !== null) { option('', blank); }
-
-   // Options as an Array
    if (choices instanceof Array)
    {
-      for (const choice of choices) { option(choice[nameAttr], choice[labelAttr]); }
+      for (const choice of choices)
+      {
+         const name = String(choice[nameAttr]);
+         let label = choice[labelAttr];
+         if (localize) { label = game.i18n.localize(label); }
+         selectChoices.push({ name, label });
+      }
    }
-
-   // Choices as an Object
    else
    {
       for (const choice of Object.entries(choices))
       {
-         let [key, value] = inverted ? choice.reverse() : choice;
-         if (nameAttr) { key = value[nameAttr]; }
-         if (labelAttr) { value = value[labelAttr]; }
-         option(key, value);
+         const [key, value] = inverted ? choice.reverse() : choice;
+         const name = String(nameAttr ? value[nameAttr] : key);
+         let label = labelAttr ? value[labelAttr] : value;
+         if (localize) { label = game.i18n.localize(label); }
+         selectChoices.push({ name, label });
       }
    }
 
-   return html;
+   // Sort the array of options
+   if (sort) { selectChoices.sort((a, b) => a.label.localeCompare(b.label)); }
+
+   // Prepend a blank option
+   if (blank !== null)
+   {
+      const label = localize ? game.i18n.localize(blank) : blank;
+      selectChoices.unshift({ name: '', label });
+   }
+
+console.log(`!! selectOptions - 2 - selectChoices: `, selectChoices);
+
+   // Create the HTML
+   let html = '';
+   for (const option of selectChoices)
+   {
+console.log(`!! selectOptions - 3 - option: `, option);
+      const label = globalThis.Handlebars.escapeExpression(option.label);
+      const isSelected = selected.includes(option.name);
+      html += `<option value="${option.name}" ${isSelected ? "selected" : ""}>${label}</option>`;
+   }
+
+console.log(`!! selectOptions - 4 - html: `, html);
+
+console.log(`!! selectOptions - 5 - globalThis.Handlebars.SafeString(html): `, globalThis.Handlebars.SafeString(html));
+
+   return new globalThis.Handlebars.SafeString(html);
+
+   // const localize = options['localize'] ?? false;
+   // let selected = options['selected'] ?? null;
+   // const blank = options['blank'] ?? null;
+   // const nameAttr = options['nameAttr'];
+   // const labelAttr = options['labelAttr'];
+   // const inverted = !!options['inverted'];
+   //
+   // selected = selected instanceof Array ? selected.map(String) : [String(selected)];
+   //
+   // // Create an option
+   // const option = (name, label) =>
+   // {
+   //    if (localize) { label = game.i18n.localize(label); }
+   //    const isSelected = selected.includes(String(name));
+   //
+   //    html += `<option value="${name}" ${isSelected ? "selected" : ""}>${label}</option>`;
+   // };
+   //
+   // // Create the options
+   // let html = '';
+   // if (blank !== null) { option('', blank); }
+   //
+   // // Options as an Array
+   // if (choices instanceof Array)
+   // {
+   //    for (const choice of choices) { option(choice[nameAttr], choice[labelAttr]); }
+   // }
+   //
+   // // Choices as an Object
+   // else
+   // {
+   //    for (const choice of Object.entries(choices))
+   //    {
+   //       let [key, value] = inverted ? choice.reverse() : choice;
+   //       if (nameAttr) { key = value[nameAttr]; }
+   //       if (labelAttr) { value = value[labelAttr]; }
+   //       option(key, value);
+   //    }
+   // }
+   //
+   // return html;
 }
