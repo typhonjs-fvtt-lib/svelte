@@ -75,13 +75,13 @@
       {
          return {
             user: u,
-            level: $doc.data.permission?.[u.id] ?? '-1'
+            level: $doc.ownership?.[u.id] ?? '-1'
          };
       });
 
       // Construct and return the data object
       return {
-         currentDefault: $doc.data.permission?.default ?? '-1',
+         currentDefault: $doc.ownership?.default ?? '-1',
          defaultLevels,
          playerLevels,
          users
@@ -102,7 +102,7 @@
    {
       if (!($doc instanceof foundry.abstract.Document)) { return; }
 
-      const formData = new FormDataExtended(event.target).toObject();
+      const formData = new FormDataExtended(event.target).object;
 
       // Collect user permissions
       const perms = {};
@@ -122,7 +122,7 @@
          const cls = getDocumentClass($doc.type);
          const updates = $doc.content.map((e) =>
          {
-            const p = foundry.utils.deepClone(e.data.permission);
+            const p = foundry.utils.deepClone(e.ownership);
             for (const [k, v] of Object.entries(perms))
             {
                if (v === -2) { delete p[k]; }
