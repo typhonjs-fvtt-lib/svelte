@@ -38,6 +38,42 @@
       }
    }
 
+
+   /**
+    * Consume / stop propagation of key down when key codes match.
+    *
+    * @param {KeyboardEvent}    event -
+    */
+   function onKeydown(event)
+   {
+      if (event.code === 'Enter')
+      {
+         event.preventDefault();
+         event.stopPropagation();
+      }
+   }
+
+   /**
+    * Handle press event if key codes match.
+    *
+    * @param {KeyboardEvent}    event -
+    */
+   function onKeyup(event)
+   {
+      if (event.code === 'Enter')
+      {
+         const invoke = button.callback ?? button.onclick;
+
+         if (typeof invoke === 'function')
+         {
+            invoke.call(button, event);
+            button = button; // This provides a reactive update if button data changes.
+         }
+
+         event.preventDefault();
+         event.stopPropagation();
+      }
+   }
 </script>
 
 <svelte:options accessors={true}/>
@@ -45,11 +81,21 @@
 <!-- Need to capture pointerdown / dblclick to prevent further action by TJSApplicationHeader -->
 <!-- svelte-ignore a11y-missing-attribute -->
 <a on:click|capture|preventDefault|stopPropagation={onClick}
-   on:pointerdown|capture|preventDefault|stopPropagation={()=>null}
+   on:keydown|capture={onKeydown}
+   on:keyup|capture={onKeyup}
    on:mousedown|capture|preventDefault|stopPropagation={()=>null}
+   on:pointerdown|capture|preventDefault|stopPropagation={()=>null}
    on:dblclick|capture|preventDefault|stopPropagation={()=>null}
    use:applyStyles={styles}
    class="header-button {button.class}"
-   role=presentation>
+   aria-label={label}
+   tabindex=0
+   role=button>
     {@html icon}{label}
 </a>
+
+<style>
+   a:focus-visible {
+      outline: var(--tjs-app-header-button-outline-focus, var(--tjs-comp-outline-focus-visible, revert));
+   }
+</style>

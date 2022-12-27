@@ -82,6 +82,7 @@
 <form on:submit|preventDefault={exportData} autocomplete=off>
     <p class=notes>{localize('FOLDER.ExportHint')}</p>
     <div class=form-group>
+        <!-- svelte-ignore a11y-label-has-associated-control -->
         <label>{localize('FOLDER.ExportDestination')}</label>
         <select name=pack bind:value={selected}>
             {#each packs as pack (pack.id)}
@@ -90,10 +91,12 @@
         </select>
     </div>
     <div class=form-group>
+        <!-- svelte-ignore a11y-label-has-associated-control -->
         <label>{localize('FOLDER.ExportMerge')}</label>
         <input type=checkbox name=merge bind:checked={merge}/>
     </div>
     <div class=form-group>
+        <!-- svelte-ignore a11y-label-has-associated-control -->
         <label>{localize('FOLDER.ExportKeepId')}</label>
         <input type=checkbox name=keepId bind:checked={keepId}/>
     </div>

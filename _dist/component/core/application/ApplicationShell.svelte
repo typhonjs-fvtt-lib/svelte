@@ -1,11 +1,16 @@
 <script>
-   import { getContext, setContext }   from 'svelte';
+   import {
+      getContext,
+      onMount,
+      setContext }                     from 'svelte';
+
    import { writable }                 from 'svelte/store';
 
    import {
       applyStyles,
       resizeObserver }                 from '@typhonjs-fvtt/svelte/action';
 
+   import FocusWrap                    from './FocusWrap.svelte';
    import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
    import TJSContainer                 from '../TJSContainer.svelte';
    import ResizableHandle              from './ResizableHandle.svelte';
@@ -46,27 +51,6 @@
 
    // Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
    const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth ? resizeObserver : () => null;
-
-   // If the application is a popOut application then when clicked bring to top. Bound to on pointerdown.
-   const bringToTop = (event) =>
-   {
-      if (typeof application.options.popOut === 'boolean' && application.options.popOut)
-      {
-         if (application !== ui?.activeWindow) { application.bringToTop.call(application); }
-
-         // If the activeElement is not `document.body` and the event target isn't the activeElement then blur the
-         // current active element and make `document.body` focused. This allows <esc> key to close all open apps /
-         // windows.
-         if (document.activeElement !== document.body && event.target !== document.activeElement)
-         {
-            // Blur current active element.
-            if (document.activeElement instanceof HTMLElement) { document.activeElement.blur(); }
-
-            // Make document body focused.
-            document.body.focus();
-         }
-      }
-   }
 
    // Use a writable store to make `elementContent` and `elementRoot` accessible. A store is used in the case when
    // One root component with an `elementRoot` is replaced with another. Due to timing issues and the onDestroy / outro
@@ -165,6 +149,65 @@
 
    // ---------------------------------------------------------------------------------------------------------------
 
+   // Focus `elementRoot` on mount to allow keyboard tab navigation of header buttons.
+   onMount(() => elementRoot.focus());
+
+   // ---------------------------------------------------------------------------------------------------------------
+
+   /**
+    * Provides focus cycling inside the application capturing `<Shift-Tab>` and if `elementRoot` or `firstFocusEl` is
+    * the actively focused element then the second to last focusable element if applicable is focused.
+    *
+    * @param {KeyboardEvent} event - Keyboard Event.
+    */
+   function onKeydown(event)
+   {
+      if (event.shiftKey && event.code === 'Tab')
+      {
+         // We only need to find the first tabindex element as app header buttons have a `tabindex`.
+         const firstFocusEl = elementRoot.querySelector('[tabindex]:not([tabindex="-1"])');
+
+         // Only cycle focus to the last keyboard focusable app element if `elementRoot` or first focusable element
+         // is the active element.
+         if (elementRoot === document.activeElement || firstFocusEl === document.activeElement)
+         {
+            // TODO: Consider non-tabindex focusable elements.
+            const allFocusable = elementRoot.querySelectorAll('[tabindex]:not([tabindex="-1"])');
+
+            if (allFocusable.length > 2)
+            {
+               // Select two elements back as the last focusable element is `FocusWrap`.
+               const lastFocusable = allFocusable[allFocusable.length - 2];
+               if (lastFocusable instanceof HTMLElement) { lastFocusable.focus(); }
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+         }
+      }
+   }
+
+   /**
+    * If the application is a popOut application then when clicked bring to top if not already the Foundry
+    * `activeWindow`.
+    */
+   function onPointerdownApp()
+   {
+      if (typeof application.options.popOut === 'boolean' && application.options.popOut &&
+       application !== globalThis.ui?.activeWindow)
+      {
+         application.bringToTop.call(application);
+      }
+   }
+
+   /**
+    * Focus `elementContent` if the active element is external to `elementContent`.
+    */
+   function onPointerdownContent()
+   {
+      if (!elementContent.contains(document.activeElement)) { elementContent.focus(); }
+   }
+
    /**
     * Callback for content resizeObserver action. This is enabled when contentOffsetHeight or contentOffsetWidth is
     * bound.
@@ -213,14 +256,18 @@
      bind:this={elementRoot}
      in:inTransition={inTransitionOptions}
      out:outTransition={outTransitionOptions}
-     on:pointerdown|capture={bringToTop}
+     on:keydown|capture={onKeydown}
+     on:pointerdown={onPointerdownApp}
      use:applyStyles={stylesApp}
-     use:appResizeObserver={resizeObservedApp}>
+     use:appResizeObserver={resizeObservedApp}
+     tabindex=-1>
    <TJSApplicationHeader {draggable} {draggableOptions} />
    <section class=window-content
             bind:this={elementContent}
+            on:pointerdown={onPointerdownContent}
             use:applyStyles={stylesContent}
-            use:contentResizeObserver={resizeObservedContent}>
+            use:contentResizeObserver={resizeObservedContent}
+            tabindex=-1>
       {#if Array.isArray(allChildren)}
          <TJSContainer children={allChildren} />
       {:else}
@@ -228,6 +275,7 @@
       {/if}
    </section>
    <ResizableHandle />
+   <FocusWrap {elementRoot} />
 </div>
 
 <style>
@@ -239,5 +287,13 @@
    /* Note: this is different than stock Foundry that sets `flex: 1`. This greatly aids control of content */
    .window-app .window-content > * {
       flex: unset;
+   }
+
+   .window-app:focus-visible {
+      outline: 2px solid transparent;
+   }
+
+   .window-content:focus-visible {
+      outline: 2px solid transparent;
    }
 </style>

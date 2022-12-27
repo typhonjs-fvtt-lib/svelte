@@ -15,6 +15,7 @@
    export let draggableOptions = void 0;
 
    const application = getContext('external').application;
+   const storeElementRoot = getContext('storeElementRoot');
 
    const storeTitle = application.reactive.storeAppOptions.title;
    const storeDraggable = application.reactive.storeAppOptions.draggable;
@@ -76,12 +77,27 @@
          destroy: () => removeListeners()
       };
    }
+
+   /**
+    * Explicitly focus `elementRoot` if pointer event is not consumed by header buttons / components. This allows
+    * keyboard tab navigation to select header buttons.
+    */
+   function onPointerdown()
+   {
+      const elementRoot = $storeElementRoot;
+      if (elementRoot.isConnected)
+      {
+         elementRoot.focus();
+      }
+   }
 </script>
 
 {#key draggable}
    <header class="window-header flexrow"
            use:draggable={dragOptions}
-           use:minimizable={$storeMinimizable}>
+           use:minimizable={$storeMinimizable}
+           on:pointerdown={onPointerdown}
+   >
       <h4 class=window-title style:display={displayHeaderTitle}>{localize($storeTitle)}</h4>
       {#each buttons as button}
          <svelte:component this={button.class} {...button.props} />

@@ -1,6 +1,6 @@
 import { TJSDialog }                from '@typhonjs-fvtt/svelte/application';
-import { TJSPermissionControl
-    as TJSPermissionControlImpl }   from '@typhonjs-fvtt/svelte/component/dialog';
+import { TJSDocumentOwnership
+    as TJSDocumentOwnershipImpl }   from '@typhonjs-fvtt/svelte/component/dialog';
 import { localize }                 from '@typhonjs-fvtt/svelte/helper';
 import { hasSetter }                from '@typhonjs-fvtt/svelte/util';
 
@@ -9,7 +9,7 @@ import { hasSetter }                from '@typhonjs-fvtt/svelte/util';
  * accessors for the document assigned are available via the `this.reactive.document`. You may swap out the document at
  * any time by setting it to a different document.
  */
-export class TJSPermissionControl extends TJSDialog
+export class TJSDocumentOwnership extends TJSDialog
 {
    /**
     * @param {foundry.abstract.Document}  document -
@@ -25,10 +25,10 @@ export class TJSPermissionControl extends TJSDialog
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
          ...dialogData,
          content: {
-            class: TJSPermissionControlImpl,
+            class: TJSDocumentOwnershipImpl,
             props: { document }
          },
-         title: `${localize('PERMISSION.Title')}: ${document.name}`,
+         title: `${localize('OWNERSHIP.Title')}: ${document.name}`,
          buttons: {
             save: {
                icon: 'far fa-save',
@@ -43,7 +43,7 @@ export class TJSPermissionControl extends TJSDialog
 
       /**
        * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with
-       *                             TJSPermissionControl.
+       *                             TJSDocumentOwnership.
        *
        * @memberof SvelteReactive#
        */
@@ -73,14 +73,14 @@ export class TJSPermissionControl extends TJSDialog
    {
       if (!(document instanceof foundry.abstract.Document))
       {
-         console.warn(`TJSPermissionControl - show - warning: 'document' is not a Document.`);
+         console.warn(`TJSDocumentOwnership - show - warning: 'document' is not a Document.`);
          return null;
       }
 
       return new Promise((resolve) =>
       {
          options.resolve = resolve;
-         new TJSPermissionControl(document, options, dialogData).render(true, { focus: true });
+         new TJSDocumentOwnership(document, options, dialogData).render(true, { focus: true });
       });
    }
 }

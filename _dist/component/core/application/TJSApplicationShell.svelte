@@ -1,18 +1,23 @@
 <script>
-   import { getContext, setContext }    from 'svelte';
-   import { writable }                  from 'svelte/store';
+   import {
+      getContext,
+      onMount,
+      setContext }                     from 'svelte';
+
+   import { writable }                 from 'svelte/store';
 
    import {
       applyStyles,
-      resizeObserver }                  from '@typhonjs-fvtt/svelte/action';
+      resizeObserver }                 from '@typhonjs-fvtt/svelte/action';
 
-   import TJSApplicationHeader          from './TJSApplicationHeader.svelte';
-   import TJSContainer                  from '../TJSContainer.svelte';
-   import ResizableHandle               from './ResizableHandle.svelte';
+   import FocusWrap                    from './FocusWrap.svelte';
+   import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
+   import TJSContainer                 from '../TJSContainer.svelte';
+   import ResizableHandle              from './ResizableHandle.svelte';
 
    import {
       s_DEFAULT_TRANSITION,
-      s_DEFAULT_TRANSITION_OPTIONS }    from '@typhonjs-fvtt/svelte/transition';
+      s_DEFAULT_TRANSITION_OPTIONS }   from '@typhonjs-fvtt/svelte/transition';
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
    // use 'elementRoot' to set the element of the Application. You can also provide `elementContent` and
@@ -46,27 +51,6 @@
 
    // Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
    const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth ? resizeObserver : () => null;
-
-   // If the application is a popOut application then when clicked bring to top. Bound to on pointerdown.
-   const bringToTop = (event) =>
-   {
-      if (typeof application.options.popOut === 'boolean' && application.options.popOut)
-      {
-         if (application !== ui?.activeWindow) { application.bringToTop.call(application); }
-
-         // If the activeElement is not `document.body` and the event target isn't the activeElement then blur the
-         // current active element and make `document.body` focused. This allows <esc> key to close all open apps /
-         // windows.
-         if (document.activeElement !== document.body && event.target !== document.activeElement)
-         {
-            // Blur current active element.
-            if (document.activeElement instanceof HTMLElement) { document.activeElement.blur(); }
-
-            // Make document body focused.
-            document.body.focus();
-         }
-      }
-   }
 
    // Use a writable store to make `elementContent` and `elementRoot` accessible. A store is used in the case when
    // One root component with an `elementRoot` is replaced with another. Due to timing issues and the onDestroy / outro
@@ -169,6 +153,65 @@
 
    // ---------------------------------------------------------------------------------------------------------------
 
+   // Focus `elementRoot` on mount to allow keyboard tab navigation of header buttons.
+   onMount(() => elementRoot.focus());
+
+   // ---------------------------------------------------------------------------------------------------------------
+
+   /**
+    * Provides focus cycling inside the application capturing `<Shift-Tab>` and if `elementRoot` or `firstFocusEl` is
+    * the actively focused element then the second to last focusable element if applicable is focused.
+    *
+    * @param {KeyboardEvent} event - Keyboard Event.
+    */
+   function onKeydown(event)
+   {
+      if (event.shiftKey && event.code === 'Tab')
+      {
+         // We only need to find the first tabindex element as app header buttons have a `tabindex`.
+         const firstFocusEl = elementRoot.querySelector('[tabindex]:not([tabindex="-1"])');
+
+         // Only cycle focus to the last keyboard focusable app element if `elementRoot` or first focusable element
+         // is the active element.
+         if (elementRoot === document.activeElement || firstFocusEl === document.activeElement)
+         {
+            // TODO: Consider non-tabindex focusable elements.
+            const allFocusable = elementRoot.querySelectorAll('[tabindex]:not([tabindex="-1"])');
+
+            if (allFocusable.length > 2)
+            {
+               // Select two elements back as the last focusable element is `FocusWrap`.
+               const lastFocusable = allFocusable[allFocusable.length - 2];
+               if (lastFocusable instanceof HTMLElement) { lastFocusable.focus(); }
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+         }
+      }
+   }
+
+   /**
+    * If the application is a popOut application then when clicked bring to top if not already the Foundry
+    * `activeWindow`.
+    */
+   function onPointerdownApp()
+   {
+      if (typeof application.options.popOut === 'boolean' && application.options.popOut &&
+       application !== globalThis.ui?.activeWindow)
+      {
+         application.bringToTop.call(application);
+      }
+   }
+
+   /**
+    * Focus `elementContent` if the active element is external to `elementContent`.
+    */
+   function onPointerdownContent()
+   {
+      if (!elementContent.contains(document.activeElement)) { elementContent.focus(); }
+   }
+
    /**
     * Callback for content resizeObserver action. This is enabled when contentOffsetHeight or contentOffsetWidth is
     * bound.
@@ -212,20 +255,24 @@
 <svelte:options accessors={true}/>
 
 <div id={application.id}
-    class="tjs-app tjs-window-app {application.options.classes.join(' ')}"
-    data-appid={application.appId}
-    bind:this={elementRoot}
-    in:inTransition={inTransitionOptions}
-    out:outTransition={outTransitionOptions}
-    on:pointerdown|capture={bringToTop}
-    use:applyStyles={stylesApp}
-    use:appResizeObserver={resizeObservedApp}
-    style:--tjs-app-background={backgroundImg}>
+     class="tjs-app tjs-window-app {application.options.classes.join(' ')}"
+     data-appid={application.appId}
+     bind:this={elementRoot}
+     in:inTransition={inTransitionOptions}
+     out:outTransition={outTransitionOptions}
+     on:keydown|capture={onKeydown}
+     on:pointerdown={onPointerdownApp}
+     use:applyStyles={stylesApp}
+     use:appResizeObserver={resizeObservedApp}
+     style:--tjs-app-background={backgroundImg}
+     tabindex=-1>
    <TJSApplicationHeader {draggable} {draggableOptions} />
    <section class=window-content
             bind:this={elementContent}
+            on:pointerdown={onPointerdownContent}
             use:applyStyles={stylesContent}
-            use:contentResizeObserver={resizeObservedContent}>
+            use:contentResizeObserver={resizeObservedContent}
+            tabindex=-1>
        {#if Array.isArray(allChildren)}
            <TJSContainer children={allChildren} />
        {:else}
@@ -233,21 +280,18 @@
        {/if}
    </section>
    <ResizableHandle />
+   <FocusWrap {elementRoot} />
 </div>
 
 <style>
-    .tjs-window-app {
-        overflow: hidden;
-    }
-
     /**
      * Defines styles that mimic a Foundry popout Application. `:global` is used to preserve the unused CSS in the
      * template above. A primary benefit of a separate application shell implementation is that the styles are not
      * overridden by any given game system / modules that might alter the standard Foundry Application CSS. This allows
      * separate and unique styles to be given to this application regardless of game system / module modifications.
      */
-    :global(.tjs-app) {
-        --tjs-app-background: "url(/ui/denim075.png)";
+
+    .tjs-app {
         max-height: 100%;
         background: var(--tjs-app-background) repeat;
         border-radius: 5px;
@@ -259,7 +303,18 @@
         overflow: inherit;
     }
 
-    :global(.tjs-window-app) {
+    .tjs-window-app:focus-visible {
+        outline: 2px solid transparent;
+    }
+
+    .tjs-window-app .window-content:focus-visible {
+        outline: 2px solid transparent;
+    }
+
+    .tjs-window-app {
+        /* Note: this is different than stock Foundry and allows rounded corners from .app core styles */
+        overflow: hidden;
+
         display: flex;
         flex-direction: column;
         flex-wrap: nowrap;
@@ -270,24 +325,24 @@
         z-index: 95;
     }
 
-    :global(.tjs-window-app > .flex0) {
+    .tjs-window-app :global(> .flex0) {
         display: block;
         flex: 0;
     }
 
-    :global(.tjs-window-app > .flex1) {
+    .tjs-window-app :global(> .flex1) {
         flex: 1;
     }
 
-    :global(.tjs-window-app > .flex2) {
+    .tjs-window-app :global(> .flex2) {
         flex: 2;
     }
 
-    :global(.tjs-window-app > .flex3) {
+    .tjs-window-app :global(> .flex3) {
         flex: 3;
     }
 
-    :global(.tjs-window-app .window-header) {
+    .tjs-window-app :global(.window-header) {
         flex: 0 0 30px;
         overflow: hidden;
         padding: 0 8px;
@@ -295,28 +350,29 @@
         border-bottom: 1px solid #000;
     }
 
-    :global(.tjs-window-app .window-header .window-title) {
+    .tjs-window-app :global(.window-header .window-title) {
         margin: 0;
         word-break: break-all;
     }
 
-    :global(.tjs-window-app .window-header a) {
+    .tjs-window-app :global(.window-header a) {
         flex: none;
         margin: 0 0 0 8px;
     }
 
-    :global(.tjs-window-app .window-header i[class^=fa]) {
+    .tjs-window-app :global(.window-header i[class^=fa]) {
         margin-right: 3px;
     }
 
-    :global(.tjs-window-app.minimized .window-header) {
+    .tjs-window-app.minimized :global(.window-header) {
         border: 1px solid #000;
     }
 
-    :global(.tjs-window-app .window-content) {
+    .tjs-window-app .window-content {
         display: flex;
         flex-direction: column;
         flex-wrap: nowrap;
+        flex: 1;
         justify-content: flex-start;
         background: none;
         padding: 8px;
@@ -325,33 +381,7 @@
         overflow-x: hidden;
     }
 
-    /* Note: this is different than stock Foundry that sets `flex: 1`. This greatly aids control of content */
-    /*:global(.tjs-window-app .window-content > *) {*/
-    /*    flex: none;*/
-    /*}*/
-
-    /*:global(.tjs-window-app .window-content > .flex0) {*/
-    /*    display: block;*/
-    /*    flex: 0;*/
-    /*}*/
-
-    /*:global(.tjs-window-app .window-content > .flex1) {*/
-    /*    flex: 1;*/
-    /*}*/
-
-    /*:global(.tjs-window-app .window-content > .flex2) {*/
-    /*    flex: 2;*/
-    /*}*/
-
-    /*:global(.tjs-window-app .window-content > .flex3) {*/
-    /*    flex: 3;*/
-    /*}*/
-
-    :global(.tjs-window-app.zhover) {
-        z-index: calc(var(--z-index-window) + 1);
-    }
-
-    :global(.tjs-window-app .window-resizable-handle) {
+    .tjs-window-app :global(.window-resizable-handle) {
         width: 20px;
         height: 20px;
         position: absolute;
@@ -363,11 +393,7 @@
         border-radius: 4px 0 0 0;
     }
 
-    :global(.tjs-window-app .window-resizable-handle i.fas) {
+    .tjs-window-app :global(.window-resizable-handle i.fas) {
         transform: rotate(45deg);
     }
-
-    /*:global(.tjs-window-app.minimized .window-resizable-handle) {*/
-    /*    display: none;*/
-    /*}*/
 </style>

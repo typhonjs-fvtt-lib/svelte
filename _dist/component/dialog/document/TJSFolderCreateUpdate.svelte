@@ -24,8 +24,8 @@
 
    let form;
 
-   let name = document?.id ? document.name : '';
-   let color = document?.data?.color;
+   let name = document?._id ? document.name : '';
+   let color = document?.color;
 
    let colorText = '';
 
@@ -39,13 +39,13 @@
       doc.set(document);
 
       name = document?.id ? document.name : '';
-      color = document?.data?.color;
+      color = document?.color;
 
       // Update the dialog button label and title.
       application.data.merge({
          buttons: {
             submit: {
-               label: localize(document?.id ? 'FOLDER.Update' : 'FOLDER.Create')
+               label: localize(document?._id ? 'FOLDER.Update' : 'FOLDER.Create')
             }
          },
          title: document?.id ? `${localize('FOLDER.Update')}: ${document.name}` : localize('FOLDER.Create')
@@ -75,8 +75,9 @@
     */
    async function saveData(event)
    {
-      const formData = new FormDataExtended(event.target).toObject();
+      const formData = new FormDataExtended(event.target).object;
 
+      if (!formData.name?.trim()) { formData.name = globalThis.Folder.implementation.defaultName(); }
       if (!formData.parent) { formData.parent = null; }
 
       let modifiedDoc = document;
@@ -87,8 +88,8 @@
       }
       else
       {
-         document.data.update(formData);
-         modifiedDoc = await Folder.create(document.data);
+         document.updateSource(formData);
+         modifiedDoc = await Folder.create(document);
       }
 
       application.options.resolve?.(modifiedDoc);
@@ -99,10 +100,12 @@
 <svelte:options accessors={true}/>
 
 <form bind:this={form} on:submit|preventDefault={saveData} id=folder-create autocomplete=off>
-   <input type=hidden name=type value={document.data.type}/>
-   <input type=hidden name=parent value={document.data.parent}/>
+   <input type=hidden name=type value={document.type} />
+   <input type=hidden name=parent value={document.parent} />
+   <input type=hidden name=color bind:value={colorText} />
 
    <div class=form-group>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>{localize('FOLDER.Name')}</label>
       <div class=form-fields>
          <input type=text name=name placeholder={newName} value={name} required/>
@@ -110,18 +113,20 @@
    </div>
 
    <div class=form-group>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>{localize('FOLDER.Color')}</label>
       <div class=form-fields>
-         <input type=text name=color bind:value={colorText} readonly />
+         <input type=text name=colorText bind:value={colorText} readonly />
          <input type=color bind:value={color} data-edit=color />
          <button type=button on:click={() => color = null}><i class="fas fa-trash-restore"></i></button>
       </div>
    </div>
 
    <div class=form-group>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>{localize('FOLDER.SortMode')}</label>
       <div class=form-fields>
-         {@html radioBoxes('sorting', sortingModes, { checked: document.data.sorting, localize: true })}
+         {@html radioBoxes('sorting', sortingModes, { checked: document.sorting, localize: true })}
       </div>
    </div>
 </form>

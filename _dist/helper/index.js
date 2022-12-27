@@ -29,25 +29,26 @@
  */
 function radioBoxes(name, choices, options)
 {
-   const checked = options['checked'] || null;
-   const localize = options['localize'] || false;
+   const checked = options.hash['checked'] || null;
+
+   const localize = options.hash['localize'] || false;
+
    let html = '';
 
    for (let [key, label] of Object.entries(choices)) // eslint-disable-line prefer-const
    {
       if (localize) { label = game.i18n.localize(label); }
       const isChecked = checked === key;
-      html += `<label class="checkbox"><input type="radio" name="${name}" value="${key}" ${
-       isChecked ? 'checked' : ''}> ${label}</label>`;
+      html += `<label class="checkbox"><input type="radio" name="${name}" value="${key}" ${isChecked ? "checked" : ""}> ${label}</label>`;
    }
 
-   return html;
+   return new Handlebars.SafeString(html);
 }
 
 /**
  * Converts the `selectOptions` Handlebars helper to be Svelte compatible. This is useful when initially converting
  * over an app to Svelte and for essential usage to several dialogs that mirror the core Foundry experience. For
- * an example of usage see {@link TJSFolderPermissions}.
+ * an example of usage see {@link TJSDocumentOwnership}.
  *
  * A helper to create a set of <option> elements in a <select> block based on a provided dictionary.
  * The provided keys are the option values while the provided values are human-readable labels.
@@ -116,47 +117,56 @@ function radioBoxes(name, choices, options)
  */
 function selectOptions(choices, options)
 {
-   const localize = options['localize'] ?? false;
-   let selected = options['selected'] ?? null;
-   const blank = options['blank'] ?? null;
-   const nameAttr = options['nameAttr'];
-   const labelAttr = options['labelAttr'];
-   const inverted = !!options['inverted'];
+   const { localize = false, blank = null, sort = false, nameAttr, labelAttr, inverted } = options;
+   let { selected = null } = options;
 
    selected = selected instanceof Array ? selected.map(String) : [String(selected)];
 
-   // Create an option
-   const option = (name, label) =>
-   {
-      if (localize) { label = game.i18n.localize(label); }
-      const isSelected = selected.includes(String(name));
+   // Prepare the choices as an array of objects
+   const selectChoices = [];
 
-      html += `<option value="${name}" ${isSelected ? "selected" : ""}>${label}</option>`;
-   };
-
-   // Create the options
-   let html = '';
-   if (blank !== null) { option('', blank); }
-
-   // Options as an Array
    if (choices instanceof Array)
    {
-      for (const choice of choices) { option(choice[nameAttr], choice[labelAttr]); }
+      for (const choice of choices)
+      {
+         const name = String(choice[nameAttr]);
+         let label = choice[labelAttr];
+         if (localize) { label = game.i18n.localize(label); }
+         selectChoices.push({ name, label });
+      }
    }
-
-   // Choices as an Object
    else
    {
       for (const choice of Object.entries(choices))
       {
-         let [key, value] = inverted ? choice.reverse() : choice;
-         if (nameAttr) { key = value[nameAttr]; }
-         if (labelAttr) { value = value[labelAttr]; }
-         option(key, value);
+         const [key, value] = inverted ? choice.reverse() : choice;
+         const name = String(nameAttr ? value[nameAttr] : key);
+         let label = labelAttr ? value[labelAttr] : value;
+         if (localize) { label = game.i18n.localize(label); }
+         selectChoices.push({ name, label });
       }
    }
 
-   return html;
+   // Sort the array of options
+   if (sort) { selectChoices.sort((a, b) => a.label.localeCompare(b.label)); }
+
+   // Prepend a blank option
+   if (blank !== null)
+   {
+      const label = localize ? game.i18n.localize(blank) : blank;
+      selectChoices.unshift({ name: '', label });
+   }
+
+   // Create the HTML
+   let html = '';
+   for (const option of selectChoices)
+   {
+      const label = globalThis.Handlebars.escapeExpression(option.label);
+      const isSelected = selected.includes(option.name);
+      html += `<option value="${option.name}" ${isSelected ? "selected" : ""}>${label}</option>`;
+   }
+
+   return new globalThis.Handlebars.SafeString(html);
 }
 
 /**
