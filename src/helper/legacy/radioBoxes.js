@@ -29,9 +29,9 @@
  */
 export function radioBoxes(name, choices, options)
 {
-   const checked = options.hash['checked'] || null;
+   const checked = options['checked'] || null;
 
-   const localize = options.hash['localize'] || false;
+   const localize = options['localize'] || false;
 
    let html = '';
 
