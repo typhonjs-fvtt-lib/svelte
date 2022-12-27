@@ -31,7 +31,7 @@
 
       doc.set(document);
 
-      const title = localize('PERMISSION.Title');
+      const title = localize('OWNERSHIP.Title');
 
       application.data.set('title', `${title}: ${document.name}`);
    }
@@ -39,7 +39,7 @@
    $: {
       ({ currentDefault, defaultLevels, playerLevels, users } = getData());
       isFolder = $doc instanceof Folder;
-      instructions = localize(isFolder ? 'PERMISSION.HintFolder' : 'PERMISSION.HintDocument');
+      instructions = localize(isFolder ? 'OWNERSHIP.HintFolder' : 'OWNERSHIP.HintDocument');
    }
 
    /**
@@ -51,17 +51,17 @@
       const playerLevels = {};
       if (isFolder)
       {
-         playerLevels['-2'] = localize('PERMISSION.DEFAULT');
-         playerLevels['-1'] = localize('PERMISSION.NOCHANGE');
+         playerLevels['-2'] = localize('OWNERSHIP.DEFAULT');
+         playerLevels['-1'] = localize('OWNERSHIP.NOCHANGE');
       }
       else
       {
-         playerLevels['-1'] = localize('PERMISSION.DEFAULT');
+         playerLevels['-1'] = localize('OWNERSHIP.DEFAULT');
       }
 
       for (const [n, l] of Object.entries(CONST.DOCUMENT_PERMISSION_LEVELS))
       {
-         playerLevels[l] = localize(`PERMISSION.${n}`);
+         playerLevels[l] = localize(`OWNERSHIP.${n}`);
       }
 
       // Default permission levels
@@ -152,7 +152,7 @@
 
    <div class=form-group>
       <!-- svelte-ignore a11y-label-has-associated-control -->
-      <label>{localize('PERMISSION.AllPlayers')}</label>
+      <label>{localize('OWNERSHIP.AllPlayers')}</label>
       <select name=default data-dtype=Number>
          {@html selectOptions(defaultLevels, { selected: currentDefault })}
       </select>
