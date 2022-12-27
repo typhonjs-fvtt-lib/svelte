@@ -1,12 +1,12 @@
 import { TJSDocumentCreate }     from './TJSDocumentCreate.js';
 import { TJSDocumentDelete }     from './TJSDocumentDelete.js';
 import { TJSDocumentImport }     from './TJSDocumentImport.js';
+import { TJSDocumentOwnership }  from './TJSDocumentOwnership.js';
 import { TJSFolderCreateUpdate } from './TJSFolderCreateUpdate.js';
 import { TJSFolderDelete }       from './TJSFolderDelete.js';
 import { TJSFolderExport }       from './TJSFolderExport.js';
 import { TJSFolderRemove }       from './TJSFolderRemove.js';
 import { TJSFolderRolltable }    from './TJSFolderRolltable.js';
-import { TJSPermissionControl }  from './TJSPermissionControl.js';
 
 /**
  * Provides several methods to create documents, folders, and modify them through use of TJSDialog and a modal and
@@ -15,7 +15,7 @@ import { TJSPermissionControl }  from './TJSPermissionControl.js';
 export class TJSDocumentDialog
 {
    /**
-    * Change permissions of a document by rendering a dialog to alter the default and all user / player permissions.
+    * Change ownership of a document by rendering a dialog to alter the default and all user / player ownership.
     *
     * @param {foundry.abstract.Document} document - Document instance to modify.
     *
@@ -26,9 +26,9 @@ export class TJSDocumentDialog
     * @returns {Promise<Document|null>} The modified document or 'null' if the user closed the dialog via `<Esc>` or the
     *                                   close header button.
     */
-   static async configurePermissions(document, options = {}, dialogData = {})
+   static async configureOwnership(document, options = {}, dialogData = {})
    {
-      return TJSPermissionControl.show(document, options, dialogData);
+      return TJSDocumentOwnership.show(document, options, dialogData);
    }
 
    /**

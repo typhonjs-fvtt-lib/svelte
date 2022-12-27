@@ -26,7 +26,7 @@
    const label = localize(documentCls.metadata.label);
 
    folderSelect = data.folder || '';
-   folders = parent ? [] : game.folders.filter((f) => (f.data.type === documentName) && f.displayed);
+   folders = parent ? [] : game.folders.filter((f) => (f.type === documentName) && f.displayed);
    types = game.system.documentTypes[documentName];
 
    hasTypes = types.length > 1;
@@ -55,7 +55,7 @@
    {
       const fd = new FormDataExtended(event.target);
 
-      foundry.utils.mergeObject(data, fd.toObject(), { inplace: true });
+      foundry.utils.mergeObject(data, fd.object, { inplace: true });
 
       if (!data.folder) { delete data['folder']; }
       if (types.length === 1) { data.type = types[0]; }

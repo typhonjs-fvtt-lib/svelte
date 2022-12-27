@@ -13,7 +13,7 @@
 
    if (!(document instanceof foundry.abstract.Document))
    {
-      throw new TypeError(`TJSPermissionControl error: 'document' is not an instance of Document.`);
+      throw new TypeError(`TJSOwnershipControl error: 'document' is not an instance of Document.`);
    }
 
    const doc = new TJSDocument(document, { delete: application.close.bind(application) });
@@ -21,17 +21,24 @@
    let form, instructions;
    let currentDefault, defaultLevels, playerLevels, users;
    let isFolder = document instanceof Folder;
+   let isEmbedded = document.isEmbedded;
+   let ownership = document.ownership;
+
+   if (!ownership && !isFolder)
+   {
+      throw new Error(`The ${document.documentName} document does not contain ownership data`);
+   }
 
    $: if ($doc !== document)
    {
       if (!(document instanceof foundry.abstract.Document))
       {
-         throw new TypeError(`TJSPermissionControl error: 'document' is not an instance of Document.`);
+         throw new TypeError(`TJSOwnershipControl error: 'document' is not an instance of Document.`);
       }
 
       doc.set(document);
 
-      const title = localize('PERMISSION.Title');
+      const title = localize('OWNERSHIP.Title');
 
       application.data.set('title', `${title}: ${document.name}`);
    }
@@ -39,7 +46,13 @@
    $: {
       ({ currentDefault, defaultLevels, playerLevels, users } = getData());
       isFolder = $doc instanceof Folder;
-      instructions = localize(isFolder ? 'PERMISSION.HintFolder' : 'PERMISSION.HintDocument');
+      isEmbedded = $doc.isEmbedded;
+      instructions = localize(isFolder ? 'OWNERSHIP.HintFolder' : 'OWNERSHIP.HintDocument');
+
+      if (!ownership && !isFolder)
+      {
+         throw new Error(`The ${document.documentName} document does not contain ownership data`);
+      }
    }
 
    /**
@@ -48,40 +61,36 @@
    function getData()
    {
       // User permission levels
-      const playerLevels = {};
-      if (isFolder)
+      const playerLevels = Object.entries(CONST.DOCUMENT_META_OWNERSHIP_LEVELS).map(([name, level]) =>
       {
-         playerLevels['-2'] = localize('PERMISSION.DEFAULT');
-         playerLevels['-1'] = localize('PERMISSION.NOCHANGE');
-      }
-      else
-      {
-         playerLevels['-1'] = localize('PERMISSION.DEFAULT');
-      }
+         return { level, label: game.i18n.localize(`OWNERSHIP.${name}`) };
+      });
 
-      for (const [n, l] of Object.entries(CONST.DOCUMENT_PERMISSION_LEVELS))
+      if (!isFolder) { playerLevels.pop(); }
+
+      for (const [name, level] of Object.entries(CONST.DOCUMENT_OWNERSHIP_LEVELS) )
       {
-         playerLevels[l] = localize(`PERMISSION.${n}`);
+         if ((level < 0) && !isEmbedded) { continue; }
+
+         playerLevels.push({ level, label: localize(`OWNERSHIP.${name}`) });
       }
 
       // Default permission levels
       const defaultLevels = foundry.utils.deepClone(playerLevels);
-
-      if (isFolder) { delete defaultLevels['-2']; }
-      else { delete defaultLevels['-1']; }
+      defaultLevels.shift();
 
       // Player users
-      const users = game.users.map((u) =>
-      {
+      const users = game.users.map(user => {
          return {
-            user: u,
-            level: $doc.data.permission?.[u.id] ?? '-1'
+            user,
+            level: isFolder ? CONST.DOCUMENT_META_OWNERSHIP_LEVELS.NOCHANGE : ownership[user.id],
+            isAuthor: $doc.author === user
          };
       });
 
       // Construct and return the data object
       return {
-         currentDefault: $doc.data.permission?.default ?? '-1',
+         currentDefault: $doc?.ownership?.default ?? playerLevels[0],
          defaultLevels,
          playerLevels,
          users
@@ -102,33 +111,37 @@
    {
       if (!($doc instanceof foundry.abstract.Document)) { return; }
 
-      const formData = new FormDataExtended(event.target).toObject();
+      const formData = new FormDataExtended(event.target).object;
 
-      // Collect user permissions
-      const perms = {};
+      // Collect new ownership levels from the form data
+      const metaLevels = CONST.DOCUMENT_META_OWNERSHIP_LEVELS;
+      const omit = isFolder ? metaLevels.NOCHANGE : metaLevels.DEFAULT;
+      const ownershipLevels = {};
       for (const [user, level] of Object.entries(formData))
       {
-         if (level === -1)
+         if (level === omit)
          {
-            delete perms[user];
+            delete ownershipLevels[user];
             continue;
          }
-         perms[user] = level;
+         ownershipLevels[user] = level;
       }
 
       // Update all documents in a Folder
       if ($doc instanceof Folder)
       {
          const cls = getDocumentClass($doc.type);
-         const updates = $doc.content.map((e) =>
+         const updates = $doc.contents.map((d) =>
          {
-            const p = foundry.utils.deepClone(e.data.permission);
-            for (const [k, v] of Object.entries(perms))
+            const ownership = foundry.utils.deepClone(d.ownership);
+
+            for (const [k, v] of Object.entries(ownershipLevels))
             {
-               if (v === -2) { delete p[k]; }
-               else { p[k] = v; }
+               if (v === metaLevels.DEFAULT) { delete ownership[k]; }
+               else { ownership[k] = v; }
             }
-            return { _id: e.id, permission: p };
+
+            return { _id: d.id, ownership };
          });
 
          await cls.updateDocuments(updates, { diff: false, recursive: false, noHook: true });
@@ -138,7 +151,7 @@
       }
 
       // Update a single Document
-      await $doc.update({ permission: perms }, { diff: false, recursive: false, noHook: true });
+      await $doc.update({ ownership: ownershipLevels }, { diff: false, recursive: false, noHook: true });
 
       application.options.resolve?.($doc);
       application.close();
@@ -151,18 +164,20 @@
    <p class=notes>{instructions}</p>
 
    <div class=form-group>
-      <label>{localize('PERMISSION.AllPlayers')}</label>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
+      <label>{localize('OWNERSHIP.AllPlayers')}</label>
       <select name=default data-dtype=Number>
-         {@html selectOptions(defaultLevels, { selected: currentDefault })}
+         {@html selectOptions(defaultLevels, { selected: currentDefault, nameAttr: 'level', labelAttr: 'label' })}
       </select>
    </div>
    <hr/>
 
    {#each users as data (data.user.id)}
       <div class=form-group class:hidden={data.user.isGM}>
+         <!-- svelte-ignore a11y-label-has-associated-control -->
          <label>{data.user.name}</label>
             <select name={data.user.id} data-dtype=Number>
-               {@html selectOptions(playerLevels, { selected: data.level })}
+               {@html selectOptions(playerLevels, { selected: data.level, nameAttr: 'level', labelAttr: 'label' })}
             </select>
         </div>
     {/each}
