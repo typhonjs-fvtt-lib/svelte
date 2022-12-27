@@ -71,6 +71,7 @@
 
 <form bind:this={form} on:submit|preventDefault={saveData} id="document-create" autocomplete="off">
    <div class="form-group">
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>{localize('Name')}</label>
       <div class="form-fields">
          <input type="text" name="name" placeholder={name} required/>
@@ -79,6 +80,7 @@
 
    {#if hasTypes}
       <div class="form-group">
+         <!-- svelte-ignore a11y-label-has-associated-control -->
          <label>{localize('Type')}</label>
          <div class="form-fields">
             <select name="type">
@@ -90,6 +92,7 @@
 
    {#if folders.length >= 1}
       <div class="form-group">
+         <!-- svelte-ignore a11y-label-has-associated-control -->
          <label>{localize('DOCUMENT.Folder')}</label>
          <div class="form-fields">
             <select name="folder" bind:value={folderSelect}>

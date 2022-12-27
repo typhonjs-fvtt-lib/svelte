@@ -151,6 +151,7 @@
    <p class=notes>{instructions}</p>
 
    <div class=form-group>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>{localize('PERMISSION.AllPlayers')}</label>
       <select name=default data-dtype=Number>
          {@html selectOptions(defaultLevels, { selected: currentDefault })}
@@ -160,6 +161,7 @@
 
    {#each users as data (data.user.id)}
       <div class=form-group class:hidden={data.user.isGM}>
+         <!-- svelte-ignore a11y-label-has-associated-control -->
          <label>{data.user.name}</label>
             <select name={data.user.id} data-dtype=Number>
                {@html selectOptions(playerLevels, { selected: data.level })}

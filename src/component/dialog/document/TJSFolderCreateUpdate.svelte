@@ -103,6 +103,7 @@
    <input type=hidden name=parent value={document.data.parent}/>
 
    <div class=form-group>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>{localize('FOLDER.Name')}</label>
       <div class=form-fields>
          <input type=text name=name placeholder={newName} value={name} required/>
@@ -110,6 +111,7 @@
    </div>
 
    <div class=form-group>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>{localize('FOLDER.Color')}</label>
       <div class=form-fields>
          <input type=text name=color bind:value={colorText} readonly />
@@ -119,6 +121,7 @@
    </div>
 
    <div class=form-group>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>{localize('FOLDER.SortMode')}</label>
       <div class=form-fields>
          {@html radioBoxes('sorting', sortingModes, { checked: document.data.sorting, localize: true })}
