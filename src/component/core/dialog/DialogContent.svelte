@@ -19,6 +19,10 @@
    const s_REGEX_HTML = /^\s*<.*>$/;
 
    let buttons;
+
+   /** @type {HTMLElement} */
+   let buttonsEl;
+
    let content = void 0;
    let dialogComponent;
    let dialogProps = {};
@@ -131,7 +135,7 @@
       }
       catch(err)
       {
-         ui.notifications.error(err);
+         globalThis.ui.notifications.error(err);
          throw new Error(err);
       }
    }
@@ -142,9 +146,9 @@
        * If this dialog is not the activeWindow then return immediately. See {@link SvelteApplication.bringToTop} as
        * SvelteApplication overrides core Foundry and always sets the activeWindow when `bringToTop` is invoked.
        */
-      if (event.key !== 'Escape' && ui.activeWindow !== application) { return; }
+      if (event.code !== 'Escape' && globalThis.ui.activeWindow !== application) { return; }
 
-      switch (event.key)
+      switch (event.code)
       {
          case 'ArrowLeft':
          {
@@ -155,6 +159,9 @@
             if (buttons.length && currentIndex > 0)
             {
                currentButtonId = buttons[currentIndex - 1].id;
+
+               const buttonEl = buttonsEl.querySelector(`.${currentButtonId}`);
+               if (buttonEl instanceof HTMLElement) { buttonEl.focus(); }
             }
             break;
          }
@@ -168,6 +175,9 @@
             if (buttons.length && currentIndex < buttons.length - 1)
             {
                currentButtonId = buttons[currentIndex + 1].id;
+
+               const buttonEl = buttonsEl.querySelector(`.${currentButtonId}`);
+               if (buttonEl instanceof HTMLElement) { buttonEl.focus(); }
             }
             break;
          }
@@ -186,6 +196,28 @@
             }
             break;
 
+         case 'Tab':
+            // Check `activeElement` on next tick to potentially update `currentButtonId` from tab / keyboard
+            // navigation.
+            setTimeout(() =>
+            {
+               const activeElement = document.activeElement;
+               if (activeElement instanceof HTMLElement && buttonsEl.contains(activeElement))
+               {
+                  let result;
+
+                  // Find class that isn't `dialog-button` or `default`.
+                  for (let cntr = 0; cntr < activeElement.classList.length; cntr++)
+                  {
+                     const item = activeElement.classList.item(cntr);
+                     if (item !== 'dialog-button' && item !== 'default') { result = item; break;}
+                  }
+
+                  if (typeof data.buttons[result] !== void 0) { currentButtonId = result; }
+               }
+            }, 0);
+            break;
+
          default:
             if (preventDefault) { event.preventDefault(); }
             if (stopPropagation) { event.stopPropagation(); }
@@ -196,7 +228,7 @@
 
 <svelte:body on:keydown={onKeydown} />
 
-<div class="dialog-content">
+<div class=dialog-content>
    {#if typeof content === 'string'}
       {@html content}
    {:else if dialogComponent}
@@ -205,7 +237,7 @@
 </div>
 
 {#if buttons.length}
-<div class="dialog-buttons">
+<div bind:this={buttonsEl} class=dialog-buttons>
    {#each buttons as button (button.id)}
    <button class="dialog-button {button.id}"
            on:click={() => onClick(button)}
