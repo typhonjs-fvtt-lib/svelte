@@ -4,7 +4,7 @@
       onMount,
       setContext }                     from 'svelte';
 
-   import { writable }                 from 'svelte/store';
+   import { AppShellContextInternal }  from './AppShellContextInternal.js';
 
    import {
       applyStyles,
@@ -52,22 +52,24 @@
    // Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
    const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth ? resizeObserver : () => null;
 
+   setContext('internal', new AppShellContextInternal());
+
    // Use a writable store to make `elementContent` and `elementRoot` accessible. A store is used in the case when
    // One root component with an `elementRoot` is replaced with another. Due to timing issues and the onDestroy / outro
    // transitions either of these may be set to null. I will investigate more and file a bug against Svelte.
-   if (!getContext('storeElementContent')) { setContext('storeElementContent', writable(elementContent)); }
-   if (!getContext('storeElementRoot')) { setContext('storeElementRoot', writable(elementRoot)); }
+   // if (!getContext('storeElementContent')) { setContext('storeElementContent', writable(elementContent)); }
+   // if (!getContext('storeElementRoot')) { setContext('storeElementRoot', writable(elementRoot)); }
 
    // Only update the `elementContent` store if the new `elementContent` is not null or undefined.
    $: if (elementContent !== void 0 && elementContent !== null)
    {
-      getContext('storeElementContent').set(elementContent);
+      getContext('internal').stores.elementContent.set(elementContent);
    }
 
    // Only update the `elementRoot` store if the new `elementRoot` is not null or undefined.
    $: if (elementRoot !== void 0 && elementRoot !== null)
    {
-      getContext('storeElementRoot').set(elementRoot);
+      getContext('internal').stores.elementRoot.set(elementRoot);
    }
 
    const context = getContext('external');

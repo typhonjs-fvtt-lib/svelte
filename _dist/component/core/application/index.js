@@ -1,4 +1,5 @@
 export { default as ApplicationShell }       from './ApplicationShell.svelte';
+export *                                     from './AppShellContextInternal.js';
 export { default as EmptyApplicationShell }  from './EmptyApplicationShell.svelte';
 export { default as TJSApplicationHeader }   from './TJSApplicationHeader.svelte';
 export { default as TJSApplicationShell }    from './TJSApplicationShell.svelte';

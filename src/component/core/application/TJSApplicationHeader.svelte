@@ -15,7 +15,7 @@
    export let draggableOptions = void 0;
 
    const application = getContext('external').application;
-   const storeElementRoot = getContext('storeElementRoot');
+   const elementRoot = getContext('internal').stores.elementRoot;
 
    const storeTitle = application.reactive.storeAppOptions.title;
    const storeDraggable = application.reactive.storeAppOptions.draggable;
@@ -84,11 +84,7 @@
     */
    function onPointerdown()
    {
-      const elementRoot = $storeElementRoot;
-      if (elementRoot.isConnected)
-      {
-         elementRoot.focus();
-      }
+      if ($elementRoot?.isConnected) { $elementRoot.focus(); }
    }
 </script>
 
