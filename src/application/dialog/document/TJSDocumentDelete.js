@@ -99,7 +99,7 @@ export class TJSDocumentDelete extends TJSDialog
     */
    static async show(document, { context = {}, ...options } = {}, dialogData = {})
    {
-      if (!(document instanceof foundry.abstract.Document))
+      if (!(document instanceof globalThis.foundry.abstract.Document))
       {
          console.warn(`TJSDocumentDelete - show - warning: 'document' is not a Document.`);
          return null;

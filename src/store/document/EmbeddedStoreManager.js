@@ -215,7 +215,7 @@ export class EmbeddedStoreManager
    {
       const doc = this.#document[0];
 
-      if (doc instanceof foundry.abstract.Document)
+      if (doc instanceof globalThis.foundry.abstract.Document)
       {
          const existingEmbeddedNames = new Set(this.#name.keys());
 

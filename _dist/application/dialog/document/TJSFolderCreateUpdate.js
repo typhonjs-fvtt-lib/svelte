@@ -70,7 +70,7 @@ export class TJSFolderCreateUpdate extends TJSDialog
     */
    static async showCreate(folderData, options = {}, dialogData = {})
    {
-      if (!(folderData?.type in CONFIG))
+      if (!(folderData?.type in globalThis.CONFIG))
       {
          console.warn(
           `TJSFolderCreateUpdate - showCreate - warning: 'type' attribute of folderData is not a Document.`);
@@ -79,7 +79,7 @@ export class TJSFolderCreateUpdate extends TJSDialog
 
       const label = localize(Folder.metadata.label);
 
-      const data = foundry.utils.mergeObject({
+      const data = globalThis.foundry.utils.mergeObject({
          name: localize('DOCUMENT.New', { type: label }),
          sorting: 'a',
       }, folderData);

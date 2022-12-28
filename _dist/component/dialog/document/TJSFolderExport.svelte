@@ -27,10 +27,10 @@
    const doc = new TJSDocument(document, { delete: application.close.bind(application) });
 
    // Get eligible pack destinations
-   let packs = game.packs.filter(p => (p.documentName === document.type) && !p.locked);
+   let packs = globalThis.game.packs.filter(p => (p.documentName === document.type) && !p.locked);
    if (!packs.length)
    {
-      ui.notifications.warn(localize('FOLDER.ExportWarningNone', { type: document.type }));
+      globalThis.ui.notifications.warn(localize('FOLDER.ExportWarningNone', { type: document.type }));
       application.options.resolve?.(null);
       application.close();
    }
@@ -57,7 +57,8 @@
    export async function exportData()
    {
       // Find the pack; maybe it has been deleted or locked
-      const pack = game.packs.find((p) => (p?.metadata?.package === 'world') && (p?.metadata?.name === selected));
+      const pack = globalThis.game.packs.find(
+       (p) => (p?.metadata?.package === 'world') && (p?.metadata?.name === selected));
 
       if (pack instanceof CompendiumCollection && !pack?.locked)
       {

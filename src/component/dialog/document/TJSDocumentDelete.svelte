@@ -12,7 +12,7 @@
 
    const { application } = getContext('external');
 
-   if (!(document instanceof foundry.abstract.Document))
+   if (!(document instanceof globalThis.foundry.abstract.Document))
    {
       throw new TypeError(`TJSDocumentDelete error: 'document' is not an instance of Document.`);
    }
@@ -29,7 +29,7 @@
 
    $: if ($doc !== document)
    {
-      if (!(document instanceof foundry.abstract.Document))
+      if (!(document instanceof globalThis.foundry.abstract.Document))
       {
          throw new TypeError(`TJSDocumentDelete error: 'document' is not an instance of Document.`);
       }

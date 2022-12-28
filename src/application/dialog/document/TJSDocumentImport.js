@@ -80,7 +80,7 @@ export class TJSDocumentImport extends TJSDialog
     */
    static async show(document, options = {}, dialogData = {})
    {
-      if (!(document instanceof foundry.abstract.Document))
+      if (!(document instanceof globalThis.foundry.abstract.Document))
       {
          console.warn(`TJSDocumentImport - show - warning: 'document' is not a Document.`);
          return null;

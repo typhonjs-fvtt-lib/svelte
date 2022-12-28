@@ -3159,7 +3159,7 @@ class EmbeddedStoreManager
    {
       const doc = this.#document[0];
 
-      if (doc instanceof foundry.abstract.Document)
+      if (doc instanceof globalThis.foundry.abstract.Document)
       {
          const existingEmbeddedNames = new Set(this.#name.keys());
 
@@ -3355,7 +3355,7 @@ class TJSDocument
       const doc = this.#document[0];
 
       // Check to see if the document is still in the associated collection to determine if actually deleted.
-      if (doc instanceof foundry.abstract.Document && !doc?.collection?.has(doc.id))
+      if (doc instanceof globalThis.foundry.abstract.Document && !doc?.collection?.has(doc.id))
       {
          delete doc?.apps[this.#uuidv4];
          this.#setDocument(void 0);
@@ -3383,7 +3383,7 @@ class TJSDocument
          this.#embeddedAPI = void 0;
       }
 
-      if (doc instanceof foundry.abstract.Document)
+      if (doc instanceof globalThis.foundry.abstract.Document)
       {
          delete doc?.apps[this.#uuidv4];
          this.#setDocument(void 0);
@@ -3429,7 +3429,7 @@ class TJSDocument
          delete this.#document[0].apps[this.#uuidv4];
       }
 
-      if (document !== void 0 && !(document instanceof foundry.abstract.Document))
+      if (document !== void 0 && !(document instanceof globalThis.foundry.abstract.Document))
       {
          throw new TypeError(`TJSDocument set error: 'document' is not a valid Document or undefined.`);
       }
@@ -3439,7 +3439,7 @@ class TJSDocument
          throw new TypeError(`TJSDocument set error: 'options' is not an object.`);
       }
 
-      if (document instanceof foundry.abstract.Document)
+      if (document instanceof globalThis.foundry.abstract.Document)
       {
          document.apps[this.#uuidv4] = {
             close: this.#deleted.bind(this),

@@ -11,6 +11,8 @@
  */
 export function localize(stringId, data)
 {
-   const result = typeof data !== 'object' ? game.i18n.localize(stringId) : game.i18n.format(stringId, data);
+   const result = typeof data !== 'object' ? globalThis.game.i18n.localize(stringId) :
+    globalThis.game.i18n.format(stringId, data);
+
    return result !== void 0 ? result : '';
 }

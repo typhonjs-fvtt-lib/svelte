@@ -84,7 +84,7 @@ export function selectOptions(choices, options)
       {
          const name = String(choice[nameAttr]);
          let label = choice[labelAttr];
-         if (localize) { label = game.i18n.localize(label); }
+         if (localize) { label = globalThis.game.i18n.localize(label); }
          selectChoices.push({ name, label });
       }
    }
@@ -95,7 +95,7 @@ export function selectOptions(choices, options)
          const [key, value] = inverted ? choice.reverse() : choice;
          const name = String(nameAttr ? value[nameAttr] : key);
          let label = labelAttr ? value[labelAttr] : value;
-         if (localize) { label = game.i18n.localize(label); }
+         if (localize) { label = globalThis.game.i18n.localize(label); }
          selectChoices.push({ name, label });
       }
    }
@@ -106,7 +106,7 @@ export function selectOptions(choices, options)
    // Prepend a blank option
    if (blank !== null)
    {
-      const label = localize ? game.i18n.localize(blank) : blank;
+      const label = localize ? globalThis.game.i18n.localize(blank) : blank;
       selectChoices.unshift({ name: '', label });
    }
 

@@ -254,12 +254,14 @@
 
 <svelte:options accessors={true}/>
 
+<!--Transitions can cause side effects; disabling for time being-->
+<!--in:inTransition={inTransitionOptions}-->
+<!--out:outTransition={outTransitionOptions}-->
+
 <div id={application.id}
      class="tjs-app tjs-window-app {application.options.classes.join(' ')}"
      data-appid={application.appId}
      bind:this={elementRoot}
-     in:inTransition={inTransitionOptions}
-     out:outTransition={outTransitionOptions}
      on:keydown|capture={onKeydown}
      on:pointerdown={onPointerdownApp}
      use:applyStyles={stylesApp}

@@ -34,11 +34,11 @@ export class TJSFolderExport extends TJSDialog
       super({}, options);
 
       // Get eligible pack destinations
-      const packs = game.packs.filter((p) => (p.documentName === document.type) && !p.locked);
+      const packs = globalThis.game.packs.filter((p) => (p.documentName === document.type) && !p.locked);
       if (!packs.length)
       {
          this.options?.resolve?.(null);
-         return ui.notifications.warn(game.i18n.format("FOLDER.ExportWarningNone", { type: document.type }));
+         return globalThis.ui.notifications.warn(localize("FOLDER.ExportWarningNone", { type: document.type }));
       }
 
       this.data = {
@@ -107,10 +107,10 @@ export class TJSFolderExport extends TJSDialog
       }
 
       // Get eligible pack destinations if there are none then post a warning.
-      const packs = game.packs.filter((p) => (p.documentName === document.type) && !p.locked);
+      const packs = globalThis.game.packs.filter((p) => (p.documentName === document.type) && !p.locked);
       if (!packs.length)
       {
-         return ui.notifications.warn(localize('FOLDER.ExportWarningNone', { type: document.type }));
+         return globalThis.ui.notifications.warn(localize('FOLDER.ExportWarningNone', { type: document.type }));
       }
 
       return new Promise((resolve) =>

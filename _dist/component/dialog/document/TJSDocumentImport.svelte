@@ -9,7 +9,7 @@
 
    const { application } = getContext('external');
 
-   if (!(document instanceof foundry.abstract.Document))
+   if (!(document instanceof globalThis.foundry.abstract.Document))
    {
       throw new TypeError(`TJSDocumentImport error: 'document' is not an instance of Document.`);
    }
@@ -23,7 +23,7 @@
 
    $: if ($doc !== document)
    {
-      if (!(document instanceof foundry.abstract.Document))
+      if (!(document instanceof globalThis.foundry.abstract.Document))
       {
          throw new TypeError(`TJSDocumentImport error: 'document' is not an instance of Document.`);
       }
@@ -38,7 +38,7 @@
 
    async function handleImport()
    {
-      if (!form.data.files.length) { return ui.notifications.error('You did not upload a data file!'); }
+      if (!form.data.files.length) { return globalThis.ui.notifications.error('You did not upload a data file!'); }
 
       const json = await readTextFromFile(form.data.files[0]);
 

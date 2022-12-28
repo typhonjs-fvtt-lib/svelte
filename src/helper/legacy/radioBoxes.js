@@ -37,10 +37,10 @@ export function radioBoxes(name, choices, options)
 
    for (let [key, label] of Object.entries(choices)) // eslint-disable-line prefer-const
    {
-      if (localize) { label = game.i18n.localize(label); }
+      if (localize) { label = globalThis.game.i18n.localize(label); }
       const isChecked = checked === key;
       html += `<label class="checkbox"><input type="radio" name="${name}" value="${key}" ${isChecked ? "checked" : ""}> ${label}</label>`;
    }
 
-   return new Handlebars.SafeString(html);
+   return new globalThis.Handlebars.SafeString(html);
 }

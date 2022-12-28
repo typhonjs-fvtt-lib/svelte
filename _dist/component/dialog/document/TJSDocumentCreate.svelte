@@ -26,8 +26,8 @@
    const label = localize(documentCls.metadata.label);
 
    folderSelect = data.folder || '';
-   folders = parent ? [] : game.folders.filter((f) => (f.type === documentName) && f.displayed);
-   types = game.system.documentTypes[documentName];
+   folders = parent ? [] : globalThis.game.folders.filter((f) => (f.type === documentName) && f.displayed);
+   types = globalThis.game.system.documentTypes[documentName];
 
    hasTypes = types.length > 1;
 
@@ -36,8 +36,8 @@
 
    types = types.reduce((obj, t) =>
    {
-      const typeLabel = CONFIG[documentName]?.typeLabels?.[t] ?? t;
-      obj[t] = game.i18n.has(typeLabel) ? localize(typeLabel) : t;
+      const typeLabel = globalThis.CONFIG[documentName]?.typeLabels?.[t] ?? t;
+      obj[t] = globalThis.game.i18n.has(typeLabel) ? localize(typeLabel) : t;
       return obj;
    }, {});
 

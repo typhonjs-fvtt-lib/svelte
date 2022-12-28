@@ -239,7 +239,7 @@ export class SvelteFormApplication extends FormApplication
          document.body.focus();
       }
 
-      ui.activeWindow = this;
+      globalThis.ui.activeWindow = this;
    }
 
    /**
@@ -396,7 +396,7 @@ export class SvelteFormApplication extends FormApplication
       this._element = null;
       this.#elementContent = null;
       this.#elementTarget = null;
-      delete ui.windows[this.appId];
+      delete globalThis.ui.windows[this.appId];
       /**
        * @ignore
        */

@@ -29,20 +29,20 @@
  */
 function radioBoxes(name, choices, options)
 {
-   const checked = options.hash['checked'] || null;
+   const checked = options['checked'] || null;
 
-   const localize = options.hash['localize'] || false;
+   const localize = options['localize'] || false;
 
    let html = '';
 
    for (let [key, label] of Object.entries(choices)) // eslint-disable-line prefer-const
    {
-      if (localize) { label = game.i18n.localize(label); }
+      if (localize) { label = globalThis.game.i18n.localize(label); }
       const isChecked = checked === key;
       html += `<label class="checkbox"><input type="radio" name="${name}" value="${key}" ${isChecked ? "checked" : ""}> ${label}</label>`;
    }
 
-   return new Handlebars.SafeString(html);
+   return new globalThis.Handlebars.SafeString(html);
 }
 
 /**
@@ -131,7 +131,7 @@ function selectOptions(choices, options)
       {
          const name = String(choice[nameAttr]);
          let label = choice[labelAttr];
-         if (localize) { label = game.i18n.localize(label); }
+         if (localize) { label = globalThis.game.i18n.localize(label); }
          selectChoices.push({ name, label });
       }
    }
@@ -142,7 +142,7 @@ function selectOptions(choices, options)
          const [key, value] = inverted ? choice.reverse() : choice;
          const name = String(nameAttr ? value[nameAttr] : key);
          let label = labelAttr ? value[labelAttr] : value;
-         if (localize) { label = game.i18n.localize(label); }
+         if (localize) { label = globalThis.game.i18n.localize(label); }
          selectChoices.push({ name, label });
       }
    }
@@ -153,7 +153,7 @@ function selectOptions(choices, options)
    // Prepend a blank option
    if (blank !== null)
    {
-      const label = localize ? game.i18n.localize(blank) : blank;
+      const label = localize ? globalThis.game.i18n.localize(blank) : blank;
       selectChoices.unshift({ name: '', label });
    }
 
@@ -182,7 +182,9 @@ function selectOptions(choices, options)
  */
 function localize(stringId, data)
 {
-   const result = typeof data !== 'object' ? game.i18n.localize(stringId) : game.i18n.format(stringId, data);
+   const result = typeof data !== 'object' ? globalThis.game.i18n.localize(stringId) :
+    globalThis.game.i18n.format(stringId, data);
+
    return result !== void 0 ? result : '';
 }
 

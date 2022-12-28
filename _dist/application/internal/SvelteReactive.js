@@ -433,11 +433,11 @@ export class SvelteReactive
       {
          if (value && this.#application.rendered)
          {
-            ui.windows[this.#application.appId] = this.#application;
+            globalThis.ui.windows[this.#application.appId] = this.#application;
          }
          else
          {
-            delete ui.windows[this.#application.appId];
+            delete globalThis.ui.windows[this.#application.appId];
          }
       }));
    }

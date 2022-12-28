@@ -1,4 +1,5 @@
 import { DialogShell }        from '@typhonjs-fvtt/svelte/component/core';
+import { localize }           from '@typhonjs-fvtt/svelte/helper';
 import { deepMerge }          from '@typhonjs-fvtt/svelte/util';
 
 import { DialogData }         from './internal/DialogData.js';
@@ -157,11 +158,11 @@ export class TJSDialog extends SvelteApplication
       const mergedButtons = deepMerge({
          yes: {
             icon: '<i class="fas fa-check"></i>',
-            label: game.i18n.localize('Yes')
+            label: localize('Yes')
          },
          no: {
             icon: '<i class="fas fa-times"></i>',
-            label: game.i18n.localize('No'),
+            label: localize('No'),
          }
       }, buttons);
 

@@ -11,7 +11,7 @@
 
    const { application } = getContext('external');
 
-   if (!(document instanceof foundry.abstract.Document))
+   if (!(document instanceof globalThis.foundry.abstract.Document))
    {
       throw new TypeError(`TJSOwnershipControl error: 'document' is not an instance of Document.`);
    }
@@ -31,7 +31,7 @@
 
    $: if ($doc !== document)
    {
-      if (!(document instanceof foundry.abstract.Document))
+      if (!(document instanceof globalThis.foundry.abstract.Document))
       {
          throw new TypeError(`TJSOwnershipControl error: 'document' is not an instance of Document.`);
       }
@@ -61,14 +61,14 @@
    function getData()
    {
       // User permission levels
-      const playerLevels = Object.entries(CONST.DOCUMENT_META_OWNERSHIP_LEVELS).map(([name, level]) =>
+      const playerLevels = Object.entries(globalThis.CONST.DOCUMENT_META_OWNERSHIP_LEVELS).map(([name, level]) =>
       {
-         return { level, label: game.i18n.localize(`OWNERSHIP.${name}`) };
+         return { level, label: localize(`OWNERSHIP.${name}`) };
       });
 
       if (!isFolder) { playerLevels.pop(); }
 
-      for (const [name, level] of Object.entries(CONST.DOCUMENT_OWNERSHIP_LEVELS) )
+      for (const [name, level] of Object.entries(globalThis.CONST.DOCUMENT_OWNERSHIP_LEVELS))
       {
          if ((level < 0) && !isEmbedded) { continue; }
 
@@ -76,14 +76,14 @@
       }
 
       // Default permission levels
-      const defaultLevels = foundry.utils.deepClone(playerLevels);
+      const defaultLevels = globalThis.foundry.utils.deepClone(playerLevels);
       defaultLevels.shift();
 
       // Player users
-      const users = game.users.map(user => {
+      const users = globalThis.game.users.map(user => {
          return {
             user,
-            level: isFolder ? CONST.DOCUMENT_META_OWNERSHIP_LEVELS.NOCHANGE : ownership[user.id],
+            level: isFolder ? globalThis.CONST.DOCUMENT_META_OWNERSHIP_LEVELS.NOCHANGE : ownership[user.id],
             isAuthor: $doc.author === user
          };
       });
@@ -109,12 +109,12 @@
     */
    async function saveData(event)
    {
-      if (!($doc instanceof foundry.abstract.Document)) { return; }
+      if (!($doc instanceof globalThis.foundry.abstract.Document)) { return; }
 
       const formData = new FormDataExtended(event.target).object;
 
       // Collect new ownership levels from the form data
-      const metaLevels = CONST.DOCUMENT_META_OWNERSHIP_LEVELS;
+      const metaLevels = globalThis.CONST.DOCUMENT_META_OWNERSHIP_LEVELS;
       const omit = isFolder ? metaLevels.NOCHANGE : metaLevels.DEFAULT;
       const ownershipLevels = {};
       for (const [user, level] of Object.entries(formData))
@@ -133,7 +133,7 @@
          const cls = getDocumentClass($doc.type);
          const updates = $doc.contents.map((d) =>
          {
-            const ownership = foundry.utils.deepClone(d.ownership);
+            const ownership = globalThis.foundry.utils.deepClone(d.ownership);
 
             for (const [k, v] of Object.entries(ownershipLevels))
             {
