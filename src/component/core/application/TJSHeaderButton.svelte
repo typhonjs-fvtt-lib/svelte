@@ -21,7 +21,7 @@
       icon = typeof button.icon !== 'string' ? void 0 : s_REGEX_HTML.test(button.icon) ? button.icon :
        `<i class="${button.icon}" title="${title}"></i>`;
 
-      label = typeof button.label === 'string' ? localize(button.label) : '';
+      label = typeof button.label === 'string' ? localize(button.label) : void 0;
 
       styles = typeof button.styles === 'object' ? button.styles : void 0;
    }
@@ -91,11 +91,27 @@
    aria-label={label}
    tabindex=0
    role=button>
-    {@html icon}{label}
+    {@html icon}{#if label}<span class:has-icon={icon !== void 0}>{label}</span>{/if}
 </a>
 
 <style>
+   a {
+      padding: var(--tjs-app-header-button-padding, 0 3px);
+   }
+
+   a :global(i) {
+      padding: var(--tjs-app-header-button-icon-padding, 0);
+   }
+
    a:focus-visible {
       outline: var(--tjs-app-header-button-outline-focus, var(--tjs-comp-outline-focus-visible, revert));
+   }
+
+   span {
+      padding: var(--tjs-app-header-button-label-padding, 0);
+   }
+
+   span.has-icon {
+      padding: var(--tjs-app-header-button-label-padding, 0 3px 0 0);
    }
 </style>

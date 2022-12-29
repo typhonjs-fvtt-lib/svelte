@@ -102,6 +102,11 @@
 {/key}
 
 <style>
+   .window-header {
+      flex: var(--tjs-app-header-flex, 0 0 30px);
+      gap: var(--tjs-app-header-gap, 5px);
+   }
+
    .window-title {
       text-overflow: ellipsis;
       overflow: hidden;

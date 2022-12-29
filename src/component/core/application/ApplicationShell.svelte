@@ -16,7 +16,6 @@
    import ResizableHandle              from './ResizableHandle.svelte';
 
    import {
-      s_DEFAULT_TRANSITION,
       s_DEFAULT_TRANSITION_OPTIONS }   from '@typhonjs-fvtt/svelte/transition';
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
@@ -52,13 +51,9 @@
    // Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
    const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth ? resizeObserver : () => null;
 
-   setContext('internal', new AppShellContextInternal());
-
    // Use a writable store to make `elementContent` and `elementRoot` accessible. A store is used in the case when
-   // One root component with an `elementRoot` is replaced with another. Due to timing issues and the onDestroy / outro
-   // transitions either of these may be set to null. I will investigate more and file a bug against Svelte.
-   // if (!getContext('storeElementContent')) { setContext('storeElementContent', writable(elementContent)); }
-   // if (!getContext('storeElementRoot')) { setContext('storeElementRoot', writable(elementRoot)); }
+   // One root component with an `elementRoot` is replaced with another.
+   setContext('internal', new AppShellContextInternal());
 
    // Only update the `elementContent` store if the new `elementContent` is not null or undefined.
    $: if (elementContent !== void 0 && elementContent !== null)
@@ -90,8 +85,8 @@
 
    // Exports properties to set a transition w/ in / out options.
    export let transition = void 0;
-   export let inTransition = s_DEFAULT_TRANSITION;
-   export let outTransition = s_DEFAULT_TRANSITION;
+   export let inTransition = void 0;
+   export let outTransition = void 0;
 
    // Exports properties to set options for any transitions.
    export let transitionOptions = void 0;
@@ -107,8 +102,7 @@
    {
       // If transition is defined and not the default transition then set it to both in and out transition otherwise
       // set the default transition to both in & out transitions.
-      const newTransition = s_DEFAULT_TRANSITION !== transition && typeof transition === 'function' ? transition :
-       s_DEFAULT_TRANSITION;
+      const newTransition = typeof transition === 'function' ? transition : void 0;
 
       inTransition = newTransition;
       outTransition = newTransition;
@@ -129,17 +123,17 @@
    }
 
    // Handle cases if inTransition is unset; assign noop default transition function.
-   $: if (typeof inTransition !== 'function') { inTransition = s_DEFAULT_TRANSITION; }
+   $: if (typeof inTransition !== 'function') { inTransition = void 0; }
 
    $:
    {
       // Handle cases if outTransition is unset; assign noop default transition function.
-      if (typeof outTransition !== 'function') { outTransition = s_DEFAULT_TRANSITION; }
+      if (typeof outTransition !== 'function') { outTransition = void 0; }
 
       // Set jquery close animation to either run or not when an out transition is changed.
       if (application && typeof application?.options?.defaultCloseAnimation === 'boolean')
       {
-         application.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION;
+         application.options.defaultCloseAnimation = outTransition === void 0;
       }
    }
 
@@ -248,49 +242,77 @@
       appOffsetHeight = offsetHeight;
       appOffsetWidth = offsetWidth;
    }
+
+   /**
+    * Transitions can cause side effects. Work around this issue by using an if conditional.
+    * Due to timing issues and the onDestroy / outro transitions can cause elementRoot / elementContent to be set to
+    * null when swapped dynamically. There is a feature request to allow transition functions to be undefined:
+    *
+    * @see: https://github.com/sveltejs/svelte/issues/6942
+    */
 </script>
 
 <svelte:options accessors={true}/>
-
-<!--Transitions can cause side effects; disabling for time being-->
-<!--in:inTransition={inTransitionOptions}-->
-<!--out:outTransition={outTransitionOptions}-->
-
-<div id={application.id}
-     class="app window-app {application.options.classes.join(' ')}"
-     data-appid={application.appId}
-     bind:this={elementRoot}
-     on:keydown|capture={onKeydown}
-     on:pointerdown={onPointerdownApp}
-     use:applyStyles={stylesApp}
-     use:appResizeObserver={resizeObservedApp}
-     tabindex=-1>
-   <TJSApplicationHeader {draggable} {draggableOptions} />
-   <section class=window-content
-            bind:this={elementContent}
-            on:pointerdown={onPointerdownContent}
-            use:applyStyles={stylesContent}
-            use:contentResizeObserver={resizeObservedContent}
-            tabindex=-1>
-      {#if Array.isArray(allChildren)}
-         <TJSContainer children={allChildren} />
-      {:else}
-         <slot />
-      {/if}
-   </section>
-   <ResizableHandle />
-   <FocusWrap {elementRoot} />
-</div>
+{#if inTransition || outTransition}
+   <div id={application.id}
+        class="app window-app {application.options.classes.join(' ')}"
+        data-appid={application.appId}
+        bind:this={elementRoot}
+        in:inTransition={inTransitionOptions}
+        out:outTransition={outTransitionOptions}
+        on:keydown|capture={onKeydown}
+        on:pointerdown={onPointerdownApp}
+        use:applyStyles={stylesApp}
+        use:appResizeObserver={resizeObservedApp}
+        tabindex=-1>
+      <TJSApplicationHeader {draggable} {draggableOptions} />
+      <section class=window-content
+               bind:this={elementContent}
+               on:pointerdown={onPointerdownContent}
+               use:applyStyles={stylesContent}
+               use:contentResizeObserver={resizeObservedContent}
+               tabindex=-1>
+         {#if Array.isArray(allChildren)}
+            <TJSContainer children={allChildren} />
+         {:else}
+            <slot />
+         {/if}
+      </section>
+      <ResizableHandle />
+      <FocusWrap {elementRoot} />
+   </div>
+{:else}
+   <div id={application.id}
+        class="app window-app {application.options.classes.join(' ')}"
+        data-appid={application.appId}
+        bind:this={elementRoot}
+        on:keydown|capture={onKeydown}
+        on:pointerdown={onPointerdownApp}
+        use:applyStyles={stylesApp}
+        use:appResizeObserver={resizeObservedApp}
+        tabindex=-1>
+      <TJSApplicationHeader {draggable} {draggableOptions} />
+      <section class=window-content
+               bind:this={elementContent}
+               on:pointerdown={onPointerdownContent}
+               use:applyStyles={stylesContent}
+               use:contentResizeObserver={resizeObservedContent}
+               tabindex=-1>
+         {#if Array.isArray(allChildren)}
+            <TJSContainer children={allChildren} />
+         {:else}
+            <slot />
+         {/if}
+      </section>
+      <ResizableHandle />
+      <FocusWrap {elementRoot} />
+   </div>
+{/if}
 
 <style>
    /* Note: this is different than stock Foundry and allows rounded corners from .app core styles */
    .window-app {
       overflow: hidden;
-   }
-
-   /* Note: this is different than stock Foundry that sets `flex: 1`. This greatly aids control of content */
-   .window-app .window-content > * {
-      flex: unset;
    }
 
    .window-app:focus-visible {
@@ -299,5 +321,16 @@
 
    .window-content:focus-visible {
       outline: 2px solid transparent;
+   }
+
+   /* Override Foundry default; adjust --tjs-app-header-gap to change gap size */
+   .window-app :global(.window-header a) {
+      flex: none;
+      margin: 0;
+   }
+
+   /* Override Foundry default; See TJSHeaderButton for CSS variables */
+   .window-app :global(.window-header i[class^=fa]) {
+      margin: 0
    }
 </style>

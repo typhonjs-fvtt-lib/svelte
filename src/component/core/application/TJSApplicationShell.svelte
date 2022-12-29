@@ -16,7 +16,6 @@
    import ResizableHandle              from './ResizableHandle.svelte';
 
    import {
-      s_DEFAULT_TRANSITION,
       s_DEFAULT_TRANSITION_OPTIONS }   from '@typhonjs-fvtt/svelte/transition';
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
@@ -94,8 +93,8 @@
 
    // Exports properties to set a transition w/ in / out options.
    export let transition = void 0;
-   export let inTransition = s_DEFAULT_TRANSITION;
-   export let outTransition = s_DEFAULT_TRANSITION;
+   export let inTransition = void 0;
+   export let outTransition = void 0;
 
    // Exports properties to set options for any transitions.
    export let transitionOptions = void 0;
@@ -111,8 +110,7 @@
    {
       // If transition is defined and not the default transition then set it to both in and out transition otherwise
       // set the default transition to both in & out transitions.
-      const newTransition = s_DEFAULT_TRANSITION !== transition && typeof transition === 'function' ? transition :
-       s_DEFAULT_TRANSITION;
+      const newTransition = typeof transition === 'function' ? transition : void 0;
 
       inTransition = newTransition;
       outTransition = newTransition;
@@ -133,17 +131,17 @@
    }
 
    // Handle cases if inTransition is unset; assign noop default transition function.
-   $: if (typeof inTransition !== 'function') { inTransition = s_DEFAULT_TRANSITION; }
+   $: if (typeof inTransition !== 'function') { inTransition = void 0; }
 
    $:
    {
       // Handle cases if outTransition is unset; assign noop default transition function.
-      if (typeof outTransition !== 'function') { outTransition = s_DEFAULT_TRANSITION; }
+      if (typeof outTransition !== 'function') { outTransition = void 0; }
 
       // Set jquery close animation to either run or not when an out transition is changed.
       if (application && typeof application?.options?.defaultCloseAnimation === 'boolean')
       {
-         application.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION;
+         application.options.defaultCloseAnimation = outTransition === void 0;
       }
    }
 
@@ -252,40 +250,75 @@
       appOffsetHeight = offsetHeight;
       appOffsetWidth = offsetWidth;
    }
+
+   /**
+    * Transitions can cause side effects. Work around this issue by using an if conditional.
+    * Due to timing issues and the onDestroy / outro transitions can cause elementRoot / elementContent to be set to
+    * null when swapped dynamically. There is a feature request to allow transition functions to be undefined:
+    *
+    * @see: https://github.com/sveltejs/svelte/issues/6942
+    */
 </script>
 
 <svelte:options accessors={true}/>
 
-<!--Transitions can cause side effects; disabling for time being-->
-<!--in:inTransition={inTransitionOptions}-->
-<!--out:outTransition={outTransitionOptions}-->
-
-<div id={application.id}
-     class="tjs-app tjs-window-app {application.options.classes.join(' ')}"
-     data-appid={application.appId}
-     bind:this={elementRoot}
-     on:keydown|capture={onKeydown}
-     on:pointerdown={onPointerdownApp}
-     use:applyStyles={stylesApp}
-     use:appResizeObserver={resizeObservedApp}
-     style:--tjs-app-background={backgroundImg}
-     tabindex=-1>
-   <TJSApplicationHeader {draggable} {draggableOptions} />
-   <section class=window-content
-            bind:this={elementContent}
-            on:pointerdown={onPointerdownContent}
-            use:applyStyles={stylesContent}
-            use:contentResizeObserver={resizeObservedContent}
-            tabindex=-1>
-       {#if Array.isArray(allChildren)}
-           <TJSContainer children={allChildren} />
-       {:else}
-           <slot />
-       {/if}
-   </section>
-   <ResizableHandle />
-   <FocusWrap {elementRoot} />
-</div>
+{#if inTransition || outTransition}
+    <div id={application.id}
+         class="tjs-app tjs-window-app {application.options.classes.join(' ')}"
+         data-appid={application.appId}
+         bind:this={elementRoot}
+         in:inTransition={inTransitionOptions}
+         out:outTransition={outTransitionOptions}
+         on:keydown|capture={onKeydown}
+         on:pointerdown={onPointerdownApp}
+         use:applyStyles={stylesApp}
+         use:appResizeObserver={resizeObservedApp}
+         style:--tjs-app-background={backgroundImg}
+         tabindex=-1>
+        <TJSApplicationHeader {draggable} {draggableOptions} />
+        <section class=window-content
+                 bind:this={elementContent}
+                 on:pointerdown={onPointerdownContent}
+                 use:applyStyles={stylesContent}
+                 use:contentResizeObserver={resizeObservedContent}
+                 tabindex=-1>
+            {#if Array.isArray(allChildren)}
+                <TJSContainer children={allChildren} />
+            {:else}
+                <slot />
+            {/if}
+        </section>
+        <ResizableHandle />
+        <FocusWrap {elementRoot} />
+    </div>
+{:else}
+    <div id={application.id}
+         class="tjs-app tjs-window-app {application.options.classes.join(' ')}"
+         data-appid={application.appId}
+         bind:this={elementRoot}
+         on:keydown|capture={onKeydown}
+         on:pointerdown={onPointerdownApp}
+         use:applyStyles={stylesApp}
+         use:appResizeObserver={resizeObservedApp}
+         style:--tjs-app-background={backgroundImg}
+         tabindex=-1>
+        <TJSApplicationHeader {draggable} {draggableOptions} />
+        <section class=window-content
+                 bind:this={elementContent}
+                 on:pointerdown={onPointerdownContent}
+                 use:applyStyles={stylesContent}
+                 use:contentResizeObserver={resizeObservedContent}
+                 tabindex=-1>
+            {#if Array.isArray(allChildren)}
+                <TJSContainer children={allChildren} />
+            {:else}
+                <slot />
+            {/if}
+        </section>
+        <ResizableHandle />
+        <FocusWrap {elementRoot} />
+    </div>
+{/if}
 
 <style>
     /**
@@ -361,11 +394,6 @@
 
     .tjs-window-app :global(.window-header a) {
         flex: none;
-        margin: 0 0 0 8px;
-    }
-
-    .tjs-window-app :global(.window-header i[class^=fa]) {
-        margin-right: 3px;
     }
 
     .tjs-window-app.minimized :global(.window-header) {
