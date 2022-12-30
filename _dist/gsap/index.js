@@ -1,7 +1,7 @@
 import * as svelteEasingFunc from 'svelte/easing';
 import { TJSVelocityTrack } from '@typhonjs-fvtt/svelte/math';
-import { Position } from '@typhonjs-fvtt/svelte/application';
 import { isIterable, isPlainObject } from '@typhonjs-fvtt/svelte/util';
+import { Position } from '@typhonjs-fvtt/svelte/application';
 
 let gsap = void 0;
 
@@ -1299,7 +1299,8 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  *
  * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
  *
- * @param {Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging" state.
+ * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
+ *                                                                            state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.
  *
@@ -1309,12 +1310,29 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  *
  * @param {object}            [params.inertiaOptions] - Inertia Options.
  *
+ * @param {Iterable<string>}  [params.hasTargetClassList] - When defined any event targets that has any class in this
+ *                                                          list are allowed.
+ *
+ * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
+ *                                                             list are ignored.
+ *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
 function draggableGsap(node, { position, active = true, button = 0, storeDragging = void 0, ease = true, inertia = false,
  easeOptions = { duration: 0.1, ease: 'power3.out' },
-  inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 } })
+  inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 },
+   hasTargetClassList, ignoreTargetClassList })
 {
+   if (hasTargetClassList !== void 0 && !isIterable(hasTargetClassList))
+   {
+      throw new TypeError(`'hasTargetClassList' is not iterable.`);
+   }
+
+   if (ignoreTargetClassList !== void 0 && !isIterable(ignoreTargetClassList))
+   {
+      throw new TypeError(`'ignoreTargetClassList' is not iterable.`);
+   }
+
    /**
     * Duplicate the app / Positionable starting position to track differences.
     *
@@ -1407,6 +1425,34 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
 
       // Do not process if the position system is not enabled.
       if (!position.enabled) { return; }
+
+      // Potentially ignore this event if `ignoreTargetClassList` is defined and the `event.target` has a matching
+      // class.
+      if (ignoreTargetClassList !== void 0 && event.target instanceof HTMLElement)
+      {
+         for (const targetClass of ignoreTargetClassList)
+         {
+            if (event.target.classList.contains(targetClass)) { return; }
+         }
+      }
+
+      // Potentially ignore this event if `hasTargetClassList` is defined and the `event.target` does not have any
+      // matching class from the list.
+      if (hasTargetClassList !== void 0 && event.target instanceof HTMLElement)
+      {
+         let foundTarget = false;
+
+         for (const targetClass of hasTargetClassList)
+         {
+            if (event.target.classList.contains(targetClass))
+            {
+               foundTarget = true;
+               break;
+            }
+         }
+
+         if (!foundTarget) { return; }
+      }
 
       event.preventDefault();
 
@@ -1563,6 +1609,30 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
          if (typeof options.inertiaOptions === 'object')
          {
             inertiaOptions = options.inertiaOptions;
+         }
+
+         if (options.hasTargetClassList !== void 0)
+         {
+            if (!isIterable(options.hasTargetClassList))
+            {
+               throw new TypeError(`'hasTargetClassList' is not iterable.`);
+            }
+            else
+            {
+               hasTargetClassList = options.hasTargetClassList;
+            }
+         }
+
+         if (options.ignoreTargetClassList !== void 0)
+         {
+            if (!isIterable(options.ignoreTargetClassList))
+            {
+               throw new TypeError(`'ignoreTargetClassList' is not iterable.`);
+            }
+            else
+            {
+               ignoreTargetClassList = options.ignoreTargetClassList;
+            }
          }
       },
 

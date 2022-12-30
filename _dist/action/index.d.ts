@@ -157,21 +157,30 @@ declare function applyPosition(node: HTMLElement, position: Position): {
  *
  * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
  *
- * @param {Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging" state.
+ * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
+ *                                                                            state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.
  *
  * @param {object}            [params.easeOptions] - Gsap `to / `quickTo` vars object.
  *
+ * @param {Iterable<string>}  [params.hasTargetClassList] - When defined any event targets that have a class in this
+ *                                                          list are allowed.
+ *
+ * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
+ *                                                             list are ignored.
+ *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-declare function draggable(node: HTMLElement, { position, active, button, storeDragging, ease, easeOptions }: {
+declare function draggable(node: HTMLElement, { position, active, button, storeDragging, ease, easeOptions, hasTargetClassList, ignoreTargetClassList }: {
     position: Position;
     active?: boolean;
     button?: number;
-    storeDragging?: Writable<boolean>;
+    storeDragging?: svelte_store.Writable<boolean>;
     ease?: boolean;
     easeOptions?: object;
+    hasTargetClassList?: Iterable<string>;
+    ignoreTargetClassList?: Iterable<string>;
 }): {
     update: Function;
     destroy: Function;

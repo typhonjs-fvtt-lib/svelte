@@ -1,3 +1,5 @@
+import * as svelte_store from 'svelte/store';
+
 declare let gsap: any;
 declare const easingFunc: {};
 declare const easingList: string[];
@@ -19,7 +21,8 @@ declare const easingList: string[];
  *
  * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
  *
- * @param {Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging" state.
+ * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
+ *                                                                            state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.
  *
@@ -29,17 +32,25 @@ declare const easingList: string[];
  *
  * @param {object}            [params.inertiaOptions] - Inertia Options.
  *
+ * @param {Iterable<string>}  [params.hasTargetClassList] - When defined any event targets that has any class in this
+ *                                                          list are allowed.
+ *
+ * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
+ *                                                             list are ignored.
+ *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-declare function draggableGsap(node: HTMLElement, { position, active, button, storeDragging, ease, inertia, easeOptions, inertiaOptions }: {
+declare function draggableGsap(node: HTMLElement, { position, active, button, storeDragging, ease, inertia, easeOptions, inertiaOptions, hasTargetClassList, ignoreTargetClassList }: {
     position: Position;
     active?: boolean;
     button?: number;
-    storeDragging?: Writable<boolean>;
+    storeDragging?: svelte_store.Writable<boolean>;
     ease?: boolean;
     inertia?: boolean;
     easeOptions?: object;
     inertiaOptions?: object;
+    hasTargetClassList?: Iterable<string>;
+    ignoreTargetClassList?: Iterable<string>;
 }): {
     update: Function;
     destroy: Function;

@@ -7,7 +7,9 @@
 
    import { localize }              from '@typhonjs-fvtt/svelte/helper';
 
-   import { isSvelteComponent }     from '@typhonjs-fvtt/svelte/util';
+   import {
+      isObject,
+      isSvelteComponent }           from '@typhonjs-fvtt/svelte/util';
 
    import TJSHeaderButton           from './TJSHeaderButton.svelte';
 
@@ -37,8 +39,8 @@
    // 0.1 and cubicOut, but can be overridden by any provided `draggableOptions`. `position`, `active`, and
    // `storeDragging` are always overridden by application position / stores.
    $: dragOptions = Object.assign({}, { ease: true, easeOptions: { duration: 0.1, ease: cubicOut } },
-    typeof draggableOptions === 'object' ? draggableOptions : {}, { position: application.position, active:
-     $storeDraggable, storeDragging });
+    isObject(draggableOptions) ? draggableOptions : {}, { position: application.position, active:
+     $storeDraggable, storeDragging, hasTargetClassList: ['window-header', 'window-title'] });
 
    let displayHeaderTitle;
 
@@ -60,7 +62,16 @@
 
    function minimizable(node, booleanStore)
    {
-      const callback = application._onToggleMinimize.bind(application);
+      const callback = (event) =>
+      {
+         // Only toggle minimize state if window title or header is the event target. Also allow toggle state if the
+         // event target has 'keep-minimized' class.
+         if (event.target.classList.contains('window-title') || event.target.classList.contains('window-header') ||
+           event.target.classList.contains('keep-minimized'))
+         {
+            application._onToggleMinimize(event);
+         }
+      }
 
       function activateListeners() { node.addEventListener('dblclick', callback); }
       function removeListeners() { node.removeEventListener('dblclick', callback); }

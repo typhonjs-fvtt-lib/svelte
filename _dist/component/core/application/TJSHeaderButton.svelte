@@ -38,7 +38,6 @@
       }
    }
 
-
    /**
     * Consume / stop propagation of key down when key codes match.
     *
@@ -78,14 +77,10 @@
 
 <svelte:options accessors={true}/>
 
-<!-- Need to capture pointerdown / dblclick to prevent further action by TJSApplicationHeader -->
 <!-- svelte-ignore a11y-missing-attribute -->
-<a on:click|capture|preventDefault|stopPropagation={onClick}
-   on:keydown|capture={onKeydown}
-   on:keyup|capture={onKeyup}
-   on:mousedown|capture|preventDefault|stopPropagation={()=>null}
-   on:pointerdown|capture|preventDefault|stopPropagation={()=>null}
-   on:dblclick|capture|preventDefault|stopPropagation={()=>null}
+<a on:click|preventDefault|stopPropagation={onClick}
+   on:keydown={onKeydown}
+   on:keyup={onKeyup}
    use:applyStyles={styles}
    class="header-button {button.class}"
    aria-label={label}
@@ -112,6 +107,6 @@
    }
 
    span.has-icon {
-      padding: var(--tjs-app-header-button-label-padding, 0 3px 0 0);
+      padding: var(--tjs-app-header-button-label-padding, 0 0 0 3px);
    }
 </style>
