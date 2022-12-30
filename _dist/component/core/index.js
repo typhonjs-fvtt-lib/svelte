@@ -1,3 +1,5 @@
+import { cssVariables } from './cssVariables.js';
+
 export { default as TJSComponentShell }   from './TJSComponentShell.svelte';
 export { default as TJSContainer }        from './TJSContainer.svelte';
 export { default as TJSGlassPane }        from './TJSGlassPane.svelte';
@@ -19,3 +21,11 @@ export *                                  from './dialog/index.js';
  *
  * @property {object}   outTransitionOptions - The options config object for out transitions.
  */
+
+/**
+ * Provides default CSS variables for core components.
+ */
+cssVariables.setProperties({
+   // TJSApplicationShell app background.
+   '--tjs-app-background': `url("${globalThis.foundry.utils.getRoute('/ui/denim075.png')}")`,
+}, false);

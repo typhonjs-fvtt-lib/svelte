@@ -1,4 +1,13 @@
 <script>
+   /**
+    * Provides an alternate application shell that is scoped by slightly different CSS classes than
+    * {@link ApplicationShell}. An application shell is a main top level slotted component that provides a reactive
+    * outer wrapper and header bar for the main content component.
+    *
+    * CSS variables:
+    * '--tjs-app-background': Controls the app background image; set in main `index.js`.
+    */
+
    import {
       getContext,
       onMount,
@@ -51,13 +60,8 @@
    // Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
    const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth ? resizeObserver : () => null;
 
+   // Internal context for `elementContent` / `elementRoot` stores.
    setContext('internal', new AppShellContextInternal());
-
-   // Use a writable store to make `elementContent` and `elementRoot` accessible. A store is used in the case when
-   // One root component with an `elementRoot` is replaced with another. Due to timing issues and the onDestroy / outro
-   // transitions either of these may be set to null. I will investigate more and file a bug against Svelte.
-   // if (!getContext('storeElementContent')) { setContext('storeElementContent', writable(elementContent)); }
-   // if (!getContext('storeElementRoot')) { setContext('storeElementRoot', writable(elementRoot)); }
 
    // Only update the `elementContent` store if the new `elementContent` is not null or undefined.
    $: if (elementContent !== void 0 && elementContent !== null)
@@ -75,10 +79,6 @@
 
    // Store Foundry Application reference.
    const application = context.application;
-
-   // TODO: Make this generic / not Foundry specific.
-   // Calculate background image w/ route prefix to set to '--tjs-app-background' CSS variable.
-   const backgroundImg = `url(${foundry.utils.getRoute('/ui/denim075.png')})`;
 
    // This component can host multiple children defined via props or in the TyphonJS SvelteData configuration object
    // that are potentially mounted in the content area. If no children defined then this component mounts any slotted
@@ -273,7 +273,6 @@
          on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
          use:appResizeObserver={resizeObservedApp}
-         style:--tjs-app-background={backgroundImg}
          tabindex=-1>
         <TJSApplicationHeader {draggable} {draggableOptions} />
         <section class=window-content
@@ -300,7 +299,6 @@
          on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
          use:appResizeObserver={resizeObservedApp}
-         style:--tjs-app-background={backgroundImg}
          tabindex=-1>
         <TJSApplicationHeader {draggable} {draggableOptions} />
         <section class=window-content
@@ -330,7 +328,7 @@
 
     .tjs-app {
         max-height: 100%;
-        background: var(--tjs-app-background) repeat;
+        background: var(--tjs-app-background);
         border-radius: 5px;
         box-shadow: 0 0 20px #000;
         margin: 3px 0;

@@ -1,4 +1,9 @@
 <script>
+   /**
+    * Provides an application shell is a main top level slotted component that provides a reactive
+    * outer wrapper and header bar for the main content component.
+    */
+
    import {
       getContext,
       onMount,
@@ -51,8 +56,7 @@
    // Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
    const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth ? resizeObserver : () => null;
 
-   // Use a writable store to make `elementContent` and `elementRoot` accessible. A store is used in the case when
-   // One root component with an `elementRoot` is replaced with another.
+   // Internal context for `elementContent` / `elementRoot` stores.
    setContext('internal', new AppShellContextInternal());
 
    // Only update the `elementContent` store if the new `elementContent` is not null or undefined.
