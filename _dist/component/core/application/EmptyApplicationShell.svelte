@@ -1,10 +1,20 @@
 <script>
-   import { getContext, setContext }    from 'svelte';
-   import { writable }                  from 'svelte/store';
+   import {
+      getContext,
+      onMount,
+      setContext }                     from 'svelte';
+
+   import { AppShellContextInternal }  from './AppShellContextInternal.js';
 
    import {
-      s_DEFAULT_TRANSITION,
-      s_DEFAULT_TRANSITION_OPTIONS }    from '@typhonjs-fvtt/svelte/transition';
+      applyStyles,
+      resizeObserver }                 from '@typhonjs-fvtt/svelte/action';
+
+   import FocusWrap                    from './FocusWrap.svelte';
+   import TJSContainer                 from '../TJSContainer.svelte';
+
+   import {
+      s_DEFAULT_TRANSITION_OPTIONS }   from '@typhonjs-fvtt/svelte/transition';
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
    // use 'elementRoot' to set the element of the Application. You can also provide `elementContent` and
@@ -12,36 +22,45 @@
    export let elementContent = void 0;
    export let elementRoot = void 0;
 
-   // If a parent component binds and sets `heightChanged` to true then it is bound to the content & root element
-   // `clientHeight`.
-   export let heightChanged = false;
+   // The children array can be specified by a parent via prop or is read below from the external context.
+   export let children = void 0;
 
-   // Store the initial `heightChanged` state. If it is truthy then `clientHeight` for the content & root elements
-   // are bound to `heightChanged` to signal to any parent component of any change to the client & root.
-   const bindHeightChanged = !!heightChanged;
+   // Explicit style overrides for the main app and content elements. Uses action `applyStyles`.
+   export let stylesApp = void 0;
 
-   // Use a writable store to make `elementContent` and `elementRoot` accessible. A store is used in the case when
-   // One root component with an `elementRoot` is replaced with another. Due to timing issues and the onDestroy / outro
-   // transitions either of these may be set to null. I will investigate more and file a bug against Svelte.
-   if (!getContext('storeElementContent')) { setContext('storeElementContent', writable(elementContent)); }
-   if (!getContext('storeElementRoot')) { setContext('storeElementRoot', writable(elementRoot)); }
+   // If a parent component binds and sets `appOffsetHeight` to true then a resizeObserver action is enabled on the
+   // outer application `div`. Additionally, the SvelteApplication position resizeObserved store is updated.
+   export let appOffsetHeight = false;
+   export let appOffsetWidth = false;
+
+   // Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
+   const appResizeObserver = !!appOffsetHeight || !!appOffsetWidth ? resizeObserver : () => null;
+
+   // Internal context for `elementContent` / `elementRoot` stores.
+   setContext('internal', new AppShellContextInternal());
 
    // Only update the `elementContent` store if the new `elementContent` is not null or undefined.
    $: if (elementContent !== void 0 && elementContent !== null)
    {
-      getContext('storeElementContent').set(elementContent);
+      getContext('internal').stores.elementContent.set(elementContent);
    }
 
    // Only update the `elementRoot` store if the new `elementRoot` is not null or undefined.
    $: if (elementRoot !== void 0 && elementRoot !== null)
    {
-      getContext('storeElementRoot').set(elementRoot);
+      getContext('internal').stores.elementRoot.set(elementRoot);
    }
 
    const context = getContext('external');
 
-   // Store Foundry Application reference.
+   // Store application reference.
    const application = context.application;
+
+   // This component can host multiple children defined via props or in the TyphonJS SvelteData configuration object
+   // that are potentially mounted in the content area. If no children defined then this component mounts any slotted
+   // child.
+   const allChildren = Array.isArray(children) ? children :
+    typeof context === 'object' ? context.children : void 0;
 
    $: if (elementRoot) { elementContent = elementRoot; }
 
@@ -52,8 +71,8 @@
 
    // Exports properties to set a transition w/ in / out options.
    export let transition = void 0;
-   export let inTransition = s_DEFAULT_TRANSITION;
-   export let outTransition = s_DEFAULT_TRANSITION;
+   export let inTransition = void 0;
+   export let outTransition = void 0;
 
    // Exports properties to set options for any transitions.
    export let transitionOptions = void 0;
@@ -69,8 +88,7 @@
    {
       // If transition is defined and not the default transition then set it to both in and out transition otherwise
       // set the default transition to both in & out transitions.
-      const newTransition = s_DEFAULT_TRANSITION !== transition && typeof transition === 'function' ? transition :
-       s_DEFAULT_TRANSITION;
+      const newTransition = typeof transition === 'function' ? transition : void 0;
 
       inTransition = newTransition;
       outTransition = newTransition;
@@ -91,17 +109,17 @@
    }
 
    // Handle cases if inTransition is unset; assign noop default transition function.
-   $: if (typeof inTransition !== 'function') { inTransition = s_DEFAULT_TRANSITION; }
+   $: if (typeof inTransition !== 'function') { inTransition = void 0; }
 
    $:
    {
       // Handle cases if outTransition is unset; assign noop default transition function.
-      if (typeof outTransition !== 'function') { outTransition = s_DEFAULT_TRANSITION; }
+      if (typeof outTransition !== 'function') { outTransition = void 0; }
 
       // Set jquery close animation to either run or not when an out transition is changed.
       if (application && typeof application?.options?.defaultCloseAnimation === 'boolean')
       {
-         application.options.defaultCloseAnimation = outTransition === s_DEFAULT_TRANSITION;
+         application.options.defaultCloseAnimation = outTransition === void 0;
       }
    }
 
@@ -110,25 +128,158 @@
 
    // Handle cases if outTransitionOptions is unset; assign empty default transition options.
    $: if (typeof outTransitionOptions !== 'object') { outTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS; }
+
+   // ---------------------------------------------------------------------------------------------------------------
+
+   // Focus `elementRoot` on mount to allow keyboard tab navigation of header buttons.
+   onMount(() => elementRoot.focus());
+
+   // ---------------------------------------------------------------------------------------------------------------
+
+   /**
+    * Provides focus cycling inside the application capturing `<Shift-Tab>` and if `elementRoot` or `firstFocusEl` is
+    * the actively focused element then the second to last focusable element if applicable is focused.
+    *
+    * @param {KeyboardEvent} event - Keyboard Event.
+    */
+   function onKeydown(event)
+   {
+      if (event.shiftKey && event.code === 'Tab')
+      {
+         // We only need to find the first tabindex element as app header buttons have a `tabindex`.
+         const firstFocusEl = elementRoot.querySelector('[tabindex]:not([tabindex="-1"])');
+
+         // Only cycle focus to the last keyboard focusable app element if `elementRoot` or first focusable element
+         // is the active element.
+         if (elementRoot === document.activeElement || firstFocusEl === document.activeElement)
+         {
+            // TODO: Consider non-tabindex focusable elements.
+            const allFocusable = elementRoot.querySelectorAll('[tabindex]:not([tabindex="-1"])');
+
+            if (allFocusable.length > 2)
+            {
+               // Select two elements back as the last focusable element is `FocusWrap`.
+               const lastFocusable = allFocusable[allFocusable.length - 2];
+               if (lastFocusable instanceof HTMLElement)
+               {
+                  lastFocusable.focus();
+               }
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+         }
+      }
+   }
+
+   /**
+    * If the application is a popOut application then when clicked bring to top if not already the Foundry
+    * `activeWindow`.
+    */
+   function onPointerdownApp()
+   {
+      if (elementRoot instanceof HTMLElement) { elementRoot.focus(); }
+
+      if (typeof application.options.popOut === 'boolean' && application.options.popOut &&
+       application !== globalThis.ui?.activeWindow)
+      {
+         application.bringToTop.call(application);
+      }
+   }
+
+   /**
+    * Callback for app resizeObserver action. This is enabled when appOffsetHeight or appOffsetWidth is
+    * bound. Additionally, the Application position resizeObserved store is updated.
+    *
+    * @param {number}   contentWidth - Observed contentWidth.
+    * @param {number}   contentHeight - Observed contentHeight
+    * @param {number}   offsetWidth - Observed offsetWidth.
+    * @param {number}   offsetHeight - Observed offsetHeight
+    */
+   function resizeObservedApp(offsetWidth, offsetHeight, contentWidth, contentHeight)
+   {
+      application.position.stores.resizeObserved.update((object) =>
+      {
+         object.contentWidth = contentWidth;
+         object.contentHeight = contentHeight;
+         object.offsetWidth = offsetWidth;
+         object.offsetHeight = offsetHeight;
+
+         return object;
+      });
+
+      appOffsetHeight = offsetHeight;
+      appOffsetWidth = offsetWidth;
+   }
+
+   /**
+    * Transitions can cause side effects. Work around this issue by using an if conditional.
+    * Due to timing issues and the onDestroy / outro transitions can cause elementRoot / elementContent to be set to
+    * null when swapped dynamically. There is a feature request to allow transition functions to be undefined:
+    *
+    * @see: https://github.com/sveltejs/svelte/issues/6942
+    */
 </script>
 
 <svelte:options accessors={true}/>
 
-{#if bindHeightChanged}
+{#if inTransition || outTransition}
     <div id={application.id}
-         class="{application.options.classes.join(' ')}"
+         class={application.options.classes.join(' ')}
          data-appid={application.appId}
-         bind:clientHeight={heightChanged}
          bind:this={elementRoot}
          in:inTransition={inTransitionOptions}
-         out:outTransition={outTransitionOptions}>
+         out:outTransition={outTransitionOptions}
+         on:keydown|capture={onKeydown}
+         on:pointerdown={onPointerdownApp}
+         use:applyStyles={stylesApp}
+         use:appResizeObserver={resizeObservedApp}
+         tabindex=-1>
+        {#if Array.isArray(allChildren)}
+            <TJSContainer children={allChildren} />
+        {:else}
+            <slot />
+        {/if}
+        <FocusWrap {elementRoot} />
     </div>
 {:else}
     <div id={application.id}
-         class="{application.options.classes.join(' ')}"
+         class={application.options.classes.join(' ')}
          data-appid={application.appId}
          bind:this={elementRoot}
-         in:inTransition={inTransitionOptions}
-         out:outTransition={outTransitionOptions}>
+         on:keydown|capture={onKeydown}
+         on:pointerdown={onPointerdownApp}
+         use:applyStyles={stylesApp}
+         use:appResizeObserver={resizeObservedApp}
+         tabindex=-1>
+        {#if Array.isArray(allChildren)}
+            <TJSContainer children={allChildren} />
+        {:else}
+            <slot />
+        {/if}
+        <FocusWrap {elementRoot} />
     </div>
 {/if}
+
+<style>
+    div {
+        background: var(--tjs-empty-app-background, none);
+
+        border-radius: var(--tjs-app-border-radius, 5px);
+        box-shadow: var(--tjs-app-box-shadow, none);
+        color: var(--tjs-app-color, inherit);
+        display: var(--tjs-app-display, flex);
+        flex-direction: var(--tjs-app-flex-direction, column);
+        flex-wrap: var(--tjs-app-flex-wrap, nowrap);
+        justify-content: var(--tjs-app-justify-content, flex-start);
+        margin: var(--tjs-app-margin, 0);
+        max-height: var(--tjs-app-max-height, 100%);
+        overflow: var(--tjs-app-overflow, hidden);
+        padding: var(--tjs-app-padding, 0);
+        position: var(--tjs-app-position, absolute);
+    }
+
+    div:focus-visible {
+        outline: var(--tjs-app-outline-focus, 2px solid transparent);
+    }
+</style>

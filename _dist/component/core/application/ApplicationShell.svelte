@@ -73,7 +73,7 @@
 
    const context = getContext('external');
 
-   // Store Foundry Application reference.
+   // Store application reference.
    const application = context.application;
 
    // This component can host multiple children defined via props or in the TyphonJS SvelteData configuration object
@@ -257,6 +257,7 @@
 </script>
 
 <svelte:options accessors={true}/>
+
 {#if inTransition || outTransition}
    <div id={application.id}
         class="app window-app {application.options.classes.join(' ')}"
@@ -316,15 +317,15 @@
 <style>
    /* Note: this is different than stock Foundry and allows rounded corners from .app core styles */
    .window-app {
-      overflow: hidden;
+      overflow: var(--tjs-app-overflow, hidden);
    }
 
    .window-app:focus-visible {
-      outline: 2px solid transparent;
+      outline: var(--tjs-app-outline-focus, 2px solid transparent);
    }
 
    .window-content:focus-visible {
-      outline: 2px solid transparent;
+      outline: var(--tjs-app-content-outline-focus, 2px solid transparent);
    }
 
    /* Override Foundry default; adjust --tjs-app-header-gap to change gap size */

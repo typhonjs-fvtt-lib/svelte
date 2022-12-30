@@ -77,7 +77,7 @@
 
    const context = getContext('external');
 
-   // Store Foundry Application reference.
+   // Store application reference.
    const application = context.application;
 
    // This component can host multiple children defined via props or in the TyphonJS SvelteData configuration object
@@ -327,37 +327,34 @@
      */
 
     .tjs-app {
-        max-height: 100%;
+        max-height: var(--tjs-app-max-height, 100%);
         background: var(--tjs-app-background);
-        border-radius: 5px;
-        box-shadow: 0 0 20px #000;
-        margin: 3px 0;
-        padding: 0.5em;
-        color: #f0f0e0;
-        z-index: 95;
-        overflow: inherit;
+        border-radius: var(--tjs-app-border-radius, 5px);
+        box-shadow: var(--tjs-app-box-shadow, 0 0 20px #000);
+        margin: var(--tjs-app-margin, 3px 0);
+        padding: var(--tjs-app-padding, 0.5em);
+        color: var(--tjs-app-color, #f0f0e0);
     }
 
     .tjs-window-app:focus-visible {
-        outline: 2px solid transparent;
+        outline: var(--tjs-app-outline-focus, 2px solid transparent);
     }
 
     .tjs-window-app .window-content:focus-visible {
-        outline: 2px solid transparent;
+        outline: var(--tjs-app-content-outline-focus, 2px solid transparent);
     }
 
     .tjs-window-app {
         /* Note: this is different than stock Foundry and allows rounded corners from .app core styles */
-        overflow: hidden;
+        overflow: var(--tjs-app-overflow, hidden);
 
-        display: flex;
-        flex-direction: column;
-        flex-wrap: nowrap;
-        justify-content: flex-start;
-        position: absolute;
-        box-shadow: 0 0 20px #000;
-        padding: 0;
-        z-index: 95;
+        display: var(--tjs-app-display, flex);
+        flex-direction: var(--tjs-app-flex-direction, column);
+        flex-wrap: var(--tjs-app-flex-wrap, nowrap);
+        justify-content: var(--tjs-app-justify-content, flex-start);
+        position: var(--tjs-app-position, absolute);
+        box-shadow: var(--tjs-app-box-shadow, 0 0 20px #000);
+        padding: var(--tjs-app-padding, 0);
     }
 
     .tjs-window-app :global(> .flex0) {
@@ -378,16 +375,16 @@
     }
 
     .tjs-window-app :global(.window-header) {
-        flex: 0 0 30px;
-        overflow: hidden;
-        padding: 0 8px;
-        line-height: 30px;
-        border-bottom: 1px solid #000;
+        flex: var(--tjs-app-header-flex, 0 0 30px);
+        overflow: var(--tjs-app-header-overflow, hidden);
+        padding: var(--tjs-app-header-padding, 0 8px);
+        line-height: var(--tjs-app-header-line-height, 30px);
+        border-bottom: var(--tjs-app-header-border-bottom, 1px solid #000);
     }
 
     .tjs-window-app :global(.window-header .window-title) {
-        margin: 0;
-        word-break: break-all;
+        margin: var(--tjs-app-header-title-margin, 0);
+        word-break: var(--tjs-app-header-title-word-break, break-all);
     }
 
     .tjs-window-app :global(.window-header a) {
@@ -395,20 +392,19 @@
     }
 
     .tjs-window-app.minimized :global(.window-header) {
-        border: none;
+        border: var(--tjs-app-header-margin-minimized, none);
     }
 
     .tjs-window-app .window-content {
-        display: flex;
-        flex-direction: column;
-        flex-wrap: nowrap;
-        flex: 1;
-        justify-content: flex-start;
-        background: none;
-        padding: 8px;
-        color: #191813;
-        overflow-y: auto;
-        overflow-x: hidden;
+        display: var(--tjs-app-content-display, flex);
+        flex-direction: var(--tjs-app-content-flex-direction, column);
+        flex-wrap: var(--tjs-app-content-flex-wrap, nowrap);
+        flex: var(--tjs-app-content-flex-wrap, 1);
+        justify-content: var(--tjs-app-content-justify-content, flex-start);
+        background: var(--tjs-app-content-background, none);
+        padding: var(--tjs-app-content-padding, 8px);
+        color: var(--tjs-app-content-color, #191813);
+        overflow: var(--tjs-app-content-color, hidden auto);
     }
 
     .tjs-window-app :global(.window-resizable-handle) {
