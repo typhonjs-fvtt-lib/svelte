@@ -395,7 +395,7 @@
     }
 
     .tjs-window-app.minimized :global(.window-header) {
-        border: 1px solid #000;
+        border: none;
     }
 
     .tjs-window-app .window-content {
