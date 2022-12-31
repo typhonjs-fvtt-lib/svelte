@@ -21,7 +21,6 @@
 
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
    import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
-   import TJSContainer                 from '../TJSContainer.svelte';
    import TJSFocusWrap                 from './TJSFocusWrap.svelte';
    import ResizableHandle              from './ResizableHandle.svelte';
 
@@ -37,9 +36,6 @@
    // Allows custom draggable implementations to be forwarded to TJSApplicationHeader.
    export let draggable = void 0;
    export let draggableOptions = void 0;
-
-   // The children array can be specified by a parent via prop or is read below from the external context.
-   export let children = void 0;
 
    // Explicit style overrides for the main app and content elements. Uses action `applyStyles`.
    export let stylesApp = void 0;
@@ -83,12 +79,6 @@
 
    // Store application reference.
    const application = context.application;
-
-   // This component can host multiple children defined via props or in the TyphonJS SvelteData configuration object
-   // that are potentially mounted in the content area. If no children defined then this component mounts any slotted
-   // child.
-   const allChildren = Array.isArray(children) ? children :
-    typeof context === 'object' ? context.children : void 0;
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -281,11 +271,7 @@
                  use:applyStyles={stylesContent}
                  use:contentResizeObserver={resizeObservedContent}
                  tabindex=-1>
-            {#if Array.isArray(allChildren)}
-                <TJSContainer children={allChildren} />
-            {:else}
-                <slot />
-            {/if}
+            <slot />
         </section>
         <ResizableHandle />
         <TJSFocusWrap {elementRoot} />
@@ -307,11 +293,7 @@
                  use:applyStyles={stylesContent}
                  use:contentResizeObserver={resizeObservedContent}
                  tabindex=-1>
-            {#if Array.isArray(allChildren)}
-                <TJSContainer children={allChildren} />
-            {:else}
-                <slot />
-            {/if}
+            <slot />
         </section>
         <ResizableHandle />
         <TJSFocusWrap {elementRoot} />

@@ -11,7 +11,6 @@
    import { A11yHelper }               from '@typhonjs-fvtt/svelte/util';
 
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
-   import TJSContainer                 from '../TJSContainer.svelte';
    import TJSFocusWrap                 from './TJSFocusWrap.svelte';
 
    import {
@@ -22,9 +21,6 @@
    // `elementTarget`. Please see SvelteApplication lifecycle documentation.
    export let elementContent = void 0;
    export let elementRoot = void 0;
-
-   // The children array can be specified by a parent via prop or is read below from the external context.
-   export let children = void 0;
 
    // Explicit style overrides for the main app and content elements. Uses action `applyStyles`.
    export let stylesApp = void 0;
@@ -60,12 +56,7 @@
    // Store application reference.
    const application = context.application;
 
-   // This component can host multiple children defined via props or in the TyphonJS SvelteData configuration object
-   // that are potentially mounted in the content area. If no children defined then this component mounts any slotted
-   // child.
-   const allChildren = Array.isArray(children) ? children :
-    typeof context === 'object' ? context.children : void 0;
-
+   // Assign elementRoot to elementContent.
    $: if (elementRoot) { elementContent = elementRoot; }
 
    // ---------------------------------------------------------------------------------------------------------------
@@ -233,11 +224,7 @@
          use:applyStyles={stylesApp}
          use:appResizeObserver={resizeObservedApp}
          tabindex=-1>
-        {#if Array.isArray(allChildren)}
-            <TJSContainer children={allChildren} />
-        {:else}
-            <slot />
-        {/if}
+        <slot />
         <TJSFocusWrap {elementRoot} />
     </div>
 {:else}
@@ -250,11 +237,7 @@
          use:applyStyles={stylesApp}
          use:appResizeObserver={resizeObservedApp}
          tabindex=-1>
-        {#if Array.isArray(allChildren)}
-            <TJSContainer children={allChildren} />
-        {:else}
-            <slot />
-        {/if}
+        <slot />
         <TJSFocusWrap {elementRoot} />
     </div>
 {/if}
