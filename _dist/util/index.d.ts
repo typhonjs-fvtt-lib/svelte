@@ -1,4 +1,61 @@
 /**
+ * Provides several helpful utility methods for accessibility and keyboard navigation.
+ */
+declare class A11yHelper {
+    /**
+     * Returns first focusable element within a specified element.
+     *
+     * @param {HTMLElement|Document} [element=document] - Optional element to start query.
+     *
+     * @param {object} [options] - Iterable list of classes to ignore elements.
+     *
+     * @param {Iterable<string>} [options.ignoreClasses] - Iterable list of classes to ignore elements.
+     *
+     * @param {Set<HTMLElement>} [options.ignoreElements] - Set of elements to ignore.
+     *
+     * @returns {HTMLElement} First focusable child element
+     */
+    static getFirstFocusableElement(element?: HTMLElement | Document, options?: {
+        ignoreClasses?: Iterable<string>;
+        ignoreElements?: Set<HTMLElement>;
+    }): HTMLElement;
+    /**
+     * Returns all focusable elements within a specified element.
+     *
+     * @param {HTMLElement|Document} [element=document] Optional element to start query.
+     *
+     * @param {object} [options] - Iterable list of classes to ignore elements.
+     *
+     * @param {Iterable<string>} [options.ignoreClasses] - Iterable list of classes to ignore elements.
+     *
+     * @param {Set<HTMLElement>} [options.ignoreElements] - Set of elements to ignore.
+     *
+     * @returns {Array<HTMLElement>} Child keyboard focusable
+     */
+    static getFocusableElements(element?: HTMLElement | Document, { ignoreClasses, ignoreElements }?: {
+        ignoreClasses?: Iterable<string>;
+        ignoreElements?: Set<HTMLElement>;
+    }): Array<HTMLElement>;
+    /**
+     * Returns first focusable element within a specified element.
+     *
+     * @param {HTMLElement|Document} [element=document] - Optional element to start query.
+     *
+     * @param {object} [options] - Iterable list of classes to ignore elements.
+     *
+     * @param {Iterable<string>} [options.ignoreClasses] - Iterable list of classes to ignore elements.
+     *
+     * @param {Set<HTMLElement>} [options.ignoreElements] - Set of elements to ignore.
+     *
+     * @returns {HTMLElement} First focusable child element
+     */
+    static getLastFocusableElement(element?: HTMLElement | Document, options?: {
+        ignoreClasses?: Iterable<string>;
+        ignoreElements?: Set<HTMLElement>;
+    }): HTMLElement;
+}
+
+/**
  * Provides access to the Clipboard API for reading / writing text strings. This requires a secure context.
  *
  * Note: `writeText` will attempt to use the older `execCommand` if available when `navigator.clipboard` is not
@@ -335,4 +392,4 @@ type ParseDataTransferOptions = {
     types?: string[] | undefined;
 };
 
-export { ClipboardAccess, ParseDataTransferOptions, StackingContext, StyleManager, debounce, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isSvelteComponent, normalizeString, outroAndDestroy, parseSvelteConfig, striptags, styleParsePixels, uuidv4 };
+export { A11yHelper, ClipboardAccess, ParseDataTransferOptions, StackingContext, StyleManager, debounce, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isSvelteComponent, normalizeString, outroAndDestroy, parseSvelteConfig, striptags, styleParsePixels, uuidv4 };

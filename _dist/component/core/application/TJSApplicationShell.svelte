@@ -13,15 +13,16 @@
       onMount,
       setContext }                     from 'svelte';
 
-   import { AppShellContextInternal }  from './AppShellContextInternal.js';
-
    import {
       applyStyles,
       resizeObserver }                 from '@typhonjs-fvtt/svelte/action';
 
-   import FocusWrap                    from './FocusWrap.svelte';
+   import { A11yHelper }               from '@typhonjs-fvtt/svelte/util';
+
+   import { AppShellContextInternal }  from './AppShellContextInternal.js';
    import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
    import TJSContainer                 from '../TJSContainer.svelte';
+   import TJSFocusWrap                 from './TJSFocusWrap.svelte';
    import ResizableHandle              from './ResizableHandle.svelte';
 
    import {
@@ -59,6 +60,9 @@
 
    // Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
    const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth ? resizeObserver : () => null;
+
+   // Provides options to `A11yHelper.getFocusableElements` to ignore TJSFocusWrap by CSS class.
+   const s_IGNORE_CLASSES = { ignoreClasses: ['tjs-focus-wrap'] };
 
    // Internal context for `elementContent` / `elementRoot` stores.
    setContext('internal', new AppShellContextInternal());
@@ -168,22 +172,18 @@
    {
       if (event.shiftKey && event.code === 'Tab')
       {
-         // We only need to find the first tabindex element as app header buttons have a `tabindex`.
-         const firstFocusEl = elementRoot.querySelector('[tabindex]:not([tabindex="-1"])');
+         // Collect all focusable elements from `elementRoot` and ignore TJSFocusWrap.
+         const allFocusable = A11yHelper.getFocusableElements(elementRoot, s_IGNORE_CLASSES);
+
+         // Find first and last focusable elements.
+         const firstFocusEl = allFocusable.length > 0 ? allFocusable[0] : void 0;
+         const lastFocusEl = allFocusable.length > 0 ? allFocusable[allFocusable.length - 1] : void 0;
 
          // Only cycle focus to the last keyboard focusable app element if `elementRoot` or first focusable element
          // is the active element.
          if (elementRoot === document.activeElement || firstFocusEl === document.activeElement)
          {
-            // TODO: Consider non-tabindex focusable elements.
-            const allFocusable = elementRoot.querySelectorAll('[tabindex]:not([tabindex="-1"])');
-
-            if (allFocusable.length > 2)
-            {
-               // Select two elements back as the last focusable element is `FocusWrap`.
-               const lastFocusable = allFocusable[allFocusable.length - 2];
-               if (lastFocusable instanceof HTMLElement) { lastFocusable.focus(); }
-            }
+            if (lastFocusEl instanceof HTMLElement && firstFocusEl !== lastFocusEl) { lastFocusEl.focus(); }
 
             event.preventDefault();
             event.stopPropagation();
@@ -288,7 +288,7 @@
             {/if}
         </section>
         <ResizableHandle />
-        <FocusWrap {elementRoot} />
+        <TJSFocusWrap {elementRoot} />
     </div>
 {:else}
     <div id={application.id}
@@ -314,7 +314,7 @@
             {/if}
         </section>
         <ResizableHandle />
-        <FocusWrap {elementRoot} />
+        <TJSFocusWrap {elementRoot} />
     </div>
 {/if}
 
