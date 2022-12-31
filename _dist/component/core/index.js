@@ -26,6 +26,9 @@ export *                                  from './dialog/index.js';
  * Provides default CSS variables for core components.
  */
 cssVariables.setProperties({
+   // Anchor text shadow / header buttons
+   '--tjs-anchor-text-shadow-focus-hover': '0 0 8px var(--color-shadow-primary)',
+
    // TJSApplicationShell app background.
    '--tjs-app-background': `url("${globalThis.foundry.utils.getRoute('/ui/denim075.png')}")`,
 }, false);

@@ -98,7 +98,12 @@
       padding: var(--tjs-app-header-button-icon-padding, 0);
    }
 
+   a:hover {
+      text-shadow: var(--tjs-app-header-button-anchor-text-shadow-hover, var(--tjs-anchor-text-shadow-focus-hover, inherit));
+   }
+
    a:focus-visible {
+      text-shadow: var(--tjs-app-header-button-anchor-text-shadow-focus, var(--tjs-anchor-text-shadow-focus-hover, inherit));
       outline: var(--tjs-app-header-button-outline-focus, var(--tjs-comp-outline-focus-visible, revert));
    }
 
