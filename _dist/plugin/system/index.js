@@ -1,8 +1,8 @@
-import { LocalStorage as LocalStorage$1, SessionStorage as SessionStorage$1 } from '@typhonjs-fvtt/svelte/store';
+import { TJSLocalStorage as TJSLocalStorage$1, TJSSessionStorage as TJSSessionStorage$1 } from '@typhonjs-fvtt/svelte/store';
 
-class LocalStorage
+class TJSLocalStorage
 {
-   #storage = new LocalStorage$1();
+   #storage = new TJSLocalStorage$1();
 
    onPluginLoad(ev)
    {
@@ -16,9 +16,9 @@ class LocalStorage
    }
 }
 
-class SessionStorage
+class TJSSessionStorage
 {
-   #storage = new SessionStorage$1();
+   #storage = new TJSSessionStorage$1();
 
    onPluginLoad(ev)
    {
@@ -32,5 +32,5 @@ class SessionStorage
    }
 }
 
-export { LocalStorage, SessionStorage };
+export { TJSLocalStorage, TJSSessionStorage };
 //# sourceMappingURL=index.js.map

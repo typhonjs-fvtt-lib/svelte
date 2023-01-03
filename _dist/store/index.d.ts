@@ -1073,20 +1073,17 @@ type KeyStoreOptions = {
     stopPropagation?: boolean;
 };
 
-/**
- * @typedef {import('svelte/store').Writable} LSStore - The backing Svelte store; a writable w/ get method attached.
- */
-declare class LocalStorage {
+declare class TJSLocalStorage {
     /**
-     * Creates a new LSStore for the given key.
+     * Creates a new writable store for the given key.
      *
      * @param {string}   key - Key to lookup in stores map.
      *
      * @param {boolean}  [defaultValue] - A default value to set for the store.
      *
-     * @returns {LSStore} The new LSStore.
+     * @returns {import('svelte/store').Writable} The new store.
      */
-    static "__#116360@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#116352@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the localStorage.
      *
@@ -1105,7 +1102,7 @@ declare class LocalStorage {
      *
      * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
      *
-     * @returns {LSStore} The Svelte store for this key.
+     * @returns {import('svelte/store').Writable} The Svelte store for this key.
      */
     getStore(key: string, defaultValue?: any): svelte_store.Writable<any>;
     /**
@@ -1128,25 +1125,18 @@ declare class LocalStorage {
     swapItemBoolean(key: string, defaultValue?: boolean): boolean;
     #private;
 }
-/**
- * - The backing Svelte store; a writable w/ get method attached.
- */
-type LSStore = svelte_store.Writable<any>;
 
-/**
- * @typedef {import('svelte/store').Writable} SSStore - The backing Svelte store; a writable w/ get method attached.
- */
-declare class SessionStorage {
+declare class TJSSessionStorage {
     /**
-     * Creates a new SSStore for the given key.
+     * Creates a new store for the given key.
      *
      * @param {string}   key - Key to lookup in stores map.
      *
      * @param {boolean}  [defaultValue] - A default value to set for the store.
      *
-     * @returns {SSStore} The new SSStore.
+     * @returns {import('svelte/store').Writable} The new store.
      */
-    static "__#116361@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#116353@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the sessionStorage.
      *
@@ -1165,7 +1155,7 @@ declare class SessionStorage {
      *
      * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
      *
-     * @returns {SSStore} The Svelte store for this key.
+     * @returns {import('svelte/store').Writable} The Svelte store for this key.
      */
     getStore(key: string, defaultValue?: any): svelte_store.Writable<any>;
     /**
@@ -1188,10 +1178,6 @@ declare class SessionStorage {
     swapItemBoolean(key: string, defaultValue?: boolean): boolean;
     #private;
 }
-/**
- * - The backing Svelte store; a writable w/ get method attached.
- */
-type SSStore = svelte_store.Writable<any>;
 
 /**
  * Provides a basic test for a given variable to test if it has the shape of a readable store by having a `subscribe`
@@ -1567,4 +1553,4 @@ type GameState = svelte_store.Readable<any>;
  */
 declare const gameState: svelte_store.Readable<any>;
 
-export { CompareFn, DataDerivedCreate, DataDynArray, DataDynArrayCreate, DataDynMap, DataDynMapCreate, DataFilter, DataOptions, DataSort, DerivedArrayReducer, DerivedMapReducer, DynArrayReducer, DynMapReducer, EmbeddedAPI, FilterFn, GameState, IDerivedReducer, IDerivedReducerCtor, IDynArrayReducerCtor, IDynMapReducerCtor, KeyStore, KeyStoreOptions, LSStore, LocalStorage, OptionsDerivedCreate, OptionsDynArrayCreate, OptionsDynMapCreate, SSStore, SessionStorage, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { CompareFn, DataDerivedCreate, DataDynArray, DataDynArrayCreate, DataDynMap, DataDynMapCreate, DataFilter, DataOptions, DataSort, DerivedArrayReducer, DerivedMapReducer, DynArrayReducer, DynMapReducer, EmbeddedAPI, FilterFn, GameState, IDerivedReducer, IDerivedReducerCtor, IDynArrayReducerCtor, IDynMapReducerCtor, KeyStore, KeyStoreOptions, OptionsDerivedCreate, OptionsDynArrayCreate, OptionsDynMapCreate, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, TJSLocalStorage, TJSSessionStorage, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };

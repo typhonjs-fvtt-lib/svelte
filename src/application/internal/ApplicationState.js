@@ -3,7 +3,7 @@ import { linear }          from 'svelte/easing';
 import { lerp }            from '@typhonjs-fvtt/svelte/math';
 import { isObject }        from '@typhonjs-fvtt/svelte/util';
 
-import { SessionStorage }  from '@typhonjs-fvtt/svelte/store';
+import { TJSSessionStorage }  from '@typhonjs-fvtt/svelte/store';
 
 export class ApplicationState
 {
@@ -22,12 +22,18 @@ export class ApplicationState
    {
       this.#application = application;
 
-      this.#sessionStorage = application?.options?.sessionStorage !== void 0 ? application.options.sessionStorage :
-       new SessionStorage();
+      const optionsSessionStorage = application?.options?.sessionStorage;
+
+      if (optionsSessionStorage !== void 0 && !(optionsSessionStorage instanceof TJSSessionStorage))
+      {
+         throw new TypeError(`'options.sessionStorage' is not an instance of TJSSessionStorage.`);
+      }
+
+      this.#sessionStorage = optionsSessionStorage !== void 0 ? optionsSessionStorage : new TJSSessionStorage();
    }
 
    /**
-    * @returns {SessionStorage} Returns SessionStorage instance.
+    * @returns {TJSSessionStorage} Returns TJSSessionStorage instance.
     */
    get sessionStorage()
    {
