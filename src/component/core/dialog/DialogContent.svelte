@@ -106,8 +106,8 @@
       {
          let result = null;
 
-         // Accept either callback or onclick as the function / data to invoke.
-         const invoke = button.callback ?? button.onclick;
+         // Accept either `onPress`, `callback` or `onclick` as the function / data to invoke.
+         const invoke = button.onPress ?? button.callback ?? button.onclick;
 
          switch (typeof invoke)
          {
