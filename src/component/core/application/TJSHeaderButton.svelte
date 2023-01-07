@@ -28,8 +28,8 @@
 
    function onClick(event)
    {
-      // Accept either callback or onclick as the function / data to invoke.
-      const invoke = button.callback ?? button.onclick;
+      // Accept `onPress`, `callback` or `onclick` as the function / data to invoke.
+      const invoke = button.onPress ?? button.callback ?? button.onclick;
 
       if (typeof invoke === 'function')
       {
@@ -61,7 +61,7 @@
    {
       if (event.code === 'Enter')
       {
-         const invoke = button.callback ?? button.onclick;
+         const invoke = button.onPress ?? button.callback ?? button.onclick;
 
          if (typeof invoke === 'function')
          {
