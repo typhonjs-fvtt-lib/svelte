@@ -72,7 +72,7 @@ export class TJSFolderExport extends TJSDialog
                }
             }
          },
-         default: 'export',
+         default: 'cancel',
          autoClose: false,
          close: () => this.options?.resolve?.(null)
       };

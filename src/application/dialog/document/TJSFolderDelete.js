@@ -46,7 +46,7 @@ export class TJSFolderDelete extends TJSDialog
                }
             }
          },
-         default: 'delete',
+         default: 'cancel',
          autoClose: false,
          close: () => this.options?.resolve?.(null)
       }, options);

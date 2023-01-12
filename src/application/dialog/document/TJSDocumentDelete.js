@@ -47,7 +47,7 @@ export class TJSDocumentDelete extends TJSDialog
                onclick: () => this.options.resolve?.(false)
             }
          },
-         default: 'delete',
+         default: 'cancel',
          close: () => this.options?.resolve?.(null)
       }, options);
 
