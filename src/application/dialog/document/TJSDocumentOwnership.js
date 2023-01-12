@@ -23,6 +23,7 @@ export class TJSDocumentOwnership extends TJSDialog
       super({
          modal: typeof options?.modal === 'boolean' ? options.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
+         minimizable: false,
          ...dialogData,
          content: {
             class: TJSDocumentOwnershipImpl,
