@@ -99,6 +99,8 @@
 
    export function requestSubmit()
    {
+console.log(`!! TJSDocumentOwnership - requestSubmit`);
+console.trace();
       form.requestSubmit();
    }
 
@@ -148,6 +150,7 @@
 
          application.options.resolve?.($doc);
          application.close();
+         return;
       }
 
       // Update a single Document

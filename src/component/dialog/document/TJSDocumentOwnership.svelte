@@ -148,6 +148,7 @@
 
          application.options.resolve?.($doc);
          application.close();
+         return;
       }
 
       // Update a single Document
