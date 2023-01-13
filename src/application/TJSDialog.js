@@ -151,7 +151,8 @@ export class TJSDialog extends SvelteApplication
     * });
     */
    static async confirm({ title, content, yes, no, render, defaultYes = true, rejectClose = false, options = {},
-    buttons = {}, draggable = true, modal = false, modalOptions = {}, popOut = true, resizable = false, transition = {},
+    buttons = {}, draggable = true, modal = false, modalOptions = {}, popOut = true, minimizable = true,
+     resizable = false, transition = {},
      zIndex } = {})
    {
       // Allow overwriting of default icon and labels.
@@ -176,6 +177,7 @@ export class TJSDialog extends SvelteApplication
             modal,
             modalOptions,
             popOut,
+            minimizable,
             resizable,
             transition,
             zIndex,
@@ -214,8 +216,8 @@ export class TJSDialog extends SvelteApplication
     * @returns {Promise<*>} The returned value from the provided callback function, if any
     */
    static async prompt({ title, content, label, callback, render, rejectClose = false, options = {}, draggable = true,
-    icon = '<i class="fas fa-check"></i>', modal = false, modalOptions = {}, popOut = true, resizable = false,
-     transition = {}, zIndex } = {})
+    icon = '<i class="fas fa-check"></i>', modal = false, modalOptions = {}, popOut = true, minimizable = true,
+     resizable = false, transition = {}, zIndex } = {})
    {
       return new Promise((resolve, reject) =>
       {
@@ -227,6 +229,7 @@ export class TJSDialog extends SvelteApplication
             modal,
             modalOptions,
             popOut,
+            minimizable,
             resizable,
             transition,
             zIndex,
@@ -285,6 +288,8 @@ export class TJSDialog extends SvelteApplication
  *
  * @property {boolean}  [popOut=true] - When true the dialog is a pop out Application.
  *
+ * @property {boolean}  [minimizable=true] - When true the dialog is minimizable.
+ *
  * @property {boolean}  [resizable=false] - When true the dialog is resizable.
  *
  * @property {object}   [transition] - Transition options for the dialog.
@@ -318,6 +323,8 @@ export class TJSDialog extends SvelteApplication
  * @property {object}   [modalOptions] - Additional options for modal dialog display.
  *
  * @property {boolean}  [popOut=true] - When true the dialog is a pop out Application.
+ *
+ * @property {boolean}  [minimizable=true] - When true the dialog is minimizable.
  *
  * @property {boolean}  [resizable=false] - When true the dialog is resizable.
  *
