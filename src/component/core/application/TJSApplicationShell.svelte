@@ -57,11 +57,16 @@
    // Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
    const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth ? resizeObserver : () => null;
 
+   // Provides the internal context for data / stores of the application shell.
+   const internal = new AppShellContextInternal();
+
+   const autoFocus = internal.stores.autoFocus;
+
    // Provides options to `A11yHelper.getFocusableElements` to ignore TJSFocusWrap by CSS class.
    const s_IGNORE_CLASSES = { ignoreClasses: ['tjs-focus-wrap'] };
 
    // Internal context for `elementContent` / `elementRoot` stores.
-   setContext('internal', new AppShellContextInternal());
+   setContext('internal', internal);
 
    // Only update the `elementContent` store if the new `elementContent` is not null or undefined.
    $: if (elementContent !== void 0 && elementContent !== null)
@@ -195,11 +200,33 @@
    }
 
    /**
-    * Focus `elementContent` if the active element is external to `elementContent`.
+    * Focus `elementContent` if the event target is not focusable and `autoFocus` is enabled.
+    *
+    * Note: `autoFocus` is an internal store. This check is a bit tricky as `section.window-content` has a tabindex
+    * of '-1', so it is focusable.
     */
-   function onPointerdownContent()
+   function onPointerdownContent(event)
    {
-      if (!elementContent.contains(document.activeElement)) { elementContent.focus(); }
+      const focusable = A11yHelper.isFocusable(event.target);
+
+      if (!focusable)
+      {
+         if ($autoFocus)
+         {
+            elementContent.focus();
+         }
+         else
+         {
+            event.preventDefault();
+         }
+      }
+      else
+      {
+         if (!$autoFocus && !focusable)
+         {
+            event.preventDefault();
+         }
+      }
    }
 
    /**
