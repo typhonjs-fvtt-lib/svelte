@@ -1,33 +1,27 @@
 <script>
+   import { applyStyles }              from '@typhonjs-fvtt/svelte/action';
+
    import {
       s_DEFAULT_TRANSITION,
       s_DEFAULT_TRANSITION_OPTIONS }   from '@typhonjs-fvtt/svelte/transition';
 
+   /** @type {string} */
    export let id = void 0;
+
+   /** @type {number} */
    export let zIndex = Number.MAX_SAFE_INTEGER;
+
+   /** @type {string} */
    export let background = '#50505080';
+
+   /** @type {boolean} */
    export let captureInput = true;
-   export let preventDefault = true;
-   export let stopPropagation = true;
 
+   /** @type {Record<string, string>} */
+   export let styles = void 0;
+
+   /** @type {HTMLDivElement} */
    let glassPane;
-
-   $: if (glassPane)
-   {
-      glassPane.style.maxWidth = '100%';
-      glassPane.style.maxHeight = '100%';
-      glassPane.style.width = '100%';
-      glassPane.style.height = '100%';
-   }
-
-   $: if (glassPane)
-   {
-      if (captureInput) { glassPane.focus(); }
-      glassPane.style.pointerEvents = captureInput ? 'auto' : 'none';
-   }
-
-   $: if (glassPane) { glassPane.style.background = background; }
-   $: if (glassPane) { glassPane.style.zIndex = zIndex; }
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -88,24 +82,51 @@
 
    // ---------------------------------------------------------------------------------------------------------------
 
+   /**
+    * Swallows / stops propagation for all events where the event target is not contained by the glass pane element.
+    *
+    * @param {Event} event - The event to swallow.
+    */
    function swallow(event)
    {
+      const targetEl = event.target;
+
+      if (targetEl !== glassPane && glassPane.contains(event.target)) { return; }
+
       if (captureInput)
       {
-         if (preventDefault) { event.preventDefault(); }
-         if (stopPropagation) { event.stopPropagation(); }
+         event.preventDefault();
+         event.stopImmediatePropagation();
       }
    }
 </script>
 
-<svelte:options accessors={true}/>
+<!-- Capture all input -->
+<svelte:window
+        on:contextmenu|capture={swallow}
+        on:dblclick|capture={swallow}
+        on:keydown|capture={swallow}
+        on:keyup|capture={swallow}
+        on:mousedown|capture={swallow}
+        on:mousemove|capture={swallow}
+        on:mouseup|capture={swallow}
+        on:pointerdown|capture={swallow}
+        on:pointermove|capture={swallow}
+        on:pointerup|capture={swallow}
+        on:touchend|capture={swallow}
+        on:touchmove|capture={swallow}
+        on:touchstart|capture={swallow}
+        on:wheel|capture={swallow}
+/>
 
 <div id={id}
      bind:this={glassPane}
      class=tjs-glass-pane
+     use:applyStyles={styles}
      in:inTransition={inTransitionOptions}
      out:outTransition={outTransitionOptions}
-     on:keydown={swallow}>
+     style:background={background}
+     style:z-index={zIndex}>
    <slot />
 </div>
 
@@ -113,5 +134,14 @@
    .tjs-glass-pane {
       position: absolute;
       overflow: inherit;
+
+      height: 100%;
+      width: 100%;
+      max-height: 100%;
+      max-width: 100%;
+   }
+
+   .tjs-glass-pane:focus-visible {
+      outline: none;
    }
 </style>
