@@ -23,6 +23,7 @@ export class TJSFolderCreateUpdate extends TJSDialog
       super({
          modal: typeof options?.modal === 'boolean' ? options.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
+         focusFirst: true,
          minimizable: false,
          ...dialogData,
          content: {
