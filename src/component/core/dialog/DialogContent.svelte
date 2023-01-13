@@ -1,18 +1,19 @@
 <script>
    import {
       getContext,
-      onDestroy }          from 'svelte';
+      onDestroy,
+      onMount }            from 'svelte';
 
    import { applyStyles }  from '@typhonjs-fvtt/svelte/action';
    import { localize }     from '@typhonjs-fvtt/svelte/helper';
 
    import {
+      A11yHelper,
       isObject,
       isSvelteComponent,
       parseSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
 
    export let data = {};
-   export let autoClose = true;
    export let modal = false;
    export let preventDefault = false;
    export let stopPropagation = false;
@@ -23,7 +24,10 @@
 
    let buttons;
 
-   /** @type {HTMLElement} */
+   /** @type {HTMLDivElement} */
+   let contentEl;
+
+   /** @type {HTMLDivElement} */
    let buttonsEl;
 
    let content = void 0;
@@ -49,6 +53,22 @@
       }
    })
 
+   // If `focusFirst` is true then focus first focusable element iin dialog content.
+   onMount(() =>
+   {
+      if (focusFirst)
+      {
+         const focusEl = A11yHelper.getFirstFocusableElement(contentEl);
+
+         if (focusEl instanceof HTMLElement)
+         {
+            // Focus on next tick to allow application / dialog to mount to bypass ApplicationShell onMount focus
+            // handling.
+            setTimeout(() => focusEl.focus(), 0);
+         }
+      }
+   });
+
    // Add key listeners to elementRoot when it is bound.
    $: if ($elementRoot)
    {
@@ -60,12 +80,18 @@
       }
    }
 
+   // When true the first focusable element that isn't a button is focused.
+   $: focusFirst = typeof data.focusFirst === 'boolean' ? data.focusFirst : false;
+
    // Focus current button when `buttonsEl` is bound.
-   $: if (buttonsEl instanceof HTMLElement)
+   $: if (!focusFirst && buttonsEl instanceof HTMLElement)
    {
       const buttonEl = buttonsEl.querySelector(`.${currentButtonId}`);
       if (buttonEl instanceof HTMLElement) { buttonEl.focus(); }
    }
+
+   // Automatically close the dialog on button click handler completion.
+   $: autoClose = typeof data.autoClose === 'boolean' ? data.autoClose : true;
 
    // If `data.buttons` is not an object then set an empty array otherwise reduce the button data.
    $:
@@ -298,7 +324,7 @@
 </script>
 
 <main>
-   <div class=dialog-content>
+   <div bind:this={contentEl} class=dialog-content>
       {#if typeof content === 'string'}
          {@html content}
       {:else if dialogComponent}
