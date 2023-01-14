@@ -24,6 +24,9 @@
  */
 export class AdapterValidators
 {
+   /** @type {boolean} */
+   #enabled = true;
+
    /**
     * @type {ValidatorData[]}
     */
@@ -44,9 +47,24 @@ export class AdapterValidators
    }
 
    /**
+    * @returns {boolean} Returns the enabled state.s
+    */
+   get enabled() { return this.#enabled; }
+
+   /**
     * @returns {number} Returns the length of the validators array.
     */
    get length() { return this.#validatorData.length; }
+
+   /**
+    * @param {boolean}  enabled - Sets enabled state.
+    */
+   set enabled(enabled)
+   {
+      if (typeof enabled !== 'boolean') { throw new TypeError(`'enabled' is not a boolean.`); }
+
+      this.#enabled = enabled;
+   }
 
    /**
     * Provides an iterator for validators.
