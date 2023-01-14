@@ -161,6 +161,9 @@
     * Provides focus cycling inside the application capturing `<Shift-Tab>` and if `elementRoot` or `firstFocusEl` is
     * the actively focused element then the second to last focusable element if applicable is focused.
     *
+    * Also, if a popout app all key down events will bring this application to the top such that when focus is trapped
+    * the app is top most.
+    *
     * @param {KeyboardEvent} event - Keyboard Event.
     */
    function onKeydown(event)
@@ -183,6 +186,13 @@
             event.preventDefault();
             event.stopPropagation();
          }
+      }
+
+      // Make sure this application is top most when it receives keyboard events.
+      if (typeof application.options.popOut === 'boolean' && application.options.popOut &&
+       application !== globalThis.ui?.activeWindow)
+      {
+         application.bringToTop.call(application);
       }
    }
 

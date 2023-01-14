@@ -158,6 +158,13 @@
             event.stopPropagation();
          }
       }
+
+      // Make sure this application is top most when it receives keyboard events.
+      if (typeof application.options.popOut === 'boolean' && application.options.popOut &&
+       application !== globalThis.ui?.activeWindow)
+      {
+         application.bringToTop.call(application);
+      }
    }
 
 
