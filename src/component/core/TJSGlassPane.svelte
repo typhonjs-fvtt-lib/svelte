@@ -5,11 +5,6 @@
       s_DEFAULT_TRANSITION,
       s_DEFAULT_TRANSITION_OPTIONS }   from '@typhonjs-fvtt/svelte/transition';
 
-   /** @type {string} */
-   export let id = void 0;
-
-   /** @type {number} */
-   export let zIndex = Number.MAX_SAFE_INTEGER;
 
    /** @type {string} */
    export let background = '#50505080';
@@ -17,11 +12,22 @@
    /** @type {boolean} */
    export let captureInput = true;
 
+   /** @type {string} */
+   export let id = void 0;
+
+   /** @type {boolean} */
+   export let slotSeparate = void 0;
+
    /** @type {Record<string, string>} */
    export let styles = void 0;
 
+   /** @type {number} */
+   export let zIndex = Number.MAX_SAFE_INTEGER;
+
    /** @type {HTMLDivElement} */
-   let glassPane;
+   let backgroundEl, containerEl, glassPaneEl;
+
+   $: slotSeparate = typeof slotSeparate === 'boolean' ? slotSeparate : false;
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -91,7 +97,11 @@
    {
       const targetEl = event.target;
 
-      if (targetEl !== glassPane && glassPane.contains(event.target)) { return; }
+      if (targetEl !== glassPaneEl && targetEl !== backgroundEl  && targetEl !== containerEl &&
+        glassPaneEl.contains(targetEl))
+      {
+         return;
+      }
 
       if (captureInput)
       {
@@ -120,28 +130,41 @@
 />
 
 <div id={id}
-     bind:this={glassPane}
+     bind:this={glassPaneEl}
      class=tjs-glass-pane
-     use:applyStyles={styles}
-     in:inTransition={inTransitionOptions}
-     out:outTransition={outTransitionOptions}
-     style:background={background}
      style:z-index={zIndex}>
-   <slot />
+
+   {#if slotSeparate}
+      <div class=tjs-glass-pane-background
+           bind:this={backgroundEl}
+           style:background={background}
+           in:inTransition={inTransitionOptions}
+           out:outTransition={outTransitionOptions}
+           use:applyStyles={styles} />
+
+      <div class=tjs-glass-pane-container bind:this={containerEl}>
+         <slot />
+      </div>
+   {:else}
+      <div class=tjs-glass-pane-background
+           bind:this={backgroundEl}
+           style:background={background}
+           in:inTransition={inTransitionOptions}
+           out:outTransition={outTransitionOptions}
+           use:applyStyles={styles} >
+         <slot />
+      </div>
+   {/if}
 </div>
 
 <style>
-   .tjs-glass-pane {
+   .tjs-glass-pane, .tjs-glass-pane-background , .tjs-glass-pane-container {
       position: absolute;
-      overflow: inherit;
+      overflow: hidden;
 
       height: 100%;
       width: 100%;
       max-height: 100%;
       max-width: 100%;
-   }
-
-   .tjs-glass-pane:focus-visible {
-      outline: none;
    }
 </style>

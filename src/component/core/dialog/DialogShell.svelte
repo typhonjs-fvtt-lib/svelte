@@ -6,6 +6,8 @@
 
    import { fade }         from 'svelte/transition';
 
+   import { isObject }     from '@typhonjs-fvtt/svelte/util';
+
    import ApplicationShell from '../application/ApplicationShell.svelte';
    import DialogContent    from './DialogContent.svelte';
    import TJSGlassPane     from '../TJSGlassPane.svelte';
@@ -47,6 +49,8 @@
    const modalProps = {
       // Background CSS style string.
       background: void 0,
+      slotSeparate: void 0,
+      styles: void 0,
 
       // Stores any transition functions.
       transition: void 0,
@@ -97,7 +101,7 @@
    // All of the checks below trigger when there are any external changes to the `data` prop.
    // Prevent any unnecessary changing of local & `application` variables unless actual changes occur.
 
-   $: if (typeof data === 'object')
+   $: if (isObject(data))
    {
       const newZIndex = Number.isInteger(data.zIndex) || data.zIndex === null ? data.zIndex :
        modal ? Number.MAX_SAFE_INTEGER : Number.MAX_SAFE_INTEGER - 1
@@ -125,7 +129,7 @@
 
    // ApplicationShell transition options ----------------------------------------------------------------------------
 
-   $: if (typeof data?.transition === 'object')
+   $: if (isObject(data?.transition))
    {
       // Store data.transitions to shorten statements below.
       const d = data.transition;
@@ -156,7 +160,22 @@
       if (newModalBackground !== modalProps.background) { modalProps.background = newModalBackground; }
    }
 
-   $: if (typeof data?.modalOptions?.transition === 'object')
+   $:
+   {
+      const newModalSlotSeparate = typeof data?.modalOptions?.slotSeparate === 'boolean' ?
+       data.modalOptions.slotSeparate : void 0;
+
+      if (newModalSlotSeparate !== modalProps.slotSeparate) { modalProps.slotSeparate = newModalSlotSeparate; }
+   }
+
+   $:
+   {
+      const newModalStyles = isObject(data?.modalOptions?.styles) ? data.modalOptions.styles : void 0;
+
+      if (newModalStyles !== modalProps.styles) { modalProps.styles = newModalStyles; }
+   }
+
+   $: if (isObject(data?.modalOptions?.transition))
    {
       // Store data.transitions to shorten statements below.
       const d = data.modalOptions.transition;
@@ -172,7 +191,7 @@
       // Provide default transition options if not defined.
       if (d?.transitionOptions !== modalProps.transitionOptions)
       {
-         modalProps.transitionOptions = typeof d?.transitionOptions === 'object' ? d.transitionOptions :
+         modalProps.transitionOptions = isObject(d?.transitionOptions) ? d.transitionOptions :
           s_MODAL_TRANSITION_OPTIONS;
       }
 
@@ -193,7 +212,7 @@
 
       if (newModalTransition !== modalProps.transition) { modalProps.transition = newModalTransition; }
 
-      const newModalTransitionOptions = typeof data?.modalOptions?.transitionOptions === 'object' ?
+      const newModalTransitionOptions = isObject(data?.modalOptions?.transitionOptions) ?
        data.modalOptions.transitionOptions : s_MODAL_TRANSITION_OPTIONS;
 
       if (newModalTransitionOptions !== modalProps.transitionOptions)
