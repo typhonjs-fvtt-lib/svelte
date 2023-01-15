@@ -34,12 +34,12 @@ export class TJSFolderRolltable extends TJSDialog
             create: {
                icon: `${CONFIG.RollTable.sidebarIcon}`,
                label: 'FOLDER.CreateTable',
-               onclick: 'createTable'
+               onPress: 'createTable'
             },
             cancel: {
                icon: 'fas fa-times',
                label: 'Cancel',
-               onclick: () =>
+               onPress: () =>
                {
                   this.options?.resolve?.(false);
                   this.close();

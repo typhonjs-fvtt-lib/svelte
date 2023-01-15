@@ -34,12 +34,12 @@ export class TJSDocumentImport extends TJSDialog
             import: {
                icon: 'fas fa-file-import',
                label: 'Import',
-               onclick: 'requestSubmit'
+               onPress: 'requestSubmit'
             },
             cancel: {
                icon: 'fas fa-times',
                label: 'Cancel',
-               onclick: () =>
+               onPress: () =>
                {
                   this.options.resolve?.(false);
                   this.close();

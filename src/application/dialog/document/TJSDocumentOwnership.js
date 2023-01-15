@@ -35,7 +35,7 @@ export class TJSDocumentOwnership extends TJSDialog
             save: {
                icon: 'far fa-save',
                label: 'Save Changes',
-               onclick: 'requestSubmit'
+               onPress: 'requestSubmit'
             }
          },
          default: 'save',

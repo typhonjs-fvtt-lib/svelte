@@ -60,12 +60,12 @@ export class TJSFolderExport extends TJSDialog
             export: {
                icon: 'fas fa-atlas',
                label: 'FOLDER.ExportTitle',
-               onclick: 'exportData'
+               onPress: 'exportData'
             },
             cancel: {
                icon: 'fas fa-times',
                label: 'Cancel',
-               onclick: () =>
+               onPress: () =>
                {
                   this.options?.resolve?.(false);
                   this.close();

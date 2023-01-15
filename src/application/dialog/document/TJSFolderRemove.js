@@ -34,12 +34,12 @@ export class TJSFolderRemove extends TJSDialog
             remove: {
                icon: 'fas fa-trash',
                label: 'FOLDER.Remove',
-               onclick: 'removeFolder'
+               onPress: 'removeFolder'
             },
             cancel: {
                icon: 'fas fa-times',
                label: 'Cancel',
-               onclick: () =>
+               onPress: () =>
                {
                   this.options?.resolve?.(false);
                   this.close();

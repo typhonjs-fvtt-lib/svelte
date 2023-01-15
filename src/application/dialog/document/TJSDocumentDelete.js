@@ -39,12 +39,12 @@ export class TJSDocumentDelete extends TJSDialog
             delete: {
                icon: 'fas fa-trash',
                label: localize('DOCUMENT.Delete', { type: localize(document.constructor.metadata.label) }),
-               onclick: 'deleteDocument'
+               onPress: 'deleteDocument'
             },
             cancel: {
                icon: 'fas fa-times',
                label: 'Cancel',
-               onclick: () => this.options.resolve?.(false)
+               onPress: () => this.options.resolve?.(false)
             }
          },
          default: 'cancel',

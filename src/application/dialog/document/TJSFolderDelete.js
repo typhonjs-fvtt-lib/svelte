@@ -34,12 +34,12 @@ export class TJSFolderDelete extends TJSDialog
             delete: {
                icon: 'fas fa-dumpster',
                label: 'FOLDER.Delete',
-               onclick: 'deleteFolder'
+               onPress: 'deleteFolder'
             },
             cancel: {
                icon: 'fas fa-times',
                label: 'Cancel',
-               onclick: () =>
+               onPress: () =>
                {
                   this.options?.resolve?.(false);
                   this.close();

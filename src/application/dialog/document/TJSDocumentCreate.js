@@ -32,7 +32,7 @@ export class TJSDocumentCreate extends TJSDialog
             create: {
                icon: 'fas fa-check',
                label: localize('DOCUMENT.Create', { type: localize(documentCls?.metadata?.label) }),
-               onclick: 'requestSubmit'
+               onPress: 'requestSubmit'
             }
          },
          default: 'create',

@@ -35,7 +35,7 @@ export class TJSFolderCreateUpdate extends TJSDialog
             submit: {
                icon: 'fas fa-check',
                label: localize(document?.id ? 'FOLDER.Update' : 'FOLDER.Create'),
-               onclick: 'requestSubmit'
+               onPress: 'requestSubmit'
             }
          },
          default: 'submit',
