@@ -63,6 +63,7 @@ export class HandlebarsFormApplication extends SvelteFormApplication
    {
       this.#innerHTML = await super._renderInner(data);
 
+      // JQuery usage via `filter`.
       this.form = this.#innerHTML.filter((i, el) => el instanceof HTMLFormElement)[0];
       if (!this.form) { this.form = this.#innerHTML.find('form')[0]; }
 

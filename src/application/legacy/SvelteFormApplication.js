@@ -2,9 +2,12 @@
 import { Position }           from '../position/Position.js';
 
 import {
+   A11yHelper,
    deepMerge,
    hasGetter,
    isApplicationShell,
+   isHMRProxy,
+   isObject,
    outroAndDestroy }          from '@typhonjs-fvtt/svelte/util';
 
 import {
@@ -146,6 +149,7 @@ export class SvelteFormApplication extends FormApplication
       return deepMerge(super.defaultOptions, {
          defaultCloseAnimation: true,     // If false the default slide close animation is not run.
          draggable: true,                 // If true then application shells are draggable.
+         focusOptions: void 0,            // Stores any assigned FocusOptions data that is applied when app is closed.
          headerButtonNoClose: false,      // If true then the close header button is removed.
          headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.
          headerNoTitleMinimized: false,   // If true then header title is hidden when application is minimized.
@@ -411,6 +415,11 @@ export class SvelteFormApplication extends FormApplication
 
       // Update the minimized UI store options.
       this.#stores.uiOptionsUpdate((storeOptions) => deepMerge(storeOptions, { minimized: this._minimized }));
+
+      // Apply any stored focus options and then remove them from options.
+      A11yHelper.applyFocusOptions(this.options.focusOptions);
+
+      delete this.options.focusOptions;
    }
 
    /**
@@ -474,6 +483,15 @@ export class SvelteFormApplication extends FormApplication
                }
 
                this.#applicationShellHolder[0] = svelteData.component;
+
+               // If Vite / HMR / svelte_hmr is enabled then add a hook to receive callbacks when the ProxyComponent
+               // refreshes. Update the element root accordingly and force an update to Position.
+               // See this issue for info about `on_hmr`:
+               // https://github.com/sveltejs/svelte-hmr/issues/57
+               if (isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
+               {
+                  svelteData.component.$$.on_hmr.push(() => () => this.#updateApplicationShell());
+               }
             }
 
             this.#svelteData.push(svelteData);
@@ -499,6 +517,15 @@ export class SvelteFormApplication extends FormApplication
             }
 
             this.#applicationShellHolder[0] = svelteData.component;
+
+            // If Vite / HMR / svelte_hmr is enabled then add a hook to receive callbacks when the ProxyComponent
+            // refreshes. Update the element root accordingly and force an update to Position.
+            // See this issue for info about `on_hmr`:
+            // https://github.com/sveltejs/svelte-hmr/issues/57
+            if (isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
+            {
+               svelteData.component.$$.on_hmr.push(() => () => this.#updateApplicationShell());
+            }
          }
 
          this.#svelteData.push(svelteData);
@@ -543,16 +570,14 @@ export class SvelteFormApplication extends FormApplication
       // main element.
       if (this.#elementTarget === null)
       {
-         const element = typeof this.options.selectorTarget === 'string' ?
-          this._element.find(this.options.selectorTarget) : this._element;
-
-         this.#elementTarget = element[0];
+         this.#elementTarget = typeof this.options.selectorTarget === 'string' ?
+          this._element[0].querySelector(this.options.selectorTarget) : this._element[0];
       }
 
-      // TODO VERIFY THIS CHECK ESPECIALLY `this.#elementTarget.length === 0`.
-      if (this.#elementTarget === null || this.#elementTarget === void 0 || this.#elementTarget.length === 0)
+      if (this.#elementTarget === null || this.#elementTarget === void 0)
       {
-         throw new Error(`SvelteFormApplication - _injectHTML: Target element '${this.options.selectorTarget}' not found.`);
+         throw new Error(
+          `SvelteFormApplication - _injectHTML: Target element '${this.options.selectorTarget}' not found.`);
       }
 
       // The initial zIndex may be set in application options or for popOut applications is stored by `_renderOuter`
@@ -836,6 +861,9 @@ export class SvelteFormApplication extends FormApplication
     */
    async _render(force = false, options = {})
    {
+      // Store any focusOptions instance.
+      if (isObject(options?.focusOptions)) { this.options.focusOptions = options.focusOptions; }
+
       if (this._state === Application.RENDER_STATES.NONE &&
        document.querySelector(`#${this.id}`) instanceof HTMLElement)
       {
@@ -928,10 +956,8 @@ export class SvelteFormApplication extends FormApplication
 
          if (this.#elementTarget === null)
          {
-            const element = typeof this.options.selectorTarget === 'string' ?
-             this._element.find(this.options.selectorTarget) : this._element;
-
-            this.#elementTarget = element[0];
+            this.#elementTarget = typeof this.options.selectorTarget === 'string' ?
+             this._element[0].querySelector(this.options.selectorTarget) : this._element[0];
          }
 
          // The initial zIndex may be set in application options or for popOut applications is stored by `_renderOuter`
