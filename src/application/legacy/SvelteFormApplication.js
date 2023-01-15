@@ -130,7 +130,7 @@ export class SvelteFormApplication extends FormApplication
        */
       Object.defineProperty(this, 'position', {
          get: () => this.#position,
-         set: (position) => { if (typeof position === 'object') { this.#position.set(position); } }
+         set: (position) => { if (isObject(position)) { this.#position.set(position); } }
       });
 
       this.#reactive = new SvelteReactive(this);
@@ -368,7 +368,7 @@ export class SvelteFormApplication extends FormApplication
 
          // If any proxy eventbus has been added then remove all event registrations from the component.
          const eventbus = entry.config.eventbus;
-         if (typeof eventbus === 'object' && typeof eventbus.off === 'function')
+         if (isObject(eventbus) && typeof eventbus.off === 'function')
          {
             eventbus.off();
             entry.config.eventbus = void 0;
@@ -497,7 +497,7 @@ export class SvelteFormApplication extends FormApplication
             this.#svelteData.push(svelteData);
          }
       }
-      else if (typeof this.options.svelte === 'object')
+      else if (isObject(this.options.svelte))
       {
          const svelteData = loadSvelteConfig({
             app: this,

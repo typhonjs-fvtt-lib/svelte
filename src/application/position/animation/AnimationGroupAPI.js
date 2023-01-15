@@ -26,7 +26,7 @@ export class AnimationGroupAPI
     */
    static #isPosition(object)
    {
-      return object !== null && typeof object === 'object' && object.animate instanceof AnimationAPI;
+      return isObject(object) && object.animate instanceof AnimationAPI;
    }
 
    /**

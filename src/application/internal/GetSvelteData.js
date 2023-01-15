@@ -1,3 +1,5 @@
+import { isObject } from '@typhonjs-fvtt/svelte/util';
+
 /**
  * Provides a helper class for {@link SvelteApplication} by combining all methods that work on the {@link SvelteData[]}
  * of mounted components. This class is instantiated and can be retrieved by the getter `svelte` via SvelteApplication.
@@ -44,7 +46,7 @@ export class GetSvelteData
    component(index)
    {
       const data = this.#svelteData[index];
-      return typeof data === 'object' ? data?.component : void 0;
+      return isObject(data) ? data?.component : void 0;
    }
 
    /**

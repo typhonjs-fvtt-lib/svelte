@@ -1,3 +1,5 @@
+import { isObject } from '@typhonjs-fvtt/svelte/util';
+
 /**
  * Provides the storage and sequencing of managed position validators. Each validator added may be a bespoke function or
  * a {@link ValidatorData} object containing an `id`, `validator`, and `weight` attributes; `validator` is the only
@@ -217,8 +219,7 @@ export class AdapterValidators
       for (const data of validators)
       {
          // Handle the case that the validator may either be a function or a validator entry / object.
-         const actualValidator = typeof data === 'function' ? data : data !== null && typeof data === 'object' ?
-          data.validator : void 0;
+         const actualValidator = typeof data === 'function' ? data : isObject(data) ? data.validator : void 0;
 
          if (!actualValidator) { continue; }
 

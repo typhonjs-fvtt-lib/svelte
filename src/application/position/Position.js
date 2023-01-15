@@ -211,7 +211,7 @@ export class Position
 
       this.#updateElementData = updateData;
 
-      if (typeof options === 'object')
+      if (isObject(options))
       {
          // Set Position options
          if (typeof options.calculateTransform === 'boolean')
