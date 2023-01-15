@@ -23,6 +23,7 @@ export class TJSFolderRolltable extends TJSDialog
       super({
          modal: typeof options?.modal === 'boolean' ? options.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
+         minimizable: false,
          ...dialogData,
          content: {
             class: TJSFolderRolltableImpl,
@@ -45,7 +46,7 @@ export class TJSFolderRolltable extends TJSDialog
                }
             }
          },
-         default: 'create',
+         default: 'cancel',
          autoClose: false,
          close: () => this.options?.resolve?.(null)
       }, options);

@@ -5,6 +5,7 @@
       s_DEFAULT_TRANSITION,
       s_DEFAULT_TRANSITION_OPTIONS }   from '@typhonjs-fvtt/svelte/transition';
 
+   import { isObject }                 from '@typhonjs-fvtt/svelte/util';
 
    /** @type {string} */
    export let background = '#50505080';
@@ -65,7 +66,7 @@
    // Run this reactive block when the last transition options state is not equal to the current options state.
    $: if (oldTransitionOptions !== transitionOptions)
    {
-      const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && typeof transitionOptions === 'object' ?
+      const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && isObject(transitionOptions) ?
        transitionOptions : s_DEFAULT_TRANSITION_OPTIONS;
 
       inTransitionOptions = newOptions;

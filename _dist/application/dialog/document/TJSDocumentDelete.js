@@ -27,6 +27,7 @@ export class TJSDocumentDelete extends TJSDialog
       super({
          modal: typeof options?.modal === 'boolean' ? options.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
+         minimizable: false,
          ...dialogData,
          content: {
             class: TJSDocumentDeleteImpl,
@@ -46,7 +47,7 @@ export class TJSDocumentDelete extends TJSDialog
                onclick: () => this.options.resolve?.(false)
             }
          },
-         default: 'delete',
+         default: 'cancel',
          close: () => this.options?.resolve?.(null)
       }, options);
 

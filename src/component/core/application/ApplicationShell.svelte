@@ -13,7 +13,9 @@
       applyStyles,
       resizeObserver }                 from '@typhonjs-fvtt/svelte/action';
 
-   import { A11yHelper }               from '@typhonjs-fvtt/svelte/util';
+   import {
+      A11yHelper,
+      isObject }                       from '@typhonjs-fvtt/svelte/util';
 
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
    import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
@@ -119,7 +121,7 @@
    // Run this reactive block when the last transition options state is not equal to the current options state.
    $: if (oldTransitionOptions !== transitionOptions)
    {
-      const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && typeof transitionOptions === 'object' ?
+      const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && isObject(transitionOptions) ?
        transitionOptions : s_DEFAULT_TRANSITION_OPTIONS;
 
       inTransitionOptions = newOptions;

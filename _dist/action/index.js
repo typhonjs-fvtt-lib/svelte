@@ -1,6 +1,6 @@
 import { isUpdatableStore, isWritableStore } from '@typhonjs-fvtt/svelte/store';
 import { styleParsePixels, debounce } from '@typhonjs-fvtt/svelte/util';
-import { hasSetter, isIterable } from '@typhonjs-fvtt/svelte/util';
+import { hasSetter, isIterable, isObject } from '@typhonjs-fvtt/svelte/util';
 import { cubicOut } from 'svelte/easing';
 
 /**
@@ -940,7 +940,7 @@ function draggable(node, { position, active = true, button = 0, storeDragging = 
 
          if (typeof options.ease === 'boolean') { ease = options.ease; }
 
-         if (typeof options.easeOptions === 'object')
+         if (isObject(options.easeOptions))
          {
             easeOptions = options.easeOptions;
             quickTo.options(easeOptions);

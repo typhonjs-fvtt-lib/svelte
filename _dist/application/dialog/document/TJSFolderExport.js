@@ -44,6 +44,7 @@ export class TJSFolderExport extends TJSDialog
       this.data = {
          modal: typeof options?.modal === 'boolean' ? options.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
+         minimizable: false,
          ...dialogData,
          content: {
             class: TJSFolderExportImpl,
@@ -71,7 +72,7 @@ export class TJSFolderExport extends TJSDialog
                }
             }
          },
-         default: 'export',
+         default: 'cancel',
          autoClose: false,
          close: () => this.options?.resolve?.(null)
       };

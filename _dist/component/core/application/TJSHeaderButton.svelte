@@ -6,6 +6,7 @@
     */
    import { applyStyles }   from '@typhonjs-fvtt/svelte/action';
    import { localize }      from '@typhonjs-fvtt/svelte/helper';
+   import { isObject }      from '@typhonjs-fvtt/svelte/util';
 
    export let button = void 0;
 
@@ -13,7 +14,7 @@
 
    let icon, label, title, styles
 
-   $: if (button)
+   $: if (isObject(button))
    {
       title = typeof button.title === 'string' ? localize(button.title) : '';
 
@@ -23,7 +24,7 @@
 
       label = typeof button.label === 'string' ? localize(button.label) : void 0;
 
-      styles = typeof button.styles === 'object' ? button.styles : void 0;
+      styles = isObject(button.styles) ? button.styles : void 0;
    }
 
    function onClick(event)

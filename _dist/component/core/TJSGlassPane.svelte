@@ -1,33 +1,34 @@
 <script>
+   import { applyStyles }              from '@typhonjs-fvtt/svelte/action';
+
    import {
       s_DEFAULT_TRANSITION,
       s_DEFAULT_TRANSITION_OPTIONS }   from '@typhonjs-fvtt/svelte/transition';
 
-   export let id = void 0;
-   export let zIndex = Number.MAX_SAFE_INTEGER;
+   import { isObject }                 from '@typhonjs-fvtt/svelte/util';
+
+   /** @type {string} */
    export let background = '#50505080';
+
+   /** @type {boolean} */
    export let captureInput = true;
-   export let preventDefault = true;
-   export let stopPropagation = true;
 
-   let glassPane;
+   /** @type {string} */
+   export let id = void 0;
 
-   $: if (glassPane)
-   {
-      glassPane.style.maxWidth = '100%';
-      glassPane.style.maxHeight = '100%';
-      glassPane.style.width = '100%';
-      glassPane.style.height = '100%';
-   }
+   /** @type {boolean} */
+   export let slotSeparate = void 0;
 
-   $: if (glassPane)
-   {
-      if (captureInput) { glassPane.focus(); }
-      glassPane.style.pointerEvents = captureInput ? 'auto' : 'none';
-   }
+   /** @type {Record<string, string>} */
+   export let styles = void 0;
 
-   $: if (glassPane) { glassPane.style.background = background; }
-   $: if (glassPane) { glassPane.style.zIndex = zIndex; }
+   /** @type {number} */
+   export let zIndex = Number.MAX_SAFE_INTEGER;
+
+   /** @type {HTMLDivElement} */
+   let backgroundEl, containerEl, glassPaneEl;
+
+   $: slotSeparate = typeof slotSeparate === 'boolean' ? slotSeparate : false;
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -65,7 +66,7 @@
    // Run this reactive block when the last transition options state is not equal to the current options state.
    $: if (oldTransitionOptions !== transitionOptions)
    {
-      const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && typeof transitionOptions === 'object' ?
+      const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && isObject(transitionOptions) ?
        transitionOptions : s_DEFAULT_TRANSITION_OPTIONS;
 
       inTransitionOptions = newOptions;
@@ -88,30 +89,83 @@
 
    // ---------------------------------------------------------------------------------------------------------------
 
+   /**
+    * Swallows / stops propagation for all events where the event target is not contained by the glass pane element.
+    *
+    * @param {Event} event - The event to swallow.
+    */
    function swallow(event)
    {
+      const targetEl = event.target;
+
+      if (targetEl !== glassPaneEl && targetEl !== backgroundEl  && targetEl !== containerEl &&
+        glassPaneEl.contains(targetEl))
+      {
+         return;
+      }
+
       if (captureInput)
       {
-         if (preventDefault) { event.preventDefault(); }
-         if (stopPropagation) { event.stopPropagation(); }
+         event.preventDefault();
+         event.stopImmediatePropagation();
       }
    }
 </script>
 
-<svelte:options accessors={true}/>
+<!-- Capture all input -->
+<svelte:window
+        on:contextmenu|capture={swallow}
+        on:dblclick|capture={swallow}
+        on:keydown|capture={swallow}
+        on:keyup|capture={swallow}
+        on:mousedown|capture={swallow}
+        on:mousemove|capture={swallow}
+        on:mouseup|capture={swallow}
+        on:pointerdown|capture={swallow}
+        on:pointermove|capture={swallow}
+        on:pointerup|capture={swallow}
+        on:touchend|capture={swallow}
+        on:touchmove|capture={swallow}
+        on:touchstart|capture={swallow}
+        on:wheel|capture={swallow}
+/>
 
 <div id={id}
-     bind:this={glassPane}
+     bind:this={glassPaneEl}
      class=tjs-glass-pane
-     in:inTransition={inTransitionOptions}
-     out:outTransition={outTransitionOptions}
-     on:keydown={swallow}>
-   <slot />
+     style:z-index={zIndex}>
+
+   {#if slotSeparate}
+      <div class=tjs-glass-pane-background
+           bind:this={backgroundEl}
+           style:background={background}
+           in:inTransition={inTransitionOptions}
+           out:outTransition={outTransitionOptions}
+           use:applyStyles={styles} />
+
+      <div class=tjs-glass-pane-container bind:this={containerEl}>
+         <slot />
+      </div>
+   {:else}
+      <div class=tjs-glass-pane-background
+           bind:this={backgroundEl}
+           style:background={background}
+           in:inTransition={inTransitionOptions}
+           out:outTransition={outTransitionOptions}
+           use:applyStyles={styles} >
+         <slot />
+      </div>
+   {/if}
 </div>
 
 <style>
-   .tjs-glass-pane {
+   .tjs-glass-pane, .tjs-glass-pane-background , .tjs-glass-pane-container {
       position: absolute;
-      overflow: inherit;
+      overflow: hidden;
+
+      height: 100%;
+      width: 100%;
+      max-height: 100%;
+      max-width: 100%;
    }
 </style>

@@ -151,8 +151,8 @@ export class TJSDialog extends SvelteApplication
     * });
     */
    static async confirm({ title, content, yes, no, render, defaultYes = true, rejectClose = false, options = {},
-    buttons = {}, draggable = true, modal = false, modalOptions = {}, popOut = true, resizable = false, transition = {},
-     zIndex } = {})
+    buttons = {}, draggable = true, focusFirst = false, modal = false, modalOptions = {}, popOut = true,
+     minimizable = true, resizable = false, transition = {}, zIndex } = {})
    {
       // Allow overwriting of default icon and labels.
       const mergedButtons = deepMerge({
@@ -173,9 +173,11 @@ export class TJSDialog extends SvelteApplication
             content,
             render,
             draggable,
+            focusFirst,
             modal,
             modalOptions,
             popOut,
+            minimizable,
             resizable,
             transition,
             zIndex,
@@ -214,8 +216,8 @@ export class TJSDialog extends SvelteApplication
     * @returns {Promise<*>} The returned value from the provided callback function, if any
     */
    static async prompt({ title, content, label, callback, render, rejectClose = false, options = {}, draggable = true,
-    icon = '<i class="fas fa-check"></i>', modal = false, modalOptions = {}, popOut = true, resizable = false,
-     transition = {}, zIndex } = {})
+    focusFirst = false, icon = '<i class="fas fa-check"></i>', modal = false, modalOptions = {}, popOut = true,
+     minimizable = true, resizable = false, transition = {}, zIndex } = {})
    {
       return new Promise((resolve, reject) =>
       {
@@ -224,9 +226,11 @@ export class TJSDialog extends SvelteApplication
             content,
             render,
             draggable,
+            focusFirst,
             modal,
             modalOptions,
             popOut,
+            minimizable,
             resizable,
             transition,
             zIndex,
@@ -257,7 +261,7 @@ export class TJSDialog extends SvelteApplication
 }
 
 /**
- * @typedef TJSConfirmConfig - Configuration options for the confirm dialog.
+ * @typedef {object} TJSConfirmConfig - Configuration options for the confirm dialog.
  *
  * @property {string}   title - The confirmation window title
  *
@@ -279,11 +283,15 @@ export class TJSDialog extends SvelteApplication
  *
  * @property {boolean}  [draggable=true] - The dialog is draggable when true.
  *
+ * @property {boolean}  [focusFirst=false] - When true the first focusable element that isn't a button is focused.
+ *
  * @property {boolean}  [modal=false] - When true a modal dialog is displayed.
  *
  * @property {object}   [modalOptions] - Additional options for modal dialog display.
  *
  * @property {boolean}  [popOut=true] - When true the dialog is a pop out Application.
+ *
+ * @property {boolean}  [minimizable=true] - When true the dialog is minimizable.
  *
  * @property {boolean}  [resizable=false] - When true the dialog is resizable.
  *
@@ -293,7 +301,7 @@ export class TJSDialog extends SvelteApplication
  */
 
 /**
- * @typedef TJSPromptConfig - Configuration options for the confirm dialog.
+ * @typedef {object} TJSPromptConfig - Configuration options for the confirm dialog.
  *
  * @property {string}   title - The confirmation window title
  *
@@ -309,6 +317,8 @@ export class TJSDialog extends SvelteApplication
  *
  * @property {object}   [options={}] - Additional application options passed to the TJSDialog.
  *
+ * @property {boolean}  [focusFirst=false] - When true the first focusable element that isn't a button is focused.
+ *
  * @property {boolean}  [draggable=true] - The dialog is draggable when true.
  *
  * @property {string}   [icon="<i class="fas fa-check"></i>"] - Set another icon besides `fa-check` for button.
@@ -318,6 +328,8 @@ export class TJSDialog extends SvelteApplication
  * @property {object}   [modalOptions] - Additional options for modal dialog display.
  *
  * @property {boolean}  [popOut=true] - When true the dialog is a pop out Application.
+ *
+ * @property {boolean}  [minimizable=true] - When true the dialog is minimizable.
  *
  * @property {boolean}  [resizable=false] - When true the dialog is resizable.
  *

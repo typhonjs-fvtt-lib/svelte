@@ -4,7 +4,9 @@ import {
    ApplicationShell,
    EmptyApplicationShell }    from '@typhonjs-fvtt/svelte/component/core';
 
-import { deepMerge }          from '@typhonjs-fvtt/svelte/util';
+import {
+   deepMerge,
+   isObject }                 from '@typhonjs-fvtt/svelte/util';
 
 export class HandlebarsApplication extends SvelteApplication
 {
@@ -22,7 +24,7 @@ export class HandlebarsApplication extends SvelteApplication
    {
       super(options);
 
-      this.options.svelte = deepMerge(typeof this.options.svelte === 'object' ?
+      this.options.svelte = deepMerge(isObject(this.options.svelte) ?
        this.options.svelte : {}, {
          class: this.popOut ? ApplicationShell : EmptyApplicationShell,
          intro: true,

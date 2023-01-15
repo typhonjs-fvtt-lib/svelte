@@ -1,5 +1,8 @@
 import { DynMapReducer }   from '@typhonjs-svelte/lib/store';
-import { hasPrototype }    from '@typhonjs-svelte/lib/util';
+
+import {
+   hasPrototype,
+   isObject }              from '@typhonjs-svelte/lib/util';
 
 /**
  */
@@ -99,7 +102,7 @@ export class EmbeddedStoreManager
       {
          ctor = options;
       }
-      else if (typeof options === 'object' && options !== null)
+      else if (isObject(options))
       {
          ({ name, ctor = DynMapReducer, ...rest } = options);
       }

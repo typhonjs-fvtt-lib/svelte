@@ -2,7 +2,9 @@ import {
    ApplicationShell,
    EmptyApplicationShell }       from '@typhonjs-fvtt/svelte/component/core';
 
-import { deepMerge }             from '@typhonjs-fvtt/svelte/util';
+import {
+   deepMerge,
+   isObject }                    from '@typhonjs-fvtt/svelte/util';
 
 import { SvelteFormApplication } from './SvelteFormApplication.js';
 
@@ -22,7 +24,7 @@ export class HandlebarsFormApplication extends SvelteFormApplication
    {
       super(object, options);
 
-      this.options.svelte = deepMerge(typeof this.options.svelte === 'object' ?
+      this.options.svelte = deepMerge(isObject(this.options.svelte) ?
        this.options.svelte : {}, {
          class: this.popOut ? ApplicationShell : EmptyApplicationShell,
          intro: true,
@@ -63,6 +65,7 @@ export class HandlebarsFormApplication extends SvelteFormApplication
    {
       this.#innerHTML = await super._renderInner(data);
 
+      // JQuery usage via `filter`.
       this.form = this.#innerHTML.filter((i, el) => el instanceof HTMLFormElement)[0];
       if (!this.form) { this.form = this.#innerHTML.find('form')[0]; }
 

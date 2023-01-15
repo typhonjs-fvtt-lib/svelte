@@ -1,10 +1,16 @@
 <script>
-   import { getContext }               from 'svelte';
-   import { fade }                     from 'svelte/transition';
+   import {
+      getContext,
+      onDestroy,
+      onMount }            from 'svelte';
 
-   import ApplicationShell             from '../application/ApplicationShell.svelte';
-   import DialogContent                from './DialogContent.svelte';
-   import TJSGlassPane                 from '../TJSGlassPane.svelte';
+   import { fade }         from 'svelte/transition';
+
+   import { isObject }     from '@typhonjs-fvtt/svelte/util';
+
+   import ApplicationShell from '../application/ApplicationShell.svelte';
+   import DialogContent    from './DialogContent.svelte';
+   import TJSGlassPane     from '../TJSGlassPane.svelte';
 
    // Application shell contract.
    export let elementContent = void 0;
@@ -43,6 +49,8 @@
    const modalProps = {
       // Background CSS style string.
       background: void 0,
+      slotSeparate: void 0,
+      styles: void 0,
 
       // Stores any transition functions.
       transition: void 0,
@@ -57,23 +65,44 @@
 
    let zIndex = void 0;
 
-   // Automatically close the dialog on button click handler completion.
-   let autoClose = true;
+   let minimizable = true;
 
    // Only set modal once on mount. You can't change between a modal an non-modal dialog during runtime.
    if (modal === void 0) { modal = typeof data?.modal === 'boolean' ? data.modal : false; }
+
+   // Special modal handling -----------------------------------------------------------------------------------------
+
+   if (modal)
+   {
+      // Add a capture listener on window keydown to act before any Foundry core Dialog listener.
+      onDestroy(() => window.removeEventListener('keydown', onKeydownModal, { capture: true }));
+      onMount(() => window.addEventListener('keydown', onKeydownModal, { capture: true }));
+   }
+   else
+   {
+      // Add a listener on document keydown that matches the Foundry core Dialog.
+      onDestroy(() => document.removeEventListener('keydown', onKeydown));
+      onMount(() => document.addEventListener('keydown', onKeydown));
+   }
+
+   // Aria Attributes ------------------------------------------------------------------------------------------------
+
+   $: if (elementRoot instanceof HTMLElement)
+   {
+      elementRoot.setAttribute('role', 'dialog');
+
+      if (modal) { elementRoot.setAttribute('aria-modal', 'true'); }
+   }
+
+   // SvelteApplication options --------------------------------------------------------------------------------------
 
    // Retrieve values from the DialogData object and also potentially set any SvelteApplication accessors.
    // Explicit checks are performed against existing local variables as the only externally reactive variable is `data`.
    // All of the checks below trigger when there are any external changes to the `data` prop.
    // Prevent any unnecessary changing of local & `application` variables unless actual changes occur.
 
-   // Foundry App options --------------------------------------------------------------------------------------------
-
-   $: if (typeof data === 'object')
+   $: if (isObject(data))
    {
-      autoClose = typeof data.autoClose === 'boolean' ? data.autoClose : true;
-
       const newZIndex = Number.isInteger(data.zIndex) || data.zIndex === null ? data.zIndex :
        modal ? Number.MAX_SAFE_INTEGER : Number.MAX_SAFE_INTEGER - 1
       if (zIndex !== newZIndex) { zIndex = newZIndex; }
@@ -81,6 +110,9 @@
       // Update the main foundry options when data changes. Perform explicit checks against existing data in `application`.
       const newDraggable = data.draggable ?? true;
       if (application.reactive.draggable !== newDraggable) { application.reactive.draggable = newDraggable; }
+
+      const newMinimizable = data.minimizable ?? true;
+      if (application.reactive.minimizable !== newMinimizable) { application.reactive.minimizable = newMinimizable; }
 
       const newPopOut = data.popOut ?? true;
       if (application.reactive.popOut !== newPopOut) { application.reactive.popOut = newPopOut; }
@@ -97,7 +129,7 @@
 
    // ApplicationShell transition options ----------------------------------------------------------------------------
 
-   $: if (typeof data?.transition === 'object')
+   $: if (isObject(data?.transition))
    {
       // Store data.transitions to shorten statements below.
       const d = data.transition;
@@ -128,7 +160,22 @@
       if (newModalBackground !== modalProps.background) { modalProps.background = newModalBackground; }
    }
 
-   $: if (typeof data?.modalOptions?.transition === 'object')
+   $:
+   {
+      const newModalSlotSeparate = typeof data?.modalOptions?.slotSeparate === 'boolean' ?
+       data.modalOptions.slotSeparate : void 0;
+
+      if (newModalSlotSeparate !== modalProps.slotSeparate) { modalProps.slotSeparate = newModalSlotSeparate; }
+   }
+
+   $:
+   {
+      const newModalStyles = isObject(data?.modalOptions?.styles) ? data.modalOptions.styles : void 0;
+
+      if (newModalStyles !== modalProps.styles) { modalProps.styles = newModalStyles; }
+   }
+
+   $: if (isObject(data?.modalOptions?.transition))
    {
       // Store data.transitions to shorten statements below.
       const d = data.modalOptions.transition;
@@ -144,7 +191,7 @@
       // Provide default transition options if not defined.
       if (d?.transitionOptions !== modalProps.transitionOptions)
       {
-         modalProps.transitionOptions = typeof d?.transitionOptions === 'object' ? d.transitionOptions :
+         modalProps.transitionOptions = isObject(d?.transitionOptions) ? d.transitionOptions :
           s_MODAL_TRANSITION_OPTIONS;
       }
 
@@ -165,7 +212,7 @@
 
       if (newModalTransition !== modalProps.transition) { modalProps.transition = newModalTransition; }
 
-      const newModalTransitionOptions = typeof data?.modalOptions?.transitionOptions === 'object' ?
+      const newModalTransitionOptions = isObject(data?.modalOptions?.transitionOptions) ?
        data.modalOptions.transitionOptions : s_MODAL_TRANSITION_OPTIONS;
 
       if (newModalTransitionOptions !== modalProps.transitionOptions)
@@ -173,18 +220,50 @@
          modalProps.transitionOptions = newModalTransitionOptions;
       }
    }
+
+   /**
+    * Handles closing all open TJSDialog instances when <Esc> key is pressed. Using `stopPropagation` allows
+    * the Foundry core Dialog keydown handler to also execute.
+    *
+    * @param {KeyboardEvent}  event - A KeyboardEvent.
+    */
+   function onKeydown(event)
+   {
+      if (event.code === 'Escape')
+      {
+         event.preventDefault();
+         event.stopPropagation();
+         application.close();
+      }
+   }
+
+   /**
+    * Handles closing any modal window and is assigned to `window` with capture acting before the Foundry Dialog keydown
+    * handler stopping immediate propagation.
+    *
+    * @param {KeyboardEvent}  event - A KeyboardEvent.
+    */
+   function onKeydownModal(event)
+   {
+      if (event.code === 'Escape')
+      {
+         event.preventDefault();
+         event.stopImmediatePropagation();
+         application.close();
+      }
+   }
 </script>
 
 <svelte:options accessors={true}/>
 
 {#if modal}
-   <TJSGlassPane id={`${application.id}-glasspane`} preventDefault={false} stopPropagation={false} {...modalProps} {zIndex}>
+   <TJSGlassPane id={`${application.id}-glasspane`} {...modalProps} {zIndex}>
       <ApplicationShell bind:elementRoot bind:elementContent {...appProps} appOffsetHeight={true}>
-         <DialogContent bind:autoClose bind:dialogInstance={dialogComponent} stopPropagation={true} {data} />
+         <DialogContent bind:dialogInstance={dialogComponent} {data} {modal} stopPropagation={true} />
       </ApplicationShell>
    </TJSGlassPane>
 {:else}
    <ApplicationShell bind:elementRoot bind:elementContent {...appProps} appOffsetHeight={true}>
-      <DialogContent bind:autoClose bind:dialogInstance={dialogComponent} {data} />
+      <DialogContent bind:dialogInstance={dialogComponent} {data} />
    </ApplicationShell>
 {/if}

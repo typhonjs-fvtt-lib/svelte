@@ -1,7 +1,7 @@
-import { isIterable, hasPrototype } from '@typhonjs-fvtt/svelte/util';
+import { isIterable, hasPrototype, isObject } from '@typhonjs-fvtt/svelte/util';
 import { derived, get, writable as writable$2 } from 'svelte/store';
 import { noop, run_all, is_function } from 'svelte/internal';
-import { uuidv4, isPlainObject, getUUIDFromDataTransfer, isObject } from '@typhonjs-fvtt/svelte/util';
+import { uuidv4, isPlainObject, getUUIDFromDataTransfer, isObject as isObject$1 } from '@typhonjs-fvtt/svelte/util';
 
 class DynReducerUtils {
     /**
@@ -3035,7 +3035,7 @@ class EmbeddedStoreManager
       {
          ctor = options;
       }
-      else if (typeof options === 'object' && options !== null)
+      else if (isObject(options))
       {
          ({ name, ctor = DynMapReducer, ...rest } = options);
       }
@@ -3504,7 +3504,7 @@ class TJSDocument
     */
    setOptions(options)
    {
-      if (!isObject(options))
+      if (!isObject$1(options))
       {
          throw new TypeError(`TJSDocument error: 'options' is not a plain object.`);
       }
@@ -3700,7 +3700,7 @@ class TJSDocumentCollection
           `TJSDocumentCollection set error: 'collection' is not a valid DocumentCollection or undefined.`);
       }
 
-      if (!isObject(options))
+      if (!isObject$1(options))
       {
          throw new TypeError(`TJSDocument set error: 'options' is not an object.`);
       }
@@ -3727,7 +3727,7 @@ class TJSDocumentCollection
     */
    setOptions(options)
    {
-      if (!isObject(options))
+      if (!isObject$1(options))
       {
          throw new TypeError(`TJSDocumentCollection error: 'options' is not an object.`);
       }

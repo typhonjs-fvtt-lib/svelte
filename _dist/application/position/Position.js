@@ -211,7 +211,7 @@ export class Position
 
       this.#updateElementData = updateData;
 
-      if (typeof options === 'object')
+      if (isObject(options))
       {
          // Set Position options
          if (typeof options.calculateTransform === 'boolean')
@@ -1286,7 +1286,7 @@ export class Position
       const validatorData = this.#validatorData;
 
       // If there are any validators allow them to potentially modify position data or reject the update.
-      if (validatorData.length)
+      if (this.#validators.enabled && validatorData.length)
       {
          s_VALIDATION_DATA.parent = parent;
 

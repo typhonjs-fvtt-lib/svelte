@@ -1,6 +1,6 @@
 import * as svelteEasingFunc from 'svelte/easing';
 import { TJSVelocityTrack } from '@typhonjs-fvtt/svelte/math';
-import { isIterable, isPlainObject } from '@typhonjs-fvtt/svelte/util';
+import { isIterable, isObject, isPlainObject } from '@typhonjs-fvtt/svelte/util';
 import { Position } from '@typhonjs-fvtt/svelte/application';
 
 let gsap = void 0;
@@ -360,7 +360,7 @@ class GsapPosition
    {
       // Load the variable arguments from arg1 / arg2.
       // If arg1 is an object then take it as the timelineOptions.
-      const timelineOptions = typeof arg1 === 'object' ? arg1 : {};
+      const timelineOptions = isObject(arg1) ? arg1 : {};
 
       // If arg1 is an array then take it as `gsapData` otherwise select arg2.
       const gsapData = isIterable(arg1) || typeof arg1 === 'function' ? arg1 : arg2;
@@ -1052,7 +1052,7 @@ class GsapCompose
 
       // Load the variable arguments from arg1 / arg2.
       // If arg1 is an object then take it as the timelineOptions.
-      const timelineOptions = typeof arg1 === 'object' ? arg1 : {};
+      const timelineOptions = isObject(arg1) ? arg1 : {};
 
       // If arg1 is an array then take it as `gsapData` otherwise select arg2.
       const gsapData = isIterable(arg1) ? arg1 : arg2;
@@ -1171,7 +1171,7 @@ function s_DISPATCH_POSITION(operation, target, options, arg1, arg2)
    {
       return GsapPosition[operation](target, options, arg1, arg2);
    }
-   else if (typeof target === 'object' && target.position instanceof Position)
+   else if (isObject(target) && target.position instanceof Position)
    {
       return GsapPosition[operation](target.position, options, arg1, arg2);
    }
@@ -1318,8 +1318,8 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-function draggableGsap(node, { position, active = true, button = 0, storeDragging = void 0, ease = true, inertia = false,
- easeOptions = { duration: 0.1, ease: 'power3.out' },
+function draggableGsap(node, { position, active = true, button = 0, storeDragging = void 0, ease = true,
+ inertia = false, easeOptions = { duration: 0.1, ease: 'power3.out' },
   inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 },
    hasTargetClassList, ignoreTargetClassList })
 {
@@ -1601,12 +1601,12 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
          if (typeof options.ease === 'boolean') { ease = options.ease; }
          if (typeof options.inertia === 'boolean') { inertia = options.inertia; }
 
-         if (typeof options.easeOptions === 'object')
+         if (isObject(options.easeOptions))
          {
             easeOptions = options.easeOptions;
          }
 
-         if (typeof options.inertiaOptions === 'object')
+         if (isObject(options.inertiaOptions))
          {
             inertiaOptions = options.inertiaOptions;
          }

@@ -23,6 +23,7 @@ export class TJSDocumentImport extends TJSDialog
       super({
          modal: typeof options?.modal === 'boolean' ? options.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
+         minimizable: false,
          ...dialogData,
          title: `${localize('DOCUMENT.ImportData')}: ${document.name}`,
          content: {
@@ -35,7 +36,7 @@ export class TJSDocumentImport extends TJSDialog
                label: 'Import',
                onclick: 'requestSubmit'
             },
-            no: {
+            cancel: {
                icon: 'fas fa-times',
                label: 'Cancel',
                onclick: () =>
@@ -45,7 +46,7 @@ export class TJSDocumentImport extends TJSDialog
                }
             }
          },
-         default: 'import',
+         default: 'cancel',
          autoClose: false, // Don't automatically close on button onclick.
          close: () => this.options.resolve?.(null)
       }, { width: 400, ...options });

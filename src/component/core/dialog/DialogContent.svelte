@@ -134,7 +134,7 @@
             dialogComponent = content;
             dialogProps = {};
          }
-         else if (typeof content === 'object')
+         else if (isObject(content))
          {
             const svelteConfig = parseSvelteConfig(content, application);
             dialogComponent = svelteConfig.class;

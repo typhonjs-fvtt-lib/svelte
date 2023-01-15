@@ -1,5 +1,7 @@
 <script>
-   import { getContext } from 'svelte';
+   import { getContext }    from 'svelte';
+
+   import { isObject }      from '@typhonjs-fvtt/svelte/util';
 
    export let warn = false;
    export let children = void 0;
@@ -12,7 +14,7 @@
    // that are potentially mounted in the content area. If no children defined then this component mounts any slotted
    // child.
    $: allChildren = Array.isArray(children) ? children :
-    typeof context === 'object' ? context.children : void 0;
+    isObject(context) ? context.children : void 0;
 </script>
 
 {#if Array.isArray(allChildren)}

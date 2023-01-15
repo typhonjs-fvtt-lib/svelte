@@ -1,3 +1,5 @@
+import { isObject } from '@typhonjs-fvtt/svelte/util';
+
 /**
  * Provides a basic {@link TJSBasicAnimation} implementation for Position animation.
  */
@@ -36,10 +38,7 @@ export class AnimationControl
       this.#willFinish = willFinish;
 
       // Set this control to animation data.
-      if (animationData !== null && typeof animationData === 'object')
-      {
-         animationData.control = this;
-      }
+      if (isObject(animationData)) { animationData.control = this; }
    }
 
    /**

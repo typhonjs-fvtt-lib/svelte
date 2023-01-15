@@ -17,7 +17,9 @@
       applyStyles,
       resizeObserver }                 from '@typhonjs-fvtt/svelte/action';
 
-   import { A11yHelper }               from '@typhonjs-fvtt/svelte/util';
+   import {
+      A11yHelper,
+      isObject }                       from '@typhonjs-fvtt/svelte/util';
 
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
    import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
@@ -57,11 +59,16 @@
    // Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
    const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth ? resizeObserver : () => null;
 
+   // Provides the internal context for data / stores of the application shell.
+   const internal = new AppShellContextInternal();
+
+   const autoFocus = internal.stores.autoFocus;
+
    // Provides options to `A11yHelper.getFocusableElements` to ignore TJSFocusWrap by CSS class.
    const s_IGNORE_CLASSES = { ignoreClasses: ['tjs-focus-wrap'] };
 
    // Internal context for `elementContent` / `elementRoot` stores.
-   setContext('internal', new AppShellContextInternal());
+   setContext('internal', internal);
 
    // Only update the `elementContent` store if the new `elementContent` is not null or undefined.
    $: if (elementContent !== void 0 && elementContent !== null)
@@ -115,7 +122,7 @@
    // Run this reactive block when the last transition options state is not equal to the current options state.
    $: if (oldTransitionOptions !== transitionOptions)
    {
-      const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && typeof transitionOptions === 'object' ?
+      const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && isObject(transitionOptions) ?
        transitionOptions : s_DEFAULT_TRANSITION_OPTIONS;
 
       inTransitionOptions = newOptions;
@@ -156,6 +163,9 @@
     * Provides focus cycling inside the application capturing `<Shift-Tab>` and if `elementRoot` or `firstFocusEl` is
     * the actively focused element then the second to last focusable element if applicable is focused.
     *
+    * Also, if a popout app all key down events will bring this application to the top such that when focus is trapped
+    * the app is top most.
+    *
     * @param {KeyboardEvent} event - Keyboard Event.
     */
    function onKeydown(event)
@@ -179,6 +189,13 @@
             event.stopPropagation();
          }
       }
+
+      // Make sure this application is top most when it receives keyboard events.
+      if (typeof application.options.popOut === 'boolean' && application.options.popOut &&
+       application !== globalThis.ui?.activeWindow)
+      {
+         application.bringToTop.call(application);
+      }
    }
 
    /**
@@ -195,11 +212,33 @@
    }
 
    /**
-    * Focus `elementContent` if the active element is external to `elementContent`.
+    * Focus `elementContent` if the event target is not focusable and `autoFocus` is enabled.
+    *
+    * Note: `autoFocus` is an internal store. This check is a bit tricky as `section.window-content` has a tabindex
+    * of '-1', so it is focusable.
     */
-   function onPointerdownContent()
+   function onPointerdownContent(event)
    {
-      if (!elementContent.contains(document.activeElement)) { elementContent.focus(); }
+      const focusable = A11yHelper.isFocusable(event.target);
+
+      if (!focusable)
+      {
+         if ($autoFocus)
+         {
+            elementContent.focus();
+         }
+         else
+         {
+            event.preventDefault();
+         }
+      }
+      else
+      {
+         if (!$autoFocus && !focusable)
+         {
+            event.preventDefault();
+         }
+      }
    }
 
    /**

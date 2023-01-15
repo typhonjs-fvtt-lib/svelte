@@ -99,8 +99,6 @@
 
    export function requestSubmit()
    {
-console.log(`!! TJSDocumentOwnership - requestSubmit`);
-console.trace();
       form.requestSubmit();
    }
 

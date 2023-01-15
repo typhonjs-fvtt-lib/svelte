@@ -17,7 +17,7 @@
    export let draggableOptions = void 0;
 
    const application = getContext('external').application;
-   const elementRoot = getContext('internal').stores.elementRoot;
+   const { autoFocus, elementRoot } = getContext('internal').stores;
 
    const storeTitle = application.reactive.storeAppOptions.title;
    const storeDraggable = application.reactive.storeAppOptions.draggable;
@@ -31,14 +31,10 @@
 
    $: draggable = typeof draggable === 'function' ? draggable : dragDefault;
 
-   // Combines external options with defaults for TJSApplicationHeader.
-   // $: dragOptions = Object.assign({}, typeof draggableOptions === 'object' ? draggableOptions : {},
-   //  { position: application.position, active: $storeDraggable, storeDragging });
-
    // Combines external options with defaults for TJSApplicationHeader. By default, easing is turned on w/ duration of
-   // 0.1 and cubicOut, but can be overridden by any provided `draggableOptions`. `position`, `active`, and
+   // 0.08 seconds and cubicOut, but can be overridden by any provided `draggableOptions`. `position`, `active`, and
    // `storeDragging` are always overridden by application position / stores.
-   $: dragOptions = Object.assign({}, { ease: true, easeOptions: { duration: 0.1, ease: cubicOut } },
+   $: dragOptions = Object.assign({}, { ease: true, easeOptions: { duration: 0.08, ease: cubicOut } },
     isObject(draggableOptions) ? draggableOptions : {}, { position: application.position, active:
      $storeDraggable, storeDragging, hasTargetClassList: ['window-header', 'window-title'] });
 
@@ -92,10 +88,19 @@
    /**
     * Explicitly focus `elementRoot` if pointer event is not consumed by header buttons / components. This allows
     * keyboard tab navigation to select header buttons.
+    *
+    * Note: if `autoFocus` internal store is set to false `elementRoot` is not focused.
     */
-   function onPointerdown()
+   function onPointerdown(event)
    {
-      if ($elementRoot?.isConnected) { $elementRoot.focus(); }
+      if ($autoFocus && $elementRoot?.isConnected)
+      {
+         $elementRoot.focus();
+      }
+      else
+      {
+         event.preventDefault();
+      }
    }
 </script>
 

@@ -1,5 +1,6 @@
 import {
    isApplicationShell,
+   isObject,
    parseSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
 
 /**
@@ -19,7 +20,7 @@ import {
  */
 export function loadSvelteConfig({ app, template, config, elementRootUpdate } = {})
 {
-   const svelteOptions = typeof config.options === 'object' ? config.options : {};
+   const svelteOptions = isObject(config.options) ? config.options : {};
 
    let target;
 
@@ -61,7 +62,7 @@ export function loadSvelteConfig({ app, template, config, elementRootUpdate } = 
    let eventbus;
 
    // Potentially inject any TyphonJS eventbus and track the proxy in the SvelteData instance.
-   if (typeof app._eventbus === 'object' && typeof app._eventbus.createProxy === 'function')
+   if (isObject(app._eventbus) && typeof app._eventbus.createProxy === 'function')
    {
       eventbus = app._eventbus.createProxy();
       externalContext.eventbus = eventbus;

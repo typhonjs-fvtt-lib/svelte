@@ -1,8 +1,10 @@
 import { gsap }         from '../gsap.js';
 
 import { Position }     from '@typhonjs-fvtt/svelte/application';
+
 import {
    isIterable,
+   isObject,
    isPlainObject }      from '@typhonjs-fvtt/svelte/util';
 
 import { GsapPosition } from './GsapPosition.js';
@@ -157,7 +159,7 @@ export class GsapCompose
 
       // Load the variable arguments from arg1 / arg2.
       // If arg1 is an object then take it as the timelineOptions.
-      const timelineOptions = typeof arg1 === 'object' ? arg1 : {};
+      const timelineOptions = isObject(arg1) ? arg1 : {};
 
       // If arg1 is an array then take it as `gsapData` otherwise select arg2.
       const gsapData = isIterable(arg1) ? arg1 : arg2;
@@ -276,7 +278,7 @@ function s_DISPATCH_POSITION(operation, target, options, arg1, arg2)
    {
       return GsapPosition[operation](target, options, arg1, arg2);
    }
-   else if (typeof target === 'object' && target.position instanceof Position)
+   else if (isObject(target) && target.position instanceof Position)
    {
       return GsapPosition[operation](target.position, options, arg1, arg2);
    }

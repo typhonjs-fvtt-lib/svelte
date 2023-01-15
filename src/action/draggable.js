@@ -1,6 +1,8 @@
-import { cubicOut }     from 'svelte/easing';
+import { cubicOut }  from 'svelte/easing';
 
-import { isIterable }   from '@typhonjs-fvtt/svelte/util';
+import {
+   isIterable,
+   isObject }        from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on a given {@link Position}
@@ -253,7 +255,7 @@ function draggable(node, { position, active = true, button = 0, storeDragging = 
 
          if (typeof options.ease === 'boolean') { ease = options.ease; }
 
-         if (typeof options.easeOptions === 'object')
+         if (isObject(options.easeOptions))
          {
             easeOptions = options.easeOptions;
             quickTo.options(easeOptions);
