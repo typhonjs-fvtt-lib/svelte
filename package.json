@@ -87,11 +87,11 @@
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "@typhonjs-svelte/lib": "github:typhonjs-svelte/lib",
     "@typhonjs-utils/file-util": "^0.0.6",
-    "deepmerge": "^4",
+    "deepmerge": "^4.2.2",
     "eslint": "^8",
     "fs-extra": "^10",
     "rollup": "^3",
-    "svelte": "^3.52.0",
+    "svelte": "^3.55.1",
     "upath": "^2"
   },
   "engines": {
