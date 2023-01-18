@@ -55,7 +55,7 @@
    {
       const fd = new FormDataExtended(event.target);
 
-      foundry.utils.mergeObject(data, fd.object, { inplace: true });
+      globalThis.foundry.utils.mergeObject(data, fd.object, { inplace: true });
 
       if (!data.folder) { delete data['folder']; }
       if (types.length === 1) { data.type = types[0]; }
