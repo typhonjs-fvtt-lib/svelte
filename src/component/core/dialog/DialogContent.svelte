@@ -196,14 +196,14 @@
                {
                   if (dialogComponent === void 0)
                   {
-                     console.warn(
-                      `TJSDialog warning: 'onPress' defined as a string with no associated content Svelte component.`);
+                     console.warn(`[TRL] TJSDialog warning: 'onPress' defined as a string with no associated ` +
+                      `content Svelte component.`);
                   }
                   else if (typeof dialogComponent?.[callback] !== 'function')
                   {
-                     console.warn(`TJSDialog warning: The content Svelte component does not contain an associated` +
-                      `function '${callback}'. Did you remember to add '<svelte:options accessors={true} />'` +
-                       `and export the function?`);
+                     console.warn(`[TRL] TJSDialog warning: The content Svelte component does not contain an ` +
+                      `associated function '${callback}'. Did you remember to add ` +
+                       `'<svelte:options accessors={true} />' and export the function?`);
                   }
                }
                break;
