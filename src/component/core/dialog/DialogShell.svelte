@@ -74,13 +74,13 @@
 
    if (modal)
    {
-      // Add a capture listener on window keydown to act before any Foundry core Dialog listener.
+      // Add a capture listener on window keydown to act before any other event listener.
       onDestroy(() => window.removeEventListener('keydown', onKeydownModal, { capture: true }));
       onMount(() => window.addEventListener('keydown', onKeydownModal, { capture: true }));
    }
    else
    {
-      // Add a listener on document keydown that matches the Foundry core Dialog.
+      // Add a listener on document keydown to act before or equal with other event listeners.
       onDestroy(() => document.removeEventListener('keydown', onKeydown));
       onMount(() => document.addEventListener('keydown', onKeydown));
    }
@@ -222,8 +222,7 @@
    }
 
    /**
-    * Handles closing all open TJSDialog instances when <Esc> key is pressed. Using `stopPropagation` allows
-    * the Foundry core Dialog keydown handler to also execute.
+    * Handles closing all open TJSDialog instances when <Esc> key is pressed.
     *
     * @param {KeyboardEvent}  event - A KeyboardEvent.
     */
@@ -238,8 +237,8 @@
    }
 
    /**
-    * Handles closing any modal window and is assigned to `window` with capture acting before the Foundry Dialog keydown
-    * handler stopping immediate propagation.
+    * Handles closing any modal window and is assigned to `window` with capture acting before any other browser wide
+    * event listeners stopping immediate propagation.
     *
     * @param {KeyboardEvent}  event - A KeyboardEvent.
     */
