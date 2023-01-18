@@ -255,11 +255,11 @@
 {#if modal}
    <TJSGlassPane id={`${application.id}-glasspane`} {...modalProps} {zIndex}>
       <ApplicationShell bind:elementRoot bind:elementContent {...appProps} appOffsetHeight={true}>
-         <DialogContent bind:dialogInstance={dialogComponent} {data} {modal} stopPropagation={true} />
+         <DialogContent bind:dialogComponent {data} {modal} stopPropagation={true} />
       </ApplicationShell>
    </TJSGlassPane>
 {:else}
    <ApplicationShell bind:elementRoot bind:elementContent {...appProps} appOffsetHeight={true}>
-      <DialogContent bind:dialogInstance={dialogComponent} {data} />
+      <DialogContent bind:dialogComponent {data} />
    </ApplicationShell>
 {/if}

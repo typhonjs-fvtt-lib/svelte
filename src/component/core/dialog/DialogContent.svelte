@@ -18,7 +18,7 @@
    export let preventDefault = false;
    export let stopPropagation = false;
 
-   export let dialogInstance = void 0;
+   export let dialogComponent = void 0;
 
    const s_REGEX_HTML = /^\s*<.*>$/;
 
@@ -31,7 +31,7 @@
    let buttonsEl;
 
    let content = void 0;
-   let dialogComponent;
+   let dialogClass;
    let dialogProps = {};
 
    let application = getContext('external').application;
@@ -104,6 +104,8 @@
          const icon = typeof b.icon !== 'string' ? void 0 : s_REGEX_HTML.test(b.icon) ? b.icon :
           `<i class="${b.icon}"></i>`;
 
+         const disabled = typeof b.disabled === 'boolean' ? b.disabled : false;
+
          const label = typeof b.label === 'string' ? `${icon !== void 0 ? ' ' : ''}${localize(b.label)}` : '';
 
          const title = typeof b.title === 'string' ? localize(b.title) : void 0;
@@ -111,7 +113,7 @@
          // Test any condition supplied otherwise default to true.
          const condition = typeof b.condition === 'function' ? b.condition.call(b) : b.condition ?? true;
 
-         if (condition) { array.push({ ...b, id: key, icon, label, title }); }
+         if (condition) { array.push({ ...b, id: key, icon, label, title, disabled }); }
 
          return array;
       }, []);
@@ -131,13 +133,13 @@
       {
          if (isSvelteComponent(content))
          {
-            dialogComponent = content;
+            dialogClass = content;
             dialogProps = {};
          }
          else if (isObject(content))
          {
             const svelteConfig = parseSvelteConfig(content, application);
-            dialogComponent = svelteConfig.class;
+            dialogClass = svelteConfig.class;
             dialogProps = svelteConfig.props ?? {};
 
             // Check for any children parsed and added to the external context.
@@ -148,13 +150,13 @@
          }
          else
          {
-            dialogComponent = void 0;
+            dialogClass = void 0;
             dialogProps = {};
          }
       }
       catch (err)
       {
-         dialogComponent = void 0;
+         dialogClass = void 0;
          dialogProps = {};
 
          content = err.message;
@@ -175,24 +177,34 @@
       {
          let result = null;
 
-         // Accept either `onPress`, `callback`, `onClick` or `onclick` as the function / data to invoke.
-         const invoke = button.onPress ?? button.callback ?? button.onClick ?? button.onclick;
+         const callback = button?.onPress;
 
-         switch (typeof invoke)
+         switch (typeof callback)
          {
             case 'function':
-               // Passing back the HTML element is to keep with the existing Foundry API, however second parameter is
-               // the Svelte component instance.
-               result = invoke(application.options.jQuery ? application.element : application.element[0],
-                dialogInstance);
+               // Pass back the TJSDialog instance.
+               result = callback(application);
                break;
 
             case 'string':
                // Attempt lookup by function name in dialog instance component.
-               if (dialogInstance !== void 0 && typeof dialogInstance[invoke] === 'function')
+               if (dialogComponent !== void 0 && typeof dialogComponent[callback] === 'function')
                {
-                  result = dialogInstance[invoke](application.options.jQuery ? application.element :
-                   application.element[0], dialogInstance);
+                  result = dialogComponent[callback](application);
+               }
+               else
+               {
+                  if (dialogComponent === void 0)
+                  {
+                     console.warn(
+                      `TJSDialog warning: 'onPress' defined as a string with no associated content Svelte component.`);
+                  }
+                  else if (typeof dialogComponent?.[callback] !== 'function')
+                  {
+                     console.warn(`TJSDialog warning: The content Svelte component does not contain an associated` +
+                      `function '${callback}'. Did you remember to add '<svelte:options accessors={true} />'` +
+                       `and export the function?`);
+                  }
                }
                break;
          }
@@ -327,8 +339,8 @@
    <div bind:this={contentEl} class=dialog-content>
       {#if typeof content === 'string'}
          {@html content}
-      {:else if dialogComponent}
-         <svelte:component bind:this={dialogInstance} this={dialogComponent} {...dialogProps} />
+      {:else if dialogClass}
+         <svelte:component bind:this={dialogComponent} this={dialogClass} {...dialogProps} />
       {/if}
    </div>
 
@@ -338,6 +350,7 @@
       <button class="dialog-button {button.id}"
               on:click|preventDefault|stopPropagation={() => onClick(button)}
               on:focus={() => currentButtonId = button.id}
+              disabled={button.disabled}
               use:applyStyles={button.styles}>
          <span title={button.title}>{#if button.icon}{@html button.icon}{/if}{button.label}</span>
       </button>
