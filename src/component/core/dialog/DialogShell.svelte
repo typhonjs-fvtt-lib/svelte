@@ -12,7 +12,7 @@
    import DialogContent    from './DialogContent.svelte';
    import TJSGlassPane     from '../TJSGlassPane.svelte';
 
-   // Application shell contract.
+   // ApplicationShell contract.
    export let elementContent = void 0;
    export let elementRoot = void 0;
 
@@ -113,9 +113,6 @@
 
       const newMinimizable = data.minimizable ?? true;
       if (application.reactive.minimizable !== newMinimizable) { application.reactive.minimizable = newMinimizable; }
-
-      const newPopOut = data.popOut ?? true;
-      if (application.reactive.popOut !== newPopOut) { application.reactive.popOut = newPopOut; }
 
       const newResizable = data.resizable ?? false;
       if (application.reactive.resizable !== newResizable) { application.reactive.resizable = newResizable; }
