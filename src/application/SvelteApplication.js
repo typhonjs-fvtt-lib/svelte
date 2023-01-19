@@ -101,6 +101,8 @@ export class SvelteApplication extends Application
    #stores;
 
    /**
+    * @param {SvelteApplicationOptions} options - The options for the application.
+    *
     * @inheritDoc
     */
    constructor(options = {})
@@ -141,7 +143,7 @@ export class SvelteApplication extends Application
    /**
     * Specifies the default options that SvelteApplication supports.
     *
-    * @returns {object} options - Application options.
+    * @returns {SvelteApplicationOptions} options - Application options.
     * @see https://foundryvtt.com/api/Application.html#options
     */
    static get defaultOptions()
@@ -160,6 +162,7 @@ export class SvelteApplication extends Application
          positionOrtho: true,             // When true Position is optimized for orthographic use.
          positionValidator: Position.Validators.transformWindow, // A function providing the default validator.
          sessionStorage: void 0,          // An instance of SessionStorage to share across SvelteApplications.
+         svelte: void 0,                  // A Svelte configuration object.
          transformOrigin: 'top left'      // By default, 'top / left' respects rotation when minimizing.
       });
    }
@@ -971,6 +974,40 @@ export class SvelteApplication extends Application
       }
    }
 }
+
+/**
+ * @typedef {ApplicationOptions} SvelteApplicationOptions
+ *
+ * @property {boolean}  [defaultCloseAnimation=true] - If false the default slide close animation is not run.
+ *
+ * @property {boolean}  [draggable=true] - If true then application shells are draggable.
+ *
+ * @property {object}   [focusOptions] - Defines A11yHelper focus target to apply when application closes.
+ *
+ * @property {boolean}  [headerButtonNoClose=false] - If true then the close header button is removed.
+ *
+ * @property {boolean}  [headerButtonNoLabel=false] - If true then header button labels are removed.
+ *
+ * @property {boolean}  [headerNoTitleMinimized=false] - If true then header title is hidden when minimized.
+ *
+ * @property {number}   [minHeight=MIN_WINDOW_HEIGHT] - Assigned to position. Number specifying minimum window height.
+ *
+ * @property {number}   [minWidth=MIN_WINDOW_WIDTH] - Assigned to position. Number specifying minimum window width.
+ *
+ * @property {boolean}  [positionable=true] - If false then `position.set` does not take effect.
+ *
+ * @property {PositionInitialHelper}   [positionInitial] - A helper for initial position placement.
+ *
+ * @property {boolean}  [positionOrtho=true] - When true Position is optimized for orthographic use.
+ *
+ * @property {PositionValidatorOptions}   [positionValidator] - A validator function or data or list of validators.
+ *
+ * @property {object}   [sessionStorage] - An instance of TJSSessionStorage to share across SvelteApplications.
+ *
+ * @property {object}   [svelte] - A Svelte configuration object defining the main component.
+ *
+ * @property {string}   [transformOrigin='top left'] - By default, 'top / left' respects rotation when minimizing.
+ */
 
 /**
  * @typedef {object} SvelteData

@@ -3,7 +3,11 @@ import {
    safeAccess,
    safeSet }   from '@typhonjs-fvtt/svelte/util';
 
-export class DialogData
+/**
+ * Provides storage for all dialog options adding `get`, `merge` and `set` methods that safely access and update
+ * data changed to the mounted DialogShell component.
+ */
+export class TJSDialogData
 {
    /**
     * @type {SvelteApplication}

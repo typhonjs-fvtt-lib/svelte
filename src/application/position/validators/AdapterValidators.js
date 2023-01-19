@@ -72,7 +72,7 @@ export class AdapterValidators
     * Provides an iterator for validators.
     *
     * @returns {Generator<ValidatorData|undefined>} Generator / iterator of validators.
-    * @yields {ValidatorData<T>}
+    * @yields {ValidatorData}
     */
    *[Symbol.iterator]()
    {
@@ -85,7 +85,7 @@ export class AdapterValidators
    }
 
    /**
-    * @param {...(ValidatorFn<T>|ValidatorData<T>)}   validators -
+    * @param {...(ValidatorFn|ValidatorData)}   validators -
     */
    add(...validators)
    {
@@ -208,7 +208,7 @@ export class AdapterValidators
    }
 
    /**
-    * @param {...(ValidatorFn<T>|ValidatorData<T>)}   validators -
+    * @param {...(ValidatorFn|ValidatorData)}   validators -
     */
    remove(...validators)
    {
@@ -249,7 +249,7 @@ export class AdapterValidators
     * Remove validators by the provided callback. The callback takes 3 parameters: `id`, `validator`, and `weight`.
     * Any truthy value returned will remove that validator.
     *
-    * @param {function(*, ValidatorFn<T>, number): boolean} callback - Callback function to evaluate each validator
+    * @param {function(*, ValidatorFn, number): boolean} callback - Callback function to evaluate each validator
     *                                                                  entry.
     */
    removeBy(callback)
@@ -337,4 +337,9 @@ export class AdapterValidators
  * @property {number}      [weight=1] - A number between 0 and 1 inclusive to position this validator against others.
  *
  * @property {Function}    [subscribe] - Optional subscribe function following the Svelte store / subscribe pattern.
+ */
+
+/**
+ * @typedef {ValidatorFn|ValidatorData|Iterable<ValidatorFn|ValidatorData>} PositionValidatorOptions Defines the
+ *          position validator options.
  */

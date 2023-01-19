@@ -1358,11 +1358,11 @@ const s_VALIDATION_DATA = {
 Object.seal(s_VALIDATION_DATA);
 
 /**
- * @typedef {object} InitialHelper
+ * @typedef {object} PositionInitialHelper
  *
- * @property {Function} getLeft - A function that takes the width parameter and returns the left position.
+ * @property {(width: number) => number} getLeft - Returns the left position given the width of the browser window.
  *
- * @property {Function} getTop - A function that takes the height parameter and returns the top position.
+ * @property {(height: number) => number} getTop - Returns the top position given the height of the browser window.
  */
 
 /**
@@ -1424,7 +1424,7 @@ Object.seal(s_VALIDATION_DATA);
  *
  * @property {boolean} calculateTransform - When true always calculate transform data.
  *
- * @property {InitialHelper} initialHelper - Provides a helper for setting initial position data.
+ * @property {PositionInitialHelper} initialHelper - Provides a helper for setting initial position data.
  *
  * @property {boolean} ortho - Sets Position to orthographic mode using just transform / matrix3d for positioning.
  *
