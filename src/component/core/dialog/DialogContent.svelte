@@ -169,6 +169,9 @@
     *
     * @param {object}   button - button data.
     *
+    * TODO: Consider adding try / catch block around callback invocation. Requires app eventbus to post UI notification
+    * error to remain platform / API neutral.
+    *
     * @returns {*}
     */
    function onClick(button)
