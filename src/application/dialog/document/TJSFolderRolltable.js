@@ -48,7 +48,7 @@ export class TJSFolderRolltable extends TJSDialog
          },
          default: 'cancel',
          autoClose: false,
-         close: () => this.options?.resolve?.(null)
+         onClose: () => this.options?.resolve?.(null)
       }, options);
 
       /**

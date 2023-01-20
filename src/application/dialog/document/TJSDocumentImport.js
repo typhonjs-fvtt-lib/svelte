@@ -48,7 +48,7 @@ export class TJSDocumentImport extends TJSDialog
          },
          default: 'cancel',
          autoClose: false, // Don't automatically close on button onclick.
-         close: () => this.options.resolve?.(null)
+         onClose: () => this.options.resolve?.(null)
       }, { width: 400, ...options });
 
       /**

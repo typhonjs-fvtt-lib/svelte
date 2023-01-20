@@ -48,7 +48,7 @@ export class TJSDocumentDelete extends TJSDialog
             }
          },
          default: 'cancel',
-         close: () => this.options?.resolve?.(null)
+         onClose: () => this.options?.resolve?.(null)
       }, options);
 
       /**

@@ -37,7 +37,7 @@ export class TJSDocumentCreate extends TJSDialog
          },
          default: 'create',
          autoClose: false,
-         close: () => this.options?.resolve?.(null)
+         onClose: () => this.options?.resolve?.(null)
       }, { width: 320, ...options });
    }
 

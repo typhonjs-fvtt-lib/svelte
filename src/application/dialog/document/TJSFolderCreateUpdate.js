@@ -40,7 +40,7 @@ export class TJSFolderCreateUpdate extends TJSDialog
          },
          default: 'submit',
          autoClose: false,
-         close: () => this.options?.resolve?.(null)
+         onClose: () => this.options?.resolve?.(null)
       }, options);
 
       /**
