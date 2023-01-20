@@ -169,8 +169,7 @@
     *
     * @param {object}   button - button data.
     *
-    * TODO: Consider adding try / catch block around callback invocation. Requires app eventbus to post UI notification
-    * error to remain platform / API neutral.
+    * TODO: When app eventbus is available send event for UI notification instead of Foundry API usage.
     *
     * @returns {*}
     */
@@ -219,6 +218,7 @@
       }
       catch(err)
       {
+         // TODO: When app eventbus is available send event for UI notification instead of Foundry API usage.
          globalThis.ui.notifications.error(err);
          throw new Error(err);
       }
