@@ -267,6 +267,9 @@ export class SvelteApplication extends Application
       const states = Application.RENDER_STATES;
       if (!options.force && ![states.RENDERED, states.ERROR].includes(this._state)) { return; }
 
+      // Resolve any managed Promise.
+      if (this.state.promises.active) { this.state.promises.resolve(); }
+
       // Unsubscribe from any local stores.
       this.#stores.unsubscribe();
 
