@@ -1,5 +1,5 @@
 import { DialogShell }        from '@typhonjs-fvtt/svelte/component/core';
-import { localize }           from '@typhonjs-fvtt/svelte/helper';
+
 import {
    deepMerge,
    isObject }                 from '@typhonjs-fvtt/svelte/util';
@@ -8,12 +8,32 @@ import { TJSDialogData }      from './internal/TJSDialogData.js';
 import { SvelteApplication }  from './SvelteApplication.js';
 
 /**
- * Provides a near Foundry API compatible dialog alternative implemented w/ Svelte. There are several features including
- * a glasspane / modal option with various styling and transition capabilities. Most importantly the `content`
- * attribute of dialog data can be a Svelte component configuration object to render HTML content.
+ * Provides a reactive dialog implementation configured from a unique dialog options object. The dialog features a
+ * bottom button bar for user selection.
  *
- * TODO: document all dialog data parameters; keep track of newly added like button -> styles, title; modal,
- * draggable, transition options, modal transitions
+ * A glasspane / modal option with various styling and transition capabilities is available when setting `modal: true`.
+ *
+ * Most importantly the `content` attribute of dialog data can be a Svelte component configuration object to render
+ * your custom component as the dialog content. When using a Svelte component as the content you can assign a string
+ * to the various `on<XXX>` dialog callbacks and an exported function from your component will be invoked to handle the
+ * button callback. All dialog button callbacks and `onClose` callback receive a single argument which is the dialog /
+ * application instance.
+ *
+ * When making a form with form validation or other dialog that you don't want to close immediately on button press you
+ * can set `autoClose: false`, however you are 100% in control of resolving any Promise callbacks from button presses
+ * and also closing the application.
+ *
+ * There is a handy Promise management capability to track a single Promise for the lifetime of an application available
+ * at `this.state.promises`. See the {@link PromiseManager} for more information. By default when the user closes the
+ * dialog / application any managed Promise is resolved with undefined.
+ *
+ * Please refer to {@link TJSDialogOptions} for the various options used to construct the dialog.
+ *
+ * There are a couple of static helper methods to quickly create standard dialogs such as a 'yes' / 'no' confirmation
+ * dialog with {@link TJSDialog.confirm} and an 'ok' single button dialog with {@link TJSDialog.prompt}. To render
+ * and retrieve asynchronous results from a pure TJSDialogOptions object as data please use {@link TJSDialog.wait}.
+ *
+ * TODO: document all extended dialog data parameters such as transition options / modal transitions.
  */
 export class TJSDialog extends SvelteApplication
 {
@@ -84,6 +104,8 @@ export class TJSDialog extends SvelteApplication
     */
    set data(data)
    {
+      if (!isObject) { throw TypeError(`TJSDialog set error: 'data' is not an object'.`); }
+
       const descriptors = Object.getOwnPropertyDescriptors(this.#data);
 
       // Remove old data for all configurable descriptors.
@@ -104,12 +126,30 @@ export class TJSDialog extends SvelteApplication
     *
     * @param {boolean}  [options.force] - Force close regardless of render state.
     *
-    * @returns {Promise<void>} A Promise which resolves once the application is closed.
+    * @returns {Promise<void>} A Promise which resolves once the application is closed with the callback value or
+    *                          `true`.
     */
    async close(options)
    {
-      // Invoke any `onClose` function defined in dialog data.
-      if (this.data.onClose !== void 0) { TJSDialog.#invokeFn(this.data.onClose, this); }
+      try
+      {
+         const result = TJSDialog.#invokeFn(this.#data.onClose, this);
+         const rejectClose = typeof this.#data.rejectClose === 'boolean' ? this.#data.rejectClose : false;
+
+         if (rejectClose && result === void 0)
+         {
+            this.state.promises.reject(new Error('TJSDialog was closed without a choice being made.'));
+         }
+         else
+         {
+            this.state.promises.resolve(result);
+         }
+      }
+      catch (err)
+      {
+         // If there is a managed Promise reject it or re-throw error.
+         if (!this.state.promises.reject(err)) { throw err; }
+      }
 
       return super.close(options);
    }
@@ -118,67 +158,62 @@ export class TJSDialog extends SvelteApplication
 
    /**
     * A helper factory method to create simple confirmation dialog windows which consist of simple yes / no prompts.
-    * If you require more flexibility, a custom Dialog instance is preferred.
+    * If you require more flexibility, a custom TJSDialog instance is preferred. The default focused button is 'yes'.
+    * You can change the default focused button by setting `default` to `yes` or `no`.
     *
     * @param {TJSDialogOptions} data - Confirm dialog options.
     *
-    * @param {Record<string, TJSDialogButtonData>}  [data.buttons={}] - Provides a button override that is merged
-    *        with default buttons allowing a change in icon / label for the default buttons.
-    *
-    * @param {boolean}  [data.defaultYes=true] - Make `yes` the default choice?
-    *
-    * @param {string|((application: TJSDialog) => any)} [data.yes] - Callback function upon `yes`; may be an async
+    * @param {string|((application: TJSDialog) => any)} [data.onYes] - Callback function upon `yes`; may be an async
     *        function. When defined as a string any matching function by name exported from content Svelte component is
     *        invoked.
     *
-    * @param {string|((application: TJSDialog) => any)} [data.no] - Callback function upon `no`; may be an async
+    * @param {string|((application: TJSDialog) => any)} [data.onNo] - Callback function upon `no`; may be an async
     *        function. When defined as a string any matching function by name exported from content Svelte component is
     *        invoked.
     *
-    * @param {boolean}  [data.rejectClose=false] - Reject the Promise if the dialog is closed without making a choice.
+    * @param {SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog constructor.
     *
-    * @returns {Promise<any>} A promise which resolves with result of yes / no callbacks or true / false.
+    * @returns {Promise<*>} A promise which resolves with result of yes / no callbacks or true / false.
     *
     * @example
-    * let d = TJSDialog.confirm({
+    * let d = await TJSDialog.confirm({
     *  title: "A Yes or No Question",
     *  content: "<p>Choose wisely.</p>",
-    *  yes: () => console.log("You chose ... wisely"),
-    *  no: () => console.log("You chose ... poorly"),
-    *  defaultYes: false
+    *  onYes: () => console.log("YES Result"),
+    *  onNo: () => console.log("NO Result")
     * });
     */
-   static async confirm({ buttons = {}, defaultYes = true, yes, no, ...data } = {})
+   static async confirm({ onYes, onNo, ...data } = {}, options = {})
    {
       // Allow overwriting of default icon and labels.
       const mergedButtons = deepMerge({
          yes: {
             icon: 'fas fa-check',
-            label: localize('Yes')
+            label: 'Yes'
          },
          no: {
             icon: 'fas fa-times',
-            label: localize('No'),
+            label: 'No',
          }
-      }, buttons);
+      }, data.buttons ?? {});
 
       return this.wait({
          ...data,
          buttons: deepMerge(mergedButtons, {
             yes: {
-               onPress: async (application) => this.#invokeFn(yes, application, true)
+               onPress: (application) => this.#invokeFn(onYes, application, true)
             },
             no: {
-               onPress: async (application) => this.#invokeFn(no, application, false)
+               onPress: (application) => this.#invokeFn(onNo, application, false)
             }
          }),
-         default: defaultYes ? 'yes' : 'no'
-      });
+         default: data.default ?? 'yes'
+      }, options);
    }
 
    /**
     * A helper method to invoke a callback function directly or lookup an exported function with the same name from any
-    * content Svelte component to invoke.
+    * content Svelte component to invoke. This is used internally to apply default values for `confirm` and `prompt`.
     *
     * @param {string|((application: TJSDialog) => any)} callback - Callback function to invoke; may be an async
     *        function. When defined as a string any matching function by name exported from content Svelte component is
@@ -188,9 +223,9 @@ export class TJSDialog extends SvelteApplication
     *
     * @param {*} [defaultResult] - An optional default result to return; undefined if not specified.
     *
-    * @returns {Promise<any>} Result.
+    * @returns {*} Result.
     */
-   static async #invokeFn(callback, application, defaultResult = void 0)
+   static #invokeFn(callback, application, defaultResult = void 0)
    {
       let result = defaultResult;
 
@@ -198,7 +233,7 @@ export class TJSDialog extends SvelteApplication
       {
          case 'function':
             // Pass the dialog instance to the callback.
-            result = await callback(application);
+            result = callback(application);
             break;
 
          case 'string':
@@ -208,7 +243,7 @@ export class TJSDialog extends SvelteApplication
             // Attempt lookup by function name in dialog instance component.
             if (dialogComponent !== void 0 && typeof dialogComponent?.[callback] === 'function')
             {
-               result = await dialogComponent?.[callback](application);
+               result = dialogComponent?.[callback](application);
             }
             else
             {
@@ -236,7 +271,7 @@ export class TJSDialog extends SvelteApplication
     *
     * @param {TJSDialogOptions} [data] - Prompt dialog options.
     *
-    * @param {string|((application: TJSDialog) => any)} [data.callback] - Callback function upon `ok`; may be an async
+    * @param {string|((application: TJSDialog) => any)} [data.onOk] - Callback function upon `ok`; may be an async
     *        function. When defined as a string any matching function by name exported from content Svelte component is
     *        invoked.
     *
@@ -244,12 +279,12 @@ export class TJSDialog extends SvelteApplication
     *
     * @param {string}   [data.icon="fas fa-check"] - Set another icon besides `fas fa-check` for button.
     *
-    * @param {boolean}  [data.rejectClose=false] - Reject the Promise if the dialog is closed without making a choice.
+    * @param {SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog constructor.
     *
-    * @returns {Promise<any|boolean>} The returned value from the provided callback function or `true` if the button
+    * @returns {Promise<*>} The returned value from the provided callback function or `true` if the button
     *          is pressed.
     */
-   static async prompt({ callback, label, icon = 'fas fa-check', ...data } = {})
+   static async prompt({ onOk, label, icon = 'fas fa-check', ...data } = {}, options = {})
    {
       return this.wait({
          ...data,
@@ -257,109 +292,42 @@ export class TJSDialog extends SvelteApplication
             ok: {
                icon,
                label,
-               onPress: async (application) => this.#invokeFn(callback, application, true)
+               onPress: (application) => this.#invokeFn(onOk, application, true)
             }
          },
          default: 'ok'
-      });
+      }, options);
    }
 
    /**
     * Wrap a data defined TJSDialog with an enclosing Promise which resolves or rejects when the client makes a choice.
     *
-    * @param {TJSDialogOptions}  [data] - Dialog data passed to the TJSDialog constructor.
-    *
-    * @param {boolean}           [data.resolveId=false] - When true and there are undefined results from any button
-    *        callbacks the button ID is returned.
-    *
-    * @param {boolean}           [data.rejectClose=false] - When true and there are undefined results reject Promise.
+    * @param {TJSDialogOptions}  data - Dialog data passed to the TJSDialog constructor.
     *
     * @param {SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog constructor.
     *
-    * @param {object}            [renderOptions]   Render options passed to the TJSDialog render call.
-    *
-    * @returns {Promise<any>} A Promise that resolves to the chosen result.
+    * @returns {Promise<*>} A Promise that resolves to the chosen result.
     */
-   static async wait(data = {}, options = {}, renderOptions = {})
+   static async wait(data, options = {})
    {
-      // Explicitly define `rejectClose` and `resolveId` if available in dialog data otherwise default to false.
-      const rejectClose = typeof data?.rejectClose === 'boolean' ? data.rejectClose : false;
-      const resolveId = typeof data?.resolveId === 'boolean' ? data.resolveId : false;
+      if (!isObject) { throw TypeError(`TJSDialog.wait error: 'data' is not an object'.`); }
 
-      return new Promise((resolve, reject) =>
-      {
-         // Tracks if a valid result is determined from a button press or default button ID.
-         let isResolved = false;
+      // Instantiate and render the dialog.
+      const dialog = new this({ ...data }, options);
+      dialog.render(true, { focus: true });
 
-         // Stores the wrapped `data.buttons`.
-         const wrappedButtons = {};
-
-         if (isObject(data.buttons))
-         {
-            // Wrap buttons with Promise resolution. Allow button callback functions to be async.
-            for (const [id, button] of Object.entries(data.buttons))
-            {
-               /** @type {string|Function} */
-               const callback = button.onPress;
-
-               // Don't override the actual `onPress` callback supplied in `data.buttons`.
-               wrappedButtons[id] = Object.assign({}, button);
-
-               wrappedButtons[id].onPress = async (application) =>
-               {
-                  // Button is pressed and this function will resolve the Promise.
-                  isResolved = true;
-
-                  const result = this.#invokeFn(callback, application);
-
-                  // Handle the case when default button IDs are desired and there are no callback results.
-                  resolve(resolveId && result === void 0 ? id : result);
-               };
-            }
-         }
-
-         const closeCallback = data.onClose;
-
-         /**
-          * Provides a customized close method that is invoked when the application is closed. If `rejectClose` is
-          * true and a result has not been resolved above then the Promise returned from `TJSDialog.wait` is rejected.
-          *
-          * @param {TJSDialog} application - The dialog application.
-          */
-         const resolveClose = async (application) =>
-         {
-            if (!isResolved)
-            {
-               const result = await (typeof closeCallback === 'function' ? closeCallback(application) : void 0);
-
-               if (rejectClose && result === void 0)
-               {
-                  reject(new Error('TJSDialog was closed without a choice being made.'));
-               }
-               else
-               {
-                  resolve(result);
-               }
-            }
-         };
-
-         // Instantiate and render the dialog.
-         new this({ ...data, buttons: wrappedButtons, onClose: resolveClose }, options).render(true, renderOptions);
-      });
+      // Return a managed Promise which is automatically resolved on button press via `DialogContent` component or when
+      // the dialog is closed.
+      return dialog.state.promises.create();
    }
 }
 
 /**
  * @typedef {object} TJSDialogOptions - Defines the common dialog configuration data.
  *
+ * @property {Record<string, TJSDialogButtonData>}  [buttons={}] - Provides configuration of the dialog button bar.
+ *
  * @property {object|string}  content - A Svelte configuration object or HTML string content.
- *
- * @property {Record<string, TJSDialogButtonData>}  [buttons={}] - Provides a button override that is merged with default
- *           buttons.
- *
- * @property {string|((application: TJSDialog) => any)} [onClose] - Callback invoked when dialog is closed; no button
- *           option selected. When defined as a string any matching function by name exported from content Svelte
- *           component is invoked.
  *
  * @property {string}   [default] - The default button ID to focus initially.
  *
@@ -367,15 +335,25 @@ export class TJSDialog extends SvelteApplication
  *
  * @property {boolean}  [focusFirst=false] - When true the first focusable element that isn't a button is focused.
  *
+ * @property {boolean}  [minimizable=true] - When true the dialog is minimizable.
+ *
  * @property {boolean}  [modal=false] - When true a modal dialog is displayed.
  *
  * @property {object}   [modalOptions] - Additional options for modal dialog display.
  *
- * @property {boolean}  [minimizable=true] - When true the dialog is minimizable.
+ * @property {string|((application: TJSDialog) => any)} [onClose] - Callback invoked when dialog is closed; no button
+ *           option selected. When defined as a string any matching function by name exported from content Svelte
+ *           component is invoked.
  *
- * @property {SvelteApplicationOptions}   [options={}] - Additional application options passed to the TJSDialog.
+ * @property {boolean}  [rejectClose=false] - When true and a Promise has been created by `TJSDialog.wait` or
+ *           directly by `this.state.promises.create()` if the Promise is not in the process of being resolved or
+ *           rejected on close of the dialog any `onClose` function is invoked and any result that is undefined will
+ *           cause the Promise to then be rejected.
  *
  * @property {boolean}  [resizable=false] - When true the dialog is resizable.
+ *
+ * @property {boolean}  [resolveId=false] - When true and resolving any Promises and there are undefined results from
+ *           any button callbacks the button ID is resolved.
  *
  * @property {string}   [title] - The dialog window title.
  *
@@ -387,6 +365,8 @@ export class TJSDialog extends SvelteApplication
 
 /**
  * @typedef {object} TJSDialogButtonData - TJSDialog button data.
+ *
+ * @property {boolean} [autoClose=true] - When false the dialog does not automatically close when button selected.
  *
  * @property {boolean|(() => boolean)} [condition] - Determines if the button is accessible providing a truthy value.
  *

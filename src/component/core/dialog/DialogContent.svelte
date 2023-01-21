@@ -13,7 +13,7 @@
       isSvelteComponent,
       parseSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
 
-   export let data = {};
+   export let data = void 0;
    export let modal = false;
    export let preventDefault = false;
    export let stopPropagation = false;
@@ -80,6 +80,9 @@
       }
    }
 
+   // Automatically close the dialog on button click handler completion.
+   $: autoClose = typeof data.autoClose === 'boolean' ? data.autoClose : true;
+
    // When true the first focusable element that isn't a button is focused.
    $: focusFirst = typeof data.focusFirst === 'boolean' ? data.focusFirst : false;
 
@@ -90,8 +93,8 @@
       if (buttonEl instanceof HTMLElement) { buttonEl.focus(); }
    }
 
-   // Automatically close the dialog on button click handler completion.
-   $: autoClose = typeof data.autoClose === 'boolean' ? data.autoClose : true;
+   // When false the dialog does not automatically close when button selected.
+   $: resolveId = typeof data.resolveId === 'boolean' ? data.resolveId : false;
 
    // If `data.buttons` is not an object then set an empty array otherwise reduce the button data.
    $:
@@ -104,6 +107,8 @@
          const icon = typeof b.icon !== 'string' ? void 0 : s_REGEX_HTML.test(b.icon) ? b.icon :
           `<i class="${b.icon}"></i>`;
 
+         const autoClose = typeof b.autoClose === 'boolean' ? b.autoClose : true;
+
          const disabled = typeof b.disabled === 'boolean' ? b.disabled : false;
 
          const label = typeof b.label === 'string' ? `${icon !== void 0 ? ' ' : ''}${localize(b.label)}` : '';
@@ -113,7 +118,7 @@
          // Test any condition supplied otherwise default to true.
          const condition = typeof b.condition === 'function' ? b.condition.call(b) : b.condition ?? true;
 
-         if (condition) { array.push({ ...b, id: key, icon, label, title, disabled }); }
+         if (condition) { array.push({ ...b, id: key, autoClose, icon, label, title, disabled }); }
 
          return array;
       }, []);
@@ -177,7 +182,7 @@
    {
       try
       {
-         let result = null;
+         let result = void 0;
 
          const callback = button?.onPress;
 
@@ -211,16 +216,26 @@
                break;
          }
 
-         // Delay closing to next clock tick to be able to return result.
-         if (autoClose) { setTimeout(() => application.close(), 0); }
+         if (button.autoClose && autoClose)
+         {
+            // If `resolveId` dialog option is true and current result is undefined then set result to the button ID.
+            if (resolveId && result === void 0) { result = button.id; }
 
-         return result;
+            application?.state?.promises.resolve(result);
+
+            application.close();
+         }
       }
       catch(err)
       {
          // TODO: When app eventbus is available send event for UI notification instead of Foundry API usage.
          globalThis.ui.notifications.error(err);
-         throw new Error(err);
+
+         // Attempt to first reject the error with any current managed Promise otherwise rethrow error.
+         if (!application?.state?.promises?.reject(err))
+         {
+            throw new Error(err);
+         }
       }
    }
 
