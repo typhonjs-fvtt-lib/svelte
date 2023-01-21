@@ -133,7 +133,7 @@ export class TJSDialog extends SvelteApplication
    {
       try
       {
-         const result = TJSDialog.#invokeFn(this.#data.onClose, this);
+         const result = TJSDialog.#invokeFn(this.#data.onClose, this, null);
          const rejectClose = typeof this.#data.rejectClose === 'boolean' ? this.#data.rejectClose : false;
 
          if (rejectClose && result === void 0)

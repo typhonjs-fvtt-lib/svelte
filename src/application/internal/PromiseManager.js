@@ -3,6 +3,8 @@
  * be lightly managed during the lifetime of an application. Presently when a promise is created via
  * {@link PromiseManager.create} it is only automatically resolved when the application is closed. You are in control
  * of resolving and rejecting any results for this Promise otherwise.
+ *
+ * The default return value when the Promise is automatically resolved in {@link SvelteApplication.close} is `null`.
  */
 export class PromiseManager
 {
