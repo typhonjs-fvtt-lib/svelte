@@ -31,7 +31,7 @@
    if (!packs.length)
    {
       globalThis.ui.notifications.warn(localize('FOLDER.ExportWarningNone', { type: document.type }));
-      application.options.resolve?.(null);
+      application.state.promises.resolve(null);
       application.close();
    }
 
