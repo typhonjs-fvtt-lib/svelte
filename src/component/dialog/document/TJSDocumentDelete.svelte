@@ -52,9 +52,7 @@
       // Remove the delete Document function callback as we are intentionally deleting below.
       doc.setOptions({ delete: void 0 });
 
-      const returnDoc = await document.delete(context);
-
-      application.options.resolve?.(returnDoc);
+      return document.delete(context);
    }
 </script>
 

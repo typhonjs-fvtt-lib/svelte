@@ -8,6 +8,26 @@ import { localize }              from '@typhonjs-fvtt/svelte/helper';
  */
 export class TJSDocumentCreate extends TJSDialog
 {
+   /**
+    * Create a new Document of the type specified by `documentCls` by rendering a dialog window to provide basic
+    * creation details.
+    *
+    * @param {object} documentCls - Document class to create.
+    *
+    * @param {object} [data] - Document data.
+    *
+    * @param {object} [context={}] - Additional context options or dialog positioning options.
+    *
+    * @param {object} [context.parent] - A parent Document within which these Documents should be embedded.
+    *
+    * @param {object} [context.pack] - A Compendium pack identifier within which the Documents should be modified.
+    *
+    * @param {boolean} [context.renderSheet] - Render the sheet for the new document.
+    *
+    * @param {...SvelteApplicationOptions} [context.options] - Rest of options to pass to TJSDialog / Application.
+    *
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    */
    constructor(documentCls, data = {}, { parent = null, pack = null, renderSheet = true, ...options } = {},
     dialogData = {})
    {
@@ -30,14 +50,13 @@ export class TJSDocumentCreate extends TJSDialog
          title: localize('DOCUMENT.Create', { type: localize(documentCls?.metadata?.label) }),
          buttons: {
             create: {
+               autoClose: false,
                icon: 'fas fa-check',
                label: localize('DOCUMENT.Create', { type: localize(documentCls?.metadata?.label) }),
                onPress: 'requestSubmit'
             }
          },
-         default: 'create',
-         autoClose: false,
-         onClose: () => this.options?.resolve?.(null)
+         default: 'create'
       }, { width: 320, ...options });
    }
 
@@ -55,14 +74,17 @@ export class TJSDocumentCreate extends TJSDialog
     *
     * @param {object} [context.pack] - A Compendium pack identifier within which the Documents should be modified.
     *
-    * @param {...*} [context.options] - Rest of options to pass to TJSDialog / Application.
+    * @param {boolean} [context.renderSheet] - Render the sheet for the new document.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {...SvelteApplicationOptions} [context.options] - Rest of options to pass to TJSDialog / Application.
+    *
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<Document|null>} The newly created document or a falsy value; either 'false' for cancelling
     *                                   or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
-   static async show(documentCls, data = {}, { parent = null, pack = null, ...options } = {}, dialogData = {})
+   static async show(documentCls, data = {}, { parent = null, pack = null, renderSheet = true, ...options } = {},
+    dialogData = {})
    {
       if (!Object.prototype.isPrototypeOf.call(foundry.abstract.Document, documentCls))
       {
@@ -76,11 +98,10 @@ export class TJSDocumentCreate extends TJSDialog
          return null;
       }
 
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSDocumentCreate(documentCls, data, { parent, pack, ...options }, dialogData).render(
-          true, { focus: true });
-      });
+      const dialog = new TJSDocumentCreate(documentCls, data, { parent, pack, renderSheet, ...options }, dialogData);
+
+      dialog.render(true, { focus: true });
+
+      return dialog.state.promises.create();
    }
 }

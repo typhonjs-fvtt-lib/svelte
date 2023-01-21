@@ -21,13 +21,13 @@ export class TJSFolderExport extends TJSDialog
     *
     * @param {boolean} [opts.keepId=true] - Keep document IDs.
     *
-    * @param {...*} [opts.options] - Rest of options to pass to TJSDialog / Application.
+    * @param {...SvelteApplicationOptions} [opts.options] - Rest of options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<CompendiumCollection|boolean|null>} The compendium collection the folder is exported to or a
-    * falsy value; either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header
-    * button.
+    *          falsy value; either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the
+    *          close header button.
     */
    constructor(document, { pack, merge, keepId, ...options } = {}, dialogData = {})
    {
@@ -37,12 +37,12 @@ export class TJSFolderExport extends TJSDialog
       const packs = globalThis.game.packs.filter((p) => (p.documentName === document.type) && !p.locked);
       if (!packs.length)
       {
-         this.options?.resolve?.(null);
+         this.state.promises.resolve(null);
          return globalThis.ui.notifications.warn(localize("FOLDER.ExportWarningNone", { type: document.type }));
       }
 
       this.data = {
-         modal: typeof options?.modal === 'boolean' ? options.modal : true,
+         modal: typeof dialogData?.modal === 'boolean' ? dialogData.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
          minimizable: false,
          ...dialogData,
@@ -58,6 +58,7 @@ export class TJSFolderExport extends TJSDialog
          title: `${localize('FOLDER.ExportTitle')}: ${document.name}`,
          buttons: {
             export: {
+               autoClose: false,
                icon: 'fas fa-atlas',
                label: 'FOLDER.ExportTitle',
                onPress: 'exportData'
@@ -65,16 +66,10 @@ export class TJSFolderExport extends TJSDialog
             cancel: {
                icon: 'fas fa-times',
                label: 'Cancel',
-               onPress: () =>
-               {
-                  this.options?.resolve?.(false);
-                  this.close();
-               }
+               onPress: () => false
             }
          },
-         default: 'cancel',
-         autoClose: false,
-         onClose: () => this.options?.resolve?.(null)
+         default: 'cancel'
       };
    }
 
@@ -91,13 +86,13 @@ export class TJSFolderExport extends TJSDialog
     *
     * @param {boolean} [opts.keepId=true] - Keep document IDs.
     *
-    * @param {...*} [opts.options] - Rest of options to pass to TJSDialog / Application.
+    * @param {...SvelteApplicationOptions} [opts.options] - Rest of options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<CompendiumCollection|boolean|null>} The compendium collection the folder is exported to or a
-    * falsy value; either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header
-    * button.
+    *          falsy value; either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the
+    *          close header button.
     */
    static async show(document, { pack, merge, keepId, ...options } = {}, dialogData = {})
    {
@@ -114,10 +109,10 @@ export class TJSFolderExport extends TJSDialog
          return globalThis.ui.notifications.warn(localize('FOLDER.ExportWarningNone', { type: document.type }));
       }
 
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSFolderExport(document, { pack, merge, keepId, ...options }, dialogData).render(true, { focus: true });
-      });
+      const dialog = new TJSFolderExport(document, { pack, merge, keepId, ...options }, dialogData);
+
+      dialog.render(true, { focus: true });
+
+      return dialog.state.promises.create();
    }
 }

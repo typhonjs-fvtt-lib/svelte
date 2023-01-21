@@ -62,14 +62,14 @@
 
       const document = await documentCls.create(data, { parent, pack, renderSheet });
 
-      application.options.resolve?.(document);
+      application.state.promises.resolve(document);
       application.close();
    }
 </script>
 
 <svelte:options accessors={true}/>
 
-<form bind:this={form} on:submit|preventDefault={saveData} id="document-create" autocomplete="off">
+<form bind:this={form} on:submit|preventDefault={saveData} autocomplete="off">
    <div class="form-group">
       <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>{localize('Name')}</label>

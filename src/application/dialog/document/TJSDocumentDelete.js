@@ -12,20 +12,20 @@ import { hasSetter }             from '@typhonjs-fvtt/svelte/util';
 export class TJSDocumentDelete extends TJSDialog
 {
    /**
-    * @param {foundry.abstract.Document}  document -
+    * @param {foundry.abstract.Document} document - Document to delete.
     *
     * @param {object} [opts] - Additional context options or dialog positioning options.
     *
     * @param {object} [opts.context] - DocumentModificationContext.
     *
-    * @param {...*} [opts.options] - Rest of options to pass to TJSDialog / Application.
+    * @param {...SvelteApplicationOptions} [opts.options] - Rest of options to pass to TJSDialog / Application.
     *
-    * @param {object}   dialogData -
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     */
    constructor(document, { context = {}, ...options } = {}, dialogData = {})
    {
       super({
-         modal: typeof options?.modal === 'boolean' ? options.modal : true,
+         modal: typeof dialogData?.modal === 'boolean' ? dialogData.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
          minimizable: false,
          ...dialogData,
@@ -44,11 +44,10 @@ export class TJSDocumentDelete extends TJSDialog
             cancel: {
                icon: 'fas fa-times',
                label: 'Cancel',
-               onPress: () => this.options.resolve?.(false)
+               onPress: () => false
             }
          },
-         default: 'cancel',
-         onClose: () => this.options?.resolve?.(null)
+         default: 'cancel'
       }, options);
 
       /**
@@ -91,12 +90,12 @@ export class TJSDocumentDelete extends TJSDialog
     *
     * @param {object} [opts.context] - DocumentModificationContext.
     *
-    * @param {...*} [opts.options] - Rest of options to pass to TJSDialog / Application.
+    * @param {...SvelteApplicationOptions} [opts.options] - Rest of options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<Document|boolean|null>} The document if deleted or a falsy value; either 'false' for cancelling
-    *                                   or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    *          or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async show(document, { context = {}, ...options } = {}, dialogData = {})
    {
@@ -112,10 +111,10 @@ export class TJSDocumentDelete extends TJSDialog
          return null;
       }
 
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSDocumentDelete(document, { context, ...options }, dialogData).render(true, { focus: true });
-      });
+      const dialog = new TJSDocumentDelete(document, { context, ...options }, dialogData);
+
+      dialog.render(true, { focus: true });
+
+      return dialog.state.promises.create();
    }
 }

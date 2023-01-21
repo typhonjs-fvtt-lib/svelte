@@ -67,11 +67,11 @@
             keepId
          });
 
-         application.options.resolve?.(pack);
+         application.state.promises.resolve(pack);
       }
       else
       {
-         application.options.resolve?.(false);
+         application.state.promises.resolve(false);
       }
 
       application.close();

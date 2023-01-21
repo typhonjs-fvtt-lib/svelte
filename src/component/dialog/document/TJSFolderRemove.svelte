@@ -37,10 +37,7 @@
       // Remove the delete Document function callback as we are intentionally deleting below.
       doc.setOptions({ delete: void 0 });
 
-      const folder = await document.delete({ deleteSubfolders: false, deleteContents: false });
-
-      application.options.resolve?.(folder);
-      application.close();
+      return document.delete({ deleteSubfolders: false, deleteContents: false });
    }
 </script>
 

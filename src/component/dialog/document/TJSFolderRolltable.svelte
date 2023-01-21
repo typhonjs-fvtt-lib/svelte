@@ -34,10 +34,7 @@
     */
    export async function createTable()
    {
-      const rollTable = await RollTable.fromFolder(document);
-
-      application.options.resolve?.(rollTable);
-      application.close();
+      return RollTable.fromFolder(document);
    }
 </script>
 

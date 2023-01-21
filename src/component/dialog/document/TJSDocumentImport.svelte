@@ -44,7 +44,7 @@
 
       const importedDoc = await document.importFromJSON(json);
 
-      application.options.resolve?.(importedDoc);
+      application.state.promises.resolve(importedDoc);
       application.close();
    }
 

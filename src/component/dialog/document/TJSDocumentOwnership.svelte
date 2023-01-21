@@ -130,7 +130,7 @@
       // Update all documents in a Folder
       if ($doc instanceof Folder)
       {
-         const cls = getDocumentClass($doc.type);
+         const cls = globalThis.getDocumentClass($doc.type);
          const updates = $doc.contents.map((d) =>
          {
             const ownership = globalThis.foundry.utils.deepClone(d.ownership);
@@ -146,7 +146,7 @@
 
          await cls.updateDocuments(updates, { diff: false, recursive: false, noHook: true });
 
-         application.options.resolve?.($doc);
+         application.state.promises.resolve($doc);
          application.close();
          return;
       }
@@ -154,14 +154,14 @@
       // Update a single Document
       await $doc.update({ ownership: ownershipLevels }, { diff: false, recursive: false, noHook: true });
 
-      application.options.resolve?.($doc);
+      application.state.promises.resolve($doc);
       application.close();
    }
 </script>
 
 <svelte:options accessors={true}/>
 
-<form bind:this={form} on:submit|preventDefault={saveData} id=permission-control>
+<form bind:this={form} on:submit|preventDefault={saveData}>
    <p class=notes>{instructions}</p>
 
    <div class=form-group>

@@ -12,16 +12,16 @@ import { hasSetter }                from '@typhonjs-fvtt/svelte/util';
 export class TJSDocumentOwnership extends TJSDialog
 {
    /**
-    * @param {foundry.abstract.Document}  document -
+    * @param {foundry.abstract.Document} document - Document instance to modify.
     *
-    * @param {object}   options -
+    * @param {SvelteApplicationOptions} [options] - Rest of options to pass to TJSDialog / Application.
     *
-    * @param {object}   dialogData -
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     */
    constructor(document, options = {}, dialogData = {})
    {
       super({
-         modal: typeof options?.modal === 'boolean' ? options.modal : true,
+         modal: typeof dialogData?.modal === 'boolean' ? dialogData.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
          focusFirst: true,
          minimizable: false,
@@ -33,14 +33,13 @@ export class TJSDocumentOwnership extends TJSDialog
          title: `${localize('OWNERSHIP.Title')}: ${document.name}`,
          buttons: {
             save: {
+               autoClose: false,
                icon: 'far fa-save',
                label: 'Save Changes',
                onPress: 'requestSubmit'
             }
          },
-         default: 'save',
-         autoClose: false,
-         onClose: () => this.options?.resolve?.(null)
+         default: 'save'
       }, options);
 
       /**
@@ -64,9 +63,9 @@ export class TJSDocumentOwnership extends TJSDialog
     *
     * @param {foundry.abstract.Document} document - Document instance to modify.
     *
-    * @param {object} [options] - Rest of options to pass to TJSDialog / Application.
+    * @param {SvelteApplicationOptions} [options] - Rest of options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<Document|null>} The modified document or 'null' if the user closed the dialog via `<Esc>` or the
     *                                   close header button.
@@ -79,10 +78,10 @@ export class TJSDocumentOwnership extends TJSDialog
          return null;
       }
 
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSDocumentOwnership(document, options, dialogData).render(true, { focus: true });
-      });
+      const dialog = new TJSDocumentOwnership(document, options, dialogData);
+
+      dialog.render(true, { focus: true });
+
+      return dialog.state.promises.create();
    }
 }

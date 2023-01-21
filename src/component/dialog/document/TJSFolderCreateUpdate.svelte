@@ -92,7 +92,7 @@
          modifiedDoc = await Folder.create(document);
       }
 
-      application.options.resolve?.(modifiedDoc);
+      application.state.promises.resolve(modifiedDoc);
       application.close();
    }
 </script>
