@@ -2,7 +2,8 @@
    import {
       getContext,
       onDestroy,
-      onMount }            from 'svelte';
+      onMount,
+      setContext }         from 'svelte';
 
    import { fade }         from 'svelte/transition';
 
@@ -21,7 +22,11 @@
 
    export let dialogComponent = void 0;
 
+   export let managedPromise = void 0;
+
    const application = getContext('external').application;
+
+   setContext('#managedPromise', managedPromise);
 
    const s_MODAL_TRANSITION = fade;
    const s_MODAL_TRANSITION_OPTIONS = { duration: 200 };

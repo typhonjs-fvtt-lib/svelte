@@ -80,9 +80,9 @@ export class TJSDialogData
    onClose;
 
    /**
-    * When true and a Promise has been created by `TJSDialog.wait` or directly by `this.state.promises.create()` if the
-    * Promise is not in the process of being resolved or rejected on close of the dialog any `onClose` function is
-    * invoked and any result that is undefined will cause the Promise to then be rejected.
+    * When true and a Promise has been created by {@link TJSDialog.wait} and the Promise is not in the process of being
+    * resolved or rejected on close of the dialog any `onClose` function is invoked and any result that is undefined
+    * will cause the Promise to then be rejected.
     *
     * @type {boolean}
     */

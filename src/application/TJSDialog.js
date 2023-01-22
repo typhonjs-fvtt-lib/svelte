@@ -2,7 +2,8 @@ import { DialogShell }        from '@typhonjs-fvtt/svelte/component/core';
 
 import {
    deepMerge,
-   isObject }                 from '@typhonjs-fvtt/svelte/util';
+   isObject,
+   ManagedPromise }           from '@typhonjs-fvtt/svelte/util';
 
 import { TJSDialogData }      from './internal/TJSDialogData.js';
 import { SvelteApplication }  from './SvelteApplication.js';
@@ -21,26 +22,32 @@ import { SvelteApplication }  from './SvelteApplication.js';
  *
  * When making a form with form validation or other dialog that you don't want to close immediately on button press you
  * can set `autoClose: false`, however you are 100% in control of resolving any Promise callbacks from button presses
- * and also closing the application.
+ * and also closing the application. Each button can also be configured with `autoClose: false` in the button data.
  *
- * There is a handy Promise management capability to track a single Promise for the lifetime of an application available
- * at `this.state.promises`. See the {@link PromiseManager} for more information. By default when the user closes the
- * dialog / application any managed Promise is resolved with undefined.
+ * There is a handy Promise management capability to track a single Promise for the lifetime of a dialog available
+ * at {@link TJSDialog.managedPromise}. By default when the user closes the dialog / application any managed Promise is
+ * resolved with `null`. The managed Promise is available in any Svelte content component by using
+ * `const managedPromise = getContext('#managedPromise')`. When handling any custom resolution particularly when
+ * setting `autoClose: false` for a given button you are 100% in control of resolving or rejecting asynchronous data to
+ * return from the dialog.
+ *
+ * To create and wait upon a managed promise for asynchronous return results use the static or member variation of
+ * {@link TJSDialog.wait}.
  *
  * Please refer to {@link TJSDialogOptions} for the various options used to construct the dialog.
  *
  * There are a couple of static helper methods to quickly create standard dialogs such as a 'yes' / 'no' confirmation
- * dialog with {@link TJSDialog.confirm} and an 'ok' single button dialog with {@link TJSDialog.prompt}. To render
- * and retrieve asynchronous results from a pure TJSDialogOptions object as data please use {@link TJSDialog.wait}.
+ * dialog with {@link TJSDialog.confirm} and an 'ok' single button dialog with {@link TJSDialog.prompt}.
  *
  * TODO: document all extended dialog data parameters such as transition options / modal transitions.
  */
 export class TJSDialog extends SvelteApplication
 {
-   /**
-    * @type {TJSDialogData}
-    */
+   /** @type {TJSDialogData} */
    #data;
+
+   /** @type {ManagedPromise} */
+   #managedPromise;
 
    /**
     * @param {TJSDialogOptions}           data - Dialog options.
@@ -50,6 +57,8 @@ export class TJSDialog extends SvelteApplication
    constructor(data, options = {})
    {
       super(options);
+
+      this.#managedPromise = new ManagedPromise();
 
       this.#data = new TJSDialogData(this);
       this.data = data;
@@ -83,7 +92,13 @@ export class TJSDialog extends SvelteApplication
             class: DialogShell,
             intro: true,
             target: document.body,
-            props: function() { return { data: this.#data }; } // this context is the SvelteApplication when invoked.
+            props: function() // `this` is the TJSDialog instance when invoked.
+            {
+               return {
+                  data: this.#data,
+                  managedPromise: this.#managedPromise
+               };
+            }
          }
       });
    }
@@ -92,10 +107,13 @@ export class TJSDialog extends SvelteApplication
     * Returns the dialog data.
     *
     * @returns {TJSDialogData} Dialog data.
-    *
-    * TODO: Update with TJSDialogOptions above.
     */
    get data() { return this.#data; }
+
+   /**
+    * @returns {ManagedPromise} Returns the managed promise.
+    */
+   get managedPromise() { return this.#managedPromise; }
 
    /**
     * Sets the dialog data; this is reactive.
@@ -104,7 +122,7 @@ export class TJSDialog extends SvelteApplication
     */
    set data(data)
    {
-      if (!isObject) { throw TypeError(`TJSDialog set error: 'data' is not an object'.`); }
+      if (!isObject) { throw TypeError(`TJSDialog set data error: 'data' is not an object'.`); }
 
       const descriptors = Object.getOwnPropertyDescriptors(this.#data);
 
@@ -136,22 +154,57 @@ export class TJSDialog extends SvelteApplication
          const result = TJSDialog.#invokeFn(this.#data.onClose, this, null);
          const rejectClose = typeof this.#data.rejectClose === 'boolean' ? this.#data.rejectClose : false;
 
-         if (rejectClose && result === void 0)
+         if (rejectClose && result === null)
          {
-            this.state.promises.reject(new Error('TJSDialog was closed without a choice being made.'));
+            this.#managedPromise.reject(new Error('TJSDialog was closed without a choice being made.'));
          }
          else
          {
-            this.state.promises.resolve(result);
+            this.#managedPromise.resolve(result);
          }
       }
       catch (err)
       {
          // If there is a managed Promise reject it or re-throw error.
-         if (!this.state.promises.reject(err)) { throw err; }
+         if (!this.#managedPromise.reject(err)) { throw err; }
       }
 
       return super.close(options);
+   }
+
+   /**
+    * Brings to top or renders this dialog returning a Promise that is resolved any button pressed or when the dialog
+    * is closed.
+    *
+    * Creates an anonymous data defined TJSDialog returning a Promise that can be awaited upon for the user to make a
+    * choice.
+    *
+    * Note: `null` is returned if the dialog is closed without a user making a choice.
+    *
+    * @template T
+    *
+    * @param {object}   [options] - Options.
+    *
+    * @param {boolean}  [options.reuse=false] - When true if there is an existing managed Promise this allows multiple
+    *        sources to await on the same result.
+    *
+    * @returns {Promise<T>} A promise for dialog resolution.
+    */
+   async wait(options)
+   {
+      // TODO: Direct usage of Foundry core Application API.
+      if (this.rendered)
+      {
+         this.bringToTop();
+      }
+      else
+      {
+         this.render(true, { focus: true });
+      }
+
+      // Return a managed Promise which is automatically resolved on button press via `DialogContent` component or when
+      // the dialog is closed.
+      return this.#managedPromise.create(options);
    }
 
    // ---------------------------------------------------------------------------------------------------------------
@@ -300,25 +353,25 @@ export class TJSDialog extends SvelteApplication
    }
 
    /**
-    * Wrap a data defined TJSDialog with an enclosing Promise which resolves or rejects when the client makes a choice.
+    * Creates an anonymous data defined TJSDialog returning a Promise that can be awaited upon for the user to make a
+    * choice.
+    *
+    * Note: By default `null` is returned if the dialog is closed without a user making a choice.
+    *
+    * @template T
     *
     * @param {TJSDialogOptions}  data - Dialog data passed to the TJSDialog constructor.
     *
     * @param {SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog constructor.
     *
-    * @returns {Promise<*>} A Promise that resolves to the chosen result.
+    * @returns {Promise<T>} A Promise that resolves to the chosen result.
     */
    static async wait(data, options = {})
    {
       if (!isObject) { throw TypeError(`TJSDialog.wait error: 'data' is not an object'.`); }
 
       // Instantiate and render the dialog.
-      const dialog = new this({ ...data }, options);
-      dialog.render(true, { focus: true });
-
-      // Return a managed Promise which is automatically resolved on button press via `DialogContent` component or when
-      // the dialog is closed.
-      return dialog.state.promises.create();
+      return new this({ ...data }, options).wait();
    }
 }
 
@@ -345,10 +398,9 @@ export class TJSDialog extends SvelteApplication
  *           option selected. When defined as a string any matching function by name exported from content Svelte
  *           component is invoked.
  *
- * @property {boolean}  [rejectClose=false] - When true and a Promise has been created by `TJSDialog.wait` or
- *           directly by `this.state.promises.create()` if the Promise is not in the process of being resolved or
- *           rejected on close of the dialog any `onClose` function is invoked and any result that is undefined will
- *           cause the Promise to then be rejected.
+ * @property {boolean}  [rejectClose=false] - When true and a Promise has been created by {@link TJSDialog.wait} and
+ *           the Promise is not in the process of being resolved or rejected on close of the dialog any `onClose`
+ *           function is invoked and any result that is undefined will cause the Promise to then be rejected.
  *
  * @property {boolean}  [resizable=false] - When true the dialog is resizable.
  *

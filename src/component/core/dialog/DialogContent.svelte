@@ -37,6 +37,8 @@
    let application = getContext('external').application;
    let { autoFocus, elementRoot } = getContext('internal').stores;
 
+   let managedPromise = getContext('#managedPromise');
+
    let currentButtonId = data.default;
 
    // Turn off autofocusing app shell / window content when modal.
@@ -221,7 +223,7 @@
             // If `resolveId` dialog option is true and current result is undefined then set result to the button ID.
             if (resolveId && result === void 0) { result = button.id; }
 
-            application?.state?.promises.resolve(result);
+            managedPromise.resolve(result);
 
             application.close();
          }
@@ -232,10 +234,7 @@
          globalThis.ui.notifications.error(err);
 
          // Attempt to first reject the error with any current managed Promise otherwise rethrow error.
-         if (!application?.state?.promises?.reject(err))
-         {
-            throw new Error(err);
-         }
+         if (!managedPromise.reject(err)) { throw new Error(err); }
       }
    }
 
