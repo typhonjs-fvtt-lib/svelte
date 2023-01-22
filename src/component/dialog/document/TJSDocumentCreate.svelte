@@ -11,7 +11,7 @@
    export let pack = null;
    export let renderSheet = true;
 
-   const { application } = getContext('external');
+   const { application } = getContext('#external');
 
    const managedPromise = getContext('#managedPromise');
 

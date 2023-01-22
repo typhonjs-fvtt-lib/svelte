@@ -24,7 +24,7 @@
 
    export let managedPromise = void 0;
 
-   const application = getContext('external').application;
+   const application = getContext('#external').application;
 
    setContext('#managedPromise', managedPromise);
 

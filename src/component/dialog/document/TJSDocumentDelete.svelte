@@ -10,7 +10,7 @@
    /** @type {object} DocumentModificationContext */
    export let context = {};
 
-   const { application } = getContext('external');
+   const { application } = getContext('#external');
 
    if (!(document instanceof globalThis.foundry.abstract.Document))
    {

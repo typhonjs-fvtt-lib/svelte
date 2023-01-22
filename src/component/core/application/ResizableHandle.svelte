@@ -3,7 +3,7 @@
 
    export let isResizable = false;
 
-   const application = getContext('external').application;
+   const application = getContext('#external').application;
 
    // Allows retrieval of the element root at runtime.
    const storeElementRoot = getContext('storeElementRoot');

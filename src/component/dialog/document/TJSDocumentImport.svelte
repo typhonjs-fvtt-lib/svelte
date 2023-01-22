@@ -7,7 +7,7 @@
    /** @type {foundry.abstract.Document} */
    export let document = void 0;
 
-   const { application } = getContext('external');
+   const { application } = getContext('#external');
 
    const managedPromise = getContext('#managedPromise');
 

@@ -11,7 +11,7 @@
 
    const s_REGEX_HEX_COLOR = /^#(?:[0-9a-fA-F]{3}){1,2}$/;
 
-   const { application } = getContext('external');
+   const { application } = getContext('#external');
 
    const managedPromise = getContext('#managedPromise');
 

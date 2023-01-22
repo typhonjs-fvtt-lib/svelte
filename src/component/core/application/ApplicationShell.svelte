@@ -81,7 +81,7 @@
       getContext('internal').stores.elementRoot.set(elementRoot);
    }
 
-   const context = getContext('external');
+   const context = getContext('#external');
 
    // Store application reference.
    const application = context.application;

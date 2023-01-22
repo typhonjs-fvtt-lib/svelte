@@ -6,7 +6,7 @@
    export let warn = false;
    export let children = void 0;
 
-   const context = getContext('external');
+   const context = getContext('#external');
 
    let allChildren;
 

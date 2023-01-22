@@ -34,7 +34,7 @@
    let dialogClass;
    let dialogProps = {};
 
-   let application = getContext('external').application;
+   let application = getContext('#external').application;
    let { autoFocus, elementRoot } = getContext('internal').stores;
 
    let managedPromise = getContext('#managedPromise');

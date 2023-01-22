@@ -16,7 +16,7 @@
    export let draggable = void 0;
    export let draggableOptions = void 0;
 
-   const application = getContext('external').application;
+   const application = getContext('#external').application;
    const { autoFocus, elementRoot } = getContext('internal').stores;
 
    const storeTitle = application.reactive.storeAppOptions.title;
