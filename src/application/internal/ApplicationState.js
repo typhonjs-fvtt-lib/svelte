@@ -5,8 +5,6 @@ import { isObject }           from '@typhonjs-fvtt/svelte/util';
 
 import { TJSSessionStorage }  from '@typhonjs-fvtt/svelte/store';
 
-import { PromiseManager }     from './PromiseManager.js';
-
 export class ApplicationState
 {
    /** @type {ApplicationShellExt} */
@@ -14,9 +12,6 @@ export class ApplicationState
 
    /** @type {Map<string, ApplicationStateData>} */
    #dataSaved = new Map();
-
-   /** @type {PromiseManager} */
-   #promiseManager;
 
    /** @type {TJSSessionStorage} */
    #sessionStorage;
@@ -28,8 +23,6 @@ export class ApplicationState
    {
       this.#application = application;
 
-      this.#promiseManager = new PromiseManager();
-
       const optionsSessionStorage = application?.options?.sessionStorage;
 
       if (optionsSessionStorage !== void 0 && !(optionsSessionStorage instanceof TJSSessionStorage))
@@ -38,14 +31,6 @@ export class ApplicationState
       }
 
       this.#sessionStorage = optionsSessionStorage !== void 0 ? optionsSessionStorage : new TJSSessionStorage();
-   }
-
-   /**
-    * @returns {PromiseManager} Returns the PromiseManager instance.
-    */
-   get promises()
-   {
-      return this.#promiseManager;
    }
 
    /**
