@@ -67,18 +67,18 @@
    const s_IGNORE_CLASSES = { ignoreClasses: ['tjs-focus-wrap'] };
 
    // Internal context for `elementContent` / `elementRoot` stores.
-   setContext('internal', internal);
+   setContext('#internal', internal);
 
    // Only update the `elementContent` store if the new `elementContent` is not null or undefined.
    $: if (elementContent !== void 0 && elementContent !== null)
    {
-      getContext('internal').stores.elementContent.set(elementContent);
+      getContext('#internal').stores.elementContent.set(elementContent);
    }
 
    // Only update the `elementRoot` store if the new `elementRoot` is not null or undefined.
    $: if (elementRoot !== void 0 && elementRoot !== null)
    {
-      getContext('internal').stores.elementRoot.set(elementRoot);
+      getContext('#internal').stores.elementRoot.set(elementRoot);
    }
 
    const context = getContext('#external');
