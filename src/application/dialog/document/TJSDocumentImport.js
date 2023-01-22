@@ -90,10 +90,6 @@ export class TJSDocumentImport extends TJSDialog
          return null;
       }
 
-      const dialog = new TJSDocumentImport(document, options, dialogData);
-
-      dialog.render(true, { focus: true });
-
-      return dialog.state.promises.create();
+      return new TJSDocumentImport(document, options, dialogData).wait();
    }
 }

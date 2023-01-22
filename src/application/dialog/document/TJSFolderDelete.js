@@ -83,10 +83,6 @@ export class TJSFolderDelete extends TJSDialog
          return null;
       }
 
-      const dialog = new TJSFolderDelete(document, options, dialogData);
-
-      dialog.render(true, { focus: true });
-
-      return dialog.state.promises.create();
+      return new TJSFolderDelete(document, options, dialogData).wait();
    }
 }

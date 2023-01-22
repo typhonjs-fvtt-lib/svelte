@@ -81,10 +81,6 @@ export class TJSFolderRolltable extends TJSDialog
          return null;
       }
 
-      const dialog = new TJSFolderRolltable(document, options, dialogData);
-
-      dialog.render(true, { focus: true });
-
-      return dialog.state.promises.create();
+      return new TJSFolderRolltable(document, options, dialogData).wait();
    }
 }

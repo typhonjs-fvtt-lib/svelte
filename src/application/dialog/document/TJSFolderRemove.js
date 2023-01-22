@@ -81,10 +81,6 @@ export class TJSFolderRemove extends TJSDialog
          return null;
       }
 
-      const dialog = new TJSFolderRemove(document, options, dialogData);
-
-      dialog.render(true, { focus: true });
-
-      return dialog.state.promises.create();
+      return new TJSFolderRemove(document, options, dialogData).wait();
    }
 }

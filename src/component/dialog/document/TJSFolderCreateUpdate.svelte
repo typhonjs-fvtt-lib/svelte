@@ -13,6 +13,8 @@
 
    const { application } = getContext('external');
 
+   const managedPromise = getContext('#managedPromise');
+
    if (!(document instanceof Folder))
    {
       throw new TypeError(`TJSFolderCreateUpdate error: 'document' is not an instance of Folder.`);
@@ -92,7 +94,7 @@
          modifiedDoc = await Folder.create(document);
       }
 
-      application.state.promises.resolve(modifiedDoc);
+      managedPromise.resolve(modifiedDoc);
       application.close();
    }
 </script>

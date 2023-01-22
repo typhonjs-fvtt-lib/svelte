@@ -13,6 +13,8 @@
 
    const { application } = getContext('external');
 
+   const managedPromise = getContext('#managedPromise');
+
    let form;
    let name, folderSelect, folders, hasTypes, type, types;
 
@@ -62,7 +64,7 @@
 
       const document = await documentCls.create(data, { parent, pack, renderSheet });
 
-      application.state.promises.resolve(document);
+      managedPromise.resolve(document);
       application.close();
    }
 </script>

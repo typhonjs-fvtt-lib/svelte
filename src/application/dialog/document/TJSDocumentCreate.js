@@ -80,8 +80,8 @@ export class TJSDocumentCreate extends TJSDialog
     *
     * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Document|null>} The newly created document or a falsy value; either 'false' for cancelling
-    *                                   or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    * @returns {Promise<foundry.abstract.Document|null>} The newly created document or a falsy value; either 'false' for
+    *          cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async show(documentCls, data = {}, { parent = null, pack = null, renderSheet = true, ...options } = {},
     dialogData = {})
@@ -98,10 +98,6 @@ export class TJSDocumentCreate extends TJSDialog
          return null;
       }
 
-      const dialog = new TJSDocumentCreate(documentCls, data, { parent, pack, renderSheet, ...options }, dialogData);
-
-      dialog.render(true, { focus: true });
-
-      return dialog.state.promises.create();
+      return new TJSDocumentCreate(documentCls, data, { parent, pack, renderSheet, ...options }, dialogData).wait();
    }
 }

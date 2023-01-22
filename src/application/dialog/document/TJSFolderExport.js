@@ -37,7 +37,7 @@ export class TJSFolderExport extends TJSDialog
       const packs = globalThis.game.packs.filter((p) => (p.documentName === document.type) && !p.locked);
       if (!packs.length)
       {
-         this.state.promises.resolve(null);
+         this.managedPromise.resolve(null);
          return globalThis.ui.notifications.warn(localize("FOLDER.ExportWarningNone", { type: document.type }));
       }
 
@@ -106,13 +106,10 @@ export class TJSFolderExport extends TJSDialog
       const packs = globalThis.game.packs.filter((p) => (p.documentName === document.type) && !p.locked);
       if (!packs.length)
       {
-         return globalThis.ui.notifications.warn(localize('FOLDER.ExportWarningNone', { type: document.type }));
+         globalThis.ui.notifications.warn(localize('FOLDER.ExportWarningNone', { type: document.type }));
+         return null;
       }
 
-      const dialog = new TJSFolderExport(document, { pack, merge, keepId, ...options }, dialogData);
-
-      dialog.render(true, { focus: true });
-
-      return dialog.state.promises.create();
+      return new TJSFolderExport(document, { pack, merge, keepId, ...options }, dialogData).wait();
    }
 }

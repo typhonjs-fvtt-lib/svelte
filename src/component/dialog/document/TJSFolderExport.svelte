@@ -19,6 +19,8 @@
 
    const { application } = getContext('external');
 
+   const managedPromise = getContext('#managedPromise');
+
    if (!(document instanceof Folder))
    {
       throw new TypeError(`TJSFolderExport error: 'document' is not an instance of Folder.`);
@@ -31,7 +33,7 @@
    if (!packs.length)
    {
       globalThis.ui.notifications.warn(localize('FOLDER.ExportWarningNone', { type: document.type }));
-      application.state.promises.resolve(null);
+      managedPromise.resolve(null);
       application.close();
    }
 
@@ -67,11 +69,11 @@
             keepId
          });
 
-         application.state.promises.resolve(pack);
+         managedPromise.resolve(pack);
       }
       else
       {
-         application.state.promises.resolve(false);
+         managedPromise.resolve(false);
       }
 
       application.close();

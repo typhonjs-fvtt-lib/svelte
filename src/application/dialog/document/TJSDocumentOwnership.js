@@ -78,10 +78,6 @@ export class TJSDocumentOwnership extends TJSDialog
          return null;
       }
 
-      const dialog = new TJSDocumentOwnership(document, options, dialogData);
-
-      dialog.render(true, { focus: true });
-
-      return dialog.state.promises.create();
+      return new TJSDocumentOwnership(document, options, dialogData).wait();
    }
 }

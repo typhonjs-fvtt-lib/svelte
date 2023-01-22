@@ -9,6 +9,8 @@
 
    const { application } = getContext('external');
 
+   const managedPromise = getContext('#managedPromise');
+
    if (!(document instanceof globalThis.foundry.abstract.Document))
    {
       throw new TypeError(`TJSDocumentImport error: 'document' is not an instance of Document.`);
@@ -44,7 +46,7 @@
 
       const importedDoc = await document.importFromJSON(json);
 
-      application.state.promises.resolve(importedDoc);
+      managedPromise.resolve(importedDoc);
       application.close();
    }
 

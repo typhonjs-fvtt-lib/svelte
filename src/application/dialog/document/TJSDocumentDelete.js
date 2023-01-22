@@ -111,10 +111,6 @@ export class TJSDocumentDelete extends TJSDialog
          return null;
       }
 
-      const dialog = new TJSDocumentDelete(document, { context, ...options }, dialogData);
-
-      dialog.render(true, { focus: true });
-
-      return dialog.state.promises.create();
+      return new TJSDocumentDelete(document, { context, ...options }, dialogData).wait();
    }
 }

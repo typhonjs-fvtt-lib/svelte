@@ -11,6 +11,8 @@
 
    const { application } = getContext('external');
 
+   const managedPromise = getContext('#managedPromise');
+
    if (!(document instanceof globalThis.foundry.abstract.Document))
    {
       throw new TypeError(`TJSOwnershipControl error: 'document' is not an instance of Document.`);
@@ -146,7 +148,7 @@
 
          await cls.updateDocuments(updates, { diff: false, recursive: false, noHook: true });
 
-         application.state.promises.resolve($doc);
+         managedPromise.resolve($doc);
          application.close();
          return;
       }
@@ -154,7 +156,7 @@
       // Update a single Document
       await $doc.update({ ownership: ownershipLevels }, { diff: false, recursive: false, noHook: true });
 
-      application.state.promises.resolve($doc);
+      managedPromise.resolve($doc);
       application.close();
    }
 </script>

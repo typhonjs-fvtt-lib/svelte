@@ -89,11 +89,7 @@ export class TJSFolderCreateUpdate extends TJSDialog
 
       const document = new Folder(data);
 
-      const dialog = new TJSFolderCreateUpdate(document, options, dialogData);
-
-      dialog.render(true, { focus: true });
-
-      return dialog.state.promises.create();
+      return new TJSFolderCreateUpdate(document, options, dialogData).wait();
    }
 
    /**
@@ -115,10 +111,6 @@ export class TJSFolderCreateUpdate extends TJSDialog
          return null;
       }
 
-      const dialog = new TJSFolderCreateUpdate(document, options, dialogData);
-
-      dialog.render(true, { focus: true });
-
-      return dialog.state.promises.create();
+      return new TJSFolderCreateUpdate(document, options, dialogData).wait();
    }
 }
