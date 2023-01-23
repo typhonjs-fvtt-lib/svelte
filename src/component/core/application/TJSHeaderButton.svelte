@@ -12,7 +12,7 @@
 
    const s_REGEX_HTML = /^\s*<.*>$/;
 
-   let icon, label, title, styles
+   let icon, keyCode, label, title, styles
 
    $: if (isObject(button))
    {
@@ -24,13 +24,27 @@
 
       label = typeof button.label === 'string' ? localize(button.label) : void 0;
 
+      keyCode = typeof button.keyCode === 'string' ? button.keyCode : 'Enter';
+
       styles = isObject(button.styles) ? button.styles : void 0;
    }
 
    function onClick(event)
    {
-      // Accept `onPress`, `callback` or `onclick` as the function / data to invoke.
-      const invoke = button.onPress ?? button.callback ?? button.onclick;
+      // Accept `onPress or `onclick` as the function / data to invoke.
+      const invoke = button?.onPress ?? button?.onclick;
+
+      if (typeof invoke === 'function')
+      {
+         invoke.call(button, event);
+         button = button; // This provides a reactive update if button data changes.
+      }
+   }
+
+   function onContextMenu(event)
+   {
+      // Accept `onContextMenu` as the function / data to invoke.
+      const invoke = button?.onContextMenu;
 
       if (typeof invoke === 'function')
       {
@@ -46,7 +60,7 @@
     */
    function onKeydown(event)
    {
-      if (event.code === 'Enter')
+      if (event.code === keyCode)
       {
          event.preventDefault();
          event.stopPropagation();
@@ -60,9 +74,9 @@
     */
    function onKeyup(event)
    {
-      if (event.code === 'Enter')
+      if (event.code === keyCode)
       {
-         const invoke = button.onPress ?? button.callback ?? button.onclick;
+         const invoke = button.onPress ?? button.onclick;
 
          if (typeof invoke === 'function')
          {
@@ -80,6 +94,7 @@
 
 <!-- svelte-ignore a11y-missing-attribute -->
 <a on:click|preventDefault|stopPropagation={onClick}
+   on:contextmenu|preventDefault|stopPropagation={onContextMenu}
    on:keydown={onKeydown}
    on:keyup={onKeyup}
    use:applyStyles={styles}
