@@ -3,6 +3,11 @@ import { linear }             from 'svelte/easing';
 import { lerp }               from '@typhonjs-fvtt/svelte/math';
 import { isObject }           from '@typhonjs-fvtt/svelte/util';
 
+/**
+ * Provides the ability the save / restore application state for positional and UI state such as minimized status.
+ *
+ * You can restore a saved state with animation; please see the options of {@link ApplicationState.restore}.
+ */
 export class ApplicationState
 {
    /** @type {ApplicationShellExt} */
