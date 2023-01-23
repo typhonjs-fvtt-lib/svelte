@@ -68,7 +68,8 @@ export function loadSvelteConfig({ app, template, config, elementRootUpdate } = 
       externalContext.eventbus = eventbus;
    }
 
-   Object.freeze(externalContext);
+   // Seal external context so that it can't be extended.
+   Object.seal(externalContext);
 
    // TODO: Remove deprecation warning in the future -----------------------------------------------------------------
 

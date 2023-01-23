@@ -42,6 +42,8 @@ export class EmbeddedStoreManager
       this.#document = document;
 
       this.handleDocChange();
+
+      Object.seal(this);
    }
 
    /**

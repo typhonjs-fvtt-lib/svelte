@@ -15,6 +15,9 @@ export class AppShellContextInternal
          elementContent: writable(void 0),
          elementRoot: writable(void 0)
       };
+
+      Object.freeze(this.#stores);
+      Object.seal(this);
    }
 
    /**

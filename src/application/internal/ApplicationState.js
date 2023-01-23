@@ -22,6 +22,8 @@ export class ApplicationState
    constructor(application)
    {
       this.#application = application;
+
+      Object.seal(this);
    }
 
    /**
