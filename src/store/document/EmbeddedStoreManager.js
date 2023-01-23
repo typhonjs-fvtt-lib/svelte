@@ -5,6 +5,10 @@ import {
    isObject }              from '@typhonjs-svelte/lib/util';
 
 /**
+ * Provides management of reactive embedded collections.
+ *
+ * TODO: Consider subscribing to TJSDocument rather than exposing {@link EmbeddedStoreManager.handleDocChange} and
+ * {@link EmbeddedStoreManager.handleUpdate}
  */
 export class EmbeddedStoreManager
 {
