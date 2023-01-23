@@ -122,7 +122,7 @@ export class TJSDialog extends SvelteApplication
     */
    set data(data)
    {
-      if (!isObject(data)) { throw TypeError(`TJSDialog set data error: 'data' is not an object'.`); }
+      if (!isObject(data)) { throw new TypeError(`TJSDialog set data error: 'data' is not an object'.`); }
 
       const descriptors = Object.getOwnPropertyDescriptors(this.#data);
 
@@ -151,25 +151,39 @@ export class TJSDialog extends SvelteApplication
    {
       try
       {
-         const result = TJSDialog.#invokeFn(this.#data.onClose, this, null);
-         const rejectClose = typeof this.#data.rejectClose === 'boolean' ? this.#data.rejectClose : false;
+         // Note: When handling a managed promise if a button selection has already been made the managed promise is
+         // already processing and the resolution below is skipped.
+         if (this.#managedPromise.isActive && !this.#managedPromise.isProcessing)
+         {
+            const result = TJSDialog.#invokeFn(this.#data.onClose, this, null);
+            const rejectClose = typeof this.#data.rejectClose === 'boolean' ? this.#data.rejectClose : false;
 
-         if (rejectClose && result === null)
-         {
-            this.#managedPromise.reject(new Error('TJSDialog was closed without a choice being made.'));
-         }
-         else
-         {
-            this.#managedPromise.resolve(result);
+            if (rejectClose && result === null)
+            {
+               this.#managedPromise.reject(new Error('TJSDialog was closed without a choice being made.'));
+            }
+            else
+            {
+               this.#managedPromise.resolve(result);
+            }
          }
       }
       catch (err)
       {
+         const notifyError = typeof this.#data.notifyError === 'boolean' ? this.#data.notifyError : true;
+         if (notifyError)
+         {
+            // TODO: When app eventbus is available send event for UI notification instead of Foundry API usage.
+            globalThis.ui.notifications.error(err, { console: false });
+         }
+
          // If there is a managed Promise reject it or re-throw error.
          if (!this.#managedPromise.reject(err)) { throw err; }
       }
-
-      return super.close(options);
+      finally
+      {
+         await super.close(options);
+      }
    }
 
    /**
@@ -386,7 +400,7 @@ export class TJSDialog extends SvelteApplication
     */
    static async wait(data, options = {})
    {
-      if (!isObject(data)) { throw TypeError(`TJSDialog.wait error: 'data' is not an object'.`); }
+      if (!isObject(data)) { throw new TypeError(`TJSDialog.wait error: 'data' is not an object'.`); }
 
       // Instantiate and render the dialog.
       return new this({ ...data }, options).wait();
@@ -411,6 +425,9 @@ export class TJSDialog extends SvelteApplication
  * @property {boolean}  [modal=false] - When true a modal dialog is displayed.
  *
  * @property {object}   [modalOptions] - Additional options for modal dialog display.
+ *
+ * @property {boolean}  [notifyError=true] - When true and an error is raised in dialog callback functions post a UI
+ *           error notification.
  *
  * @property {string|((application: TJSDialog) => any)} [onClose] - Callback invoked when dialog is closed; no button
  *           option selected. When defined as a string any matching function by name exported from content Svelte

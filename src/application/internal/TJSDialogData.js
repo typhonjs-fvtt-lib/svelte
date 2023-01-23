@@ -5,7 +5,7 @@ import {
 
 /**
  * Provides storage for all dialog options adding `get`, `merge` and `set` methods that safely access and update
- * data changed to the mounted DialogShell component.
+ * data changed to the mounted DialogShell component reactively.
  */
 export class TJSDialogData
 {
@@ -70,6 +70,13 @@ export class TJSDialogData
     * TODO: Better specify type / options.
     */
    modalOptions;
+
+   /**
+    * When true and an error is raised in dialog callback functions post a UI error notification.
+    *
+    * @type {boolean}
+    */
+   notifyError;
 
    /**
     * Callback invoked when dialog is closed; no button option selected. When defined as a string any matching function

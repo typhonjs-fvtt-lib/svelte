@@ -218,23 +218,31 @@
                break;
          }
 
+         // By default, both 'button.autoClose' & autoClose are true, so skip auto-closing when either is false.
          if (button.autoClose && autoClose)
          {
             // If `resolveId` dialog option is true and current result is undefined then set result to the button ID.
             if (resolveId && result === void 0) { result = button.id; }
 
             managedPromise.resolve(result);
-
-            application.close();
          }
       }
       catch(err)
       {
-         // TODO: When app eventbus is available send event for UI notification instead of Foundry API usage.
-         globalThis.ui.notifications.error(err);
+         const notifyError = typeof data.notifyError === 'boolean' ? data.notifyError : true;
+         if (notifyError)
+         {
+            // TODO: When app eventbus is available send event for UI notification instead of Foundry API usage.
+            globalThis.ui.notifications.error(err, { console: false });
+         }
 
          // Attempt to first reject the error with any current managed Promise otherwise rethrow error.
-         if (!managedPromise.reject(err)) { throw new Error(err); }
+         if (!managedPromise.reject(err)) { throw err; }
+      }
+      finally
+      {
+         // By default, both 'button.autoClose' & autoClose are true, so skip auto-closing when either is false.
+         if (button.autoClose && autoClose) { application.close(); }
       }
    }
 
