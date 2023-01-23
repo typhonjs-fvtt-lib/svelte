@@ -214,6 +214,8 @@ export class TJSDialog extends SvelteApplication
     * If you require more flexibility, a custom TJSDialog instance is preferred. The default focused button is 'yes'.
     * You can change the default focused button by setting `default` to `yes` or `no`.
     *
+    * @template T
+    *
     * @param {TJSDialogOptions} data - Confirm dialog options.
     *
     * @param {string|((application: TJSDialog) => any)} [data.onYes] - Callback function upon `yes`; may be an async
@@ -226,15 +228,18 @@ export class TJSDialog extends SvelteApplication
     *
     * @param {SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog constructor.
     *
-    * @returns {Promise<*>} A promise which resolves with result of yes / no callbacks or true / false.
+    * @returns {Promise<T>} A promise which resolves with result of yes / no callbacks or true / false.
     *
     * @example
-    * let d = await TJSDialog.confirm({
-    *  title: "A Yes or No Question",
-    *  content: "<p>Choose wisely.</p>",
-    *  onYes: () => console.log("YES Result"),
-    *  onNo: () => console.log("NO Result")
+    * const result = await TJSDialog.confirm({
+    *  title: 'A Yes or No Question',
+    *  content: '<p>Choose wisely.</p>',
+    *  onYes: () => 'YES Result'
+    *  onNo: () => 'NO Result'
     * });
+    *
+    * // Logs 'YES result', 'NO Result', or null if the user closed the dialog without making a selection.
+    * console.log(result);
     */
    static async confirm({ onYes, onNo, ...data } = {}, options = {})
    {
@@ -322,6 +327,8 @@ export class TJSDialog extends SvelteApplication
    /**
     * A helper factory method to display a basic "prompt" style TJSDialog with a single button.
     *
+    * @template T
+    *
     * @param {TJSDialogOptions} [data] - Prompt dialog options.
     *
     * @param {string|((application: TJSDialog) => any)} [data.onOk] - Callback function upon `ok`; may be an async
@@ -334,8 +341,19 @@ export class TJSDialog extends SvelteApplication
     *
     * @param {SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog constructor.
     *
-    * @returns {Promise<*>} The returned value from the provided callback function or `true` if the button
+    * @returns {Promise<T>} The returned value from the provided callback function or `true` if the button
     *          is pressed.
+    *
+    * @example
+    * const result = await TJSDialog.prompt({
+    *  title: 'Are you OK?',
+    *  content: '<p>Are you OK?.</p>',
+    *  label: 'Feeling Fine!'
+    *  onOk: () => 'OK'
+    * });
+    *
+    * // Logs 'OK' or null if the user closed the dialog without making a selection.
+    * console.log(result);
     */
    static async prompt({ onOk, label, icon = 'fas fa-check', ...data } = {}, options = {})
    {

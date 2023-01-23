@@ -2,7 +2,8 @@ import { derived, writable }  from "svelte/store";
 
 import {
    propertyStore,
-   subscribeIgnoreFirst }     from '@typhonjs-fvtt/svelte/store';
+   subscribeIgnoreFirst,
+   TJSSessionStorage }        from '@typhonjs-fvtt/svelte/store';
 
 import {
    deepMerge,
@@ -10,7 +11,39 @@ import {
    safeSet }                  from '@typhonjs-fvtt/svelte/util';
 
 /**
- * Contains the reactive functionality / Svelte stores associated with SvelteApplication.
+ * Contains the reactive functionality / Svelte stores associated with SvelteApplication and retrievable by
+ * {@link SvelteApplication.reactive}.
+ *
+ * There are several reactive getters for UI state such as:
+ * - {@link SvelteReactive.dragging}
+ * - {@link SvelteReactive.minimized}
+ * - {@link SvelteReactive.resizing}
+ *
+ * There are also reactive getters / setters for {@link SvelteApplicationOptions} stored in
+ * {@link SvelteApplication.options}:
+ * - {@link SvelteReactive}
+ *
+ *
+ * This API is not sealed and it is recommended that you extend it with accessors to get / set data that is reactive
+ * in your application. An example of setting an exported prop `document` from the main mounted application shell.
+ *
+ * @example
+ * import { hasSetter } from '@typhonjs-fvtt/runtime/svelte/util';
+ *
+ * // Note: make a normal comment.
+ * //  * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with
+ * //  *                             Document with the mounted application shell Svelte component.
+ * //  *
+ * //  * @memberof SvelteReactive#
+ * //  *
+ * Object.defineProperty(this.reactive, 'document', {
+ *    get: () => this.svelte?.applicationShell?.document,
+ *    set: (document) =>
+ *    {
+ *       const component = this.svelte?.applicationShell;
+ *       if (hasSetter(component, 'document')) { component.document = document; }
+ *    }
+ * });
  */
 export class SvelteReactive
 {
@@ -23,6 +56,9 @@ export class SvelteReactive
     * @type {boolean}
     */
    #initialized = false;
+
+   /** @type {TJSSessionStorage} */
+   #sessionStorage;
 
    /**
     * The Application option store which is injected into mounted Svelte component context under the `external` key.
@@ -72,12 +108,20 @@ export class SvelteReactive
    constructor(application)
    {
       this.#application = application;
+      const optionsSessionStorage = application?.options?.sessionStorage;
+
+      if (optionsSessionStorage !== void 0 && !(optionsSessionStorage instanceof TJSSessionStorage))
+      {
+         throw new TypeError(`'options.sessionStorage' is not an instance of TJSSessionStorage.`);
+      }
+
+      this.#sessionStorage = optionsSessionStorage !== void 0 ? optionsSessionStorage : new TJSSessionStorage();
    }
 
    /**
     * Initializes reactive support. Package private for internal use.
     *
-    * @returns {SvelteStores} Internal methods to interact with Svelte stores.
+    * @returns {SvelteStores|void} Internal methods to interact with Svelte stores.
     * @package
     */
    initialize()
@@ -95,6 +139,30 @@ export class SvelteReactive
          unsubscribe: this.#storesUnsubscribe.bind(this)
       };
    }
+
+// Store getters -----------------------------------------------------------------------------------------------------
+
+   /**
+    * @returns {TJSSessionStorage} Returns TJSSessionStorage instance.
+    */
+   get sessionStorage()
+   {
+      return this.#sessionStorage;
+   }
+
+   /**
+    * Returns the store for app options.
+    *
+    * @returns {StoreAppOptions} App options store.
+    */
+   get storeAppOptions() { return this.#storeAppOptions; }
+
+   /**
+    * Returns the store for UI options.
+    *
+    * @returns {StoreUIOptions} UI options store.
+    */
+   get storeUIState() { return this.#storeUIState; }
 
 // Only reactive getters ---------------------------------------------------------------------------------------------
 
@@ -167,20 +235,6 @@ export class SvelteReactive
     * @returns {boolean} Resizable app option.
     */
    get resizable() { return this.#application?.options?.resizable; }
-
-   /**
-    * Returns the store for app options.
-    *
-    * @returns {StoreAppOptions} App options store.
-    */
-   get storeAppOptions() { return this.#storeAppOptions; }
-
-   /**
-    * Returns the store for UI options.
-    *
-    * @returns {StoreUIOptions} UI options store.
-    */
-   get storeUIState() { return this.#storeUIState; }
 
    /**
     * Returns the title accessor from the parent Application class.
@@ -282,6 +336,8 @@ export class SvelteReactive
          this.setOptions('title', '');
       }
    }
+
+   // Reactive Options API -------------------------------------------------------------------------------------------
 
    /**
     * Provides a way to safely get this applications options given an accessor string which describes the
