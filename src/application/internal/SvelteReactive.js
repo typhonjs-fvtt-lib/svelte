@@ -14,17 +14,33 @@ import {
  * Contains the reactive functionality / Svelte stores associated with SvelteApplication and retrievable by
  * {@link SvelteApplication.reactive}.
  *
- * There are several reactive getters for UI state such as:
+ * There are several reactive getters for UI state such and for two-way bindings / stores see
+ * {@link SvelteReactive.storeUIState}:
  * - {@link SvelteReactive.dragging}
  * - {@link SvelteReactive.minimized}
  * - {@link SvelteReactive.resizing}
  *
- * There are also reactive getters / setters for {@link SvelteApplicationOptions} stored in
- * {@link SvelteApplication.options}:
- * - {@link SvelteReactive}
+ * There are also reactive getters / setters for {@link SvelteApplicationOptions} and Foundry
+ * {@link ApplicationOptions}. You can use the following as one way bindings and update the associated stores. For
+ * two-way bindings / stores see {@link SvelteReactive.storeAppOptions}.
  *
+ * - {@link SvelteReactive.draggable}
+ * - {@link SvelteReactive.headerButtonNoClose}
+ * - {@link SvelteReactive.headerButtonNoLabel}
+ * - {@link SvelteReactive.headerNoTitleMinimized}
+ * - {@link SvelteReactive.minimizable}
+ * - {@link SvelteReactive.popOut}
+ * - {@link SvelteReactive.positionable}
+ * - {@link SvelteReactive.resizable}
+ * - {@link SvelteReactive.title}
  *
- * This API is not sealed and it is recommended that you extend it with accessors to get / set data that is reactive
+ * An instance of TJSSessionStorage is accessible via {@link SvelteReactive.sessionStorage}. Optionally you can pass
+ * in an existing instance that can be shared across multiple SvelteApplications by setting
+ * {@link SvelteApplicationOptions.sessionStorage}.
+ *
+ * -------------------------------------------------------------------------------------------------------------------
+ *
+ * This API is not sealed, and it is recommended that you extend it with accessors to get / set data that is reactive
  * in your application. An example of setting an exported prop `document` from the main mounted application shell.
  *
  * @example
@@ -225,9 +241,18 @@ export class SvelteReactive
    get minimizable() { return this.#application?.options?.minimizable; }
 
    /**
-    * @inheritDoc
+    * Returns the Foundry popOut state; {@link Application.popOut}
+    *
+    * @returns {boolean} Positionable app option.
     */
    get popOut() { return this.#application.popOut; }
+
+   /**
+    * Returns the positionable app option; {@link SvelteApplicationOptions.positionable}
+    *
+    * @returns {boolean} Positionable app option.
+    */
+   get positionable() { return this.#application?.options?.positionable; }
 
    /**
     * Returns the resizable option.
@@ -237,7 +262,7 @@ export class SvelteReactive
    get resizable() { return this.#application?.options?.resizable; }
 
    /**
-    * Returns the title accessor from the parent Application class.
+    * Returns the title accessor from the parent Application class; {@link Application.title}
     * TODO: Application v2; note that super.title localizes `this.options.title`; IMHO it shouldn't.
     *
     * @returns {string} Title.
@@ -306,6 +331,16 @@ export class SvelteReactive
    set popOut(popOut)
    {
       if (typeof popOut === 'boolean') { this.setOptions('popOut', popOut); }
+   }
+
+   /**
+    * Sets `this.options.positionable` enabling / disabling {@link SvelteApplication.position.set}.
+    *
+    * @param {boolean}  positionable - Sets the positionable option.
+    */
+   set positionable(positionable)
+   {
+      if (typeof positionable === 'boolean') { this.setOptions('positionable', positionable); }
    }
 
    /**
@@ -423,6 +458,7 @@ export class SvelteReactive
          headerNoTitleMinimized: propertyStore(writableAppOptions, 'headerNoTitleMinimized'),
          minimizable: propertyStore(writableAppOptions, 'minimizable'),
          popOut: propertyStore(writableAppOptions, 'popOut'),
+         positionable: propertyStore(writableAppOptions, 'positionable'),
          resizable: propertyStore(writableAppOptions, 'resizable'),
          title: propertyStore(writableAppOptions, 'title')
       };
@@ -464,7 +500,6 @@ export class SvelteReactive
 
    /**
     * Registers local store subscriptions for app options. `popOut` controls registering this app with `ui.windows`.
-    * `zIndex` controls the z-index style of the element root.
     *
     * @see SvelteApplication._injectHTML
     */
@@ -515,8 +550,9 @@ export class SvelteReactive
     * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
     * the new buttons.
     *
-    * Optionally you can set in the Foundry app options `headerButtonNoClose` to remove the close button and
-    * `headerButtonNoLabel` to true and labels will be removed from the header buttons.
+    * Optionally you can set in the SvelteApplication app options {@link SvelteApplicationOptions.headerButtonNoClose}
+    * to remove the close button and {@link SvelteApplicationOptions.headerButtonNoLabel} to true and labels will be
+    * removed from the header buttons.
     *
     * @param {object} opts - Optional parameters (for internal use)
     *
