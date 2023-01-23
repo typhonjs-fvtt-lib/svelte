@@ -141,8 +141,8 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Specifies the default options that SvelteFormApplication supports.
     *
-    * @returns {object} options - Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
+    * @returns {SvelteApplicationOptions} options - Application options.
+    * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
     */
    static get defaultOptions()
    {
@@ -152,6 +152,7 @@ export class SvelteFormApplication extends FormApplication
          focusOptions: void 0,            // Stores any assigned FocusOptions data that is applied when app is closed.
          headerButtonNoClose: false,      // If true then the close header button is removed.
          headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.
+         headerIcon: void 0,              // Sets a header icon given an image URL.
          headerNoTitleMinimized: false,   // If true then header title is hidden when application is minimized.
          minHeight: MIN_WINDOW_HEIGHT,    // Assigned to position. Number specifying minimum window height.
          minWidth: MIN_WINDOW_WIDTH,      // Assigned to position. Number specifying minimum window width.
@@ -634,6 +635,8 @@ export class SvelteFormApplication extends FormApplication
          });
       }
 
+      element.classList.remove('minimized');
+
       // Reset display none on all children of header.
       for (let cntr = header.children.length; --cntr >= 0;) { header.children[cntr].style.display = null; }
 
@@ -674,8 +677,6 @@ export class SvelteFormApplication extends FormApplication
       // Remove inline styles that override any styles assigned to the app.
       element.style.minWidth = null;
       element.style.minHeight = null;
-
-      element.classList.remove('minimized');
 
       this._minimized = false;
 

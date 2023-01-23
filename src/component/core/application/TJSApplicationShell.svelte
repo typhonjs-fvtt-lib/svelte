@@ -396,9 +396,7 @@
     }
 
     .tjs-window-app :global(.window-header) {
-        flex: var(--tjs-app-header-flex, 0 0 30px);
         overflow: var(--tjs-app-header-overflow, hidden);
-        padding: var(--tjs-app-header-padding, 0 8px);
         line-height: var(--tjs-app-header-line-height, 30px);
         border-bottom: var(--tjs-app-header-border-bottom, 1px solid #000);
     }

@@ -27,6 +27,7 @@ import {
  * - {@link SvelteReactive.draggable}
  * - {@link SvelteReactive.headerButtonNoClose}
  * - {@link SvelteReactive.headerButtonNoLabel}
+ * - {@link SvelteReactive.headerIcon}
  * - {@link SvelteReactive.headerNoTitleMinimized}
  * - {@link SvelteReactive.minimizable}
  * - {@link SvelteReactive.popOut}
@@ -227,6 +228,13 @@ export class SvelteReactive
    get headerButtonNoLabel() { return this.#application?.options?.headerButtonNoLabel; }
 
    /**
+    * Returns the headerIcon app option.
+    *
+    * @returns {string|void} URL for header app icon.
+    */
+   get headerIcon() { return this.#application?.options?.headerIcon; }
+
+   /**
     * Returns the headerNoTitleMinimized app option.
     *
     * @returns {boolean} When true removes the header title when minimized.
@@ -297,6 +305,16 @@ export class SvelteReactive
    set headerButtonNoLabel(headerButtonNoLabel)
    {
       if (typeof headerButtonNoLabel === 'boolean') { this.setOptions('headerButtonNoLabel', headerButtonNoLabel); }
+   }
+
+   /**
+    * Sets `this.options.headerIcon` which is reactive for application shells.
+    *
+    * @param {string|void}  headerIcon - Sets the headerButtonNoLabel option.
+    */
+   set headerIcon(headerIcon)
+   {
+      if (headerIcon === void 0 || typeof headerIcon === 'string') { this.setOptions('headerIcon', headerIcon); }
    }
 
    /**
@@ -455,6 +473,7 @@ export class SvelteReactive
          draggable: propertyStore(writableAppOptions, 'draggable'),
          headerButtonNoClose: propertyStore(writableAppOptions, 'headerButtonNoClose'),
          headerButtonNoLabel: propertyStore(writableAppOptions, 'headerButtonNoLabel'),
+         headerIcon: propertyStore(writableAppOptions, 'headerIcon'),
          headerNoTitleMinimized: propertyStore(writableAppOptions, 'headerNoTitleMinimized'),
          minimizable: propertyStore(writableAppOptions, 'minimizable'),
          popOut: propertyStore(writableAppOptions, 'popOut'),

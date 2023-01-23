@@ -17,12 +17,14 @@
    export let draggableOptions = void 0;
 
    const application = getContext('#external').application;
+
    const { autoFocus, elementRoot } = getContext('#internal').stores;
 
    const storeTitle = application.reactive.storeAppOptions.title;
    const storeDraggable = application.reactive.storeAppOptions.draggable;
    const storeDragging = application.reactive.storeUIState.dragging;
    const storeHeaderButtons = application.reactive.storeUIState.headerButtons;
+   const storeHeaderIcon = application.reactive.storeAppOptions.headerIcon;
    const storeHeaderNoTitleMinimized = application.reactive.storeAppOptions.headerNoTitleMinimized;
    const storeMinimizable = application.reactive.storeAppOptions.minimizable;
    const storeMinimized = application.reactive.storeUIState.minimized;
@@ -110,6 +112,9 @@
            use:minimizable={$storeMinimizable}
            on:pointerdown={onPointerdown}
    >
+      {#if typeof $storeHeaderIcon === 'string'}
+         <img class="tjs-app-icon keep-minimized" src={$storeHeaderIcon} alt=icon>
+      {/if}
       <h4 class=window-title style:display={displayHeaderTitle}>{localize($storeTitle)}</h4>
       {#each buttons as button}
          <svelte:component this={button.class} {...button.props} />
@@ -121,6 +126,14 @@
    .window-header {
       flex: var(--tjs-app-header-flex, 0 0 30px);
       gap: var(--tjs-app-header-gap, 5px);
+      padding: var(--tjs-app-header-padding, 0 4px);
+   }
+
+   .window-header .tjs-app-icon {
+      align-self: center;
+      border-radius: var(--tjs-app-header-icon-border-radius, 4px);
+      height: var(--tjs-app-header-icon-height, 24px);
+      flex: var(--tjs-app-header-icon-width, 0 0 24px);
    }
 
    .window-title {
