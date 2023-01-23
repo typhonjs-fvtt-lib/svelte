@@ -133,7 +133,7 @@
       align-self: center;
       border-radius: var(--tjs-app-header-icon-border-radius, 4px);
       height: var(--tjs-app-header-icon-height, 24px);
-      flex: var(--tjs-app-header-icon-width, 0 0 24px);
+      flex: 0 0 var(--tjs-app-header-icon-width, 24px);
    }
 
    .window-title {
