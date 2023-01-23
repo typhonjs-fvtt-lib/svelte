@@ -122,7 +122,7 @@ export class TJSDialog extends SvelteApplication
     */
    set data(data)
    {
-      if (!isObject) { throw TypeError(`TJSDialog set data error: 'data' is not an object'.`); }
+      if (!isObject(data)) { throw TypeError(`TJSDialog set data error: 'data' is not an object'.`); }
 
       const descriptors = Object.getOwnPropertyDescriptors(this.#data);
 
@@ -386,7 +386,7 @@ export class TJSDialog extends SvelteApplication
     */
    static async wait(data, options = {})
    {
-      if (!isObject) { throw TypeError(`TJSDialog.wait error: 'data' is not an object'.`); }
+      if (!isObject(data)) { throw TypeError(`TJSDialog.wait error: 'data' is not an object'.`); }
 
       // Instantiate and render the dialog.
       return new this({ ...data }, options).wait();
