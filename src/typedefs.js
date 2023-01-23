@@ -48,11 +48,11 @@
  *
  * @property {import('svelte/store').Writable<boolean>} popOut - Derived store for `popOut` updates.
  *
+ * @property {import('svelte/store').Writable<boolean>} positionable - Derived store for `positionable` updates.
+ *
  * @property {import('svelte/store').Writable<boolean>} resizable - Derived store for `resizable` updates.
  *
  * @property {import('svelte/store').Writable<string>} title - Derived store for `title` updates.
- *
- * @property {import('svelte/store').Writable<number>} zIndex - Derived store for `zIndex` updates.
  */
 
 /**
