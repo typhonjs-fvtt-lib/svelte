@@ -35,6 +35,9 @@
    export let draggable = void 0;
    export let draggableOptions = void 0;
 
+   /** @type {{ autoFocus?: boolean }} */
+   export let internalContext = void 0;
+
    // The children array can be specified by a parent via prop or is read below from the external context.
    // export let children = void 0;
 
@@ -59,7 +62,7 @@
    const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth ? resizeObserver : () => null;
 
    // Provides the internal context for data / stores of the application shell.
-   const internal = new AppShellContextInternal();
+   const internal = new AppShellContextInternal(internalContext);
 
    const autoFocus = internal.stores.autoFocus;
 
@@ -228,14 +231,26 @@
          }
          else
          {
-            event.preventDefault();
-         }
-      }
-      else
-      {
-         if (!$autoFocus && !focusable)
-         {
-            event.preventDefault();
+            // Only focus the content element if the active element is outside the app; maintaining internal focused
+            // element.
+            if (document.activeElement instanceof HTMLElement && !elementRoot.contains(document.activeElement))
+            {
+               elementContent.focus();
+            }
+            else
+            {
+               // Only focus the content element if the active element is outside the app; maintaining internal focused
+               // element.
+               if (document.activeElement instanceof HTMLElement && !elementRoot.contains(document.activeElement))
+               {
+                  elementContent.focus();
+               }
+               else
+               {
+                  event.stopPropagation();
+                  event.preventDefault();
+               }
+            }
          }
       }
    }

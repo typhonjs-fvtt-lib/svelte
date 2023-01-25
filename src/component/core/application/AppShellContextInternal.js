@@ -8,10 +8,13 @@ export class AppShellContextInternal
    /** @type {InternalAppStores} */
    #stores;
 
-   constructor()
+   /**
+    * @param {{ autoFocus?: boolean }} internalContext - Internal context data defined through application shell prop.
+    */
+   constructor(internalContext)
    {
       this.#stores = {
-         autoFocus: writable(true),
+         autoFocus: writable(typeof internalContext?.autoFocus === 'boolean' ? internalContext.autoFocus : true),
          elementContent: writable(void 0),
          elementRoot: writable(void 0)
       };

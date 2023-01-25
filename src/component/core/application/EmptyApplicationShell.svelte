@@ -24,6 +24,9 @@
    export let elementContent = void 0;
    export let elementRoot = void 0;
 
+   /** @type {{ autoFocus?: boolean }} */
+   export let internalContext = void 0;
+
    // Explicit style overrides for the main app and content elements. Uses action `applyStyles`.
    export let stylesApp = void 0;
 
@@ -38,8 +41,11 @@
    // Provides options to `A11yHelper.getFocusableElements` to ignore TJSFocusWrap by CSS class.
    const s_IGNORE_CLASSES = { ignoreClasses: ['tjs-focus-wrap'] };
 
+   const internal = new AppShellContextInternal(internalContext);
+   const autoFocus = internal.stores.autoFocus;
+
    // Internal context for `elementContent` / `elementRoot` stores.
-   setContext('#internal', new AppShellContextInternal());
+   setContext('#internal', internal);
 
    // Only update the `elementContent` store if the new `elementContent` is not null or undefined.
    $: if (elementContent !== void 0 && elementContent !== null)
@@ -173,10 +179,37 @@
    /**
     * If the application is a popOut application then when clicked bring to top if not already the Foundry
     * `activeWindow`.
+    *
+    * @param {PointerEvent} event - A PointerEvent.
     */
-   function onPointerdownApp()
+   function onPointerdownApp(event)
    {
-      if (elementRoot instanceof HTMLElement) { elementRoot.focus(); }
+      const focusable = A11yHelper.isFocusable(event.target);
+
+      if (!focusable)
+      {
+         if (elementRoot instanceof HTMLElement)
+         {
+            if ($autoFocus)
+            {
+               // When autofocus is enabled always focus the app on window header click.
+               elementRoot.focus();
+            }
+            else
+            {
+               // Only focus the app header if the active element is outside the app; maintaining internal focused element.
+               if (document.activeElement instanceof HTMLElement && !elementRoot.contains(document.activeElement))
+               {
+                  elementRoot.focus();
+               }
+               else
+               {
+                  event.stopPropagation();
+                  event.preventDefault();
+               }
+            }
+         }
+      }
 
       if (typeof application.options.popOut === 'boolean' && application.options.popOut &&
        application !== globalThis.ui?.activeWindow)

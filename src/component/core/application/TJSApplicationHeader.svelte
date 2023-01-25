@@ -99,16 +99,37 @@
     * Explicitly focus `elementRoot` if pointer event is not consumed by header buttons / components. This allows
     * keyboard tab navigation to select header buttons.
     *
-    * Note: if `autoFocus` internal store is set to false `elementRoot` is not focused.
+    * Note: if `autoFocus` internal store is set to false `elementRoot` is not focused unless the current browser wide
+    * active element is not contained inside the app element.
     */
    function onPointerdown(event)
    {
-      if ($autoFocus && $elementRoot?.isConnected)
+      const rootEl = $elementRoot;
+
+      if (rootEl instanceof HTMLElement && rootEl?.isConnected)
       {
-         $elementRoot.focus();
+         if ($autoFocus)
+         {
+            // When autofocus is enabled always focus the app on window header click.
+            rootEl.focus();
+         }
+         else
+         {
+            // Only focus the app header if the active element is outside the app; maintaining internal focused element.
+            if (document.activeElement instanceof HTMLElement && !rootEl.contains(document.activeElement))
+            {
+               rootEl.focus();
+            }
+            else
+            {
+               event.stopPropagation();
+               event.preventDefault();
+            }
+         }
       }
       else
       {
+         event.stopPropagation();
          event.preventDefault();
       }
    }
