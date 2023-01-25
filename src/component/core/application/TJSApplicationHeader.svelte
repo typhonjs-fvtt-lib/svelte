@@ -29,6 +29,10 @@
    const storeMinimizable = application.reactive.storeAppOptions.minimizable;
    const storeMinimized = application.reactive.storeUIState.minimized;
 
+   // These classes in the window header allow dragging.
+   const s_DRAG_TARGET_CLASSLIST = Object.freeze(['tjs-app-icon', 'tjs-window-header-spacer',
+    'window-header', 'window-title']);
+
    let dragOptions;
 
    $: draggable = typeof draggable === 'function' ? draggable : dragDefault;
@@ -38,24 +42,28 @@
    // `storeDragging` are always overridden by application position / stores.
    $: dragOptions = Object.assign({}, { ease: true, easeOptions: { duration: 0.08, ease: cubicOut } },
     isObject(draggableOptions) ? draggableOptions : {}, { position: application.position, active:
-     $storeDraggable, storeDragging, hasTargetClassList: ['window-header', 'window-title'] });
+     $storeDraggable, storeDragging, hasTargetClassList: s_DRAG_TARGET_CLASSLIST });
 
    let displayHeaderTitle;
 
    $: displayHeaderTitle = $storeHeaderNoTitleMinimized && $storeMinimized ? 'none' : null;
 
-   let buttons;
+   let buttonsLeft;
+   let buttonsRight;
 
    $:
    {
-      buttons = $storeHeaderButtons.reduce((array, button) =>
-      {
-         // If the button is a SvelteComponent set it as the class otherwise use `TJSHeaderButton` w/ button as props.
-         array.push(isSvelteComponent(button) ? { class: button, props: {} } :
-          { class: TJSHeaderButton, props: { button } });
+      buttonsLeft = [];
+      buttonsRight = [];
 
-         return array;
-      }, []);
+      for (const button of $storeHeaderButtons)
+      {
+         const buttonsList = typeof button?.alignLeft === 'boolean' && button?.alignLeft ? buttonsLeft : buttonsRight;
+
+         // If the button is a Svelte component set it as the class otherwise use `TJSHeaderButton` w/ button as props.
+         buttonsList.push(isSvelteComponent(button) ? { class: button, props: {} } :
+          { class: TJSHeaderButton, props: { button } });
+      }
    }
 
    function minimizable(node, booleanStore)
@@ -110,19 +118,34 @@
    <header class="window-header flexrow"
            use:draggable={dragOptions}
            use:minimizable={$storeMinimizable}
-           on:pointerdown={onPointerdown}
-   >
+           on:pointerdown={onPointerdown}>
       {#if typeof $storeHeaderIcon === 'string'}
          <img class="tjs-app-icon keep-minimized" src={$storeHeaderIcon} alt=icon>
       {/if}
-      <h4 class=window-title style:display={displayHeaderTitle}>{localize($storeTitle)}</h4>
-      {#each buttons as button}
+      <h4 class=window-title style:display={displayHeaderTitle}>
+         {localize($storeTitle)}
+      </h4>
+      {#each buttonsLeft as button}
+         <svelte:component this={button.class} {...button.props} />
+      {/each}
+      <span class=tjs-window-header-spacer />
+      {#each buttonsRight as button}
          <svelte:component this={button.class} {...button.props} />
       {/each}
    </header>
 {/key}
 
 <style>
+   /**
+    * Provides a zero space element that expands to the right creating the gap between window title and left aligned
+    * buttons and right aligned buttons. Note the use of a negative left margin to remove the gap between elements.
+    */
+   .tjs-window-header-spacer {
+      flex: 0;
+      margin-left: calc(-1 * var(--tjs-app-header-gap, 5px));
+      margin-right: auto;
+   }
+
    .window-header {
       flex: var(--tjs-app-header-flex, 0 0 30px);
       gap: var(--tjs-app-header-gap, 5px);
@@ -132,13 +155,15 @@
    .window-header .tjs-app-icon {
       align-self: center;
       border-radius: var(--tjs-app-header-icon-border-radius, 4px);
-      height: var(--tjs-app-header-icon-height, 24px);
       flex: 0 0 var(--tjs-app-header-icon-width, 24px);
+      height: var(--tjs-app-header-icon-height, 24px);
    }
 
    .window-title {
-      text-overflow: ellipsis;
+      gap: var(--tjs-app-header-gap, 5px);
+      max-width: fit-content;
       overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
    }
 </style>
