@@ -149,7 +149,7 @@ export class SvelteFormApplication extends FormApplication
       return deepMerge(super.defaultOptions, {
          defaultCloseAnimation: true,     // If false the default slide close animation is not run.
          draggable: true,                 // If true then application shells are draggable.
-         focusOptions: void 0,            // Stores any assigned FocusOptions data that is applied when app is closed.
+         focusSource: void 0,             // Stores any A11yFocusSource data that is applied when app is closed.
          headerButtonNoClose: false,      // If true then the close header button is removed.
          headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.
          headerIcon: void 0,              // Sets a header icon given an image URL.
@@ -418,9 +418,9 @@ export class SvelteFormApplication extends FormApplication
       this.#stores.uiOptionsUpdate((storeOptions) => deepMerge(storeOptions, { minimized: this._minimized }));
 
       // Apply any stored focus options and then remove them from options.
-      A11yHelper.applyFocusOptions(this.options.focusOptions);
+      A11yHelper.applyFocusSource(this.options.focusSource);
 
-      delete this.options.focusOptions;
+      delete this.options.focusSource;
    }
 
    /**
@@ -862,8 +862,8 @@ export class SvelteFormApplication extends FormApplication
     */
    async _render(force = false, options = {})
    {
-      // Store any focusOptions instance.
-      if (isObject(options?.focusOptions)) { this.options.focusOptions = options.focusOptions; }
+      // Store any focusSource instance.
+      if (isObject(options?.focusSource)) { this.options.focusSource = options.focusSource; }
 
       if (this._state === Application.RENDER_STATES.NONE &&
        document.querySelector(`#${this.id}`) instanceof HTMLElement)
