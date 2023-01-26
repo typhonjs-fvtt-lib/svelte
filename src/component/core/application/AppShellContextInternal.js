@@ -8,13 +8,9 @@ export class AppShellContextInternal
    /** @type {InternalAppStores} */
    #stores;
 
-   /**
-    * @param {{ autoFocus?: boolean }} internalContext - Internal context data defined through application shell prop.
-    */
-   constructor(internalContext)
+   constructor()
    {
       this.#stores = {
-         autoFocus: writable(typeof internalContext?.autoFocus === 'boolean' ? internalContext.autoFocus : true),
          elementContent: writable(void 0),
          elementRoot: writable(void 0)
       };
@@ -34,9 +30,6 @@ export class AppShellContextInternal
 
 /**
  * @typedef {object} InternalAppStores
- *
- * @property {import('svelte/store').Writable<boolean>} autoFocus - When true pointer down on app header will focus the
- *  app and / or the window content area. An example of turning this off is useful for modal dialogs.
  *
  * @property {import('svelte/store').Writable<HTMLElement>} elementContent - The window content element.
  *

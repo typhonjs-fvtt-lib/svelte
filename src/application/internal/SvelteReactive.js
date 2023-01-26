@@ -25,6 +25,8 @@ import {
  * two-way bindings / stores see {@link SvelteReactive.storeAppOptions}.
  *
  * - {@link SvelteReactive.draggable}
+ * - {@link SvelteReactive.focusAuto}
+ * - {@link SvelteReactive.focusKeep}
  * - {@link SvelteReactive.headerButtonNoClose}
  * - {@link SvelteReactive.headerButtonNoLabel}
  * - {@link SvelteReactive.headerIcon}
@@ -214,6 +216,20 @@ export class SvelteReactive
    get draggable() { return this.#application?.options?.draggable; }
 
    /**
+    * Returns the focusAuto app option.
+    *
+    * @returns {boolean} When true auto-management of app focus is enabled.
+    */
+   get focusAuto() { return this.#application?.options?.focusAuto; }
+
+   /**
+    * Returns the focusKeep app option.
+    *
+    * @returns {boolean} When `focusAuto` and `focusKeep` is true; keeps internal focus.
+    */
+   get focusKeep() { return this.#application?.options?.focusKeep; }
+
+   /**
     * Returns the headerButtonNoClose app option.
     *
     * @returns {boolean} Remove the close the button in header app option.
@@ -285,6 +301,26 @@ export class SvelteReactive
    set draggable(draggable)
    {
       if (typeof draggable === 'boolean') { this.setOptions('draggable', draggable); }
+   }
+
+   /**
+    * Sets `this.options.focusAuto` which is reactive for application shells.
+    *
+    * @param {boolean}  focusAuto - Sets the focusAuto option.
+    */
+   set focusAuto(focusAuto)
+   {
+      if (typeof focusAuto === 'boolean') { this.setOptions('focusAuto', focusAuto); }
+   }
+
+   /**
+    * Sets `this.options.focusKeep` which is reactive for application shells.
+    *
+    * @param {boolean}  focusKeep - Sets the focusKeep option.
+    */
+   set focusKeep(focusKeep)
+   {
+      if (typeof focusKeep === 'boolean') { this.setOptions('focusKeep', focusKeep); }
    }
 
    /**
@@ -471,6 +507,8 @@ export class SvelteReactive
          subscribe: writableAppOptions.subscribe,
 
          draggable: propertyStore(writableAppOptions, 'draggable'),
+         focusAuto: propertyStore(writableAppOptions, 'focusAuto'),
+         focusKeep: propertyStore(writableAppOptions, 'focusKeep'),
          headerButtonNoClose: propertyStore(writableAppOptions, 'headerButtonNoClose'),
          headerButtonNoLabel: propertyStore(writableAppOptions, 'headerButtonNoLabel'),
          headerIcon: propertyStore(writableAppOptions, 'headerIcon'),

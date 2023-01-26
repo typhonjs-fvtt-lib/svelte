@@ -16,9 +16,12 @@
    export let draggable = void 0;
    export let draggableOptions = void 0;
 
-   const application = getContext('#external').application;
+   const { application } = getContext('#external');
 
-   const { autoFocus, elementRoot } = getContext('#internal').stores;
+   // Focus related app options stores.
+   const { focusAuto, focusKeep } = application.reactive.storeAppOptions;
+
+   const { elementRoot } = getContext('#internal').stores;
 
    const storeTitle = application.reactive.storeAppOptions.title;
    const storeDraggable = application.reactive.storeAppOptions.draggable;
@@ -99,7 +102,7 @@
     * Explicitly focus `elementRoot` if pointer event is not consumed by header buttons / components. This allows
     * keyboard tab navigation to select header buttons.
     *
-    * Note: if `autoFocus` internal store is set to false `elementRoot` is not focused unless the current browser wide
+    * Note: if `focusAuto` app option store is set to false `elementRoot` is not focused unless the current browser wide
     * active element is not contained inside the app element.
     */
    function onPointerdown(event)
@@ -108,7 +111,7 @@
 
       if (rootEl instanceof HTMLElement && rootEl?.isConnected)
       {
-         if ($autoFocus)
+         if ($focusAuto)
          {
             // When autofocus is enabled always focus the app on window header click.
             rootEl.focus();

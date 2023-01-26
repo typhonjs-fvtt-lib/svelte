@@ -24,9 +24,6 @@
    export let elementContent = void 0;
    export let elementRoot = void 0;
 
-   /** @type {{ autoFocus?: boolean }} */
-   export let internalContext = void 0;
-
    // Explicit style overrides for the main app and content elements. Uses action `applyStyles`.
    export let stylesApp = void 0;
 
@@ -41,8 +38,7 @@
    // Provides options to `A11yHelper.getFocusableElements` to ignore TJSFocusWrap by CSS class.
    const s_IGNORE_CLASSES = { ignoreClasses: ['tjs-focus-wrap'] };
 
-   const internal = new AppShellContextInternal(internalContext);
-   const autoFocus = internal.stores.autoFocus;
+   const internal = new AppShellContextInternal();
 
    // Internal context for `elementContent` / `elementRoot` stores.
    setContext('#internal', internal);
@@ -59,10 +55,11 @@
       getContext('#internal').stores.elementRoot.set(elementRoot);
    }
 
-   const context = getContext('#external');
-
    // Store application reference.
-   const application = context.application;
+   const { application } = getContext('#external');
+
+   // Focus related app options stores.
+   const { focusAuto, focusKeep } = application.reactive.storeAppOptions;
 
    // Assign elementRoot to elementContent.
    $: if (elementRoot) { elementContent = elementRoot; }
@@ -190,7 +187,7 @@
       {
          if (elementRoot instanceof HTMLElement)
          {
-            if ($autoFocus)
+            if ($focusAuto)
             {
                // When autofocus is enabled always focus the app on window header click.
                elementRoot.focus();

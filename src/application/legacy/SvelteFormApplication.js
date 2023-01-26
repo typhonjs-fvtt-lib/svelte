@@ -149,6 +149,8 @@ export class SvelteFormApplication extends FormApplication
       return deepMerge(super.defaultOptions, {
          defaultCloseAnimation: true,     // If false the default slide close animation is not run.
          draggable: true,                 // If true then application shells are draggable.
+         focusAuto: true,                 // When true auto-management of app focus is enabled.
+         focusKeep: false,                // When `focusAuto` and `focusKeep` is true; keeps internal focus.
          focusSource: void 0,             // Stores any A11yFocusSource data that is applied when app is closed.
          headerButtonNoClose: false,      // If true then the close header button is removed.
          headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.

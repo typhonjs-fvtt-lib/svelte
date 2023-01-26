@@ -35,9 +35,6 @@
    export let draggable = void 0;
    export let draggableOptions = void 0;
 
-   /** @type {{ autoFocus?: boolean }} */
-   export let internalContext = void 0;
-
    // The children array can be specified by a parent via prop or is read below from the external context.
    // export let children = void 0;
 
@@ -62,9 +59,7 @@
    const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth ? resizeObserver : () => null;
 
    // Provides the internal context for data / stores of the application shell.
-   const internal = new AppShellContextInternal(internalContext);
-
-   const autoFocus = internal.stores.autoFocus;
+   const internal = new AppShellContextInternal();
 
    // Provides options to `A11yHelper.getFocusableElements` to ignore TJSFocusWrap by CSS class.
    const s_IGNORE_CLASSES = { ignoreClasses: ['tjs-focus-wrap'] };
@@ -84,10 +79,11 @@
       getContext('#internal').stores.elementRoot.set(elementRoot);
    }
 
-   const context = getContext('#external');
-
    // Store application reference.
-   const application = context.application;
+   const { application } = getContext('#external');
+
+   // Focus related app options stores.
+   const { focusAuto, focusKeep } = application.reactive.storeAppOptions;
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -214,10 +210,10 @@
    }
 
    /**
-    * Focus `elementContent` if the event target is not focusable and `autoFocus` is enabled.
+    * Focus `elementContent` if the event target is not focusable and `focusAuto` is enabled.
     *
-    * Note: `autoFocus` is an internal store. This check is a bit tricky as `section.window-content` has a tabindex
-    * of '-1', so it is focusable.
+    * Note: `focusAuto` is an app option store. This check is a bit tricky as `section.window-content` has a tabindex
+    * of '-1', so it is focusable manually.
     */
    function onPointerdownContent(event)
    {
@@ -225,7 +221,7 @@
 
       if (!focusable)
       {
-         if ($autoFocus)
+         if ($focusAuto)
          {
             elementContent.focus();
          }

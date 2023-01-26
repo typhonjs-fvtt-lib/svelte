@@ -34,15 +34,19 @@
    let dialogClass;
    let dialogProps = {};
 
-   let application = getContext('#external').application;
-   let { autoFocus, elementRoot } = getContext('#internal').stores;
+   let { elementRoot } = getContext('#internal').stores;
+
+   let { application } = getContext('#external');
+
+   // Focus related app options stores.
+   const { focusAuto, focusKeep } = application.reactive.storeAppOptions;
 
    let managedPromise = getContext('#managedPromise');
 
    let currentButtonId = data.default;
 
    // Turn off autofocusing app shell / window content when modal.
-   if (modal) { $autoFocus = false; }
+   if (modal) { $focusAuto = false; }
 
    // Remove key listeners from elementRoot.
    onDestroy(() =>

@@ -151,7 +151,9 @@ export class SvelteApplication extends Application
       return deepMerge(super.defaultOptions, {
          defaultCloseAnimation: true,     // If false the default slide close animation is not run.
          draggable: true,                 // If true then application shells are draggable.
-         focusSource: void 0,            // Stores any A11yFocusSource data that is applied when app is closed.
+         focusAuto: true,                 // When true auto-management of app focus is enabled.
+         focusKeep: false,                // When `focusAuto` and `focusKeep` is true; keeps internal focus.
+         focusSource: void 0,             // Stores any A11yFocusSource data that is applied when app is closed.
          headerButtonNoClose: false,      // If true then the close header button is removed.
          headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.
          headerIcon: void 0,              // Sets a header icon given an image URL.
@@ -983,7 +985,11 @@ export class SvelteApplication extends Application
  *
  * @property {boolean}  [draggable=true] - If true then application shells are draggable.
  *
- * @property {object}   [focusSource] - Defines A11yHelper focus target to apply when application closes.
+ * @property {boolean}  [focusAuto=true] - When true auto-management of app focus is enabled.
+ *
+ * @property {boolean}  [focusKeep=false] - When `focusAuto` and `focusKeep` is true; keeps internal focus.
+ *
+ * @property {object}   [focusSource] - Defines A11yHelper focus source to apply when application closes.
  *
  * @property {boolean}  [headerButtonNoClose=false] - If true then the close header button is removed.
  *

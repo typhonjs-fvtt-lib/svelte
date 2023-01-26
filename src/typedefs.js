@@ -35,6 +35,10 @@
  *
  * @property {import('svelte/store').Writable<boolean>} draggable - Derived store for `draggable` updates.
  *
+ * @property {import('svelte/store').Writable<boolean>} focusAuto - Derived store for `focusAuto` updates.
+ *
+ * @property {import('svelte/store').Writable<boolean>} focusKeep - Derived store for `focusKeep` updates.
+ *
  * @property {import('svelte/store').Writable<boolean>} headerButtonNoClose - Derived store for `headerButtonNoClose`
  *                                                                            updates.
  *
