@@ -24,6 +24,7 @@ export class TJSDocumentOwnership extends TJSDialog
          modal: typeof dialogData?.modal === 'boolean' ? dialogData.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
          focusFirst: true,
+         focusKeep: true,
          minimizable: false,
          ...dialogData,
          content: {

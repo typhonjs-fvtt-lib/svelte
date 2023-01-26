@@ -220,17 +220,16 @@
    {
       const focusable = A11yHelper.isFocusable(event.target);
 
-      if (!focusable)
+      if (!focusable && $focusAuto)
       {
-         if ($focusAuto)
+         if ($focusKeep)
          {
-            elementContent.focus();
-         }
-         else
-         {
+            const focusOutside = document.activeElement instanceof HTMLElement &&
+             !elementRoot.contains(document.activeElement);
+
             // Only focus the content element if the active element is outside the app; maintaining internal focused
             // element.
-            if (document.activeElement instanceof HTMLElement && !elementRoot.contains(document.activeElement))
+            if (focusOutside)
             {
                elementContent.focus();
             }
@@ -240,7 +239,33 @@
                event.preventDefault();
             }
          }
+         else
+         {
+            elementContent.focus();
+         }
       }
+      //
+      // if (!focusable)
+      // {
+      //    if ($focusAuto)
+      //    {
+      //       elementContent.focus();
+      //    }
+      //    else
+      //    {
+      //       // Only focus the content element if the active element is outside the app; maintaining internal focused
+      //       // element.
+      //       if (document.activeElement instanceof HTMLElement && !elementRoot.contains(document.activeElement))
+      //       {
+      //          elementContent.focus();
+      //       }
+      //       else
+      //       {
+      //          event.stopPropagation();
+      //          event.preventDefault();
+      //       }
+      //    }
+      // }
    }
 
    /**

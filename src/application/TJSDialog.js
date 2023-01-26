@@ -418,7 +418,11 @@ export class TJSDialog extends SvelteApplication
  *
  * @property {boolean}  [draggable=true] - The dialog is draggable when true.
  *
+ * @property {boolean}  [focusAuto=true] - When true auto-management of app focus is enabled.
+ *
  * @property {boolean}  [focusFirst=false] - When true the first focusable element that isn't a button is focused.
+ *
+ * @property {boolean}  [focusKeep=false] - When `focusAuto` and `focusKeep` is true; keeps internal focus.
  *
  * @property {boolean}  [minimizable=true] - When true the dialog is minimizable.
  *

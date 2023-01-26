@@ -35,6 +35,7 @@ export class TJSDocumentCreate extends TJSDialog
          modal: typeof options?.modal === 'boolean' ? options.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
          focusFirst: true,
+         focusKeep: true,
          minimizable: false,
          ...dialogData,
          content: {

@@ -25,6 +25,7 @@ export class TJSDocumentImport extends TJSDialog
       super({
          modal: typeof dialogData?.modal === 'boolean' ? dialogData.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
+         focusKeep: true,
          minimizable: false,
          ...dialogData,
          title: `${localize('DOCUMENT.ImportData')}: ${document.name}`,

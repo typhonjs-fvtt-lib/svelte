@@ -44,6 +44,7 @@ export class TJSFolderExport extends TJSDialog
       this.data = {
          modal: typeof dialogData?.modal === 'boolean' ? dialogData.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
+         focusKeep: true,
          minimizable: false,
          ...dialogData,
          content: {

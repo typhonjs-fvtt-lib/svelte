@@ -14,7 +14,6 @@
       parseSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
 
    export let data = void 0;
-   export let modal = false;
    export let preventDefault = false;
    export let stopPropagation = false;
 
@@ -38,15 +37,9 @@
 
    let { application } = getContext('#external');
 
-   // Focus related app options stores.
-   const { focusAuto, focusKeep } = application.reactive.storeAppOptions;
-
    let managedPromise = getContext('#managedPromise');
 
    let currentButtonId = data.default;
-
-   // Turn off autofocusing app shell / window content when modal.
-   if (modal) { $focusAuto = false; }
 
    // Remove key listeners from elementRoot.
    onDestroy(() =>

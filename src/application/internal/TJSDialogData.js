@@ -43,11 +43,25 @@ export class TJSDialogData
    draggable;
 
    /**
+    * When true auto-management of app focus is enabled.
+    *
+    * @type {boolean}
+    */
+   focusAuto;
+
+   /**
     * When true the first focusable element that isn't a button is focused.
     *
     * @type {boolean}
     */
    focusFirst;
+
+   /**
+    * When `focusAuto` and `focusKeep` is true; keeps internal focus.
+    *
+    * @type {boolean}
+    */
+   focusKeep;
 
    /**
     * When true the dialog is minimizable.

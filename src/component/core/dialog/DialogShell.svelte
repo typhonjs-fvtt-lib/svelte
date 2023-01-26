@@ -113,14 +113,35 @@
       if (zIndex !== newZIndex) { zIndex = newZIndex; }
 
       // Update the main foundry options when data changes. Perform explicit checks against existing data in `application`.
-      const newDraggable = data.draggable ?? true;
-      if (application.reactive.draggable !== newDraggable) { application.reactive.draggable = newDraggable; }
+      const newDraggable = typeof data.draggable === 'boolean' ? data.draggable : void 0;
+      if (newDraggable !== void 0 && application.reactive.draggable !== newDraggable)
+      {
+         application.reactive.draggable = newDraggable;
+      }
 
-      const newMinimizable = data.minimizable ?? true;
-      if (application.reactive.minimizable !== newMinimizable) { application.reactive.minimizable = newMinimizable; }
+      const newFocusAuto = typeof data.focusAuto === 'boolean' ? data.focusAuto : void 0;
+      if (newFocusAuto !== void 0 && application.reactive.focusAuto !== newFocusAuto)
+      {
+         application.reactive.focusAuto = newFocusAuto;
+      }
 
-      const newResizable = data.resizable ?? false;
-      if (application.reactive.resizable !== newResizable) { application.reactive.resizable = newResizable; }
+      const newFocusKeep = typeof data.focusKeep === 'boolean' ? data.focusKeep : void 0;
+      if (newFocusKeep !== void 0 && application.reactive.focusKeep !== newFocusKeep)
+      {
+         application.reactive.focusKeep = newFocusKeep;
+      }
+
+      const newMinimizable = typeof data.minimizable === 'boolean' ? data.minimizable : void 0;
+      if (newMinimizable !== void 0 && application.reactive.minimizable !== newMinimizable)
+      {
+         application.reactive.minimizable = newMinimizable;
+      }
+
+      const newResizable = typeof data.resizable === 'boolean' ? data.resizable : void 0;
+      if (newResizable !== void 0 && application.reactive.resizable !== newResizable)
+      {
+         application.reactive.resizable = newResizable;
+      }
 
       // Note application.title from Application localizes `options.title`, so compare with `application.options.title`.
       const newTitle = data.title ?? 'Dialog';
@@ -260,7 +281,7 @@
 {#if modal}
    <TJSGlassPane id={`${application.id}-glasspane`} {...modalProps} {zIndex}>
       <ApplicationShell bind:elementRoot bind:elementContent {...appProps} appOffsetHeight={true}>
-         <DialogContent bind:dialogComponent {data} {modal} stopPropagation={true} />
+         <DialogContent bind:dialogComponent {data} stopPropagation={true} />
       </ApplicationShell>
    </TJSGlassPane>
 {:else}
