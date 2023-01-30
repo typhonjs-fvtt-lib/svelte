@@ -195,6 +195,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
          if (!foundTarget) { return; }
       }
 
+      event.stopPropagation();
       event.preventDefault();
 
       dragging = false;
@@ -242,6 +243,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
 
       if (event.button !== -1 || !event.isPrimary) { return; }
 
+      event.stopPropagation();
       event.preventDefault();
 
       // Only set store dragging on first move event.
@@ -289,6 +291,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
     */
    function onDragPointerUp(event)
    {
+      event.stopPropagation();
       event.preventDefault();
 
       dragging = false;

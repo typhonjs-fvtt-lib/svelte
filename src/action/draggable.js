@@ -155,6 +155,7 @@ function draggable(node, { position, active = true, button = 0, storeDragging = 
          if (!foundTarget) { return; }
       }
 
+      event.stopPropagation();
       event.preventDefault();
 
       dragging = false;
@@ -188,6 +189,7 @@ function draggable(node, { position, active = true, button = 0, storeDragging = 
 
       if (event.button !== -1 || !event.isPrimary) { return; }
 
+      event.stopPropagation();
       event.preventDefault();
 
       // Only set store dragging on first move event.
@@ -222,6 +224,7 @@ function draggable(node, { position, active = true, button = 0, storeDragging = 
     */
    function onDragPointerUp(event)
    {
+      event.stopPropagation();
       event.preventDefault();
 
       dragging = false;
