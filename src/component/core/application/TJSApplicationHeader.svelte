@@ -132,25 +132,6 @@
          {
             rootEl.focus();
          }
-
-         // if ($focusAuto)
-         // {
-         //    // When autofocus is enabled always focus the app on window header click.
-         //    rootEl.focus();
-         // }
-         // else
-         // {
-         //    // Only focus the app header if the active element is outside the app; maintaining internal focused element.
-         //    if (document.activeElement instanceof HTMLElement && !rootEl.contains(document.activeElement))
-         //    {
-         //       rootEl.focus();
-         //    }
-         //    else
-         //    {
-         //       event.stopPropagation();
-         //       event.preventDefault();
-         //    }
-         // }
       }
       else
       {

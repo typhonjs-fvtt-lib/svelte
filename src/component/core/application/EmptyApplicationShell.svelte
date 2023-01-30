@@ -206,54 +206,7 @@
          {
             elementRoot.focus();
          }
-
-         // if (elementRoot instanceof HTMLElement)
-         // {
-         //    if ($focusAuto)
-         //    {
-         //       // When autofocus is enabled always focus the app on window header click.
-         //       elementRoot.focus();
-         //    }
-         //    else
-         //    {
-         //       // Only focus the app header if the active element is outside the app; maintaining internal focused element.
-         //       if (document.activeElement instanceof HTMLElement && !elementRoot.contains(document.activeElement))
-         //       {
-         //          elementRoot.focus();
-         //       }
-         //       else
-         //       {
-         //          event.stopPropagation();
-         //          event.preventDefault();
-         //       }
-         //    }
-         // }
       }
-      //
-      // if (!focusable)
-      // {
-      //    if (elementRoot instanceof HTMLElement)
-      //    {
-      //       if ($focusAuto)
-      //       {
-      //          // When autofocus is enabled always focus the app on window header click.
-      //          elementRoot.focus();
-      //       }
-      //       else
-      //       {
-      //          // Only focus the app header if the active element is outside the app; maintaining internal focused element.
-      //          if (document.activeElement instanceof HTMLElement && !elementRoot.contains(document.activeElement))
-      //          {
-      //             elementRoot.focus();
-      //          }
-      //          else
-      //          {
-      //             event.stopPropagation();
-      //             event.preventDefault();
-      //          }
-      //       }
-      //    }
-      // }
 
       if (typeof application.options.popOut === 'boolean' && application.options.popOut &&
        application !== globalThis.ui?.activeWindow)

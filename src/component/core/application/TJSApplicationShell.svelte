@@ -244,28 +244,6 @@
             elementContent.focus();
          }
       }
-      //
-      // if (!focusable)
-      // {
-      //    if ($focusAuto)
-      //    {
-      //       elementContent.focus();
-      //    }
-      //    else
-      //    {
-      //       // Only focus the content element if the active element is outside the app; maintaining internal focused
-      //       // element.
-      //       if (document.activeElement instanceof HTMLElement && !elementRoot.contains(document.activeElement))
-      //       {
-      //          elementContent.focus();
-      //       }
-      //       else
-      //       {
-      //          event.stopPropagation();
-      //          event.preventDefault();
-      //       }
-      //    }
-      // }
    }
 
    /**
