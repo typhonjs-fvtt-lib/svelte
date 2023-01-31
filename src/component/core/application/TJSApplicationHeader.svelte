@@ -155,7 +155,7 @@
       {#each buttonsLeft as button}
          <svelte:component this={button.class} {...button.props} />
       {/each}
-      <span class=tjs-window-header-spacer />
+      <span class="tjs-window-header-spacer keep-minimized" />
       {#each buttonsRight as button}
          <svelte:component this={button.class} {...button.props} />
       {/each}
