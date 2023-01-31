@@ -7,6 +7,7 @@
     *
     * TRL also supports the following extra button data:
     * - {keyCode='Enter'}           keyCode: A string conforming to `KeyboardEvent.code` to activate `onPress` callback.
+    * - {keepMinimized=false}       keepMinimized: When true the button is not removed when app minimized.
     * - {Function}                  onContextMenu: Invoked when right mouse button or contextmenu key is pressed.
     * - {Function}                  onPress: Invoked when left mouse button or `keyCode` key is pressed.
     * - {Record<string, string>}    styles: Additional inline styles to apply to button.
@@ -20,22 +21,19 @@
 
    const s_REGEX_HTML = /^\s*<.*>$/;
 
-   let icon, keyCode, label, title, styles
+   $: title = isObject(button) && typeof button.title === 'string' ? localize(button.title) : '';
 
-   $: if (isObject(button))
-   {
-      title = typeof button.title === 'string' ? localize(button.title) : '';
+   // Handle icon and treat bare strings as the icon class; otherwise assume the icon is fully formed HTML.
+   $: icon = isObject(button) && typeof button.icon !== 'string' ? void 0 : s_REGEX_HTML.test(button.icon) ?
+    button.icon : `<i class="${button.icon}" title="${title}"></i>`;
 
-      // Handle icon and treat bare strings as the icon class; otherwise assume the icon is fully formed HTML.
-      icon = typeof button.icon !== 'string' ? void 0 : s_REGEX_HTML.test(button.icon) ? button.icon :
-       `<i class="${button.icon}" title="${title}"></i>`;
+   $: label = isObject(button) && typeof button.label === 'string' ? localize(button.label) : void 0;
 
-      label = typeof button.label === 'string' ? localize(button.label) : void 0;
+   $: keepMinimized = isObject(button) && typeof button.keepMinimized === 'boolean' ? button.keepMinimized : false;
 
-      keyCode = typeof button.keyCode === 'string' ? button.keyCode : 'Enter';
+   $: keyCode = isObject(button) && typeof button.keyCode === 'string' ? button.keyCode : 'Enter';
 
-      styles = isObject(button.styles) ? button.styles : void 0;
-   }
+   $: styles = isObject(button) && isObject(button.styles) ? button.styles : void 0;
 
    function onClick(event)
    {
@@ -107,6 +105,7 @@
    on:keyup={onKeyup}
    use:applyStyles={styles}
    class="header-button {button.class}"
+   class:keep-minimized={keepMinimized}
    aria-label={label}
    tabindex=0
    role=button>
