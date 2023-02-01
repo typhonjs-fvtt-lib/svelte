@@ -126,8 +126,8 @@
    }
 
    a:focus-visible {
-      text-shadow: var(--tjs-app-header-button-anchor-text-shadow-focus, var(--tjs-default-text-shadow-focus-hover, inherit));
-      outline: var(--tjs-app-header-button-outline-focus, var(--tjs-default-outline-focus-visible, revert));
+      text-shadow: var(--tjs-app-header-button-anchor-text-shadow-focus-visible, var(--tjs-default-text-shadow-focus-hover, inherit));
+      outline: var(--tjs-app-header-button-outline-focus-visible, var(--tjs-default-outline-focus-visible, revert));
    }
 
    span {

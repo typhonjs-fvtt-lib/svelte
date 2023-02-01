@@ -350,11 +350,11 @@
    }
 
    .window-app:focus-visible {
-      outline: var(--tjs-app-outline-focus, 2px solid transparent);
+      outline: var(--tjs-app-outline-focus-visible, 2px solid transparent);
    }
 
    .window-content:focus-visible {
-      outline: var(--tjs-app-content-outline-focus, 2px solid transparent);
+      outline: var(--tjs-app-content-outline-focus-visible, 2px solid transparent);
    }
 
    /* Override Foundry default; adjust --tjs-app-header-gap to change gap size */

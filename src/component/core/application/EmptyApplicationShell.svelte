@@ -300,6 +300,6 @@
     }
 
     div:focus-visible {
-        outline: var(--tjs-app-outline-focus, 2px solid transparent);
+        outline: var(--tjs-app-outline-focus-visible, 2px solid transparent);
     }
 </style>
