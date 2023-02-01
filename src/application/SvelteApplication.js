@@ -154,6 +154,7 @@ export class SvelteApplication extends Application
          focusAuto: true,                 // When true auto-management of app focus is enabled.
          focusKeep: false,                // When `focusAuto` and `focusKeep` is true; keeps internal focus.
          focusSource: void 0,             // Stores any A11yFocusSource data that is applied when app is closed.
+         focusTrap: true,                 // When true focus trapping / wrapping is enabled keeping focus inside app.
          headerButtonNoClose: false,      // If true then the close header button is removed.
          headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.
          headerIcon: void 0,              // Sets a header icon given an image URL.

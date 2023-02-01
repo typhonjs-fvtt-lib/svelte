@@ -424,6 +424,8 @@ export class TJSDialog extends SvelteApplication
  *
  * @property {boolean}  [focusKeep=false] - When `focusAuto` and `focusKeep` is true; keeps internal focus.
  *
+ * @property {boolean}  [focusTrap=true] - When true focus trapping / wrapping is enabled keeping focus inside app.
+ *
  * @property {boolean}  [minimizable=true] - When true the dialog is minimizable.
  *
  * @property {boolean}  [modal=false] - When true a modal dialog is displayed.

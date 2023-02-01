@@ -1,8 +1,11 @@
 <script>
-   import { A11yHelper } from '@typhonjs-fvtt/svelte/util';
+   import { A11yHelper }        from '@typhonjs-fvtt/svelte/util';
 
    /** @type {HTMLElement} */
    export let elementRoot = void 0;
+
+   /** @type {boolean} */
+   export let enabled = true;
 
    let ignoreElements, wrapEl;
 
@@ -10,6 +13,9 @@
 
    function onFocus()
    {
+      // Early out if not enabled.
+      if (!enabled) { return; }
+
       if (elementRoot instanceof HTMLElement)
       {
          const firstFocusEl = A11yHelper.getFirstFocusableElement(elementRoot, ignoreElements);

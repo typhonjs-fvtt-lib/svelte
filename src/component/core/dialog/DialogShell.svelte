@@ -131,6 +131,12 @@
          application.reactive.focusKeep = newFocusKeep;
       }
 
+      const newFocusTrap = typeof data.focusTrap === 'boolean' ? data.focusTrap : void 0;
+      if (newFocusTrap !== void 0 && application.reactive.focusTrap !== newFocusTrap)
+      {
+         application.reactive.focusTrap = newFocusTrap;
+      }
+
       const newMinimizable = typeof data.minimizable === 'boolean' ? data.minimizable : void 0;
       if (newMinimizable !== void 0 && application.reactive.minimizable !== newMinimizable)
       {

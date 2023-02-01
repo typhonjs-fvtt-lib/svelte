@@ -27,6 +27,7 @@ import {
  * - {@link SvelteReactive.draggable}
  * - {@link SvelteReactive.focusAuto}
  * - {@link SvelteReactive.focusKeep}
+ * - {@link SvelteReactive.focusTrap}
  * - {@link SvelteReactive.headerButtonNoClose}
  * - {@link SvelteReactive.headerButtonNoLabel}
  * - {@link SvelteReactive.headerIcon}
@@ -230,6 +231,13 @@ export class SvelteReactive
    get focusKeep() { return this.#application?.options?.focusKeep; }
 
    /**
+    * Returns the focusTrap app option.
+    *
+    * @returns {boolean} When true focus trapping / wrapping is enabled keeping focus inside app.
+    */
+   get focusTrap() { return this.#application?.options?.focusTrap; }
+
+   /**
     * Returns the headerButtonNoClose app option.
     *
     * @returns {boolean} Remove the close the button in header app option.
@@ -321,6 +329,16 @@ export class SvelteReactive
    set focusKeep(focusKeep)
    {
       if (typeof focusKeep === 'boolean') { this.setOptions('focusKeep', focusKeep); }
+   }
+
+   /**
+    * Sets `this.options.focusTrap` which is reactive for application shells.
+    *
+    * @param {boolean}  focusTrap - Sets the focusTrap option.
+    */
+   set focusTrap(focusTrap)
+   {
+      if (typeof focusTrap === 'boolean') { this.setOptions('focusTrap', focusTrap); }
    }
 
    /**
@@ -509,6 +527,7 @@ export class SvelteReactive
          draggable: propertyStore(writableAppOptions, 'draggable'),
          focusAuto: propertyStore(writableAppOptions, 'focusAuto'),
          focusKeep: propertyStore(writableAppOptions, 'focusKeep'),
+         focusTrap: propertyStore(writableAppOptions, 'focusTrap'),
          headerButtonNoClose: propertyStore(writableAppOptions, 'headerButtonNoClose'),
          headerButtonNoLabel: propertyStore(writableAppOptions, 'headerButtonNoLabel'),
          headerIcon: propertyStore(writableAppOptions, 'headerIcon'),

@@ -59,7 +59,14 @@
    const { application } = getContext('#external');
 
    // Focus related app options stores.
-   const { focusAuto, focusKeep } = application.reactive.storeAppOptions;
+   const { focusAuto, focusKeep, focusTrap } = application.reactive.storeAppOptions;
+
+   const { minimized } = application.reactive.storeUIState;
+
+   let focusWrapEnabled;
+
+   // Enable TJSFocusWrap component when focus trapping app option is true and app is not minimized.
+   $: focusWrapEnabled = $focusTrap && !$minimized;
 
    // Assign elementRoot to elementContent.
    $: if (elementRoot) { elementContent = elementRoot; }
@@ -144,7 +151,7 @@
     */
    function onKeydown(event)
    {
-      if (event.shiftKey && event.code === 'Tab')
+      if (focusWrapEnabled && event.shiftKey && event.code === 'Tab')
       {
          // Collect all focusable elements from `elementRoot` and ignore TJSFocusWrap.
          const allFocusable = A11yHelper.getFocusableElements(elementRoot, s_IGNORE_CLASSES);
@@ -264,7 +271,7 @@
          use:appResizeObserver={resizeObservedApp}
          tabindex=-1>
         <slot />
-        <TJSFocusWrap {elementRoot} />
+        <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
     </div>
 {:else}
     <div id={application.id}
@@ -277,7 +284,7 @@
          use:appResizeObserver={resizeObservedApp}
          tabindex=-1>
         <slot />
-        <TJSFocusWrap {elementRoot} />
+        <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
     </div>
 {/if}
 

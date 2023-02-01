@@ -151,6 +151,7 @@ export class SvelteFormApplication extends FormApplication
          draggable: true,                 // If true then application shells are draggable.
          focusAuto: true,                 // When true auto-management of app focus is enabled.
          focusKeep: false,                // When `focusAuto` and `focusKeep` is true; keeps internal focus.
+         focusTrap: true,                 // When true focus trapping / wrapping is enabled keeping focus inside app.
          focusSource: void 0,             // Stores any A11yFocusSource data that is applied when app is closed.
          headerButtonNoClose: false,      // If true then the close header button is removed.
          headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.
