@@ -91,7 +91,7 @@
    let focusWrapEnabled;
 
    // Enable TJSFocusWrap component when focus trapping app option is true and app is not minimized.
-   $: focusWrapEnabled = $focusTrap && !$minimized;
+   $: focusWrapEnabled = $focusAuto && $focusTrap && !$minimized;
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -161,9 +161,56 @@
    // ---------------------------------------------------------------------------------------------------------------
 
    // Focus `elementRoot` on mount to allow keyboard tab navigation of header buttons.
-   onMount(() => elementRoot.focus());
+   onMount(() =>
+   {
+      if ($focusAuto) { elementRoot.focus(); }
+   });
 
    // ---------------------------------------------------------------------------------------------------------------
+
+   /**
+    * Provides a handler for the custom `close:popup` event fired by `svelte-standard` components like TJSMenu. The
+    * intention is to handle focus management of a component that is no longer connected in the DOM. If a target element
+    * that is the source of the close event is attached attempt to resolve internal focus to the application.
+    *
+    * @param {CustomEvent}  event - A custom event for `close:popup`.
+    */
+   function onClosePopup(event)
+   {
+      // Early out as automatic focus management is not enabled.
+      if (!$focusAuto) { return; }
+
+      const targetEl = event?.detail?.target;
+
+      // Early out if there is no target element.
+      if (!(targetEl instanceof HTMLElement)) { return; }
+
+      // Early out if the target element is focusable as it will gain focus naturally.
+      if (A11yHelper.isFocusable(targetEl)) { return; }
+
+      const elementRootContains = elementRoot.contains(targetEl);
+
+      // First check for if the target is elementRoot or elementContent then fallback to contains checks.
+      if (targetEl === elementRoot)
+      {
+         elementRoot.focus();
+      }
+      else if (targetEl === elementContent)
+      {
+         elementContent.focus();
+      }
+      else if (elementRootContains)
+      {
+         if (elementContent.contains(targetEl))
+         {
+            elementContent.focus();
+         }
+         else
+         {
+            elementRoot.focus();
+         }
+      }
+   }
 
    /**
     * Provides focus cycling inside the application capturing `<Shift-Tab>` and if `elementRoot` or `firstFocusEl` is
@@ -197,7 +244,7 @@
       }
 
       // Make sure this application is top most when it receives keyboard events.
-      if (typeof application.options.popOut === 'boolean' && application.options.popOut &&
+      if (typeof application?.options?.popOut === 'boolean' && application.options.popOut &&
        application !== globalThis.ui?.activeWindow)
       {
          application.bringToTop.call(application);
@@ -210,7 +257,7 @@
     */
    function onPointerdownApp()
    {
-      if (typeof application.options.popOut === 'boolean' && application.options.popOut &&
+      if (typeof application?.options?.popOut === 'boolean' && application.options.popOut &&
        application !== globalThis.ui?.activeWindow)
       {
          application.bringToTop.call(application);
@@ -242,7 +289,6 @@
             }
             else
             {
-               event.stopPropagation();
                event.preventDefault();
             }
          }
@@ -310,6 +356,7 @@
          bind:this={elementRoot}
          in:inTransition={inTransitionOptions}
          out:outTransition={outTransitionOptions}
+         on:close:popup|preventDefault|stopPropagation={onClosePopup}
          on:keydown|capture={onKeydown}
          on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
@@ -332,6 +379,7 @@
          class="tjs-app tjs-window-app {application.options.classes.join(' ')}"
          data-appid={application.appId}
          bind:this={elementRoot}
+         on:close:popup|preventDefault|stopPropagation={onClosePopup}
          on:keydown|capture={onKeydown}
          on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
