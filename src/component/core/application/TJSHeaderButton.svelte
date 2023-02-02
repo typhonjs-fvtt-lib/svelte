@@ -126,8 +126,10 @@
    }
 
    a:focus-visible {
-      text-shadow: var(--tjs-app-header-button-anchor-text-shadow-focus-visible, var(--tjs-default-text-shadow-focus-hover, inherit));
+      box-shadow: var(--tjs-app-header-button-box-shadow-focus-visible, var(--tjs-default-box-shadow-focus-visible));
       outline: var(--tjs-app-header-button-outline-focus-visible, var(--tjs-default-outline-focus-visible, revert));
+      transition: var(--tjs-app-header-button-transition-focus-visible, var(--tjs-default-transition-focus-visible));
+      text-shadow: var(--tjs-app-header-button-anchor-text-shadow-focus-visible, var(--tjs-default-text-shadow-focus-hover, inherit));
    }
 
    span {
