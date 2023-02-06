@@ -892,7 +892,7 @@ export class SvelteFormApplication extends FormApplication
     * Render the inner application content. Only render a template if one is defined otherwise provide an empty
     * JQuery element per the core Foundry API.
     *
-    * @param {Object} data         The data used to render the inner template
+    * @param {object} data         The data used to render the inner template
     *
     * @returns {Promise.<JQuery>}   A promise resolving to the constructed jQuery object
     *

@@ -94,7 +94,7 @@ export class AdapterValidators
        *
        * @type {number}
        */
-      let subscribeCount = 0;
+      // let subscribeCount = 0;  // TODO: Currently unused
 
       for (const validator of validators)
       {
@@ -180,7 +180,7 @@ export class AdapterValidators
             }
 
             this.#mapUnsubscribe.set(data.validator, unsubscribe);
-            subscribeCount++;
+            // subscribeCount++;  // TODO: Currently unused
          }
       }
 

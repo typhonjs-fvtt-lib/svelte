@@ -272,6 +272,21 @@ export class GsapCompose
    }
 }
 
+/**
+ *
+ *
+ * @param {string}            operation - GsapPosition function to invoke.
+ *
+ * @param {Position|object}   [target] -
+ *
+ * @param {object}            [options] -
+ *
+ * @param {*}                 [arg1] -
+ *
+ * @param {*}                 [arg2] -
+ *
+ * @returns {*} GsapPosition function result.
+ */
 function s_DISPATCH_POSITION(operation, target, options, arg1, arg2)
 {
    if (target instanceof Position)

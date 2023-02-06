@@ -814,6 +814,9 @@ class DraggableGsapOptions
 /**
  * Define a function to get a DraggableGsapOptions instance.
  *
+ * @param {{ ease?: boolean, easeOptions?: object, inertia?: boolean, inertiaOptions?: object }} options -
+ *        DraggableGsapOptions.
+ *
  * @returns {DraggableGsapOptions} A new options instance.
  */
 draggableGsap.options = (options) => new DraggableGsapOptions(options);

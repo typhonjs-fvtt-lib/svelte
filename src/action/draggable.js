@@ -457,6 +457,8 @@ class DraggableOptions
 /**
  * Define a function to get a DraggableOptions instance.
  *
+ * @param {{ ease?: boolean, easeOptions?: object }} options - Draggable options.
+ *
  * @returns {DraggableOptions} A new options instance.
  */
 draggable.options = (options) => new DraggableOptions(options);
