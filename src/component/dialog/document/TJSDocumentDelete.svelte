@@ -17,7 +17,7 @@
       throw new TypeError(`TJSDocumentDelete error: 'document' is not an instance of Document.`);
    }
 
-   const doc = new TJSDocument(document, { delete: application.close.bind(application) });
+   const doc = new TJSDocument(document, { postDelete: application.close.bind(application) });
 
    let name = document?.id ? document.name : '';
    let type = localize(document.constructor.metadata.label);
@@ -50,7 +50,7 @@
    export async function deleteDocument()
    {
       // Remove the delete Document function callback as we are intentionally deleting below.
-      doc.setOptions({ delete: void 0 });
+      doc.setOptions({ postDelete: void 0 });
 
       return document.delete(context);
    }
