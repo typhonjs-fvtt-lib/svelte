@@ -3,7 +3,7 @@
  */
 declare class A11yHelper {
     /**
-     * Apply focus to the HTMLElement targets in a given FocusOptions data object. An iterable list `options.focusEl`
+     * Apply focus to the HTMLElement targets in a given A11yFocusSource data object. An iterable list `options.focusEl`
      * can contain HTMLElements or selector strings. If multiple focus targets are provided in a list then the first
      * valid target found will be focused. If focus target is a string then a lookup via `document.querySelector` is
      * performed. In this case you should provide a unique selector for the desired focus target.
@@ -11,10 +11,10 @@ declare class A11yHelper {
      * Note: The body of this method is postponed to the next clock tick to allow any changes in the DOM to occur that
      * might alter focus targets before applying.
      *
-     * @param {FocusOptions|{ focusOptions: FocusOptions }}   options - The focus options instance to apply.
+     * @param {A11yFocusSource|{ focusSource: A11yFocusSource }}   options - The focus options instance to apply.
      */
-    static applyFocusOptions(options: FocusOptions | {
-        focusOptions: FocusOptions;
+    static applyFocusSource(options: A11yFocusSource | {
+        focusSource: A11yFocusSource;
     }): void;
     /**
      * Returns first focusable element within a specified element.
@@ -38,23 +38,34 @@ declare class A11yHelper {
      *
      * @param {HTMLElement|Document} [element=document] Optional element to start query.
      *
-     * @param {object} [options] - Optional parameters.
+     * @param {object}            [options] - Optional parameters.
      *
-     * @param {boolean} [options.anchorHref=true] - When true anchors must have an HREF.
+     * @param {boolean}           [options.anchorHref=true] - When true anchors must have an HREF.
      *
-     * @param {Iterable<string>} [options.ignoreClasses] - Iterable list of classes to ignore elements.
+     * @param {Iterable<string>}  [options.ignoreClasses] - Iterable list of classes to ignore elements.
      *
-     * @param {Set<HTMLElement>} [options.ignoreElements] - Set of elements to ignore.
+     * @param {Set<HTMLElement>}  [options.ignoreElements] - Set of elements to ignore.
+     *
+     * @param {string}            [options.selectors] - Custom list of focusable selectors for `querySelectorAll`.
      *
      * @returns {Array<HTMLElement>} Child keyboard focusable
      */
-    static getFocusableElements(element?: HTMLElement | Document, { anchorHref, ignoreClasses, ignoreElements }?: {
+    static getFocusableElements(element?: HTMLElement | Document, { anchorHref, ignoreClasses, ignoreElements, selectors }?: {
         anchorHref?: boolean;
         ignoreClasses?: Iterable<string>;
         ignoreElements?: Set<HTMLElement>;
+        selectors?: string;
     }): Array<HTMLElement>;
     /**
-     * Gets a FocusOptions object from the given DOM event allowing for optional X / Y screen space overrides.
+     * Returns the default focusable selectors query.
+     *
+     * @param {boolean}  [anchorHref=true] - When true anchors must have an HREF.
+     *
+     * @returns {string} Focusable selectors for `querySelectorAll`.
+     */
+    static "__#169507@#getFocusableSelectors"(anchorHref?: boolean): string;
+    /**
+     * Gets a A11yFocusSource object from the given DOM event allowing for optional X / Y screen space overrides.
      * Browsers (Firefox / Chrome) forwards a mouse event for the context menu keyboard button. Provides detection of
      * when the context menu event is from the keyboard. Firefox as of (1/23) does not provide the correct screen space
      * coordinates, so for keyboard context menu presses coordinates are generated from the centroid point of the
@@ -62,35 +73,35 @@ declare class A11yHelper {
      *
      * A default fallback element or selector string may be provided to provide the focus target. If the event comes from
      * the keyboard however the source focused element is inserted as the target with the fallback value appended to the
-     * list of focus targets. When FocusOptions is applied by {@link A11yHelper.applyFocusOptions} the target focus
+     * list of focus targets. When A11yFocusSource is applied by {@link A11yHelper.applyFocusSource} the target focus
      * list is iterated through until a connected target is found and focus applied.
      *
      * @param {object} options - Options
      *
      * @param {KeyboardEvent|MouseEvent}   [options.event] - The source DOM event.
      *
-     * @param {boolean} [options.debug] - When true {@link A11yHelper.applyFocusOptions} logs focus target data.
+     * @param {boolean} [options.debug] - When true {@link A11yHelper.applyFocusSource} logs focus target data.
      *
-     * @param {HTMLElement|string} [options.focusEl] - A specific HTMLElement or selector string
+     * @param {HTMLElement|string} [options.focusEl] - A specific HTMLElement or selector string as the focus target.
      *
      * @param {number}   [options.x] - Used when an event isn't provided; integer of event source in screen space.
      *
      * @param {number}   [options.y] - Used when an event isn't provided; integer of event source in screen space.
      *
-     * @returns {FocusOptions} A FocusOptions object.
+     * @returns {A11yFocusSource} A A11yFocusSource object.
      *
      * @see https://bugzilla.mozilla.org/show_bug.cgi?id=1426671
      * @see https://bugzilla.mozilla.org/show_bug.cgi?id=314314
      *
      * TODO: Evaluate / test against touch input devices.
      */
-    static getFocusOptions({ event, x, y, focusEl, debug }: {
+    static getFocusSource({ event, x, y, focusEl, debug }: {
         event?: KeyboardEvent | MouseEvent;
         debug?: boolean;
         focusEl?: HTMLElement | string;
         x?: number;
         y?: number;
-    }): FocusOptions;
+    }): A11yFocusSource;
     /**
      * Returns first focusable element within a specified element.
      *
@@ -125,14 +136,22 @@ declare class A11yHelper {
         anchorHref?: boolean;
         ignoreClasses?: Iterable<string>;
     }): boolean;
+    /**
+     * Convenience method to check if the given data is a valid focus source.
+     *
+     * @param {HTMLElement|string}   data - Either an HTMLElement or selector string.
+     *
+     * @returns {boolean} Is valid focus source.
+     */
+    static isFocusSource(data: HTMLElement | string): boolean;
 }
 /**
  * - Provides essential data to return focus to an HTMLElement after a series of UI
  * actions like working with context menus and modal dialogs.
  */
-type FocusOptions = {
+type A11yFocusSource = {
     /**
-     * - When true logs to console the actions taken in {@link A11yHelper.applyFocusOptions }.
+     * - When true logs to console the actions taken in {@link A11yHelper.applyFocusSource }.
      */
     debug?: boolean;
     /**
@@ -152,6 +171,73 @@ type FocusOptions = {
      */
     y?: number;
 };
+
+/**
+ * Provides management of a single Promise that can be shared and accessed across JS & Svelte components. This allows a
+ * Promise to be created and managed as part of the TRL application lifecycle and accessed safely in various control
+ * flow scenarios. When resolution of the current managed Promise starts further interaction is prevented.
+ *
+ * Note: to enable debugging / log statements set the static `logging` variable to true.
+ */
+declare class ManagedPromise {
+    /** @type {boolean} */
+    static "__#169508@#logging": boolean;
+    /**
+     * Sets global logging enabled state.
+     *
+     * @param {boolean}  logging - New logging enabled state.
+     */
+    static set logging(arg: boolean);
+    /**
+     * @returns {boolean} Whether global logging is enabled.
+     */
+    static get logging(): boolean;
+    /**
+     * @returns {boolean} Whether there is an active managed Promise.
+     */
+    get isActive(): boolean;
+    /**
+     * @returns {boolean} Whether there is an active managed Promise and resolution is currently being processed.
+     */
+    get isProcessing(): boolean;
+    /**
+     * Resolves any current Promise with undefined and creates a new current Promise.
+     *
+     * @template T
+     *
+     * @param {object} opts - Options.
+     *
+     * @param {boolean}  [opts.reuse=false] - When true if there is an existing live Promise it is returned immediately.
+     *
+     * @returns {Promise<T>} The new current managed Promise.
+     */
+    create<T>({ reuse }?: {
+        reuse?: boolean;
+    }): Promise<T>;
+    /**
+     * Gets the current Promise if any.
+     *
+     * @returns {Promise<any>} Current Promise.
+     */
+    get(): Promise<any>;
+    /**
+     * Rejects the current Promise if applicable.
+     *
+     * @param {*}  [result] - Result to reject.
+     *
+     * @returns {boolean} Was the promise rejected.
+     */
+    reject(result?: any): boolean;
+    /**
+     * Resolves the current Promise if applicable.
+     *
+     * @param {*}  [result] - Result to resolve.
+     *
+     * @returns {boolean} Was the promise resolved.
+     */
+    resolve(result?: any): boolean;
+    #private;
+}
 
 /**
  * Provides access to the Clipboard API for reading / writing text strings. This requires a secure context.
@@ -253,8 +339,17 @@ type StackingContext = {
 };
 
 /**
- * First pass at a system to create a unique style sheet for the UI library that loads default values for all CSS
- * variables.
+ * Provides a managed dynamic style sheet / element useful in configuring global CSS variables. When creating an
+ * instance of StyleManager you must provide a "document key" / string for the style element added. The style element
+ * can be accessed via `document[docKey]`.
+ *
+ * Instances of StyleManager can also be versioned by supplying a positive integer greater than or equal to `1` via the
+ * 'version' option. This version number is assigned to the associated style element. When a StyleManager instance is
+ * created and there is an existing instance with a version that is lower than the current instance all CSS rules are
+ * removed letting the higher version to take precedence. This isn't a perfect system and requires thoughtful
+ * construction of CSS variables exposed, but allows multiple independently compiled TRL packages to load the latest
+ * CSS variables. It is recommended to always set `overwrite` option of {@link StyleManager.setProperty} and
+ * {@link StyleManager.setProperties} to `false` when loading initial values.
  */
 declare class StyleManager {
     /**
@@ -267,24 +362,29 @@ declare class StyleManager {
      *
      * @param {Document} [opts.document] - Target document to load styles into.
      *
+     * @param {number}   [opts.version] - An integer representing the version / level of styles being managed.
+     *
      */
-    constructor({ docKey, selector, document }?: {
+    constructor({ docKey, selector, document, version }?: {
         docKey: string;
         selector?: string;
         document?: Document;
+        version?: number;
     });
     /**
-     * Provides an accessor to get the `cssText` for the style sheet.
-     *
-     * @returns {string}
+     * @returns {string} Provides an accessor to get the `cssText` for the style sheet.
      */
     get cssText(): string;
+    /**
+     * @returns {number} Returns the version of this instance.
+     */
+    get version(): number;
     /**
      * Provides a copy constructor to duplicate an existing StyleManager instance into a new document.
      *
      * Note: This is used to support the `PopOut` module.
      *
-     * @param [document] Target browser document to clone into.
+     * @param {Document} [document] Target browser document to clone into.
      *
      * @returns {StyleManager} New style manager instance.
      */
@@ -319,12 +419,11 @@ declare class StyleManager {
      */
     setProperty(key: string, value: string, overwrite?: boolean): void;
     /**
-     * Removes the property keys specified. If `keys` is a string a single property is removed. Or if `keys` is an
-     * iterable list then all property keys in the list are removed.
+     * Removes the property keys specified. If `keys` is an iterable list then all property keys in the list are removed.
      *
-     * @param {string|Iterable<string>} keys - The property keys to remove.
+     * @param {Iterable<string>} keys - The property keys to remove.
      */
-    removeProperties(keys: string | Iterable<string>): void;
+    removeProperties(keys: Iterable<string>): void;
     /**
      * Removes a particular CSS variable.
      *
@@ -453,6 +552,8 @@ declare function hasSetter(object: any, accessor: string): boolean;
  */
 declare function hasPrototype(target: any, Prototype: Function): boolean;
 
+declare function klona<T>(input: T): T;
+
 interface StateMachineOptions {
     readonly allowedTags?: Set<string>;
     readonly disallowedTags?: Set<string>;
@@ -490,4 +591,4 @@ type ParseDataTransferOptions = {
     types?: string[] | undefined;
 };
 
-export { A11yHelper, ClipboardAccess, FocusOptions, ParseDataTransferOptions, StackingContext, StyleManager, debounce, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isSvelteComponent, normalizeString, outroAndDestroy, parseSvelteConfig, striptags, styleParsePixels, uuidv4 };
+export { A11yFocusSource, A11yHelper, ClipboardAccess, ManagedPromise, ParseDataTransferOptions, StackingContext, StyleManager, debounce, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, striptags, styleParsePixels, uuidv4 };

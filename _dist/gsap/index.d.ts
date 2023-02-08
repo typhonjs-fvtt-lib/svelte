@@ -59,9 +59,17 @@ declare namespace draggableGsap {
     /**
      * Define a function to get a DraggableGsapOptions instance.
      *
+     * @param {{ ease?: boolean, easeOptions?: object, inertia?: boolean, inertiaOptions?: object }} options -
+     *        DraggableGsapOptions.
+     *
      * @returns {DraggableGsapOptions} A new options instance.
      */
-    function options(options: any): DraggableGsapOptions;
+    function options(options: {
+        ease?: boolean;
+        easeOptions?: any;
+        inertia?: boolean;
+        inertiaOptions?: any;
+    }): DraggableGsapOptions;
 }
 /**
  * Provides a store / object to make updating / setting draggableGsap options much easier.

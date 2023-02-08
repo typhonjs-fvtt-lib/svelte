@@ -19,12 +19,12 @@ export class TJSDocumentDialog
     *
     * @param {foundry.abstract.Document} document - Document instance to modify.
     *
-    * @param {object} [options] - Rest of options to pass to TJSDialog / Application.
+    * @param {SvelteApplicationOptions} [options] - Rest of options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<Document|null>} The modified document or 'null' if the user closed the dialog via `<Esc>` or the
-    *                                   close header button.
+    *          close header button.
     */
    static async configureOwnership(document, options = {}, dialogData = {})
    {
@@ -45,16 +45,19 @@ export class TJSDocumentDialog
     *
     * @param {object} [context.pack] - A Compendium pack identifier within which the Documents should be modified.
     *
-    * @param {...*} [context.options] - Rest of options to pass to TJSDialog / Application.
+    * @param {boolean} [context.renderSheet] - Render the sheet for the new document.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {...SvelteApplicationOptions} [context.options] - Rest of options to pass to TJSDialog / Application.
+    *
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<Document|null>} The newly created document or a falsy value; either 'false' for cancelling
-    *                                   or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    *          or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
-   static async documentCreate(documentCls, data = {}, { parent = null, pack = null, ...options } = {}, dialogData = {})
+   static async documentCreate(documentCls, data = {},
+    { parent = null, pack = null, renderSheet = true, ...options } = {}, dialogData = {})
    {
-      return TJSDocumentCreate.show(documentCls, data, { parent, pack, ...options }, dialogData);
+      return TJSDocumentCreate.show(documentCls, data, { parent, pack, renderSheet, ...options }, dialogData);
    }
 
    /**
@@ -66,12 +69,12 @@ export class TJSDocumentDialog
     *
     * @param {object} [opts.context] - DocumentModificationContext.
     *
-    * @param {...*} [opts.options] - Rest of options to pass to TJSDialog / Application.
+    * @param {...SvelteApplicationOptions} [opts.options] - Rest of options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<Document|boolean|null>} The document if deleted or a falsy value; either 'false' for cancelling
-    *                                   or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    *          or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async documentDelete(document, { context = {}, ...options } = {}, dialogData = {})
    {
@@ -83,9 +86,9 @@ export class TJSDocumentDialog
     *
     * @param {object} folderData - Initial data with which to populate the creation form.
     *
-    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<Folder|null>} The newly created Folder or null if the dialog is closed.
     */
@@ -99,12 +102,12 @@ export class TJSDocumentDialog
     *
     * @param {Folder} document - Folder to delete.
     *
-    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<Folder|boolean|null>} The deleted Folder or a falsy value; either 'false' for cancelling or
-    * 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    *          'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async folderDelete(document, options = {}, dialogData = {})
    {
@@ -124,13 +127,13 @@ export class TJSDocumentDialog
     *
     * @param {boolean} [opts.keepId=true] - Keep document IDs.
     *
-    * @param {...*} [opts.options] - Rest of options to pass to TJSDialog / Application.
+    * @param {...SvelteApplicationOptions} [opts.options] - Rest of options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<CompendiumCollection|boolean|null>} The compendium collection the folder is exported to or a
-    * falsy value; either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header
-    * button.
+    *          falsy value; either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the
+    *          close header button.
     */
    static async folderExport(document, { pack, merge, keepId, ...options } = {}, dialogData = {})
    {
@@ -142,12 +145,12 @@ export class TJSDocumentDialog
     *
     * @param {Folder} document - Folder to remove.
     *
-    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<Folder|boolean|null>} The removed Folder or a falsy value; either 'false' for cancelling or
-    * 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    *          'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async folderRemove(document, options = {}, dialogData = {})
    {
@@ -159,12 +162,12 @@ export class TJSDocumentDialog
     *
     * @param {Folder} document - Folder to create roll table from...
     *
-    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<RollTable|boolean|null>} The newly created RollTable or a falsy value; either 'false' for
-    * cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    *          cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async folderRolltable(document, options = {}, dialogData = {})
    {
@@ -176,9 +179,9 @@ export class TJSDocumentDialog
     *
     * @param {Folder} document - The folder to edit.
     *
-    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<Folder|null>} The modified Folder or null if the dialog is closed.
     */
@@ -192,12 +195,12 @@ export class TJSDocumentDialog
     *
     * @param {foundry.abstract.Document} document - The document to import JSON to...
     *
-    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<Document|boolean|null>} The document after import completes or a falsy value; either 'false' for
-    *                         cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    *          cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async importFromJSON(document, options = {}, dialogData = {})
    {

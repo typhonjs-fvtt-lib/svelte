@@ -141,17 +141,21 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Specifies the default options that SvelteFormApplication supports.
     *
-    * @returns {object} options - Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
+    * @returns {SvelteApplicationOptions} options - Application options.
+    * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
     */
    static get defaultOptions()
    {
       return deepMerge(super.defaultOptions, {
          defaultCloseAnimation: true,     // If false the default slide close animation is not run.
          draggable: true,                 // If true then application shells are draggable.
-         focusOptions: void 0,            // Stores any assigned FocusOptions data that is applied when app is closed.
+         focusAuto: true,                 // When true auto-management of app focus is enabled.
+         focusKeep: false,                // When `focusAuto` and `focusKeep` is true; keeps internal focus.
+         focusTrap: true,                 // When true focus trapping / wrapping is enabled keeping focus inside app.
+         focusSource: void 0,             // Stores any A11yFocusSource data that is applied when app is closed.
          headerButtonNoClose: false,      // If true then the close header button is removed.
          headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.
+         headerIcon: void 0,              // Sets a header icon given an image URL.
          headerNoTitleMinimized: false,   // If true then header title is hidden when application is minimized.
          minHeight: MIN_WINDOW_HEIGHT,    // Assigned to position. Number specifying minimum window height.
          minWidth: MIN_WINDOW_WIDTH,      // Assigned to position. Number specifying minimum window width.
@@ -417,9 +421,9 @@ export class SvelteFormApplication extends FormApplication
       this.#stores.uiOptionsUpdate((storeOptions) => deepMerge(storeOptions, { minimized: this._minimized }));
 
       // Apply any stored focus options and then remove them from options.
-      A11yHelper.applyFocusOptions(this.options.focusOptions);
+      A11yHelper.applyFocusSource(this.options.focusSource);
 
-      delete this.options.focusOptions;
+      delete this.options.focusSource;
    }
 
    /**
@@ -634,6 +638,8 @@ export class SvelteFormApplication extends FormApplication
          });
       }
 
+      element.classList.remove('minimized');
+
       // Reset display none on all children of header.
       for (let cntr = header.children.length; --cntr >= 0;) { header.children[cntr].style.display = null; }
 
@@ -674,8 +680,6 @@ export class SvelteFormApplication extends FormApplication
       // Remove inline styles that override any styles assigned to the app.
       element.style.minWidth = null;
       element.style.minHeight = null;
-
-      element.classList.remove('minimized');
 
       this._minimized = false;
 
@@ -861,8 +865,8 @@ export class SvelteFormApplication extends FormApplication
     */
    async _render(force = false, options = {})
    {
-      // Store any focusOptions instance.
-      if (isObject(options?.focusOptions)) { this.options.focusOptions = options.focusOptions; }
+      // Store any focusSource instance.
+      if (isObject(options?.focusSource)) { this.options.focusSource = options.focusSource; }
 
       if (this._state === Application.RENDER_STATES.NONE &&
        document.querySelector(`#${this.id}`) instanceof HTMLElement)
@@ -888,7 +892,7 @@ export class SvelteFormApplication extends FormApplication
     * Render the inner application content. Only render a template if one is defined otherwise provide an empty
     * JQuery element per the core Foundry API.
     *
-    * @param {Object} data         The data used to render the inner template
+    * @param {object} data         The data used to render the inner template
     *
     * @returns {Promise.<JQuery>}   A promise resolving to the constructed jQuery object
     *

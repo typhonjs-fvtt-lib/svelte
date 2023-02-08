@@ -7,7 +7,9 @@
    /** @type {foundry.abstract.Document} */
    export let document = void 0;
 
-   const { application } = getContext('external');
+   const { application } = getContext('#external');
+
+   const managedPromise = getContext('#managedPromise');
 
    if (!(document instanceof globalThis.foundry.abstract.Document))
    {
@@ -44,7 +46,7 @@
 
       const importedDoc = await document.importFromJSON(json);
 
-      application.options.resolve?.(importedDoc);
+      managedPromise.resolve(importedDoc);
       application.close();
    }
 

@@ -61,30 +61,36 @@
    // Provides the internal context for data / stores of the application shell.
    const internal = new AppShellContextInternal();
 
-   const autoFocus = internal.stores.autoFocus;
-
    // Provides options to `A11yHelper.getFocusableElements` to ignore TJSFocusWrap by CSS class.
    const s_IGNORE_CLASSES = { ignoreClasses: ['tjs-focus-wrap'] };
 
    // Internal context for `elementContent` / `elementRoot` stores.
-   setContext('internal', internal);
+   setContext('#internal', internal);
 
    // Only update the `elementContent` store if the new `elementContent` is not null or undefined.
    $: if (elementContent !== void 0 && elementContent !== null)
    {
-      getContext('internal').stores.elementContent.set(elementContent);
+      getContext('#internal').stores.elementContent.set(elementContent);
    }
 
    // Only update the `elementRoot` store if the new `elementRoot` is not null or undefined.
    $: if (elementRoot !== void 0 && elementRoot !== null)
    {
-      getContext('internal').stores.elementRoot.set(elementRoot);
+      getContext('#internal').stores.elementRoot.set(elementRoot);
    }
 
-   const context = getContext('external');
-
    // Store application reference.
-   const application = context.application;
+   const { application } = getContext('#external');
+
+   // Focus related app options stores.
+   const { focusAuto, focusKeep, focusTrap } = application.reactive.storeAppOptions;
+
+   const { minimized } = application.reactive.storeUIState;
+
+   let focusWrapEnabled;
+
+   // Enable TJSFocusWrap component when focus trapping app option is true and app is not minimized.
+   $: focusWrapEnabled = $focusAuto && $focusTrap && !$minimized;
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -159,6 +165,50 @@
    // ---------------------------------------------------------------------------------------------------------------
 
    /**
+    * Provides a handler for the custom `close:popup` event fired by `svelte-standard` components like TJSMenu. The
+    * intention is to handle focus management of a component that is no longer connected in the DOM. If a target element
+    * that is the source of the close event is attached attempt to resolve internal focus to the application.
+    *
+    * @param {CustomEvent}  event - A custom event for `close:popup`.
+    */
+   function onClosePopup(event)
+   {
+      // Early out as automatic focus management is not enabled.
+      if (!$focusAuto) { return; }
+
+      const targetEl = event?.detail?.target;
+
+      // Early out if there is no target element.
+      if (!(targetEl instanceof HTMLElement)) { return; }
+
+      // Early out if the target element is focusable as it will gain focus naturally.
+      if (A11yHelper.isFocusable(targetEl)) { return; }
+
+      const elementRootContains = elementRoot.contains(targetEl);
+
+      // First check for if the target is elementRoot or elementContent then fallback to contains checks.
+      if (targetEl === elementRoot)
+      {
+         elementRoot.focus();
+      }
+      else if (targetEl === elementContent)
+      {
+         elementContent.focus();
+      }
+      else if (elementRootContains)
+      {
+         if (elementContent.contains(targetEl))
+         {
+            elementContent.focus();
+         }
+         else
+         {
+            elementRoot.focus();
+         }
+      }
+   }
+
+   /**
     * Provides focus cycling inside the application capturing `<Shift-Tab>` and if `elementRoot` or `firstFocusEl` is
     * the actively focused element then last focusable element is focused skipping `TJSFocusWrap`.
     *
@@ -169,7 +219,7 @@
     */
    function onKeydown(event)
    {
-      if (event.shiftKey && event.code === 'Tab')
+      if (focusWrapEnabled && event.shiftKey && event.code === 'Tab')
       {
          // Collect all focusable elements from `elementRoot` and ignore TJSFocusWrap.
          const allFocusable = A11yHelper.getFocusableElements(elementRoot, s_IGNORE_CLASSES);
@@ -190,7 +240,7 @@
       }
 
       // Make sure this application is top most when it receives keyboard events.
-      if (typeof application.options.popOut === 'boolean' && application.options.popOut &&
+      if (typeof application?.options?.popOut === 'boolean' && application.options.popOut &&
        application !== globalThis.ui?.activeWindow)
       {
          application.bringToTop.call(application);
@@ -203,7 +253,7 @@
     */
    function onPointerdownApp()
    {
-      if (typeof application.options.popOut === 'boolean' && application.options.popOut &&
+      if (typeof application?.options?.popOut === 'boolean' && application.options.popOut &&
        application !== globalThis.ui?.activeWindow)
       {
          application.bringToTop.call(application);
@@ -211,31 +261,36 @@
    }
 
    /**
-    * Focus `elementContent` if the event target is not focusable and `autoFocus` is enabled.
+    * Focus `elementContent` if the event target is not focusable and `focusAuto` is enabled.
     *
-    * Note: `autoFocus` is an internal store. This check is a bit tricky as `section.window-content` has a tabindex
-    * of '-1', so it is focusable.
+    * Note: `focusAuto` is an app option store. This check is a bit tricky as `section.window-content` has a tabindex
+    * of '-1', so it is focusable manually.
     */
    function onPointerdownContent(event)
    {
       const focusable = A11yHelper.isFocusable(event.target);
 
-      if (!focusable)
+      if (!focusable && $focusAuto)
       {
-         if ($autoFocus)
+         if ($focusKeep)
          {
-            elementContent.focus();
+            const focusOutside = document.activeElement instanceof HTMLElement &&
+             !elementRoot.contains(document.activeElement);
+
+            // Only focus the content element if the active element is outside the app; maintaining internal focused
+            // element.
+            if (focusOutside)
+            {
+               elementContent.focus();
+            }
+            else
+            {
+               event.preventDefault();
+            }
          }
          else
          {
-            event.preventDefault();
-         }
-      }
-      else
-      {
-         if (!$autoFocus && !focusable)
-         {
-            event.preventDefault();
+            elementContent.focus();
          }
       }
    }
@@ -297,6 +352,7 @@
         bind:this={elementRoot}
         in:inTransition={inTransitionOptions}
         out:outTransition={outTransitionOptions}
+        on:close:popup|preventDefault|stopPropagation={onClosePopup}
         on:keydown|capture={onKeydown}
         on:pointerdown={onPointerdownApp}
         use:applyStyles={stylesApp}
@@ -319,6 +375,7 @@
         class="app window-app {application.options.classes.join(' ')}"
         data-appid={application.appId}
         bind:this={elementRoot}
+        on:close:popup|preventDefault|stopPropagation={onClosePopup}
         on:keydown|capture={onKeydown}
         on:pointerdown={onPointerdownApp}
         use:applyStyles={stylesApp}
@@ -334,7 +391,7 @@
          <slot />
       </section>
       <ResizableHandle />
-      <TJSFocusWrap {elementRoot} />
+      <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
    </div>
 {/if}
 
@@ -345,11 +402,11 @@
    }
 
    .window-app:focus-visible {
-      outline: var(--tjs-app-outline-focus, 2px solid transparent);
+      outline: var(--tjs-app-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
    }
 
    .window-content:focus-visible {
-      outline: var(--tjs-app-content-outline-focus, 2px solid transparent);
+      outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
    }
 
    /* Override Foundry default; adjust --tjs-app-header-gap to change gap size */

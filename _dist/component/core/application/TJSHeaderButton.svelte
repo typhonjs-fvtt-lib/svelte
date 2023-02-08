@@ -1,8 +1,17 @@
 <script>
    /**
-    * Provides an app header button conforming to the Foundry {@link ApplicationHeaderButton} type. Additionally a
-    * `title` field is supported to give a tool tip for the button. The `onclick` function if defined is invoked when
-    * the button is clicked and state is updated accordingly.
+    * Provides an app header button conforming to the Foundry {@link ApplicationHeaderButton} type. Additionally, a
+    * `title` field is supported to give a tool tip for the button. For backward compatibility `onclick` is supported,
+    * but for uniformity across TRL defining an `onPress` function is recommended. If defined it is invoked when
+    * the button is clicked or `Enter` key pressed and state is updated accordingly.
+    *
+    * TRL also supports the following extra button data:
+    * - {keyCode='Enter'}           keyCode: A string conforming to `KeyboardEvent.code` to activate `onPress` callback.
+    * - {keepMinimized=false}       keepMinimized: When true the button is not removed when app minimized.
+    * - {Function}                  onContextMenu: Invoked when right mouse button or contextmenu key is pressed.
+    * - {Function}                  onPress: Invoked when left mouse button or `keyCode` key is pressed.
+    * - {Record<string, string>}    styles: Additional inline styles to apply to button.
+    * - {string}                    title: Tooltip title.
     */
    import { applyStyles }   from '@typhonjs-fvtt/svelte/action';
    import { localize }      from '@typhonjs-fvtt/svelte/helper';
@@ -12,25 +21,36 @@
 
    const s_REGEX_HTML = /^\s*<.*>$/;
 
-   let icon, label, title, styles
+   $: title = isObject(button) && typeof button.title === 'string' ? localize(button.title) : '';
 
-   $: if (isObject(button))
-   {
-      title = typeof button.title === 'string' ? localize(button.title) : '';
+   // Handle icon and treat bare strings as the icon class; otherwise assume the icon is fully formed HTML.
+   $: icon = isObject(button) && typeof button.icon !== 'string' ? void 0 : s_REGEX_HTML.test(button.icon) ?
+    button.icon : `<i class="${button.icon}" title="${title}"></i>`;
 
-      // Handle icon and treat bare strings as the icon class; otherwise assume the icon is fully formed HTML.
-      icon = typeof button.icon !== 'string' ? void 0 : s_REGEX_HTML.test(button.icon) ? button.icon :
-       `<i class="${button.icon}" title="${title}"></i>`;
+   $: label = isObject(button) && typeof button.label === 'string' ? localize(button.label) : void 0;
 
-      label = typeof button.label === 'string' ? localize(button.label) : void 0;
+   $: keepMinimized = isObject(button) && typeof button.keepMinimized === 'boolean' ? button.keepMinimized : false;
 
-      styles = isObject(button.styles) ? button.styles : void 0;
-   }
+   $: keyCode = isObject(button) && typeof button.keyCode === 'string' ? button.keyCode : 'Enter';
+
+   $: styles = isObject(button) && isObject(button.styles) ? button.styles : void 0;
 
    function onClick(event)
    {
-      // Accept `onPress`, `callback` or `onclick` as the function / data to invoke.
-      const invoke = button.onPress ?? button.callback ?? button.onclick;
+      // Accept `onPress or `onclick` as the function / data to invoke.
+      const invoke = button?.onPress ?? button?.onclick;
+
+      if (typeof invoke === 'function')
+      {
+         invoke.call(button, event);
+         button = button; // This provides a reactive update if button data changes.
+      }
+   }
+
+   function onContextMenu(event)
+   {
+      // Accept `onContextMenu` as the function / data to invoke.
+      const invoke = button?.onContextMenu;
 
       if (typeof invoke === 'function')
       {
@@ -46,7 +66,7 @@
     */
    function onKeydown(event)
    {
-      if (event.code === 'Enter')
+      if (event.code === keyCode)
       {
          event.preventDefault();
          event.stopPropagation();
@@ -60,9 +80,9 @@
     */
    function onKeyup(event)
    {
-      if (event.code === 'Enter')
+      if (event.code === keyCode)
       {
-         const invoke = button.onPress ?? button.callback ?? button.onclick;
+         const invoke = button.onPress ?? button.onclick;
 
          if (typeof invoke === 'function')
          {
@@ -80,10 +100,12 @@
 
 <!-- svelte-ignore a11y-missing-attribute -->
 <a on:click|preventDefault|stopPropagation={onClick}
+   on:contextmenu|preventDefault|stopPropagation={onContextMenu}
    on:keydown={onKeydown}
    on:keyup={onKeyup}
    use:applyStyles={styles}
    class="header-button {button.class}"
+   class:keep-minimized={keepMinimized}
    aria-label={label}
    tabindex=0
    role=button>
@@ -100,12 +122,14 @@
    }
 
    a:hover {
-      text-shadow: var(--tjs-app-header-button-anchor-text-shadow-hover, var(--tjs-default-text-shadow-focus-hover, inherit));
+      text-shadow: var(--tjs-app-header-button-text-shadow-hover, var(--tjs-default-text-shadow-focus-hover, inherit));
    }
 
    a:focus-visible {
-      text-shadow: var(--tjs-app-header-button-anchor-text-shadow-focus, var(--tjs-default-text-shadow-focus-hover, inherit));
-      outline: var(--tjs-app-header-button-outline-focus, var(--tjs-comp-outline-focus-visible, revert));
+      box-shadow: var(--tjs-app-header-button-box-shadow-focus-visible, var(--tjs-default-box-shadow-focus-visible));
+      outline: var(--tjs-app-header-button-outline-focus-visible, var(--tjs-default-outline-focus-visible, revert));
+      transition: var(--tjs-app-header-button-transition-focus-visible, var(--tjs-default-transition-focus-visible));
+      text-shadow: var(--tjs-app-header-button-text-shadow-focus-visible, var(--tjs-default-text-shadow-focus-hover, inherit));
    }
 
    span {

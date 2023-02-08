@@ -12,43 +12,41 @@ import { hasSetter }             from '@typhonjs-fvtt/svelte/util';
 export class TJSDocumentImport extends TJSDialog
 {
    /**
-    * @param {foundry.abstract.Document}  document -
+    * Render an import dialog for updating the data related to this Document through an exported JSON file
     *
-    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    * @param {foundry.abstract.Document} document - The document to import JSON to...
     *
-    * @param {object} [dialogData] -
+    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
+    *
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     */
    constructor(document, options, dialogData = {})
    {
       super({
-         modal: typeof options?.modal === 'boolean' ? options.modal : true,
+         modal: typeof dialogData?.modal === 'boolean' ? dialogData.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
+         focusKeep: true,
          minimizable: false,
          ...dialogData,
          title: `${localize('DOCUMENT.ImportData')}: ${document.name}`,
          content: {
             class: TJSDocumentImportImpl,
-            props: { document, context }
+            props: { document }
          },
          buttons: {
             import: {
+               autoClose: false, // Don't automatically close on button onclick.
                icon: 'fas fa-file-import',
                label: 'Import',
-               onclick: 'requestSubmit'
+               onPress: 'requestSubmit'
             },
             cancel: {
                icon: 'fas fa-times',
                label: 'Cancel',
-               onclick: () =>
-               {
-                  this.options.resolve?.(false);
-                  this.close();
-               }
+               onPress: () => false
             }
          },
-         default: 'cancel',
-         autoClose: false, // Don't automatically close on button onclick.
-         close: () => this.options.resolve?.(null)
+         default: 'cancel'
       }, { width: 400, ...options });
 
       /**
@@ -72,12 +70,12 @@ export class TJSDocumentImport extends TJSDialog
     *
     * @param {foundry.abstract.Document} document - The document to import JSON to...
     *
-    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<Document|boolean|null>} The document after import completes or a falsy value; either 'false' for
-    *                         cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    *          cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async show(document, options = {}, dialogData = {})
    {
@@ -93,10 +91,6 @@ export class TJSDocumentImport extends TJSDialog
          return null;
       }
 
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSDocumentImport(document, options, dialogData).render(true, { focus: true });
-      });
+      return new TJSDocumentImport(document, options, dialogData).wait();
    }
 }

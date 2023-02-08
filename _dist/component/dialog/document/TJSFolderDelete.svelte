@@ -6,7 +6,7 @@
 
    export let document = void 0;
 
-   const { application } = getContext('external');
+   const { application } = getContext('#external');
 
    if (!(document instanceof Folder))
    {
@@ -37,10 +37,7 @@
       // Remove the delete Document function callback as we are intentionally deleting below.
       doc.setOptions({ delete: void 0 });
 
-      const folder = await document.delete({ deleteSubfolders: true, deleteContents: true });
-
-      application.options.resolve?.(folder);
-      application.close();
+      return document.delete({ deleteSubfolders: true, deleteContents: true });
    }
 </script>
 

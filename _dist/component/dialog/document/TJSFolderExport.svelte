@@ -17,7 +17,9 @@
    $: merge = typeof merge === 'boolean' ? merge : true;
    $: keepId = typeof keepId === 'boolean' ? keepId : true;
 
-   const { application } = getContext('external');
+   const { application } = getContext('#external');
+
+   const managedPromise = getContext('#managedPromise');
 
    if (!(document instanceof Folder))
    {
@@ -31,7 +33,7 @@
    if (!packs.length)
    {
       globalThis.ui.notifications.warn(localize('FOLDER.ExportWarningNone', { type: document.type }));
-      application.options.resolve?.(null);
+      managedPromise.resolve(null);
       application.close();
    }
 
@@ -67,11 +69,11 @@
             keepId
          });
 
-         application.options.resolve?.(pack);
+         managedPromise.resolve(pack);
       }
       else
       {
-         application.options.resolve?.(false);
+         managedPromise.resolve(false);
       }
 
       application.close();

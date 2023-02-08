@@ -49,10 +49,10 @@ declare function autoBlur(node: HTMLElement): {
  *
  * @param {import('svelte/store').Writable<boolean>}  storeFocused - Update store for focus changes.
  *
- * @returns {{update: update, destroy: (function(): void)}} Action lifecycle methods.
+ * @returns {{update: (function(object): void), destroy: (function(): void)}} Action lifecycle methods.
  */
 declare function isFocused(node: HTMLElement, storeFocused: svelte_store.Writable<boolean>): {
-    update: update;
+    update: ((arg0: object) => void);
     destroy: (() => void);
 };
 
@@ -64,13 +64,13 @@ declare function isFocused(node: HTMLElement, storeFocused: svelte_store.Writabl
  *
  * @param {{keydown: Function, keyup: Function}}   keyStore - Object to forward events key down / up events to...
  *
- * @returns {{update: update, destroy: (function(): void)}} Action lifecycle methods.
+ * @returns {{update: (function(object): void), destroy: (function(): void)}} Action lifecycle methods.
  */
 declare function keyforward(node: HTMLElement, keyStore: {
     keydown: Function;
     keyup: Function;
 }): {
-    update: update;
+    update: ((arg0: object) => void);
     destroy: (() => void);
 };
 
@@ -189,9 +189,14 @@ declare namespace draggable {
     /**
      * Define a function to get a DraggableOptions instance.
      *
+     * @param {{ ease?: boolean, easeOptions?: object }} options - Draggable options.
+     *
      * @returns {DraggableOptions} A new options instance.
      */
-    function options(options: any): DraggableOptions;
+    function options(options: {
+        ease?: boolean;
+        easeOptions?: any;
+    }): DraggableOptions;
 }
 declare class DraggableOptions {
     constructor({ ease, easeOptions }?: {

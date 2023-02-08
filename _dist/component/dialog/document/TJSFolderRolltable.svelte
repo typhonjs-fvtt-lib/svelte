@@ -6,7 +6,7 @@
 
    export let document = void 0;
 
-   const { application } = getContext('external');
+   const { application } = getContext('#external');
 
    if (!(document instanceof Folder))
    {
@@ -34,10 +34,7 @@
     */
    export async function createTable()
    {
-      const rollTable = await RollTable.fromFolder(document);
-
-      application.options.resolve?.(rollTable);
-      application.close();
+      return RollTable.fromFolder(document);
    }
 </script>
 

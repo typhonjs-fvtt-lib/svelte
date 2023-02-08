@@ -12,18 +12,21 @@ import { hasSetter }                from '@typhonjs-fvtt/svelte/util';
 export class TJSFolderCreateUpdate extends TJSDialog
 {
    /**
-    * @param {Folder}  document -
+    * Updates an existing Folder by rendering a dialog window with basic details.
     *
-    * @param {object}   options -
+    * @param {Folder} document - The folder to edit.
     *
-    * @param {object}   dialogData -
+    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    *
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     */
    constructor(document, options = {}, dialogData = {})
    {
       super({
-         modal: typeof options?.modal === 'boolean' ? options.modal : true,
+         modal: typeof dialogData?.modal === 'boolean' ? dialogData.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
          focusFirst: true,
+         focusKeep: true,
          minimizable: false,
          ...dialogData,
          content: {
@@ -33,14 +36,13 @@ export class TJSFolderCreateUpdate extends TJSDialog
          title: document.id ? `${localize('FOLDER.Update')}: ${document.name}` : localize('FOLDER.Create'),
          buttons: {
             submit: {
+               autoClose: false,
                icon: 'fas fa-check',
                label: localize(document?.id ? 'FOLDER.Update' : 'FOLDER.Create'),
-               onclick: 'requestSubmit'
+               onPress: 'requestSubmit'
             }
          },
-         default: 'submit',
-         autoClose: false,
-         close: () => this.options?.resolve?.(null)
+         default: 'submit'
       }, options);
 
       /**
@@ -88,11 +90,7 @@ export class TJSFolderCreateUpdate extends TJSDialog
 
       const document = new Folder(data);
 
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSFolderCreateUpdate(document, options, dialogData).render(true, { focus: true });
-      });
+      return new TJSFolderCreateUpdate(document, options, dialogData).wait();
    }
 
    /**
@@ -102,7 +100,7 @@ export class TJSFolderCreateUpdate extends TJSDialog
     *
     * @param {object} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<Folder|null>} The modified Folder or null if the dialog is closed.
     */
@@ -114,10 +112,6 @@ export class TJSFolderCreateUpdate extends TJSDialog
          return null;
       }
 
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSFolderCreateUpdate(document, options, dialogData).render(true, { focus: true });
-      });
+      return new TJSFolderCreateUpdate(document, options, dialogData).wait();
    }
 }

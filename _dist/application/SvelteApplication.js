@@ -101,6 +101,8 @@ export class SvelteApplication extends Application
    #stores;
 
    /**
+    * @param {SvelteApplicationOptions} options - The options for the application.
+    *
     * @inheritDoc
     */
    constructor(options = {})
@@ -141,17 +143,21 @@ export class SvelteApplication extends Application
    /**
     * Specifies the default options that SvelteApplication supports.
     *
-    * @returns {object} options - Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
+    * @returns {SvelteApplicationOptions} options - Application options.
+    * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
     */
    static get defaultOptions()
    {
       return deepMerge(super.defaultOptions, {
          defaultCloseAnimation: true,     // If false the default slide close animation is not run.
          draggable: true,                 // If true then application shells are draggable.
-         focusOptions: void 0,            // Stores any assigned FocusOptions data that is applied when app is closed.
+         focusAuto: true,                 // When true auto-management of app focus is enabled.
+         focusKeep: false,                // When `focusAuto` and `focusKeep` is true; keeps internal focus.
+         focusSource: void 0,             // Stores any A11yFocusSource data that is applied when app is closed.
+         focusTrap: true,                 // When true focus trapping / wrapping is enabled keeping focus inside app.
          headerButtonNoClose: false,      // If true then the close header button is removed.
          headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.
+         headerIcon: void 0,              // Sets a header icon given an image URL.
          headerNoTitleMinimized: false,   // If true then header title is hidden when application is minimized.
          minHeight: MIN_WINDOW_HEIGHT,    // Assigned to position. Number specifying minimum window height.
          minWidth: MIN_WINDOW_WIDTH,      // Assigned to position. Number specifying minimum window width.
@@ -160,6 +166,7 @@ export class SvelteApplication extends Application
          positionOrtho: true,             // When true Position is optimized for orthographic use.
          positionValidator: Position.Validators.transformWindow, // A function providing the default validator.
          sessionStorage: void 0,          // An instance of SessionStorage to share across SvelteApplications.
+         svelte: void 0,                  // A Svelte configuration object.
          transformOrigin: 'top left'      // By default, 'top / left' respects rotation when minimizing.
       });
    }
@@ -392,9 +399,9 @@ export class SvelteApplication extends Application
       this.#stores.uiOptionsUpdate((storeOptions) => deepMerge(storeOptions, { minimized: this._minimized }));
 
       // Apply any stored focus options and then remove them from options.
-      A11yHelper.applyFocusOptions(this.options.focusOptions);
+      A11yHelper.applyFocusSource(this.options.focusSource);
 
-      delete this.options.focusOptions;
+      delete this.options.focusSource;
    }
 
    /**
@@ -608,6 +615,8 @@ export class SvelteApplication extends Application
          });
       }
 
+      element.classList.remove('minimized');
+
       // Reset display none on all children of header.
       for (let cntr = header.children.length; --cntr >= 0;) { header.children[cntr].style.display = null; }
 
@@ -648,8 +657,6 @@ export class SvelteApplication extends Application
       // Remove inline styles that override any styles assigned to the app.
       element.style.minWidth = null;
       element.style.minHeight = null;
-
-      element.classList.remove('minimized');
 
       this._minimized = false;
 
@@ -850,8 +857,8 @@ export class SvelteApplication extends Application
     */
    async _render(force = false, options = {})
    {
-      // Store any focusOptions instance.
-      if (isObject(options?.focusOptions)) { this.options.focusOptions = options.focusOptions; }
+      // Store any focusSource instance.
+      if (isObject(options?.focusSource)) { this.options.focusSource = options.focusSource; }
 
       if (this._state === Application.RENDER_STATES.NONE &&
        document.querySelector(`#${this.id}`) instanceof HTMLElement)
@@ -877,7 +884,7 @@ export class SvelteApplication extends Application
     * Render the inner application content. Only render a template if one is defined otherwise provide an empty
     * JQuery element per the core Foundry API.
     *
-    * @param {Object} data         The data used to render the inner template
+    * @param {object} data         The data used to render the inner template
     *
     * @returns {Promise.<JQuery>}   A promise resolving to the constructed jQuery object
     *
@@ -971,6 +978,44 @@ export class SvelteApplication extends Application
       }
    }
 }
+
+/**
+ * @typedef {ApplicationOptions} SvelteApplicationOptions
+ *
+ * @property {boolean}  [defaultCloseAnimation=true] - If false the default slide close animation is not run.
+ *
+ * @property {boolean}  [draggable=true] - If true then application shells are draggable.
+ *
+ * @property {boolean}  [focusAuto=true] - When true auto-management of app focus is enabled.
+ *
+ * @property {boolean}  [focusKeep=false] - When `focusAuto` and `focusKeep` is true; keeps internal focus.
+ *
+ * @property {object}   [focusSource] - Defines A11yHelper focus source to apply when application closes.
+ *
+ * @property {boolean}  [headerButtonNoClose=false] - If true then the close header button is removed.
+ *
+ * @property {boolean}  [headerButtonNoLabel=false] - If true then header button labels are removed.
+ *
+ * @property {boolean}  [headerNoTitleMinimized=false] - If true then header title is hidden when minimized.
+ *
+ * @property {number}   [minHeight=MIN_WINDOW_HEIGHT] - Assigned to position. Number specifying minimum window height.
+ *
+ * @property {number}   [minWidth=MIN_WINDOW_WIDTH] - Assigned to position. Number specifying minimum window width.
+ *
+ * @property {boolean}  [positionable=true] - If false then `position.set` does not take effect.
+ *
+ * @property {PositionInitialHelper}   [positionInitial] - A helper for initial position placement.
+ *
+ * @property {boolean}  [positionOrtho=true] - When true Position is optimized for orthographic use.
+ *
+ * @property {PositionValidatorOptions}   [positionValidator] - A validator function or data or list of validators.
+ *
+ * @property {object}   [sessionStorage] - An instance of TJSSessionStorage to share across SvelteApplications.
+ *
+ * @property {object}   [svelte] - A Svelte configuration object defining the main component.
+ *
+ * @property {string}   [transformOrigin='top left'] - By default, 'top / left' respects rotation when minimizing.
+ */
 
 /**
  * @typedef {object} SvelteData

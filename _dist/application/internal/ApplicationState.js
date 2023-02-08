@@ -1,19 +1,20 @@
-import { linear }          from 'svelte/easing';
+import { linear }             from 'svelte/easing';
 
-import { lerp }            from '@typhonjs-fvtt/svelte/math';
-import { isObject }        from '@typhonjs-fvtt/svelte/util';
+import { lerp }               from '@typhonjs-fvtt/svelte/math';
+import { isObject }           from '@typhonjs-fvtt/svelte/util';
 
-import { TJSSessionStorage }  from '@typhonjs-fvtt/svelte/store';
-
+/**
+ * Provides the ability the save / restore application state for positional and UI state such as minimized status.
+ *
+ * You can restore a saved state with animation; please see the options of {@link ApplicationState.restore}.
+ */
 export class ApplicationState
 {
    /** @type {ApplicationShellExt} */
    #application;
 
-   /** @type {Map<string, ApplicationData>} */
+   /** @type {Map<string, ApplicationStateData>} */
    #dataSaved = new Map();
-
-   #sessionStorage;
 
    /**
     * @param {ApplicationShellExt}   application - The application.
@@ -22,22 +23,7 @@ export class ApplicationState
    {
       this.#application = application;
 
-      const optionsSessionStorage = application?.options?.sessionStorage;
-
-      if (optionsSessionStorage !== void 0 && !(optionsSessionStorage instanceof TJSSessionStorage))
-      {
-         throw new TypeError(`'options.sessionStorage' is not an instance of TJSSessionStorage.`);
-      }
-
-      this.#sessionStorage = optionsSessionStorage !== void 0 ? optionsSessionStorage : new TJSSessionStorage();
-   }
-
-   /**
-    * @returns {TJSSessionStorage} Returns TJSSessionStorage instance.
-    */
-   get sessionStorage()
-   {
-      return this.#sessionStorage;
+      Object.seal(this);
    }
 
    /**
@@ -45,7 +31,7 @@ export class ApplicationState
     *
     * @param {object} [extra] - Extra data to add to application state.
     *
-    * @returns {ApplicationData} Passed in object with current application state.
+    * @returns {ApplicationStateData} Passed in object with current application state.
     */
    get(extra = {})
    {
@@ -62,7 +48,7 @@ export class ApplicationState
     *
     * @param {string}   name - Saved data set name.
     *
-    * @returns {ApplicationData} The saved data set.
+    * @returns {ApplicationStateData} The saved data set.
     */
    getSave({ name })
    {
@@ -81,7 +67,7 @@ export class ApplicationState
     *
     * @param {string}   options.name - Name to remove and retrieve.
     *
-    * @returns {ApplicationData} Saved application data.
+    * @returns {ApplicationStateData} Saved application data.
     */
    remove({ name })
    {
@@ -116,7 +102,7 @@ export class ApplicationState
     *
     * @param {Function}          [params.interpolate=lerp] - Interpolation function.
     *
-    * @returns {ApplicationData|Promise<ApplicationData>} Saved application data.
+    * @returns {ApplicationStateData|Promise<ApplicationStateData>} Saved application data.
     */
    restore({ name, remove = false, async = false, animateTo = false, duration = 0.1, ease = linear,
     interpolate = lerp })
@@ -154,7 +140,7 @@ export class ApplicationState
     *
     * @param {...*}     [options.extra] - Extra data to add to saved data.
     *
-    * @returns {ApplicationData} Current application data
+    * @returns {ApplicationStateData} Current application data
     */
    save({ name, ...extra })
    {
@@ -179,7 +165,7 @@ export class ApplicationState
     *
     * TODO: THIS METHOD NEEDS TO BE REFACTORED WHEN TRL IS MADE INTO A STANDALONE FRAMEWORK.
     *
-    * @param {ApplicationData}   data - Saved data set name.
+    * @param {ApplicationStateData}   data - Saved data set name.
     *
     * @param {object}            [opts] - Optional parameters
     *
@@ -311,7 +297,7 @@ export class ApplicationState
          else
          {
             // When not rendered set position to the 'beforeMinimized' data if it exists otherwise set w/ 'position'.
-            // Currently w/ Foundry core Application API it is impossible to initially render an app in the minimized
+            // Currently, w/ Foundry core Application API it is impossible to initially render an app in the minimized
             // state.
 
             let positionData = data.position;
@@ -337,7 +323,7 @@ export class ApplicationState
 }
 
 /**
- * @typedef {object} ApplicationData
+ * @typedef {object} ApplicationStateData
  *
  * @property {PositionDataExtended}   position - Application position.
  *

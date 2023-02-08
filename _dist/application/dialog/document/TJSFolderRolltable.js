@@ -12,17 +12,18 @@ import { hasSetter }             from '@typhonjs-fvtt/svelte/util';
 export class TJSFolderRolltable extends TJSDialog
 {
    /**
-    * @param {Folder}  document -
+    * @param {Folder} document - Folder to create roll table from...
     *
-    * @param {object}   options -
+    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {object}   dialogData -
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     */
    constructor(document, options = {}, dialogData = {})
    {
       super({
-         modal: typeof options?.modal === 'boolean' ? options.modal : true,
+         modal: typeof dialogData?.modal === 'boolean' ? dialogData.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
+         focusKeep: true,
          minimizable: false,
          ...dialogData,
          content: {
@@ -34,21 +35,15 @@ export class TJSFolderRolltable extends TJSDialog
             create: {
                icon: `${CONFIG.RollTable.sidebarIcon}`,
                label: 'FOLDER.CreateTable',
-               onclick: 'createTable'
+               onPress: 'createTable'
             },
             cancel: {
                icon: 'fas fa-times',
                label: 'Cancel',
-               onclick: () =>
-               {
-                  this.options?.resolve?.(false);
-                  this.close();
-               }
+               onPress: () => false
             }
          },
-         default: 'cancel',
-         autoClose: false,
-         close: () => this.options?.resolve?.(null)
+         default: 'cancel'
       }, options);
 
       /**
@@ -72,9 +67,9 @@ export class TJSFolderRolltable extends TJSDialog
     *
     * @param {Folder} document - Folder to create roll table from...
     *
-    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<RollTable|boolean|null>} The newly created RollTable or a falsy value; either 'false' for
     * cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
@@ -87,10 +82,6 @@ export class TJSFolderRolltable extends TJSDialog
          return null;
       }
 
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSFolderRolltable(document, options, dialogData).render(true, { focus: true });
-      });
+      return new TJSFolderRolltable(document, options, dialogData).wait();
    }
 }

@@ -2,7 +2,8 @@ import { derived, writable }  from "svelte/store";
 
 import {
    propertyStore,
-   subscribeIgnoreFirst }     from '@typhonjs-fvtt/svelte/store';
+   subscribeIgnoreFirst,
+   TJSSessionStorage }        from '@typhonjs-fvtt/svelte/store';
 
 import {
    deepMerge,
@@ -10,7 +11,59 @@ import {
    safeSet }                  from '@typhonjs-fvtt/svelte/util';
 
 /**
- * Contains the reactive functionality / Svelte stores associated with SvelteApplication.
+ * Contains the reactive functionality / Svelte stores associated with SvelteApplication and retrievable by
+ * {@link SvelteApplication.reactive}.
+ *
+ * There are several reactive getters for UI state such and for two-way bindings / stores see
+ * {@link SvelteReactive.storeUIState}:
+ * - {@link SvelteReactive.dragging}
+ * - {@link SvelteReactive.minimized}
+ * - {@link SvelteReactive.resizing}
+ *
+ * There are also reactive getters / setters for {@link SvelteApplicationOptions} and Foundry
+ * {@link ApplicationOptions}. You can use the following as one way bindings and update the associated stores. For
+ * two-way bindings / stores see {@link SvelteReactive.storeAppOptions}.
+ *
+ * - {@link SvelteReactive.draggable}
+ * - {@link SvelteReactive.focusAuto}
+ * - {@link SvelteReactive.focusKeep}
+ * - {@link SvelteReactive.focusTrap}
+ * - {@link SvelteReactive.headerButtonNoClose}
+ * - {@link SvelteReactive.headerButtonNoLabel}
+ * - {@link SvelteReactive.headerIcon}
+ * - {@link SvelteReactive.headerNoTitleMinimized}
+ * - {@link SvelteReactive.minimizable}
+ * - {@link SvelteReactive.popOut}
+ * - {@link SvelteReactive.positionable}
+ * - {@link SvelteReactive.resizable}
+ * - {@link SvelteReactive.title}
+ *
+ * An instance of TJSSessionStorage is accessible via {@link SvelteReactive.sessionStorage}. Optionally you can pass
+ * in an existing instance that can be shared across multiple SvelteApplications by setting
+ * {@link SvelteApplicationOptions.sessionStorage}.
+ *
+ * -------------------------------------------------------------------------------------------------------------------
+ *
+ * This API is not sealed, and it is recommended that you extend it with accessors to get / set data that is reactive
+ * in your application. An example of setting an exported prop `document` from the main mounted application shell.
+ *
+ * @example
+ * import { hasSetter } from '@typhonjs-fvtt/runtime/svelte/util';
+ *
+ * // Note: make a normal comment.
+ * //  * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with
+ * //  *                             Document with the mounted application shell Svelte component.
+ * //  *
+ * //  * @memberof SvelteReactive#
+ * //  *
+ * Object.defineProperty(this.reactive, 'document', {
+ *    get: () => this.svelte?.applicationShell?.document,
+ *    set: (document) =>
+ *    {
+ *       const component = this.svelte?.applicationShell;
+ *       if (hasSetter(component, 'document')) { component.document = document; }
+ *    }
+ * });
  */
 export class SvelteReactive
 {
@@ -23,6 +76,9 @@ export class SvelteReactive
     * @type {boolean}
     */
    #initialized = false;
+
+   /** @type {TJSSessionStorage} */
+   #sessionStorage;
 
    /**
     * The Application option store which is injected into mounted Svelte component context under the `external` key.
@@ -72,12 +128,20 @@ export class SvelteReactive
    constructor(application)
    {
       this.#application = application;
+      const optionsSessionStorage = application?.options?.sessionStorage;
+
+      if (optionsSessionStorage !== void 0 && !(optionsSessionStorage instanceof TJSSessionStorage))
+      {
+         throw new TypeError(`'options.sessionStorage' is not an instance of TJSSessionStorage.`);
+      }
+
+      this.#sessionStorage = optionsSessionStorage !== void 0 ? optionsSessionStorage : new TJSSessionStorage();
    }
 
    /**
     * Initializes reactive support. Package private for internal use.
     *
-    * @returns {SvelteStores} Internal methods to interact with Svelte stores.
+    * @returns {SvelteStores|void} Internal methods to interact with Svelte stores.
     * @package
     */
    initialize()
@@ -95,6 +159,30 @@ export class SvelteReactive
          unsubscribe: this.#storesUnsubscribe.bind(this)
       };
    }
+
+// Store getters -----------------------------------------------------------------------------------------------------
+
+   /**
+    * @returns {TJSSessionStorage} Returns TJSSessionStorage instance.
+    */
+   get sessionStorage()
+   {
+      return this.#sessionStorage;
+   }
+
+   /**
+    * Returns the store for app options.
+    *
+    * @returns {StoreAppOptions} App options store.
+    */
+   get storeAppOptions() { return this.#storeAppOptions; }
+
+   /**
+    * Returns the store for UI options.
+    *
+    * @returns {StoreUIOptions} UI options store.
+    */
+   get storeUIState() { return this.#storeUIState; }
 
 // Only reactive getters ---------------------------------------------------------------------------------------------
 
@@ -129,6 +217,27 @@ export class SvelteReactive
    get draggable() { return this.#application?.options?.draggable; }
 
    /**
+    * Returns the focusAuto app option.
+    *
+    * @returns {boolean} When true auto-management of app focus is enabled.
+    */
+   get focusAuto() { return this.#application?.options?.focusAuto; }
+
+   /**
+    * Returns the focusKeep app option.
+    *
+    * @returns {boolean} When `focusAuto` and `focusKeep` is true; keeps internal focus.
+    */
+   get focusKeep() { return this.#application?.options?.focusKeep; }
+
+   /**
+    * Returns the focusTrap app option.
+    *
+    * @returns {boolean} When true focus trapping / wrapping is enabled keeping focus inside app.
+    */
+   get focusTrap() { return this.#application?.options?.focusTrap; }
+
+   /**
     * Returns the headerButtonNoClose app option.
     *
     * @returns {boolean} Remove the close the button in header app option.
@@ -141,6 +250,13 @@ export class SvelteReactive
     * @returns {boolean} Remove the labels from buttons in header app option.
     */
    get headerButtonNoLabel() { return this.#application?.options?.headerButtonNoLabel; }
+
+   /**
+    * Returns the headerIcon app option.
+    *
+    * @returns {string|void} URL for header app icon.
+    */
+   get headerIcon() { return this.#application?.options?.headerIcon; }
 
    /**
     * Returns the headerNoTitleMinimized app option.
@@ -157,9 +273,18 @@ export class SvelteReactive
    get minimizable() { return this.#application?.options?.minimizable; }
 
    /**
-    * @inheritDoc
+    * Returns the Foundry popOut state; {@link Application.popOut}
+    *
+    * @returns {boolean} Positionable app option.
     */
    get popOut() { return this.#application.popOut; }
+
+   /**
+    * Returns the positionable app option; {@link SvelteApplicationOptions.positionable}
+    *
+    * @returns {boolean} Positionable app option.
+    */
+   get positionable() { return this.#application?.options?.positionable; }
 
    /**
     * Returns the resizable option.
@@ -169,21 +294,7 @@ export class SvelteReactive
    get resizable() { return this.#application?.options?.resizable; }
 
    /**
-    * Returns the store for app options.
-    *
-    * @returns {StoreAppOptions} App options store.
-    */
-   get storeAppOptions() { return this.#storeAppOptions; }
-
-   /**
-    * Returns the store for UI options.
-    *
-    * @returns {StoreUIOptions} UI options store.
-    */
-   get storeUIState() { return this.#storeUIState; }
-
-   /**
-    * Returns the title accessor from the parent Application class.
+    * Returns the title accessor from the parent Application class; {@link Application.title}
     * TODO: Application v2; note that super.title localizes `this.options.title`; IMHO it shouldn't.
     *
     * @returns {string} Title.
@@ -198,6 +309,36 @@ export class SvelteReactive
    set draggable(draggable)
    {
       if (typeof draggable === 'boolean') { this.setOptions('draggable', draggable); }
+   }
+
+   /**
+    * Sets `this.options.focusAuto` which is reactive for application shells.
+    *
+    * @param {boolean}  focusAuto - Sets the focusAuto option.
+    */
+   set focusAuto(focusAuto)
+   {
+      if (typeof focusAuto === 'boolean') { this.setOptions('focusAuto', focusAuto); }
+   }
+
+   /**
+    * Sets `this.options.focusKeep` which is reactive for application shells.
+    *
+    * @param {boolean}  focusKeep - Sets the focusKeep option.
+    */
+   set focusKeep(focusKeep)
+   {
+      if (typeof focusKeep === 'boolean') { this.setOptions('focusKeep', focusKeep); }
+   }
+
+   /**
+    * Sets `this.options.focusTrap` which is reactive for application shells.
+    *
+    * @param {boolean}  focusTrap - Sets the focusTrap option.
+    */
+   set focusTrap(focusTrap)
+   {
+      if (typeof focusTrap === 'boolean') { this.setOptions('focusTrap', focusTrap); }
    }
 
    /**
@@ -218,6 +359,16 @@ export class SvelteReactive
    set headerButtonNoLabel(headerButtonNoLabel)
    {
       if (typeof headerButtonNoLabel === 'boolean') { this.setOptions('headerButtonNoLabel', headerButtonNoLabel); }
+   }
+
+   /**
+    * Sets `this.options.headerIcon` which is reactive for application shells.
+    *
+    * @param {string|void}  headerIcon - Sets the headerButtonNoLabel option.
+    */
+   set headerIcon(headerIcon)
+   {
+      if (headerIcon === void 0 || typeof headerIcon === 'string') { this.setOptions('headerIcon', headerIcon); }
    }
 
    /**
@@ -255,6 +406,16 @@ export class SvelteReactive
    }
 
    /**
+    * Sets `this.options.positionable` enabling / disabling {@link SvelteApplication.position.set}.
+    *
+    * @param {boolean}  positionable - Sets the positionable option.
+    */
+   set positionable(positionable)
+   {
+      if (typeof positionable === 'boolean') { this.setOptions('positionable', positionable); }
+   }
+
+   /**
     * Sets `this.options.resizable` which is reactive for application shells.
     *
     * @param {boolean}  resizable - Sets the resizable option.
@@ -282,6 +443,8 @@ export class SvelteReactive
          this.setOptions('title', '');
       }
    }
+
+   // Reactive Options API -------------------------------------------------------------------------------------------
 
    /**
     * Provides a way to safely get this applications options given an accessor string which describes the
@@ -362,11 +525,16 @@ export class SvelteReactive
          subscribe: writableAppOptions.subscribe,
 
          draggable: propertyStore(writableAppOptions, 'draggable'),
+         focusAuto: propertyStore(writableAppOptions, 'focusAuto'),
+         focusKeep: propertyStore(writableAppOptions, 'focusKeep'),
+         focusTrap: propertyStore(writableAppOptions, 'focusTrap'),
          headerButtonNoClose: propertyStore(writableAppOptions, 'headerButtonNoClose'),
          headerButtonNoLabel: propertyStore(writableAppOptions, 'headerButtonNoLabel'),
+         headerIcon: propertyStore(writableAppOptions, 'headerIcon'),
          headerNoTitleMinimized: propertyStore(writableAppOptions, 'headerNoTitleMinimized'),
          minimizable: propertyStore(writableAppOptions, 'minimizable'),
          popOut: propertyStore(writableAppOptions, 'popOut'),
+         positionable: propertyStore(writableAppOptions, 'positionable'),
          resizable: propertyStore(writableAppOptions, 'resizable'),
          title: propertyStore(writableAppOptions, 'title')
       };
@@ -408,7 +576,6 @@ export class SvelteReactive
 
    /**
     * Registers local store subscriptions for app options. `popOut` controls registering this app with `ui.windows`.
-    * `zIndex` controls the z-index style of the element root.
     *
     * @see SvelteApplication._injectHTML
     */
@@ -459,8 +626,9 @@ export class SvelteReactive
     * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
     * the new buttons.
     *
-    * Optionally you can set in the Foundry app options `headerButtonNoClose` to remove the close button and
-    * `headerButtonNoLabel` to true and labels will be removed from the header buttons.
+    * Optionally you can set in the SvelteApplication app options {@link SvelteApplicationOptions.headerButtonNoClose}
+    * to remove the close button and {@link SvelteApplicationOptions.headerButtonNoLabel} to true and labels will be
+    * removed from the header buttons.
     *
     * @param {object} opts - Optional parameters (for internal use)
     *

@@ -2,7 +2,8 @@
    import {
       getContext,
       onDestroy,
-      onMount }            from 'svelte';
+      onMount,
+      setContext }         from 'svelte';
 
    import { fade }         from 'svelte/transition';
 
@@ -12,7 +13,7 @@
    import DialogContent    from './DialogContent.svelte';
    import TJSGlassPane     from '../TJSGlassPane.svelte';
 
-   // Application shell contract.
+   // ApplicationShell contract.
    export let elementContent = void 0;
    export let elementRoot = void 0;
 
@@ -21,7 +22,11 @@
 
    export let dialogComponent = void 0;
 
-   const application = getContext('external').application;
+   export let managedPromise = void 0;
+
+   const application = getContext('#external').application;
+
+   setContext('#managedPromise', managedPromise);
 
    const s_MODAL_TRANSITION = fade;
    const s_MODAL_TRANSITION_OPTIONS = { duration: 200 };
@@ -74,13 +79,13 @@
 
    if (modal)
    {
-      // Add a capture listener on window keydown to act before any Foundry core Dialog listener.
+      // Add a capture listener on window keydown to act before any other event listener.
       onDestroy(() => window.removeEventListener('keydown', onKeydownModal, { capture: true }));
       onMount(() => window.addEventListener('keydown', onKeydownModal, { capture: true }));
    }
    else
    {
-      // Add a listener on document keydown that matches the Foundry core Dialog.
+      // Add a listener on document keydown to act before or equal with other event listeners.
       onDestroy(() => document.removeEventListener('keydown', onKeydown));
       onMount(() => document.addEventListener('keydown', onKeydown));
    }
@@ -108,17 +113,41 @@
       if (zIndex !== newZIndex) { zIndex = newZIndex; }
 
       // Update the main foundry options when data changes. Perform explicit checks against existing data in `application`.
-      const newDraggable = data.draggable ?? true;
-      if (application.reactive.draggable !== newDraggable) { application.reactive.draggable = newDraggable; }
+      const newDraggable = typeof data.draggable === 'boolean' ? data.draggable : void 0;
+      if (newDraggable !== void 0 && application.reactive.draggable !== newDraggable)
+      {
+         application.reactive.draggable = newDraggable;
+      }
 
-      const newMinimizable = data.minimizable ?? true;
-      if (application.reactive.minimizable !== newMinimizable) { application.reactive.minimizable = newMinimizable; }
+      const newFocusAuto = typeof data.focusAuto === 'boolean' ? data.focusAuto : void 0;
+      if (newFocusAuto !== void 0 && application.reactive.focusAuto !== newFocusAuto)
+      {
+         application.reactive.focusAuto = newFocusAuto;
+      }
 
-      const newPopOut = data.popOut ?? true;
-      if (application.reactive.popOut !== newPopOut) { application.reactive.popOut = newPopOut; }
+      const newFocusKeep = typeof data.focusKeep === 'boolean' ? data.focusKeep : void 0;
+      if (newFocusKeep !== void 0 && application.reactive.focusKeep !== newFocusKeep)
+      {
+         application.reactive.focusKeep = newFocusKeep;
+      }
 
-      const newResizable = data.resizable ?? false;
-      if (application.reactive.resizable !== newResizable) { application.reactive.resizable = newResizable; }
+      const newFocusTrap = typeof data.focusTrap === 'boolean' ? data.focusTrap : void 0;
+      if (newFocusTrap !== void 0 && application.reactive.focusTrap !== newFocusTrap)
+      {
+         application.reactive.focusTrap = newFocusTrap;
+      }
+
+      const newMinimizable = typeof data.minimizable === 'boolean' ? data.minimizable : void 0;
+      if (newMinimizable !== void 0 && application.reactive.minimizable !== newMinimizable)
+      {
+         application.reactive.minimizable = newMinimizable;
+      }
+
+      const newResizable = typeof data.resizable === 'boolean' ? data.resizable : void 0;
+      if (newResizable !== void 0 && application.reactive.resizable !== newResizable)
+      {
+         application.reactive.resizable = newResizable;
+      }
 
       // Note application.title from Application localizes `options.title`, so compare with `application.options.title`.
       const newTitle = data.title ?? 'Dialog';
@@ -222,8 +251,7 @@
    }
 
    /**
-    * Handles closing all open TJSDialog instances when <Esc> key is pressed. Using `stopPropagation` allows
-    * the Foundry core Dialog keydown handler to also execute.
+    * Handles closing all open TJSDialog instances when <Esc> key is pressed.
     *
     * @param {KeyboardEvent}  event - A KeyboardEvent.
     */
@@ -238,8 +266,8 @@
    }
 
    /**
-    * Handles closing any modal window and is assigned to `window` with capture acting before the Foundry Dialog keydown
-    * handler stopping immediate propagation.
+    * Handles closing any modal window and is assigned to `window` with capture acting before any other browser wide
+    * event listeners stopping immediate propagation.
     *
     * @param {KeyboardEvent}  event - A KeyboardEvent.
     */
@@ -259,11 +287,11 @@
 {#if modal}
    <TJSGlassPane id={`${application.id}-glasspane`} {...modalProps} {zIndex}>
       <ApplicationShell bind:elementRoot bind:elementContent {...appProps} appOffsetHeight={true}>
-         <DialogContent bind:dialogInstance={dialogComponent} {data} {modal} stopPropagation={true} />
+         <DialogContent bind:dialogComponent {data} stopPropagation={true} />
       </ApplicationShell>
    </TJSGlassPane>
 {:else}
    <ApplicationShell bind:elementRoot bind:elementContent {...appProps} appOffsetHeight={true}>
-      <DialogContent bind:dialogInstance={dialogComponent} {data} />
+      <DialogContent bind:dialogComponent {data} />
    </ApplicationShell>
 {/if}

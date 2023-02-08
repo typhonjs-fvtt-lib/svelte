@@ -12,17 +12,20 @@ import { hasSetter }          from '@typhonjs-fvtt/svelte/util';
 export class TJSFolderDelete extends TJSDialog
 {
    /**
-    * @param {Folder}  document -
+    * Deletes a folder and does delete subfolders / documents.
     *
-    * @param {object}   options -
+    * @param {Folder} document - Folder to delete.
     *
-    * @param {object}   dialogData -
+    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
+    *
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     */
    constructor(document, options = {}, dialogData = {})
    {
       super({
-         modal: typeof options?.modal === 'boolean' ? options.modal : true,
+         modal: typeof dialogData?.modal === 'boolean' ? dialogData.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
+         focusKeep: true,
          minimizable: false,
          ...dialogData,
          content: {
@@ -34,21 +37,15 @@ export class TJSFolderDelete extends TJSDialog
             delete: {
                icon: 'fas fa-dumpster',
                label: 'FOLDER.Delete',
-               onclick: 'deleteFolder'
+               onPress: 'deleteFolder'
             },
             cancel: {
                icon: 'fas fa-times',
                label: 'Cancel',
-               onclick: () =>
-               {
-                  this.options?.resolve?.(false);
-                  this.close();
-               }
+               onPress: () => false
             }
          },
-         default: 'cancel',
-         autoClose: false,
-         close: () => this.options?.resolve?.(null)
+         default: 'cancel'
       }, options);
 
       /**
@@ -72,12 +69,12 @@ export class TJSFolderDelete extends TJSDialog
     *
     * @param {Folder} document - Folder to delete.
     *
-    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<Folder|boolean|null>} The deleted Folder or a falsy value; either 'false' for cancelling or
-    * 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    *          'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async show(document, options = {}, dialogData = {})
    {
@@ -87,10 +84,6 @@ export class TJSFolderDelete extends TJSDialog
          return null;
       }
 
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSFolderDelete(document, options, dialogData).render(true, { focus: true });
-      });
+      return new TJSFolderDelete(document, options, dialogData).wait();
    }
 }

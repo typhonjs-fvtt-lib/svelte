@@ -11,10 +11,12 @@ export class AppShellContextInternal
    constructor()
    {
       this.#stores = {
-         autoFocus: writable(true),
          elementContent: writable(void 0),
          elementRoot: writable(void 0)
       };
+
+      Object.freeze(this.#stores);
+      Object.seal(this);
    }
 
    /**
@@ -28,9 +30,6 @@ export class AppShellContextInternal
 
 /**
  * @typedef {object} InternalAppStores
- *
- * @property {import('svelte/store').Writable<boolean>} autoFocus - When true pointer down on app header will focus the
- *  app and / or the window content area. An example of turning this off is useful for modal dialogs.
  *
  * @property {import('svelte/store').Writable<HTMLElement>} elementContent - The window content element.
  *

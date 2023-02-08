@@ -2124,9 +2124,7 @@ class KeyStore
    }
 
    /**
-    * Returns current pressed keys iterator.
-    *
-    * @returns {IterableIterator<string>}
+    * @returns {IterableIterator<string>} Returns current pressed keys iterator.
     */
    keysPressed()
    {
@@ -2134,9 +2132,7 @@ class KeyStore
    }
 
    /**
-    * Returns currently tracked keys iterator.
-    *
-    * @returns {IterableIterator<string>}
+    * @returns {IterableIterator<string>} Returns currently tracked keys iterator.
     */
    keysTracked()
    {
@@ -2793,9 +2789,9 @@ function subscribeFirstRest(store, first, update)
  * [`derived`](https://svelte.dev/docs#run-time-svelte-store-writable)'s 1st parameter.
  * @param {!Function} derive The callback to determine the derived value. Same as
  * [`derived`](https://svelte.dev/docs#run-time-svelte-store-writable)'s 2nd parameter.
- * @param {!Function|{withOld: !Function}} reflect Called when the
- * derived store gets a new value via its `set` or `update` methods, and determines new values for
- * the origin stores. [Read more...](https://github.com/PixievoltNo1/svelte-writable-derived#new-parameter-reflect)
+ * @param {!Function} reflect Called when the derived store gets a new value via its `set` or
+ * `update` methods, and determines new values for the origin stores.
+ * [Read more...](https://github.com/PixievoltNo1/svelte-writable-derived#new-parameter-reflect)
  * @param [initial] The new store's initial value. Same as
  * [`derived`](https://svelte.dev/docs#run-time-svelte-store-writable)'s 3rd parameter.
  * 
@@ -2803,7 +2799,7 @@ function subscribeFirstRest(store, first, update)
  */
 function writableDerived(origins, derive, reflect, initial) {
 	var childDerivedSetter, originValues, blockNextDerive = false;
-	var reflectOldValues = "withOld" in reflect;
+	var reflectOldValues = reflect.length >= 2;
 	var wrappedDerive = (got, set) => {
 		childDerivedSetter = set;
 		if (reflectOldValues) {
@@ -2822,7 +2818,8 @@ function writableDerived(origins, derive, reflect, initial) {
 	var childDerived = derived(origins, wrappedDerive, initial);
 	
 	var singleOrigin = !Array.isArray(origins);
-	var sendUpstream = (setWith) => {
+	function doReflect(reflecting) {
+		var setWith = reflect(reflecting, originValues);
 		if (singleOrigin) {
 			blockNextDerive = true;
 			origins.set(setWith);
@@ -2833,30 +2830,6 @@ function writableDerived(origins, derive, reflect, initial) {
 			} );
 		}
 		blockNextDerive = false;
-	};
-	if (reflectOldValues) {
-		reflect = reflect.withOld;
-	}
-	var reflectIsAsync = reflect.length >= (reflectOldValues ? 3 : 2);
-	var cleanup = null;
-	function doReflect(reflecting) {
-		if (cleanup) {
-			cleanup();
-			cleanup = null;
-		}
-
-		if (reflectOldValues) {
-			var returned = reflect(reflecting, originValues, sendUpstream);
-		} else {
-			var returned = reflect(reflecting, sendUpstream);
-		}
-		if (reflectIsAsync) {
-			if (typeof returned == "function") {
-				cleanup = returned;
-			}
-		} else {
-			sendUpstream(returned);
-		}
 	}
 	
 	var tryingSet = false;
@@ -2910,10 +2883,10 @@ function propertyStore(origin, propName) {
 		return writableDerived(
 			origin,
 			(object) => object[propName],
-			{ withOld(reflecting, object) {
+			(reflecting, object) => {
 				object[propName] = reflecting;
 				return object;
-			} }
+			},
 		);
 	} else {
 		let props = propName.concat();
@@ -2925,19 +2898,23 @@ function propertyStore(origin, propName) {
 				}
 				return value;
 			},
-			{ withOld(reflecting, object) {
+			(reflecting, object) => {
 				let target = object;
 				for (let i = 0; i < props.length - 1; ++i) {
 					target = target[ props[i] ];
 				}
 				target[ props[props.length - 1] ] = reflecting;
 				return object;
-			} }
+			},
 		);
 	}
 }
 
 /**
+ * Provides management of reactive embedded collections.
+ *
+ * TODO: Consider subscribing to TJSDocument rather than exposing {@link EmbeddedStoreManager.handleDocChange} and
+ * {@link EmbeddedStoreManager.handleUpdate}
  */
 class EmbeddedStoreManager
 {
@@ -2971,6 +2948,8 @@ class EmbeddedStoreManager
       this.#document = document;
 
       this.handleDocChange();
+
+      Object.seal(this);
    }
 
    /**
@@ -3280,7 +3259,7 @@ class TJSDocument
    /**
     * @type {TJSDocumentOptions}
     */
-   #options = { delete: void 0 };
+   #options = { delete: void 0, preDelete: void 0 };
 
    #subscriptions = [];
    #updateOptions;
@@ -3352,9 +3331,17 @@ class TJSDocument
          delete doc?.apps[this.#uuidv4];
          this.#setDocument(void 0);
 
-         if (typeof this.#options.delete === 'function') { await this.#options.delete(); }
+         if (typeof this.#options.preDelete === 'function')
+         {
+            await this.#options.preDelete(doc);
+         }
 
          this.#updateSubscribers(false, { action: 'delete', data: void 0 });
+
+         if (typeof this.#options.delete === 'function')
+         {
+            await this.#options.delete(doc);
+         }
 
          this.#updateOptions = void 0;
       }
@@ -3509,14 +3496,28 @@ class TJSDocument
          throw new TypeError(`TJSDocument error: 'options' is not a plain object.`);
       }
 
+      // Verify valid values -------------
+
       if (options.delete !== void 0 && typeof options.delete !== 'function')
       {
          throw new TypeError(`TJSDocument error: 'delete' attribute in options is not a function.`);
       }
 
+      if (options.preDelete !== void 0 && typeof options.preDelete !== 'function')
+      {
+         throw new TypeError(`TJSDocument error: 'preDelete' attribute in options is not a function.`);
+      }
+
+      // Set any valid values -------------
+
       if (options.delete === void 0 || typeof options.delete === 'function')
       {
          this.#options.delete = options.delete;
+      }
+
+      if (options.preDelete === void 0 || typeof options.preDelete === 'function')
+      {
+         this.#options.preDelete = options.preDelete;
       }
    }
 
@@ -3545,7 +3546,11 @@ class TJSDocument
 /**
  * @typedef {object} TJSDocumentOptions
  *
- * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
+ * @property {(doc: foundry.abstract.Document) => void} [delete] - Optional post delete function to invoke when
+ *           document is deleted _after_ subscribers have been notified.
+ *
+ * @property {(doc: foundry.abstract.Document) => void} [preDelete] - Optional pre delete function to invoke when
+ *           document is deleted _before_ subscribers are notified.
  */
 
 /**
@@ -3574,7 +3579,7 @@ class TJSDocumentCollection
    /**
     * @type {TJSDocumentCollectionOptions}
     */
-   #options = { delete: void 0 };
+   #options = { delete: void 0, preDelete: void 0 };
 
    #subscriptions = [];
    #updateOptions;
@@ -3630,9 +3635,17 @@ class TJSDocumentCollection
          this.#collection = void 0;
       }
 
+      if (typeof this.#options.preDelete === 'function')
+      {
+         await this.#options.preDelete(collection);
+      }
+
       this.#notify(false, { action: 'delete', documentType: collection.documentName, documents: [], data: [] });
 
-      if (typeof this.#options.delete === 'function') { await this.#options.delete(); }
+      if (typeof this.#options.delete === 'function')
+      {
+         await this.#options.delete(collection);
+      }
 
       this.#updateOptions = void 0;
    }
@@ -3732,14 +3745,28 @@ class TJSDocumentCollection
          throw new TypeError(`TJSDocumentCollection error: 'options' is not an object.`);
       }
 
+      // Verify valid values -------------
+
       if (options.delete !== void 0 && typeof options.delete !== 'function')
       {
          throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
       }
 
+      if (options.preDelete !== void 0 && typeof options.preDelete !== 'function')
+      {
+         throw new TypeError(`TJSDocumentCollection error: 'preDelete' attribute in options is not a function.`);
+      }
+
+      // Set any valid values -------------
+
       if (options.delete === void 0 || typeof options.delete === 'function')
       {
          this.#options.delete = options.delete;
+      }
+
+      if (options.preDelete === void 0 || typeof options.preDelete === 'function')
+      {
+         this.#options.preDelete = options.preDelete;
       }
    }
 
@@ -3772,7 +3799,11 @@ class TJSDocumentCollection
 /**
  * @typedef TJSDocumentCollectionOptions
  *
- * @property {Function} [delete] - Optional delete function to invoke when document is deleted.
+ * @property {(collection: foundry.abstract.DocumentCollection) => void} [delete] - Optional post delete function
+ *           to invoke when document is deleted _after_ subscribers have been notified.
+ *
+ * @property {(collection: foundry.abstract.DocumentCollection) => void} [preDelete] - Optional pre delete function to
+ *           invoke when document is deleted _before_ subscribers are notified.
  */
 
 const storeState = writable$2(void 0);

@@ -16,16 +16,25 @@
    export let draggable = void 0;
    export let draggableOptions = void 0;
 
-   const application = getContext('external').application;
-   const { autoFocus, elementRoot } = getContext('internal').stores;
+   const { application } = getContext('#external');
+
+   // Focus related app options stores.
+   const { focusAuto, focusKeep } = application.reactive.storeAppOptions;
+
+   const { elementRoot } = getContext('#internal').stores;
 
    const storeTitle = application.reactive.storeAppOptions.title;
    const storeDraggable = application.reactive.storeAppOptions.draggable;
    const storeDragging = application.reactive.storeUIState.dragging;
    const storeHeaderButtons = application.reactive.storeUIState.headerButtons;
+   const storeHeaderIcon = application.reactive.storeAppOptions.headerIcon;
    const storeHeaderNoTitleMinimized = application.reactive.storeAppOptions.headerNoTitleMinimized;
    const storeMinimizable = application.reactive.storeAppOptions.minimizable;
    const storeMinimized = application.reactive.storeUIState.minimized;
+
+   // These classes in the window header allow dragging.
+   const s_DRAG_TARGET_CLASSLIST = Object.freeze(['tjs-app-icon', 'tjs-window-header-spacer',
+    'window-header', 'window-title']);
 
    let dragOptions;
 
@@ -36,24 +45,28 @@
    // `storeDragging` are always overridden by application position / stores.
    $: dragOptions = Object.assign({}, { ease: true, easeOptions: { duration: 0.08, ease: cubicOut } },
     isObject(draggableOptions) ? draggableOptions : {}, { position: application.position, active:
-     $storeDraggable, storeDragging, hasTargetClassList: ['window-header', 'window-title'] });
+     $storeDraggable, storeDragging, hasTargetClassList: s_DRAG_TARGET_CLASSLIST });
 
    let displayHeaderTitle;
 
    $: displayHeaderTitle = $storeHeaderNoTitleMinimized && $storeMinimized ? 'none' : null;
 
-   let buttons;
+   let buttonsLeft;
+   let buttonsRight;
 
    $:
    {
-      buttons = $storeHeaderButtons.reduce((array, button) =>
-      {
-         // If the button is a SvelteComponent set it as the class otherwise use `TJSHeaderButton` w/ button as props.
-         array.push(isSvelteComponent(button) ? { class: button, props: {} } :
-          { class: TJSHeaderButton, props: { button } });
+      buttonsLeft = [];
+      buttonsRight = [];
 
-         return array;
-      }, []);
+      for (const button of $storeHeaderButtons)
+      {
+         const buttonsList = typeof button?.alignLeft === 'boolean' && button?.alignLeft ? buttonsLeft : buttonsRight;
+
+         // If the button is a Svelte component set it as the class otherwise use `TJSHeaderButton` w/ button as props.
+         buttonsList.push(isSvelteComponent(button) ? { class: button, props: {} } :
+          { class: TJSHeaderButton, props: { button } });
+      }
    }
 
    function minimizable(node, booleanStore)
@@ -89,17 +102,35 @@
     * Explicitly focus `elementRoot` if pointer event is not consumed by header buttons / components. This allows
     * keyboard tab navigation to select header buttons.
     *
-    * Note: if `autoFocus` internal store is set to false `elementRoot` is not focused.
+    * Note: if `focusKeep` app option store is set to true `elementRoot` is only focused if the current browser wide
+    * active element is not contained inside the app element.
     */
    function onPointerdown(event)
    {
-      if ($autoFocus && $elementRoot?.isConnected)
+      const rootEl = $elementRoot;
+
+      if ($focusAuto && rootEl instanceof HTMLElement && rootEl?.isConnected)
       {
-         $elementRoot.focus();
-      }
-      else
-      {
-         event.preventDefault();
+         if ($focusKeep)
+         {
+            const focusOutside = document.activeElement instanceof HTMLElement &&
+             !rootEl.contains(document.activeElement);
+
+            // Only focus the content element if the active element is outside the app; maintaining internal focused
+            // element.
+            if (focusOutside)
+            {
+               rootEl.focus();
+            }
+            else
+            {
+               event.preventDefault();
+            }
+         }
+         else
+         {
+            rootEl.focus();
+         }
       }
    }
 </script>
@@ -108,24 +139,52 @@
    <header class="window-header flexrow"
            use:draggable={dragOptions}
            use:minimizable={$storeMinimizable}
-           on:pointerdown={onPointerdown}
-   >
-      <h4 class=window-title style:display={displayHeaderTitle}>{localize($storeTitle)}</h4>
-      {#each buttons as button}
+           on:pointerdown={onPointerdown}>
+      {#if typeof $storeHeaderIcon === 'string'}
+         <img class="tjs-app-icon keep-minimized" src={$storeHeaderIcon} alt=icon>
+      {/if}
+      <h4 class=window-title style:display={displayHeaderTitle}>
+         {localize($storeTitle)}
+      </h4>
+      {#each buttonsLeft as button}
+         <svelte:component this={button.class} {...button.props} />
+      {/each}
+      <span class="tjs-window-header-spacer keep-minimized" />
+      {#each buttonsRight as button}
          <svelte:component this={button.class} {...button.props} />
       {/each}
    </header>
 {/key}
 
 <style>
+   /**
+    * Provides a zero space element that expands to the right creating the gap between window title and left aligned
+    * buttons and right aligned buttons. Note the use of a negative left margin to remove the gap between elements.
+    */
+   .tjs-window-header-spacer {
+      flex: 0;
+      margin-left: calc(-1 * var(--tjs-app-header-gap, 5px));
+      margin-right: auto;
+   }
+
    .window-header {
       flex: var(--tjs-app-header-flex, 0 0 30px);
       gap: var(--tjs-app-header-gap, 5px);
+      padding: var(--tjs-app-header-padding, 0 4px);
+   }
+
+   .window-header .tjs-app-icon {
+      align-self: center;
+      border-radius: var(--tjs-app-header-icon-border-radius, 4px);
+      flex: 0 0 var(--tjs-app-header-icon-width, 24px);
+      height: var(--tjs-app-header-icon-height, 24px);
    }
 
    .window-title {
-      text-overflow: ellipsis;
+      gap: var(--tjs-app-header-gap, 5px);
+      max-width: fit-content;
       overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
    }
 </style>

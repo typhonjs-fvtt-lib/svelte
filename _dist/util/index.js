@@ -250,7 +250,7 @@ function _deepMerge(target = {}, ...sourceObj)
 class A11yHelper
 {
    /**
-    * Apply focus to the HTMLElement targets in a given FocusOptions data object. An iterable list `options.focusEl`
+    * Apply focus to the HTMLElement targets in a given A11yFocusSource data object. An iterable list `options.focusEl`
     * can contain HTMLElements or selector strings. If multiple focus targets are provided in a list then the first
     * valid target found will be focused. If focus target is a string then a lookup via `document.querySelector` is
     * performed. In this case you should provide a unique selector for the desired focus target.
@@ -258,14 +258,14 @@ class A11yHelper
     * Note: The body of this method is postponed to the next clock tick to allow any changes in the DOM to occur that
     * might alter focus targets before applying.
     *
-    * @param {FocusOptions|{ focusOptions: FocusOptions }}   options - The focus options instance to apply.
+    * @param {A11yFocusSource|{ focusSource: A11yFocusSource }}   options - The focus options instance to apply.
     */
-   static applyFocusOptions(options)
+   static applyFocusSource(options)
    {
       if (!isObject(options)) { return; }
 
-      // Handle the case of receiving an object with embedded `focusOptions`.
-      const focusOpts = isObject(options?.focusOptions) ? options.focusOptions : options;
+      // Handle the case of receiving an object with embedded `focusSource`.
+      const focusOpts = isObject(options?.focusSource) ? options.focusSource : options;
 
       setTimeout(() =>
       {
@@ -275,7 +275,7 @@ class A11yHelper
          {
             if (debug)
             {
-               console.log(`A11yHelper.applyFocusOptions debug - Attempting to apply focus target: `, focusOpts.focusEl);
+               console.debug(`A11yHelper.applyFocusSource debug - Attempting to apply focus target: `, focusOpts.focusEl);
             }
 
             for (const target of focusOpts.focusEl)
@@ -285,7 +285,7 @@ class A11yHelper
                   target.focus();
                   if (debug)
                   {
-                     console.log(`A11yHelper.applyFocusOptions debug - Applied focus to target: `, target);
+                     console.debug(`A11yHelper.applyFocusSource debug - Applied focus to target: `, target);
                   }
                   break;
                }
@@ -297,20 +297,20 @@ class A11yHelper
                      element.focus();
                      if (debug)
                      {
-                        console.log(`A11yHelper.applyFocusOptions debug - Applied focus to target: `, element);
+                        console.debug(`A11yHelper.applyFocusSource debug - Applied focus to target: `, element);
                      }
                      break;
                   }
                   else if (debug)
                   {
-                     console.log(`A11yHelper.applyFocusOptions debug - Could not query selector: `, target);
+                     console.debug(`A11yHelper.applyFocusSource debug - Could not query selector: `, target);
                   }
                }
             }
          }
          else if (debug)
          {
-            console.log(`A11yHelper.applyFocusOptions debug - No focus targets defined.`);
+            console.debug(`A11yHelper.applyFocusSource debug - No focus targets defined.`);
          }
       }, 0);
    }
@@ -340,17 +340,19 @@ class A11yHelper
     *
     * @param {HTMLElement|Document} [element=document] Optional element to start query.
     *
-    * @param {object} [options] - Optional parameters.
+    * @param {object}            [options] - Optional parameters.
     *
-    * @param {boolean} [options.anchorHref=true] - When true anchors must have an HREF.
+    * @param {boolean}           [options.anchorHref=true] - When true anchors must have an HREF.
     *
-    * @param {Iterable<string>} [options.ignoreClasses] - Iterable list of classes to ignore elements.
+    * @param {Iterable<string>}  [options.ignoreClasses] - Iterable list of classes to ignore elements.
     *
-    * @param {Set<HTMLElement>} [options.ignoreElements] - Set of elements to ignore.
+    * @param {Set<HTMLElement>}  [options.ignoreElements] - Set of elements to ignore.
+    *
+    * @param {string}            [options.selectors] - Custom list of focusable selectors for `querySelectorAll`.
     *
     * @returns {Array<HTMLElement>} Child keyboard focusable
     */
-   static getFocusableElements(element = document, { anchorHref = true, ignoreClasses, ignoreElements } = {})
+   static getFocusableElements(element = document, { anchorHref = true, ignoreClasses, ignoreElements, selectors } = {})
    {
       if (!(element instanceof HTMLElement) && !(element instanceof Document))
       {
@@ -372,12 +374,19 @@ class A11yHelper
          throw new TypeError(`'ignoreElements' is not a Set.`);
       }
 
-      const allElements = [...element.querySelectorAll(
-       `a${anchorHref ? '[href]' : ''}, button, details, embed, iframe, input:not([type=hidden]), object, select, textarea, [tabindex]:not([tabindex="-1"])`)];
+      if (selectors !== void 0 && typeof selectors !== 'string')
+      {
+         throw new TypeError(`'selectors' is not a string.`);
+      }
+
+      const selectorQuery = selectors ?? this.#getFocusableSelectors(anchorHref);
+
+      const allElements = [...element.querySelectorAll(selectorQuery)];
 
       if (ignoreElements && ignoreClasses)
       {
-         return allElements.filter((el) => {
+         return allElements.filter((el) =>
+         {
             let hasIgnoreClass = false;
             for (const ignoreClass of ignoreClasses)
             {
@@ -389,13 +398,14 @@ class A11yHelper
             }
 
             return !hasIgnoreClass && !ignoreElements.has(el) && el.style.display !== 'none' &&
-             el.style.visibility !== 'hidden' && !el.hasAttribute('disabled') &&
+             el.style.visibility !== 'hidden' && !el.hasAttribute('disabled') && !el.hasAttribute('inert') &&
               el.getAttribute('aria-hidden') !== 'true';
          });
       }
       else if (ignoreClasses)
       {
-         return allElements.filter((el) => {
+         return allElements.filter((el) =>
+         {
             let hasIgnoreClass = false;
             for (const ignoreClass of ignoreClasses)
             {
@@ -407,27 +417,43 @@ class A11yHelper
             }
 
             return !hasIgnoreClass && el.style.display !== 'none' && el.style.visibility !== 'hidden' &&
-             !el.hasAttribute('disabled') && el.getAttribute('aria-hidden') !== 'true';
+             !el.hasAttribute('disabled') && !el.hasAttribute('inert') && el.getAttribute('aria-hidden') !== 'true';
          });
       }
       else if (ignoreElements)
       {
-         return allElements.filter((el) => {
+         return allElements.filter((el) =>
+         {
             return !ignoreElements.has(el) && el.style.display !== 'none' && el.style.visibility !== 'hidden' &&
-             !el.hasAttribute('disabled') && el.getAttribute('aria-hidden') !== 'true';
+             !el.hasAttribute('disabled') && !el.hasAttribute('inert') && el.getAttribute('aria-hidden') !== 'true';
          });
       }
       else
       {
-         return allElements.filter((el) => {
+         return allElements.filter((el) =>
+         {
             return el.style.display !== 'none' && el.style.visibility !== 'hidden' && !el.hasAttribute('disabled') &&
-             el.getAttribute('aria-hidden') !== 'true';
+             !el.hasAttribute('inert') && el.getAttribute('aria-hidden') !== 'true';
          });
       }
    }
 
    /**
-    * Gets a FocusOptions object from the given DOM event allowing for optional X / Y screen space overrides.
+    * Returns the default focusable selectors query.
+    *
+    * @param {boolean}  [anchorHref=true] - When true anchors must have an HREF.
+    *
+    * @returns {string} Focusable selectors for `querySelectorAll`.
+    */
+   static #getFocusableSelectors(anchorHref = true)
+   {
+      return `button, [contenteditable=""], [contenteditable="true"], details summary:not([tabindex="-1"]), embed, a${
+       anchorHref ? '[href]' : ''}, iframe, object, input:not([type=hidden]), select, textarea, ` +
+        `[tabindex]:not([tabindex="-1"])`;
+   }
+
+   /**
+    * Gets a A11yFocusSource object from the given DOM event allowing for optional X / Y screen space overrides.
     * Browsers (Firefox / Chrome) forwards a mouse event for the context menu keyboard button. Provides detection of
     * when the context menu event is from the keyboard. Firefox as of (1/23) does not provide the correct screen space
     * coordinates, so for keyboard context menu presses coordinates are generated from the centroid point of the
@@ -435,39 +461,39 @@ class A11yHelper
     *
     * A default fallback element or selector string may be provided to provide the focus target. If the event comes from
     * the keyboard however the source focused element is inserted as the target with the fallback value appended to the
-    * list of focus targets. When FocusOptions is applied by {@link A11yHelper.applyFocusOptions} the target focus
+    * list of focus targets. When A11yFocusSource is applied by {@link A11yHelper.applyFocusSource} the target focus
     * list is iterated through until a connected target is found and focus applied.
     *
     * @param {object} options - Options
     *
     * @param {KeyboardEvent|MouseEvent}   [options.event] - The source DOM event.
     *
-    * @param {boolean} [options.debug] - When true {@link A11yHelper.applyFocusOptions} logs focus target data.
+    * @param {boolean} [options.debug] - When true {@link A11yHelper.applyFocusSource} logs focus target data.
     *
-    * @param {HTMLElement|string} [options.focusEl] - A specific HTMLElement or selector string
+    * @param {HTMLElement|string} [options.focusEl] - A specific HTMLElement or selector string as the focus target.
     *
     * @param {number}   [options.x] - Used when an event isn't provided; integer of event source in screen space.
     *
     * @param {number}   [options.y] - Used when an event isn't provided; integer of event source in screen space.
     *
-    * @returns {FocusOptions} A FocusOptions object.
+    * @returns {A11yFocusSource} A A11yFocusSource object.
     *
     * @see https://bugzilla.mozilla.org/show_bug.cgi?id=1426671
     * @see https://bugzilla.mozilla.org/show_bug.cgi?id=314314
     *
     * TODO: Evaluate / test against touch input devices.
     */
-   static getFocusOptions({ event, x, y, focusEl, debug = false })
+   static getFocusSource({ event, x, y, focusEl, debug = false })
    {
       if (focusEl !== void 0 && !(focusEl instanceof HTMLElement) && typeof focusEl !== 'string')
       {
          throw new TypeError(
-          `A11yHelper.getFocusOptions error: 'focusEl' is not a HTMLElement or string.`);
+          `A11yHelper.getFocusSource error: 'focusEl' is not a HTMLElement or string.`);
       }
 
       if (debug !== void 0 && typeof debug !== 'boolean')
       {
-         throw new TypeError(`A11yHelper.getFocusOptions error: 'debug' is not a boolean.`);
+         throw new TypeError(`A11yHelper.getFocusSource error: 'debug' is not a boolean.`);
       }
 
       // Handle the case when no event is provided and x, y, or focusEl is explicitly defined.
@@ -475,12 +501,12 @@ class A11yHelper
       {
          if (typeof x !== 'number')
          {
-            throw new TypeError(`A11yHelper.getFocusOptions error: 'event' not defined and 'x' is not a number.`);
+            throw new TypeError(`A11yHelper.getFocusSource error: 'event' not defined and 'x' is not a number.`);
          }
 
          if (typeof y !== 'number')
          {
-            throw new TypeError(`A11yHelper.getFocusOptions error: 'event' not defined and 'y' is not a number.`);
+            throw new TypeError(`A11yHelper.getFocusSource error: 'event' not defined and 'y' is not a number.`);
          }
 
          return {
@@ -488,22 +514,22 @@ class A11yHelper
             focusEl: focusEl !== void 0 ? [focusEl] : void 0,
             x,
             y,
-         }
+         };
       }
 
       if (!(event instanceof KeyboardEvent) && !(event instanceof MouseEvent))
       {
-         throw new TypeError(`A11yHelper.getFocusOptions error: 'event' is not a KeyboardEvent or MouseEvent.`);
+         throw new TypeError(`A11yHelper.getFocusSource error: 'event' is not a KeyboardEvent or MouseEvent.`);
       }
 
       if (x !== void 0 && !Number.isInteger(x))
       {
-         throw new TypeError(`A11yHelper.getFocusOptions error: 'x' is not a number.`);
+         throw new TypeError(`A11yHelper.getFocusSource error: 'x' is not a number.`);
       }
 
       if (y !== void 0 && !Number.isInteger(y))
       {
-         throw new TypeError(`A11yHelper.getFocusOptions error: 'y' is not a number.`);
+         throw new TypeError(`A11yHelper.getFocusSource error: 'y' is not a number.`);
       }
 
       /** @type {HTMLElement} */
@@ -511,7 +537,7 @@ class A11yHelper
 
       if (!(targetEl instanceof HTMLElement))
       {
-         throw new TypeError(`A11yHelper.getFocusOptions error: 'event.target' is not an HTMLElement.`);
+         throw new TypeError(`A11yHelper.getFocusSource error: 'event.target' is not an HTMLElement.`);
       }
 
       const result = { debug };
@@ -583,7 +609,10 @@ class A11yHelper
     */
    static isFocusable(el, { anchorHref = true, ignoreClasses } = {})
    {
-      if (el === void 0 || el === null || !(el instanceof HTMLElement) || el?.hidden || !el?.isConnected) { return false; }
+      if (el === void 0 || el === null || !(el instanceof HTMLElement) || el?.hidden || !el?.isConnected)
+      {
+         return false;
+      }
 
       if (typeof anchorHref !== 'boolean')
       {
@@ -595,12 +624,16 @@ class A11yHelper
          throw new TypeError(`'ignoreClasses' is not an iterable list.`);
       }
 
+      const contenteditableAttr = el.getAttribute('contenteditable');
+      const contenteditableFocusable = typeof contenteditableAttr === 'string' &&
+       (contenteditableAttr === '' || contenteditableAttr === 'true');
+
       const tabindexAttr = el.getAttribute('tabindex');
       const tabindexFocusable = typeof tabindexAttr === 'string' && tabindexAttr !== '-1';
 
       const isAnchor = el instanceof HTMLAnchorElement;
 
-      if (tabindexFocusable || isAnchor || el instanceof HTMLButtonElement ||
+      if (contenteditableFocusable || tabindexFocusable || isAnchor || el instanceof HTMLButtonElement ||
        el instanceof HTMLDetailsElement || el instanceof HTMLEmbedElement || el instanceof HTMLIFrameElement ||
         el instanceof HTMLInputElement || el instanceof HTMLObjectElement || el instanceof HTMLSelectElement ||
          el instanceof HTMLTextAreaElement)
@@ -611,18 +644,30 @@ class A11yHelper
          }
 
          return el.style.display !== 'none' && el.style.visibility !== 'hidden' && !el.hasAttribute('disabled') &&
-          el.getAttribute('aria-hidden') !== 'true';
+          !el.hasAttribute('inert') && el.getAttribute('aria-hidden') !== 'true';
       }
 
       return false;
    }
+
+   /**
+    * Convenience method to check if the given data is a valid focus source.
+    *
+    * @param {HTMLElement|string}   data - Either an HTMLElement or selector string.
+    *
+    * @returns {boolean} Is valid focus source.
+    */
+   static isFocusSource(data)
+   {
+      return data instanceof HTMLElement || typeof data === 'string';
+   }
 }
 
 /**
- * @typedef {object} FocusOptions - Provides essential data to return focus to an HTMLElement after a series of UI
+ * @typedef {object} A11yFocusSource - Provides essential data to return focus to an HTMLElement after a series of UI
  * actions like working with context menus and modal dialogs.
  *
- * @property {boolean} [debug] - When true logs to console the actions taken in {@link A11yHelper.applyFocusOptions}.
+ * @property {boolean} [debug] - When true logs to console the actions taken in {@link A11yHelper.applyFocusSource}.
  *
  * @property {Iterable<HTMLElement|string>} [focusEl] - List of targets to attempt to focus.
  *
@@ -632,6 +677,237 @@ class A11yHelper
  *
  * @property {number} [y] - Potential Y coordinate of initial event.
  */
+
+/**
+ * Provides management of a single Promise that can be shared and accessed across JS & Svelte components. This allows a
+ * Promise to be created and managed as part of the TRL application lifecycle and accessed safely in various control
+ * flow scenarios. When resolution of the current managed Promise starts further interaction is prevented.
+ *
+ * Note: to enable debugging / log statements set the static `logging` variable to true.
+ */
+class ManagedPromise
+{
+   /** @type {boolean} */
+   static #logging = false;
+
+   /** @type {{ isProcessing?: boolean, promise?: Promise, reject: Function, resolve: Function }} */
+   #current;
+
+   /**
+    * @returns {boolean} Whether global logging is enabled.
+    */
+   static get logging()
+   {
+      return this.#logging;
+   }
+
+   /**
+    * @returns {boolean} Whether there is an active managed Promise.
+    */
+   get isActive()
+   {
+      return this.#current !== void 0;
+   }
+
+   /**
+    * @returns {boolean} Whether there is an active managed Promise and resolution is currently being processed.
+    */
+   get isProcessing()
+   {
+      return this.#current !== void 0 ? this.#current.isProcessing : false;
+   }
+
+   /**
+    * Sets global logging enabled state.
+    *
+    * @param {boolean}  logging - New logging enabled state.
+    */
+   static set logging(logging)
+   {
+      if (typeof logging !== 'boolean')
+      {
+         throw new TypeError(`[TRL] ManagedPromise.logging error: 'logging' is not a boolean.`);
+      }
+
+      this.#logging = logging;
+   }
+
+   // ----------------------------------------------------------------------------------------------------------------
+
+   /**
+    * Resolves any current Promise with undefined and creates a new current Promise.
+    *
+    * @template T
+    *
+    * @param {object} opts - Options.
+    *
+    * @param {boolean}  [opts.reuse=false] - When true if there is an existing live Promise it is returned immediately.
+    *
+    * @returns {Promise<T>} The new current managed Promise.
+    */
+   create({ reuse = false } = {})
+   {
+      if (typeof reuse !== 'boolean')
+      {
+         throw new TypeError(`[TRL] ManagedPromise.create error: 'reuse' is not a boolean.`);
+      }
+
+      if (reuse && this.#current !== void 0 && this.#current.promise instanceof Promise)
+      {
+         if (ManagedPromise.#logging)
+         {
+            console.warn(`[TRL] ManagedPromise.create info: Reusing / returning existing managed Promise.`);
+         }
+
+         return this.#current.promise;
+      }
+
+      if (this.#current !== void 0)
+      {
+         if (ManagedPromise.#logging)
+         {
+            console.warn(
+             `[TRL] ManagedPromise.create info: Creating a new Promise and resolving existing immediately.`);
+         }
+
+         this.#current.resolve(void 0);
+         this.#current = void 0;
+      }
+
+      const promise = new Promise((resolve, reject) =>
+      {
+         this.#current = {
+            isProcessing: false,
+            reject,
+            resolve
+         };
+      });
+
+      this.#current.promise = promise;
+
+      return promise;
+   }
+
+   /**
+    * Gets the current Promise if any.
+    *
+    * @returns {Promise<any>} Current Promise.
+    */
+   get()
+   {
+      return this.#current ? this.#current.promise : void 0;
+   }
+
+   /**
+    * Rejects the current Promise if applicable.
+    *
+    * @param {*}  [result] - Result to reject.
+    *
+    * @returns {boolean} Was the promise rejected.
+    */
+   reject(result = void 0)
+   {
+      // Early out as Promise resolution is currently processing.
+      if (this.#current !== void 0 && this.#current.isProcessing)
+      {
+         if (ManagedPromise.#logging)
+         {
+            console.warn(`[TRL] ManagedPromise.reject info: Currently processing promise.`);
+         }
+
+         return true;
+      }
+
+      if (this.#current !== void 0)
+      {
+         this.#current.isProcessing = true;
+
+         if (result instanceof Promise)
+         {
+            result.then((value) =>
+            {
+               this.#current.reject(value);
+               this.#current = void 0;
+            }).catch((err) =>
+            {
+               this.#current.reject(err);
+               this.#current = void 0;
+            });
+         }
+         else
+         {
+            this.#current.reject(result);
+            this.#current = void 0;
+         }
+
+         return true;
+      }
+      else
+      {
+         if (ManagedPromise.#logging)
+         {
+            console.warn(`[TRL] ManagedPromise.reject warning: No current managed Promise to reject.`);
+         }
+
+         return false;
+      }
+   }
+
+   /**
+    * Resolves the current Promise if applicable.
+    *
+    * @param {*}  [result] - Result to resolve.
+    *
+    * @returns {boolean} Was the promise resolved.
+    */
+   resolve(result = void 0)
+   {
+      // Early out as Promise resolution is currently processing.
+      if (this.#current !== void 0 && this.#current.isProcessing)
+      {
+         if (ManagedPromise.#logging)
+         {
+            console.warn(`[TRL] ManagedPromise.resolve info: Currently processing promise.`);
+         }
+
+         return true;
+      }
+
+      if (this.#current !== void 0)
+      {
+         if (result instanceof Promise)
+         {
+            this.#current.isProcessing = true;
+
+            result.then((value) =>
+            {
+               this.#current.resolve(value);
+               this.#current = void 0;
+            }).catch((err) =>
+            {
+               this.#current.reject(err);
+               this.#current = void 0;
+            });
+         }
+         else
+         {
+            this.#current.resolve(result);
+            this.#current = void 0;
+         }
+
+         return true;
+      }
+      else
+      {
+         if (ManagedPromise.#logging)
+         {
+            console.warn(`[TRL] ManagedPromise.resolve warning: No current managed Promise to resolve.`);
+         }
+
+         return false;
+      }
+   }
+}
 
 /**
  * Provides access to the Clipboard API for reading / writing text strings. This requires a secure context.
@@ -961,11 +1237,23 @@ function getStackingContext(node)
  */
 
 /**
- * First pass at a system to create a unique style sheet for the UI library that loads default values for all CSS
- * variables.
+ * Provides a managed dynamic style sheet / element useful in configuring global CSS variables. When creating an
+ * instance of StyleManager you must provide a "document key" / string for the style element added. The style element
+ * can be accessed via `document[docKey]`.
+ *
+ * Instances of StyleManager can also be versioned by supplying a positive integer greater than or equal to `1` via the
+ * 'version' option. This version number is assigned to the associated style element. When a StyleManager instance is
+ * created and there is an existing instance with a version that is lower than the current instance all CSS rules are
+ * removed letting the higher version to take precedence. This isn't a perfect system and requires thoughtful
+ * construction of CSS variables exposed, but allows multiple independently compiled TRL packages to load the latest
+ * CSS variables. It is recommended to always set `overwrite` option of {@link StyleManager.setProperty} and
+ * {@link StyleManager.setProperties} to `false` when loading initial values.
  */
 class StyleManager
 {
+   /** @type {CSSStyleRule} */
+   #cssRule;
+
    /** @type {string} */
    #docKey;
 
@@ -975,8 +1263,8 @@ class StyleManager
    /** @type {HTMLStyleElement} */
    #styleElement;
 
-   /** @type {CSSStyleRule} */
-   #cssRule;
+   /** @type {number} */
+   #version;
 
    /**
     *
@@ -988,20 +1276,39 @@ class StyleManager
     *
     * @param {Document} [opts.document] - Target document to load styles into.
     *
+    * @param {number}   [opts.version] - An integer representing the version / level of styles being managed.
+    *
     */
-   constructor({ docKey, selector = ':root', document = globalThis.document } = {})
+   constructor({ docKey, selector = ':root', document = globalThis.document, version } = {})
    {
-      if (typeof selector !== 'string') { throw new TypeError(`StyleManager error: 'selector' is not a string.`); }
       if (typeof docKey !== 'string') { throw new TypeError(`StyleManager error: 'docKey' is not a string.`); }
+
+      // TODO: Verify 'document' type from Popout FVTT module. For some reason the popout document trips this
+      //  unintentionally.
+      // if (!(document instanceof Document))
+      // {
+      //    throw new TypeError(`StyleManager error: 'document' is not an instance of Document.`);
+      // }
+
+      if (typeof selector !== 'string') { throw new TypeError(`StyleManager error: 'selector' is not a string.`); }
+
+      if (version !== void 0 && !Number.isSafeInteger(version) && version < 1)
+      {
+         throw new TypeError(`StyleManager error: 'version' is defined and is not a positive integer >= 1.`);
+      }
 
       this.#selector = selector;
       this.#docKey = docKey;
+      this.#version = version;
 
       if (document[this.#docKey] === void 0)
       {
          this.#styleElement = document.createElement('style');
 
          document.head.append(this.#styleElement);
+
+         // Set initial style manager version if any supplied.
+         this.#styleElement._STYLE_MANAGER_VERSION = version;
 
          this.#styleElement.sheet.insertRule(`${selector} {}`, 0);
 
@@ -1013,13 +1320,22 @@ class StyleManager
       {
          this.#styleElement = document[docKey];
          this.#cssRule = this.#styleElement.sheet.cssRules[0];
+
+         if (version)
+         {
+            const existingVersion = this.#styleElement._STYLE_MANAGER_VERSION ?? 0;
+
+            // Remove all existing CSS rules / text if version is greater than existing version.
+            if (version > existingVersion)
+            {
+               this.#cssRule.style.cssText = '';
+            }
+         }
       }
    }
 
    /**
-    * Provides an accessor to get the `cssText` for the style sheet.
-    *
-    * @returns {string}
+    * @returns {string} Provides an accessor to get the `cssText` for the style sheet.
     */
    get cssText()
    {
@@ -1027,17 +1343,30 @@ class StyleManager
    }
 
    /**
+    * @returns {number} Returns the version of this instance.
+    */
+   get version()
+   {
+      return this.#version;
+   }
+
+   /**
     * Provides a copy constructor to duplicate an existing StyleManager instance into a new document.
     *
     * Note: This is used to support the `PopOut` module.
     *
-    * @param [document] Target browser document to clone into.
+    * @param {Document} [document] Target browser document to clone into.
     *
     * @returns {StyleManager} New style manager instance.
     */
    clone(document = globalThis.document)
    {
-      const newStyleManager = new StyleManager({ selector: this.#selector, docKey: this.#docKey, document });
+      const newStyleManager = new StyleManager({
+         selector: this.#selector,
+         docKey: this.#docKey,
+         document,
+         version: this.#version
+      });
 
       newStyleManager.#cssRule.style.cssText = this.#cssRule.style.cssText;
 
@@ -1074,6 +1403,8 @@ class StyleManager
     */
    getProperty(key)
    {
+      if (typeof key !== 'string') { throw new TypeError(`StyleManager error: 'key' is not a string.`); }
+
       return this.#cssRule.style.getPropertyValue(key);
    }
 
@@ -1086,6 +1417,10 @@ class StyleManager
     */
    setProperties(rules, overwrite = true)
    {
+      if (!isObject(rules)) { throw new TypeError(`StyleManager error: 'rules' is not an object.`); }
+
+      if (typeof overwrite !== 'boolean') { throw new TypeError(`StyleManager error: 'overwrite' is not a boolean.`); }
+
       if (overwrite)
       {
          for (const [key, value] of Object.entries(rules))
@@ -1117,6 +1452,12 @@ class StyleManager
     */
    setProperty(key, value, overwrite = true)
    {
+      if (typeof key !== 'string') { throw new TypeError(`StyleManager error: 'key' is not a string.`); }
+
+      if (typeof value !== 'string') { throw new TypeError(`StyleManager error: 'value' is not a string.`); }
+
+      if (typeof overwrite !== 'boolean') { throw new TypeError(`StyleManager error: 'overwrite' is not a boolean.`); }
+
       if (overwrite)
       {
          this.#cssRule.style.setProperty(key, value);
@@ -1131,19 +1472,17 @@ class StyleManager
    }
 
    /**
-    * Removes the property keys specified. If `keys` is a string a single property is removed. Or if `keys` is an
-    * iterable list then all property keys in the list are removed.
+    * Removes the property keys specified. If `keys` is an iterable list then all property keys in the list are removed.
     *
-    * @param {string|Iterable<string>} keys - The property keys to remove.
+    * @param {Iterable<string>} keys - The property keys to remove.
     */
    removeProperties(keys)
    {
-      if (isIterable(keys))
+      if (!isIterable(keys)) { throw new TypeError(`StyleManager error: 'keys' is not an iterable list.`); }
+
+      for (const key of keys)
       {
-         for (const key of keys)
-         {
-            if (typeof key === 'string') { this.#cssRule.style.removeProperty(key); }
-         }
+         if (typeof key === 'string') { this.#cssRule.style.removeProperty(key); }
       }
    }
 
@@ -1156,6 +1495,8 @@ class StyleManager
     */
    removeProperty(key)
    {
+      if (typeof key !== 'string') { throw new TypeError(`StyleManager error: 'key' is not a string.`); }
+
       return this.#cssRule.style.removeProperty(key);
    }
 }
@@ -1415,7 +1756,7 @@ function parseSvelteConfig(config, thisArg = void 0)
       delete svelteConfig.context;
 
       const result = contextFunc.call(thisArg);
-      if (typeof result === 'object')
+      if (isObject(result))
       {
          externalContext = { ...result };
       }
@@ -1430,7 +1771,7 @@ function parseSvelteConfig(config, thisArg = void 0)
       externalContext = Object.fromEntries(svelteConfig.context);
       delete svelteConfig.context;
    }
-   else if (typeof svelteConfig.context === 'object')
+   else if (isObject(svelteConfig.context))
    {
       externalContext = svelteConfig.context;
       delete svelteConfig.context;
@@ -1467,7 +1808,7 @@ function parseSvelteConfig(config, thisArg = void 0)
 
       delete svelteConfig.children;
    }
-   else if (typeof svelteConfig.children === 'object')
+   else if (isObject(svelteConfig.children))
    {
       if (!isSvelteComponent(svelteConfig.children.class))
       {
@@ -1486,7 +1827,7 @@ function parseSvelteConfig(config, thisArg = void 0)
       svelteConfig.context = new Map();
    }
 
-   svelteConfig.context.set('external', externalContext);
+   svelteConfig.context.set('#external', externalContext);
 
    return svelteConfig;
 }
@@ -1509,7 +1850,7 @@ function s_PROCESS_PROPS(props, thisArg, config)
    if (typeof props === 'function')
    {
       const result = props.call(thisArg);
-      if (typeof result === 'object')
+      if (isObject(result))
       {
          return result;
       }
@@ -1519,7 +1860,7 @@ function s_PROCESS_PROPS(props, thisArg, config)
           JSON.stringify(config)}`);
       }
    }
-   else if (typeof props === 'object')
+   else if (isObject(props))
    {
       return props;
    }
@@ -1952,5 +2293,5 @@ function getUUIDFromDataTransfer(data, { actor = true, compendium = true, world 
  * @property {string[]|undefined}   [types] - Require the `data.type` to match entry in `types`.
  */
 
-export { A11yHelper, ClipboardAccess, StyleManager, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, striptags, styleParsePixels, uuidv4 };
+export { A11yHelper, ClipboardAccess, ManagedPromise, StyleManager, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, striptags, styleParsePixels, uuidv4 };
 //# sourceMappingURL=index.js.map

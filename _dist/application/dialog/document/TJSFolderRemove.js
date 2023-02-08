@@ -12,17 +12,18 @@ import { hasSetter }          from '@typhonjs-fvtt/svelte/util';
 export class TJSFolderRemove extends TJSDialog
 {
    /**
-    * @param {Folder}  document -
+    * @param {Folder} document - Folder to remove.
     *
-    * @param {object}   options -
+    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {object}   dialogData -
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     */
    constructor(document, options = {}, dialogData = {})
    {
       super({
-         modal: typeof options?.modal === 'boolean' ? options.modal : true,
+         modal: typeof dialogData?.modal === 'boolean' ? dialogData.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
+         focusKeep: true,
          minimizable: false,
          ...dialogData,
          content: {
@@ -34,21 +35,15 @@ export class TJSFolderRemove extends TJSDialog
             remove: {
                icon: 'fas fa-trash',
                label: 'FOLDER.Remove',
-               onclick: 'removeFolder'
+               onPress: 'removeFolder'
             },
             cancel: {
                icon: 'fas fa-times',
                label: 'Cancel',
-               onclick: () =>
-               {
-                  this.options?.resolve?.(false);
-                  this.close();
-               }
+               onPress: () => false
             }
          },
-         default: 'cancel',
-         autoClose: false,
-         close: () => this.options?.resolve?.(null)
+         default: 'cancel'
       }, options);
 
       /**
@@ -72,12 +67,12 @@ export class TJSFolderRemove extends TJSDialog
     *
     * @param {Folder} document - Folder to remove.
     *
-    * @param {object} [options] - Options to pass to TJSDialog / Application.
+    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {object} [dialogData] - Optional data to modify dialog.
+    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<Folder|boolean|null>} The removed Folder or a falsy value; either 'false' for cancelling or
-    * 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    *          'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async show(document, options = {}, dialogData = {})
    {
@@ -87,10 +82,6 @@ export class TJSFolderRemove extends TJSDialog
          return null;
       }
 
-      return new Promise((resolve) =>
-      {
-         options.resolve = resolve;
-         new TJSFolderRemove(document, options, dialogData).render(true, { focus: true });
-      });
+      return new TJSFolderRemove(document, options, dialogData).wait();
    }
 }

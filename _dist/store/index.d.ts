@@ -1009,15 +1009,11 @@ declare class KeyStore {
      */
     keydown(event: KeyboardEvent): void;
     /**
-     * Returns current pressed keys iterator.
-     *
-     * @returns {IterableIterator<string>}
+     * @returns {IterableIterator<string>} Returns current pressed keys iterator.
      */
     keysPressed(): IterableIterator<string>;
     /**
-     * Returns currently tracked keys iterator.
-     *
-     * @returns {IterableIterator<string>}
+     * @returns {IterableIterator<string>} Returns currently tracked keys iterator.
      */
     keysTracked(): IterableIterator<string>;
     /**
@@ -1083,7 +1079,7 @@ declare class TJSLocalStorage {
      *
      * @returns {import('svelte/store').Writable} The new store.
      */
-    static "__#116384@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#119577@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the localStorage.
      *
@@ -1136,7 +1132,7 @@ declare class TJSSessionStorage {
      *
      * @returns {import('svelte/store').Writable} The new store.
      */
-    static "__#116385@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#119578@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the sessionStorage.
      *
@@ -1252,9 +1248,8 @@ type StoresValues<T> = T extends Readable<infer U> ? U :
     { [K in keyof T]: T[K] extends Readable<infer U> ? U : never };
 
 /** Values sent to origin stores. */
-type SetValues<T> = T extends MinimalWritable<infer U> ? U : any[];
-// See this discussion for why the array form is underspecified:
-// https://github.com/PixievoltNo1/svelte-writable-derived/issues/19
+type SetValues<T> = T extends MinimalWritable<infer U> ? U :
+    { [K in keyof T]?: T[K] extends MinimalWritable<infer U> ? U : never };
 
 /**
  * Create a store similar to [Svelte's `derived`](https://svelte.dev/docs#run-time-svelte-store-writable), but which
@@ -1276,62 +1271,14 @@ type SetValues<T> = T extends MinimalWritable<infer U> ? U : any[];
 declare function writableDerived<S extends Stores, T>(
     origins: S,
     derive: (values: StoresValues<S>) => T,
-    reflect: (reflecting: T) => SetValues<S>,
+    reflect: (reflecting: T, old: StoresValues<S>) => SetValues<S>,
     initial?: T
 ): Writable<T>;
 
 declare function writableDerived<S extends Stores, T>(
     origins: S,
     derive: (values: StoresValues<S>, set: (value: T) => void) => void,
-    reflect: (reflecting: T) => SetValues<S>,
-    initial?: T
-): Writable<T>;
-
-declare function writableDerived<S extends Stores, T>(
-    origins: S,
-    derive: (values: StoresValues<S>) => T,
-    reflect: (reflecting: T, set: (value: SetValues<S>) => void) => ( () => void ) | void,
-    initial?: T
-): Writable<T>;
-
-declare function writableDerived<S extends Stores, T>(
-    origins: S,
-    derive: (values: StoresValues<S>, set: (value: T) => void) => void,
-    reflect: (reflecting: T, set: (value: SetValues<S>) => void) => ( () => void ) | void,
-    initial?: T
-): Writable<T>;
-
-declare function writableDerived<S extends Stores, T>(
-    origins: S,
-    derive: (values: StoresValues<S>) => T,
-    reflect: { withOld: (reflecting: T, old: StoresValues<S>) => SetValues<S> },
-    initial?: T
-): Writable<T>;
-
-declare function writableDerived<S extends Stores, T>(
-    origins: S,
-    derive: (values: StoresValues<S>, set: (value: T) => void) => void,
-    reflect: { withOld: (reflecting: T, old: StoresValues<S>) => SetValues<S> },
-    initial?: T
-): Writable<T>;
-
-declare function writableDerived<S extends Stores, T>(
-    origins: S,
-    derive: (values: StoresValues<S>) => T,
-    reflect: {
-        withOld: (reflecting: T, old: StoresValues<S>, set: (value: SetValues<S>) => void)
-            => ( () => void ) | void
-    },
-    initial?: T
-): Writable<T>;
-
-declare function writableDerived<S extends Stores, T>(
-    origins: S,
-    derive: (values: StoresValues<S>, set: (value: T) => void) => void,
-    reflect: {
-        withOld: (reflecting: T, old: StoresValues<S>, set: (value: SetValues<S>) => void)
-            => ( () => void ) | void
-    },
+    reflect: (reflecting: T, old: StoresValues<S>) => SetValues<S>,
     initial?: T
 ): Writable<T>;
 
@@ -1461,9 +1408,15 @@ declare class TJSDocument {
 }
 type TJSDocumentOptions = {
     /**
-     * - Optional delete function to invoke when document is deleted.
+     * - Optional post delete function to invoke when
+     * document is deleted _after_ subscribers have been notified.
      */
-    delete?: Function;
+    delete?: (doc: foundry.abstract.Document) => void;
+    /**
+     * - Optional pre delete function to invoke when
+     * document is deleted _before_ subscribers are notified.
+     */
+    preDelete?: (doc: foundry.abstract.Document) => void;
 };
 type EmbeddedAPI = {
     /**
@@ -1537,9 +1490,15 @@ declare class TJSDocumentCollection<T extends DocumentCollection> {
 }
 type TJSDocumentCollectionOptions = {
     /**
-     * - Optional delete function to invoke when document is deleted.
+     * - Optional post delete function
+     * to invoke when document is deleted _after_ subscribers have been notified.
      */
-    delete?: Function;
+    delete?: (collection: foundry.abstract.DocumentCollection) => void;
+    /**
+     * - Optional pre delete function to
+     * invoke when document is deleted _before_ subscribers are notified.
+     */
+    preDelete?: (collection: foundry.abstract.DocumentCollection) => void;
 };
 
 /**

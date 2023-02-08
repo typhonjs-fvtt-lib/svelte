@@ -11,7 +11,9 @@
    export let pack = null;
    export let renderSheet = true;
 
-   const { application } = getContext('external');
+   const { application } = getContext('#external');
+
+   const managedPromise = getContext('#managedPromise');
 
    let form;
    let name, folderSelect, folders, hasTypes, type, types;
@@ -55,21 +57,21 @@
    {
       const fd = new FormDataExtended(event.target);
 
-      foundry.utils.mergeObject(data, fd.object, { inplace: true });
+      globalThis.foundry.utils.mergeObject(data, fd.object, { inplace: true });
 
       if (!data.folder) { delete data['folder']; }
       if (types.length === 1) { data.type = types[0]; }
 
       const document = await documentCls.create(data, { parent, pack, renderSheet });
 
-      application.options.resolve?.(document);
+      managedPromise.resolve(document);
       application.close();
    }
 </script>
 
 <svelte:options accessors={true}/>
 
-<form bind:this={form} on:submit|preventDefault={saveData} id="document-create" autocomplete="off">
+<form bind:this={form} on:submit|preventDefault={saveData} autocomplete="off">
    <div class="form-group">
       <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>{localize('Name')}</label>

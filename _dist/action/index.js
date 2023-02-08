@@ -1,6 +1,6 @@
 import { isUpdatableStore, isWritableStore } from '@typhonjs-fvtt/svelte/store';
-import { styleParsePixels, debounce } from '@typhonjs-fvtt/svelte/util';
-import { hasSetter, isIterable, isObject } from '@typhonjs-fvtt/svelte/util';
+import { styleParsePixels, isObject, debounce } from '@typhonjs-fvtt/svelte/util';
+import { hasSetter, isIterable, isObject as isObject$1 } from '@typhonjs-fvtt/svelte/util';
 import { cubicOut } from 'svelte/easing';
 
 /**
@@ -267,7 +267,7 @@ function s_GET_UPDATE_TYPE(target)
    const targetType = typeof target;
 
    // Does the target have resizeObserved writable store?
-   if ((targetType === 'object' || targetType === 'function'))
+   if (targetType !== null && (targetType === 'object' || targetType === 'function'))
    {
       if (isUpdatableStore(target.resizeObserved))
       {
@@ -276,7 +276,7 @@ function s_GET_UPDATE_TYPE(target)
 
       // Now check for a child stores object which is a common TRL pattern for exposing stores.
       const stores = target?.stores;
-      if (typeof stores === 'object' || typeof stores === 'function')
+      if (isObject(stores) || typeof stores === 'function')
       {
          if (isUpdatableStore(stores.resizeObserved))
          {
@@ -285,7 +285,7 @@ function s_GET_UPDATE_TYPE(target)
       }
    }
 
-   if (targetType === 'object') { return s_UPDATE_TYPES.attribute; }
+   if (targetType !== null && targetType === 'object') { return s_UPDATE_TYPES.attribute; }
 
    if (targetType === 'function') { return s_UPDATE_TYPES.function; }
 
@@ -509,18 +509,23 @@ function autoBlur(node)
 /**
  * Provides an action to monitor focus state of a given element and set an associated store with current focus state.
  *
- * This action is usable with any writable store. 
+ * This action is usable with any writable store.
  *
  * @param {HTMLElement} node - Target element.
  *
  * @param {import('svelte/store').Writable<boolean>}  storeFocused - Update store for focus changes.
  *
- * @returns {{update: update, destroy: (function(): void)}} Action lifecycle methods.
+ * @returns {{update: (function(object): void), destroy: (function(): void)}} Action lifecycle methods.
  */
 function isFocused(node, storeFocused)
 {
    let localFocused = false;
 
+   /**
+    * Updates `storeFocused` w/ current focused state.
+    *
+    * @param {boolean}  current - current focused state.
+    */
    function setFocused(current)
    {
       localFocused = current;
@@ -528,22 +533,34 @@ function isFocused(node, storeFocused)
       if (isWritableStore(storeFocused)) { storeFocused.set(localFocused); }
    }
 
+   /**
+    * Focus event listener.
+    */
    function onFocus()
    {
       setFocused(true);
    }
 
+   /**
+    * Blur event listener.
+    */
    function onBlur()
    {
       setFocused(false);
    }
 
+   /**
+    * Activate listeners.
+    */
    function activateListeners()
    {
       node.addEventListener('focus', onFocus);
       node.addEventListener('blur', onBlur);
    }
 
+   /**
+    * Remove listeners.
+    */
    function removeListeners()
    {
       node.removeEventListener('focus', onFocus);
@@ -571,11 +588,10 @@ function isFocused(node, storeFocused)
  *
  * @param {{keydown: Function, keyup: Function}}   keyStore - Object to forward events key down / up events to...
  *
- * @returns {{update: update, destroy: (function(): void)}} Action lifecycle methods.
+ * @returns {{update: (function(object): void), destroy: (function(): void)}} Action lifecycle methods.
  */
 function keyforward(node, keyStore)
 {
-
    if (typeof keyStore?.keydown !== 'function' || typeof keyStore.keyup !== 'function')
    {
       throw new TypeError(`'keyStore' doesn't have required 'keydown' or 'keyup' methods.`);
@@ -597,12 +613,18 @@ function keyforward(node, keyStore)
       keyStore.keyup(event);
    }
 
+   /**
+    * Activates key listeners.
+    */
    function activateListeners()
    {
       node.addEventListener('keydown', onKeydown);
       node.addEventListener('keyup', onKeyup);
    }
 
+   /**
+    * Removes key listeners.
+    */
    function removeListeners()
    {
       node.removeEventListener('keydown', onKeydown);
@@ -940,7 +962,7 @@ function draggable(node, { position, active = true, button = 0, storeDragging = 
 
          if (typeof options.ease === 'boolean') { ease = options.ease; }
 
-         if (isObject(options.easeOptions))
+         if (isObject$1(options.easeOptions))
          {
             easeOptions = options.easeOptions;
             quickTo.options(easeOptions);
@@ -1141,6 +1163,8 @@ class DraggableOptions
 
 /**
  * Define a function to get a DraggableOptions instance.
+ *
+ * @param {{ ease?: boolean, easeOptions?: object }} options - Draggable options.
  *
  * @returns {DraggableOptions} A new options instance.
  */

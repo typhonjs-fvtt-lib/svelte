@@ -13,12 +13,11 @@
       isSvelteComponent,
       parseSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
 
-   export let data = {};
-   export let modal = false;
+   export let data = void 0;
    export let preventDefault = false;
    export let stopPropagation = false;
 
-   export let dialogInstance = void 0;
+   export let dialogComponent = void 0;
 
    const s_REGEX_HTML = /^\s*<.*>$/;
 
@@ -31,16 +30,16 @@
    let buttonsEl;
 
    let content = void 0;
-   let dialogComponent;
+   let dialogClass;
    let dialogProps = {};
 
-   let application = getContext('external').application;
-   let { autoFocus, elementRoot } = getContext('internal').stores;
+   let { elementRoot } = getContext('#internal').stores;
+
+   let { application } = getContext('#external');
+
+   let managedPromise = getContext('#managedPromise');
 
    let currentButtonId = data.default;
-
-   // Turn off autofocusing app shell / window content when modal.
-   if (modal) { $autoFocus = false; }
 
    // Remove key listeners from elementRoot.
    onDestroy(() =>
@@ -80,6 +79,9 @@
       }
    }
 
+   // Automatically close the dialog on button click handler completion.
+   $: autoClose = typeof data.autoClose === 'boolean' ? data.autoClose : true;
+
    // When true the first focusable element that isn't a button is focused.
    $: focusFirst = typeof data.focusFirst === 'boolean' ? data.focusFirst : false;
 
@@ -90,8 +92,8 @@
       if (buttonEl instanceof HTMLElement) { buttonEl.focus(); }
    }
 
-   // Automatically close the dialog on button click handler completion.
-   $: autoClose = typeof data.autoClose === 'boolean' ? data.autoClose : true;
+   // When false the dialog does not automatically close when button selected.
+   $: resolveId = typeof data.resolveId === 'boolean' ? data.resolveId : false;
 
    // If `data.buttons` is not an object then set an empty array otherwise reduce the button data.
    $:
@@ -104,6 +106,10 @@
          const icon = typeof b.icon !== 'string' ? void 0 : s_REGEX_HTML.test(b.icon) ? b.icon :
           `<i class="${b.icon}"></i>`;
 
+         const autoClose = typeof b.autoClose === 'boolean' ? b.autoClose : true;
+
+         const disabled = typeof b.disabled === 'boolean' ? b.disabled : false;
+
          const label = typeof b.label === 'string' ? `${icon !== void 0 ? ' ' : ''}${localize(b.label)}` : '';
 
          const title = typeof b.title === 'string' ? localize(b.title) : void 0;
@@ -111,7 +117,7 @@
          // Test any condition supplied otherwise default to true.
          const condition = typeof b.condition === 'function' ? b.condition.call(b) : b.condition ?? true;
 
-         if (condition) { array.push({ ...b, id: key, icon, label, title }); }
+         if (condition) { array.push({ ...b, id: key, autoClose, icon, label, title, disabled }); }
 
          return array;
       }, []);
@@ -131,13 +137,13 @@
       {
          if (isSvelteComponent(content))
          {
-            dialogComponent = content;
+            dialogClass = content;
             dialogProps = {};
          }
          else if (isObject(content))
          {
             const svelteConfig = parseSvelteConfig(content, application);
-            dialogComponent = svelteConfig.class;
+            dialogClass = svelteConfig.class;
             dialogProps = svelteConfig.props ?? {};
 
             // Check for any children parsed and added to the external context.
@@ -148,13 +154,13 @@
          }
          else
          {
-            dialogComponent = void 0;
+            dialogClass = void 0;
             dialogProps = {};
          }
       }
       catch (err)
       {
-         dialogComponent = void 0;
+         dialogClass = void 0;
          dialogProps = {};
 
          content = err.message;
@@ -167,45 +173,73 @@
     *
     * @param {object}   button - button data.
     *
+    * TODO: When app eventbus is available send event for UI notification instead of Foundry API usage.
+    *
     * @returns {*}
     */
    function onClick(button)
    {
       try
       {
-         let result = null;
+         let result = void 0;
 
-         // Accept either `onPress`, `callback`, `onClick` or `onclick` as the function / data to invoke.
-         const invoke = button.onPress ?? button.callback ?? button.onClick ?? button.onclick;
+         const callback = button?.onPress;
 
-         switch (typeof invoke)
+         switch (typeof callback)
          {
             case 'function':
-               // Passing back the HTML element is to keep with the existing Foundry API, however second parameter is
-               // the Svelte component instance.
-               result = invoke(application.options.jQuery ? application.element : application.element[0],
-                dialogInstance);
+               // Pass back the TJSDialog instance.
+               result = callback(application);
                break;
 
             case 'string':
                // Attempt lookup by function name in dialog instance component.
-               if (dialogInstance !== void 0 && typeof dialogInstance[invoke] === 'function')
+               if (dialogComponent !== void 0 && typeof dialogComponent[callback] === 'function')
                {
-                  result = dialogInstance[invoke](application.options.jQuery ? application.element :
-                   application.element[0], dialogInstance);
+                  result = dialogComponent[callback](application);
+               }
+               else
+               {
+                  if (dialogComponent === void 0)
+                  {
+                     console.warn(`[TRL] TJSDialog warning: 'onPress' defined as a string with no associated ` +
+                      `content Svelte component.`);
+                  }
+                  else if (typeof dialogComponent?.[callback] !== 'function')
+                  {
+                     console.warn(`[TRL] TJSDialog warning: The content Svelte component does not contain an ` +
+                      `associated function '${callback}'. Did you remember to add ` +
+                       `'<svelte:options accessors={true} />' and export the function?`);
+                  }
                }
                break;
          }
 
-         // Delay closing to next clock tick to be able to return result.
-         if (autoClose) { setTimeout(() => application.close(), 0); }
+         // By default, both 'button.autoClose' & autoClose are true, so skip auto-closing when either is false.
+         if (button.autoClose && autoClose)
+         {
+            // If `resolveId` dialog option is true and current result is undefined then set result to the button ID.
+            if (resolveId && result === void 0) { result = button.id; }
 
-         return result;
+            managedPromise.resolve(result);
+         }
       }
       catch(err)
       {
-         globalThis.ui.notifications.error(err);
-         throw new Error(err);
+         const notifyError = typeof data.notifyError === 'boolean' ? data.notifyError : true;
+         if (notifyError)
+         {
+            // TODO: When app eventbus is available send event for UI notification instead of Foundry API usage.
+            globalThis.ui.notifications.error(err, { console: false });
+         }
+
+         // Attempt to first reject the error with any current managed Promise otherwise rethrow error.
+         if (!managedPromise.reject(err)) { throw err; }
+      }
+      finally
+      {
+         // By default, both 'button.autoClose' & autoClose are true, so skip auto-closing when either is false.
+         if (button.autoClose && autoClose) { application.close(); }
       }
    }
 
@@ -327,8 +361,8 @@
    <div bind:this={contentEl} class=dialog-content>
       {#if typeof content === 'string'}
          {@html content}
-      {:else if dialogComponent}
-         <svelte:component bind:this={dialogInstance} this={dialogComponent} {...dialogProps} />
+      {:else if dialogClass}
+         <svelte:component bind:this={dialogComponent} this={dialogClass} {...dialogProps} />
       {/if}
    </div>
 
@@ -338,6 +372,7 @@
       <button class="dialog-button {button.id}"
               on:click|preventDefault|stopPropagation={() => onClick(button)}
               on:focus={() => currentButtonId = button.id}
+              disabled={button.disabled}
               use:applyStyles={button.styles}>
          <span title={button.title}>{#if button.icon}{@html button.icon}{/if}{button.label}</span>
       </button>

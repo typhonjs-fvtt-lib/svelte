@@ -52,12 +52,12 @@ export function loadSvelteConfig({ app, template, config, elementRootUpdate } = 
 
    const svelteConfig = parseSvelteConfig({ ...config, target }, app);
 
-   const externalContext = svelteConfig.context.get('external');
+   const externalContext = svelteConfig.context.get('#external');
 
    // Inject the Foundry application instance and `elementRootUpdate` to the external context.
    externalContext.application = app;
    externalContext.elementRootUpdate = elementRootUpdate;
-   externalContext.sessionStorage = app.state.sessionStorage;
+   externalContext.sessionStorage = app.reactive.sessionStorage;
 
    let eventbus;
 
@@ -67,6 +67,21 @@ export function loadSvelteConfig({ app, template, config, elementRootUpdate } = 
       eventbus = app._eventbus.createProxy();
       externalContext.eventbus = eventbus;
    }
+
+   // Seal external context so that it can't be extended.
+   Object.seal(externalContext);
+
+   // TODO: Remove deprecation warning in the future -----------------------------------------------------------------
+
+   svelteConfig.context.set('external', new Proxy({}, {
+      get(targetUnused, prop)
+      {
+         console.warn(`[TRL] Deprecation warning: Please change getContext('external') to getContext('#external').`);
+         return externalContext[prop];
+      }
+   }));
+
+   // TODO: Remove deprecation warning in the future -----------------------------------------------------------------
 
    // Create the Svelte component.
    /**

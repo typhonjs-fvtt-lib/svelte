@@ -1165,6 +1165,21 @@ class GsapCompose
    }
 }
 
+/**
+ *
+ *
+ * @param {string}            operation - GsapPosition function to invoke.
+ *
+ * @param {Position|object}   [target] -
+ *
+ * @param {object}            [options] -
+ *
+ * @param {*}                 [arg1] -
+ *
+ * @param {*}                 [arg2] -
+ *
+ * @returns {*} GsapPosition function result.
+ */
 function s_DISPATCH_POSITION(operation, target, options, arg1, arg2)
 {
    if (target instanceof Position)
@@ -2054,6 +2069,9 @@ class DraggableGsapOptions
 
 /**
  * Define a function to get a DraggableGsapOptions instance.
+ *
+ * @param {{ ease?: boolean, easeOptions?: object, inertia?: boolean, inertiaOptions?: object }} options -
+ *        DraggableGsapOptions.
  *
  * @returns {DraggableGsapOptions} A new options instance.
  */
