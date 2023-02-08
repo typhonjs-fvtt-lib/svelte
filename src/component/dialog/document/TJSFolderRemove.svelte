@@ -13,7 +13,7 @@
       throw new TypeError(`TJSFolderRemove error: 'document' is not an instance of Folder.`);
    }
 
-   const doc = new TJSDocument(document, { postDelete: application.close.bind(application) });
+   const doc = new TJSDocument(document, { delete: application.close.bind(application) });
 
    $: if ($doc !== document)
    {
@@ -35,7 +35,7 @@
    export async function removeFolder()
    {
       // Remove the delete Document function callback as we are intentionally deleting below.
-      doc.setOptions({ postDelete: void 0 });
+      doc.setOptions({ delete: void 0 });
 
       return document.delete({ deleteSubfolders: false, deleteContents: false });
    }

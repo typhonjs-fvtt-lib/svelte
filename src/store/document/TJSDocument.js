@@ -32,7 +32,7 @@ export class TJSDocument
    /**
     * @type {TJSDocumentOptions}
     */
-   #options = { delete: void 0, postDelete: void 0, preDelete: void 0 };
+   #options = { delete: void 0, preDelete: void 0 };
 
    #subscriptions = [];
    #updateOptions;
@@ -104,15 +104,6 @@ export class TJSDocument
          delete doc?.apps[this.#uuidv4];
          this.#setDocument(void 0);
 
-         // TODO: Remove deprecation warning in the future.
-         if (typeof this.#options.delete === 'function')
-         {
-            console.warn(`[TRL] TJSDocument deprecation warning: 'delete' callback will be removed in a future ` +
-             `release. Please use 'preDelete' or 'postDelete' callbacks.`);
-
-            await this.#options.delete();
-         }
-
          if (typeof this.#options.preDelete === 'function')
          {
             await this.#options.preDelete(doc);
@@ -120,9 +111,9 @@ export class TJSDocument
 
          this.#updateSubscribers(false, { action: 'delete', data: void 0 });
 
-         if (typeof this.#options.postDelete === 'function')
+         if (typeof this.#options.delete === 'function')
          {
-            await this.#options.postDelete(doc);
+            await this.#options.delete(doc);
          }
 
          this.#updateOptions = void 0;
@@ -285,11 +276,6 @@ export class TJSDocument
          throw new TypeError(`TJSDocument error: 'delete' attribute in options is not a function.`);
       }
 
-      if (options.postDelete !== void 0 && typeof options.postDelete !== 'function')
-      {
-         throw new TypeError(`TJSDocument error: 'postDelete' attribute in options is not a function.`);
-      }
-
       if (options.preDelete !== void 0 && typeof options.preDelete !== 'function')
       {
          throw new TypeError(`TJSDocument error: 'preDelete' attribute in options is not a function.`);
@@ -299,19 +285,7 @@ export class TJSDocument
 
       if (options.delete === void 0 || typeof options.delete === 'function')
       {
-         // TODO: Remove deprecation warning in the future.
-         if (options.delete !== void 0)
-         {
-            console.warn(`[TRL] TJSDocument deprecation warning: 'delete' callback will be removed in a future ` +
-             `release. Please use 'preDelete' or 'postDelete' callbacks.`);
-         }
-
          this.#options.delete = options.delete;
-      }
-
-      if (options.postDelete === void 0 || typeof options.postDelete === 'function')
-      {
-         this.#options.postDelete = options.postDelete;
       }
 
       if (options.preDelete === void 0 || typeof options.preDelete === 'function')
@@ -345,11 +319,11 @@ export class TJSDocument
 /**
  * @typedef {object} TJSDocumentOptions
  *
- * @property {(doc: foundry.abstract.Document) => void} [preDelete] - Optional pre delete function to invoke when
- *           document is deleted, but _before_ subscribers are notified.
+ * @property {(doc: foundry.abstract.Document) => void} [delete] - Optional post delete function to invoke when
+ *           document is deleted _after_ subscribers have been notified.
  *
- * @property {(doc: foundry.abstract.Document) => void} [postDelete] - Optional post delete function to invoke when
- *           document is deleted, but _after_ subscribers have been notified.
+ * @property {(doc: foundry.abstract.Document) => void} [preDelete] - Optional pre delete function to invoke when
+ *           document is deleted _before_ subscribers are notified.
  */
 
 /**

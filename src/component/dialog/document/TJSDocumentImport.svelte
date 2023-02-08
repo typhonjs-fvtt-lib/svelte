@@ -16,7 +16,7 @@
       throw new TypeError(`TJSDocumentImport error: 'document' is not an instance of Document.`);
    }
 
-   const doc = new TJSDocument(document, { postDelete: application.close.bind(application) });
+   const doc = new TJSDocument(document, { delete: application.close.bind(application) });
 
    let form;
 

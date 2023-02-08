@@ -13,7 +13,7 @@
       throw new TypeError(`TJSFolderRolltable error: 'document' is not an instance of Folder.`);
    }
 
-   const doc = new TJSDocument(document, { postDelete: application.close.bind(application) });
+   const doc = new TJSDocument(document, { delete: application.close.bind(application) });
 
    $: if ($doc !== document)
    {

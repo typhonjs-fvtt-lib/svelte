@@ -26,7 +26,7 @@
       throw new TypeError(`TJSFolderExport error: 'document' is not an instance of Folder.`);
    }
 
-   const doc = new TJSDocument(document, { postDelete: application.close.bind(application) });
+   const doc = new TJSDocument(document, { delete: application.close.bind(application) });
 
    // Get eligible pack destinations
    let packs = globalThis.game.packs.filter(p => (p.documentName === document.type) && !p.locked);

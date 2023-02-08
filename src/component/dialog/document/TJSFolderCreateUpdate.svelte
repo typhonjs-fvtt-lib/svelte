@@ -20,7 +20,7 @@
       throw new TypeError(`TJSFolderCreateUpdate error: 'document' is not an instance of Folder.`);
    }
 
-   const doc = new TJSDocument(document, { postDelete: application.close.bind(application) });
+   const doc = new TJSDocument(document, { delete: application.close.bind(application) });
    const newName = localize('DOCUMENT.New', { type: localize(Folder.metadata.label) });
    const sortingModes = { a: 'FOLDER.SortAlphabetical', m: 'FOLDER.SortManual' };
 

@@ -19,7 +19,7 @@ export class TJSDocumentCollection
    /**
     * @type {TJSDocumentCollectionOptions}
     */
-   #options = { delete: void 0, postDelete: void 0, preDelete: void 0 };
+   #options = { delete: void 0, preDelete: void 0 };
 
    #subscriptions = [];
    #updateOptions;
@@ -75,15 +75,6 @@ export class TJSDocumentCollection
          this.#collection = void 0;
       }
 
-      // TODO: Remove deprecation warning in the future.
-      if (typeof this.#options.delete === 'function')
-      {
-         console.warn(`[TRL] TJSDocumentCollection deprecation warning: 'delete' callback will be removed in a ` +
-          `future release. Please use 'preDelete' or 'postDelete' callbacks.`);
-
-         await this.#options.delete();
-      }
-
       if (typeof this.#options.preDelete === 'function')
       {
          await this.#options.preDelete(collection);
@@ -91,9 +82,9 @@ export class TJSDocumentCollection
 
       this.#notify(false, { action: 'delete', documentType: collection.documentName, documents: [], data: [] });
 
-      if (typeof this.#options.postDelete === 'function')
+      if (typeof this.#options.delete === 'function')
       {
-         await this.#options.postDelete(collection);
+         await this.#options.delete(collection);
       }
 
       this.#updateOptions = void 0;
@@ -201,11 +192,6 @@ export class TJSDocumentCollection
          throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
       }
 
-      if (options.postDelete !== void 0 && typeof options.postDelete !== 'function')
-      {
-         throw new TypeError(`TJSDocumentCollection error: 'postDelete' attribute in options is not a function.`);
-      }
-
       if (options.preDelete !== void 0 && typeof options.preDelete !== 'function')
       {
          throw new TypeError(`TJSDocumentCollection error: 'preDelete' attribute in options is not a function.`);
@@ -215,19 +201,7 @@ export class TJSDocumentCollection
 
       if (options.delete === void 0 || typeof options.delete === 'function')
       {
-         // TODO: Remove deprecation warning in the future.
-         if (options.delete !== void 0)
-         {
-            console.warn(`[TRL] TJSDocumentCollection deprecation warning: 'delete' callback will be removed in a ` +
-             `future release. Please use 'preDelete' or 'postDelete' callbacks.`);
-         }
-
          this.#options.delete = options.delete;
-      }
-
-      if (options.postDelete === void 0 || typeof options.postDelete === 'function')
-      {
-         this.#options.postDelete = options.postDelete;
       }
 
       if (options.preDelete === void 0 || typeof options.preDelete === 'function')
@@ -265,9 +239,9 @@ export class TJSDocumentCollection
 /**
  * @typedef TJSDocumentCollectionOptions
  *
- * @property {(collection: foundry.abstract.DocumentCollection) => void} [preDelete] - Optional pre delete function to
- *           invoke when document is deleted, but _before_ subscribers are notified.
+ * @property {(collection: foundry.abstract.DocumentCollection) => void} [delete] - Optional post delete function
+ *           to invoke when document is deleted _after_ subscribers have been notified.
  *
- * @property {(collection: foundry.abstract.DocumentCollection) => void} [postDelete] - Optional post delete function
- *           to invoke when document is deleted, but _after_ subscribers have been notified.
+ * @property {(collection: foundry.abstract.DocumentCollection) => void} [preDelete] - Optional pre delete function to
+ *           invoke when document is deleted _before_ subscribers are notified.
  */
