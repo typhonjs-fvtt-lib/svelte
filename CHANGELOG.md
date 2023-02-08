@@ -18,6 +18,14 @@
   - Context menu / right click support w/ `onContextMenu` callback.
   - Integrated keyboard handling.
 
+- CSS default variables (used across all components when text is focused / hovered):
+  - `--tjs-default-text-shadow-focus-hover` -> default value:  '0 0 8px var(--color-shadow-primary)'
+
+- Undefined universal CSS variables for focus visible support / keyboard navigation:
+  - `--tjs-default-outline-focus-visible`: Define `outline` for focused components.
+  - `--tjs-default-transition-focus-visible`: Optional `transition` to apply.
+  - `--tjs-default-box-shadow-focus-visible`: Optional box-shadow to apply instead of outline.
+
 - Vite 4 support
 
 ## Release 0.0.21 (minor)
