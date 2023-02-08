@@ -97,7 +97,7 @@
   "engines": {
     "node": ">=14.18"
   },
-  "homepage": "https://github.com/typhonjs-fvtt/svelte#readme",
+  "homepage": "https://github.com/typhonjs-fvtt-lib/svelte#readme",
   "keywords": [
     "foundry vtt",
     "fvtt",
@@ -115,5 +115,5 @@
   "directories": {},
   "license": "MPL-2.0",
   "repository": "github:typhonjs-fvtt/svelte",
-  "bugs": "https://github.com/typhonjs-fvtt/svelte/issues"
+  "bugs": "https://github.com/typhonjs-fvtt-lib/svelte/issues"
 }
