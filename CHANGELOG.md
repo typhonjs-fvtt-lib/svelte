@@ -1,4 +1,25 @@
 # Changelog
+## Release 0.0.22 (major)
+- Advanced focus management including focus trapping for application shells.
+  - Check options `focusAuto`, `focusKeep`, `focusTrap` in SvelteApplication `options` / `reactive`
+    - By default `focusAuto` / `focusTrap` is enabled for application shells.
+    - `focusSource` for pass-through handling of returning focus to source of action on close.
+  - Note: To enable keyboard navigation by `tab` traversal you need to remove / reassign the Foundry key binding for 
+    `tab`.
+    
+- TJSDialog completely overhauled. 
+  - Keeps the same configuration options / remove all JQuery support.
+  - New `wait` method w/ managed Promise handling. 
+    - Inside of dialog Svelte components access managed promise via `getContext('#managedPromise')`
+
+- New options for application header button options:
+  - Left align buttons after title w/ `alignLeft: true`.
+  - Keep button when minimized w/ `keepMinimized: true`.
+  - Context menu / right click support w/ `onContextMenu` callback.
+  - Integrated keyboard handling.
+
+- Vite 4 support
+
 ## Release 0.0.21 (minor)
 - Updated @typhonjs-svelte/lib to latest.
 - New utility class to manage CSS variable called `StyleManager` added to `util` subpackage export.
