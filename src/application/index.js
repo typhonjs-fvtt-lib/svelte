@@ -1,10 +1,40 @@
 import { SvelteApplication } from './SvelteApplication.js';
+import { TJSAppIndex }       from './internal/index.js';
 
 export * from './SvelteApplication.js';
 export * from './TJSDialog.js';
 
-// TODO: temporary
+// TODO: temporary; Position may be relocated to a store sub-package export.
 export * from './position/Position.js';
+
+// Handle `hotReload` Foundry hook when running the Vite dev server. -------------------------------------------------
+
+if (import.meta.hot)
+{
+   Hooks.on('hotReload', (data) =>
+   {
+      // Only handle JSON hot reload presumably specified in package manifest for language translation files.
+      if (data?.extension === 'json')
+      {
+         // Postpone until next clock tick to allow Foundry to update localization first.
+         setTimeout(() =>
+         {
+            for (const app of TJSAppIndex.values())
+            {
+               const appShell = app.svelte.applicationShell;
+
+               // TODO: Replace temporary reference to reload function in prototype `svelte-hmr` changes.
+               if (appShell && typeof appShell?.reloadHot === 'function')
+               {
+                  appShell.reloadHot();
+               }
+            }
+         }, 0);
+      }
+
+      return true;
+   });
+}
 
 // Handle `PopOut!` module hooks to allow applications to popout to their own browser window -------------------------
 
