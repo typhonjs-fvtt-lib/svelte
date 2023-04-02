@@ -14,7 +14,8 @@ import {
    ApplicationState,
    GetSvelteData,
    loadSvelteConfig,
-   SvelteReactive }           from './internal/index.js';
+   SvelteReactive,
+   TJSAppIndex }              from './internal/index.js';
 
 /**
  * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
@@ -359,6 +360,9 @@ export class SvelteApplication extends Application
 
       // Await all Svelte components to destroy.
       await Promise.all(svelteDestroyPromises);
+
+      // Remove from all visible apps tracked.
+      TJSAppIndex.delete(this);
 
       // Reset SvelteData like this to maintain reference to GetSvelteData / `this.svelte`.
       this.#svelteData.length = 0;
@@ -873,6 +877,9 @@ export class SvelteApplication extends Application
 
       if (!this.#onMount)
       {
+         // Add to visible apps tracked.
+         TJSAppIndex.add(this);
+
          this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent, elementTarget:
           this.#elementTarget });
 

@@ -23,10 +23,9 @@ if (import.meta.hot)
             {
                const appShell = app.svelte.applicationShell;
 
-               // TODO: Replace temporary reference to reload function in prototype `svelte-hmr` changes.
-               if (appShell && typeof appShell?.reloadHot === 'function')
+               if (appShell && typeof appShell?.$$?.hmr_reload === 'function')
                {
-                  appShell.reloadHot();
+                  appShell.$$.hmr_reload();
                }
             }
          }, 0);
