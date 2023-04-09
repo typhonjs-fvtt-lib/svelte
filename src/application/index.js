@@ -23,9 +23,31 @@ if (import.meta.hot)
             {
                const appShell = app.svelte.applicationShell;
 
-               if (appShell && typeof appShell?.$$?.hmr_reload === 'function')
+               // Retrieve the original `svelte-hmr` instrumented HMR component / not the proxy.
+               const hmrComponent = appShell?.$$?.hmr_cmp;
+
+               if (appShell && typeof hmrComponent?.$replace === 'function')
                {
-                  appShell.$$.hmr_reload();
+                  const svelteData = app.svelte.dataByComponent(appShell);
+                  if (svelteData)
+                  {
+                     try
+                     {
+                        // Replace with self; this will invoke `on_hmr` callback in associated SvelteApplication.
+                        hmrComponent.$replace(hmrComponent.constructor, {
+                           target: svelteData.config.target,
+                           anchor: svelteData.config.anchor,
+                           preserveLocalState: true,
+                           conservative: true
+                        });
+                     }
+                     catch (error)
+                     {
+                        const name = hmrComponent?.constructor?.name ?? 'Unknown';
+                        console.error(`TyphonJS Runtime Library error; Could not hot reload component: '${name}'`);
+                        console.error(error);
+                     }
+                  }
                }
             }
          }, 0);
