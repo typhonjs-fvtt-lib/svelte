@@ -11,9 +11,7 @@ import { SvelteFormApplication } from './SvelteFormApplication.js';
 export class HandlebarsFormApplication extends SvelteFormApplication
 {
    /**
-    * Temporarily holds the inner HTML.
-    *
-    * @type {JQuery}
+    * Temporarily holds the inner JQuery HTML.
     */
    #innerHTML;
 
@@ -33,12 +31,11 @@ export class HandlebarsFormApplication extends SvelteFormApplication
    }
 
    /**
-    * Append HTML to application shell content area.
+    * Append JQuery HTML to application shell content area.
     *
-    * @param {JQuery}   html - new content.
-    *
-    * @private
+    * @protected
     * @ignore
+    * @internal
     */
    _injectHTML(html) // eslint-disable-line no-unused-vars
    {
@@ -58,8 +55,9 @@ export class HandlebarsFormApplication extends SvelteFormApplication
     * Duplicates the FormApplication `_renderInner` method as SvelteFormApplication does not defer to super
     * implementations.
     *
-    * @inheritDoc
+    * @protected
     * @ignore
+    * @internal
     */
    async _renderInner(data)
    {
@@ -76,8 +74,9 @@ export class HandlebarsFormApplication extends SvelteFormApplication
     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
     * application frame / title for pop-out applications.
     *
-    * @inheritDoc
+    * @protected
     * @ignore
+    * @internal
     */
    _replaceHTML(element, html)  // eslint-disable-line no-unused-vars
    {

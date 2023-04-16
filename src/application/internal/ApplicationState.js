@@ -46,7 +46,9 @@ export class ApplicationState
    /**
     * Returns any stored save state by name.
     *
-    * @param {string}   name - Saved data set name.
+    * @param {object}   options - Options.
+    *
+    * @param {string}   options.name - Saved data set name.
     *
     * @returns {ApplicationStateData} The saved data set.
     */

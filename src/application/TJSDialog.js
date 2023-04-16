@@ -296,6 +296,8 @@ export class TJSDialog extends SvelteApplication
     * @param {*} [defaultResult] - An optional default result to return; undefined if not specified.
     *
     * @returns {*} Result.
+    *
+    * @internal
     */
    static #invokeFn(callback, application, defaultResult = void 0)
    {
