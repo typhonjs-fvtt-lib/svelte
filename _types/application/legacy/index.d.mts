@@ -1,47 +1,320 @@
-import * as svelte_store from 'svelte/store';
-import * as svelte from 'svelte';
-
 declare class HandlebarsApplication {
     /**
      * @inheritDoc
      */
     constructor(options: any);
-    /**
-     * Append HTML to application shell content area.
-     *
-     * @param {JQuery}   html - new content; is ignored
-     *
-     * @private
-     * @ignore
-     */
-    private _injectHTML;
-    _renderInner(data: any): Promise<any>;
-    /**
-     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
-     * application frame / title for pop-out applications.
-     *
-     * @inheritDoc
-     * @ignore
-     */
-    _replaceHTML(element: any, html: any): void;
     #private;
 }
 
 /**
- * Contains the reactive functionality / Svelte stores associated with SvelteApplication.
+ * Provides the ability the save / restore application state for positional and UI state such as minimized status.
+ *
+ * You can restore a saved state with animation; please see the options of {@link ApplicationState.restore}.
+ */
+declare class ApplicationState {
+    /**
+     * @param {ApplicationShellExt}   application - The application.
+     */
+    constructor(application: ApplicationShellExt);
+    /**
+     * Returns current application state along with any extra data passed into method.
+     *
+     * @param {object} [extra] - Extra data to add to application state.
+     *
+     * @returns {ApplicationStateData} Passed in object with current application state.
+     */
+    get(extra?: object): ApplicationStateData;
+    /**
+     * Returns any stored save state by name.
+     *
+     * @param {object}   options - Options.
+     *
+     * @param {string}   options.name - Saved data set name.
+     *
+     * @returns {ApplicationStateData} The saved data set.
+     */
+    getSave({ name }: {
+        name: string;
+    }): ApplicationStateData;
+    /**
+     * Removes and returns any application state by name.
+     *
+     * @param {object}   options - Options.
+     *
+     * @param {string}   options.name - Name to remove and retrieve.
+     *
+     * @returns {ApplicationStateData} Saved application data.
+     */
+    remove({ name }: {
+        name: string;
+    }): ApplicationStateData;
+    /**
+     * Restores a saved application state returning the data. Several optional parameters are available
+     * to control whether the restore action occurs silently (no store / inline styles updates), animates
+     * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
+     * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
+     * returned if awaiting the end of the animation.
+     *
+     * @param {object}            params - Parameters
+     *
+     * @param {string}            params.name - Saved data set name.
+     *
+     * @param {boolean}           [params.remove=false] - Remove data set.
+     *
+     * @param {boolean}           [params.async=false] - If animating return a Promise that resolves with any saved data.
+     *
+     * @param {boolean}           [params.animateTo=false] - Animate to restore data.
+     *
+     * @param {number}            [params.duration=0.1] - Duration in seconds.
+     *
+     * @param {Function}          [params.ease=linear] - Easing function.
+     *
+     * @param {Function}          [params.interpolate=lerp] - Interpolation function.
+     *
+     * @returns {ApplicationStateData|Promise<ApplicationStateData>} Saved application data.
+     */
+    restore({ name, remove, async, animateTo, duration, ease, interpolate }: {
+        name: string;
+        remove?: boolean;
+        async?: boolean;
+        animateTo?: boolean;
+        duration?: number;
+        ease?: Function;
+        interpolate?: Function;
+    }): ApplicationStateData | Promise<ApplicationStateData>;
+    /**
+     * Saves current application state with the opportunity to add extra data to the saved state.
+     *
+     * @param {object}   options - Options.
+     *
+     * @param {string}   options.name - name to index this saved data.
+     *
+     * @param {...*}     [options.extra] - Extra data to add to saved data.
+     *
+     * @returns {ApplicationStateData} Current application data
+     */
+    save({ name, ...extra }: {
+        name: string;
+        extra?: any[];
+    }): ApplicationStateData;
+    /**
+     * Restores a saved application state returning the data. Several optional parameters are available
+     * to control whether the restore action occurs silently (no store / inline styles updates), animates
+     * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
+     * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
+     * returned if awaiting the end of the animation.
+     *
+     * Note: If serializing application state any minimized apps will use the before minimized state on initial render
+     * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
+     *
+     * TODO: THIS METHOD NEEDS TO BE REFACTORED WHEN TRL IS MADE INTO A STANDALONE FRAMEWORK.
+     *
+     * @param {ApplicationStateData}   data - Saved data set name.
+     *
+     * @param {object}            [opts] - Optional parameters
+     *
+     * @param {boolean}           [opts.async=false] - If animating return a Promise that resolves with any saved data.
+     *
+     * @param {boolean}           [opts.animateTo=false] - Animate to restore data.
+     *
+     * @param {number}            [opts.duration=0.1] - Duration in seconds.
+     *
+     * @param {Function}          [opts.ease=linear] - Easing function.
+     *
+     * @param {Function}          [opts.interpolate=lerp] - Interpolation function.
+     *
+     * @returns {ApplicationShellExt|Promise<ApplicationShellExt>} When synchronous the application or Promise when
+     *                                                             animating resolving with application.
+     */
+    set(data: ApplicationStateData, { async, animateTo, duration, ease, interpolate }?: {
+        async?: boolean;
+        animateTo?: boolean;
+        duration?: number;
+        ease?: Function;
+        interpolate?: Function;
+    }): ApplicationShellExt | Promise<ApplicationShellExt>;
+    #private;
+}
+type ApplicationStateData = {
+    /**
+     * - Application position.
+     */
+    position: PositionDataExtended;
+    /**
+     * - Any application saved position state for #beforeMinimized
+     */
+    beforeMinimized: object;
+    /**
+     * - Application options.
+     */
+    options: object;
+    /**
+     * - Application UI state.
+     */
+    ui: object;
+};
+
+/**
+ * Provides a helper class for {@link SvelteApplication} by combining all methods that work on the {@link SvelteData[]}
+ * of mounted components. This class is instantiated and can be retrieved by the getter `svelte` via SvelteApplication.
+ */
+declare class GetSvelteData {
+    /**
+     * Keep a direct reference to the SvelteData array in an associated {@link SvelteApplication}.
+     *
+     * @param {MountedAppShell[]|null[]}  applicationShellHolder - A reference to the MountedAppShell array.
+     *
+     * @param {SvelteData[]}  svelteData - A reference to the SvelteData array of mounted components.
+     */
+    constructor(applicationShellHolder: MountedAppShell[] | null[], svelteData: SvelteData[]);
+    /**
+     * Returns any mounted {@link MountedAppShell}.
+     *
+     * @returns {MountedAppShell|null} Any mounted application shell.
+     */
+    get applicationShell(): any;
+    /**
+     * Returns the indexed Svelte component.
+     *
+     * @param {number}   index -
+     *
+     * @returns {object} The loaded Svelte component.
+     */
+    component(index: number): object;
+    /**
+     * Returns the Svelte component entries iterator.
+     *
+     * @returns {Generator<Array<number|import('svelte').SvelteComponent>>} Svelte component entries iterator.
+     * @yields
+     */
+    componentEntries(): Generator<Array<number | any>>;
+    /**
+     * Returns the Svelte component values iterator.
+     *
+     * @returns {Generator<import('svelte').SvelteComponent>} Svelte component values iterator.
+     * @yields
+     */
+    componentValues(): Generator<any>;
+    /**
+     * Returns the indexed SvelteData entry.
+     *
+     * @param {number}   index -
+     *
+     * @returns {SvelteData} The loaded Svelte config + component.
+     */
+    data(index: number): SvelteData;
+    /**
+     * Returns the {@link SvelteData} instance for a given component.
+     *
+     * @param {object} component - Svelte component.
+     *
+     * @returns {SvelteData} -  The loaded Svelte config + component.
+     */
+    dataByComponent(component: object): SvelteData;
+    /**
+     * Returns the SvelteData entries iterator.
+     *
+     * @returns {IterableIterator<[number, SvelteData]>} SvelteData entries iterator.
+     */
+    dataEntries(): IterableIterator<[number, SvelteData]>;
+    /**
+     * Returns the SvelteData values iterator.
+     *
+     * @returns {IterableIterator<SvelteData>} SvelteData values iterator.
+     */
+    dataValues(): IterableIterator<SvelteData>;
+    /**
+     * Returns the length of the mounted Svelte component list.
+     *
+     * @returns {number} Length of mounted Svelte component list.
+     */
+    get length(): number;
+    #private;
+}
+
+/**
+ * Contains the reactive functionality / Svelte stores associated with SvelteApplication and retrievable by
+ * {@link SvelteApplication.reactive}.
+ *
+ * There are several reactive getters for UI state such and for two-way bindings / stores see
+ * {@link SvelteReactive.storeUIState}:
+ * - {@link SvelteReactive.dragging}
+ * - {@link SvelteReactive.minimized}
+ * - {@link SvelteReactive.resizing}
+ *
+ * There are also reactive getters / setters for {@link SvelteApplicationOptions} and Foundry
+ * {@link ApplicationOptions}. You can use the following as one way bindings and update the associated stores. For
+ * two-way bindings / stores see {@link SvelteReactive.storeAppOptions}.
+ *
+ * - {@link SvelteReactive.draggable}
+ * - {@link SvelteReactive.focusAuto}
+ * - {@link SvelteReactive.focusKeep}
+ * - {@link SvelteReactive.focusTrap}
+ * - {@link SvelteReactive.headerButtonNoClose}
+ * - {@link SvelteReactive.headerButtonNoLabel}
+ * - {@link SvelteReactive.headerIcon}
+ * - {@link SvelteReactive.headerNoTitleMinimized}
+ * - {@link SvelteReactive.minimizable}
+ * - {@link SvelteReactive.popOut}
+ * - {@link SvelteReactive.positionable}
+ * - {@link SvelteReactive.resizable}
+ * - {@link SvelteReactive.title}
+ *
+ * An instance of TJSSessionStorage is accessible via {@link SvelteReactive.sessionStorage}. Optionally you can pass
+ * in an existing instance that can be shared across multiple SvelteApplications by setting
+ * {@link SvelteApplicationOptions.sessionStorage}.
+ *
+ * -------------------------------------------------------------------------------------------------------------------
+ *
+ * This API is not sealed, and it is recommended that you extend it with accessors to get / set data that is reactive
+ * in your application. An example of setting an exported prop `document` from the main mounted application shell.
+ *
+ * @example
+ * import { hasSetter } from '@typhonjs-fvtt/runtime/svelte/util';
+ *
+ * // Note: make a normal comment.
+ * //  * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with
+ * //  *                             Document with the mounted application shell Svelte component.
+ * //  *
+ * //  * @memberof SvelteReactive#
+ * //  *
+ * Object.defineProperty(this.reactive, 'document', {
+ *    get: () => this.svelte?.applicationShell?.document,
+ *    set: (document) =>
+ *    {
+ *       const component = this.svelte?.applicationShell;
+ *       if (hasSetter(component, 'document')) { component.document = document; }
+ *    }
+ * });
  */
 declare class SvelteReactive {
     /**
      * @param {SvelteApplication} application - The host Foundry application.
      */
-    constructor(application: any);
+    constructor(application: SvelteApplication);
     /**
      * Initializes reactive support. Package private for internal use.
      *
-     * @returns {SvelteStores} Internal methods to interact with Svelte stores.
+     * @returns {SvelteStores|void} Internal methods to interact with Svelte stores.
      * @package
      */
-    initialize(): any;
+    initialize(): SvelteStores | void;
+    /**
+     * @returns {TJSSessionStorage} Returns TJSSessionStorage instance.
+     */
+    get sessionStorage(): TJSSessionStorage;
+    /**
+     * Returns the store for app options.
+     *
+     * @returns {StoreAppOptions} App options store.
+     */
+    get storeAppOptions(): StoreAppOptions;
+    /**
+     * Returns the store for UI options.
+     *
+     * @returns {StoreUIOptions} UI options store.
+     */
+    get storeUIState(): StoreUIOptions;
     /**
      * Returns the current dragging UI state.
      *
@@ -73,6 +346,42 @@ declare class SvelteReactive {
      */
     get draggable(): boolean;
     /**
+     * Sets `this.options.focusAuto` which is reactive for application shells.
+     *
+     * @param {boolean}  focusAuto - Sets the focusAuto option.
+     */
+    set focusAuto(arg: boolean);
+    /**
+     * Returns the focusAuto app option.
+     *
+     * @returns {boolean} When true auto-management of app focus is enabled.
+     */
+    get focusAuto(): boolean;
+    /**
+     * Sets `this.options.focusKeep` which is reactive for application shells.
+     *
+     * @param {boolean}  focusKeep - Sets the focusKeep option.
+     */
+    set focusKeep(arg: boolean);
+    /**
+     * Returns the focusKeep app option.
+     *
+     * @returns {boolean} When `focusAuto` and `focusKeep` is true; keeps internal focus.
+     */
+    get focusKeep(): boolean;
+    /**
+     * Sets `this.options.focusTrap` which is reactive for application shells.
+     *
+     * @param {boolean}  focusTrap - Sets the focusTrap option.
+     */
+    set focusTrap(arg: boolean);
+    /**
+     * Returns the focusTrap app option.
+     *
+     * @returns {boolean} When true focus trapping / wrapping is enabled keeping focus inside app.
+     */
+    get focusTrap(): boolean;
+    /**
      * Sets `this.options.headerButtonNoClose` which is reactive for application shells.
      *
      * @param {boolean}  headerButtonNoClose - Sets the headerButtonNoClose option.
@@ -96,6 +405,18 @@ declare class SvelteReactive {
      * @returns {boolean} Remove the labels from buttons in header app option.
      */
     get headerButtonNoLabel(): boolean;
+    /**
+     * Sets `this.options.headerIcon` which is reactive for application shells.
+     *
+     * @param {string|void}  headerIcon - Sets the headerButtonNoLabel option.
+     */
+    set headerIcon(arg: string | void);
+    /**
+     * Returns the headerIcon app option.
+     *
+     * @returns {string|void} URL for header app icon.
+     */
+    get headerIcon(): string | void;
     /**
      * Sets `this.options.headerNoTitleMinimized` which is reactive for application shells.
      *
@@ -128,9 +449,23 @@ declare class SvelteReactive {
      */
     set popOut(arg: boolean);
     /**
-     * @inheritDoc
+     * Returns the Foundry popOut state; {@link Application.popOut}
+     *
+     * @returns {boolean} Positionable app option.
      */
     get popOut(): boolean;
+    /**
+     * Sets `this.options.positionable` enabling / disabling {@link SvelteApplication.position.set}.
+     *
+     * @param {boolean}  positionable - Sets the positionable option.
+     */
+    set positionable(arg: boolean);
+    /**
+     * Returns the positionable app option; {@link SvelteApplicationOptions.positionable}
+     *
+     * @returns {boolean} Positionable app option.
+     */
+    get positionable(): boolean;
     /**
      * Sets `this.options.resizable` which is reactive for application shells.
      *
@@ -144,18 +479,6 @@ declare class SvelteReactive {
      */
     get resizable(): boolean;
     /**
-     * Returns the store for app options.
-     *
-     * @returns {StoreAppOptions} App options store.
-     */
-    get storeAppOptions(): any;
-    /**
-     * Returns the store for UI options.
-     *
-     * @returns {StoreUIOptions} UI options store.
-     */
-    get storeUIState(): any;
-    /**
      * Sets `this.options.title` which is reactive for application shells.
      *
      * Note: Will set empty string if title is undefined or null.
@@ -164,7 +487,7 @@ declare class SvelteReactive {
      */
     set title(arg: string);
     /**
-     * Returns the title accessor from the parent Application class.
+     * Returns the title accessor from the parent Application class; {@link Application.title}
      * TODO: Application v2; note that super.title localizes `this.options.title`; IMHO it shouldn't.
      *
      * @returns {string} Title.
@@ -211,8 +534,9 @@ declare class SvelteReactive {
      * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
      * the new buttons.
      *
-     * Optionally you can set in the Foundry app options `headerButtonNoClose` to remove the close button and
-     * `headerButtonNoLabel` to true and labels will be removed from the header buttons.
+     * Optionally you can set in the SvelteApplication app options {@link SvelteApplicationOptions.headerButtonNoClose}
+     * to remove the close button and {@link SvelteApplicationOptions.headerButtonNoLabel} to true and labels will be
+     * removed from the header buttons.
      *
      * @param {object} opts - Optional parameters (for internal use)
      *
@@ -227,252 +551,168 @@ declare class SvelteReactive {
     #private;
 }
 
-declare class ApplicationState {
-    /**
-     * @param {ApplicationShellExt}   application - The application.
-     */
-    constructor(application: any);
-    /**
-     * Returns current application state along with any extra data passed into method.
-     *
-     * @param {object} [extra] - Extra data to add to application state.
-     *
-     * @returns {ApplicationData} Passed in object with current application state.
-     */
-    get(extra?: object): ApplicationData;
-    /**
-     * Returns any stored save state by name.
-     *
-     * @param {string}   name - Saved data set name.
-     *
-     * @returns {ApplicationData} The saved data set.
-     */
-    getSave({ name }: string): ApplicationData;
-    /**
-     * Removes and returns any application state by name.
-     *
-     * @param {object}   options - Options.
-     *
-     * @param {string}   options.name - Name to remove and retrieve.
-     *
-     * @returns {ApplicationData} Saved application data.
-     */
-    remove({ name }: {
-        name: string;
-    }): ApplicationData;
-    /**
-     * Restores a saved application state returning the data. Several optional parameters are available
-     * to control whether the restore action occurs silently (no store / inline styles updates), animates
-     * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
-     * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
-     * returned if awaiting the end of the animation.
-     *
-     * @param {object}            params - Parameters
-     *
-     * @param {string}            params.name - Saved data set name.
-     *
-     * @param {boolean}           [params.remove=false] - Remove data set.
-     *
-     * @param {boolean}           [params.async=false] - If animating return a Promise that resolves with any saved data.
-     *
-     * @param {boolean}           [params.animateTo=false] - Animate to restore data.
-     *
-     * @param {number}            [params.duration=0.1] - Duration in seconds.
-     *
-     * @param {Function}          [params.ease=linear] - Easing function.
-     *
-     * @param {Function}          [params.interpolate=lerp] - Interpolation function.
-     *
-     * @returns {ApplicationData|Promise<ApplicationData>} Saved application data.
-     */
-    restore({ name, remove, async, animateTo, duration, ease, interpolate }: {
-        name: string;
-        remove?: boolean;
-        async?: boolean;
-        animateTo?: boolean;
-        duration?: number;
-        ease?: Function;
-        interpolate?: Function;
-    }): ApplicationData | Promise<ApplicationData>;
-    /**
-     * Saves current application state with the opportunity to add extra data to the saved state.
-     *
-     * @param {object}   options - Options.
-     *
-     * @param {string}   options.name - name to index this saved data.
-     *
-     * @param {...*}     [options.extra] - Extra data to add to saved data.
-     *
-     * @returns {ApplicationData} Current application data
-     */
-    save({ name, ...extra }: {
-        name: string;
-        extra?: any[];
-    }): ApplicationData;
-    /**
-     * Restores a saved application state returning the data. Several optional parameters are available
-     * to control whether the restore action occurs silently (no store / inline styles updates), animates
-     * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
-     * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
-     * returned if awaiting the end of the animation.
-     *
-     * @param {ApplicationData}   data - Saved data set name.
-     *
-     * @param {object}            opts - Optional parameters
-     *
-     * @param {boolean}           [opts.async=false] - If animating return a Promise that resolves with any saved data.
-     *
-     * @param {boolean}           [opts.animateTo=false] - Animate to restore data.
-     *
-     * @param {number}            [opts.duration=0.1] - Duration in seconds.
-     *
-     * @param {Function}          [opts.ease=linear] - Easing function.
-     *
-     * @param {Function}          [opts.interpolate=lerp] - Interpolation function.
-     *
-     * @returns {ApplicationShellExt|Promise<ApplicationShellExt>} When synchronous the application or Promise when
-     *                                                             animating resolving with application.
-     */
-    set(data: ApplicationData, { async, animateTo, duration, ease, interpolate }: {
-        async?: boolean;
-        animateTo?: boolean;
-        duration?: number;
-        ease?: Function;
-        interpolate?: Function;
-    }): any | Promise<any>;
-    #private;
-}
-type ApplicationData = {
-    /**
-     * - Application position.
-     */
-    position: any;
-    /**
-     * - Any application saved position state for #beforeMinimized
-     */
-    beforeMinimized: object;
-    /**
-     * - Application options.
-     */
-    options: object;
-    /**
-     * - Application UI state.
-     */
-    ui: object;
-};
-
 /**
- * Provides a helper class for {@link SvelteApplication} by combining all methods that work on the {@link SvelteData[]}
- * of mounted components. This class is instantiated and can be retrieved by the getter `svelte` via SvelteApplication.
+ * Provides a basic {@link TJSBasicAnimation} implementation for Position animation.
  */
-declare class GetSvelteData {
+declare class AnimationControl$1 {
     /**
-     * Keep a direct reference to the SvelteData array in an associated {@link SvelteApplication}.
+     * Defines a static empty / void animation control.
      *
-     * @param {MountedAppShell[]|null[]}  applicationShellHolder - A reference to the MountedAppShell array.
-     *
-     * @param {SvelteData[]}  svelteData - A reference to the SvelteData array of mounted components.
+     * @type {AnimationControl}
      */
-    constructor(applicationShellHolder: any[] | null[], svelteData: any[]);
+    static "__#50141@#voidControl": AnimationControl$1;
     /**
-     * Returns any mounted {@link MountedAppShell}.
+     * Provides a static void / undefined AnimationControl that is automatically resolved.
      *
-     * @returns {MountedAppShell|null} Any mounted application shell.
+     * @returns {AnimationControl} Void AnimationControl
      */
-    get applicationShell(): any;
+    static get voidControl(): AnimationControl$1;
     /**
-     * Returns the indexed Svelte component.
+     * @param {object|null} [animationData] - Animation data from {@link AnimationAPI}.
      *
-     * @param {number}   index -
-     *
-     * @returns {object} The loaded Svelte component.
+     * @param {boolean}     [willFinish] - Promise that tracks animation finished state.
      */
-    component(index: number): object;
+    constructor(animationData?: object | null, willFinish?: boolean);
     /**
-     * Returns the Svelte component entries iterator.
+     * Get a promise that resolves when animation is finished.
      *
-     * @returns {Generator<Array<number|SvelteComponent>>} Svelte component entries iterator.
-     * @yields
+     * @returns {Promise<void>}
      */
-    componentEntries(): Generator<Array<number | any>>;
+    get finished(): Promise<void>;
     /**
-     * Returns the Svelte component values iterator.
+     * Returns whether this animation is currently active / animating.
      *
-     * @returns {Generator<SvelteComponent>} Svelte component values iterator.
-     * @yields
+     * Note: a delayed animation may not be started / active yet. Use {@link AnimationControl.isFinished} to determine
+     * if an animation is actually finished.
+     *
+     * @returns {boolean} Animation active state.
      */
-    componentValues(): Generator<any>;
+    get isActive(): boolean;
     /**
-     * Returns the indexed SvelteData entry.
+     * Returns whether this animation is completely finished.
      *
-     * @param {number}   index -
-     *
-     * @returns {SvelteData} The loaded Svelte config + component.
+     * @returns {boolean} Animation finished state.
      */
-    data(index: number): any;
+    get isFinished(): boolean;
     /**
-     * Returns the {@link SvelteData} instance for a given component.
-     *
-     * @param {object} component - Svelte component.
-     *
-     * @returns {SvelteData} -  The loaded Svelte config + component.
+     * Cancels the animation.
      */
-    dataByComponent(component: object): any;
-    /**
-     * Returns the SvelteData entries iterator.
-     *
-     * @returns {IterableIterator<[number, SvelteData]>} SvelteData entries iterator.
-     */
-    dataEntries(): IterableIterator<[number, any]>;
-    /**
-     * Returns the SvelteData values iterator.
-     *
-     * @returns {IterableIterator<SvelteData>} SvelteData values iterator.
-     */
-    dataValues(): IterableIterator<any>;
-    /**
-     * Returns the length of the mounted Svelte component list.
-     *
-     * @returns {number} Length of mounted Svelte component list.
-     */
-    get length(): number;
+    cancel(): void;
     #private;
 }
 
 declare class AnimationAPI {
     constructor(position: any, data: any);
     /**
-     * Returns whether there are active animation instances for this Position.
+     * Returns whether there are scheduled animations whether active or delayed for this Position.
      *
      * @returns {boolean} Are there active animation instances.
      */
-    get isActive(): boolean;
+    get isScheduled(): boolean;
     /**
      * Cancels all animation instances for this Position instance.
      */
     cancel(): void;
     /**
-     * Provides animation
+     * Returns all currently scheduled AnimationControl instances for this Position instance.
+     *
+     * @returns {AnimationControl[]} All currently scheduled animation controls for this Position instance.
+     */
+    getScheduled(): AnimationControl$1[];
+    /**
+     * Provides a tween from given position data to the current position.
+     *
+     * @param {PositionDataExtended} fromData - The starting position.
+     *
+     * @param {object}         [opts] - Optional parameters.
+     *
+     * @param {number}         [opts.delay=0] - Delay in seconds before animation starts.
+     *
+     * @param {number}         [opts.duration=1] - Duration in seconds.
+     *
+     * @param {Function}       [opts.ease=cubicOut] - Easing function.
+     *
+     * @param {Function}       [opts.interpolate=lerp] - Interpolation function.
+     *
+     * @returns {AnimationControl}  A control object that can cancel animation and provides a `finished` Promise.
+     */
+    from(fromData: PositionDataExtended, { delay, duration, ease, interpolate }?: {
+        delay?: number;
+        duration?: number;
+        ease?: Function;
+        interpolate?: Function;
+    }): AnimationControl$1;
+    /**
+     * Provides a tween from given position data to the current position.
+     *
+     * @param {PositionDataExtended} fromData - The starting position.
+     *
+     * @param {PositionDataExtended} toData - The ending position.
+     *
+     * @param {object}         [opts] - Optional parameters.
+     *
+     * @param {number}         [opts.delay=0] - Delay in seconds before animation starts.
+     *
+     * @param {number}         [opts.duration=1] - Duration in seconds.
+     *
+     * @param {Function}       [opts.ease=cubicOut] - Easing function.
+     *
+     * @param {Function}       [opts.interpolate=lerp] - Interpolation function.
+     *
+     * @returns {AnimationControl}  A control object that can cancel animation and provides a `finished` Promise.
+     */
+    fromTo(fromData: PositionDataExtended, toData: PositionDataExtended, { delay, duration, ease, interpolate }?: {
+        delay?: number;
+        duration?: number;
+        ease?: Function;
+        interpolate?: Function;
+    }): AnimationControl$1;
+    /**
+     * Provides a tween to given position data from the current position.
      *
      * @param {PositionDataExtended} toData - The destination position.
      *
      * @param {object}         [opts] - Optional parameters.
      *
-     * @param {number}         [opts.duration] - Duration in seconds.
+     * @param {number}         [opts.delay=0] - Delay in seconds before animation starts.
      *
-     * @param {Function}       [opts.ease=linear] - Easing function.
+     * @param {number}         [opts.duration=1] - Duration in seconds.
+     *
+     * @param {Function}       [opts.ease=cubicOut] - Easing function.
      *
      * @param {Function}       [opts.interpolate=lerp] - Interpolation function.
      *
-     * @returns {TJSBasicAnimation}  A control object that can cancel animation and provides a `finished` Promise.
+     * @returns {AnimationControl}  A control object that can cancel animation and provides a `finished` Promise.
      */
-    to(toData: any, { duration, ease, interpolate }?: {
+    to(toData: PositionDataExtended, { delay, duration, ease, interpolate }?: {
+        delay?: number;
         duration?: number;
         ease?: Function;
         interpolate?: Function;
-    }): any;
+    }): AnimationControl$1;
+    /**
+     * Returns a function that provides an optimized way to constantly update a to-tween.
+     *
+     * @param {Iterable<string>}  keys - The keys for quickTo.
+     *
+     * @param {object}            [opts] - Optional parameters.
+     *
+     * @param {number}            [opts.duration=1] - Duration in seconds.
+     *
+     * @param {Function}          [opts.ease=cubicOut] - Easing function.
+     *
+     * @param {Function}          [opts.interpolate=lerp] - Interpolation function.
+     *
+     * @returns {quickToCallback} quick-to tween function.
+     */
+    quickTo(keys: Iterable<string>, { duration, ease, interpolate }?: {
+        duration?: number;
+        ease?: Function;
+        interpolate?: Function;
+    }): quickToCallback$1;
     #private;
 }
+type quickToCallback$1 = (...args: (number | object)[]) => any;
 
 declare class PositionStateAPI {
     constructor(position: any, data: any, transforms: any);
@@ -483,13 +723,13 @@ declare class PositionStateAPI {
      *
      * @returns {PositionDataExtended} The saved data set.
      */
-    get({ name }: string): any;
+    get({ name }: string): PositionDataExtended;
     /**
      * Returns any associated default data.
      *
      * @returns {PositionDataExtended} Associated default data.
      */
-    getDefault(): any;
+    getDefault(): PositionDataExtended;
     /**
      * Removes and returns any position state by name.
      *
@@ -501,7 +741,7 @@ declare class PositionStateAPI {
      */
     remove({ name }: {
         name: string;
-    }): any;
+    }): PositionDataExtended;
     /**
      * Resets data to default values and invokes set.
      *
@@ -556,7 +796,7 @@ declare class PositionStateAPI {
         duration?: number;
         ease?: Function;
         interpolate?: Function;
-    }): any | Promise<any>;
+    }): PositionDataExtended | Promise<PositionDataExtended>;
     /**
      * Saves current position state with the opportunity to add extra data to the saved state.
      *
@@ -571,7 +811,7 @@ declare class PositionStateAPI {
     save({ name, ...extra }: {
         name: string;
         extra?: any[];
-    }): any;
+    }): PositionData;
     /**
      * Directly sets a position state.
      *
@@ -641,32 +881,40 @@ declare class TransformData {
  */
 declare class AdapterValidators {
     /**
+     * @param {boolean}  enabled - Sets enabled state.
+     */
+    set enabled(arg: boolean);
+    /**
+     * @returns {boolean} Returns the enabled state.s
+     */
+    get enabled(): boolean;
+    /**
      * @returns {number} Returns the length of the validators array.
      */
     get length(): number;
     /**
-     * @param {...(ValidatorFn<T>|ValidatorData<T>)}   validators -
+     * @param {...(ValidatorFn|ValidatorData)}   validators -
      */
-    add(...validators: (ValidatorFn<any> | ValidatorData<any>)[]): void;
+    add(...validators: (ValidatorFn | ValidatorData)[]): void;
     clear(): void;
     /**
-     * @param {...(ValidatorFn<T>|ValidatorData<T>)}   validators -
+     * @param {...(ValidatorFn|ValidatorData)}   validators -
      */
-    remove(...validators: (ValidatorFn<any> | ValidatorData<any>)[]): void;
+    remove(...validators: (ValidatorFn | ValidatorData)[]): void;
     /**
      * Remove validators by the provided callback. The callback takes 3 parameters: `id`, `validator`, and `weight`.
      * Any truthy value returned will remove that validator.
      *
-     * @param {function(*, ValidatorFn<T>, number): boolean} callback - Callback function to evaluate each validator
+     * @param {function(*, ValidatorFn, number): boolean} callback - Callback function to evaluate each validator
      *                                                                  entry.
      */
-    removeBy(callback: (arg0: any, arg1: ValidatorFn<any>, arg2: number) => boolean): void;
+    removeBy(callback: (arg0: any, arg1: ValidatorFn, arg2: number) => boolean): void;
     removeById(...ids: any[]): void;
     /**
      * Provides an iterator for validators.
      *
      * @returns {Generator<ValidatorData|undefined>} Generator / iterator of validators.
-     * @yields {ValidatorData<T>}
+     * @yields {ValidatorData}
      */
     [Symbol.iterator](): Generator<ValidatorData | undefined>;
     #private;
@@ -675,7 +923,7 @@ declare class AdapterValidators {
  * - Position validator function that takes a {@link PositionData } instance potentially
  *                             modifying it or returning null if invalid.
  */
-type ValidatorFn = (valData: any) => any | null;
+type ValidatorFn = (valData: ValidationData) => PositionData | null;
 type ValidatorData = {
     /**
      * - An ID associated with this validator. Can be used to remove the validator.
@@ -699,7 +947,7 @@ type ValidatorData = {
 /**
  * Defines stored positional data.
  */
-declare class PositionData {
+declare class PositionData$1 {
     constructor({ height, left, maxHeight, maxWidth, minHeight, minWidth, rotateX, rotateY, rotateZ, scale, translateX, translateY, translateZ, top, transformOrigin, width, zIndex }?: {
         height?: any;
         left?: any;
@@ -720,9 +968,9 @@ declare class PositionData {
         zIndex?: any;
     });
     /**
-     * @type {number|'auto'|null}
+     * @type {number|'auto'|'inherit'|null}
      */
-    height: number | 'auto' | null;
+    height: number | 'auto' | 'inherit' | null;
     /**
      * @type {number|null}
      */
@@ -780,9 +1028,9 @@ declare class PositionData {
      */
     translateZ: number | null;
     /**
-     * @type {number|'auto'|null}
+     * @type {number|'auto'|'inherit'|null}
      */
-    width: number | 'auto' | null;
+    width: number | 'auto' | 'inherit' | null;
     /**
      * @type {number|null}
      */
@@ -794,14 +1042,130 @@ declare class PositionData {
      *
      * @returns {PositionData} This instance.
      */
-    copy(data: PositionData): PositionData;
+    copy(data: PositionData$1): PositionData$1;
+}
+
+/**
+ * Provides a public API for grouping multiple {@link Position} animations together with the AnimationManager.
+ *
+ * Note: To remove cyclic dependencies as this class provides the Position static / group Animation API `instanceof`
+ * checks are not done against Position. Instead, a check for the animate property being an instanceof
+ * {@link AnimationAPI} is performed in {@link AnimationGroupAPI.#isPosition}.
+ *
+ * @see AnimationAPI
+ */
+declare class AnimationGroupAPI {
+    /**
+     * Checks of the given object is a Position instance by checking for AnimationAPI.
+     *
+     * @param {*}  object - Any data.
+     *
+     * @returns {boolean} Is Position.
+     */
+    static "__#50144@#isPosition"(object: any): boolean;
+    /**
+     * Cancels any animation for given Position data.
+     *
+     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+     */
+    static cancel(position: Position | {
+        position: Position;
+    } | Iterable<Position> | Iterable<{
+        position: Position;
+    }>): void;
+    /**
+     * Cancels all Position animation.
+     */
+    static cancelAll(): void;
+    /**
+     * Gets all animation controls for the given position data.
+     *
+     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+     *
+     * @returns {{position: Position, data: object|void, controls: AnimationControl[]}[]} Results array.
+     */
+    static getScheduled(position: Position | {
+        position: Position;
+    } | Iterable<Position> | Iterable<{
+        position: Position;
+    }>): {
+        position: Position;
+        data: object | void;
+        controls: AnimationControl[];
+    }[];
+    /**
+     * Provides the `from` animation tween for one or more Position instances as a group.
+     *
+     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+     *
+     * @param {object|Function}   fromData -
+     *
+     * @param {object|Function}   options -
+     *
+     * @returns {TJSBasicAnimation} Basic animation control.
+     */
+    static from(position: Position | {
+        position: Position;
+    } | Iterable<Position> | Iterable<{
+        position: Position;
+    }>, fromData: object | Function, options: object | Function): TJSBasicAnimation;
+    /**
+     * Provides the `fromTo` animation tween for one or more Position instances as a group.
+     *
+     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+     *
+     * @param {object|Function}   fromData -
+     *
+     * @param {object|Function}   toData -
+     *
+     * @param {object|Function}   options -
+     *
+     * @returns {TJSBasicAnimation} Basic animation control.
+     */
+    static fromTo(position: Position | {
+        position: Position;
+    } | Iterable<Position> | Iterable<{
+        position: Position;
+    }>, fromData: object | Function, toData: object | Function, options: object | Function): TJSBasicAnimation;
+    /**
+     * Provides the `to` animation tween for one or more Position instances as a group.
+     *
+     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+     *
+     * @param {object|Function}   toData -
+     *
+     * @param {object|Function}   options -
+     *
+     * @returns {TJSBasicAnimation} Basic animation control.
+     */
+    static to(position: Position | {
+        position: Position;
+    } | Iterable<Position> | Iterable<{
+        position: Position;
+    }>, toData: object | Function, options: object | Function): TJSBasicAnimation;
+    /**
+     * Provides the `to` animation tween for one or more Position instances as a group.
+     *
+     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+     *
+     * @param {Iterable<string>}  keys -
+     *
+     * @param {object|Function}   options -
+     *
+     * @returns {quickToCallback} Basic animation control.
+     */
+    static quickTo(position: Position | {
+        position: Position;
+    } | Iterable<Position> | Iterable<{
+        position: Position;
+    }>, keys: Iterable<string>, options: object | Function): quickToCallback;
 }
 
 /**
  * Provides a store for position following the subscriber protocol in addition to providing individual writable derived
  * stores for each independent variable.
  */
-declare class Position {
+declare class Position$1 {
     /**
      * @returns {AnimationGroupAPI} Public Animation API.
      */
@@ -810,7 +1174,7 @@ declare class Position {
      * @returns {{browserCentered?: Centered, Centered?: *}} Initial position helpers.
      */
     static get Initial(): {
-        browserCentered?: any;
+        browserCentered?: Centered;
         Centered?: any;
     };
     /**
@@ -828,18 +1192,30 @@ declare class Position {
      *  Available validators.
      */
     static get Validators(): {
-        basicWindow?: any;
-        transformWindow?: any;
+        basicWindow?: BasicBounds;
+        transformWindow?: TransformBounds;
         TransformBounds?: any;
         BasicBounds?: any;
     };
     /**
-     * @param {PositionParent|PositionOptions}   [parent] - A potential parent element or object w/ `elementTarget`
+     * Returns a duplicate of a given position instance copying any options and validators.
+     *
+     * // TODO: Consider more safety over options processing.
+     *
+     * @param {Position}          position - A position instance.
+     *
+     * @param {PositionOptions}   options - Position options.
+     *
+     * @returns {Position} A duplicate position instance.
+     */
+    static duplicate(position: Position$1, options: PositionOptions): Position$1;
+    /**
+     * @param {PositionParent|PositionOptionsAll}   [parent] - A potential parent element or object w/ `elementTarget`
      *                                                      getter. May also be the PositionOptions object w/ 1 argument.
      *
-     * @param {PositionOptions}   options - Default values.
+     * @param {PositionOptionsAll}   [options] - Default values.
      */
-    constructor(parent?: PositionParent | PositionOptions, options: PositionOptions);
+    constructor(parent?: PositionParent | PositionOptionsAll, options?: PositionOptionsAll);
     /**
      * Returns the animation API.
      *
@@ -856,6 +1232,18 @@ declare class Position {
         height: number | 'auto';
     };
     /**
+     * Sets the enabled state.
+     *
+     * @param {boolean}  enabled - New enabled state.
+     */
+    set enabled(arg: boolean);
+    /**
+     * Returns the enabled state.
+     *
+     * @returns {boolean} Enabled state.
+     */
+    get enabled(): boolean;
+    /**
      * Returns the current HTMLElement being positioned.
      *
      * @returns {HTMLElement|undefined} Current HTMLElement being positioned.
@@ -870,7 +1258,7 @@ declare class Position {
     /**
      * Sets the associated {@link PositionParent} instance. Resets the style cache and default data.
      *
-     * @param {PositionParent} parent - A PositionParent instance.
+     * @param {PositionParent|void} parent - A PositionParent instance.
      */
     set parent(arg: any);
     /**
@@ -904,15 +1292,15 @@ declare class Position {
      */
     get validators(): AdapterValidators;
     /**
-     * @param {number|'auto'|null} height -
+     * @param {number|string|null} height -
      */
-    set height(arg: number | "auto");
+    set height(arg: number | "auto" | "inherit");
     /**
-     * @returns {number|'auto'|null} height
+     * @returns {number|'auto'|'inherit'|null} height
      */
-    get height(): number | "auto";
+    get height(): number | "auto" | "inherit";
     /**
-     * @param {number|null} left -
+     * @param {number|string|null} left -
      */
     set left(arg: number);
     /**
@@ -920,7 +1308,7 @@ declare class Position {
      */
     get left(): number;
     /**
-     * @param {number|null} maxHeight -
+     * @param {number|string|null} maxHeight -
      */
     set maxHeight(arg: number);
     /**
@@ -928,7 +1316,7 @@ declare class Position {
      */
     get maxHeight(): number;
     /**
-     * @param {number|null} maxWidth -
+     * @param {number|string|null} maxWidth -
      */
     set maxWidth(arg: number);
     /**
@@ -936,7 +1324,7 @@ declare class Position {
      */
     get maxWidth(): number;
     /**
-     * @param {number|null} minHeight -
+     * @param {number|string|null} minHeight -
      */
     set minHeight(arg: number);
     /**
@@ -944,7 +1332,7 @@ declare class Position {
      */
     get minHeight(): number;
     /**
-     * @param {number|null} minWidth -
+     * @param {number|string|null} minWidth -
      */
     set minWidth(arg: number);
     /**
@@ -952,7 +1340,7 @@ declare class Position {
      */
     get minWidth(): number;
     /**
-     * @param {number|null} rotateX -
+     * @param {number|string|null} rotateX -
      */
     set rotateX(arg: number);
     /**
@@ -960,7 +1348,7 @@ declare class Position {
      */
     get rotateX(): number;
     /**
-     * @param {number|null} rotateY -
+     * @param {number|string|null} rotateY -
      */
     set rotateY(arg: number);
     /**
@@ -968,7 +1356,7 @@ declare class Position {
      */
     get rotateY(): number;
     /**
-     * @param {number|null} rotateZ -
+     * @param {number|string|null} rotateZ -
      */
     set rotateZ(arg: number);
     /**
@@ -976,7 +1364,7 @@ declare class Position {
      */
     get rotateZ(): number;
     /**
-     * @param {number|null} rotateZ - alias for rotateZ
+     * @param {number|string|null} rotateZ - alias for rotateZ
      */
     set rotation(arg: number);
     /**
@@ -984,7 +1372,7 @@ declare class Position {
      */
     get rotation(): number;
     /**
-     * @param {number|null} scale -
+     * @param {number|string|null} scale -
      */
     set scale(arg: number);
     /**
@@ -992,7 +1380,7 @@ declare class Position {
      */
     get scale(): number;
     /**
-     * @param {number|null} top -
+     * @param {number|string|null} top -
      */
     set top(arg: number);
     /**
@@ -1008,7 +1396,7 @@ declare class Position {
      */
     get transformOrigin(): string;
     /**
-     * @param {number|null} translateX -
+     * @param {number|string|null} translateX -
      */
     set translateX(arg: number);
     /**
@@ -1016,7 +1404,7 @@ declare class Position {
      */
     get translateX(): number;
     /**
-     * @param {number|null} translateY -
+     * @param {number|string|null} translateY -
      */
     set translateY(arg: number);
     /**
@@ -1024,7 +1412,7 @@ declare class Position {
      */
     get translateY(): number;
     /**
-     * @param {number|null} translateZ -
+     * @param {number|string|null} translateZ -
      */
     set translateZ(arg: number);
     /**
@@ -1032,15 +1420,15 @@ declare class Position {
      */
     get translateZ(): number;
     /**
-     * @param {number|'auto'|null} width -
+     * @param {number|string|null} width -
      */
-    set width(arg: number | "auto");
+    set width(arg: number | "auto" | "inherit");
     /**
-     * @returns {number|'auto'|null} width
+     * @returns {number|'auto'|'inherit'|null} width
      */
-    get width(): number | "auto";
+    get width(): number | "auto" | "inherit";
     /**
-     * @param {number|null} zIndex -
+     * @param {number|string|null} zIndex -
      */
     set zIndex(arg: number);
     /**
@@ -1057,11 +1445,11 @@ declare class Position {
      *
      * @returns {PositionData} Passed in object with current position data.
      */
-    get(position?: object | PositionData, options?: PositionGetOptions): PositionData;
+    get(position?: object | PositionData$1, options?: PositionGetOptions): PositionData$1;
     /**
      * @returns {PositionData} Current position data.
      */
-    toJSON(): PositionData;
+    toJSON(): PositionData$1;
     /**
      * All calculation and updates of position are implemented in {@link Position}. This allows position to be fully
      * reactive and in control of updating inline styles for the application.
@@ -1085,7 +1473,7 @@ declare class Position {
      *
      * @returns {Position} This Position instance.
      */
-    set(position?: PositionDataExtended): Position;
+    set(position?: PositionDataExtended$1): Position$1;
     /**
      *
      * @param {function(PositionData): void} handler - Callback function that is invoked on update / changes. Receives
@@ -1093,64 +1481,64 @@ declare class Position {
      *
      * @returns {(function(): void)} Unsubscribe function.
      */
-    subscribe(handler: (arg0: PositionData) => void): (() => void);
+    subscribe(handler: (arg0: PositionData$1) => void): (() => void);
     #private;
 }
-type InitialHelper = {
+type PositionInitialHelper = {
     /**
-     * - A function that takes the width parameter and returns the left position.
+     * - Returns the left position given the width of the browser window.
      */
-    getLeft: Function;
+    getLeft: (width: number) => number;
     /**
-     * - A function that takes the height parameter and returns the top position.
+     * - Returns the top position given the height of the browser window.
      */
-    getTop: Function;
+    getTop: (height: number) => number;
 };
-type PositionDataExtended = {
+type PositionDataExtended$1 = {
     /**
      * -
      */
-    height?: number | 'auto' | null;
+    height?: number | string | null;
     /**
      * -
      */
-    left?: number | null;
+    left?: number | string | null;
     /**
      * -
      */
-    maxHeight?: number | null;
+    maxHeight?: number | string | null;
     /**
      * -
      */
-    maxWidth?: number | null;
+    maxWidth?: number | string | null;
     /**
      * -
      */
-    minHeight?: number | null;
+    minHeight?: number | string | null;
     /**
      * -
      */
-    minWidth?: number | null;
+    minWidth?: number | string | null;
     /**
      * -
      */
-    rotateX?: number | null;
+    rotateX?: number | string | null;
     /**
      * -
      */
-    rotateY?: number | null;
+    rotateY?: number | string | null;
     /**
      * -
      */
-    rotateZ?: number | null;
+    rotateZ?: number | string | null;
     /**
      * -
      */
-    scale?: number | null;
+    scale?: number | string | null;
     /**
      * -
      */
-    top?: number | null;
+    top?: number | string | null;
     /**
      * -
      */
@@ -1158,25 +1546,25 @@ type PositionDataExtended = {
     /**
      * -
      */
-    translateX?: number | null;
+    translateX?: number | string | null;
     /**
      * -
      */
-    translateY?: number | null;
+    translateY?: number | string | null;
     /**
      * -
      */
-    translateZ?: number | null;
+    translateZ?: number | string | null;
     /**
      * -
      */
-    width?: number | 'auto' | null;
+    width?: number | string | null;
     /**
      * -
      *
      * Extended properties -----------------------------------------------------------------------------------------------
      */
-    zIndex?: number | null;
+    zIndex?: number | string | null;
     /**
      * - When true any associated element is updated immediately.
      */
@@ -1191,6 +1579,10 @@ type PositionGetOptions = {
      * - When provided only these keys are copied.
      */
     keys: Iterable<string>;
+    /**
+     * - When provided these keys are excluded.
+     */
+    exclude: Iterable<string>;
     /**
      * - When true any `null` values are converted into defaults.
      */
@@ -1207,7 +1599,7 @@ type PositionOptions = {
     /**
      * - Provides a helper for setting initial position data.
      */
-    initialHelper: InitialHelper;
+    initialHelper: PositionInitialHelper;
     /**
      * - Sets Position to orthographic mode using just transform / matrix3d for positioning.
      */
@@ -1217,25 +1609,8 @@ type PositionOptions = {
      */
     transformSubscribed: boolean;
 };
+type PositionOptionsAll = PositionOptions & PositionData$1;
 type PositionParent = HTMLElement | object;
-type ResizeObserverData = {
-    /**
-     * -
-     */
-    contentHeight: number | undefined;
-    /**
-     * -
-     */
-    contentWidth: number | undefined;
-    /**
-     * -
-     */
-    offsetHeight: number | undefined;
-    /**
-     * -
-     */
-    offsetWidth: number | undefined;
-};
 /**
  * - Provides individual writable stores for {@link Position }.
  */
@@ -1244,159 +1619,114 @@ type StorePosition = {
      * - Readable store for dimension
      *   data.
      */
-    dimension: svelte_store.Readable<{
-        width: number;
-        height: number;
-    }>;
+    dimension: any;
     /**
      * - Readable store for current element.
      */
-    element: svelte_store.Readable<HTMLElement>;
+    element: any;
     /**
      * - Derived store for `left` updates.
      */
-    left: svelte_store.Writable<number | null>;
+    left: any;
     /**
      * - Derived store for `top` updates.
      */
-    top: svelte_store.Writable<number | null>;
+    top: any;
     /**
      * - Derived store for `width` updates.
      */
-    width: svelte_store.Writable<number | 'auto' | null>;
+    width: any;
     /**
      * - Derived store for `height` updates.
      */
-    height: svelte_store.Writable<number | 'auto' | null>;
+    height: any;
     /**
      * - Derived store for `maxHeight` updates.
      */
-    maxHeight: svelte_store.Writable<number | null>;
+    maxHeight: any;
     /**
      * - Derived store for `maxWidth` updates.
      */
-    maxWidth: svelte_store.Writable<number | null>;
+    maxWidth: any;
     /**
      * - Derived store for `minHeight` updates.
      */
-    minHeight: svelte_store.Writable<number | null>;
+    minHeight: any;
     /**
      * - Derived store for `minWidth` updates.
      */
-    minWidth: svelte_store.Writable<number | null>;
+    minWidth: any;
     /**
      * - Readable store for `contentHeight`.
      */
-    resizeContentHeight: svelte_store.Readable<number | undefined>;
+    resizeContentHeight: any;
     /**
      * - Readable store for `contentWidth`.
      */
-    resizeContentWidth: svelte_store.Readable<number | undefined>;
+    resizeContentWidth: any;
     /**
      * - Protected store for resize observer updates.
      */
-    resizeObserved: svelte_store.Writable<ResizeObserverData>;
+    resizeObserved: any;
     /**
      * - Readable store for `offsetHeight`.
      */
-    resizeOffsetHeight: svelte_store.Readable<number | undefined>;
+    resizeOffsetHeight: any;
     /**
      * - Readable store for `offsetWidth`.
      */
-    resizeOffsetWidth: svelte_store.Readable<number | undefined>;
+    resizeOffsetWidth: any;
     /**
      * - Derived store for `rotate` updates.
      */
-    rotate: svelte_store.Writable<number | null>;
+    rotate: any;
     /**
      * - Derived store for `rotateX` updates.
      */
-    rotateX: svelte_store.Writable<number | null>;
+    rotateX: any;
     /**
      * - Derived store for `rotateY` updates.
      */
-    rotateY: svelte_store.Writable<number | null>;
+    rotateY: any;
     /**
      * - Derived store for `rotateZ` updates.
      */
-    rotateZ: svelte_store.Writable<number | null>;
+    rotateZ: any;
     /**
      * - Derived store for `scale` updates.
      */
-    scale: svelte_store.Writable<number | null>;
+    scale: any;
     /**
      * - Readable store for transform data.
      */
-    transform: svelte_store.Readable<TransformData>;
+    transform: any;
     /**
      * - Derived store for `transformOrigin`.
      */
-    transformOrigin: svelte_store.Writable<string>;
+    transformOrigin: any;
     /**
      * - Derived store for `translateX` updates.
      */
-    translateX: svelte_store.Writable<number | null>;
+    translateX: any;
     /**
      * - Derived store for `translateY` updates.
      */
-    translateY: svelte_store.Writable<number | null>;
+    translateY: any;
     /**
      * - Derived store for `translateZ` updates.
      */
-    translateZ: svelte_store.Writable<number | null>;
+    translateZ: any;
     /**
      * - Derived store for `zIndex` updates.
      */
-    zIndex: svelte_store.Writable<number | null>;
+    zIndex: any;
 };
-/**
- * Provides a public API for grouping multiple animations together with the AnimationManager.
- */
-declare class AnimationGroupAPI {
-    /**
-     * Cancels any animation for given Position data.
-     *
-     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} data -
-     */
-    static cancel(data: Position | {
-        position: Position;
-    } | Iterable<Position> | Iterable<{
-        position: Position;
-    }>): void;
-    /**
-     * Cancels all Position animation.
-     */
-    static cancelAll(): void;
-    /**
-     * Animates one or more Position instances as a group.
-     *
-     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
-     *
-     * @param {object|Function}   toData -
-     *
-     * @param {object|Function}   options -
-     *
-     * @returns {TJSBasicAnimation} Basic animation control.
-     */
-    static to(position: Position | {
-        position: Position;
-    } | Iterable<Position> | Iterable<{
-        position: Position;
-    }>, toData: object | Function, options: object | Function): any;
-}
 
 /**
  * Provides a Svelte aware extension to FormApplication to control the app lifecycle appropriately. You can
  * declaratively load one or more components from `defaultOptions`.
  */
 declare class SvelteFormApplication {
-    /**
-     * Specifies the default options that SvelteFormApplication supports.
-     *
-     * @returns {object} options - Application options.
-     * @see https://foundryvtt.com/api/Application.html#options
-     */
-    static get defaultOptions(): any;
     /**
      * @inheritDoc
      */
@@ -1431,89 +1761,6 @@ declare class SvelteFormApplication {
      * @returns {GetSvelteData} GetSvelteData
      */
     get svelte(): GetSvelteData;
-    /**
-     * In this case of when a template is defined in app options `html` references the inner HTML / template. However,
-     * to activate classic v1 tabs for a Svelte component the element target is passed as an array simulating JQuery as
-     * the element is retrieved immediately and the core listeners use standard DOM queries.
-     *
-     * Note: App options `suppressFormInit` prevents activating core listeners. Potentially suppress form initialization.
-     * Useful when a Svelte application needs to use a FormApplication like when creating a game / config settings app.
-     *
-     * @inheritDoc
-     * @protected
-     * @ignore
-     */
-    protected _activateCoreListeners(html: any): void;
-    /**
-     * Provide an override to set this application as the active window regardless of z-index. Changes behaviour from
-     * Foundry core. This is important / used for instance in dialog key handling for left / right button selection.
-     *
-     * @param {object} [opts] - Optional parameters.
-     *
-     * @param {boolean} [opts.force=false] - Force bring to top; will increment z-index by popOut order.
-     *
-     */
-    bringToTop({ force }?: {
-        force?: boolean;
-    }): void;
-    /**
-     * Potentially suppress form initialization. Useful when a Svelte application needs to use a FormApplication like
-     * when creating a game / config settings app.
-     *
-     * @inheritDoc
-     * @protected
-     * @ignore
-     */
-    protected _updateObject(event: any, formData: any): Promise<any>;
-    /**
-     * Note: This method is fully overridden and duplicated as Svelte components need to be destroyed manually and the
-     * best visual result is to destroy them after the default slide up animation occurs, but before the element
-     * is removed from the DOM.
-     *
-     * If you destroy the Svelte components before the slide up animation the Svelte elements are removed immediately
-     * from the DOM. The purpose of overriding ensures the slide up animation is always completed before
-     * the Svelte components are destroyed and then the element is removed from the DOM.
-     *
-     * Close the application and unregister references to it within UI mappings.
-     * This function returns a Promise that resolves once the window closing animation concludes.
-     *
-     * @param {object}   [options] - Optional parameters.
-     *
-     * @param {boolean}  [options.force] - Force close regardless of render state.
-     *
-     * @returns {Promise<void>}    A Promise which resolves once the application is closed.
-     * @ignore
-     */
-    close(options?: {
-        force?: boolean;
-    }): Promise<void>;
-    /**
-     * @ignore
-     */
-    _state: any;
-    /**
-     * @ignore
-     */
-    _element: any;
-    /**
-     * @ignore
-     */
-    _minimized: boolean;
-    /**
-     * @ignore
-     */
-    _scrollPositions: any;
-    /**
-     * Inject the Svelte components defined in `this.options.svelte`. The Svelte component can attach to the existing
-     * pop-out of Application or provide no template and render into a document fragment which is then attached to the
-     * DOM.
-     *
-     * @param {JQuery} html -
-     *
-     * @inheritDoc
-     * @ignore
-     */
-    _injectHTML(html: any): void;
     /**
      * Provides a mechanism to update the UI options store for maximized.
      *
@@ -1567,49 +1814,6 @@ declare class SvelteFormApplication {
         elementTarget?: HTMLElement;
     }): void;
     /**
-     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
-     * application frame / title for pop-out applications.
-     *
-     * @inheritDoc
-     * @ignore
-     */
-    _replaceHTML(element: any, html: any): void;
-    /**
-     * Provides an override verifying that a new Application being rendered for the first time doesn't have a
-     * corresponding DOM element already loaded. This is a check that only occurs when `this._state` is
-     * `Application.RENDER_STATES.NONE`. It is useful in particular when SvelteFormApplication has a static ID
-     * explicitly set in `this.options.id` and long intro / outro transitions are assigned. If a new application
-     * sharing this static ID attempts to open / render for the first time while an existing DOM element sharing
-     * this static ID exists then the initial render is cancelled below rather than crashing later in the render
-     * cycle {@link Position.set}.
-     *
-     * @inheritDoc
-     * @protected
-     * @ignore
-     */
-    protected _render(force?: boolean, options?: {}): Promise<void>;
-    /**
-     * Render the inner application content. Only render a template if one is defined otherwise provide an empty
-     * JQuery element per the core Foundry API.
-     *
-     * @param {Object} data         The data used to render the inner template
-     *
-     * @returns {Promise.<JQuery>}   A promise resolving to the constructed jQuery object
-     *
-     * @protected
-     * @ignore
-     */
-    protected _renderInner(data: any): Promise<any>;
-    /**
-     * Stores the initial z-index set in `_renderOuter` which is used in `_injectHTML` to set the target element
-     * z-index after the Svelte component is mounted.
-     *
-     * @returns {Promise<JQuery>} Outer frame / unused.
-     * @protected
-     * @ignore
-     */
-    protected _renderOuter(): Promise<any>;
-    /**
      * All calculation and updates of position are implemented in {@link Position.set}. This allows position to be fully
      * reactive and in control of updating inline styles for the application.
      *
@@ -1620,118 +1824,13 @@ declare class SvelteFormApplication {
      *
      * @returns {Position} The updated position object for the application containing the new values
      */
-    setPosition(position?: any): Position;
+    setPosition(position?: PositionDataExtended): Position$1;
     #private;
 }
-type SvelteData = {
-    /**
-     * -
-     */
-    config: object;
-    /**
-     * -
-     */
-    component: svelte.SvelteComponent;
-    /**
-     * -
-     */
-    element: HTMLElement;
-    /**
-     * -
-     */
-    injectHTML: boolean;
-};
-type SvelteStores = {
-    /**
-     * - Update function for app options store.
-     */
-    appOptionsUpdate: any;
-    /**
-     * - Subscribes to local stores.
-     */
-    subscribe: Function;
-    /**
-     * - Update function for UI options store.
-     */
-    uiOptionsUpdate: any;
-    /**
-     * - Unsubscribes from local stores.
-     */
-    unsubscribe: Function;
-};
 
 declare class HandlebarsFormApplication extends SvelteFormApplication {
     form: any;
     #private;
 }
 
-/**
- * - Application shell contract for Svelte components.
- */
-type MountedAppShell = {
-    /**
-     * - The root element / exported prop.
-     */
-    elementRoot: HTMLElement;
-    /**
-     * - The content element / exported prop.
-     */
-    elementContent?: HTMLElement;
-    /**
-     * - The target element / exported prop.
-     */
-    elementTarget?: HTMLElement;
-};
-/**
- * - Provides a custom readable Svelte store for Application options state.
- */
-type StoreAppOptions = {
-    /**
-     * - Subscribe to all app options updates.
-     */
-    subscribe: any;
-    /**
-     * - Derived store for `draggable` updates.
-     */
-    draggable: svelte_store.Readable<boolean>;
-    /**
-     * - Derived store for `minimizable` updates.
-     */
-    minimizable: svelte_store.Readable<boolean>;
-    /**
-     * - Derived store for `popOut` updates.
-     */
-    popOut: svelte_store.Readable<boolean>;
-    /**
-     * - Derived store for `resizable` updates.
-     */
-    resizable: svelte_store.Readable<boolean>;
-    /**
-     * - Derived store for `title` updates.
-     */
-    title: svelte_store.Readable<string>;
-    /**
-     * - Derived store for `zIndex` updates.
-     */
-    zIndex: svelte_store.Readable<number>;
-};
-/**
- * - Provides a custom readable Svelte store for UI options state.
- */
-type StoreUIOptions = {
-    /**
-     * - Subscribe to all UI options updates.
-     */
-    subscribe: any;
-    /**
-     * - Derived store for
-     *   `headerButtons` updates.
-     */
-    headerButtons: svelte_store.Readable<any[]>;
-    /**
-     * - Derived store for `minimized` updates.
-     */
-    minimized: svelte_store.Readable<boolean>;
-};
-
-export { HandlebarsApplication, HandlebarsFormApplication, MountedAppShell, StoreAppOptions, StoreUIOptions, SvelteData, SvelteFormApplication, SvelteStores };
+export { HandlebarsApplication, HandlebarsFormApplication, SvelteFormApplication };
