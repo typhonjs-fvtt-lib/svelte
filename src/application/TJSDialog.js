@@ -111,7 +111,7 @@ export class TJSDialog extends SvelteApplication
    get data() { return this.#data; }
 
    /**
-    * @returns {ManagedPromise} Returns the managed promise.
+    * @returns {import('@typhonjs-svelte/lib/util').ManagedPromise} Returns the managed promise.
     */
    get managedPromise() { return this.#managedPromise; }
 
@@ -230,7 +230,10 @@ export class TJSDialog extends SvelteApplication
     *
     * @template T
     *
-    * @param {TJSDialogOptions} data - Confirm dialog options.
+    * @param {TJSDialogOptions & {
+    *    onYes?: string|((application: TJSDialog) => any),
+    *    onNo?: string|((application: TJSDialog) => any)
+    * }} [data] - Confirm dialog options.
     *
     * @param {string|((application: TJSDialog) => any)} [data.onYes] - Callback function upon `yes`; may be an async
     *        function. When defined as a string any matching function by name exported from content Svelte component is
@@ -345,7 +348,11 @@ export class TJSDialog extends SvelteApplication
     *
     * @template T
     *
-    * @param {TJSDialogOptions} [data] - Prompt dialog options.
+    * @param {TJSDialogOptions & {
+    *    onOk?: string|((application: TJSDialog) => any),
+    *    label?: string,
+    *    icon?: string
+    * }} [data] - Prompt dialog options that includes any TJSDialog options along with the following optional fields:
     *
     * @param {string|((application: TJSDialog) => any)} [data.onOk] - Callback function upon `ok`; may be an async
     *        function. When defined as a string any matching function by name exported from content Svelte component is
@@ -408,69 +415,3 @@ export class TJSDialog extends SvelteApplication
       return new this({ ...data }, options).wait();
    }
 }
-
-/**
- * @typedef {object} TJSDialogOptions - Defines the common dialog configuration data.
- *
- * @property {Record<string, TJSDialogButtonData>}  [buttons={}] - Provides configuration of the dialog button bar.
- *
- * @property {object|string}  content - A Svelte configuration object or HTML string content.
- *
- * @property {string}   [default] - The default button ID to focus initially.
- *
- * @property {boolean}  [draggable=true] - The dialog is draggable when true.
- *
- * @property {boolean}  [focusAuto=true] - When true auto-management of app focus is enabled.
- *
- * @property {boolean}  [focusFirst=false] - When true the first focusable element that isn't a button is focused.
- *
- * @property {boolean}  [focusKeep=false] - When `focusAuto` and `focusKeep` is true; keeps internal focus.
- *
- * @property {boolean}  [focusTrap=true] - When true focus trapping / wrapping is enabled keeping focus inside app.
- *
- * @property {boolean}  [minimizable=true] - When true the dialog is minimizable.
- *
- * @property {boolean}  [modal=false] - When true a modal dialog is displayed.
- *
- * @property {object}   [modalOptions] - Additional options for modal dialog display.
- *
- * @property {boolean}  [notifyError=true] - When true and an error is raised in dialog callback functions post a UI
- *           error notification.
- *
- * @property {string|((application: TJSDialog) => any)} [onClose] - Callback invoked when dialog is closed; no button
- *           option selected. When defined as a string any matching function by name exported from content Svelte
- *           component is invoked.
- *
- * @property {boolean}  [rejectClose=false] - When true and a Promise has been created by {@link TJSDialog.wait} and
- *           the Promise is not in the process of being resolved or rejected on close of the dialog any `onClose`
- *           function is invoked and any result that is undefined will cause the Promise to then be rejected.
- *
- * @property {boolean}  [resizable=false] - When true the dialog is resizable.
- *
- * @property {boolean}  [resolveId=false] - When true and resolving any Promises and there are undefined results from
- *           any button callbacks the button ID is resolved.
- *
- * @property {string}   [title] - The dialog window title.
- *
- * @property {object}   [transition] - Transition options for the dialog.
- *
- * @property {number|null} [zIndex] - A specific z-index for the dialog. Pass null for the dialog to act like other
- *           applications in regard bringing to top when activated.
- */
-
-/**
- * @typedef {object} TJSDialogButtonData - TJSDialog button data.
- *
- * @property {boolean} [autoClose=true] - When false the dialog does not automatically close when button selected.
- *
- * @property {boolean|(() => boolean)} [condition] - Determines if the button is accessible providing a truthy value.
- *
- * @property {string} [label] - Button label; will be localized.
- *
- * @property {string} [icon] - Button icon; you should supply the direct Font Awesome class names: IE "fas fa-check".
- *
- * @property {string|((application: TJSDialog) => any)} [onPress] - Callback for button press. When defined as a
- *           string any matching function by name exported from content Svelte component is invoked.
- *
- * @property {Record<string, string>} [styles] - Inline styles to apply to the button.
- */

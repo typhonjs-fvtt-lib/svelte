@@ -1,4 +1,7 @@
-import { TransformData } from '../transform/TransformData.js';
+import { TransformData }   from '../transform/TransformData.js';
+
+// Explicit import for TS declaration generation.
+import { PositionData }    from '../PositionData.js'; // eslint-disable-line no-unused-vars
 
 const s_TRANSFORM_DATA = new TransformData();
 

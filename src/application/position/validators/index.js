@@ -1,7 +1,6 @@
-import { BasicBounds }     from './BasicBounds.js';
-import { TransformBounds } from './TransformBounds.js';
+export * from './AdapterValidators.js';
+export * from './BasicBounds.js';
+export * from './TransformBounds.js';
 
-const basicWindow = new BasicBounds({ lock: true });
-const transformWindow = new TransformBounds({ lock: true });
-
-export { basicWindow, BasicBounds, transformWindow, TransformBounds };
+//
+// export { basicWindow, BasicBounds, transformWindow, TransformBounds };

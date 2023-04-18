@@ -1,4 +1,4 @@
-import { isObject } from '@typhonjs-fvtt/svelte/util';
+import { isObject }     from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides the storage and sequencing of managed position validators. Each validator added may be a bespoke function or
@@ -315,31 +315,3 @@ export class AdapterValidators
       // if (length !== this.#validatorData.length) { this.#indexUpdate(); }
    }
 }
-
-/**
- * @callback ValidatorFn - Position validator function that takes a {@link PositionData} instance potentially
- *                             modifying it or returning null if invalid.
- *
- * @param {ValidationData} valData - Validation data.
- *
- * @returns {PositionData|null} The validated position data or null to cancel position update.
- *
- */
-
-/**
- * @typedef {object} ValidatorData
- *
- * @property {*}           [id=undefined] - An ID associated with this validator. Can be used to remove the validator.
- *
- * @property {ValidatorFn} validator - Position validator function that takes a {@link PositionData} instance
- *                                     potentially modifying it or returning null if invalid.
- *
- * @property {number}      [weight=1] - A number between 0 and 1 inclusive to position this validator against others.
- *
- * @property {Function}    [subscribe] - Optional subscribe function following the Svelte store / subscribe pattern.
- */
-
-/**
- * @typedef {ValidatorFn|ValidatorData|Iterable<ValidatorFn|ValidatorData>} PositionValidatorOptions Defines the
- *          position validator options.
- */
