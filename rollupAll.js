@@ -282,32 +282,26 @@ fs.copySync('./src/component', './_dist/component');
 fs.emptyDirSync('./_dist/gsap/plugin');
 fs.copySync('./src/gsap/plugin', './_dist/gsap/plugin');
 
+// Common application generateDTS options.
+const applicationDTSOptions = { filterDiagnostic, onwarn, replace, transformers: [jsdocRemoveNodeByTags('internal')] };
+
 await generateDTS({
    input: './_dist/application/index.js',
    output: './_types/application/index.d.mts',
    prependGen: ['./_dist/application/typedefs.js'],
-   transformers: [jsdocRemoveNodeByTags('internal')],
-   filterDiagnostic,
-   onwarn,
-   replace
+   ...applicationDTSOptions
 });
 
 await generateDTS({
    input: './_dist/application/dialog/index.js',
    output: './_types/application/dialog/index.d.mts',
    // prependGen: ['./_dist/application/typedefs.js'],
-   transformers: [jsdocRemoveNodeByTags('internal')],
-   filterDiagnostic,
-   onwarn,
-   replace
+   ...applicationDTSOptions
 });
 
 await generateDTS({
    input: './_dist/application/legacy/index.js',
    output: './_types/application/legacy/index.d.mts',
    // prependGen: ['./_dist/application/typedefs.js'],
-   transformers: [jsdocRemoveNodeByTags('internal')],
-   filterDiagnostic,
-   onwarn,
-   replace
+   ...applicationDTSOptions
 });
