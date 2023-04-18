@@ -8,7 +8,7 @@ import {
  * document collections reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
  *
- * @template {DocumentCollection} T
+ * @template {globalThis.DocumentCollection} T
  */
 export class TJSDocumentCollection
 {
