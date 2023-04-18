@@ -52,7 +52,9 @@ const ignorePattern = /^@typhonjs-svelte\/lib/;
 
 const onwarn = (warning, warn) =>
 {
-   if (warning.code === 'UNRESOLVED_IMPORT' && !ignorePattern.test(warning.exporter)) { warn(warning); }
+   if (warning.code === 'UNRESOLVED_IMPORT' && ignorePattern.test(warning.exporter)) { return; }
+
+   warn(warning);
 };
 
 // Rollup plugin options for generateDTS.
