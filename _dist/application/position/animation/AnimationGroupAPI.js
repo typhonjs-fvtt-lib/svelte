@@ -6,6 +6,10 @@ import { AnimationManager }      from './AnimationManager.js';
 import { AnimationAPI }          from './AnimationAPI.js';
 import { AnimationGroupControl } from './AnimationGroupControl.js';
 
+// Explicit import for TS declaration generation.
+import { AnimationControl }      from './AnimationControl.js'; // eslint-disable-line no-unused-vars
+import { Position }              from '../Position.js';        // eslint-disable-line no-unused-vars
+
 /**
  * Provides a public API for grouping multiple {@link Position} animations together with the AnimationManager.
  *
@@ -135,7 +139,7 @@ export class AnimationGroupAPI
     *
     * @param {object|Function}   options -
     *
-    * @returns {TJSBasicAnimation} Basic animation control.
+    * @returns {import('@typhonjs-svelte/lib/animate').TJSBasicAnimation} Basic animation control.
     */
    static from(position, fromData, options)
    {
@@ -276,7 +280,7 @@ export class AnimationGroupAPI
     *
     * @param {object|Function}   options -
     *
-    * @returns {TJSBasicAnimation} Basic animation control.
+    * @returns {import('@typhonjs-svelte/lib/animate').TJSBasicAnimation} Basic animation control.
     */
    static fromTo(position, fromData, toData, options)
    {
@@ -447,7 +451,7 @@ export class AnimationGroupAPI
     *
     * @param {object|Function}   options -
     *
-    * @returns {TJSBasicAnimation} Basic animation control.
+    * @returns {import('@typhonjs-svelte/lib/animate').TJSBasicAnimation} Basic animation control.
     */
    static to(position, toData, options)
    {

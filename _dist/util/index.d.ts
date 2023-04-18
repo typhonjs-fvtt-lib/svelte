@@ -63,7 +63,7 @@ declare class A11yHelper {
      *
      * @returns {string} Focusable selectors for `querySelectorAll`.
      */
-    static "__#169507@#getFocusableSelectors"(anchorHref?: boolean): string;
+    static "__#174340@#getFocusableSelectors"(anchorHref?: boolean): string;
     /**
      * Gets a A11yFocusSource object from the given DOM event allowing for optional X / Y screen space overrides.
      * Browsers (Firefox / Chrome) forwards a mouse event for the context menu keyboard button. Provides detection of
@@ -181,7 +181,7 @@ type A11yFocusSource = {
  */
 declare class ManagedPromise {
     /** @type {boolean} */
-    static "__#169508@#logging": boolean;
+    static "__#174341@#logging": boolean;
     /**
      * Sets global logging enabled state.
      *
@@ -563,6 +563,87 @@ interface StateMachineOptions {
 declare function striptags(text: string, options?: Partial<StateMachineOptions>): string;
 
 /**
+ * Recursively deep merges all source objects into the target object in place. Like `Object.assign` if you provide `{}`
+ * as the target a copy is produced. If the target and source property are object literals they are merged.
+ * Deleting keys is supported by specifying a property starting with `-=`.
+ *
+ * @param {object}      target - Target object.
+ *
+ * @param {...object}   sourceObj - One or more source objects.
+ *
+ * @returns {object}    Target object.
+ */
+declare function deepMerge(target?: object, ...sourceObj: object[]): object;
+/**
+ * Tests for whether an object is iterable.
+ *
+ * @param {*} value - Any value.
+ *
+ * @returns {boolean} Whether object is iterable.
+ */
+declare function isIterable(value: any): boolean;
+/**
+ * Tests for whether an object is async iterable.
+ *
+ * @param {*} value - Any value.
+ *
+ * @returns {boolean} Whether value is async iterable.
+ */
+declare function isIterableAsync(value: any): boolean;
+/**
+ * Tests for whether object is not null and a typeof object.
+ *
+ * @param {*} value - Any value.
+ *
+ * @returns {boolean} Is it an object.
+ */
+declare function isObject(value: any): boolean;
+/**
+ * Tests for whether the given value is a plain object.
+ *
+ * An object is plain if it is created by either: {}, new Object() or Object.create(null).
+ *
+ * @param {*} value - Any value
+ *
+ * @returns {boolean} Is it a plain object.
+ */
+declare function isPlainObject(value: any): boolean;
+/**
+ * Provides a way to safely access an objects data / entries given an accessor string which describes the
+ * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
+ * to walk.
+ *
+ * @param {object}   data - An object to access entry data.
+ *
+ * @param {string}   accessor - A string describing the entries to access.
+ *
+ * @param {*}        defaultValue - (Optional) A default value to return if an entry for accessor is not found.
+ *
+ * @returns {object} The data object.
+ */
+declare function safeAccess(data: object, accessor: string, defaultValue?: any): object;
+/**
+ * Provides a way to safely set an objects data / entries given an accessor string which describes the
+ * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
+ * to walk.
+ *
+ * @param {object}   data - An object to access entry data.
+ *
+ * @param {string}   accessor - A string describing the entries to access.
+ *
+ * @param {*}        value - A new value to set if an entry for accessor is found.
+ *
+ * @param {string}   [operation='set'] - Operation to perform including: 'add', 'div', 'mult', 'set',
+ *                                       'set-undefined', 'sub'.
+ *
+ * @param {boolean}  [createMissing=true] - If true missing accessor entries will be created as objects
+ *                                          automatically.
+ *
+ * @returns {boolean} True if successful.
+ */
+declare function safeSet(data: object, accessor: string, value: any, operation?: string, createMissing?: boolean): boolean;
+
+/**
  * Attempts to create a Foundry UUID from standard drop data. This may not work for all systems.
  *
  * @param {object}   data - Drop transfer data.
@@ -591,4 +672,4 @@ type ParseDataTransferOptions = {
     types?: string[] | undefined;
 };
 
-export { A11yFocusSource, A11yHelper, ClipboardAccess, ManagedPromise, ParseDataTransferOptions, StackingContext, StyleManager, debounce, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, striptags, styleParsePixels, uuidv4 };
+export { A11yFocusSource, A11yHelper, ClipboardAccess, ManagedPromise, ParseDataTransferOptions, StackingContext, StyleManager, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, striptags, styleParsePixels, uuidv4 };

@@ -3,6 +3,10 @@ import {
    safeAccess,
    safeSet }   from '@typhonjs-fvtt/svelte/util';
 
+// Explicit import for TS declaration generation.
+import { SvelteApplication }  from '../SvelteApplication.js';   // eslint-disable-line no-unused-vars
+import { TJSDialog }          from '../TJSDialog.js';           // eslint-disable-line no-unused-vars
+
 /**
  * Provides storage for all dialog options adding `get`, `merge` and `set` methods that safely access and update
  * data changed to the mounted DialogShell component reactively.

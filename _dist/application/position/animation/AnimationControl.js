@@ -1,7 +1,7 @@
 import { isObject } from '@typhonjs-fvtt/svelte/util';
 
 /**
- * Provides a basic {@link TJSBasicAnimation} implementation for Position animation.
+ * Provides a TJSBasicAnimation implementation for Position animation.
  */
 export class AnimationControl
 {

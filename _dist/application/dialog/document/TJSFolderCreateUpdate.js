@@ -14,7 +14,7 @@ export class TJSFolderCreateUpdate extends TJSDialog
    /**
     * Updates an existing Folder by rendering a dialog window with basic details.
     *
-    * @param {Folder} document - The folder to edit.
+    * @param {globalThis.Folder} document - The folder to edit.
     *
     * @param {object} [options] - Options to pass to TJSDialog / Application.
     *
@@ -46,8 +46,8 @@ export class TJSFolderCreateUpdate extends TJSDialog
       }, options);
 
       /**
-       * @member {Folder} document - Adds accessors to SvelteReactive to get / set the document associated with
-       *                           TJSFolderDialog.
+       * @member {globalThis.Folder} document - Adds accessors to SvelteReactive to get / set the document associated
+       *                             with TJSFolderDialog.
        *
        * @memberof SvelteReactive#
        */
@@ -70,7 +70,7 @@ export class TJSFolderCreateUpdate extends TJSDialog
     *
     * @param {object} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Folder|null>} The newly created Folder or null if the dialog is closed.
+    * @returns {Promise<globalThis.Folder|null>} The newly created Folder or null if the dialog is closed.
     */
    static async showCreate(folderData, options = {}, dialogData = {})
    {
@@ -96,17 +96,17 @@ export class TJSFolderCreateUpdate extends TJSDialog
    /**
     * Updates an existing Folder by rendering a dialog window with basic details.
     *
-    * @param {Folder} document - The folder to edit.
+    * @param {globalThis.Folder} document - The folder to edit.
     *
     * @param {object} [options] - Options to pass to TJSDialog / Application.
     *
     * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Folder|null>} The modified Folder or null if the dialog is closed.
+    * @returns {Promise<globalThis.Folder|null>} The modified Folder or null if the dialog is closed.
     */
    static async showUpdate(document, options = {}, dialogData = {})
    {
-      if (!(document instanceof Folder))
+      if (!(document instanceof globalThis.Folder))
       {
          console.warn(`TJSFolderCreateUpdate - show - warning: 'document' is not a Folder.`);
          return null;

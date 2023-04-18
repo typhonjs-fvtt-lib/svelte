@@ -12,7 +12,7 @@ import { hasSetter }          from '@typhonjs-fvtt/svelte/util';
 export class TJSFolderRemove extends TJSDialog
 {
    /**
-    * @param {Folder} document - Folder to remove.
+    * @param {globalThis.Folder} document - Folder to remove.
     *
     * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
@@ -65,14 +65,14 @@ export class TJSFolderRemove extends TJSDialog
    /**
     * Removes a folder, but does not delete / remove subfolders / documents.
     *
-    * @param {Folder} document - Folder to remove.
+    * @param {globalThis.Folder} document - Folder to remove.
     *
     * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
     * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Folder|boolean|null>} The removed Folder or a falsy value; either 'false' for cancelling or
-    *          'null' if the user closed the dialog via `<Esc>` or the close header button.
+    * @returns {Promise<globalThis.Folder|boolean|null>} The removed Folder or a falsy value; either 'false' for
+    *          cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async show(document, options = {}, dialogData = {})
    {

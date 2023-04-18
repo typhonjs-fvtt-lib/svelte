@@ -11,14 +11,16 @@ import { AnimationAPI }          from './animation/AnimationAPI.js';
 import { AnimationGroupAPI }     from './animation/AnimationGroupAPI.js';
 import * as constants            from './constants.js';
 import { convertRelative }       from './convertRelative.js';
-import * as positionInitial      from './initial/index.js';
+import { Centered }              from './initial/index.js';
 import { PositionChangeSet }     from './PositionChangeSet.js';
 import { PositionData }          from './PositionData.js';
 import { PositionStateAPI }      from './PositionStateAPI.js';
 import { StyleCache }            from './StyleCache.js';
 import { TransformData }         from './transform/TransformData.js';
-import { AdapterValidators }     from './validators/AdapterValidators.js';
-import * as positionValidators   from './validators/index.js';
+import {
+   AdapterValidators,
+   BasicBounds,
+   TransformBounds }             from './validators/index.js';
 import { Transforms }            from './transform/Transforms.js';
 import { UpdateElementData }     from './update/UpdateElementData.js';
 import { UpdateElementManager }  from './update/UpdateElementManager.js';
@@ -29,6 +31,24 @@ import { UpdateElementManager }  from './update/UpdateElementManager.js';
  */
 export class Position
 {
+   /**
+    * @type {{browserCentered: Centered, Centered: Centered}}
+    */
+   static #positionInitial = {
+      browserCentered: new Centered({ lock: true }),
+      Centered
+   };
+
+   /**
+    * @type {{TransformBounds: TransformBounds, BasicBounds: BasicBounds, basicWindow: BasicBounds, transformWindow: TransformBounds}}
+    */
+   static #positionValidators = {
+      basicWindow: new BasicBounds({ lock: true }),
+      BasicBounds,
+      transformWindow: new TransformBounds({ lock: true }),
+      TransformBounds
+   };
+
    /**
     * @type {PositionData}
     */
@@ -49,13 +69,6 @@ export class Position
    #enabled = true;
 
    /**
-    * Stores the style attributes that changed on update.
-    *
-    * @type {PositionChangeSet}
-    */
-   #positionChangeSet = new PositionChangeSet();
-
-   /**
     * Stores ongoing options that are set in the constructor or by transform store subscription.
     *
     * @type {PositionOptions}
@@ -73,6 +86,13 @@ export class Position
     * @type {PositionParent}
     */
    #parent;
+
+   /**
+    * Stores the style attributes that changed on update.
+    *
+    * @type {PositionChangeSet}
+    */
+   #positionChangeSet = new PositionChangeSet();
 
    /**
     * @type {StorePosition}
@@ -131,9 +151,9 @@ export class Position
    static get Animate() { return AnimationGroupAPI; }
 
    /**
-    * @returns {{browserCentered?: Centered, Centered?: *}} Initial position helpers.
+    * @returns {{browserCentered: Centered, Centered: Centered}} Position initial API.
     */
-   static get Initial() { return positionInitial; }
+   static get Initial() { return this.#positionInitial; }
 
    /**
     * Returns TransformData class / constructor.
@@ -147,10 +167,10 @@ export class Position
     *
     * Note: `basicWindow` and `BasicBounds` will eventually be removed.
     *
-    * @returns {{basicWindow?: BasicBounds, transformWindow?: TransformBounds, TransformBounds?: *, BasicBounds?: *}}
-    *  Available validators.
+    * @returns {{TransformBounds: TransformBounds, BasicBounds: BasicBounds, basicWindow: BasicBounds, transformWindow: TransformBounds}}
+    * Available validators.
     */
-   static get Validators() { return positionValidators; }
+   static get Validators() { return this.#positionValidators; }
 
    /**
     * Returns a duplicate of a given position instance copying any options and validators.
@@ -1356,188 +1376,3 @@ const s_VALIDATION_DATA = {
 };
 
 Object.seal(s_VALIDATION_DATA);
-
-/**
- * @typedef {object} PositionInitialHelper
- *
- * @property {(width: number) => number} getLeft - Returns the left position given the width of the browser window.
- *
- * @property {(height: number) => number} getTop - Returns the top position given the height of the browser window.
- */
-
-/**
- * @typedef {object} PositionDataExtended
- *
- * @property {number|string|null} [height] -
- *
- * @property {number|string|null} [left] -
- *
- * @property {number|string|null} [maxHeight] -
- *
- * @property {number|string|null} [maxWidth] -
- *
- * @property {number|string|null} [minHeight] -
- *
- * @property {number|string|null} [minWidth] -
- *
- * @property {number|string|null} [rotateX] -
- *
- * @property {number|string|null} [rotateY] -
- *
- * @property {number|string|null} [rotateZ] -
- *
- * @property {number|string|null} [scale] -
- *
- * @property {number|string|null} [top] -
- *
- * @property {string|null} [transformOrigin] -
- *
- * @property {number|string|null} [translateX] -
- *
- * @property {number|string|null} [translateY] -
- *
- * @property {number|string|null} [translateZ] -
- *
- * @property {number|string|null} [width] -
- *
- * @property {number|string|null} [zIndex] -
- *
- * Extended properties -----------------------------------------------------------------------------------------------
- *
- * @property {boolean} [immediateElementUpdate] - When true any associated element is updated immediately.
- *
- * @property {number|null} [rotation] - Alias for `rotateZ`.
- */
-
-/**
- * @typedef {object} PositionGetOptions
- *
- * @property {Iterable<string>} keys - When provided only these keys are copied.
- *
- * @property {Iterable<string>} exclude - When provided these keys are excluded.
- *
- * @property {boolean} numeric - When true any `null` values are converted into defaults.
- */
-
-/**
- * @typedef {object} PositionOptions - Options set in constructor.
- *
- * @property {boolean} calculateTransform - When true always calculate transform data.
- *
- * @property {PositionInitialHelper} initialHelper - Provides a helper for setting initial position data.
- *
- * @property {boolean} ortho - Sets Position to orthographic mode using just transform / matrix3d for positioning.
- *
- * @property {boolean} transformSubscribed - Set to true when there are subscribers to the readable transform store.
- */
-
-/**
- * @typedef {PositionOptions & PositionData} PositionOptionsAll
- */
-
-/**
- * @typedef {HTMLElement | object} PositionParent
- *
- * @property {Function} [elementTarget] - Potentially returns any parent object.
- */
-
-/**
- * @typedef {object} ResizeObserverData
- *
- * @property {number|undefined} contentHeight -
- *
- * @property {number|undefined} contentWidth -
- *
- * @property {number|undefined} offsetHeight -
- *
- * @property {number|undefined} offsetWidth -
- */
-
-/**
- * @typedef {object} StorePosition - Provides individual writable stores for {@link Position}.
- *
- * @property {import('svelte/store').Readable<{width: number, height: number}>} dimension - Readable store for dimension
- *                                                                                          data.
- *
- * @property {import('svelte/store').Readable<HTMLElement>} element - Readable store for current element.
- *
- * @property {import('svelte/store').Writable<number|null>} left - Derived store for `left` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} top - Derived store for `top` updates.
- *
- * @property {import('svelte/store').Writable<number|'auto'|null>} width - Derived store for `width` updates.
- *
- * @property {import('svelte/store').Writable<number|'auto'|null>} height - Derived store for `height` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} maxHeight - Derived store for `maxHeight` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} maxWidth - Derived store for `maxWidth` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} minHeight - Derived store for `minHeight` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} minWidth - Derived store for `minWidth` updates.
- *
- * @property {import('svelte/store').Readable<number|undefined>} resizeContentHeight - Readable store for `contentHeight`.
- *
- * @property {import('svelte/store').Readable<number|undefined>} resizeContentWidth - Readable store for `contentWidth`.
- *
- * @property {import('svelte/store').Writable<ResizeObserverData>} resizeObserved - Protected store for resize observer updates.
- *
- * @property {import('svelte/store').Readable<number|undefined>} resizeOffsetHeight - Readable store for `offsetHeight`.
- *
- * @property {import('svelte/store').Readable<number|undefined>} resizeOffsetWidth - Readable store for `offsetWidth`.
- *
- * @property {import('svelte/store').Writable<number|null>} rotate - Derived store for `rotate` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} rotateX - Derived store for `rotateX` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} rotateY - Derived store for `rotateY` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} rotateZ - Derived store for `rotateZ` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} scale - Derived store for `scale` updates.
- *
- * @property {import('svelte/store').Readable<TransformData>} transform - Readable store for transform data.
- *
- * @property {import('svelte/store').Writable<string>} transformOrigin - Derived store for `transformOrigin`.
- *
- * @property {import('svelte/store').Writable<number|null>} translateX - Derived store for `translateX` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} translateY - Derived store for `translateY` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} translateZ - Derived store for `translateZ` updates.
- *
- * @property {import('svelte/store').Writable<number|null>} zIndex - Derived store for `zIndex` updates.
- */
-
-/**
- * @typedef {object} ValidationData
- *
- * @property {PositionData} position -
- *
- * @property {PositionParent} parent -
- *
- * @property {HTMLElement} el -
- *
- * @property {CSSStyleDeclaration} computed -
- *
- * @property {Transforms} transforms -
- *
- * @property {number} height -
- *
- * @property {number} width -
- *
- * @property {number|undefined} marginLeft -
- *
- * @property {number|undefined} marginTop -
- *
- * @property {number|undefined} maxHeight -
- *
- * @property {number|undefined} maxWidth -
- *
- * @property {number|undefined} minHeight -
- *
- * @property {number|undefined} minWidth -
- *
- * @property {object} rest - The rest of any data submitted to {@link Position.set}
- */

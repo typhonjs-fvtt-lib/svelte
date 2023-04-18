@@ -4,6 +4,9 @@ import * as constants            from '../constants.js';
 
 import { TransformData }         from './TransformData.js';
 
+// Explicit import for TS declaration generation.
+import { PositionData }          from '../PositionData.js'; // eslint-disable-line no-unused-vars
+
 /** @type {number[]} */
 const s_SCALE_VECTOR = [1, 1, 1];
 

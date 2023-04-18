@@ -1,4 +1,3 @@
-/// <reference types="gl-matrix/index.js" />
 export * from 'gl-matrix';
 
 /**

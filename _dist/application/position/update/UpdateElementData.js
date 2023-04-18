@@ -69,14 +69,14 @@ export class UpdateElementData
       this.subscriptions = void 0;
 
       /**
-       * @type {Writable<{width: (number|"auto"), height: (number|"auto")}>}
+       * @type {import('svelte/store').Writable<{width: (number|"auto"), height: (number|"auto")}>}
        */
       this.storeDimension = writable(this.dimensionData);
 
       // When there are subscribers set option to calculate transform updates; set to false when no subscribers.
 
       /**
-       * @type {Writable<TransformData>}
+       * @type {import('svelte/store').Writable<TransformData>}
        */
       this.storeTransform = writable(this.transformData, () =>
       {

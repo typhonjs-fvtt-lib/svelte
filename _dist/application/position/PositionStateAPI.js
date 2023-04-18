@@ -3,6 +3,9 @@ import { linear }       from 'svelte/easing';
 import { lerp }         from '@typhonjs-fvtt/svelte/math';
 import { isIterable }   from '@typhonjs-fvtt/svelte/util';
 
+// Explicit import for TS declaration generation.
+import { PositionData } from './PositionData.js';  // eslint-disable-line no-unused-vars
+
 export class PositionStateAPI
 {
    /** @type {PositionData} */
@@ -29,7 +32,9 @@ export class PositionStateAPI
    /**
     * Returns any stored save state by name.
     *
-    * @param {string}   name - Saved data set name.
+    * @param {object}   options - Options
+    *
+    * @param {string}   options.name - Saved data set name.
     *
     * @returns {PositionDataExtended} The saved data set.
     */

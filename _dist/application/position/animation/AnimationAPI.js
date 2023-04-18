@@ -14,6 +14,10 @@ import {
    animateKeys,
    setNumericDefaults }       from '../constants.js';
 
+// Explicit import for TS declaration generation.
+import { Position }           from '../Position.js';     // eslint-disable-line no-unused-vars
+import { PositionData }       from '../PositionData.js'; // eslint-disable-line no-unused-vars
+
 export class AnimationAPI
 {
    /** @type {PositionData} */
@@ -37,6 +41,11 @@ export class AnimationAPI
     */
    #cleanup;
 
+   /**
+    * @param {Position}       position -
+    *
+    * @param {PositionData}   data -
+    */
    constructor(position, data)
    {
       this.#position = position;
@@ -617,13 +626,3 @@ export class AnimationAPI
       return quickToCB;
    }
 }
-
-/**
- * @callback quickToCallback
- *
- * @param {...number|object} args - Either individual numbers corresponding to the order in which keys are specified or
- *                                  a single object with keys specified and numerical values.
- *
- * @property {({duration?: number, ease?: Function, interpolate?: Function}) => quickToCallback} options - A function
- *                                  to update options for quickTo function.
- */

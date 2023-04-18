@@ -146,6 +146,8 @@ export class SvelteApplication extends Application
     *
     * @returns {SvelteApplicationOptions} options - Application options.
     * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
+    *
+    * @internal
     */
    static get defaultOptions()
    {
@@ -212,9 +214,9 @@ export class SvelteApplication extends Application
     * to activate classic v1 tabs for a Svelte component the element target is passed as an array simulating JQuery as
     * the element is retrieved immediately and the core listeners use standard DOM queries.
     *
-    * @inheritDoc
     * @protected
     * @ignore
+    * @internal
     */
    _activateCoreListeners(html)
    {
@@ -229,6 +231,8 @@ export class SvelteApplication extends Application
     *
     * @param {boolean} [opts.force=false] - Force bring to top; will increment z-index by popOut order.
     *
+    * @ignore
+    * @internal
     */
    bringToTop({ force = false } = {})
    {
@@ -265,7 +269,9 @@ export class SvelteApplication extends Application
     * @param {boolean}  [options.force] - Force close regardless of render state.
     *
     * @returns {Promise<void>}    A Promise which resolves once the application is closed.
+    *
     * @ignore
+    * @internal
     */
    async close(options = {})
    {
@@ -277,6 +283,7 @@ export class SvelteApplication extends Application
 
       /**
        * @ignore
+       * @internal
        */
       this._state = states.CLOSING;
 
@@ -380,21 +387,33 @@ export class SvelteApplication extends Application
 
       // Clean up data
       this.#applicationShellHolder[0] = null;
+
       /**
        * @ignore
+       * @internal
        */
       this._element = null;
       this.#elementContent = null;
       this.#elementTarget = null;
+
       delete globalThis.ui.windows[this.appId];
+
       /**
        * @ignore
+       * @internal
        */
       this._minimized = false;
+
       /**
        * @ignore
+       * @internal
        */
       this._scrollPositions = null;
+
+      /**
+       * @ignore
+       * @internal
+       */
       this._state = states.CLOSED;
 
       this.#onMount = false;
@@ -413,10 +432,9 @@ export class SvelteApplication extends Application
     * pop-out of Application or provide no template and render into a document fragment which is then attached to the
     * DOM.
     *
-    * @param {JQuery} html -
-    *
-    * @inheritDoc
+    * @protected
     * @ignore
+    * @internal
     */
    _injectHTML(html)
    {
@@ -836,8 +854,9 @@ export class SvelteApplication extends Application
     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
     * application frame / title for pop-out applications.
     *
-    * @inheritDoc
+    * @protected
     * @ignore
+    * @internal
     */
    _replaceHTML(element, html)  // eslint-disable-line no-unused-vars
    {
@@ -855,9 +874,9 @@ export class SvelteApplication extends Application
     * this static ID exists then the initial render is cancelled below rather than crashing later in the render
     * cycle {@link Position.set}.
     *
-    * @inheritDoc
     * @protected
     * @ignore
+    * @internal
     */
    async _render(force = false, options = {})
    {
@@ -891,12 +910,9 @@ export class SvelteApplication extends Application
     * Render the inner application content. Only render a template if one is defined otherwise provide an empty
     * JQuery element per the core Foundry API.
     *
-    * @param {object} data         The data used to render the inner template
-    *
-    * @returns {Promise.<JQuery>}   A promise resolving to the constructed jQuery object
-    *
     * @protected
     * @ignore
+    * @internal
     */
    async _renderInner(data)
    {
@@ -910,9 +926,9 @@ export class SvelteApplication extends Application
     * Stores the initial z-index set in `_renderOuter` which is used in `_injectHTML` to set the target element
     * z-index after the Svelte component is mounted.
     *
-    * @returns {Promise<JQuery>} Outer frame / unused.
     * @protected
     * @ignore
+    * @internal
     */
    async _renderOuter()
    {
@@ -985,65 +1001,3 @@ export class SvelteApplication extends Application
       }
    }
 }
-
-/**
- * @typedef {ApplicationOptions} SvelteApplicationOptions
- *
- * @property {boolean}  [defaultCloseAnimation=true] - If false the default slide close animation is not run.
- *
- * @property {boolean}  [draggable=true] - If true then application shells are draggable.
- *
- * @property {boolean}  [focusAuto=true] - When true auto-management of app focus is enabled.
- *
- * @property {boolean}  [focusKeep=false] - When `focusAuto` and `focusKeep` is true; keeps internal focus.
- *
- * @property {object}   [focusSource] - Defines A11yHelper focus source to apply when application closes.
- *
- * @property {boolean}  [headerButtonNoClose=false] - If true then the close header button is removed.
- *
- * @property {boolean}  [headerButtonNoLabel=false] - If true then header button labels are removed.
- *
- * @property {boolean}  [headerNoTitleMinimized=false] - If true then header title is hidden when minimized.
- *
- * @property {number}   [minHeight=MIN_WINDOW_HEIGHT] - Assigned to position. Number specifying minimum window height.
- *
- * @property {number}   [minWidth=MIN_WINDOW_WIDTH] - Assigned to position. Number specifying minimum window width.
- *
- * @property {boolean}  [positionable=true] - If false then `position.set` does not take effect.
- *
- * @property {PositionInitialHelper}   [positionInitial] - A helper for initial position placement.
- *
- * @property {boolean}  [positionOrtho=true] - When true Position is optimized for orthographic use.
- *
- * @property {PositionValidatorOptions}   [positionValidator] - A validator function or data or list of validators.
- *
- * @property {object}   [sessionStorage] - An instance of TJSSessionStorage to share across SvelteApplications.
- *
- * @property {object}   [svelte] - A Svelte configuration object defining the main component.
- *
- * @property {string}   [transformOrigin='top left'] - By default, 'top / left' respects rotation when minimizing.
- */
-
-/**
- * @typedef {object} SvelteData
- *
- * @property {object}                           config -
- *
- * @property {import('svelte').SvelteComponent} component -
- *
- * @property {HTMLElement}                      element -
- *
- * @property {boolean}                          injectHTML -
- */
-
-/**
- * @typedef {object} SvelteStores
- *
- * @property {import('svelte/store').Writable.update} appOptionsUpdate - Update function for app options store.
- *
- * @property {Function} subscribe - Subscribes to local stores.
- *
- * @property {import('svelte/store').Writable.update} uiOptionsUpdate - Update function for UI options store.
- *
- * @property {Function} unsubscribe - Unsubscribes from local stores.
- */

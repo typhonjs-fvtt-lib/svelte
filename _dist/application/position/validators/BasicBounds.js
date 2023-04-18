@@ -1,3 +1,6 @@
+// Explicit import for TS declaration generation.
+import { PositionData } from '../PositionData.js'; // eslint-disable-line no-unused-vars
+
 export class BasicBounds
 {
    /**

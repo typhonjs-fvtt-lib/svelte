@@ -100,7 +100,7 @@ export class TJSDocumentDialog
    /**
     * Deletes a folder and does delete subfolders / documents.
     *
-    * @param {Folder} document - Folder to delete.
+    * @param {globalThis.Folder} document - Folder to delete.
     *
     * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
@@ -117,7 +117,7 @@ export class TJSDocumentDialog
    /**
     * Shows a modal / non-draggable dialog to export a folder to an eligible compendium pack.
     *
-    * @param {Folder} document - Folder to export.
+    * @param {globalThis.Folder} document - Folder to export.
     *
     * @param {object} [opts] - Additional options.
     *
@@ -141,16 +141,16 @@ export class TJSDocumentDialog
    }
 
    /**
-    * Removes a folder, but does not delete / remove subfolders / documents.
+    * Removes a folder, but does not delete / remove sub-folders / documents.
     *
-    * @param {Folder} document - Folder to remove.
+    * @param {globalThis.Folder} document - Folder to remove.
     *
     * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
     * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Folder|boolean|null>} The removed Folder or a falsy value; either 'false' for cancelling or
-    *          'null' if the user closed the dialog via `<Esc>` or the close header button.
+    * @returns {Promise<globalThis.Folder|boolean|null>} The removed Folder or a falsy value; either 'false' for
+    *          cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async folderRemove(document, options = {}, dialogData = {})
    {
@@ -160,14 +160,14 @@ export class TJSDocumentDialog
    /**
     * Create a RollTable from the contents of the Folder.
     *
-    * @param {Folder} document - Folder to create roll table from...
+    * @param {globalThis.Folder} document - Folder to create roll table from...
     *
     * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
     * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<RollTable|boolean|null>} The newly created RollTable or a falsy value; either 'false' for
-    *          cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    * @returns {Promise<globalThis.RollTable|boolean|null>} The newly created RollTable or a falsy value; either
+    *          'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async folderRolltable(document, options = {}, dialogData = {})
    {
@@ -177,13 +177,13 @@ export class TJSDocumentDialog
    /**
     * Updates an existing Folder by rendering a dialog window with basic details.
     *
-    * @param {Folder} document - The folder to edit.
+    * @param {globalThis.Folder} document - The folder to edit.
     *
     * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
     *
     * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Folder|null>} The modified Folder or null if the dialog is closed.
+    * @returns {Promise<globalThis.Folder|null>} The modified Folder or null if the dialog is closed.
     */
    static async folderUpdate(document, options = {}, dialogData = {})
    {

@@ -1,5 +1,5 @@
 /**
- * Provides a basic {@link TJSBasicAnimation} implementation for a Position animation for a group of Position instances.
+ * Provides a TJSBasicAnimation implementation for a Position animation for a group of Position instances.
  */
 export class AnimationGroupControl
 {
