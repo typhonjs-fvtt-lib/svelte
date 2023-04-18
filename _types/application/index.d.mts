@@ -1,3 +1,599 @@
+type quickToCallback = (...args: (number | object)[]) => any;
+type PositionInitialHelper = {
+    /**
+     * - Returns the left position given the width of the browser window.
+     */
+    getLeft: (width: number) => number;
+    /**
+     * - Returns the top position given the height of the browser window.
+     */
+    getTop: (height: number) => number;
+};
+type PositionGetOptions = {
+    /**
+     * - When provided only these keys are copied.
+     */
+    keys: Iterable<string>;
+    /**
+     * - When provided these keys are excluded.
+     */
+    exclude: Iterable<string>;
+    /**
+     * - When true any `null` values are converted into defaults.
+     */
+    numeric: boolean;
+};
+/**
+ * - Options set in constructor.
+ */
+type PositionOptions = {
+    /**
+     * - When true always calculate transform data.
+     */
+    calculateTransform: boolean;
+    /**
+     * - Provides a helper for setting initial position data.
+     */
+    initialHelper: PositionInitialHelper;
+    /**
+     * - Sets Position to orthographic mode using just transform / matrix3d for positioning.
+     */
+    ortho: boolean;
+    /**
+     * - Set to true when there are subscribers to the readable transform store.
+     */
+    transformSubscribed: boolean;
+};
+type PositionOptionsAll = PositionOptions & PositionData;
+type PositionParent = HTMLElement | object;
+type ResizeObserverData = {
+    /**
+     * -
+     */
+    contentHeight: number | undefined;
+    /**
+     * -
+     */
+    contentWidth: number | undefined;
+    /**
+     * -
+     */
+    offsetHeight: number | undefined;
+    /**
+     * -
+     */
+    offsetWidth: number | undefined;
+};
+/**
+ * - Provides individual writable stores for {@link Position }.
+ */
+type StorePosition = {
+    /**
+     * - Readable store for dimension
+     *   data.
+     */
+    dimension: import('svelte/store').Readable<{
+        width: number;
+        height: number;
+    }>;
+    /**
+     * - Readable store for current element.
+     */
+    element: import('svelte/store').Readable<HTMLElement>;
+    /**
+     * - Derived store for `left` updates.
+     */
+    left: import('svelte/store').Writable<number | null>;
+    /**
+     * - Derived store for `top` updates.
+     */
+    top: import('svelte/store').Writable<number | null>;
+    /**
+     * - Derived store for `width` updates.
+     */
+    width: import('svelte/store').Writable<number | 'auto' | null>;
+    /**
+     * - Derived store for `height` updates.
+     */
+    height: import('svelte/store').Writable<number | 'auto' | null>;
+    /**
+     * - Derived store for `maxHeight` updates.
+     */
+    maxHeight: import('svelte/store').Writable<number | null>;
+    /**
+     * - Derived store for `maxWidth` updates.
+     */
+    maxWidth: import('svelte/store').Writable<number | null>;
+    /**
+     * - Derived store for `minHeight` updates.
+     */
+    minHeight: import('svelte/store').Writable<number | null>;
+    /**
+     * - Derived store for `minWidth` updates.
+     */
+    minWidth: import('svelte/store').Writable<number | null>;
+    /**
+     * - Readable store for `contentHeight`.
+     */
+    resizeContentHeight: import('svelte/store').Readable<number | undefined>;
+    /**
+     * - Readable store for `contentWidth`.
+     */
+    resizeContentWidth: import('svelte/store').Readable<number | undefined>;
+    /**
+     * - Protected store for resize observer updates.
+     */
+    resizeObserved: import('svelte/store').Writable<ResizeObserverData>;
+    /**
+     * - Readable store for `offsetHeight`.
+     */
+    resizeOffsetHeight: import('svelte/store').Readable<number | undefined>;
+    /**
+     * - Readable store for `offsetWidth`.
+     */
+    resizeOffsetWidth: import('svelte/store').Readable<number | undefined>;
+    /**
+     * - Derived store for `rotate` updates.
+     */
+    rotate: import('svelte/store').Writable<number | null>;
+    /**
+     * - Derived store for `rotateX` updates.
+     */
+    rotateX: import('svelte/store').Writable<number | null>;
+    /**
+     * - Derived store for `rotateY` updates.
+     */
+    rotateY: import('svelte/store').Writable<number | null>;
+    /**
+     * - Derived store for `rotateZ` updates.
+     */
+    rotateZ: import('svelte/store').Writable<number | null>;
+    /**
+     * - Derived store for `scale` updates.
+     */
+    scale: import('svelte/store').Writable<number | null>;
+    /**
+     * - Readable store for transform data.
+     */
+    transform: import('svelte/store').Readable<TransformData>;
+    /**
+     * - Derived store for `transformOrigin`.
+     */
+    transformOrigin: import('svelte/store').Writable<string>;
+    /**
+     * - Derived store for `translateX` updates.
+     */
+    translateX: import('svelte/store').Writable<number | null>;
+    /**
+     * - Derived store for `translateY` updates.
+     */
+    translateY: import('svelte/store').Writable<number | null>;
+    /**
+     * - Derived store for `translateZ` updates.
+     */
+    translateZ: import('svelte/store').Writable<number | null>;
+    /**
+     * - Derived store for `zIndex` updates.
+     */
+    zIndex: import('svelte/store').Writable<number | null>;
+};
+type PositionDataExtended = {
+    /**
+     * -
+     */
+    height?: number | string | null;
+    /**
+     * -
+     */
+    left?: number | string | null;
+    /**
+     * -
+     */
+    maxHeight?: number | string | null;
+    /**
+     * -
+     */
+    maxWidth?: number | string | null;
+    /**
+     * -
+     */
+    minHeight?: number | string | null;
+    /**
+     * -
+     */
+    minWidth?: number | string | null;
+    /**
+     * -
+     */
+    rotateX?: number | string | null;
+    /**
+     * -
+     */
+    rotateY?: number | string | null;
+    /**
+     * -
+     */
+    rotateZ?: number | string | null;
+    /**
+     * -
+     */
+    scale?: number | string | null;
+    /**
+     * -
+     */
+    top?: number | string | null;
+    /**
+     * -
+     */
+    transformOrigin?: string | null;
+    /**
+     * -
+     */
+    translateX?: number | string | null;
+    /**
+     * -
+     */
+    translateY?: number | string | null;
+    /**
+     * -
+     */
+    translateZ?: number | string | null;
+    /**
+     * -
+     */
+    width?: number | string | null;
+    /**
+     * -
+     *
+     * Extended properties -----------------------------------------------------------------------------------------------
+     */
+    zIndex?: number | string | null;
+    /**
+     * - When true any associated element is updated immediately.
+     */
+    immediateElementUpdate?: boolean;
+    /**
+     * - Alias for `rotateZ`.
+     */
+    rotation?: number | null;
+};
+type ValidationData = {
+    /**
+     * -
+     */
+    position: PositionData;
+    /**
+     * -
+     */
+    parent: PositionParent;
+    /**
+     * -
+     */
+    el: HTMLElement;
+    /**
+     * -
+     */
+    computed: CSSStyleDeclaration;
+    /**
+     * -
+     */
+    transforms: Transforms;
+    /**
+     * -
+     */
+    height: number;
+    /**
+     * -
+     */
+    width: number;
+    /**
+     * -
+     */
+    marginLeft: number | undefined;
+    /**
+     * -
+     */
+    marginTop: number | undefined;
+    /**
+     * -
+     */
+    maxHeight: number | undefined;
+    /**
+     * -
+     */
+    maxWidth: number | undefined;
+    /**
+     * -
+     */
+    minHeight: number | undefined;
+    /**
+     * -
+     */
+    minWidth: number | undefined;
+    /**
+     * - The rest of any data submitted to {@link Position.set }
+     */
+    rest: object;
+};
+/**
+ * - Position validator function that takes a {@link PositionData } instance potentially
+ *                             modifying it or returning null if invalid.
+ */
+type ValidatorFn = (valData: ValidationData) => PositionData | null;
+type ValidatorData = {
+    /**
+     * - An ID associated with this validator. Can be used to remove the validator.
+     */
+    id?: any;
+    /**
+     * - Position validator function that takes a {@link PositionData } instance
+     *   potentially modifying it or returning null if invalid.
+     */
+    validator: ValidatorFn;
+    /**
+     * - A number between 0 and 1 inclusive to position this validator against others.
+     */
+    weight?: number;
+    /**
+     * - Optional subscribe function following the Svelte store / subscribe pattern.
+     */
+    subscribe?: Function;
+};
+/**
+ * Defines the
+ *          position validator options.
+ */
+type PositionValidatorOptions = ValidatorFn | ValidatorData | Iterable<ValidatorFn | ValidatorData>;
+/**
+ * - Application shell contract for Svelte components.
+ */
+type MountedAppShell = {
+    /**
+     * - The root element / exported prop.
+     */
+    elementRoot: HTMLElement;
+    /**
+     * - The content element / exported prop.
+     */
+    elementContent?: HTMLElement;
+    /**
+     * - The target element / exported prop.
+     */
+    elementTarget?: HTMLElement;
+};
+type SvelteApplicationOptions = {
+    /**
+     * - If false the default slide close animation is not run.
+     */
+    defaultCloseAnimation?: boolean;
+    /**
+     * - If true then application shells are draggable.
+     */
+    draggable?: boolean;
+    /**
+     * - When true auto-management of app focus is enabled.
+     */
+    focusAuto?: boolean;
+    /**
+     * - When `focusAuto` and `focusKeep` is true; keeps internal focus.
+     */
+    focusKeep?: boolean;
+    /**
+     * - Defines A11yHelper focus source to apply when application closes.
+     */
+    focusSource?: object;
+    /**
+     * - If true then the close header button is removed.
+     */
+    headerButtonNoClose?: boolean;
+    /**
+     * - If true then header button labels are removed.
+     */
+    headerButtonNoLabel?: boolean;
+    /**
+     * - If true then header title is hidden when minimized.
+     */
+    headerNoTitleMinimized?: boolean;
+    /**
+     * - Assigned to position. Number specifying minimum
+     * window height.
+     */
+    minHeight?: number;
+    /**
+     * - Assigned to position. Number specifying minimum
+     * window width.
+     */
+    minWidth?: number;
+    /**
+     * - If false then `position.set` does not take effect.
+     */
+    positionable?: boolean;
+    /**
+     * - A helper for initial position placement.
+     */
+    positionInitial?: PositionInitialHelper;
+    /**
+     * - When true Position is optimized for orthographic use.
+     */
+    positionOrtho?: boolean;
+    /**
+     * - A validator function or data or list of validators.
+     */
+    positionValidator?: PositionValidatorOptions;
+    /**
+     * - An instance of TJSSessionStorage to share across SvelteApplications.
+     */
+    sessionStorage?: object;
+    /**
+     * - A Svelte configuration object defining the main component.
+     */
+    svelte?: object;
+    /**
+     * - By default, 'top / left' respects rotation when minimizing.
+     */
+    transformOrigin?: string;
+};
+type SvelteData = {
+    /**
+     * -
+     */
+    config: object;
+    /**
+     * -
+     */
+    component: import('svelte').SvelteComponent;
+    /**
+     * -
+     */
+    element: HTMLElement;
+    /**
+     * -
+     */
+    injectHTML: boolean;
+};
+type SvelteStores = {
+    /**
+     * - Update function for app options store.
+     */
+    appOptionsUpdate: any;
+    /**
+     * - Subscribes to local stores.
+     */
+    subscribe: Function;
+    /**
+     * - Update function for UI options store.
+     */
+    uiOptionsUpdate: any;
+    /**
+     * - Unsubscribes from local stores.
+     */
+    unsubscribe: Function;
+};
+/**
+ * - Defines the common dialog configuration data.
+ */
+type TJSDialogOptions = {
+    /**
+     * - Provides configuration of the dialog button bar.
+     */
+    buttons?: Record<string, TJSDialogButtonData>;
+    /**
+     * - A Svelte configuration object or HTML string content.
+     */
+    content: object | string;
+    /**
+     * - The default button ID to focus initially.
+     */
+    default?: string;
+    /**
+     * - The dialog is draggable when true.
+     */
+    draggable?: boolean;
+    /**
+     * - When true auto-management of app focus is enabled.
+     */
+    focusAuto?: boolean;
+    /**
+     * - When true the first focusable element that isn't a button is focused.
+     */
+    focusFirst?: boolean;
+    /**
+     * - When `focusAuto` and `focusKeep` is true; keeps internal focus.
+     */
+    focusKeep?: boolean;
+    /**
+     * - When true focus trapping / wrapping is enabled keeping focus inside app.
+     */
+    focusTrap?: boolean;
+    /**
+     * - When true the dialog is minimizable.
+     */
+    minimizable?: boolean;
+    /**
+     * - When true a modal dialog is displayed.
+     */
+    modal?: boolean;
+    /**
+     * - Additional options for modal dialog display.
+     */
+    modalOptions?: object;
+    /**
+     * - When true and an error is raised in dialog callback functions post a UI
+     * error notification.
+     */
+    notifyError?: boolean;
+    /**
+     * - Callback invoked when dialog is closed; no button
+     * option selected. When defined as a string any matching function by name exported from content Svelte
+     * component is invoked.
+     */
+    onClose?: string | ((application: TJSDialog) => any);
+    /**
+     * - When true and a Promise has been created by {@link TJSDialog.wait } and
+     * the Promise is not in the process of being resolved or rejected on close of the dialog any `onClose`
+     * function is invoked and any result that is undefined will cause the Promise to then be rejected.
+     */
+    rejectClose?: boolean;
+    /**
+     * - When true the dialog is resizable.
+     */
+    resizable?: boolean;
+    /**
+     * - When true and resolving any Promises and there are undefined results from
+     * any button callbacks the button ID is resolved.
+     */
+    resolveId?: boolean;
+    /**
+     * - The dialog window title.
+     */
+    title?: string;
+    /**
+     * - Transition options for the dialog.
+     */
+    transition?: object;
+    /**
+     * - A specific z-index for the dialog. Pass null for the dialog to act like other
+     * applications in regard bringing to top when activated.
+     */
+    zIndex?: number | null;
+};
+/**
+ * - TJSDialog button data.
+ */
+type TJSDialogButtonData = {
+    /**
+     * - When false the dialog does not automatically close when button selected.
+     */
+    autoClose?: boolean;
+    /**
+     * - Determines if the button is accessible providing a truthy value.
+     */
+    condition?: boolean | (() => boolean);
+    /**
+     * - Button label; will be localized.
+     */
+    label?: string;
+    /**
+     * - Button icon; you should supply the direct Font Awesome class names: IE "fas fa-check".
+     */
+    icon?: string;
+    /**
+     * - Callback for button press. When defined as a
+     * string any matching function by name exported from content Svelte component is invoked.
+     */
+    onPress?: string | ((application: TJSDialog) => any);
+    /**
+     * - Inline styles to apply to the button.
+     */
+    styles?: Record<string, string>;
+};
+
+import * as svelte from 'svelte';
+import * as svelte_store from 'svelte/store';
+import * as _typhonjs_svelte_lib_store from '@typhonjs-svelte/lib/store';
+import * as _typhonjs_svelte_lib_animate from '@typhonjs-svelte/lib/animate';
+import * as _typhonjs_svelte_lib_util from '@typhonjs-svelte/lib/util';
+
 /**
  * Provides the ability the save / restore application state for positional and UI state such as minimized status.
  *
@@ -5,9 +601,9 @@
  */
 declare class ApplicationState {
     /**
-     * @param {ApplicationShellExt}   application - The application.
+     * @param {SvelteApplication}   application - The application.
      */
-    constructor(application: ApplicationShellExt);
+    constructor(application: SvelteApplication);
     /**
      * Returns current application state along with any extra data passed into method.
      *
@@ -115,7 +711,7 @@ declare class ApplicationState {
      *
      * @param {Function}          [opts.interpolate=lerp] - Interpolation function.
      *
-     * @returns {ApplicationShellExt|Promise<ApplicationShellExt>} When synchronous the application or Promise when
+     * @returns {SvelteApplication|Promise<SvelteApplication>} When synchronous the application or Promise when
      *                                                             animating resolving with application.
      */
     set(data: ApplicationStateData, { async, animateTo, duration, ease, interpolate }?: {
@@ -124,7 +720,7 @@ declare class ApplicationState {
         duration?: number;
         ease?: Function;
         interpolate?: Function;
-    }): ApplicationShellExt | Promise<ApplicationShellExt>;
+    }): SvelteApplication | Promise<SvelteApplication>;
     #private;
 }
 type ApplicationStateData = {
@@ -164,7 +760,7 @@ declare class GetSvelteData {
      *
      * @returns {MountedAppShell|null} Any mounted application shell.
      */
-    get applicationShell(): any;
+    get applicationShell(): MountedAppShell;
     /**
      * Returns the indexed Svelte component.
      *
@@ -179,14 +775,14 @@ declare class GetSvelteData {
      * @returns {Generator<Array<number|import('svelte').SvelteComponent>>} Svelte component entries iterator.
      * @yields
      */
-    componentEntries(): Generator<Array<number | any>>;
+    componentEntries(): Generator<Array<number | svelte.SvelteComponent>>;
     /**
      * Returns the Svelte component values iterator.
      *
      * @returns {Generator<import('svelte').SvelteComponent>} Svelte component values iterator.
      * @yields
      */
-    componentValues(): Generator<any>;
+    componentValues(): Generator<svelte.SvelteComponent>;
     /**
      * Returns the indexed SvelteData entry.
      *
@@ -292,9 +888,9 @@ declare class SvelteReactive {
      */
     initialize(): SvelteStores | void;
     /**
-     * @returns {TJSSessionStorage} Returns TJSSessionStorage instance.
+     * @returns {import('@typhonjs-svelte/lib/store').TJSSessionStorage} Returns TJSSessionStorage instance.
      */
-    get sessionStorage(): TJSSessionStorage;
+    get sessionStorage(): _typhonjs_svelte_lib_store.TJSSessionStorage;
     /**
      * Returns the store for app options.
      *
@@ -542,23 +1138,113 @@ declare class SvelteReactive {
     }): void;
     #private;
 }
+/**
+ * - Provides a custom readable Svelte store for Application options state.
+ */
+type StoreAppOptions = {
+    /**
+     * - Subscribe to all app options updates.
+     */
+    subscribe: svelte_store.Readable<object>;
+    /**
+     * - Derived store for `draggable` updates.
+     */
+    draggable: svelte_store.Writable<boolean>;
+    /**
+     * - Derived store for `focusAuto` updates.
+     */
+    focusAuto: svelte_store.Writable<boolean>;
+    /**
+     * - Derived store for `focusKeep` updates.
+     */
+    focusKeep: svelte_store.Writable<boolean>;
+    /**
+     * - Derived store for `focusTrap` updates.
+     */
+    focusTrap: svelte_store.Writable<boolean>;
+    /**
+     * - Derived store for `headerButtonNoClose`
+     *   updates.
+     */
+    headerButtonNoClose: svelte_store.Writable<boolean>;
+    /**
+     * - Derived store for `headerButtonNoLabel`
+     *   updates.
+     */
+    headerButtonNoLabel: svelte_store.Writable<boolean>;
+    /**
+     * - Derived store for `headerIcon` updates.
+     */
+    headerIcon: svelte_store.Writable<string>;
+    /**
+     * - Derived store for
+     *   `headerNoTitleMinimized` updates.
+     */
+    headerNoTitleMinimized: svelte_store.Writable<boolean>;
+    /**
+     * - Derived store for `minimizable` updates.
+     */
+    minimizable: svelte_store.Writable<boolean>;
+    /**
+     * - Derived store for `popOut` updates.
+     */
+    popOut: svelte_store.Writable<boolean>;
+    /**
+     * - Derived store for `positionable` updates.
+     */
+    positionable: svelte_store.Writable<boolean>;
+    /**
+     * - Derived store for `resizable` updates.
+     */
+    resizable: svelte_store.Writable<boolean>;
+    /**
+     * - Derived store for `title` updates.
+     */
+    title: svelte_store.Writable<string>;
+};
+/**
+ * - Provides a custom readable Svelte store for UI options state.
+ */
+type StoreUIOptions = {
+    /**
+     * - Subscribe to all UI options updates.
+     */
+    subscribe: any;
+    /**
+     * - Derived store for `dragging` updates.
+     */
+    dragging: svelte_store.Writable<boolean>;
+    /**
+     * - Derived store for
+     * `headerButtons` updates.
+     */
+    headerButtons: svelte_store.Readable<globalThis.ApplicationHeaderButton[]>;
+    /**
+     * - Derived store for `minimized` updates.
+     */
+    minimized: svelte_store.Readable<boolean>;
+    /**
+     * - Derived store for `resizing` updates.
+     */
+    resizing: svelte_store.Writable<boolean>;
+};
 
 /**
- * Provides a basic {@link TJSBasicAnimation} implementation for Position animation.
+ * Provides a TJSBasicAnimation implementation for Position animation.
  */
-declare class AnimationControl$1 {
+declare class AnimationControl {
     /**
      * Defines a static empty / void animation control.
      *
      * @type {AnimationControl}
      */
-    static "__#1@#voidControl": AnimationControl$1;
+    static "__#269538@#voidControl": AnimationControl;
     /**
      * Provides a static void / undefined AnimationControl that is automatically resolved.
      *
      * @returns {AnimationControl} Void AnimationControl
      */
-    static get voidControl(): AnimationControl$1;
+    static get voidControl(): AnimationControl;
     /**
      * @param {object|null} [animationData] - Animation data from {@link AnimationAPI}.
      *
@@ -593,8 +1279,114 @@ declare class AnimationControl$1 {
     #private;
 }
 
+/**
+ * Defines stored positional data.
+ */
+declare class PositionData {
+    constructor({ height, left, maxHeight, maxWidth, minHeight, minWidth, rotateX, rotateY, rotateZ, scale, translateX, translateY, translateZ, top, transformOrigin, width, zIndex }?: {
+        height?: any;
+        left?: any;
+        maxHeight?: any;
+        maxWidth?: any;
+        minHeight?: any;
+        minWidth?: any;
+        rotateX?: any;
+        rotateY?: any;
+        rotateZ?: any;
+        scale?: any;
+        translateX?: any;
+        translateY?: any;
+        translateZ?: any;
+        top?: any;
+        transformOrigin?: any;
+        width?: any;
+        zIndex?: any;
+    });
+    /**
+     * @type {number|'auto'|'inherit'|null}
+     */
+    height: number | 'auto' | 'inherit' | null;
+    /**
+     * @type {number|null}
+     */
+    left: number | null;
+    /**
+     * @type {number|null}
+     */
+    maxHeight: number | null;
+    /**
+     * @type {number|null}
+     */
+    maxWidth: number | null;
+    /**
+     * @type {number|null}
+     */
+    minHeight: number | null;
+    /**
+     * @type {number|null}
+     */
+    minWidth: number | null;
+    /**
+     * @type {number|null}
+     */
+    rotateX: number | null;
+    /**
+     * @type {number|null}
+     */
+    rotateY: number | null;
+    /**
+     * @type {number|null}
+     */
+    rotateZ: number | null;
+    /**
+     * @type {number|null}
+     */
+    scale: number | null;
+    /**
+     * @type {number|null}
+     */
+    top: number | null;
+    /**
+     * @type {string|null}
+     */
+    transformOrigin: string | null;
+    /**
+     * @type {number|null}
+     */
+    translateX: number | null;
+    /**
+     * @type {number|null}
+     */
+    translateY: number | null;
+    /**
+     * @type {number|null}
+     */
+    translateZ: number | null;
+    /**
+     * @type {number|'auto'|'inherit'|null}
+     */
+    width: number | 'auto' | 'inherit' | null;
+    /**
+     * @type {number|null}
+     */
+    zIndex: number | null;
+    /**
+     * Copies given data to this instance.
+     *
+     * @param {PositionData}   data - Copy from this instance.
+     *
+     * @returns {PositionData} This instance.
+     */
+    copy(data: PositionData): PositionData;
+}
+
 declare class AnimationAPI {
-    constructor(position: any, data: any);
+    /**
+     * @param {Position}       position -
+     *
+     * @param {PositionData}   data -
+     */
+    constructor(position: Position, data: PositionData);
     /**
      * Returns whether there are scheduled animations whether active or delayed for this Position.
      *
@@ -610,7 +1402,7 @@ declare class AnimationAPI {
      *
      * @returns {AnimationControl[]} All currently scheduled animation controls for this Position instance.
      */
-    getScheduled(): AnimationControl$1[];
+    getScheduled(): AnimationControl[];
     /**
      * Provides a tween from given position data to the current position.
      *
@@ -633,7 +1425,7 @@ declare class AnimationAPI {
         duration?: number;
         ease?: Function;
         interpolate?: Function;
-    }): AnimationControl$1;
+    }): AnimationControl;
     /**
      * Provides a tween from given position data to the current position.
      *
@@ -658,7 +1450,7 @@ declare class AnimationAPI {
         duration?: number;
         ease?: Function;
         interpolate?: Function;
-    }): AnimationControl$1;
+    }): AnimationControl;
     /**
      * Provides a tween to given position data from the current position.
      *
@@ -681,7 +1473,7 @@ declare class AnimationAPI {
         duration?: number;
         ease?: Function;
         interpolate?: Function;
-    }): AnimationControl$1;
+    }): AnimationControl;
     /**
      * Returns a function that provides an optimized way to constantly update a to-tween.
      *
@@ -701,21 +1493,24 @@ declare class AnimationAPI {
         duration?: number;
         ease?: Function;
         interpolate?: Function;
-    }): quickToCallback$1;
+    }): quickToCallback;
     #private;
 }
-type quickToCallback$1 = (...args: (number | object)[]) => any;
 
 declare class PositionStateAPI {
     constructor(position: any, data: any, transforms: any);
     /**
      * Returns any stored save state by name.
      *
-     * @param {string}   name - Saved data set name.
+     * @param {object}   options - Options
+     *
+     * @param {string}   options.name - Saved data set name.
      *
      * @returns {PositionDataExtended} The saved data set.
      */
-    get({ name }: string): PositionDataExtended;
+    get({ name }: {
+        name: string;
+    }): PositionDataExtended;
     /**
      * Returns any associated default data.
      *
@@ -823,7 +1618,7 @@ declare class PositionStateAPI {
 /**
  * Provides the output data for {@link Transforms.getData}.
  */
-declare class TransformData$1 {
+declare class TransformData {
     /**
      * @returns {DOMRect} The bounding rectangle.
      */
@@ -911,130 +1706,138 @@ declare class AdapterValidators {
     [Symbol.iterator](): Generator<ValidatorData | undefined>;
     #private;
 }
-/**
- * - Position validator function that takes a {@link PositionData } instance potentially
- *                             modifying it or returning null if invalid.
- */
-type ValidatorFn = (valData: ValidationData) => PositionData | null;
-type ValidatorData = {
-    /**
-     * - An ID associated with this validator. Can be used to remove the validator.
-     */
-    id?: any;
-    /**
-     * - Position validator function that takes a {@link PositionData } instance
-     *   potentially modifying it or returning null if invalid.
-     */
-    validator: ValidatorFn;
-    /**
-     * - A number between 0 and 1 inclusive to position this validator against others.
-     */
-    weight?: number;
-    /**
-     * - Optional subscribe function following the Svelte store / subscribe pattern.
-     */
-    subscribe?: Function;
-};
 
-/**
- * Defines stored positional data.
- */
-declare class PositionData$1 {
-    constructor({ height, left, maxHeight, maxWidth, minHeight, minWidth, rotateX, rotateY, rotateZ, scale, translateX, translateY, translateZ, top, transformOrigin, width, zIndex }?: {
-        height?: any;
-        left?: any;
-        maxHeight?: any;
-        maxWidth?: any;
-        minHeight?: any;
-        minWidth?: any;
-        rotateX?: any;
-        rotateY?: any;
-        rotateZ?: any;
-        scale?: any;
-        translateX?: any;
-        translateY?: any;
-        translateZ?: any;
-        top?: any;
-        transformOrigin?: any;
-        width?: any;
-        zIndex?: any;
+declare class BasicBounds {
+    constructor({ constrain, element, enabled, lock, width, height }?: {
+        constrain?: boolean;
+        element: any;
+        enabled?: boolean;
+        lock?: boolean;
+        width: any;
+        height: any;
+    });
+    set element(arg: HTMLElement);
+    get element(): HTMLElement;
+    set constrain(arg: boolean);
+    get constrain(): boolean;
+    set enabled(arg: boolean);
+    get enabled(): boolean;
+    set width(arg: number);
+    get width(): number;
+    set height(arg: number);
+    get height(): number;
+    setDimension(width: any, height: any): void;
+    /**
+     * Provides a validator that respects transforms in positional data constraining the position to within the target
+     * elements bounds.
+     *
+     * @param {ValidationData}   valData - The associated validation data for position updates.
+     *
+     * @returns {PositionData} Potentially adjusted position data.
+     */
+    validator(valData: ValidationData): PositionData;
+    #private;
+}
+
+declare class TransformBounds {
+    constructor({ constrain, element, enabled, lock, width, height }?: {
+        constrain?: boolean;
+        element: any;
+        enabled?: boolean;
+        lock?: boolean;
+        width: any;
+        height: any;
+    });
+    set element(arg: HTMLElement);
+    get element(): HTMLElement;
+    set constrain(arg: boolean);
+    get constrain(): boolean;
+    set enabled(arg: boolean);
+    get enabled(): boolean;
+    set width(arg: number);
+    get width(): number;
+    set height(arg: number);
+    get height(): number;
+    setDimension(width: any, height: any): void;
+    /**
+     * Provides a validator that respects transforms in positional data constraining the position to within the target
+     * elements bounds.
+     *
+     * @param {ValidationData}   valData - The associated validation data for position updates.
+     *
+     * @returns {PositionData} Potentially adjusted position data.
+     */
+    validator(valData: ValidationData): PositionData;
+    #private;
+}
+
+declare class Centered {
+    /**
+     * @param {object}      [options] - Initial options.
+     *
+     * @param {HTMLElement} [options.element] - Target element.
+     *
+     * @param {boolean}     [options.lock=false] - Lock parameters from being set.
+     *
+     * @param {number}      [options.width] - Manual width.
+     *
+     * @param {number}      [options.height] - Manual height.
+     */
+    constructor({ element, lock, width, height }?: {
+        element?: HTMLElement;
+        lock?: boolean;
+        width?: number;
+        height?: number;
     });
     /**
-     * @type {number|'auto'|'inherit'|null}
+     * @param {HTMLElement|undefined|null} element - Set target element.
      */
-    height: number | 'auto' | 'inherit' | null;
+    set element(arg: HTMLElement);
     /**
-     * @type {number|null}
+     * @returns {HTMLElement|undefined|null} Target element.
      */
-    left: number | null;
+    get element(): HTMLElement;
     /**
-     * @type {number|null}
+     * @param {number}   width - Set manual width.
      */
-    maxHeight: number | null;
+    set width(arg: number);
     /**
-     * @type {number|null}
+     * @returns {number} Get manual width.
      */
-    maxWidth: number | null;
+    get width(): number;
     /**
-     * @type {number|null}
+     * @param {number}   height - Set manual height.
      */
-    minHeight: number | null;
+    set height(arg: number);
     /**
-     * @type {number|null}
+     * @returns {number} Get manual height.
      */
-    minWidth: number | null;
+    get height(): number;
     /**
-     * @type {number|null}
-     */
-    rotateX: number | null;
-    /**
-     * @type {number|null}
-     */
-    rotateY: number | null;
-    /**
-     * @type {number|null}
-     */
-    rotateZ: number | null;
-    /**
-     * @type {number|null}
-     */
-    scale: number | null;
-    /**
-     * @type {number|null}
-     */
-    top: number | null;
-    /**
-     * @type {string|null}
-     */
-    transformOrigin: string | null;
-    /**
-     * @type {number|null}
-     */
-    translateX: number | null;
-    /**
-     * @type {number|null}
-     */
-    translateY: number | null;
-    /**
-     * @type {number|null}
-     */
-    translateZ: number | null;
-    /**
-     * @type {number|'auto'|'inherit'|null}
-     */
-    width: number | 'auto' | 'inherit' | null;
-    /**
-     * @type {number|null}
-     */
-    zIndex: number | null;
-    /**
-     * Copies given data to this instance.
+     * Set manual width & height.
      *
-     * @param {PositionData}   data - Copy from this instance.
+     * @param {number}   width - New manual width.
      *
-     * @returns {PositionData} This instance.
+     * @param {number}   height - New manual height.
      */
-    copy(data: PositionData$1): PositionData$1;
+    setDimension(width: number, height: number): void;
+    /**
+     * Get the left constraint based on any manual target values or the browser inner width.
+     *
+     * @param {number}   width - Target width.
+     *
+     * @returns {number} Calculated left constraint.
+     */
+    getLeft(width: number): number;
+    /**
+     * Get the top constraint based on any manual target values or the browser inner height.
+     *
+     * @param {number}   height - Target height.
+     *
+     * @returns {number} Calculated top constraint.
+     */
+    getTop(height: number): number;
+    #private;
 }
 
 /**
@@ -1054,7 +1857,7 @@ declare class AnimationGroupAPI {
      *
      * @returns {boolean} Is Position.
      */
-    static "__#4@#isPosition"(object: any): boolean;
+    static "__#269541@#isPosition"(object: any): boolean;
     /**
      * Cancels any animation for given Position data.
      *
@@ -1094,13 +1897,13 @@ declare class AnimationGroupAPI {
      *
      * @param {object|Function}   options -
      *
-     * @returns {TJSBasicAnimation} Basic animation control.
+     * @returns {import('@typhonjs-svelte/lib/animate').TJSBasicAnimation} Basic animation control.
      */
     static from(position: Position | {
         position: Position;
     } | Iterable<Position> | Iterable<{
         position: Position;
-    }>, fromData: object | Function, options: object | Function): TJSBasicAnimation;
+    }>, fromData: object | Function, options: object | Function): _typhonjs_svelte_lib_animate.TJSBasicAnimation;
     /**
      * Provides the `fromTo` animation tween for one or more Position instances as a group.
      *
@@ -1112,13 +1915,13 @@ declare class AnimationGroupAPI {
      *
      * @param {object|Function}   options -
      *
-     * @returns {TJSBasicAnimation} Basic animation control.
+     * @returns {import('@typhonjs-svelte/lib/animate').TJSBasicAnimation} Basic animation control.
      */
     static fromTo(position: Position | {
         position: Position;
     } | Iterable<Position> | Iterable<{
         position: Position;
-    }>, fromData: object | Function, toData: object | Function, options: object | Function): TJSBasicAnimation;
+    }>, fromData: object | Function, toData: object | Function, options: object | Function): _typhonjs_svelte_lib_animate.TJSBasicAnimation;
     /**
      * Provides the `to` animation tween for one or more Position instances as a group.
      *
@@ -1128,13 +1931,13 @@ declare class AnimationGroupAPI {
      *
      * @param {object|Function}   options -
      *
-     * @returns {TJSBasicAnimation} Basic animation control.
+     * @returns {import('@typhonjs-svelte/lib/animate').TJSBasicAnimation} Basic animation control.
      */
     static to(position: Position | {
         position: Position;
     } | Iterable<Position> | Iterable<{
         position: Position;
-    }>, toData: object | Function, options: object | Function): TJSBasicAnimation;
+    }>, toData: object | Function, options: object | Function): _typhonjs_svelte_lib_animate.TJSBasicAnimation;
     /**
      * Provides the `to` animation tween for one or more Position instances as a group.
      *
@@ -1153,194 +1956,57 @@ declare class AnimationGroupAPI {
     }>, keys: Iterable<string>, options: object | Function): quickToCallback;
 }
 
-declare class Transforms {
-    _data: {};
-    /**
-     * @returns {boolean} Whether there are active transforms in local data.
-     */
-    get isActive(): boolean;
-    /**
-     * Sets the local rotateX data if the value is a finite number otherwise removes the local data.
-     *
-     * @param {number|null|undefined}   value - A value to set.
-     */
-    set rotateX(arg: number);
-    /**
-     * @returns {number|undefined} Any local rotateX data.
-     */
-    get rotateX(): number;
-    /**
-     * Sets the local rotateY data if the value is a finite number otherwise removes the local data.
-     *
-     * @param {number|null|undefined}   value - A value to set.
-     */
-    set rotateY(arg: number);
-    /**
-     * @returns {number|undefined} Any local rotateY data.
-     */
-    get rotateY(): number;
-    /**
-     * Sets the local rotateZ data if the value is a finite number otherwise removes the local data.
-     *
-     * @param {number|null|undefined}   value - A value to set.
-     */
-    set rotateZ(arg: number);
-    /**
-     * @returns {number|undefined} Any local rotateZ data.
-     */
-    get rotateZ(): number;
-    /**
-     * Sets the local scale data if the value is a finite number otherwise removes the local data.
-     *
-     * @param {number|null|undefined}   value - A value to set.
-     */
-    set scale(arg: number);
-    /**
-     * @returns {number|undefined} Any local rotateZ scale.
-     */
-    get scale(): number;
-    /**
-     * Sets the local translateX data if the value is a finite number otherwise removes the local data.
-     *
-     * @param {number|null|undefined}   value - A value to set.
-     */
-    set translateX(arg: number);
-    /**
-     * @returns {number|undefined} Any local translateZ data.
-     */
-    get translateX(): number;
-    /**
-     * Sets the local translateY data if the value is a finite number otherwise removes the local data.
-     *
-     * @param {number|null|undefined}   value - A value to set.
-     */
-    set translateY(arg: number);
-    /**
-     * @returns {number|undefined} Any local translateZ data.
-     */
-    get translateY(): number;
-    /**
-     * Sets the local translateZ data if the value is a finite number otherwise removes the local data.
-     *
-     * @param {number|null|undefined}   value - A value to set.
-     */
-    set translateZ(arg: number);
-    /**
-     * @returns {number|undefined} Any local translateZ data.
-     */
-    get translateZ(): number;
-    /**
-     * Returns the matrix3d CSS transform for the given position / transform data.
-     *
-     * @param {object} [data] - Optional position data otherwise use local stored transform data.
-     *
-     * @returns {string} The CSS matrix3d string.
-     */
-    getCSS(data?: object): string;
-    /**
-     * Returns the matrix3d CSS transform for the given position / transform data.
-     *
-     * @param {object} [data] - Optional position data otherwise use local stored transform data.
-     *
-     * @returns {string} The CSS matrix3d string.
-     */
-    getCSSOrtho(data?: object): string;
-    /**
-     * Collects all data including a bounding rect, transform matrix, and points array of the given {@link PositionData}
-     * instance with the applied local transform data.
-     *
-     * @param {PositionData} position - The position data to process.
-     *
-     * @param {TransformData} [output] - Optional TransformData output instance.
-     *
-     * @param {object} [validationData] - Optional validation data for adjustment parameters.
-     *
-     * @returns {TransformData} The output TransformData instance.
-     */
-    getData(position: PositionData, output?: TransformData$1, validationData?: object): TransformData$1;
-    /**
-     * Creates a transform matrix based on local data applied in order it was added.
-     *
-     * If no data object is provided then the source is the local transform data. If another data object is supplied
-     * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
-     * construction of a transform matrix in advance of setting local data and is useful in collision detection.
-     *
-     * @param {object}   [data] - PositionData instance or local transform data.
-     *
-     * @param {Matrix4}  [output] - The output mat4 instance.
-     *
-     * @returns {Matrix4} Transform matrix.
-     */
-    getMat4(data?: object, output?: Matrix4): Matrix4;
-    /**
-     * Provides an orthographic enhancement to convert left / top positional data to a translate operation.
-     *
-     * This transform matrix takes into account that the remaining operations are , but adds any left / top attributes from passed in data to
-     * translate X / Y.
-     *
-     * If no data object is provided then the source is the local transform data. If another data object is supplied
-     * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
-     * construction of a transform matrix in advance of setting local data and is useful in collision detection.
-     *
-     * @param {object}   [data] - PositionData instance or local transform data.
-     *
-     * @param {Matrix4}  [output] - The output mat4 instance.
-     *
-     * @returns {Matrix4} Transform matrix.
-     */
-    getMat4Ortho(data?: object, output?: Matrix4): Matrix4;
-    /**
-     * Tests an object if it contains transform keys and the values are finite numbers.
-     *
-     * @param {object} data - An object to test for transform data.
-     *
-     * @returns {boolean} Whether the given PositionData has transforms.
-     */
-    hasTransform(data: object): boolean;
-    /**
-     * Resets internal data from the given object containing valid transform keys.
-     *
-     * @param {object}   data - An object with transform data.
-     */
-    reset(data: object): void;
-    #private;
-}
-
 /**
  * Provides a store for position following the subscriber protocol in addition to providing individual writable derived
  * stores for each independent variable.
  */
-declare class Position$1 {
+declare class Position {
+    /**
+     * @type {{browserCentered: Centered, Centered: Centered}}
+     */
+    static "__#269549@#positionInitial": {
+        browserCentered: Centered;
+        Centered: Centered;
+    };
+    /**
+     * @type {{TransformBounds: TransformBounds, BasicBounds: BasicBounds, basicWindow: BasicBounds, transformWindow: TransformBounds}}
+     */
+    static "__#269549@#positionValidators": {
+        TransformBounds: TransformBounds;
+        BasicBounds: BasicBounds;
+        basicWindow: BasicBounds;
+        transformWindow: TransformBounds;
+    };
     /**
      * @returns {AnimationGroupAPI} Public Animation API.
      */
     static get Animate(): AnimationGroupAPI;
     /**
-     * @returns {{browserCentered?: Centered, Centered?: *}} Initial position helpers.
+     * @returns {{browserCentered: Centered, Centered: Centered}} Position initial API.
      */
     static get Initial(): {
-        browserCentered?: Centered;
-        Centered?: any;
+        browserCentered: Centered;
+        Centered: Centered;
     };
     /**
      * Returns TransformData class / constructor.
      *
      * @returns {TransformData} TransformData class / constructor.
      */
-    static get TransformData(): TransformData$1;
+    static get TransformData(): TransformData;
     /**
      * Returns default validators.
      *
      * Note: `basicWindow` and `BasicBounds` will eventually be removed.
      *
-     * @returns {{basicWindow?: BasicBounds, transformWindow?: TransformBounds, TransformBounds?: *, BasicBounds?: *}}
-     *  Available validators.
+     * @returns {{TransformBounds: TransformBounds, BasicBounds: BasicBounds, basicWindow: BasicBounds, transformWindow: TransformBounds}}
+     * Available validators.
      */
     static get Validators(): {
-        basicWindow?: BasicBounds;
-        transformWindow?: TransformBounds;
-        TransformBounds?: any;
-        BasicBounds?: any;
+        TransformBounds: TransformBounds;
+        BasicBounds: BasicBounds;
+        basicWindow: BasicBounds;
+        transformWindow: TransformBounds;
     };
     /**
      * Returns a duplicate of a given position instance copying any options and validators.
@@ -1353,7 +2019,7 @@ declare class Position$1 {
      *
      * @returns {Position} A duplicate position instance.
      */
-    static duplicate(position: Position$1, options: PositionOptions): Position$1;
+    static duplicate(position: Position, options: PositionOptions): Position;
     /**
      * @param {PositionParent|PositionOptionsAll}   [parent] - A potential parent element or object w/ `elementTarget`
      *                                                      getter. May also be the PositionOptions object w/ 1 argument.
@@ -1429,7 +2095,7 @@ declare class Position$1 {
      *
      * @returns {TransformData} Transform Data.
      */
-    get transform(): TransformData$1;
+    get transform(): TransformData;
     /**
      * Returns the validators.
      *
@@ -1590,11 +2256,11 @@ declare class Position$1 {
      *
      * @returns {PositionData} Passed in object with current position data.
      */
-    get(position?: object | PositionData$1, options?: PositionGetOptions): PositionData$1;
+    get(position?: object | PositionData, options?: PositionGetOptions): PositionData;
     /**
      * @returns {PositionData} Current position data.
      */
-    toJSON(): PositionData$1;
+    toJSON(): PositionData;
     /**
      * All calculation and updates of position are implemented in {@link Position}. This allows position to be fully
      * reactive and in control of updating inline styles for the application.
@@ -1618,7 +2284,7 @@ declare class Position$1 {
      *
      * @returns {Position} This Position instance.
      */
-    set(position?: PositionDataExtended$1): Position$1;
+    set(position?: PositionDataExtended): Position;
     /**
      *
      * @param {function(PositionData): void} handler - Callback function that is invoked on update / changes. Receives
@@ -1626,334 +2292,21 @@ declare class Position$1 {
      *
      * @returns {(function(): void)} Unsubscribe function.
      */
-    subscribe(handler: (arg0: PositionData$1) => void): (() => void);
+    subscribe(handler: (arg0: PositionData) => void): (() => void);
     #private;
 }
-type PositionInitialHelper = {
-    /**
-     * - Returns the left position given the width of the browser window.
-     */
-    getLeft: (width: number) => number;
-    /**
-     * - Returns the top position given the height of the browser window.
-     */
-    getTop: (height: number) => number;
-};
-type PositionDataExtended$1 = {
-    /**
-     * -
-     */
-    height?: number | string | null;
-    /**
-     * -
-     */
-    left?: number | string | null;
-    /**
-     * -
-     */
-    maxHeight?: number | string | null;
-    /**
-     * -
-     */
-    maxWidth?: number | string | null;
-    /**
-     * -
-     */
-    minHeight?: number | string | null;
-    /**
-     * -
-     */
-    minWidth?: number | string | null;
-    /**
-     * -
-     */
-    rotateX?: number | string | null;
-    /**
-     * -
-     */
-    rotateY?: number | string | null;
-    /**
-     * -
-     */
-    rotateZ?: number | string | null;
-    /**
-     * -
-     */
-    scale?: number | string | null;
-    /**
-     * -
-     */
-    top?: number | string | null;
-    /**
-     * -
-     */
-    transformOrigin?: string | null;
-    /**
-     * -
-     */
-    translateX?: number | string | null;
-    /**
-     * -
-     */
-    translateY?: number | string | null;
-    /**
-     * -
-     */
-    translateZ?: number | string | null;
-    /**
-     * -
-     */
-    width?: number | string | null;
-    /**
-     * -
-     *
-     * Extended properties -----------------------------------------------------------------------------------------------
-     */
-    zIndex?: number | string | null;
-    /**
-     * - When true any associated element is updated immediately.
-     */
-    immediateElementUpdate?: boolean;
-    /**
-     * - Alias for `rotateZ`.
-     */
-    rotation?: number | null;
-};
-type PositionGetOptions = {
-    /**
-     * - When provided only these keys are copied.
-     */
-    keys: Iterable<string>;
-    /**
-     * - When provided these keys are excluded.
-     */
-    exclude: Iterable<string>;
-    /**
-     * - When true any `null` values are converted into defaults.
-     */
-    numeric: boolean;
-};
-/**
- * - Options set in constructor.
- */
-type PositionOptions = {
-    /**
-     * - When true always calculate transform data.
-     */
-    calculateTransform: boolean;
-    /**
-     * - Provides a helper for setting initial position data.
-     */
-    initialHelper: PositionInitialHelper;
-    /**
-     * - Sets Position to orthographic mode using just transform / matrix3d for positioning.
-     */
-    ortho: boolean;
-    /**
-     * - Set to true when there are subscribers to the readable transform store.
-     */
-    transformSubscribed: boolean;
-};
-type PositionOptionsAll = PositionOptions & PositionData$1;
-type PositionParent = HTMLElement | object;
-type ResizeObserverData = {
-    /**
-     * -
-     */
-    contentHeight: number | undefined;
-    /**
-     * -
-     */
-    contentWidth: number | undefined;
-    /**
-     * -
-     */
-    offsetHeight: number | undefined;
-    /**
-     * -
-     */
-    offsetWidth: number | undefined;
-};
-/**
- * - Provides individual writable stores for {@link Position }.
- */
-type StorePosition = {
-    /**
-     * - Readable store for dimension
-     *   data.
-     */
-    dimension: any;
-    /**
-     * - Readable store for current element.
-     */
-    element: any;
-    /**
-     * - Derived store for `left` updates.
-     */
-    left: any;
-    /**
-     * - Derived store for `top` updates.
-     */
-    top: any;
-    /**
-     * - Derived store for `width` updates.
-     */
-    width: any;
-    /**
-     * - Derived store for `height` updates.
-     */
-    height: any;
-    /**
-     * - Derived store for `maxHeight` updates.
-     */
-    maxHeight: any;
-    /**
-     * - Derived store for `maxWidth` updates.
-     */
-    maxWidth: any;
-    /**
-     * - Derived store for `minHeight` updates.
-     */
-    minHeight: any;
-    /**
-     * - Derived store for `minWidth` updates.
-     */
-    minWidth: any;
-    /**
-     * - Readable store for `contentHeight`.
-     */
-    resizeContentHeight: any;
-    /**
-     * - Readable store for `contentWidth`.
-     */
-    resizeContentWidth: any;
-    /**
-     * - Protected store for resize observer updates.
-     */
-    resizeObserved: any;
-    /**
-     * - Readable store for `offsetHeight`.
-     */
-    resizeOffsetHeight: any;
-    /**
-     * - Readable store for `offsetWidth`.
-     */
-    resizeOffsetWidth: any;
-    /**
-     * - Derived store for `rotate` updates.
-     */
-    rotate: any;
-    /**
-     * - Derived store for `rotateX` updates.
-     */
-    rotateX: any;
-    /**
-     * - Derived store for `rotateY` updates.
-     */
-    rotateY: any;
-    /**
-     * - Derived store for `rotateZ` updates.
-     */
-    rotateZ: any;
-    /**
-     * - Derived store for `scale` updates.
-     */
-    scale: any;
-    /**
-     * - Readable store for transform data.
-     */
-    transform: any;
-    /**
-     * - Derived store for `transformOrigin`.
-     */
-    transformOrigin: any;
-    /**
-     * - Derived store for `translateX` updates.
-     */
-    translateX: any;
-    /**
-     * - Derived store for `translateY` updates.
-     */
-    translateY: any;
-    /**
-     * - Derived store for `translateZ` updates.
-     */
-    translateZ: any;
-    /**
-     * - Derived store for `zIndex` updates.
-     */
-    zIndex: any;
-};
-type ValidationData$1 = {
-    /**
-     * -
-     */
-    position: PositionData$1;
-    /**
-     * -
-     */
-    parent: PositionParent;
-    /**
-     * -
-     */
-    el: HTMLElement;
-    /**
-     * -
-     */
-    computed: CSSStyleDeclaration;
-    /**
-     * -
-     */
-    transforms: Transforms;
-    /**
-     * -
-     */
-    height: number;
-    /**
-     * -
-     */
-    width: number;
-    /**
-     * -
-     */
-    marginLeft: number | undefined;
-    /**
-     * -
-     */
-    marginTop: number | undefined;
-    /**
-     * -
-     */
-    maxHeight: number | undefined;
-    /**
-     * -
-     */
-    maxWidth: number | undefined;
-    /**
-     * -
-     */
-    minHeight: number | undefined;
-    /**
-     * -
-     */
-    minWidth: number | undefined;
-    /**
-     * - The rest of any data submitted to {@link Position.set }
-     */
-    rest: object;
-};
 
 /**
  * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
  * load one or more components from `defaultOptions`.
  */
-declare class SvelteApplication$1 {
+declare class SvelteApplication {
     /**
      * @param {SvelteApplicationOptions} options - The options for the application.
      *
      * @inheritDoc
      */
-    constructor(options?: ApplicationOptions);
+    constructor(options?: SvelteApplicationOptions);
     /**
      * Returns the content element if an application shell is mounted.
      *
@@ -2065,46 +2418,9 @@ declare class SvelteApplication$1 {
      *
      * @returns {Position} The updated position object for the application containing the new values
      */
-    setPosition(position?: PositionDataExtended): Position$1;
+    setPosition(position?: PositionDataExtended): Position;
     #private;
 }
-type SvelteApplicationOptions$1 = ApplicationOptions;
-type SvelteData$1 = {
-    /**
-     * -
-     */
-    config: object;
-    /**
-     * -
-     */
-    component: any;
-    /**
-     * -
-     */
-    element: HTMLElement;
-    /**
-     * -
-     */
-    injectHTML: boolean;
-};
-type SvelteStores$1 = {
-    /**
-     * - Update function for app options store.
-     */
-    appOptionsUpdate: any;
-    /**
-     * - Subscribes to local stores.
-     */
-    subscribe: Function;
-    /**
-     * - Update function for UI options store.
-     */
-    uiOptionsUpdate: any;
-    /**
-     * - Unsubscribes from local stores.
-     */
-    unsubscribe: Function;
-};
 
 /**
  * Provides storage for all dialog options adding `get`, `merge` and `set` methods that safely access and update
@@ -2300,7 +2616,7 @@ declare class TJSDialogData {
  *
  * TODO: document all extended dialog data parameters such as transition options / modal transitions.
  */
-declare class TJSDialog$1 extends SvelteApplication$1 {
+declare class TJSDialog extends SvelteApplication {
     /**
      * A helper factory method to create simple confirmation dialog windows which consist of simple yes / no prompts.
      * If you require more flexibility, a custom TJSDialog instance is preferred. The default focused button is 'yes'.
@@ -2308,7 +2624,10 @@ declare class TJSDialog$1 extends SvelteApplication$1 {
      *
      * @template T
      *
-     * @param {TJSDialogOptions} data - Confirm dialog options.
+     * @param {TJSDialogOptions & {
+     *    onYes?: string|((application: TJSDialog) => any),
+     *    onNo?: string|((application: TJSDialog) => any)
+     * }} [data] - Confirm dialog options.
      *
      * @param {string|((application: TJSDialog) => any)} [data.onYes] - Callback function upon `yes`; may be an async
      *        function. When defined as a string any matching function by name exported from content Svelte component is
@@ -2333,13 +2652,20 @@ declare class TJSDialog$1 extends SvelteApplication$1 {
      * // Logs 'YES result', 'NO Result', or null if the user closed the dialog without making a selection.
      * console.log(result);
      */
-    static confirm<T_1>({ onYes, onNo, ...data }?: TJSDialogOptions, options?: SvelteApplicationOptions): Promise<T_1>;
+    static confirm<T_1>({ onYes, onNo, ...data }?: TJSDialogOptions & {
+        onYes?: string | ((application: TJSDialog) => any);
+        onNo?: string | ((application: TJSDialog) => any);
+    }, options?: SvelteApplicationOptions): Promise<T_1>;
     /**
      * A helper factory method to display a basic "prompt" style TJSDialog with a single button.
      *
      * @template T
      *
-     * @param {TJSDialogOptions} [data] - Prompt dialog options.
+     * @param {TJSDialogOptions & {
+     *    onOk?: string|((application: TJSDialog) => any),
+     *    label?: string,
+     *    icon?: string
+     * }} [data] - Prompt dialog options that includes any TJSDialog options along with the following optional fields:
      *
      * @param {string|((application: TJSDialog) => any)} [data.onOk] - Callback function upon `ok`; may be an async
      *        function. When defined as a string any matching function by name exported from content Svelte component is
@@ -2365,7 +2691,11 @@ declare class TJSDialog$1 extends SvelteApplication$1 {
      * // Logs 'OK' or null if the user closed the dialog without making a selection.
      * console.log(result);
      */
-    static prompt<T_2>({ onOk, label, icon, ...data }?: TJSDialogOptions, options?: SvelteApplicationOptions): Promise<T_2>;
+    static prompt<T_2>({ onOk, label, icon, ...data }?: TJSDialogOptions & {
+        onOk?: string | ((application: TJSDialog) => any);
+        label?: string;
+        icon?: string;
+    }, options?: SvelteApplicationOptions): Promise<T_2>;
     /**
      * Creates an anonymous data defined TJSDialog returning a Promise that can be awaited upon for the user to make a
      * choice.
@@ -2400,9 +2730,9 @@ declare class TJSDialog$1 extends SvelteApplication$1 {
      */
     get data(): TJSDialogData;
     /**
-     * @returns {ManagedPromise} Returns the managed promise.
+     * @returns {import('@typhonjs-svelte/lib/util').ManagedPromise} Returns the managed promise.
      */
-    get managedPromise(): ManagedPromise;
+    get managedPromise(): _typhonjs_svelte_lib_util.ManagedPromise;
     /**
      * Brings to top or renders this dialog returning a Promise that is resolved any button pressed or when the dialog
      * is closed.
@@ -2426,258 +2756,5 @@ declare class TJSDialog$1 extends SvelteApplication$1 {
     }): Promise<T>;
     #private;
 }
-/**
- * - Defines the common dialog configuration data.
- */
-type TJSDialogOptions = {
-    /**
-     * - Provides configuration of the dialog button bar.
-     */
-    buttons?: Record<string, TJSDialogButtonData$1>;
-    /**
-     * - A Svelte configuration object or HTML string content.
-     */
-    content: object | string;
-    /**
-     * - The default button ID to focus initially.
-     */
-    default?: string;
-    /**
-     * - The dialog is draggable when true.
-     */
-    draggable?: boolean;
-    /**
-     * - When true auto-management of app focus is enabled.
-     */
-    focusAuto?: boolean;
-    /**
-     * - When true the first focusable element that isn't a button is focused.
-     */
-    focusFirst?: boolean;
-    /**
-     * - When `focusAuto` and `focusKeep` is true; keeps internal focus.
-     */
-    focusKeep?: boolean;
-    /**
-     * - When true focus trapping / wrapping is enabled keeping focus inside app.
-     */
-    focusTrap?: boolean;
-    /**
-     * - When true the dialog is minimizable.
-     */
-    minimizable?: boolean;
-    /**
-     * - When true a modal dialog is displayed.
-     */
-    modal?: boolean;
-    /**
-     * - Additional options for modal dialog display.
-     */
-    modalOptions?: object;
-    /**
-     * - When true and an error is raised in dialog callback functions post a UI
-     * error notification.
-     */
-    notifyError?: boolean;
-    /**
-     * - Callback invoked when dialog is closed; no button
-     * option selected. When defined as a string any matching function by name exported from content Svelte
-     * component is invoked.
-     */
-    onClose?: string | ((application: TJSDialog$1) => any);
-    /**
-     * - When true and a Promise has been created by {@link TJSDialog.wait } and
-     * the Promise is not in the process of being resolved or rejected on close of the dialog any `onClose`
-     * function is invoked and any result that is undefined will cause the Promise to then be rejected.
-     */
-    rejectClose?: boolean;
-    /**
-     * - When true the dialog is resizable.
-     */
-    resizable?: boolean;
-    /**
-     * - When true and resolving any Promises and there are undefined results from
-     * any button callbacks the button ID is resolved.
-     */
-    resolveId?: boolean;
-    /**
-     * - The dialog window title.
-     */
-    title?: string;
-    /**
-     * - Transition options for the dialog.
-     */
-    transition?: object;
-    /**
-     * - A specific z-index for the dialog. Pass null for the dialog to act like other
-     * applications in regard bringing to top when activated.
-     */
-    zIndex?: number | null;
-};
-/**
- * - TJSDialog button data.
- */
-type TJSDialogButtonData$1 = {
-    /**
-     * - When false the dialog does not automatically close when button selected.
-     */
-    autoClose?: boolean;
-    /**
-     * - Determines if the button is accessible providing a truthy value.
-     */
-    condition?: boolean | (() => boolean);
-    /**
-     * - Button label; will be localized.
-     */
-    label?: string;
-    /**
-     * - Button icon; you should supply the direct Font Awesome class names: IE "fas fa-check".
-     */
-    icon?: string;
-    /**
-     * - Callback for button press. When defined as a
-     * string any matching function by name exported from content Svelte component is invoked.
-     */
-    onPress?: string | ((application: TJSDialog$1) => any);
-    /**
-     * - Inline styles to apply to the button.
-     */
-    styles?: Record<string, string>;
-};
 
-/**
- * - Application shell contract for Svelte components.
- */
-type MountedAppShell$1 = {
-    /**
-     * - The root element / exported prop.
-     */
-    elementRoot: HTMLElement;
-    /**
-     * - The content element / exported prop.
-     */
-    elementContent?: HTMLElement;
-    /**
-     * - The target element / exported prop.
-     */
-    elementTarget?: HTMLElement;
-};
-type ApplicationShellExt$1 = ApplicationShell;
-/**
- * - Provides a custom readable Svelte store for Application options state.
- */
-type StoreAppOptions$1 = {
-    /**
-     * - Subscribe to all app options updates.
-     */
-    subscribe: any;
-    /**
-     * - Derived store for `draggable` updates.
-     */
-    draggable: any;
-    /**
-     * - Derived store for `focusAuto` updates.
-     */
-    focusAuto: any;
-    /**
-     * - Derived store for `focusKeep` updates.
-     */
-    focusKeep: any;
-    /**
-     * - Derived store for `focusTrap` updates.
-     */
-    focusTrap: any;
-    /**
-     * - Derived store for `headerButtonNoClose`
-     *   updates.
-     */
-    headerButtonNoClose: any;
-    /**
-     * - Derived store for `headerButtonNoLabel`
-     *   updates.
-     */
-    headerButtonNoLabel: any;
-    /**
-     * - Derived store for `headerIcon` updates.
-     */
-    headerIcon: any;
-    /**
-     * - Derived store for
-     *   `headerNoTitleMinimized` updates.
-     */
-    headerNoTitleMinimized: any;
-    /**
-     * - Derived store for `minimizable` updates.
-     */
-    minimizable: any;
-    /**
-     * - Derived store for `popOut` updates.
-     */
-    popOut: any;
-    /**
-     * - Derived store for `positionable` updates.
-     */
-    positionable: any;
-    /**
-     * - Derived store for `resizable` updates.
-     */
-    resizable: any;
-    /**
-     * - Derived store for `title` updates.
-     */
-    title: any;
-};
-/**
- * - Provides a custom readable Svelte store for UI options state.
- */
-type StoreUIOptions$1 = {
-    /**
-     * - Subscribe to all UI options updates.
-     */
-    subscribe: any;
-    /**
-     * - Derived store for `dragging` updates.
-     */
-    dragging: any;
-    /**
-     * - Derived store for
-     *   `headerButtons` updates.
-     */
-    headerButtons: any;
-    /**
-     * - Derived store for `minimized` updates.
-     */
-    minimized: any;
-    /**
-     * - Derived store for `resizing` updates.
-     */
-    resizing: any;
-};
-type TransformData = {
-    /**
-     * - A transition applying to both in & out.
-     */
-    transition: Function;
-    /**
-     * - A transition applying to in.
-     */
-    inTransition: Function;
-    /**
-     * - A transition applying to out.
-     */
-    outTransition: Function;
-    /**
-     * - The options config object for in & out transitions.
-     */
-    transitionOptions: object;
-    /**
-     * - The options config object for in transitions.
-     */
-    inTransitionOptions: object;
-    /**
-     * - The options config object for out transitions.
-     */
-    outTransitionOptions: object;
-};
-
-export { ApplicationShellExt$1 as ApplicationShellExt, MountedAppShell$1 as MountedAppShell, Position$1 as Position, PositionDataExtended$1 as PositionDataExtended, PositionGetOptions, PositionInitialHelper, PositionOptions, PositionOptionsAll, PositionParent, ResizeObserverData, StoreAppOptions$1 as StoreAppOptions, StorePosition, StoreUIOptions$1 as StoreUIOptions, SvelteApplication$1 as SvelteApplication, SvelteApplicationOptions$1 as SvelteApplicationOptions, SvelteData$1 as SvelteData, SvelteStores$1 as SvelteStores, TJSDialog$1 as TJSDialog, TJSDialogButtonData$1 as TJSDialogButtonData, TJSDialogOptions, TransformData, ValidationData$1 as ValidationData };
+export { Position, SvelteApplication, TJSDialog };
