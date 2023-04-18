@@ -1,8 +1,9 @@
-import resolve             from '@rollup/plugin-node-resolve';
-import { generateTSDef }   from '@typhonjs-build-test/esm-d-ts';
-import fs                  from 'fs-extra';
-import { rollup }          from 'rollup';
-import upath               from 'upath';
+import resolve                   from '@rollup/plugin-node-resolve';
+import { generateDTS }           from '@typhonjs-build-test/esm-d-ts';
+import { jsdocRemoveNodeByTags } from '@typhonjs-build-test/esm-d-ts/transformer';
+import fs                        from 'fs-extra';
+import { rollup }                from 'rollup';
+import upath                     from 'upath';
 
 import { typhonjsRuntime } from './.rollup/local/index.js';
 
@@ -234,9 +235,10 @@ for (const config of rollupConfigs)
 
    console.log(`Generating TS Declaration: ${config.input.input}`);
 
-   await generateTSDef({
+   await generateDTS({
       main: config.input.input,
-      output: upath.changeExt(config.output.file, '.d.ts')
+      output: upath.changeExt(config.output.file, '.d.ts'),
+      bundlePackageExports: true
    });
 
    fs.writeJSONSync(`${upath.dirname(config.output.file)}/package.json`, {
@@ -291,18 +293,23 @@ fs.writeJSONSync(`./_dist/component/dialog/package.json`, {
 fs.emptyDirSync('./_dist/gsap/plugin');
 fs.copySync('./src/gsap/plugin', './_dist/gsap/plugin');
 
-// TODO: DO NOT UNCOMMENT. These definitions are hand modified after initial generation.
-// await generateTSDef({
-//    main: './_dist/application/index.js',
-//    output: './_types/application/index.d.mts'
-// });
-//
-// await generateTSDef({
-//    main: './_dist/application/dialog/index.js',
-//    output: './_types/application/dialog/index.d.mts'
-// });
-//
-// await generateTSDef({
-//    main: './_dist/application/legacy/index.js',
-//    output: './_types/application/legacy/index.d.mts'
-// });
+await generateDTS({
+   main: './_dist/application/index.js',
+   output: './_types/application/index.d.mts',
+   prependGen: ['./_dist/application/typedefs.js'],
+   transformers: [jsdocRemoveNodeByTags('internal')]
+});
+
+await generateDTS({
+   main: './_dist/application/dialog/index.js',
+   output: './_types/application/dialog/index.d.mts',
+   // prependGen: ['./_dist/application/typedefs.js'],
+   transformers: [jsdocRemoveNodeByTags('internal')]
+});
+
+await generateDTS({
+   main: './_dist/application/legacy/index.js',
+   output: './_types/application/legacy/index.d.mts',
+   // prependGen: ['./_dist/application/typedefs.js'],
+   transformers: [jsdocRemoveNodeByTags('internal')]
+});
