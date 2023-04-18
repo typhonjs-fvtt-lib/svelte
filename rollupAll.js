@@ -30,6 +30,23 @@ const replace = {
    '@typhonjs-svelte/lib/': '@typhonjs-fvtt/svelte/'
 };
 
+/**
+ * Filter out "Duplicate identifier 'DOMRect'" messages.
+ *
+ * TODO: NOTE - The filtering of 2300 is unwanted churn, but 1014 can be a valid error though currently there is no
+ * great way to describe destructuring rest parameters as a function argument with JSDoc that Typescript agrees with.
+ * See this issue:
+ *
+ * @param {import('typescript').Diagnostic} diagnostic -
+ *
+ * @param {string} message -
+ *
+ * @returns {boolean} Return true to filter message.
+ */
+const filterDiagnostic = (diagnostic, message) =>
+ (diagnostic.code === 2300 && message === `Duplicate identifier 'DOMRect'.`) ||
+  (diagnostic.code === 1014 && message === `A rest parameter must be last in a parameter list.`);
+
 // We don't care about external warning messages for `@typhonjs-svelte/lib` imports.
 const ignorePattern = /^@typhonjs-svelte\/lib/;
 
@@ -39,7 +56,7 @@ const onwarn = (warning, warn) =>
 };
 
 // Rollup plugin options for generateDTS.
-const dtsPluginOptions = { bundlePackageExports: true, onwarn, replace };
+const dtsPluginOptions = { bundlePackageExports: true, filterDiagnostic, onwarn, replace };
 
 const rollupConfigs = [
    {
@@ -268,6 +285,7 @@ await generateDTS({
    output: './_types/application/index.d.mts',
    prependGen: ['./_dist/application/typedefs.js'],
    transformers: [jsdocRemoveNodeByTags('internal')],
+   filterDiagnostic,
    onwarn,
    replace
 });
@@ -277,6 +295,7 @@ await generateDTS({
    output: './_types/application/dialog/index.d.mts',
    // prependGen: ['./_dist/application/typedefs.js'],
    transformers: [jsdocRemoveNodeByTags('internal')],
+   filterDiagnostic,
    onwarn,
    replace
 });
@@ -286,6 +305,7 @@ await generateDTS({
    output: './_types/application/legacy/index.d.mts',
    // prependGen: ['./_dist/application/typedefs.js'],
    transformers: [jsdocRemoveNodeByTags('internal')],
+   filterDiagnostic,
    onwarn,
    replace
 });
