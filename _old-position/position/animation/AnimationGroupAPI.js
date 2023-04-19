@@ -139,7 +139,7 @@ export class AnimationGroupAPI
     *
     * @param {object|Function}   options -
     *
-    * @returns {import('@typhonjs-svelte/lib/animate').TJSBasicAnimation} Basic animation control.
+    * @returns {import('../../../../../typhonjs-svelte/lib/dist/animate/index.js').TJSBasicAnimation} Basic animation control.
     */
    static from(position, fromData, options)
    {
@@ -280,7 +280,7 @@ export class AnimationGroupAPI
     *
     * @param {object|Function}   options -
     *
-    * @returns {import('@typhonjs-svelte/lib/animate').TJSBasicAnimation} Basic animation control.
+    * @returns {import('../../../../../typhonjs-svelte/lib/dist/animate/index.js').TJSBasicAnimation} Basic animation control.
     */
    static fromTo(position, fromData, toData, options)
    {
@@ -451,7 +451,7 @@ export class AnimationGroupAPI
     *
     * @param {object|Function}   options -
     *
-    * @returns {import('@typhonjs-svelte/lib/animate').TJSBasicAnimation} Basic animation control.
+    * @returns {import('../../../../../typhonjs-svelte/lib/dist/animate/index.js').TJSBasicAnimation} Basic animation control.
     */
    static to(position, toData, options)
    {

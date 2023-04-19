@@ -4,9 +4,6 @@ import { TJSAppIndex }       from './internal/index.js';
 export * from './SvelteApplication.js';
 export * from './TJSDialog.js';
 
-// TODO: temporary; Position may be relocated to a store sub-package export.
-export * from './position/Position.js';
-
 // Handle `hotReload` Foundry hook when running the Vite dev server. -------------------------------------------------
 
 if (import.meta.hot)

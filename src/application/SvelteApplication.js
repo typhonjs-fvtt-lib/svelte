@@ -1,5 +1,4 @@
-// import { Position }           from '@typhonjs-fvtt/svelte/store';
-import { Position }           from './position/Position.js';
+import { Position }           from '@typhonjs-svelte/lib/store/position';
 
 import {
    A11yHelper,
@@ -944,7 +943,7 @@ export class SvelteApplication extends Application
     * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
     * to update to using the {@link Position.validators} functionality.
     *
-    * @param {PositionDataExtended}   [position] - Position data.
+    * @param {import('@typhonjs-svelte/lib/store/position').PositionDataExtended}   [position] - Position data.
     *
     * @returns {Position} The updated position object for the application containing the new values
     */

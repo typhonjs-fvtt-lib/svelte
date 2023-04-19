@@ -1,6 +1,6 @@
 import { gsap }         from '../gsap.js';
 
-import { Position }     from '@typhonjs-fvtt/svelte/application';
+import { Position }     from '@typhonjs-svelte/lib/store/position';
 
 import {
    isIterable,
@@ -384,7 +384,7 @@ class TimelinePositionImpl
    /**
     * Gets the target from GSAP data entry.
     *
-    * @param {PositionDataExtended|PositionDataExtended[]}  positionData - PositionInfo data.
+    * @param {import('@typhonjs-svelte/lib/store/position').PositionDataExtended|import('@typhonjs-svelte/lib/store/position').PositionDataExtended[]}  positionData - PositionInfo data.
     *
     * @param {HTMLElement|HTMLElement[]}  elements - One or more HTMLElements.
     *
@@ -392,7 +392,7 @@ class TimelinePositionImpl
     *
     * @param {number}         cntr - Current GSAP data entry index.
     *
-    * @returns {PositionDataExtended|PositionDataExtended[]|HTMLElement|HTMLElement[]} The target object or HTMLElement.
+    * @returns {import('@typhonjs-svelte/lib/store/position').PositionDataExtended|import('@typhonjs-svelte/lib/store/position').PositionDataExtended[]|HTMLElement|HTMLElement[]} The target object or HTMLElement.
     */
    static getTarget(positionData, elements, entry, cntr)
    {
@@ -723,7 +723,7 @@ function s_VALIDATE_GSAPDATA_ENTRY(gsapData)
  *
  * @property {Position[]}              position -
  *
- * @property {PositionDataExtended[]}  positionData -
+ * @property {import('@typhonjs-svelte/lib/store/position').PositionDataExtended[]}  positionData -
  *
  * @property {object[]}                data - Contains the full data object when a list of object w/ position is used.
  *
