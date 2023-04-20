@@ -910,6 +910,25 @@ class ManagedPromise
 }
 
 /**
+ * Provides utility methods for checking browser capabilities.
+ *
+ * TODO: perhaps add support for various standard media query checks for level 4 & 5.
+ * @see https://kilianvalkhof.com/2021/web/detecting-media-query-support-in-css-and-javascript/
+ */
+class BrowserSupports
+{
+   /**
+    * Check for container query support.
+    *
+    * @returns {boolean} True if container queries supported.
+    */
+   static get containerQueries()
+   {
+      return 'container' in document.documentElement.style;
+   }
+}
+
+/**
  * Provides access to the Clipboard API for reading / writing text strings. This requires a secure context.
  *
  * Note: `writeText` will attempt to use the older `execCommand` if available when `navigator.clipboard` is not
@@ -2293,5 +2312,5 @@ function getUUIDFromDataTransfer(data, { actor = true, compendium = true, world 
  * @property {string[]|undefined}   [types] - Require the `data.type` to match entry in `types`.
  */
 
-export { A11yHelper, ClipboardAccess, ManagedPromise, StyleManager, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, striptags, styleParsePixels, uuidv4 };
+export { A11yHelper, BrowserSupports, ClipboardAccess, ManagedPromise, StyleManager, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, striptags, styleParsePixels, uuidv4 };
 //# sourceMappingURL=index.js.map
