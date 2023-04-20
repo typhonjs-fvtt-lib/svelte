@@ -1,7 +1,7 @@
 import * as svelteEasingFunc from 'svelte/easing';
 import { TJSVelocityTrack } from '@typhonjs-fvtt/svelte/math';
 import { isIterable, isObject, isPlainObject } from '@typhonjs-fvtt/svelte/util';
-import { Position } from '@typhonjs-fvtt/svelte/application';
+import { Position } from '@typhonjs-fvtt/svelte/store/position';
 
 let gsap = void 0;
 
@@ -555,7 +555,7 @@ class TimelinePositionImpl
    /**
     * Gets the target from GSAP data entry.
     *
-    * @param {PositionDataExtended|PositionDataExtended[]}  positionData - PositionInfo data.
+    * @param {import('@typhonjs-svelte/lib/store/position').PositionDataExtended|import('@typhonjs-svelte/lib/store/position').PositionDataExtended[]}  positionData - PositionInfo data.
     *
     * @param {HTMLElement|HTMLElement[]}  elements - One or more HTMLElements.
     *
@@ -563,7 +563,7 @@ class TimelinePositionImpl
     *
     * @param {number}         cntr - Current GSAP data entry index.
     *
-    * @returns {PositionDataExtended|PositionDataExtended[]|HTMLElement|HTMLElement[]} The target object or HTMLElement.
+    * @returns {import('@typhonjs-svelte/lib/store/position').PositionDataExtended|import('@typhonjs-svelte/lib/store/position').PositionDataExtended[]|HTMLElement|HTMLElement[]} The target object or HTMLElement.
     */
    static getTarget(positionData, elements, entry, cntr)
    {
@@ -894,7 +894,7 @@ function s_VALIDATE_GSAPDATA_ENTRY(gsapData)
  *
  * @property {Position[]}              position -
  *
- * @property {PositionDataExtended[]}  positionData -
+ * @property {import('@typhonjs-svelte/lib/store/position').PositionDataExtended[]}  positionData -
  *
  * @property {object[]}                data - Contains the full data object when a list of object w/ position is used.
  *
@@ -1308,7 +1308,7 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  *
  * @param {object}            params - Required parameters.
  *
- * @param {Position}          params.position - A position instance.
+ * @param {import('@typhonjs-svelte/lib/store/position').Position}   params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
@@ -1322,7 +1322,7 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  * @param {boolean}           [params.inertia=false] - When true inertia easing is enabled.
  *
  * @param {object}            [params.easeOptions] - Gsap `to / `quickTo` vars object.
- *
+ *u
  * @param {object}            [params.inertiaOptions] - Inertia Options.
  *
  * @param {Iterable<string>}  [params.hasTargetClassList] - When defined any event targets that has any class in this

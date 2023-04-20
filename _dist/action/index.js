@@ -686,7 +686,7 @@ function applyStyles(node, properties)
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
- * @param {Position}          position - A position instance.
+ * @param {import('@typhonjs-svelte/lib/store/position').Position}          position - A position instance.
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
@@ -719,7 +719,7 @@ function applyPosition(node, position)
  *
  * @param {object}            params - Required parameters.
  *
- * @param {Position}          params.position - A position instance.
+ * @param {import('@typhonjs-svelte/lib/store/position').Position}   params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *

@@ -3447,7 +3447,8 @@ class TJSDocument
     *
     * @param {object}   data - Document transfer data.
     *
-    * @param {ParseDataTransferOptions & TJSDocumentOptions}   [options] - Optional parameters.
+    * @param {import('@typhonjs-fvtt/svelte/util').ParseDataTransferOptions & TJSDocumentOptions}   [options] - Optional
+    *        parameters.
     *
     * @returns {Promise<boolean>} Returns true if new document set from data transfer blob.
     */
@@ -3568,7 +3569,7 @@ class TJSDocument
  * document collections reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
  *
- * @template {DocumentCollection} T
+ * @template {globalThis.DocumentCollection} T
  */
 class TJSDocumentCollection
 {

@@ -1,5 +1,6 @@
 import * as svelte_store from 'svelte/store';
 import { Writable, Readable } from 'svelte/store';
+import * as _typhonjs_fvtt_svelte_util from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides a managed Map with non-destructive reducing / filtering / sorting capabilities with subscription /
@@ -1079,7 +1080,7 @@ declare class TJSLocalStorage {
      *
      * @returns {import('svelte/store').Writable} The new store.
      */
-    static "__#122986@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#121591@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the localStorage.
      *
@@ -1132,7 +1133,7 @@ declare class TJSSessionStorage {
      *
      * @returns {import('svelte/store').Writable} The new store.
      */
-    static "__#122987@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
+    static "__#121592@#createStore"(key: string, defaultValue?: boolean): svelte_store.Writable<any>;
     /**
      * Get value from the sessionStorage.
      *
@@ -1377,11 +1378,12 @@ declare class TJSDocument {
      *
      * @param {object}   data - Document transfer data.
      *
-     * @param {ParseDataTransferOptions & TJSDocumentOptions}   [options] - Optional parameters.
+     * @param {import('@typhonjs-fvtt/svelte/util').ParseDataTransferOptions & TJSDocumentOptions}   [options] - Optional
+     *        parameters.
      *
      * @returns {Promise<boolean>} Returns true if new document set from data transfer blob.
      */
-    setFromDataTransfer(data: object, options?: ParseDataTransferOptions & TJSDocumentOptions): Promise<boolean>;
+    setFromDataTransfer(data: object, options?: _typhonjs_fvtt_svelte_util.ParseDataTransferOptions & TJSDocumentOptions): Promise<boolean>;
     /**
      * Sets the document by Foundry UUID performing a lookup and setting the document if found.
      *
@@ -1438,9 +1440,9 @@ type EmbeddedAPI = {
  * document collections reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
  *
- * @template {DocumentCollection} T
+ * @template {globalThis.DocumentCollection} T
  */
-declare class TJSDocumentCollection<T extends DocumentCollection> {
+declare class TJSDocumentCollection<T extends globalThis.DocumentCollection> {
     /**
      * @param {T|TJSDocumentCollectionOptions}   [collection] - Collection to wrap or TJSDocumentCollectionOptions.
      *

@@ -1,4 +1,6 @@
 import * as svelte_store from 'svelte/store';
+import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
+import { Position } from '@typhonjs-fvtt/svelte/store/position';
 
 declare let gsap: any;
 declare const easingFunc: {};
@@ -15,7 +17,7 @@ declare const easingList: string[];
  *
  * @param {object}            params - Required parameters.
  *
- * @param {Position}          params.position - A position instance.
+ * @param {import('@typhonjs-fvtt/svelte/store/position').Position}   params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
@@ -29,7 +31,7 @@ declare const easingList: string[];
  * @param {boolean}           [params.inertia=false] - When true inertia easing is enabled.
  *
  * @param {object}            [params.easeOptions] - Gsap `to / `quickTo` vars object.
- *
+ *u
  * @param {object}            [params.inertiaOptions] - Inertia Options.
  *
  * @param {Iterable<string>}  [params.hasTargetClassList] - When defined any event targets that has any class in this
@@ -41,7 +43,7 @@ declare const easingList: string[];
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
 declare function draggableGsap(node: HTMLElement, { position, active, button, storeDragging, ease, inertia, easeOptions, inertiaOptions, hasTargetClassList, ignoreTargetClassList }: {
-    position: Position;
+    position: _typhonjs_fvtt_svelte_store_position.Position;
     active?: boolean;
     button?: number;
     storeDragging?: svelte_store.Writable<boolean>;

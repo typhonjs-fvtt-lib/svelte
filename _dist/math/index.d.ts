@@ -1,5 +1,3 @@
-export * from 'gl-matrix';
-
 /**
  * Performs linear interpolation between a start & end value by given amount between 0 - 1 inclusive.
  *
@@ -38,7 +36,7 @@ declare function radToDeg(rad: number): number;
  * discarded each update. `velQuick` is responsive, but noisy. `velSmooth` is laggy but eventually more accurate. By
  * tracking them separately the used result can be responsive in the short term and accurate in the long term.
  *
- * TODO: This class will be moved to a final location in the @typhonjs-svelte/lib/math package.
+ * TODO: This class will be moved to a final location in the @typhonjs-fvtt/svelte/math package.
  */
 declare class TJSVelocityTrack {
     /**

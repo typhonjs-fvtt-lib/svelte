@@ -330,7 +330,7 @@ export class ApplicationState
 /**
  * @typedef {object} ApplicationStateData
  *
- * @property {PositionDataExtended}   position - Application position.
+ * @property {import('@typhonjs-svelte/lib/store/position').PositionDataExtended}   position - Application position.
  *
  * @property {object}         beforeMinimized - Any application saved position state for #beforeMinimized
  *
