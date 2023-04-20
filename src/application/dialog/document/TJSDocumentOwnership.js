@@ -68,8 +68,8 @@ export class TJSDocumentOwnership extends TJSDialog
     *
     * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Document|null>} The modified document or 'null' if the user closed the dialog via `<Esc>` or the
-    *                                   close header button.
+    * @returns {Promise<foundry.abstract.Document|null>} The modified document or 'null' if the user closed the dialog
+    *          via `<Esc>` or the close header button.
     */
    static async show(document, options = {}, dialogData = {})
    {

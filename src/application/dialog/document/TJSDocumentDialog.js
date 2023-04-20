@@ -23,8 +23,8 @@ export class TJSDocumentDialog
     *
     * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Document|null>} The modified document or 'null' if the user closed the dialog via `<Esc>` or the
-    *          close header button.
+    * @returns {Promise<foundry.abstract.Document|null>} The modified document or 'null' if the user closed the
+    *          dialog via `<Esc>` or the close header button.
     */
    static async configureOwnership(document, options = {}, dialogData = {})
    {
@@ -51,8 +51,8 @@ export class TJSDocumentDialog
     *
     * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Document|null>} The newly created document or a falsy value; either 'false' for cancelling
-    *          or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    * @returns {Promise<foundry.abstract.Document|null>} The newly created document or a falsy value; either 'false'
+    *          for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async documentCreate(documentCls, data = {},
     { parent = null, pack = null, renderSheet = true, ...options } = {}, dialogData = {})
@@ -73,8 +73,8 @@ export class TJSDocumentDialog
     *
     * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Document|boolean|null>} The document if deleted or a falsy value; either 'false' for cancelling
-    *          or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    * @returns {Promise<foundry.abstract.Document|boolean|null>} The document if deleted or a falsy value; either
+    *          'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async documentDelete(document, { context = {}, ...options } = {}, dialogData = {})
    {
@@ -131,9 +131,9 @@ export class TJSDocumentDialog
     *
     * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<CompendiumCollection|boolean|null>} The compendium collection the folder is exported to or a
-    *          falsy value; either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the
-    *          close header button.
+    * @returns {Promise<globalThis.CompendiumCollection|boolean|null>} The compendium collection the folder is exported
+    *          to or a falsy value; either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>`
+    *          or the close header button.
     */
    static async folderExport(document, { pack, merge, keepId, ...options } = {}, dialogData = {})
    {
@@ -199,8 +199,8 @@ export class TJSDocumentDialog
     *
     * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Document|boolean|null>} The document after import completes or a falsy value; either 'false' for
-    *          cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    * @returns {Promise<foundry.abstract.Document|boolean|null>} The document after import completes or a falsy value;
+    *          either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async importFromJSON(document, options = {}, dialogData = {})
    {
