@@ -131,15 +131,15 @@ declare namespace resizeObserver {
 }
 
 /**
- * Provides an action to apply a Position instance to a HTMLElement and invoke `position.parent`
+ * Provides an action to apply a TJSPosition instance to a HTMLElement and invoke `position.parent`
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
- * @param {import('@typhonjs-fvtt/svelte/store/position').Position}          position - A position instance.
+ * @param {import('@typhonjs-fvtt/svelte/store/position').TJSPosition}          position - A position instance.
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-declare function applyPosition(node: HTMLElement, position: _typhonjs_fvtt_svelte_store_position.Position): {
+declare function applyPosition(node: HTMLElement, position: _typhonjs_fvtt_svelte_store_position.TJSPosition): {
     update: Function;
     destroy: Function;
 };
@@ -152,7 +152,7 @@ declare function applyPosition(node: HTMLElement, position: _typhonjs_fvtt_svelt
  *
  * @param {object}            params - Required parameters.
  *
- * @param {import('@typhonjs-fvtt/svelte/store/position').Position}   params.position - A position instance.
+ * @param {import('@typhonjs-fvtt/svelte/store/position').TJSPosition}   params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
@@ -174,7 +174,7 @@ declare function applyPosition(node: HTMLElement, position: _typhonjs_fvtt_svelt
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
 declare function draggable(node: HTMLElement, { position, active, button, storeDragging, ease, easeOptions, hasTargetClassList, ignoreTargetClassList }: {
-    position: _typhonjs_fvtt_svelte_store_position.Position;
+    position: _typhonjs_fvtt_svelte_store_position.TJSPosition;
     active?: boolean;
     button?: number;
     storeDragging?: svelte_store.Writable<boolean>;

@@ -5,7 +5,7 @@ import { mat4, vec3, degToRad, lerp } from '@typhonjs-fvtt/svelte/math';
 import { writable } from 'svelte/store';
 
 /**
- * Provides a TJSBasicAnimation implementation for Position animation.
+ * Provides a TJSBasicAnimation implementation for TJSPosition animation.
  */
 class AnimationControl
 {
@@ -94,7 +94,7 @@ class AnimationControl
 }
 
 /**
- * Provides animation management and scheduling allowing all Position instances to utilize one micro-task.
+ * Provides animation management and scheduling allowing all TJSPosition instances to utilize one micro-task.
  */
 class AnimationManager
 {
@@ -218,9 +218,9 @@ class AnimationManager
    }
 
    /**
-    * Cancels all animations for given Position instance.
+    * Cancels all animations for given TJSPosition instance.
     *
-    * @param {Position} position - Position instance.
+    * @param {TJSPosition} position - TJSPosition instance.
     */
    static cancel(position)
    {
@@ -271,11 +271,11 @@ class AnimationManager
    }
 
    /**
-    * Gets all {@link AnimationControl} instances for a given Position instance.
+    * Gets all {@link AnimationControl} instances for a given TJSPosition instance.
     *
-    * @param {Position} position - Position instance.
+    * @param {TJSPosition} position - TJSPosition instance.
     *
-    * @returns {AnimationControl[]} All scheduled AnimationControl instances for the given Position instance.
+    * @returns {AnimationControl[]} All scheduled AnimationControl instances for the given TJSPosition instance.
     */
    static getScheduled(position)
    {
@@ -307,7 +307,7 @@ class AnimationManager
 AnimationManager.animate();
 
 /**
- * Stores the PositionData properties that can be animated.
+ * Stores the TJSPositionData properties that can be animated.
  *
  * @type {Set<string>}
  */
@@ -321,7 +321,7 @@ const animateKeys = new Set([
 ]);
 
 /**
- * Defines the keys of PositionData that are transform keys.
+ * Defines the keys of TJSPositionData that are transform keys.
  *
  * @type {string[]}
  */
@@ -337,7 +337,7 @@ Object.freeze(transformKeys);
 const relativeRegex = /^([-+*])=(-?[\d]*\.?[\d]+)$/;
 
 /**
- * Provides numeric defaults for all parameters. This is used by {@link Position.get} to optionally provide
+ * Provides numeric defaults for all parameters. This is used by {@link TJSPosition.get} to optionally provide
  * numeric defaults.
  *
  * @type {{rotation: number, scale: number, minWidth: null, minHeight: null, translateZ: number, top: number, left: number, maxHeight: null, translateY: number, translateX: number, width: number, transformOrigin: null, rotateX: number, rotateY: number, height: number, maxWidth: null, zIndex: null, rotateZ: number}}
@@ -369,9 +369,9 @@ const numericDefaults = {
 Object.freeze(numericDefaults);
 
 /**
- * Sets numeric defaults for a {@link PositionData} like object.
+ * Sets numeric defaults for a {@link TJSPositionData} like object.
  *
- * @param {object}   data - A PositionData like object.
+ * @param {object}   data - A TJSPositionData like object.
  */
 function setNumericDefaults(data)
 {
@@ -389,7 +389,7 @@ function setNumericDefaults(data)
 }
 
 /**
- * Defines bitwise keys for transforms used in {@link Transforms.getMat4}.
+ * Defines bitwise keys for transforms used in {@link TJSTransforms.getMat4}.
  *
  * @type {object}
  */
@@ -425,9 +425,9 @@ Object.freeze(transformOrigins);
 /**
  * Converts any relative string values for animatable keys to actual updates performed against current data.
  *
- * @param {PositionDataExtended}    positionData - position data.
+ * @param {TJSPositionDataExtended}    positionData - position data.
  *
- * @param {Position|PositionData}   position - The source position instance.
+ * @param {TJSPosition|TJSPositionData}   position - The source position instance.
  */
 function convertRelative(positionData, position)
 {
@@ -474,7 +474,7 @@ function convertRelative(positionData, position)
 /**
  * Defines stored positional data.
  */
-class PositionData
+class TJSPositionData
 {
    constructor({ height = null, left = null, maxHeight = null, maxWidth = null, minHeight = null, minWidth = null,
     rotateX = null, rotateY = null, rotateZ = null, scale = null, translateX = null, translateY = null,
@@ -571,9 +571,9 @@ class PositionData
    /**
     * Copies given data to this instance.
     *
-    * @param {PositionData}   data - Copy from this instance.
+    * @param {TJSPositionData}   data - Copy from this instance.
     *
-    * @returns {PositionData} This instance.
+    * @returns {TJSPositionData} This instance.
     */
    copy(data)
    {
@@ -601,10 +601,10 @@ class PositionData
 
 class AnimationAPI
 {
-   /** @type {PositionData} */
+   /** @type {TJSPositionData} */
    #data;
 
-   /** @type {Position} */
+   /** @type {TJSPosition} */
    #position;
 
    /**
@@ -623,9 +623,9 @@ class AnimationAPI
    #cleanup;
 
    /**
-    * @param {Position}       position -
+    * @param {TJSPosition}       position -
     *
-    * @param {PositionData}   data -
+    * @param {TJSPositionData}   data -
     */
    constructor(position, data)
    {
@@ -636,7 +636,7 @@ class AnimationAPI
    }
 
    /**
-    * Returns whether there are scheduled animations whether active or delayed for this Position.
+    * Returns whether there are scheduled animations whether active or delayed for this TJSPosition.
     *
     * @returns {boolean} Are there active animation instances.
     */
@@ -731,7 +731,7 @@ class AnimationAPI
    }
 
    /**
-    * Cancels all animation instances for this Position instance.
+    * Cancels all animation instances for this TJSPosition instance.
     */
    cancel()
    {
@@ -754,9 +754,9 @@ class AnimationAPI
    }
 
    /**
-    * Returns all currently scheduled AnimationControl instances for this Position instance.
+    * Returns all currently scheduled AnimationControl instances for this TJSPosition instance.
     *
-    * @returns {AnimationControl[]} All currently scheduled animation controls for this Position instance.
+    * @returns {AnimationControl[]} All currently scheduled animation controls for this TJSPosition instance.
     */
    getScheduled()
    {
@@ -766,7 +766,7 @@ class AnimationAPI
    /**
     * Provides a tween from given position data to the current position.
     *
-    * @param {PositionDataExtended} fromData - The starting position.
+    * @param {TJSPositionDataExtended} fromData - The starting position.
     *
     * @param {object}         [opts] - Optional parameters.
     *
@@ -843,9 +843,9 @@ class AnimationAPI
    /**
     * Provides a tween from given position data to the current position.
     *
-    * @param {PositionDataExtended} fromData - The starting position.
+    * @param {TJSPositionDataExtended} fromData - The starting position.
     *
-    * @param {PositionDataExtended} toData - The ending position.
+    * @param {TJSPositionDataExtended} toData - The ending position.
     *
     * @param {object}         [opts] - Optional parameters.
     *
@@ -934,7 +934,7 @@ class AnimationAPI
    /**
     * Provides a tween to given position data from the current position.
     *
-    * @param {PositionDataExtended} toData - The destination position.
+    * @param {TJSPositionDataExtended} toData - The destination position.
     *
     * @param {object}         [opts] - Optional parameters.
     *
@@ -1209,7 +1209,7 @@ class AnimationAPI
 }
 
 /**
- * Provides a TJSBasicAnimation implementation for a Position animation for a group of Position instances.
+ * Provides a TJSBasicAnimation implementation for a TJSPosition animation for a group of TJSPosition instances.
  */
 class AnimationGroupControl
 {
@@ -1324,10 +1324,10 @@ class AnimationGroupControl
 }
 
 /**
- * Provides a public API for grouping multiple {@link Position} animations together with the AnimationManager.
+ * Provides a public API for grouping multiple {@link TJSPosition} animations together with the AnimationManager.
  *
- * Note: To remove cyclic dependencies as this class provides the Position static / group Animation API `instanceof`
- * checks are not done against Position. Instead, a check for the animate property being an instanceof
+ * Note: To remove cyclic dependencies as this class provides the TJSPosition static / group Animation API `instanceof`
+ * checks are not done against TJSPosition. Instead, a check for the animate property being an instanceof
  * {@link AnimationAPI} is performed in {@link AnimationGroupAPI.#isPosition}.
  *
  * @see AnimationAPI
@@ -1335,11 +1335,11 @@ class AnimationGroupControl
 class AnimationGroupAPI
 {
    /**
-    * Checks of the given object is a Position instance by checking for AnimationAPI.
+    * Checks of the given object is a TJSPosition instance by checking for AnimationAPI.
     *
     * @param {*}  object - Any data.
     *
-    * @returns {boolean} Is Position.
+    * @returns {boolean} Is TJSPosition.
     */
    static #isPosition(object)
    {
@@ -1347,9 +1347,9 @@ class AnimationGroupAPI
    }
 
    /**
-    * Cancels any animation for given Position data.
+    * Cancels any animation for given TJSPosition data.
     *
-    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+    * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
     */
    static cancel(position)
    {
@@ -1387,16 +1387,16 @@ class AnimationGroupAPI
    }
 
    /**
-    * Cancels all Position animation.
+    * Cancels all TJSPosition animation.
     */
    static cancelAll() { AnimationManager.cancelAll(); }
 
    /**
     * Gets all animation controls for the given position data.
     *
-    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+    * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
     *
-    * @returns {{position: Position, data: object|void, controls: AnimationControl[]}[]} Results array.
+    * @returns {{position: TJSPosition, data: object|void, controls: AnimationControl[]}[]} Results array.
     */
    static getScheduled(position)
    {
@@ -1444,9 +1444,9 @@ class AnimationGroupAPI
    }
 
    /**
-    * Provides the `from` animation tween for one or more Position instances as a group.
+    * Provides the `from` animation tween for one or more TJSPosition instances as a group.
     *
-    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+    * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
     *
     * @param {object|Function}   fromData -
     *
@@ -1583,9 +1583,9 @@ class AnimationGroupAPI
    }
 
    /**
-    * Provides the `fromTo` animation tween for one or more Position instances as a group.
+    * Provides the `fromTo` animation tween for one or more TJSPosition instances as a group.
     *
-    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+    * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
     *
     * @param {object|Function}   fromData -
     *
@@ -1756,9 +1756,9 @@ class AnimationGroupAPI
    }
 
    /**
-    * Provides the `to` animation tween for one or more Position instances as a group.
+    * Provides the `to` animation tween for one or more TJSPosition instances as a group.
     *
-    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+    * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
     *
     * @param {object|Function}   toData -
     *
@@ -1895,9 +1895,9 @@ class AnimationGroupAPI
    }
 
    /**
-    * Provides the `to` animation tween for one or more Position instances as a group.
+    * Provides the `to` animation tween for one or more TJSPosition instances as a group.
     *
-    * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+    * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
     *
     * @param {Iterable<string>}  keys -
     *
@@ -2412,18 +2412,18 @@ class PositionChangeSet
 
 class PositionStateAPI
 {
-   /** @type {PositionData} */
+   /** @type {TJSPositionData} */
    #data;
 
    /**
-    * @type {Map<string, PositionDataExtended>}
+    * @type {Map<string, TJSPositionDataExtended>}
     */
    #dataSaved = new Map();
 
-   /** @type {Position} */
+   /** @type {TJSPosition} */
    #position;
 
-   /** @type {Transforms} */
+   /** @type {TJSTransforms} */
    #transforms;
 
    constructor(position, data, transforms)
@@ -2440,7 +2440,7 @@ class PositionStateAPI
     *
     * @param {string}   options.name - Saved data set name.
     *
-    * @returns {PositionDataExtended} The saved data set.
+    * @returns {TJSPositionDataExtended} The saved data set.
     */
    get({ name })
    {
@@ -2452,7 +2452,7 @@ class PositionStateAPI
    /**
     * Returns any associated default data.
     *
-    * @returns {PositionDataExtended} Associated default data.
+    * @returns {TJSPositionDataExtended} Associated default data.
     */
    getDefault()
    {
@@ -2466,7 +2466,7 @@ class PositionStateAPI
     *
     * @param {string}   options.name - Name to remove and retrieve.
     *
-    * @returns {PositionDataExtended} Saved position data.
+    * @returns {TJSPositionDataExtended} Saved position data.
     */
    remove({ name })
    {
@@ -2496,7 +2496,7 @@ class PositionStateAPI
       // Quit early if there is no saved default data.
       if (typeof defaultData !== 'object') { return false; }
 
-      // Cancel all animations for Position if there are currently any scheduled.
+      // Cancel all animations for TJSPosition if there are currently any scheduled.
       if (this.#position.animate.isScheduled)
       {
          this.#position.animate.cancel();
@@ -2550,7 +2550,7 @@ class PositionStateAPI
     *
     * @param {Function}          [params.interpolate=lerp] - Interpolation function.
     *
-    * @returns {PositionDataExtended|Promise<PositionDataExtended>} Saved position data.
+    * @returns {TJSPositionDataExtended|Promise<TJSPositionDataExtended>} Saved position data.
     */
    restore({ name, remove = false, properties, silent = false, async = false, animateTo = false, duration = 0.1,
     ease = linear, interpolate = lerp })
@@ -2614,7 +2614,7 @@ class PositionStateAPI
     *
     * @param {...*}     [opts.extra] - Extra data to add to saved data.
     *
-    * @returns {PositionData} Current position data
+    * @returns {TJSPositionData} Current position data
     */
    save({ name, ...extra })
    {
@@ -2634,7 +2634,7 @@ class PositionStateAPI
     *
     * @param {string}   opts.name - name to index this saved data.
     *
-    * @param {...*}     [opts.data] - Position data to set.
+    * @param {...*}     [opts.data] - TJSPosition data to set.
     */
    set({ name, ...data })
    {
@@ -2771,7 +2771,7 @@ class StyleCache
       this.resizeObserved.offsetHeight = void 0;
       this.resizeObserved.offsetWidth = void 0;
 
-      // Reset the tracked element this Position instance is modifying.
+      // Reset the tracked element this TJSPosition instance is modifying.
       this.stores.element.set(void 0);
    }
 
@@ -2800,15 +2800,15 @@ class StyleCache
 
       this.hasWillChange = willChange !== '' && willChange !== 'auto';
 
-      // Update the tracked element this Position instance is modifying.
+      // Update the tracked element this TJSPosition instance is modifying.
       this.stores.element.set(el);
    }
 }
 
 /**
- * Provides the output data for {@link Transforms.getData}.
+ * Provides the output data for {@link TJSTransforms.getData}.
  */
-class TransformData
+class TJSTransformData
 {
    constructor()
    {
@@ -2883,9 +2883,9 @@ class TransformData
  * runs before a higher weighted validator. If no weight is specified the default of '1' is assigned and it is appended
  * to the end of the validators list.
  *
- * This class forms the public API which is accessible from the `.validators` getter in the main Position instance.
+ * This class forms the public API which is accessible from the `.validators` getter in the main TJSPosition instance.
  * ```
- * const position = new Position(<PositionData>);
+ * const position = new TJSPosition(<TJSPositionData>);
  * position.validators.add(...);
  * position.validators.clear();
  * position.validators.length;
@@ -3340,7 +3340,7 @@ class BasicBounds
     *
     * @param {ValidationData}   valData - The associated validation data for position updates.
     *
-    * @returns {PositionData} Potentially adjusted position data.
+    * @returns {TJSPositionData} Potentially adjusted position data.
     */
    validator(valData)
    {
@@ -3383,7 +3383,7 @@ class BasicBounds
    }
 }
 
-const s_TRANSFORM_DATA = new TransformData();
+const s_TRANSFORM_DATA = new TJSTransformData();
 
 class TransformBounds
 {
@@ -3537,7 +3537,7 @@ class TransformBounds
     *
     * @param {ValidationData}   valData - The associated validation data for position updates.
     *
-    * @returns {PositionData} Potentially adjusted position data.
+    * @returns {TJSPositionData} Potentially adjusted position data.
     */
    validator(valData)
    {
@@ -3617,7 +3617,7 @@ const s_MAT4_TEMP = mat4.create();
 /** @type {Vector3} */
 const s_VEC3_TEMP = vec3.create();
 
-class Transforms
+class TJSTransforms
 {
    /**
     * Stores the transform keys in the order added.
@@ -3875,18 +3875,18 @@ class Transforms
    }
 
    /**
-    * Collects all data including a bounding rect, transform matrix, and points array of the given {@link PositionData}
+    * Collects all data including a bounding rect, transform matrix, and points array of the given {@link TJSPositionData}
     * instance with the applied local transform data.
     *
-    * @param {PositionData} position - The position data to process.
+    * @param {TJSPositionData} position - The position data to process.
     *
-    * @param {TransformData} [output] - Optional TransformData output instance.
+    * @param {TJSTransformData} [output] - Optional TJSTransformData output instance.
     *
     * @param {object} [validationData] - Optional validation data for adjustment parameters.
     *
-    * @returns {TransformData} The output TransformData instance.
+    * @returns {TJSTransformData} The output TJSTransformData instance.
     */
-   getData(position, output = new TransformData(), validationData = {})
+   getData(position, output = new TJSTransformData(), validationData = {})
    {
       const valWidth = validationData.width ?? 0;
       const valHeight = validationData.height ?? 0;
@@ -3998,7 +3998,7 @@ class Transforms
     * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
     * construction of a transform matrix in advance of setting local data and is useful in collision detection.
     *
-    * @param {object}   [data] - PositionData instance or local transform data.
+    * @param {object}   [data] - TJSPositionData instance or local transform data.
     *
     * @param {Matrix4}  [output] - The output mat4 instance.
     *
@@ -4133,7 +4133,7 @@ class Transforms
     * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
     * construction of a transform matrix in advance of setting local data and is useful in collision detection.
     *
-    * @param {object}   [data] - PositionData instance or local transform data.
+    * @param {object}   [data] - TJSPositionData instance or local transform data.
     *
     * @param {Matrix4}  [output] - The output mat4 instance.
     *
@@ -4227,7 +4227,7 @@ class Transforms
     *
     * @param {object} data - An object to test for transform data.
     *
-    * @returns {boolean} Whether the given PositionData has transforms.
+    * @returns {boolean} Whether the given TJSPositionData has transforms.
     */
    hasTransform(data)
    {
@@ -4272,13 +4272,13 @@ class Transforms
  * translation.
  *
  * This method is used internally, but may be useful if you need the origin translation matrices to transform
- * bespoke points based on any `transformOrigin` set in {@link PositionData}.
+ * bespoke points based on any `transformOrigin` set in {@link TJSPositionData}.
  *
- * @param {string}   transformOrigin - The transform origin attribute from PositionData.
+ * @param {string}   transformOrigin - The transform origin attribute from TJSPositionData.
  *
- * @param {number}   width - The PositionData width or validation data width when 'auto'.
+ * @param {number}   width - The TJSPositionData width or validation data width when 'auto'.
  *
- * @param {number}   height - The PositionData height or validation data height when 'auto'.
+ * @param {number}   height - The TJSPositionData height or validation data height when 'auto'.
  *
  * @param {Matrix4[]}   output - Output Mat4 array.
  *
@@ -4380,18 +4380,18 @@ class UpdateElementData
    constructor()
    {
       /**
-       * Stores the private data from Position.
+       * Stores the private data from TJSPosition.
        *
-       * @type {PositionData}
+       * @type {TJSPositionData}
        */
       this.data = void 0;
 
       /**
        * Provides a copy of local data sent to subscribers.
        *
-       * @type {PositionData}
+       * @type {TJSPositionData}
        */
-      this.dataSubscribers = new PositionData();
+      this.dataSubscribers = new TJSPositionData();
 
       /**
        * Stores the current dimension data used for the readable `dimension` store.
@@ -4406,12 +4406,12 @@ class UpdateElementData
       this.changeSet = void 0;
 
       /**
-       * @type {PositionOptions}
+       * @type {TJSPositionOptions}
        */
       this.options = void 0;
 
       /**
-       * Stores if this Position / update data is queued for update.
+       * Stores if this TJSPosition / update data is queued for update.
        *
        * @type {boolean}
        */
@@ -4423,7 +4423,7 @@ class UpdateElementData
       this.styleCache = void 0;
 
       /**
-       * @type {Transforms}
+       * @type {TJSTransforms}
        */
       this.transforms = void 0;
 
@@ -4431,12 +4431,12 @@ class UpdateElementData
        * Stores the current transform data used for the readable `transform` store. It is only active when there are
        * subscribers to the store or calculateTransform options is true.
        *
-       * @type {TransformData}
+       * @type {TJSTransformData}
        */
-      this.transformData = new TransformData();
+      this.transformData = new TJSTransformData();
 
       /**
-       * @type {(function(PositionData): void)[]}
+       * @type {(function(TJSPositionData): void)[]}
        */
       this.subscriptions = void 0;
 
@@ -4448,7 +4448,7 @@ class UpdateElementData
       // When there are subscribers set option to calculate transform updates; set to false when no subscribers.
 
       /**
-       * @type {import('svelte/store').Writable<TransformData>}
+       * @type {import('svelte/store').Writable<TJSTransformData>}
        */
       this.storeTransform = writable(this.transformData, () =>
       {
@@ -4493,7 +4493,7 @@ async function nextAnimationFrame(cntr = 1)
 }
 
 /**
- * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link Position.elementUpdated} to await
+ * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link TJSPosition.elementUpdated} to await
  * on the returned promise that is resolved with the current render time via `nextAnimationFrame` /
  * `requestAnimationFrame`. This allows the underlying data model to be updated immediately while updates to the
  * element are in sync with the browser and potentially in the future be further throttled.
@@ -4659,7 +4659,7 @@ class UpdateElementManager
 }
 
 /**
- * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link Position.elementUpdated} to await
+ * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link TJSPosition.elementUpdated} to await
  * on the returned promise that is resolved with the current render time via `nextAnimationFrame` /
  * `requestAnimationFrame`. This allows the underlying data model to be updated immediately while updates to the
  * element are in sync with the browser and potentially in the future be further throttled.
@@ -4712,7 +4712,7 @@ function s_UPDATE_ELEMENT(el, updateData)
 }
 
 /**
- * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link Position.elementUpdated} to await
+ * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link TJSPosition.elementUpdated} to await
  * on the returned promise that is resolved with the current render time via `nextAnimationFrame` /
  * `requestAnimationFrame`. This allows the underlying data model to be updated immediately while updates to the
  * element are in sync with the browser and potentially in the future be further throttled.
@@ -4791,7 +4791,7 @@ const s_VALIDATION_DATA$1 = {
  * Provides a store for position following the subscriber protocol in addition to providing individual writable derived
  * stores for each independent variable.
  */
-class Position
+class TJSPosition
 {
    /**
     * @type {{browserCentered: Centered, Centered: Centered}}
@@ -4812,9 +4812,9 @@ class Position
    };
 
    /**
-    * @type {PositionData}
+    * @type {TJSPositionData}
     */
-   #data = new PositionData();
+   #data = new TJSPositionData();
 
    /**
     * Provides the animation API.
@@ -4833,7 +4833,7 @@ class Position
    /**
     * Stores ongoing options that are set in the constructor or by transform store subscription.
     *
-    * @type {PositionOptions}
+    * @type {TJSPositionOptions}
     */
    #options = {
       calculateTransform: false,
@@ -4845,7 +4845,7 @@ class Position
    /**
     * The associated parent for positional data tracking. Used in validators.
     *
-    * @type {PositionParent}
+    * @type {TJSPositionParent}
     */
    #parent;
 
@@ -4871,14 +4871,14 @@ class Position
    /**
     * Stores the subscribers.
     *
-    * @type {(function(PositionData): void)[]}
+    * @type {(function(TJSPositionData): void)[]}
     */
    #subscriptions = [];
 
    /**
-    * @type {Transforms}
+    * @type {TJSTransforms}
     */
-   #transforms = new Transforms();
+   #transforms = new TJSTransforms();
 
    /**
     * @type {UpdateElementData}
@@ -4913,16 +4913,16 @@ class Position
    static get Animate() { return AnimationGroupAPI; }
 
    /**
-    * @returns {{browserCentered: Centered, Centered: Centered}} Position initial API.
+    * @returns {{browserCentered: Centered, Centered: Centered}} TJSPosition initial API.
     */
    static get Initial() { return this.#positionInitial; }
 
    /**
-    * Returns TransformData class / constructor.
+    * Returns TJSTransformData class / constructor.
     *
-    * @returns {TransformData} TransformData class / constructor.
+    * @returns {TJSTransformData} TJSTransformData class / constructor.
     */
-   static get TransformData() { return TransformData; }
+   static get TransformData() { return TJSTransformData; }
 
    /**
     * Returns default validators.
@@ -4939,17 +4939,17 @@ class Position
     *
     * // TODO: Consider more safety over options processing.
     *
-    * @param {Position}          position - A position instance.
+    * @param {TJSPosition}          position - A position instance.
     *
-    * @param {PositionOptions}   options - Position options.
+    * @param {TJSPositionOptions}   options - TJSPosition options.
     *
-    * @returns {Position} A duplicate position instance.
+    * @returns {TJSPosition} A duplicate position instance.
     */
    static duplicate(position, options)
    {
-      if (!(position instanceof Position)) { throw new TypeError(`'position' is not an instance of Position.`); }
+      if (!(position instanceof TJSPosition)) { throw new TypeError(`'position' is not an instance of Position.`); }
 
-      const newPosition = new Position(options);
+      const newPosition = new TJSPosition(options);
 
       newPosition.#options = Object.assign({}, position.#options, options);
       newPosition.#validators.add(...position.#validators);
@@ -4960,10 +4960,10 @@ class Position
    }
 
    /**
-    * @param {PositionParent|PositionOptionsAll}   [parent] - A potential parent element or object w/ `elementTarget`
-    *                                                      getter. May also be the PositionOptions object w/ 1 argument.
+    * @param {TJSPositionParent|TJSPositionOptionsAll}   [parent] - A potential parent element or object w/ `elementTarget`
+    *                                                      getter. May also be the TJSPositionOptions object w/ 1 argument.
     *
-    * @param {PositionOptionsAll}   [options] - Default values.
+    * @param {TJSPositionOptionsAll}   [options] - Default values.
     */
    constructor(parent, options)
    {
@@ -4995,7 +4995,7 @@ class Position
 
       if (isObject(options))
       {
-         // Set Position options
+         // Set TJSPosition options
          if (typeof options.calculateTransform === 'boolean')
          {
             this.#options.calculateTransform = options.calculateTransform;
@@ -5100,7 +5100,7 @@ class Position
       }
 
       this.#stores = {
-         // The main properties for manipulating Position.
+         // The main properties for manipulating TJSPosition.
          height: propertyStore(this, 'height'),
          left: propertyStore(this, 'left'),
          rotateX: propertyStore(this, 'rotateX'),
@@ -5225,16 +5225,16 @@ class Position
    }
 
    /**
-    * Returns the associated {@link PositionParent} instance.
+    * Returns the associated {@link TJSPositionParent} instance.
     *
-    * @returns {PositionParent} The PositionParent instance.
+    * @returns {TJSPositionParent} The TJSPositionParent instance.
     */
    get parent() { return this.#parent; }
 
    /**
     * Returns the state API.
     *
-    * @returns {PositionStateAPI} Position state API.
+    * @returns {PositionStateAPI} TJSPosition state API.
     */
    get state() { return this.#state; }
 
@@ -5248,7 +5248,7 @@ class Position
    /**
     * Returns the transform data for the readable store.
     *
-    * @returns {TransformData} Transform Data.
+    * @returns {TJSTransformData} Transform Data.
     */
    get transform()
    {
@@ -5278,9 +5278,9 @@ class Position
    }
 
    /**
-    * Sets the associated {@link PositionParent} instance. Resets the style cache and default data.
+    * Sets the associated {@link TJSPositionParent} instance. Resets the style cache and default data.
     *
-    * @param {PositionParent|void} parent - A PositionParent instance.
+    * @param {TJSPositionParent|void} parent - A TJSPositionParent instance.
     */
    set parent(parent)
    {
@@ -5538,12 +5538,12 @@ class Position
    /**
     * Assigns current position to object passed into method.
     *
-    * @param {object|PositionData}  [position] - Target to assign current position data.
+    * @param {object|TJSPositionData}  [position] - Target to assign current position data.
     *
-    * @param {PositionGetOptions}   [options] - Defines options for specific keys and substituting null for numeric
+    * @param {TJSPositionGetOptions}   [options] - Defines options for specific keys and substituting null for numeric
     *                                           default values.
     *
-    * @returns {PositionData} Passed in object with current position data.
+    * @returns {TJSPositionData} Passed in object with current position data.
     */
    get(position = {}, options)
    {
@@ -5589,7 +5589,7 @@ class Position
    }
 
    /**
-    * @returns {PositionData} Current position data.
+    * @returns {TJSPositionData} Current position data.
     */
    toJSON()
    {
@@ -5597,7 +5597,7 @@ class Position
    }
 
    /**
-    * All calculation and updates of position are implemented in {@link Position}. This allows position to be fully
+    * All calculation and updates of position are implemented in {@link TJSPosition}. This allows position to be fully
     * reactive and in control of updating inline styles for the application.
     *
     * Note: the logic for updating position is improved and changes a few aspects from the default
@@ -5612,12 +5612,12 @@ class Position
     * implement one or more validator functions and add them from the application via
     * `this.position.validators.add(<Function>)`.
     *
-    * Updates to any target element are decoupled from the underlying Position data. This method returns this instance
-    * that you can then await on the target element inline style update by using {@link Position.elementUpdated}.
+    * Updates to any target element are decoupled from the underlying TJSPosition data. This method returns this instance
+    * that you can then await on the target element inline style update by using {@link TJSPosition.elementUpdated}.
     *
-    * @param {PositionDataExtended} [position] - Position data to set.
+    * @param {TJSPositionDataExtended} [position] - TJSPosition data to set.
     *
-    * @returns {Position} This Position instance.
+    * @returns {TJSPosition} This TJSPosition instance.
     */
    set(position = {})
    {
@@ -5850,8 +5850,8 @@ class Position
 
    /**
     *
-    * @param {function(PositionData): void} handler - Callback function that is invoked on update / changes. Receives
-    *                                                 a copy of the PositionData.
+    * @param {function(TJSPositionData): void} handler - Callback function that is invoked on update / changes. Receives
+    *                                                 a copy of the TJSPositionData.
     *
     * @returns {(function(): void)} Unsubscribe function.
     */
@@ -5870,7 +5870,7 @@ class Position
    }
 
    /**
-    * @param {PositionDataExtended} opts -
+    * @param {TJSPositionDataExtended} opts -
     *
     * @param {number|null} opts.left -
     *
@@ -5916,7 +5916,7 @@ class Position
     *
     * @param {StyleCache} styleCache -
     *
-    * @returns {null|PositionData} Updated position data or null if validation fails.
+    * @returns {null|TJSPositionData} Updated position data or null if validation fails.
     */
    #updatePosition({
       // Directly supported parameters
@@ -6109,7 +6109,7 @@ class Position
    }
 }
 
-const s_DATA_UPDATE = new PositionData();
+const s_DATA_UPDATE = new TJSPositionData();
 
 /**
  * @type {ValidationData}
@@ -6133,5 +6133,5 @@ const s_VALIDATION_DATA = {
 
 Object.seal(s_VALIDATION_DATA);
 
-export { Position, PositionData, TransformData, Transforms };
+export { TJSPosition, TJSPositionData, TJSTransformData, TJSTransforms };
 //# sourceMappingURL=index.js.map

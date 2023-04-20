@@ -1,7 +1,7 @@
 import * as svelteEasingFunc from 'svelte/easing';
 import { TJSVelocityTrack } from '@typhonjs-fvtt/svelte/math';
 import { isIterable, isObject, isPlainObject } from '@typhonjs-fvtt/svelte/util';
-import { Position } from '@typhonjs-fvtt/svelte/store/position';
+import { TJSPosition } from '@typhonjs-fvtt/svelte/store/position';
 
 let gsap = void 0;
 
@@ -186,7 +186,7 @@ class TimelineImpl
 const s_TYPES_POSITION = new Set(['from', 'fromTo', 'set', 'to']);
 
 /**
- * Stores the Position properties in order to create the minimum update data object when animating.
+ * Stores the TJSPosition properties in order to create the minimum update data object when animating.
  *
  * @type {Set<string>}
  */
@@ -200,14 +200,14 @@ const s_POSITION_KEYS = new Set([
 ]);
 
 /**
- * Stores the seen Position properties when building the minimum update data object when animating.
+ * Stores the seen TJSPosition properties when building the minimum update data object when animating.
  *
  * @type {Set<string>}
  */
 const s_POSITION_PROPS = new Set();
 
 /**
- * Defines the options for {@link Position.get}.
+ * Defines the options for {@link TJSPosition.get}.
  *
  * @type {{keys: Set<string>, numeric: boolean}}
  */
@@ -217,7 +217,7 @@ const s_POSITION_GET_OPTIONS = {
 };
 
 /**
- * Provides a data driven ways to connect a {@link Position} instance with a GSAP timeline and tweens.
+ * Provides a data driven ways to connect a {@link TJSPosition} instance with a GSAP timeline and tweens.
  *
  * {@link GsapPosition.timeline} supports the following types: 'add', 'addLabel', 'addPause', 'call', 'from',
  * 'fromTo', 'set', 'to'.
@@ -225,7 +225,7 @@ const s_POSITION_GET_OPTIONS = {
 class GsapPosition
 {
    /**
-    * @param {Position} tjsPosition - Position instance.
+    * @param {TJSPosition} tjsPosition - TJSPosition instance.
     *
     * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
     *
@@ -243,7 +243,7 @@ class GsapPosition
       const filter = options?.filter;
       const initialProps = options?.initialProps;
 
-      // Only retrieve the Position keys that are in vars.
+      // Only retrieve the TJSPosition keys that are in vars.
       s_POSITION_PROPS.clear();
 
       // Add any initial props if defined.
@@ -263,7 +263,7 @@ class GsapPosition
    }
 
    /**
-    * @param {Position} tjsPosition - Position instance.
+    * @param {TJSPosition} tjsPosition - TJSPosition instance.
     *
     * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
     *
@@ -283,7 +283,7 @@ class GsapPosition
       const filter = options?.filter;
       const initialProps = options?.initialProps;
 
-      // Only retrieve the Position keys that are in vars.
+      // Only retrieve the TJSPosition keys that are in vars.
       s_POSITION_PROPS.clear();
 
       // Add any initial props if defined.
@@ -308,7 +308,7 @@ class GsapPosition
    }
 
    /**
-    * @param {Position} tjsPosition - Position instance.
+    * @param {TJSPosition} tjsPosition - TJSPosition instance.
     *
     * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
     *
@@ -328,7 +328,7 @@ class GsapPosition
       const filter = options?.filter;
       const initialProps = options?.initialProps;
 
-      // Only retrieve the Position keys that are in vars.
+      // Only retrieve the TJSPosition keys that are in vars.
       s_POSITION_PROPS.clear();
 
       // Add any initial props if defined.
@@ -346,7 +346,7 @@ class GsapPosition
    }
 
    /**
-    * @param {Position|Iterable<Position>}   tjsPosition - Position instance.
+    * @param {TJSPosition|Iterable<TJSPosition>}   tjsPosition - TJSPosition instance.
     *
     * @param {object|GsapData}               arg1 - Either an object defining timelineOptions or GsapData.
     *
@@ -451,7 +451,7 @@ class GsapPosition
       {
          const gsapDataSingle = positionInfo.gsapData[0];
 
-         // If `position` option is defined then handle each Position instance as a sub-timeline.
+         // If `position` option is defined then handle each TJSPosition instance as a sub-timeline.
          if (typeof optionPosition !== void 0)
          {
             let index = 0;
@@ -509,7 +509,7 @@ class GsapPosition
    }
 
    /**
-    * @param {Position|Position[]} tjsPosition - Position instance.
+    * @param {TJSPosition|TJSPosition[]} tjsPosition - TJSPosition instance.
     *
     * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
     *
@@ -527,7 +527,7 @@ class GsapPosition
       const filter = options?.filter;
       const initialProps = options?.initialProps;
 
-      // Only retrieve the Position keys that are in vars.
+      // Only retrieve the TJSPosition keys that are in vars.
       s_POSITION_PROPS.clear();
 
       // Add any initial props if defined.
@@ -555,7 +555,7 @@ class TimelinePositionImpl
    /**
     * Gets the target from GSAP data entry.
     *
-    * @param {import('@typhonjs-svelte/lib/store/position').PositionDataExtended|import('@typhonjs-svelte/lib/store/position').PositionDataExtended[]}  positionData - PositionInfo data.
+    * @param {import('@typhonjs-svelte/lib/store/position').TJSPositionDataExtended|import('@typhonjs-svelte/lib/store/position').TJSPositionDataExtended[]}  positionData - PositionInfo data.
     *
     * @param {HTMLElement|HTMLElement[]}  elements - One or more HTMLElements.
     *
@@ -563,7 +563,7 @@ class TimelinePositionImpl
     *
     * @param {number}         cntr - Current GSAP data entry index.
     *
-    * @returns {import('@typhonjs-svelte/lib/store/position').PositionDataExtended|import('@typhonjs-svelte/lib/store/position').PositionDataExtended[]|HTMLElement|HTMLElement[]} The target object or HTMLElement.
+    * @returns {import('@typhonjs-svelte/lib/store/position').TJSPositionDataExtended|import('@typhonjs-svelte/lib/store/position').TJSPositionDataExtended[]|HTMLElement|HTMLElement[]} The target object or HTMLElement.
     */
    static getTarget(positionData, elements, entry, cntr)
    {
@@ -632,7 +632,7 @@ class TimelinePositionImpl
    }
 
    /**
-    * Validates data for Position related properties: 'from', 'fromTo', 'set', 'to'. Also adds all properties found
+    * Validates data for TJSPosition related properties: 'from', 'fromTo', 'set', 'to'. Also adds all properties found
     * in Gsap entry data to s_POSITION_PROPS, so that just the properties being animated are added to animated
     * `positionData`.
     *
@@ -663,7 +663,7 @@ class TimelinePositionImpl
                throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'vars' object.`);
             }
 
-            // Only retrieve the Position keys that are in vars.
+            // Only retrieve the TJSPosition keys that are in vars.
             for (const prop in vars)
             {
                if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
@@ -687,7 +687,7 @@ class TimelinePositionImpl
                throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'toVars' object.`);
             }
 
-            // Only retrieve the Position keys that are in fromVars / toVars.
+            // Only retrieve the TJSPosition keys that are in fromVars / toVars.
             for (const prop in fromVars)
             {
                if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
@@ -705,7 +705,7 @@ class TimelinePositionImpl
 }
 
 /**
- * @param {Position|Iterable<Position>}   tjsPositions -
+ * @param {TJSPosition|Iterable<TJSPosition>}   tjsPositions -
  *
  * @param {object}                        vars -
  *
@@ -726,7 +726,7 @@ function s_GET_POSITIONINFO(tjsPositions, vars, filter, gsapData)
       gsapData: [],
    };
 
-   // If gsapData is a function invoke it w/ the current Position instance and position data to retrieve a unique
+   // If gsapData is a function invoke it w/ the current TJSPosition instance and position data to retrieve a unique
    // gsapData object. If null / undefined is returned this entry is ignored.
    if (typeof gsapData === 'function')
    {
@@ -740,7 +740,7 @@ function s_GET_POSITIONINFO(tjsPositions, vars, filter, gsapData)
 
       const populateData = (entry) =>
       {
-         const isPosition = entry instanceof Position;
+         const isPosition = entry instanceof TJSPosition;
 
          gsapDataOptions.index = index++;
          gsapDataOptions.position = isPosition ? entry : entry.position;
@@ -781,7 +781,7 @@ function s_GET_POSITIONINFO(tjsPositions, vars, filter, gsapData)
    {
       for (const entry of tjsPositions)
       {
-         const isPosition = entry instanceof Position;
+         const isPosition = entry instanceof TJSPosition;
 
          const position = isPosition ? entry : entry.position;
          const data = isPosition ? void 0 : entry;
@@ -795,7 +795,7 @@ function s_GET_POSITIONINFO(tjsPositions, vars, filter, gsapData)
    }
    else
    {
-      const isPosition = tjsPositions instanceof Position;
+      const isPosition = tjsPositions instanceof TJSPosition;
 
       const position = isPosition ? tjsPositions : tjsPositions.position;
       const data = isPosition ? void 0 : tjsPositions;
@@ -892,9 +892,9 @@ function s_VALIDATE_GSAPDATA_ENTRY(gsapData)
 /**
  * @typedef {object} PositionInfo
  *
- * @property {Position[]}              position -
+ * @property {TJSPosition[]}              position -
  *
- * @property {import('@typhonjs-svelte/lib/store/position').PositionDataExtended[]}  positionData -
+ * @property {import('@typhonjs-svelte/lib/store/position').TJSPositionDataExtended[]}  positionData -
  *
  * @property {object[]}                data - Contains the full data object when a list of object w/ position is used.
  *
@@ -904,7 +904,7 @@ function s_VALIDATE_GSAPDATA_ENTRY(gsapData)
  */
 
 /**
- * Provides a data driven ways to connect a {@link Position} instance with a GSAP timeline and tweens.
+ * Provides a data driven ways to connect a {@link TJSPosition} instance with a GSAP timeline and tweens.
  *
  * {@link GsapPosition.timeline} supports the following types: 'add', 'addLabel', 'addPause', 'call', 'from',
  * 'fromTo', 'set', 'to'.
@@ -912,11 +912,11 @@ function s_VALIDATE_GSAPDATA_ENTRY(gsapData)
 class GsapCompose
 {
    /**
-    * @param {GSAPTarget} target - A standard GSAP target or Position.
+    * @param {GSAPTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   vars - GSAP vars object for `from`.
     *
-    * @param {GsapPositionOptions} [options] - Options for filtering and initial data population for Position tweens.
+    * @param {GsapPositionOptions} [options] - Options for filtering and initial data population for TJSPosition tweens.
     *
     * @returns {object} GSAP tween
     */
@@ -927,14 +927,14 @@ class GsapCompose
          throw new TypeError(`GsapCompose.from error: 'vars' is not an object.`);
       }
 
-      // If target is Position related attempt to dispatch to GsapPosition.
+      // If target is TJSPosition related attempt to dispatch to GsapPosition.
       const positionTween = s_DISPATCH_POSITION('from', target, options, vars);
 
       return positionTween !== void 0 ? positionTween : gsap.from(target, vars);
    }
 
    /**
-    * @param {GSAPTarget} target - A standard GSAP target or Position.
+    * @param {GSAPTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   fromVars - GSAP fromVars object for `fromTo`
     *
@@ -956,7 +956,7 @@ class GsapCompose
          throw new TypeError(`GsapCompose.fromTo error: 'toVars' is not an object.`);
       }
 
-      // If target is Position related attempt to dispatch to GsapPosition.
+      // If target is TJSPosition related attempt to dispatch to GsapPosition.
       const positionTween = s_DISPATCH_POSITION('fromTo', target, options, fromVars, toVars);
 
       return positionTween !== void 0 ? positionTween : gsap.fromTo(target, fromVars, toVars);
@@ -976,7 +976,7 @@ class GsapCompose
    }
 
    /**
-    * @param {GSAPTarget} target - A standard GSAP target or Position.
+    * @param {GSAPTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {string}   key - Property of position to manipulate.
     *
@@ -998,7 +998,7 @@ class GsapCompose
          throw new TypeError(`GsapCompose.quickTo error: 'vars' is not an object.`);
       }
 
-      // If target is Position related attempt to dispatch to GsapPosition.
+      // If target is TJSPosition related attempt to dispatch to GsapPosition.
       const positionQuickTo = s_DISPATCH_POSITION('quickTo', target, options, key, vars);
 
       return positionQuickTo !== void 0 ? positionQuickTo : gsap.quickTo(target, key, vars);
@@ -1027,7 +1027,7 @@ class GsapCompose
    }
 
    /**
-    * @param {GSAPTarget} target - A standard GSAP target or Position.
+    * @param {GSAPTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object|GsapData}   [arg1] - Either an object defining timeline options or GsapData.
     *
@@ -1046,7 +1046,7 @@ class GsapCompose
          return gsap.timeline(target);
       }
 
-      // If target is Position related attempt to dispatch to GsapPosition.
+      // If target is TJSPosition related attempt to dispatch to GsapPosition.
       const positionTimeline = s_DISPATCH_POSITION('timeline', target, arg1, arg2, arg3);
       if (positionTimeline !== void 0) { return positionTimeline; }
 
@@ -1143,7 +1143,7 @@ class GsapCompose
    }
 
    /**
-    * @param {GSAPTarget} target - A standard GSAP target or Position.
+    * @param {GSAPTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   vars - GSAP vars object for `to`.
     *
@@ -1158,7 +1158,7 @@ class GsapCompose
          throw new TypeError(`GsapCompose.to error: 'vars' is not an object.`);
       }
 
-      // If target is Position related attempt to dispatch to GsapPosition.
+      // If target is TJSPosition related attempt to dispatch to GsapPosition.
       const positionTween = s_DISPATCH_POSITION('to', target, options, vars);
 
       return positionTween !== void 0 ? positionTween : gsap.to(target, vars);
@@ -1170,7 +1170,7 @@ class GsapCompose
  *
  * @param {string}            operation - GsapPosition function to invoke.
  *
- * @param {Position|object}   [target] -
+ * @param {TJSPosition|object}   [target] -
  *
  * @param {object}            [options] -
  *
@@ -1182,11 +1182,11 @@ class GsapCompose
  */
 function s_DISPATCH_POSITION(operation, target, options, arg1, arg2)
 {
-   if (target instanceof Position)
+   if (target instanceof TJSPosition)
    {
       return GsapPosition[operation](target, options, arg1, arg2);
    }
-   else if (isObject(target) && target.position instanceof Position)
+   else if (isObject(target) && target.position instanceof TJSPosition)
    {
       return GsapPosition[operation](target.position, options, arg1, arg2);
    }
@@ -1197,7 +1197,7 @@ function s_DISPATCH_POSITION(operation, target, options, arg1, arg2)
 
       for (const entry of target)
       {
-         const isPosition = entry instanceof Position || entry?.position instanceof Position;
+         const isPosition = entry instanceof TJSPosition || entry?.position instanceof TJSPosition;
 
          hasPosition |= isPosition;
          if (!isPosition) { allPosition = false; }
@@ -1221,7 +1221,7 @@ function s_DISPATCH_POSITION(operation, target, options, arg1, arg2)
 }
 
 /**
- * Validates data for Position related properties: 'from', 'fromTo', 'set', 'to'. Also adds all properties found
+ * Validates data for TJSPosition related properties: 'from', 'fromTo', 'set', 'to'. Also adds all properties found
  * in Gsap entry data to s_POSITION_PROPS, so that just the properties being animated are added to animated
  * `positionData`.
  *
@@ -1283,7 +1283,7 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  * @typedef {object} GsapPositionOptions
  *
  * @property {Function} [filter] - An optional filter function to adjust position data in `onUpdate` callbacks. This is
- *                                 useful if you need to transform any data from GSAP / plugins into data Position can
+ *                                 useful if you need to transform any data from GSAP / plugins into data TJSPosition can
  *                                 utilize.
  *
  * @property {Iterable<string>} [initialProps] - Provides an iterable of property keys to assign to initial position
@@ -1292,7 +1292,7 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  */
 
 /**
- * @typedef {string|object|Position|Iterable<Position>|Array<HTMLElement|object>} GSAPTarget
+ * @typedef {string|object|TJSPosition|Iterable<TJSPosition>|Array<HTMLElement|object>} GSAPTarget
  */
 
 // const s_HAS_QUICK_TO = GsapCompose.hasMethod('quickTo');
@@ -1308,7 +1308,7 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  *
  * @param {object}            params - Required parameters.
  *
- * @param {import('@typhonjs-svelte/lib/store/position').Position}   params.position - A position instance.
+ * @param {import('@typhonjs-svelte/lib/store/position').TJSPosition}   params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *

@@ -2,7 +2,7 @@ import * as svelte_store from 'svelte/store';
 import * as _typhonjs_fvtt_svelte_animate from '@typhonjs-fvtt/svelte/animate';
 
 type quickToCallback = (...args: (number | object)[]) => any;
-type PositionInitialHelper = {
+type TJSPositionInitialHelper = {
     /**
      * - Returns the left position given the width of the browser window.
      */
@@ -12,7 +12,7 @@ type PositionInitialHelper = {
      */
     getTop: (height: number) => number;
 };
-type PositionGetOptions = {
+type TJSPositionGetOptions = {
     /**
      * - When provided only these keys are copied.
      */
@@ -29,7 +29,7 @@ type PositionGetOptions = {
 /**
  * - Options set in constructor.
  */
-type PositionOptions = {
+type TJSPositionOptions = {
     /**
      * - When true always calculate transform data.
      */
@@ -37,9 +37,9 @@ type PositionOptions = {
     /**
      * - Provides a helper for setting initial position data.
      */
-    initialHelper: PositionInitialHelper;
+    initialHelper: TJSPositionInitialHelper;
     /**
-     * - Sets Position to orthographic mode using just transform / matrix3d for positioning.
+     * - Sets TJSPosition to orthographic mode using just transform / matrix3d for positioning.
      */
     ortho: boolean;
     /**
@@ -47,8 +47,8 @@ type PositionOptions = {
      */
     transformSubscribed: boolean;
 };
-type PositionOptionsAll = PositionOptions & PositionData;
-type PositionParent = HTMLElement | object;
+type TJSPositionOptionsAll = TJSPositionOptions & TJSPositionData;
+type TJSPositionParent = HTMLElement | object;
 type ResizeObserverData = {
     /**
      * -
@@ -68,7 +68,7 @@ type ResizeObserverData = {
     offsetWidth: number | undefined;
 };
 /**
- * - Provides individual writable stores for {@link Position }.
+ * - Provides individual writable stores for {@link TJSPosition }.
  */
 type StorePosition = {
     /**
@@ -158,7 +158,7 @@ type StorePosition = {
     /**
      * - Readable store for transform data.
      */
-    transform: svelte_store.Readable<TransformData>;
+    transform: svelte_store.Readable<TJSTransformData>;
     /**
      * - Derived store for `transformOrigin`.
      */
@@ -180,7 +180,7 @@ type StorePosition = {
      */
     zIndex: svelte_store.Writable<number | null>;
 };
-type PositionDataExtended = {
+type TJSPositionDataExtended = {
     /**
      * -
      */
@@ -260,15 +260,19 @@ type PositionDataExtended = {
      */
     rotation?: number | null;
 };
+/**
+ * - 4x4 Matrix; Format: column-major, when typed out it looks like row-major.
+ */
+type Matrix4 = Float32Array;
 type ValidationData = {
     /**
      * -
      */
-    position: PositionData;
+    position: TJSPositionData;
     /**
      * -
      */
-    parent: PositionParent;
+    parent: TJSPositionParent;
     /**
      * -
      */
@@ -280,7 +284,7 @@ type ValidationData = {
     /**
      * -
      */
-    transforms: Transforms;
+    transforms: TJSTransforms;
     /**
      * -
      */
@@ -314,26 +318,22 @@ type ValidationData = {
      */
     minWidth: number | undefined;
     /**
-     * - The rest of any data submitted to {@link Position.set }
+     * - The rest of any data submitted to {@link TJSPosition.set }
      */
     rest: object;
 };
 /**
- * - 4x4 Matrix; Format: column-major, when typed out it looks like row-major.
- */
-type Matrix4 = Float32Array;
-/**
- * - Position validator function that takes a {@link PositionData } instance potentially
+ * - TJSPosition validator function that takes a {@link TJSPositionData } instance potentially
  *                             modifying it or returning null if invalid.
  */
-type ValidatorFn = (valData: ValidationData) => PositionData | null;
+type ValidatorFn = (valData: ValidationData) => TJSPositionData | null;
 type ValidatorData = {
     /**
      * - An ID associated with this validator. Can be used to remove the validator.
      */
     id?: any;
     /**
-     * - Position validator function that takes a {@link PositionData } instance
+     * - TJSPosition validator function that takes a {@link TJSPositionData } instance
      *   potentially modifying it or returning null if invalid.
      */
     validator: ValidatorFn;
@@ -350,11 +350,11 @@ type ValidatorData = {
  * Defines the
  *          position validator options.
  */
-type PositionValidatorOptions = ValidatorFn | ValidatorData | Iterable<ValidatorFn | ValidatorData>;
+type TJSPositionValidatorOptions = ValidatorFn | ValidatorData | Iterable<ValidatorFn | ValidatorData>;
 
 
 /**
- * Provides a TJSBasicAnimation implementation for Position animation.
+ * Provides a TJSBasicAnimation implementation for TJSPosition animation.
  */
 declare class AnimationControl {
     /**
@@ -406,7 +406,7 @@ declare class AnimationControl {
 /**
  * Defines stored positional data.
  */
-declare class PositionData {
+declare class TJSPositionData {
     constructor({ height, left, maxHeight, maxWidth, minHeight, minWidth, rotateX, rotateY, rotateZ, scale, translateX, translateY, translateZ, top, transformOrigin, width, zIndex }?: {
         height?: any;
         left?: any;
@@ -497,40 +497,40 @@ declare class PositionData {
     /**
      * Copies given data to this instance.
      *
-     * @param {PositionData}   data - Copy from this instance.
+     * @param {TJSPositionData}   data - Copy from this instance.
      *
-     * @returns {PositionData} This instance.
+     * @returns {TJSPositionData} This instance.
      */
-    copy(data: PositionData): PositionData;
+    copy(data: TJSPositionData): TJSPositionData;
 }
 
 declare class AnimationAPI {
     /**
-     * @param {Position}       position -
+     * @param {TJSPosition}       position -
      *
-     * @param {PositionData}   data -
+     * @param {TJSPositionData}   data -
      */
-    constructor(position: Position, data: PositionData);
+    constructor(position: TJSPosition, data: TJSPositionData);
     /**
-     * Returns whether there are scheduled animations whether active or delayed for this Position.
+     * Returns whether there are scheduled animations whether active or delayed for this TJSPosition.
      *
      * @returns {boolean} Are there active animation instances.
      */
     get isScheduled(): boolean;
     /**
-     * Cancels all animation instances for this Position instance.
+     * Cancels all animation instances for this TJSPosition instance.
      */
     cancel(): void;
     /**
-     * Returns all currently scheduled AnimationControl instances for this Position instance.
+     * Returns all currently scheduled AnimationControl instances for this TJSPosition instance.
      *
-     * @returns {AnimationControl[]} All currently scheduled animation controls for this Position instance.
+     * @returns {AnimationControl[]} All currently scheduled animation controls for this TJSPosition instance.
      */
     getScheduled(): AnimationControl[];
     /**
      * Provides a tween from given position data to the current position.
      *
-     * @param {PositionDataExtended} fromData - The starting position.
+     * @param {TJSPositionDataExtended} fromData - The starting position.
      *
      * @param {object}         [opts] - Optional parameters.
      *
@@ -544,7 +544,7 @@ declare class AnimationAPI {
      *
      * @returns {AnimationControl}  A control object that can cancel animation and provides a `finished` Promise.
      */
-    from(fromData: PositionDataExtended, { delay, duration, ease, interpolate }?: {
+    from(fromData: TJSPositionDataExtended, { delay, duration, ease, interpolate }?: {
         delay?: number;
         duration?: number;
         ease?: Function;
@@ -553,9 +553,9 @@ declare class AnimationAPI {
     /**
      * Provides a tween from given position data to the current position.
      *
-     * @param {PositionDataExtended} fromData - The starting position.
+     * @param {TJSPositionDataExtended} fromData - The starting position.
      *
-     * @param {PositionDataExtended} toData - The ending position.
+     * @param {TJSPositionDataExtended} toData - The ending position.
      *
      * @param {object}         [opts] - Optional parameters.
      *
@@ -569,7 +569,7 @@ declare class AnimationAPI {
      *
      * @returns {AnimationControl}  A control object that can cancel animation and provides a `finished` Promise.
      */
-    fromTo(fromData: PositionDataExtended, toData: PositionDataExtended, { delay, duration, ease, interpolate }?: {
+    fromTo(fromData: TJSPositionDataExtended, toData: TJSPositionDataExtended, { delay, duration, ease, interpolate }?: {
         delay?: number;
         duration?: number;
         ease?: Function;
@@ -578,7 +578,7 @@ declare class AnimationAPI {
     /**
      * Provides a tween to given position data from the current position.
      *
-     * @param {PositionDataExtended} toData - The destination position.
+     * @param {TJSPositionDataExtended} toData - The destination position.
      *
      * @param {object}         [opts] - Optional parameters.
      *
@@ -592,7 +592,7 @@ declare class AnimationAPI {
      *
      * @returns {AnimationControl}  A control object that can cancel animation and provides a `finished` Promise.
      */
-    to(toData: PositionDataExtended, { delay, duration, ease, interpolate }?: {
+    to(toData: TJSPositionDataExtended, { delay, duration, ease, interpolate }?: {
         delay?: number;
         duration?: number;
         ease?: Function;
@@ -630,17 +630,17 @@ declare class PositionStateAPI {
      *
      * @param {string}   options.name - Saved data set name.
      *
-     * @returns {PositionDataExtended} The saved data set.
+     * @returns {TJSPositionDataExtended} The saved data set.
      */
     get({ name }: {
         name: string;
-    }): PositionDataExtended;
+    }): TJSPositionDataExtended;
     /**
      * Returns any associated default data.
      *
-     * @returns {PositionDataExtended} Associated default data.
+     * @returns {TJSPositionDataExtended} Associated default data.
      */
-    getDefault(): PositionDataExtended;
+    getDefault(): TJSPositionDataExtended;
     /**
      * Removes and returns any position state by name.
      *
@@ -648,11 +648,11 @@ declare class PositionStateAPI {
      *
      * @param {string}   options.name - Name to remove and retrieve.
      *
-     * @returns {PositionDataExtended} Saved position data.
+     * @returns {TJSPositionDataExtended} Saved position data.
      */
     remove({ name }: {
         name: string;
-    }): PositionDataExtended;
+    }): TJSPositionDataExtended;
     /**
      * Resets data to default values and invokes set.
      *
@@ -695,7 +695,7 @@ declare class PositionStateAPI {
      *
      * @param {Function}          [params.interpolate=lerp] - Interpolation function.
      *
-     * @returns {PositionDataExtended|Promise<PositionDataExtended>} Saved position data.
+     * @returns {TJSPositionDataExtended|Promise<TJSPositionDataExtended>} Saved position data.
      */
     restore({ name, remove, properties, silent, async, animateTo, duration, ease, interpolate }: {
         name: string;
@@ -707,7 +707,7 @@ declare class PositionStateAPI {
         duration?: number;
         ease?: Function;
         interpolate?: Function;
-    }): PositionDataExtended | Promise<PositionDataExtended>;
+    }): TJSPositionDataExtended | Promise<TJSPositionDataExtended>;
     /**
      * Saves current position state with the opportunity to add extra data to the saved state.
      *
@@ -717,12 +717,12 @@ declare class PositionStateAPI {
      *
      * @param {...*}     [opts.extra] - Extra data to add to saved data.
      *
-     * @returns {PositionData} Current position data
+     * @returns {TJSPositionData} Current position data
      */
     save({ name, ...extra }: {
         name: string;
         extra?: any[];
-    }): PositionData;
+    }): TJSPositionData;
     /**
      * Directly sets a position state.
      *
@@ -730,7 +730,7 @@ declare class PositionStateAPI {
      *
      * @param {string}   opts.name - name to index this saved data.
      *
-     * @param {...*}     [opts.data] - Position data to set.
+     * @param {...*}     [opts.data] - TJSPosition data to set.
      */
     set({ name, ...data }: {
         name: string;
@@ -740,9 +740,9 @@ declare class PositionStateAPI {
 }
 
 /**
- * Provides the output data for {@link Transforms.getData}.
+ * Provides the output data for {@link TJSTransforms.getData}.
  */
-declare class TransformData {
+declare class TJSTransformData {
     /**
      * @returns {DOMRect} The bounding rectangle.
      */
@@ -779,9 +779,9 @@ declare class TransformData {
  * runs before a higher weighted validator. If no weight is specified the default of '1' is assigned and it is appended
  * to the end of the validators list.
  *
- * This class forms the public API which is accessible from the `.validators` getter in the main Position instance.
+ * This class forms the public API which is accessible from the `.validators` getter in the main TJSPosition instance.
  * ```
- * const position = new Position(<PositionData>);
+ * const position = new TJSPosition(<TJSPositionData>);
  * position.validators.add(...);
  * position.validators.clear();
  * position.validators.length;
@@ -857,9 +857,9 @@ declare class BasicBounds {
      *
      * @param {ValidationData}   valData - The associated validation data for position updates.
      *
-     * @returns {PositionData} Potentially adjusted position data.
+     * @returns {TJSPositionData} Potentially adjusted position data.
      */
-    validator(valData: ValidationData): PositionData;
+    validator(valData: ValidationData): TJSPositionData;
     #private;
 }
 
@@ -889,9 +889,9 @@ declare class TransformBounds {
      *
      * @param {ValidationData}   valData - The associated validation data for position updates.
      *
-     * @returns {PositionData} Potentially adjusted position data.
+     * @returns {TJSPositionData} Potentially adjusted position data.
      */
-    validator(valData: ValidationData): PositionData;
+    validator(valData: ValidationData): TJSPositionData;
     #private;
 }
 
@@ -965,57 +965,57 @@ declare class Centered {
 }
 
 /**
- * Provides a public API for grouping multiple {@link Position} animations together with the AnimationManager.
+ * Provides a public API for grouping multiple {@link TJSPosition} animations together with the AnimationManager.
  *
- * Note: To remove cyclic dependencies as this class provides the Position static / group Animation API `instanceof`
- * checks are not done against Position. Instead, a check for the animate property being an instanceof
+ * Note: To remove cyclic dependencies as this class provides the TJSPosition static / group Animation API `instanceof`
+ * checks are not done against TJSPosition. Instead, a check for the animate property being an instanceof
  * {@link AnimationAPI} is performed in {@link AnimationGroupAPI.#isPosition}.
  *
  * @see AnimationAPI
  */
 declare class AnimationGroupAPI {
     /**
-     * Checks of the given object is a Position instance by checking for AnimationAPI.
+     * Checks of the given object is a TJSPosition instance by checking for AnimationAPI.
      *
      * @param {*}  object - Any data.
      *
-     * @returns {boolean} Is Position.
+     * @returns {boolean} Is TJSPosition.
      */
     static "__#146909@#isPosition"(object: any): boolean;
     /**
-     * Cancels any animation for given Position data.
+     * Cancels any animation for given TJSPosition data.
      *
-     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+     * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
      */
-    static cancel(position: Position | {
-        position: Position;
-    } | Iterable<Position> | Iterable<{
-        position: Position;
+    static cancel(position: TJSPosition | {
+        position: TJSPosition;
+    } | Iterable<TJSPosition> | Iterable<{
+        position: TJSPosition;
     }>): void;
     /**
-     * Cancels all Position animation.
+     * Cancels all TJSPosition animation.
      */
     static cancelAll(): void;
     /**
      * Gets all animation controls for the given position data.
      *
-     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+     * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
      *
-     * @returns {{position: Position, data: object|void, controls: AnimationControl[]}[]} Results array.
+     * @returns {{position: TJSPosition, data: object|void, controls: AnimationControl[]}[]} Results array.
      */
-    static getScheduled(position: Position | {
-        position: Position;
-    } | Iterable<Position> | Iterable<{
-        position: Position;
+    static getScheduled(position: TJSPosition | {
+        position: TJSPosition;
+    } | Iterable<TJSPosition> | Iterable<{
+        position: TJSPosition;
     }>): {
-        position: Position;
+        position: TJSPosition;
         data: object | void;
         controls: AnimationControl[];
     }[];
     /**
-     * Provides the `from` animation tween for one or more Position instances as a group.
+     * Provides the `from` animation tween for one or more TJSPosition instances as a group.
      *
-     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+     * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
      *
      * @param {object|Function}   fromData -
      *
@@ -1023,15 +1023,15 @@ declare class AnimationGroupAPI {
      *
      * @returns {import('@typhonjs-fvtt/svelte/animate').TJSBasicAnimation} Basic animation control.
      */
-    static from(position: Position | {
-        position: Position;
-    } | Iterable<Position> | Iterable<{
-        position: Position;
+    static from(position: TJSPosition | {
+        position: TJSPosition;
+    } | Iterable<TJSPosition> | Iterable<{
+        position: TJSPosition;
     }>, fromData: object | Function, options: object | Function): _typhonjs_fvtt_svelte_animate.TJSBasicAnimation;
     /**
-     * Provides the `fromTo` animation tween for one or more Position instances as a group.
+     * Provides the `fromTo` animation tween for one or more TJSPosition instances as a group.
      *
-     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+     * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
      *
      * @param {object|Function}   fromData -
      *
@@ -1041,15 +1041,15 @@ declare class AnimationGroupAPI {
      *
      * @returns {import('@typhonjs-fvtt/svelte/animate').TJSBasicAnimation} Basic animation control.
      */
-    static fromTo(position: Position | {
-        position: Position;
-    } | Iterable<Position> | Iterable<{
-        position: Position;
+    static fromTo(position: TJSPosition | {
+        position: TJSPosition;
+    } | Iterable<TJSPosition> | Iterable<{
+        position: TJSPosition;
     }>, fromData: object | Function, toData: object | Function, options: object | Function): _typhonjs_fvtt_svelte_animate.TJSBasicAnimation;
     /**
-     * Provides the `to` animation tween for one or more Position instances as a group.
+     * Provides the `to` animation tween for one or more TJSPosition instances as a group.
      *
-     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+     * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
      *
      * @param {object|Function}   toData -
      *
@@ -1057,15 +1057,15 @@ declare class AnimationGroupAPI {
      *
      * @returns {import('@typhonjs-fvtt/svelte/animate').TJSBasicAnimation} Basic animation control.
      */
-    static to(position: Position | {
-        position: Position;
-    } | Iterable<Position> | Iterable<{
-        position: Position;
+    static to(position: TJSPosition | {
+        position: TJSPosition;
+    } | Iterable<TJSPosition> | Iterable<{
+        position: TJSPosition;
     }>, toData: object | Function, options: object | Function): _typhonjs_fvtt_svelte_animate.TJSBasicAnimation;
     /**
-     * Provides the `to` animation tween for one or more Position instances as a group.
+     * Provides the `to` animation tween for one or more TJSPosition instances as a group.
      *
-     * @param {Position|{position: Position}|Iterable<Position>|Iterable<{position: Position}>} position -
+     * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
      *
      * @param {Iterable<string>}  keys -
      *
@@ -1073,10 +1073,10 @@ declare class AnimationGroupAPI {
      *
      * @returns {quickToCallback} Basic animation control.
      */
-    static quickTo(position: Position | {
-        position: Position;
-    } | Iterable<Position> | Iterable<{
-        position: Position;
+    static quickTo(position: TJSPosition | {
+        position: TJSPosition;
+    } | Iterable<TJSPosition> | Iterable<{
+        position: TJSPosition;
     }>, keys: Iterable<string>, options: object | Function): quickToCallback;
 }
 
@@ -1084,7 +1084,7 @@ declare class AnimationGroupAPI {
  * Provides a store for position following the subscriber protocol in addition to providing individual writable derived
  * stores for each independent variable.
  */
-declare class Position {
+declare class TJSPosition {
     /**
      * @type {{browserCentered: Centered, Centered: Centered}}
      */
@@ -1106,18 +1106,18 @@ declare class Position {
      */
     static get Animate(): AnimationGroupAPI;
     /**
-     * @returns {{browserCentered: Centered, Centered: Centered}} Position initial API.
+     * @returns {{browserCentered: Centered, Centered: Centered}} TJSPosition initial API.
      */
     static get Initial(): {
         browserCentered: Centered;
         Centered: Centered;
     };
     /**
-     * Returns TransformData class / constructor.
+     * Returns TJSTransformData class / constructor.
      *
-     * @returns {TransformData} TransformData class / constructor.
+     * @returns {TJSTransformData} TJSTransformData class / constructor.
      */
-    static get TransformData(): TransformData;
+    static get TransformData(): TJSTransformData;
     /**
      * Returns default validators.
      *
@@ -1137,20 +1137,20 @@ declare class Position {
      *
      * // TODO: Consider more safety over options processing.
      *
-     * @param {Position}          position - A position instance.
+     * @param {TJSPosition}          position - A position instance.
      *
-     * @param {PositionOptions}   options - Position options.
+     * @param {TJSPositionOptions}   options - TJSPosition options.
      *
-     * @returns {Position} A duplicate position instance.
+     * @returns {TJSPosition} A duplicate position instance.
      */
-    static duplicate(position: Position, options: PositionOptions): Position;
+    static duplicate(position: TJSPosition, options: TJSPositionOptions): TJSPosition;
     /**
-     * @param {PositionParent|PositionOptionsAll}   [parent] - A potential parent element or object w/ `elementTarget`
-     *                                                      getter. May also be the PositionOptions object w/ 1 argument.
+     * @param {TJSPositionParent|TJSPositionOptionsAll}   [parent] - A potential parent element or object w/ `elementTarget`
+     *                                                      getter. May also be the TJSPositionOptions object w/ 1 argument.
      *
-     * @param {PositionOptionsAll}   [options] - Default values.
+     * @param {TJSPositionOptionsAll}   [options] - Default values.
      */
-    constructor(parent?: PositionParent | PositionOptionsAll, options?: PositionOptionsAll);
+    constructor(parent?: TJSPositionParent | TJSPositionOptionsAll, options?: TJSPositionOptionsAll);
     /**
      * Returns the animation API.
      *
@@ -1191,21 +1191,21 @@ declare class Position {
      */
     get elementUpdated(): Promise<number>;
     /**
-     * Sets the associated {@link PositionParent} instance. Resets the style cache and default data.
+     * Sets the associated {@link TJSPositionParent} instance. Resets the style cache and default data.
      *
-     * @param {PositionParent|void} parent - A PositionParent instance.
+     * @param {TJSPositionParent|void} parent - A TJSPositionParent instance.
      */
     set parent(arg: any);
     /**
-     * Returns the associated {@link PositionParent} instance.
+     * Returns the associated {@link TJSPositionParent} instance.
      *
-     * @returns {PositionParent} The PositionParent instance.
+     * @returns {TJSPositionParent} The TJSPositionParent instance.
      */
     get parent(): any;
     /**
      * Returns the state API.
      *
-     * @returns {PositionStateAPI} Position state API.
+     * @returns {PositionStateAPI} TJSPosition state API.
      */
     get state(): PositionStateAPI;
     /**
@@ -1217,9 +1217,9 @@ declare class Position {
     /**
      * Returns the transform data for the readable store.
      *
-     * @returns {TransformData} Transform Data.
+     * @returns {TJSTransformData} Transform Data.
      */
-    get transform(): TransformData;
+    get transform(): TJSTransformData;
     /**
      * Returns the validators.
      *
@@ -1373,20 +1373,20 @@ declare class Position {
     /**
      * Assigns current position to object passed into method.
      *
-     * @param {object|PositionData}  [position] - Target to assign current position data.
+     * @param {object|TJSPositionData}  [position] - Target to assign current position data.
      *
-     * @param {PositionGetOptions}   [options] - Defines options for specific keys and substituting null for numeric
+     * @param {TJSPositionGetOptions}   [options] - Defines options for specific keys and substituting null for numeric
      *                                           default values.
      *
-     * @returns {PositionData} Passed in object with current position data.
+     * @returns {TJSPositionData} Passed in object with current position data.
      */
-    get(position?: object | PositionData, options?: PositionGetOptions): PositionData;
+    get(position?: object | TJSPositionData, options?: TJSPositionGetOptions): TJSPositionData;
     /**
-     * @returns {PositionData} Current position data.
+     * @returns {TJSPositionData} Current position data.
      */
-    toJSON(): PositionData;
+    toJSON(): TJSPositionData;
     /**
-     * All calculation and updates of position are implemented in {@link Position}. This allows position to be fully
+     * All calculation and updates of position are implemented in {@link TJSPosition}. This allows position to be fully
      * reactive and in control of updating inline styles for the application.
      *
      * Note: the logic for updating position is improved and changes a few aspects from the default
@@ -1401,26 +1401,26 @@ declare class Position {
      * implement one or more validator functions and add them from the application via
      * `this.position.validators.add(<Function>)`.
      *
-     * Updates to any target element are decoupled from the underlying Position data. This method returns this instance
-     * that you can then await on the target element inline style update by using {@link Position.elementUpdated}.
+     * Updates to any target element are decoupled from the underlying TJSPosition data. This method returns this instance
+     * that you can then await on the target element inline style update by using {@link TJSPosition.elementUpdated}.
      *
-     * @param {PositionDataExtended} [position] - Position data to set.
+     * @param {TJSPositionDataExtended} [position] - TJSPosition data to set.
      *
-     * @returns {Position} This Position instance.
+     * @returns {TJSPosition} This TJSPosition instance.
      */
-    set(position?: PositionDataExtended): Position;
+    set(position?: TJSPositionDataExtended): TJSPosition;
     /**
      *
-     * @param {function(PositionData): void} handler - Callback function that is invoked on update / changes. Receives
-     *                                                 a copy of the PositionData.
+     * @param {function(TJSPositionData): void} handler - Callback function that is invoked on update / changes. Receives
+     *                                                 a copy of the TJSPositionData.
      *
      * @returns {(function(): void)} Unsubscribe function.
      */
-    subscribe(handler: (arg0: PositionData) => void): (() => void);
+    subscribe(handler: (arg0: TJSPositionData) => void): (() => void);
     #private;
 }
 
-declare class Transforms {
+declare class TJSTransforms {
     _data: {};
     /**
      * @returns {boolean} Whether there are active transforms in local data.
@@ -1513,18 +1513,18 @@ declare class Transforms {
      */
     getCSSOrtho(data?: object): string;
     /**
-     * Collects all data including a bounding rect, transform matrix, and points array of the given {@link PositionData}
+     * Collects all data including a bounding rect, transform matrix, and points array of the given {@link TJSPositionData}
      * instance with the applied local transform data.
      *
-     * @param {PositionData} position - The position data to process.
+     * @param {TJSPositionData} position - The position data to process.
      *
-     * @param {TransformData} [output] - Optional TransformData output instance.
+     * @param {TJSTransformData} [output] - Optional TJSTransformData output instance.
      *
      * @param {object} [validationData] - Optional validation data for adjustment parameters.
      *
-     * @returns {TransformData} The output TransformData instance.
+     * @returns {TJSTransformData} The output TJSTransformData instance.
      */
-    getData(position: PositionData, output?: TransformData, validationData?: object): TransformData;
+    getData(position: TJSPositionData, output?: TJSTransformData, validationData?: object): TJSTransformData;
     /**
      * Creates a transform matrix based on local data applied in order it was added.
      *
@@ -1532,7 +1532,7 @@ declare class Transforms {
      * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
      * construction of a transform matrix in advance of setting local data and is useful in collision detection.
      *
-     * @param {object}   [data] - PositionData instance or local transform data.
+     * @param {object}   [data] - TJSPositionData instance or local transform data.
      *
      * @param {Matrix4}  [output] - The output mat4 instance.
      *
@@ -1549,7 +1549,7 @@ declare class Transforms {
      * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
      * construction of a transform matrix in advance of setting local data and is useful in collision detection.
      *
-     * @param {object}   [data] - PositionData instance or local transform data.
+     * @param {object}   [data] - TJSPositionData instance or local transform data.
      *
      * @param {Matrix4}  [output] - The output mat4 instance.
      *
@@ -1561,7 +1561,7 @@ declare class Transforms {
      *
      * @param {object} data - An object to test for transform data.
      *
-     * @returns {boolean} Whether the given PositionData has transforms.
+     * @returns {boolean} Whether the given TJSPositionData has transforms.
      */
     hasTransform(data: object): boolean;
     /**
@@ -1573,4 +1573,4 @@ declare class Transforms {
     #private;
 }
 
-export { Position, PositionData, PositionDataExtended, PositionInitialHelper, PositionValidatorOptions, TransformData, Transforms };
+export { TJSPosition, TJSPositionData, TJSPositionDataExtended, TJSPositionInitialHelper, TJSPositionValidatorOptions, TJSTransformData, TJSTransforms };
