@@ -90,7 +90,7 @@ export class TJSDocumentDialog
     *
     * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Folder|null>} The newly created Folder or null if the dialog is closed.
+    * @returns {Promise<globalThis.Folder|null>} The newly created Folder or null if the dialog is closed.
     */
    static async folderCreate(folderData, options = {}, dialogData = {})
    {
@@ -106,7 +106,7 @@ export class TJSDocumentDialog
     *
     * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Folder|boolean|null>} The deleted Folder or a falsy value; either 'false' for cancelling or
+    * @returns {Promise<globalThis.Folder|boolean|null>} The deleted Folder or a falsy value; either 'false' for cancelling or
     *          'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async folderDelete(document, options = {}, dialogData = {})

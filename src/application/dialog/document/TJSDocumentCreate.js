@@ -93,7 +93,7 @@ export class TJSDocumentCreate extends TJSDialog
          return null;
       }
 
-      if (Object.prototype.isPrototypeOf.call(Folder, documentCls))
+      if (Object.prototype.isPrototypeOf.call(globalThis.Folder, documentCls))
       {
          console.warn(`TJSDocumentCreate - show - warning: 'documentCls' is a Folder.`);
          return null;

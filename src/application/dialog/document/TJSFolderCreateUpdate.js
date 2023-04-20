@@ -81,14 +81,14 @@ export class TJSFolderCreateUpdate extends TJSDialog
          return null;
       }
 
-      const label = localize(Folder.metadata.label);
+      const label = localize(globalThis.Folder.metadata.label);
 
       const data = globalThis.foundry.utils.mergeObject({
          name: localize('DOCUMENT.New', { type: label }),
          sorting: 'a',
       }, folderData);
 
-      const document = new Folder(data);
+      const document = new globalThis.Folder(data);
 
       return new TJSFolderCreateUpdate(document, options, dialogData).wait();
    }

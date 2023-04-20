@@ -85,7 +85,7 @@ export class TJSDocumentImport extends TJSDialog
          return null;
       }
 
-      if (document instanceof Folder)
+      if (document instanceof globalThis.Folder)
       {
          console.warn(`TJSDocumentImport - show - warning: 'document' is a Folder; unsupported operation'.`);
          return null;

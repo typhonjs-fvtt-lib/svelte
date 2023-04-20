@@ -78,7 +78,7 @@ export class TJSFolderDelete extends TJSDialog
     */
    static async show(document, options = {}, dialogData = {})
    {
-      if (!(document instanceof Folder))
+      if (!(document instanceof globalThis.Folder))
       {
          console.warn(`TJSFolderDelete - show - warning: 'document' is not a Folder.`);
          return null;
