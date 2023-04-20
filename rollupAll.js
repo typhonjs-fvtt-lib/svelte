@@ -23,6 +23,8 @@ const outputPlugins = [];
 // Defines whether source maps are generated / loaded from the .env file.
 const sourcemap = s_SOURCEMAPS;
 
+// GenerateDTS options -----------------------------------------------------------------------------------------------
+
 // Provides naive search / replace of bundled declaration file rewriting the re-bundled definitions from
 // @typhonjs-svelte/lib. This will alter the JSDoc comments and import symbols.
 const replace = {
@@ -53,12 +55,13 @@ const ignorePattern = /^@typhonjs-svelte\/lib/;
 const onwarn = (warning, warn) =>
 {
    if (warning.code === 'UNRESOLVED_IMPORT' && ignorePattern.test(warning.exporter)) { return; }
-
    warn(warning);
 };
 
 // Rollup plugin options for generateDTS.
 const dtsPluginOptions = { bundlePackageExports: true, filterDiagnostic, onwarn, replace };
+
+// -------------------------------------------------------------------------------------------------------------------
 
 const rollupConfigs = [
    {
@@ -178,6 +181,24 @@ const rollupConfigs = [
       },
       output: {
          file: '_dist/store/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap
+      }
+   },
+   {
+      input: {
+         input: 'src/store/position/index.js',
+         plugins: [
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/store/position`] }),
+            resolve(s_RESOLVE_CONFIG),
+            generateDTS.plugin(dtsPluginOptions)
+         ]
+      },
+      output: {
+         file: '_dist/store/position/index.js',
          format: 'es',
          generatedCode: { constBindings: true },
          paths: externalPathsNPM,

@@ -10,7 +10,7 @@
   "svelte": "src/index-svelte.js",
   "exports": {
     "./action": {
-      "types": "./_distaction/index.d.ts",
+      "types": "./_dist/action/index.d.ts",
       "import": "./_dist/action/index.js"
     },
     "./animate": {
@@ -60,6 +60,10 @@
       "types": "./_dist/store/index.d.ts",
       "import": "./_dist/store/index.js"
     },
+    "./store/position": {
+      "types": "./_dist/store/position/index.d.ts",
+      "import": "./_dist/store/position/index.js"
+    },
     "./transition": {
       "types": "./_dist/transition/index.d.ts",
       "import": "./_dist/transition/index.js"
@@ -82,7 +86,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15",
-    "@typhonjs-build-test/esm-d-ts": "^0.0.8",
+    "@typhonjs-build-test/esm-d-ts": "^0.0.16",
     "@typhonjs-config/eslint-config": "^0.3.0",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "@typhonjs-svelte/lib": "github:typhonjs-svelte/lib",
@@ -91,7 +95,7 @@
     "eslint": "^8",
     "fs-extra": "^11.1.0",
     "rollup": "^3",
-    "svelte": "^3.55.1",
+    "svelte": "^3.58.0",
     "upath": "^2"
   },
   "engines": {
