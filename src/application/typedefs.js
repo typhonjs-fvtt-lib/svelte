@@ -37,13 +37,16 @@
  *
  * @property {boolean}  [positionable=true] - If false then `position.set` does not take effect.
  *
- * @property {import('@typhonjs-svelte/lib/store/position').PositionInitialHelper}   [positionInitial] - A helper for initial position placement.
+ * @property {import('@typhonjs-svelte/lib/store/position').TJSPositionInitialHelper}   [positionInitial] - A helper
+ *           for initial position placement.
  *
- * @property {boolean}  [positionOrtho=true] - When true Position is optimized for orthographic use.
+ * @property {boolean}  [positionOrtho=true] - When true TJSPosition is optimized for orthographic use.
  *
- * @property {import('@typhonjs-svelte/lib/store/position').PositionValidatorOptions}   [positionValidator] - A validator function or data or list of validators.
+ * @property {import('@typhonjs-svelte/lib/store/position').TJSPositionValidatorOptions}   [positionValidator] - A
+ *           validator function or data or list of validators.
  *
- * @property {import('@typhonjs-svelte/lib/store').TJSSessionStorage}   [sessionStorage] - An instance of TJSSessionStorage to share across SvelteApplications.
+ * @property {import('@typhonjs-svelte/lib/store').TJSSessionStorage}   [sessionStorage] - An instance of
+ *           TJSSessionStorage to share across SvelteApplications.
  *
  * @property {object}   [svelte] - A Svelte configuration object defining the main component.
  *

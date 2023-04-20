@@ -1,11 +1,11 @@
 import { hasSetter } from '@typhonjs-fvtt/svelte/util';
 
 /**
- * Provides an action to apply a Position instance to a HTMLElement and invoke `position.parent`
+ * Provides an action to apply a TJSPosition instance to a HTMLElement and invoke `position.parent`
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
- * @param {import('@typhonjs-svelte/lib/store/position').Position}          position - A position instance.
+ * @param {import('@typhonjs-svelte/lib/store/position').TJSPosition}          position - A position instance.
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */

@@ -1,4 +1,4 @@
-import { Position }           from '@typhonjs-svelte/lib/store/position';
+import { TJSPosition }        from '@typhonjs-svelte/lib/store/position';
 
 import {
    A11yHelper,
@@ -66,7 +66,7 @@ export class SvelteFormApplication extends FormApplication
    /**
     * The position store.
     *
-    * @type {Position}
+    * @type {TJSPosition}
     */
    #position;
 
@@ -108,8 +108,8 @@ export class SvelteFormApplication extends FormApplication
 
       this.#applicationState = new ApplicationState(this);
 
-      // Initialize Position with the position object set by Application.
-      this.#position = new Position(this, {
+      // Initialize TJSPosition with the position object set by Application.
+      this.#position = new TJSPosition(this, {
          ...this.position,
          ...this.options,
          initial: this.options.positionInitial,
@@ -121,9 +121,9 @@ export class SvelteFormApplication extends FormApplication
       delete this.position;
 
       /**
-       * Define accessors to retrieve Position by `this.position`.
+       * Define accessors to retrieve TJSPosition by `this.position`.
        *
-       * @member {Position} position - Adds accessors to SvelteFormApplication to get / set the position data.
+       * @member {TJSPosition} position - Adds accessors to SvelteFormApplication to get / set the position data.
        *
        * @memberof SvelteFormApplication#
        */
@@ -161,9 +161,9 @@ export class SvelteFormApplication extends FormApplication
          minHeight: MIN_WINDOW_HEIGHT,    // Assigned to position. Number specifying minimum window height.
          minWidth: MIN_WINDOW_WIDTH,      // Assigned to position. Number specifying minimum window width.
          positionable: true,              // If false then `position.set` does not take effect.
-         positionInitial: Position.Initial.browserCentered,      // A helper for initial position placement.
-         positionOrtho: true,             // When true Position is optimized for orthographic use.
-         positionValidator: Position.Validators.transformWindow, // A function providing the default validator.
+         positionInitial: TJSPosition.Initial.browserCentered,      // A helper for initial position placement.
+         positionOrtho: true,             // When true TJSPosition is optimized for orthographic use.
+         positionValidator: TJSPosition.Validators.transformWindow, // A function providing the default validator.
          sessionStorage: void 0,          // An instance of SessionStorage to share across SvelteApplications.
          suppressFormInit: false,         // If true automatic suppression of core FormApplication methods is enabled.
          transformOrigin: 'top left'      // By default, 'top / left' respects rotation when minimizing.
@@ -505,7 +505,7 @@ export class SvelteFormApplication extends FormApplication
                this.#applicationShellHolder[0] = svelteData.component;
 
                // If Vite / HMR / svelte_hmr is enabled then add a hook to receive callbacks when the ProxyComponent
-               // refreshes. Update the element root accordingly and force an update to Position.
+               // refreshes. Update the element root accordingly and force an update to TJSPosition.
                // See this issue for info about `on_hmr`:
                // https://github.com/sveltejs/svelte-hmr/issues/57
                if (isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
@@ -539,7 +539,7 @@ export class SvelteFormApplication extends FormApplication
             this.#applicationShellHolder[0] = svelteData.component;
 
             // If Vite / HMR / svelte_hmr is enabled then add a hook to receive callbacks when the ProxyComponent
-            // refreshes. Update the element root accordingly and force an update to Position.
+            // refreshes. Update the element root accordingly and force an update to TJSPosition.
             // See this issue for info about `on_hmr`:
             // https://github.com/sveltejs/svelte-hmr/issues/57
             if (isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
@@ -874,7 +874,7 @@ export class SvelteFormApplication extends FormApplication
     * explicitly set in `this.options.id` and long intro / outro transitions are assigned. If a new application
     * sharing this static ID attempts to open / render for the first time while an existing DOM element sharing
     * this static ID exists then the initial render is cancelled below rather than crashing later in the render
-    * cycle {@link Position.set}.
+    * cycle {@link TJSPosition.set}.
     *
     * @protected
     * @ignore
@@ -937,15 +937,15 @@ export class SvelteFormApplication extends FormApplication
    }
 
    /**
-    * All calculation and updates of position are implemented in {@link Position.set}. This allows position to be fully
+    * All calculation and updates of position are implemented in {@link TJSPosition.set}. This allows position to be fully
     * reactive and in control of updating inline styles for the application.
     *
     * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
-    * to update to using the {@link Position.validators} functionality.
+    * to update to using the {@link TJSPosition.validators} functionality.
     *
-    * @param {import('@typhonjs-svelte/lib/store/position').PositionDataExtended}   [position] - Position data.
+    * @param {import('@typhonjs-svelte/lib/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
     *
-    * @returns {Position} The updated position object for the application containing the new values
+    * @returns {TJSPosition} The updated position object for the application containing the new values
     */
    setPosition(position)
    {

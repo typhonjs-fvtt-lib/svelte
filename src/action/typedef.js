@@ -1,5 +1,5 @@
 /**
  * @typedef {object} Positionable
  *
- * @property {Position}   position - An instance of Position that manages application positional state.
+ * @property {Position}   position - An instance of TJSPosition that manages application positional state.
  */
