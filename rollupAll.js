@@ -323,6 +323,6 @@ await generateDTS({
 await generateDTS({
    input: './_dist/application/legacy/index.js',
    output: './_types/application/legacy/index.d.mts',
-   // prependGen: ['./_dist/application/typedefs.js'],
+   prependGen: ['./_dist/application/typedefs.js'],
    ...applicationDTSOptions
 });
