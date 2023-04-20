@@ -21,7 +21,8 @@
  *
  * @property {boolean}  [focusKeep=false] - When `focusAuto` and `focusKeep` is true; keeps internal focus.
  *
- * @property {object}   [focusSource] - Defines A11yHelper focus source to apply when application closes.
+ * @property {import('@typhonjs-svelte/lib/util').A11yFocusSource}   [focusSource] - Defines A11yHelper focus source to
+ *           apply when application closes.
  *
  * @property {boolean}  [headerButtonNoClose=false] - If true then the close header button is removed.
  *
@@ -48,9 +49,11 @@
  * @property {import('@typhonjs-svelte/lib/store').TJSSessionStorage}   [sessionStorage] - An instance of
  *           TJSSessionStorage to share across SvelteApplications.
  *
- * @property {object}   [svelte] - A Svelte configuration object defining the main component.
+ * @property {import('@typhonjs-svelte/lib/util').TJSSvelteConfig}   [svelte] - A Svelte configuration object defining
+ *           the main component.
  *
- * @property {string}   [transformOrigin='top left'] - By default, 'top / left' respects rotation when minimizing.
+ * @property {import('@typhonjs-svelte/lib/store/position').TJSTransformOrigin}   [transformOrigin='top left'] - By
+ *           default, 'top / left' respects rotation when minimizing.
  */
 
 /**
