@@ -5,7 +5,7 @@ import { hasSetter } from '@typhonjs-fvtt/svelte/util';
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
- * @param {Position}          position - A position instance.
+ * @param {import('@typhonjs-svelte/lib/store/position').Position}          position - A position instance.
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */

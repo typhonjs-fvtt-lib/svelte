@@ -4,5 +4,3 @@ export * from './document/TJSDocument.js';
 export * from './document/TJSDocumentCollection.js';
 
 export * from './gameState.js';
-
-// export * from './position/Position.js';

@@ -220,7 +220,8 @@ export class TJSDocument
     *
     * @param {object}   data - Document transfer data.
     *
-    * @param {ParseDataTransferOptions & TJSDocumentOptions}   [options] - Optional parameters.
+    * @param {import('@typhonjs-fvtt/svelte/util').ParseDataTransferOptions & TJSDocumentOptions}   [options] - Optional
+    *        parameters.
     *
     * @returns {Promise<boolean>} Returns true if new document set from data transfer blob.
     */
