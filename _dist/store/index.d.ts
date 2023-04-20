@@ -1495,12 +1495,12 @@ type TJSDocumentCollectionOptions = {
      * - Optional post delete function
      * to invoke when document is deleted _after_ subscribers have been notified.
      */
-    delete?: (collection: foundry.abstract.DocumentCollection) => void;
+    delete?: (collection: globalThis.DocumentCollection) => void;
     /**
      * - Optional pre delete function to
      * invoke when document is deleted _before_ subscribers are notified.
      */
-    preDelete?: (collection: foundry.abstract.DocumentCollection) => void;
+    preDelete?: (collection: globalThis.DocumentCollection) => void;
 };
 
 /**

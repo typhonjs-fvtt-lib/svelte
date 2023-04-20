@@ -97,7 +97,7 @@ export class TJSFolderExport extends TJSDialog
     */
    static async show(document, { pack, merge, keepId, ...options } = {}, dialogData = {})
    {
-      if (!(document instanceof Folder))
+      if (!(document instanceof globalThis.Folder))
       {
          console.warn(`TJSFolderExport - show - warning: 'document' is not a Folder.`);
          return null;

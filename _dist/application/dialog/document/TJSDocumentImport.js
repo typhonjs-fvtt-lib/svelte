@@ -74,8 +74,9 @@ export class TJSDocumentImport extends TJSDialog
     *
     * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Document|boolean|null>} The document after import completes or a falsy value; either 'false' for
-    *          cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    * @returns {Promise<foundry.abstract.Document|boolean|null>} The document after import completes or a falsy value;
+    *          either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header
+    *          button.
     */
    static async show(document, options = {}, dialogData = {})
    {
@@ -85,7 +86,7 @@ export class TJSDocumentImport extends TJSDialog
          return null;
       }
 
-      if (document instanceof Folder)
+      if (document instanceof globalThis.Folder)
       {
          console.warn(`TJSDocumentImport - show - warning: 'document' is a Folder; unsupported operation'.`);
          return null;

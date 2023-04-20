@@ -3800,10 +3800,10 @@ class TJSDocumentCollection
 /**
  * @typedef TJSDocumentCollectionOptions
  *
- * @property {(collection: foundry.abstract.DocumentCollection) => void} [delete] - Optional post delete function
+ * @property {(collection: globalThis.DocumentCollection) => void} [delete] - Optional post delete function
  *           to invoke when document is deleted _after_ subscribers have been notified.
  *
- * @property {(collection: foundry.abstract.DocumentCollection) => void} [preDelete] - Optional pre delete function to
+ * @property {(collection: globalThis.DocumentCollection) => void} [preDelete] - Optional pre delete function to
  *           invoke when document is deleted _before_ subscribers are notified.
  */
 

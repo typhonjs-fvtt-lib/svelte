@@ -78,13 +78,13 @@ declare class TJSDocumentDelete {
      *
      * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
      *
-     * @returns {Promise<Document|boolean|null>} The document if deleted or a falsy value; either 'false' for cancelling
-     *          or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+     * @returns {Promise<foundry.abstract.Document|boolean|null>} The document if deleted or a falsy value; either
+     *          'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
      */
     static show(document: foundry.abstract.Document, { context, ...options }?: {
         context?: object;
         options?: SvelteApplicationOptions[];
-    }, dialogData?: TJSDialogOptions): Promise<Document | boolean | null>;
+    }, dialogData?: TJSDialogOptions): Promise<foundry.abstract.Document | boolean | null>;
     /**
      * @param {foundry.abstract.Document} document - Document to delete.
      *
@@ -116,10 +116,10 @@ declare class TJSDocumentDialog {
      *
      * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
      *
-     * @returns {Promise<Document|null>} The modified document or 'null' if the user closed the dialog via `<Esc>` or the
-     *          close header button.
+     * @returns {Promise<foundry.abstract.Document|null>} The modified document or 'null' if the user closed the
+     *          dialog via `<Esc>` or the close header button.
      */
-    static configureOwnership(document: foundry.abstract.Document, options?: SvelteApplicationOptions, dialogData?: TJSDialogOptions): Promise<Document | null>;
+    static configureOwnership(document: foundry.abstract.Document, options?: SvelteApplicationOptions, dialogData?: TJSDialogOptions): Promise<foundry.abstract.Document | null>;
     /**
      * Create a new Document of the type specified by `documentCls` by rendering a dialog window to provide basic
      * creation details.
@@ -140,15 +140,15 @@ declare class TJSDocumentDialog {
      *
      * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
      *
-     * @returns {Promise<Document|null>} The newly created document or a falsy value; either 'false' for cancelling
-     *          or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+     * @returns {Promise<foundry.abstract.Document|null>} The newly created document or a falsy value; either 'false'
+     *          for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
      */
     static documentCreate(documentCls: object, data?: object, { parent, pack, renderSheet, ...options }?: {
         parent?: object;
         pack?: object;
         renderSheet?: boolean;
         options?: SvelteApplicationOptions[];
-    }, dialogData?: TJSDialogOptions): Promise<Document | null>;
+    }, dialogData?: TJSDialogOptions): Promise<foundry.abstract.Document | null>;
     /**
      * Shows a modal / non-draggable dialog to delete a document.
      *
@@ -162,13 +162,13 @@ declare class TJSDocumentDialog {
      *
      * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
      *
-     * @returns {Promise<Document|boolean|null>} The document if deleted or a falsy value; either 'false' for cancelling
-     *          or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+     * @returns {Promise<foundry.abstract.Document|boolean|null>} The document if deleted or a falsy value; either
+     *          'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
      */
     static documentDelete(document: foundry.abstract.Document, { context, ...options }?: {
         context?: object;
         options?: SvelteApplicationOptions[];
-    }, dialogData?: TJSDialogOptions): Promise<Document | boolean | null>;
+    }, dialogData?: TJSDialogOptions): Promise<foundry.abstract.Document | boolean | null>;
     /**
      * Create a new Folder by rendering a dialog window to provide basic creation details.
      *
@@ -178,9 +178,9 @@ declare class TJSDocumentDialog {
      *
      * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
      *
-     * @returns {Promise<Folder|null>} The newly created Folder or null if the dialog is closed.
+     * @returns {Promise<globalThis.Folder|null>} The newly created Folder or null if the dialog is closed.
      */
-    static folderCreate(folderData: object, options?: SvelteApplicationOptions, dialogData?: TJSDialogOptions): Promise<Folder | null>;
+    static folderCreate(folderData: object, options?: SvelteApplicationOptions, dialogData?: TJSDialogOptions): Promise<globalThis.Folder | null>;
     /**
      * Deletes a folder and does delete subfolders / documents.
      *
@@ -190,10 +190,10 @@ declare class TJSDocumentDialog {
      *
      * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
      *
-     * @returns {Promise<Folder|boolean|null>} The deleted Folder or a falsy value; either 'false' for cancelling or
+     * @returns {Promise<globalThis.Folder|boolean|null>} The deleted Folder or a falsy value; either 'false' for cancelling or
      *          'null' if the user closed the dialog via `<Esc>` or the close header button.
      */
-    static folderDelete(document: globalThis.Folder, options?: SvelteApplicationOptions, dialogData?: TJSDialogOptions): Promise<Folder | boolean | null>;
+    static folderDelete(document: globalThis.Folder, options?: SvelteApplicationOptions, dialogData?: TJSDialogOptions): Promise<globalThis.Folder | boolean | null>;
     /**
      * Shows a modal / non-draggable dialog to export a folder to an eligible compendium pack.
      *
@@ -211,16 +211,16 @@ declare class TJSDocumentDialog {
      *
      * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
      *
-     * @returns {Promise<CompendiumCollection|boolean|null>} The compendium collection the folder is exported to or a
-     *          falsy value; either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the
-     *          close header button.
+     * @returns {Promise<globalThis.CompendiumCollection|boolean|null>} The compendium collection the folder is exported
+     *          to or a falsy value; either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>`
+     *          or the close header button.
      */
     static folderExport(document: globalThis.Folder, { pack, merge, keepId, ...options }?: {
         pack?: string;
         merge?: boolean;
         keepId?: boolean;
         options?: SvelteApplicationOptions[];
-    }, dialogData?: TJSDialogOptions): Promise<CompendiumCollection | boolean | null>;
+    }, dialogData?: TJSDialogOptions): Promise<globalThis.CompendiumCollection | boolean | null>;
     /**
      * Removes a folder, but does not delete / remove sub-folders / documents.
      *
@@ -268,10 +268,10 @@ declare class TJSDocumentDialog {
      *
      * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
      *
-     * @returns {Promise<Document|boolean|null>} The document after import completes or a falsy value; either 'false' for
-     *          cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+     * @returns {Promise<foundry.abstract.Document|boolean|null>} The document after import completes or a falsy value;
+     *          either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
      */
-    static importFromJSON(document: foundry.abstract.Document, options?: SvelteApplicationOptions, dialogData?: TJSDialogOptions): Promise<Document | boolean | null>;
+    static importFromJSON(document: foundry.abstract.Document, options?: SvelteApplicationOptions, dialogData?: TJSDialogOptions): Promise<foundry.abstract.Document | boolean | null>;
 }
 
 /**
@@ -289,10 +289,11 @@ declare class TJSDocumentImport {
      *
      * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
      *
-     * @returns {Promise<Document|boolean|null>} The document after import completes or a falsy value; either 'false' for
-     *          cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+     * @returns {Promise<foundry.abstract.Document|boolean|null>} The document after import completes or a falsy value;
+     *          either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header
+     *          button.
      */
-    static show(document: foundry.abstract.Document, options?: SvelteApplicationOptions, dialogData?: TJSDialogOptions): Promise<Document | boolean | null>;
+    static show(document: foundry.abstract.Document, options?: SvelteApplicationOptions, dialogData?: TJSDialogOptions): Promise<foundry.abstract.Document | boolean | null>;
     /**
      * Render an import dialog for updating the data related to this Document through an exported JSON file
      *
@@ -320,10 +321,10 @@ declare class TJSDocumentOwnership {
      *
      * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
      *
-     * @returns {Promise<Document|null>} The modified document or 'null' if the user closed the dialog via `<Esc>` or the
-     *                                   close header button.
+     * @returns {Promise<foundry.abstract.Document|null>} The modified document or 'null' if the user closed the dialog
+     *          via `<Esc>` or the close header button.
      */
-    static show(document: foundry.abstract.Document, options?: SvelteApplicationOptions, dialogData?: TJSDialogOptions): Promise<Document | null>;
+    static show(document: foundry.abstract.Document, options?: SvelteApplicationOptions, dialogData?: TJSDialogOptions): Promise<foundry.abstract.Document | null>;
     /**
      * @param {foundry.abstract.Document} document - Document instance to modify.
      *
