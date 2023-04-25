@@ -79,7 +79,7 @@
    {
       const formData = new FormDataExtended(event.target).object;
 
-      if (!formData.name?.trim()) { formData.name = globalThis.Folder.implementation.defaultName(); }
+      if (!formData.name?.trim()) { formData.name = Folder.implementation.defaultName(); }
       if (!formData.parent) { formData.parent = null; }
 
       let modifiedDoc = document;

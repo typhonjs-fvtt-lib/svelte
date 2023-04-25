@@ -106,7 +106,7 @@ export class TJSDocumentDelete extends TJSDialog
          return null;
       }
 
-      if (document instanceof globalThis.Folder)
+      if (document instanceof Folder)
       {
          console.warn(`TJSDocumentDelete - show - warning: 'document' is a Folder.`);
          return null;

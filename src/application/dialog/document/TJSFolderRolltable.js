@@ -76,7 +76,7 @@ export class TJSFolderRolltable extends TJSDialog
     */
    static async show(document, options = {}, dialogData = {})
    {
-      if (!(document instanceof globalThis.Folder))
+      if (!(document instanceof Folder))
       {
          console.warn(`TJSFolderRolltable - show - warning: 'document' is not a Folder.`);
          return null;
