@@ -17,6 +17,10 @@
       "types": "./_dist/animate/index.d.ts",
       "import": "./_dist/animate/index.js"
     },
+    "./animate/action": {
+      "types": "./_dist/animate/action/index.d.ts",
+      "import": "./_dist/animate/action/index.js"
+    },
     "./application": {
       "import": "./_dist/application/index.js"
     },
