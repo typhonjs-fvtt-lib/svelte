@@ -912,8 +912,8 @@ class ManagedPromise
 /**
  * Provides utility methods for checking browser capabilities.
  *
- * TODO: perhaps add support for various standard media query checks for level 4 & 5.
  * @see https://kilianvalkhof.com/2021/web/detecting-media-query-support-in-css-and-javascript/
+ * TODO: perhaps add support for various standard media query checks for level 4 & 5.
  */
 class BrowserSupports
 {
@@ -1255,20 +1255,39 @@ function getStackingContext(node)
  * @property {string}  reason - Reason for why a stacking context was created.
  */
 
+const s_REGEX = /(\d+)\s*px/;
+
+/**
+ * Parses a pixel string / computed styles. Ex. `100px` returns `100`.
+ *
+ * @param {string}   value - Value to parse.
+ *
+ * @returns {number|undefined} The integer component of a pixel string.
+ */
+function styleParsePixels(value)
+{
+   if (typeof value !== 'string') { return void 0; }
+
+   const isPixels = s_REGEX.test(value);
+   const number = parseInt(value);
+
+   return isPixels && Number.isFinite(number) ? number : void 0;
+}
+
 /**
  * Provides a managed dynamic style sheet / element useful in configuring global CSS variables. When creating an
- * instance of StyleManager you must provide a "document key" / string for the style element added. The style element
+ * instance of TJSStyleManager you must provide a "document key" / string for the style element added. The style element
  * can be accessed via `document[docKey]`.
  *
- * Instances of StyleManager can also be versioned by supplying a positive integer greater than or equal to `1` via the
- * 'version' option. This version number is assigned to the associated style element. When a StyleManager instance is
- * created and there is an existing instance with a version that is lower than the current instance all CSS rules are
- * removed letting the higher version to take precedence. This isn't a perfect system and requires thoughtful
+ * Instances of TJSStyleManager can also be versioned by supplying a positive integer greater than or equal to `1` via
+ * the 'version' option. This version number is assigned to the associated style element. When a TJSStyleManager
+ * instance is created and there is an existing instance with a version that is lower than the current instance all CSS
+ * rules are removed letting the higher version to take precedence. This isn't a perfect system and requires thoughtful
  * construction of CSS variables exposed, but allows multiple independently compiled TRL packages to load the latest
- * CSS variables. It is recommended to always set `overwrite` option of {@link StyleManager.setProperty} and
- * {@link StyleManager.setProperties} to `false` when loading initial values.
+ * CSS variables. It is recommended to always set `overwrite` option of {@link TJSStyleManager.setProperty} and
+ * {@link TJSStyleManager.setProperties} to `false` when loading initial values.
  */
-class StyleManager
+class TJSStyleManager
 {
    /** @type {CSSStyleRule} */
    #cssRule;
@@ -1296,7 +1315,6 @@ class StyleManager
     * @param {Document} [opts.document] - Target document to load styles into.
     *
     * @param {number}   [opts.version] - An integer representing the version / level of styles being managed.
-    *
     */
    constructor({ docKey, selector = ':root', document = globalThis.document, version } = {})
    {
@@ -1306,7 +1324,7 @@ class StyleManager
       //  unintentionally.
       // if (!(document instanceof Document))
       // {
-      //    throw new TypeError(`StyleManager error: 'document' is not an instance of Document.`);
+      //    throw new TypeError(`TJSStyleManager error: 'document' is not an instance of Document.`);
       // }
 
       if (typeof selector !== 'string') { throw new TypeError(`StyleManager error: 'selector' is not a string.`); }
@@ -1370,17 +1388,17 @@ class StyleManager
    }
 
    /**
-    * Provides a copy constructor to duplicate an existing StyleManager instance into a new document.
+    * Provides a copy constructor to duplicate an existing TJSStyleManager instance into a new document.
     *
     * Note: This is used to support the `PopOut` module.
     *
     * @param {Document} [document] Target browser document to clone into.
     *
-    * @returns {StyleManager} New style manager instance.
+    * @returns {TJSStyleManager} New style manager instance.
     */
    clone(document = globalThis.document)
    {
-      const newStyleManager = new StyleManager({
+      const newStyleManager = new TJSStyleManager({
          selector: this.#selector,
          docKey: this.#docKey,
          document,
@@ -1430,7 +1448,7 @@ class StyleManager
    /**
     * Set rules by property / value; useful for CSS variables.
     *
-    * @param {Object<string, string>}  rules - An object with property / value string pairs to load.
+    * @param {{ [key: string]: string }}  rules - An object with property / value string pairs to load.
     *
     * @param {boolean}                 [overwrite=true] - When true overwrites any existing values.
     */
@@ -1518,25 +1536,6 @@ class StyleManager
 
       return this.#cssRule.style.removeProperty(key);
    }
-}
-
-const s_REGEX = /(\d+)\s*px/;
-
-/**
- * Parses a pixel string / computed styles. Ex. `100px` returns `100`.
- *
- * @param {string}   value - Value to parse.
- *
- * @returns {number|undefined} The integer component of a pixel string.
- */
-function styleParsePixels(value)
-{
-   if (typeof value !== 'string') { return void 0; }
-
-   const isPixels = s_REGEX.test(value);
-   const number = parseInt(value);
-
-   return isPixels && Number.isFinite(number) ? number : void 0;
 }
 
 /**
@@ -1635,6 +1634,57 @@ function isSvelteComponent(comp)
 }
 
 /**
+ * Validates `config` argument whether it is a valid {@link TJSSvelteConfig}.
+ *
+ * @param {*}  config - The potential config object to validate.
+ *
+ * @param {boolean}  [raiseException=false] - If validation fails raise an exception.
+ *
+ * @returns {boolean} Is the config a valid TJSSvelteConfig.
+ *
+ * @throws {TypeError}  Any validation error when `raiseException` is enabled.
+ */
+function isTJSSvelteConfig(config, raiseException = false)
+{
+   if (!isObject(config))
+   {
+      if (raiseException) { throw new TypeError(`isTJSSvelteConfig error: 'config' is not an object.`); }
+      return false;
+   }
+
+   if (!isSvelteComponent(config.class))
+   {
+      if (raiseException)
+      {
+         throw new TypeError(`isTJSSvelteConfig error: 'config.class' is not a Svelte component constructor.`);
+      }
+      return false;
+   }
+
+   return true;
+}
+
+/**
+ * @typedef {object} TJSSvelteConfig
+ *
+ * @property {{ new(options: import('#svelte').ComponentConstructorOptions): import('#svelte').SvelteComponent | import('#svelte').SvelteComponentTyped }} class -
+ *
+ * @property {Element|Document|ShadowRoot}   [target=document.body] -
+ *
+ * @property {Element} [anchor] -
+ *
+ * @property {() => Record<string, *> | Record<string, *>} [props] -
+ *
+ * @property {() => (Record<string, *> | Map<string, *>) | Map<string, *> | Record<string, *>} [context] -
+ *
+ * @property {boolean}  [hydrate] -
+ *
+ * @property {boolean} [intro] -
+ *
+ * @property {boolean}  [$$inline] -
+ */
+
+/**
  * Runs outro transition then destroys Svelte component.
  *
  * Workaround for https://github.com/sveltejs/svelte/issues/4056
@@ -1673,7 +1723,7 @@ async function outroAndDestroy(instance)
  *
  * @returns {object} The processed Svelte config object.
  */
-function parseSvelteConfig(config, thisArg = void 0)
+function parseTJSSvelteConfig(config, thisArg = void 0)
 {
    if (typeof config !== 'object')
    {
@@ -2312,5 +2362,5 @@ function getUUIDFromDataTransfer(data, { actor = true, compendium = true, world 
  * @property {string[]|undefined}   [types] - Require the `data.type` to match entry in `types`.
  */
 
-export { A11yHelper, BrowserSupports, ClipboardAccess, ManagedPromise, StyleManager, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, striptags, styleParsePixels, uuidv4 };
+export { A11yHelper, BrowserSupports, ClipboardAccess, ManagedPromise, TJSStyleManager, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, isTJSSvelteConfig, klona, normalizeString, outroAndDestroy, parseTJSSvelteConfig, safeAccess, safeSet, striptags, styleParsePixels, uuidv4 };
 //# sourceMappingURL=index.js.map

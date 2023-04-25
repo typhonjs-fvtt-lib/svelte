@@ -3,6 +3,7 @@ import { isObject, isPlainObject, isIterable, styleParsePixels } from '@typhonjs
 import { cubicOut, linear } from 'svelte/easing';
 import { mat4, vec3, degToRad, lerp } from '@typhonjs-fvtt/svelte/math';
 import { writable } from 'svelte/store';
+import { nextAnimationFrame } from '@typhonjs-fvtt/svelte/animate';
 
 /**
  * Provides a TJSBasicAnimation implementation for TJSPosition animation.
@@ -220,7 +221,7 @@ class AnimationManager
    /**
     * Cancels all animations for given TJSPosition instance.
     *
-    * @param {TJSPosition} position - TJSPosition instance.
+    * @param {import('../').TJSPosition} position - TJSPosition instance.
     */
    static cancel(position)
    {
@@ -273,9 +274,10 @@ class AnimationManager
    /**
     * Gets all {@link AnimationControl} instances for a given TJSPosition instance.
     *
-    * @param {TJSPosition} position - TJSPosition instance.
+    * @param {import('../').TJSPosition} position - TJSPosition instance.
     *
-    * @returns {AnimationControl[]} All scheduled AnimationControl instances for the given TJSPosition instance.
+    * @returns {import('./AnimationControl').AnimationControl[]} All scheduled AnimationControl instances for the given
+    *          TJSPosition instance.
     */
    static getScheduled(position)
    {
@@ -425,9 +427,9 @@ Object.freeze(transformOrigins);
 /**
  * Converts any relative string values for animatable keys to actual updates performed against current data.
  *
- * @param {TJSPositionDataExtended}    positionData - position data.
+ * @param {import('./').TJSPositionDataExtended}    positionData - position data.
  *
- * @param {TJSPosition|TJSPositionData}   position - The source position instance.
+ * @param {import('./').TJSPosition | import('./').TJSPositionData}   position - The source position instance.
  */
 function convertRelative(positionData, position)
 {
@@ -471,140 +473,12 @@ function convertRelative(positionData, position)
    }
 }
 
-/**
- * Defines stored positional data.
- */
-class TJSPositionData
-{
-   constructor({ height = null, left = null, maxHeight = null, maxWidth = null, minHeight = null, minWidth = null,
-    rotateX = null, rotateY = null, rotateZ = null, scale = null, translateX = null, translateY = null,
-     translateZ = null, top = null, transformOrigin = null, width = null, zIndex = null } = {})
-   {
-      /**
-       * @type {number|'auto'|'inherit'|null}
-       */
-      this.height = height;
-
-      /**
-       * @type {number|null}
-       */
-      this.left = left;
-
-      /**
-       * @type {number|null}
-       */
-      this.maxHeight = maxHeight;
-
-      /**
-       * @type {number|null}
-       */
-      this.maxWidth = maxWidth;
-
-      /**
-       * @type {number|null}
-       */
-      this.minHeight = minHeight;
-
-      /**
-       * @type {number|null}
-       */
-      this.minWidth = minWidth;
-
-      /**
-       * @type {number|null}
-       */
-      this.rotateX = rotateX;
-
-      /**
-       * @type {number|null}
-       */
-      this.rotateY = rotateY;
-
-      /**
-       * @type {number|null}
-       */
-      this.rotateZ = rotateZ;
-
-      /**
-       * @type {number|null}
-       */
-      this.scale = scale;
-
-      /**
-       * @type {number|null}
-       */
-      this.top = top;
-
-      /**
-       * @type {string|null}
-       */
-      this.transformOrigin = transformOrigin;
-
-      /**
-       * @type {number|null}
-       */
-      this.translateX = translateX;
-
-      /**
-       * @type {number|null}
-       */
-      this.translateY = translateY;
-
-      /**
-       * @type {number|null}
-       */
-      this.translateZ = translateZ;
-
-      /**
-       * @type {number|'auto'|'inherit'|null}
-       */
-      this.width = width;
-
-      /**
-       * @type {number|null}
-       */
-      this.zIndex = zIndex;
-
-      Object.seal(this);
-   }
-
-   /**
-    * Copies given data to this instance.
-    *
-    * @param {TJSPositionData}   data - Copy from this instance.
-    *
-    * @returns {TJSPositionData} This instance.
-    */
-   copy(data)
-   {
-      this.height = data.height;
-      this.left = data.left;
-      this.maxHeight = data.maxHeight;
-      this.maxWidth = data.maxWidth;
-      this.minHeight = data.minHeight;
-      this.minWidth = data.minWidth;
-      this.rotateX = data.rotateX;
-      this.rotateY = data.rotateY;
-      this.rotateZ = data.rotateZ;
-      this.scale = data.scale;
-      this.top = data.top;
-      this.transformOrigin = data.transformOrigin;
-      this.translateX = data.translateX;
-      this.translateY = data.translateY;
-      this.translateZ = data.translateZ;
-      this.width = data.width;
-      this.zIndex = data.zIndex;
-
-      return this;
-   }
-}
-
 class AnimationAPI
 {
-   /** @type {TJSPositionData} */
+   /** @type {import('../').TJSPositionData} */
    #data;
 
-   /** @type {TJSPosition} */
+   /** @type {import('../').TJSPosition} */
    #position;
 
    /**
@@ -623,9 +497,9 @@ class AnimationAPI
    #cleanup;
 
    /**
-    * @param {TJSPosition}       position -
+    * @param {import('../').TJSPosition}       position -
     *
-    * @param {TJSPositionData}   data -
+    * @param {import('../').TJSPositionData}   data -
     */
    constructor(position, data)
    {
@@ -766,7 +640,7 @@ class AnimationAPI
    /**
     * Provides a tween from given position data to the current position.
     *
-    * @param {TJSPositionDataExtended} fromData - The starting position.
+    * @param {import('../').TJSPositionDataExtended} fromData - The starting position.
     *
     * @param {object}         [opts] - Optional parameters.
     *
@@ -843,9 +717,9 @@ class AnimationAPI
    /**
     * Provides a tween from given position data to the current position.
     *
-    * @param {TJSPositionDataExtended} fromData - The starting position.
+    * @param {import('../').TJSPositionDataExtended} fromData - The starting position.
     *
-    * @param {TJSPositionDataExtended} toData - The ending position.
+    * @param {import('../').TJSPositionDataExtended} toData - The ending position.
     *
     * @param {object}         [opts] - Optional parameters.
     *
@@ -934,7 +808,7 @@ class AnimationAPI
    /**
     * Provides a tween to given position data from the current position.
     *
-    * @param {TJSPositionDataExtended} toData - The destination position.
+    * @param {import('../').TJSPositionDataExtended} toData - The destination position.
     *
     * @param {object}         [opts] - Optional parameters.
     *
@@ -1020,7 +894,7 @@ class AnimationAPI
     *
     * @param {Function}          [opts.interpolate=lerp] - Interpolation function.
     *
-    * @returns {quickToCallback} quick-to tween function.
+    * @returns {import('../').quickToCallback} quick-to tween function.
     */
    quickTo(keys, { duration = 1, ease = cubicOut, interpolate = lerp } = {})
    {
@@ -1178,7 +1052,7 @@ class AnimationAPI
        *
        * @param {Function}          [opts.interpolate] - Interpolation function.
        *
-       * @returns {quickToCallback} The quickTo callback.
+       * @returns {import('../').quickToCallback} The quickTo callback.
        */
       quickToCB.options = ({ duration, ease, interpolate } = {}) => // eslint-disable-line no-shadow
       {
@@ -1213,7 +1087,7 @@ class AnimationAPI
  */
 class AnimationGroupControl
 {
-   /** @type {AnimationControl[]} */
+   /** @type {import('./AnimationControl').AnimationControl[]} */
    #animationControls;
 
    /** @type {Promise<Awaited<unknown>[]>} */
@@ -1234,7 +1108,8 @@ class AnimationGroupControl
    static get voidControl() { return this.#voidControl; }
 
    /**
-    * @param {AnimationControl[]} animationControls - An array of AnimationControl instances.
+    * @param {import('./AnimationControl').AnimationControl[]} animationControls - An array of AnimationControl
+    *        instances.
     */
    constructor(animationControls)
    {
@@ -1349,7 +1224,7 @@ class AnimationGroupAPI
    /**
     * Cancels any animation for given TJSPosition data.
     *
-    * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
+    * @param {import('../').TJSPosition | {position: import('../').TJSPosition} | Iterable<import('../').TJSPosition> | Iterable<{position: import('../').TJSPosition}>} position -
     */
    static cancel(position)
    {
@@ -1394,9 +1269,9 @@ class AnimationGroupAPI
    /**
     * Gets all animation controls for the given position data.
     *
-    * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
+    * @param {import('../').TJSPosition | {position: import('../').TJSPosition} | Iterable<import('../').TJSPosition> | Iterable<{position: import('../').TJSPosition}>} position -
     *
-    * @returns {{position: TJSPosition, data: object|void, controls: AnimationControl[]}[]} Results array.
+    * @returns {{ position: import('../').TJSPosition, data: object | void, controls: import('./AnimationControl').AnimationControl[]}[]} Results array.
     */
    static getScheduled(position)
    {
@@ -1446,13 +1321,13 @@ class AnimationGroupAPI
    /**
     * Provides the `from` animation tween for one or more TJSPosition instances as a group.
     *
-    * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
+    * @param {import('../').TJSPosition | {position: import('../').TJSPosition} | Iterable<import('../').TJSPosition> | Iterable<{position: import('../').TJSPosition}>} position -
     *
     * @param {object|Function}   fromData -
     *
     * @param {object|Function}   options -
     *
-    * @returns {import('@typhonjs-svelte/lib/animate').TJSBasicAnimation} Basic animation control.
+    * @returns {import('#svelte-lib/animate').TJSBasicAnimation} Basic animation control.
     */
    static from(position, fromData, options)
    {
@@ -1467,7 +1342,7 @@ class AnimationGroupAPI
       }
 
       /**
-       * @type {AnimationControl[]}
+       * @type {import('./AnimationControl').AnimationControl[]}
        */
       const animationControls = [];
 
@@ -1585,7 +1460,7 @@ class AnimationGroupAPI
    /**
     * Provides the `fromTo` animation tween for one or more TJSPosition instances as a group.
     *
-    * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
+    * @param {import('../').TJSPosition | {position: import('../').TJSPosition} | Iterable<import('../').TJSPosition> | Iterable<{position: import('../').TJSPosition}>} position -
     *
     * @param {object|Function}   fromData -
     *
@@ -1593,7 +1468,7 @@ class AnimationGroupAPI
     *
     * @param {object|Function}   options -
     *
-    * @returns {import('@typhonjs-svelte/lib/animate').TJSBasicAnimation} Basic animation control.
+    * @returns {import('#svelte-lib/animate').TJSBasicAnimation} Basic animation control.
     */
    static fromTo(position, fromData, toData, options)
    {
@@ -1613,7 +1488,7 @@ class AnimationGroupAPI
       }
 
       /**
-       * @type {AnimationControl[]}
+       * @type {import('./AnimationControl').AnimationControl[]}
        */
       const animationControls = [];
 
@@ -1758,13 +1633,13 @@ class AnimationGroupAPI
    /**
     * Provides the `to` animation tween for one or more TJSPosition instances as a group.
     *
-    * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
+    * @param {import('../').TJSPosition | {position: import('../').TJSPosition} | Iterable<import('../').TJSPosition> | Iterable<{position: import('../').TJSPosition}>} position -
     *
     * @param {object|Function}   toData -
     *
     * @param {object|Function}   options -
     *
-    * @returns {import('@typhonjs-svelte/lib/animate').TJSBasicAnimation} Basic animation control.
+    * @returns {import('#svelte-lib/animate').TJSBasicAnimation} Basic animation control.
     */
    static to(position, toData, options)
    {
@@ -1779,7 +1654,7 @@ class AnimationGroupAPI
       }
 
       /**
-       * @type {AnimationControl[]}
+       * @type {import('./AnimationControl').AnimationControl[]}
        */
       const animationControls = [];
 
@@ -1897,13 +1772,13 @@ class AnimationGroupAPI
    /**
     * Provides the `to` animation tween for one or more TJSPosition instances as a group.
     *
-    * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
+    * @param {import('../').TJSPosition | {position: import('../').TJSPosition} | Iterable<import('../').TJSPosition> | Iterable<{position: import('../').TJSPosition}>} position -
     *
     * @param {Iterable<string>}  keys -
     *
     * @param {object|Function}   options -
     *
-    * @returns {quickToCallback} Basic animation control.
+    * @returns {import('../').quickToCallback} Basic animation control.
     */
    static quickTo(position, keys, options)
    {
@@ -1918,7 +1793,7 @@ class AnimationGroupAPI
       }
 
       /**
-       * @type {quickToCallback[]}
+       * @type {import('../').quickToCallback[]}
        */
       const quickToCallbacks = [];
 
@@ -2109,7 +1984,7 @@ class AnimationGroupAPI
        *
        * @param {Function}          [options.interpolate] - Interpolation function.
        *
-       * @returns {quickToCallback} The quickTo callback.
+       * @returns {import('../').quickToCallback} The quickTo callback.
        */
       quickToCB.options = (options) => // eslint-disable-line no-shadow
       {
@@ -2410,20 +2285,148 @@ class PositionChangeSet
    }
 }
 
+/**
+ * Defines stored positional data.
+ */
+class TJSPositionData
+{
+   constructor({ height = null, left = null, maxHeight = null, maxWidth = null, minHeight = null, minWidth = null,
+    rotateX = null, rotateY = null, rotateZ = null, scale = null, translateX = null, translateY = null,
+     translateZ = null, top = null, transformOrigin = null, width = null, zIndex = null } = {})
+   {
+      /**
+       * @type {number|'auto'|'inherit'|null}
+       */
+      this.height = height;
+
+      /**
+       * @type {number|null}
+       */
+      this.left = left;
+
+      /**
+       * @type {number|null}
+       */
+      this.maxHeight = maxHeight;
+
+      /**
+       * @type {number|null}
+       */
+      this.maxWidth = maxWidth;
+
+      /**
+       * @type {number|null}
+       */
+      this.minHeight = minHeight;
+
+      /**
+       * @type {number|null}
+       */
+      this.minWidth = minWidth;
+
+      /**
+       * @type {number|null}
+       */
+      this.rotateX = rotateX;
+
+      /**
+       * @type {number|null}
+       */
+      this.rotateY = rotateY;
+
+      /**
+       * @type {number|null}
+       */
+      this.rotateZ = rotateZ;
+
+      /**
+       * @type {number|null}
+       */
+      this.scale = scale;
+
+      /**
+       * @type {number|null}
+       */
+      this.top = top;
+
+      /**
+       * @type {string|null}
+       */
+      this.transformOrigin = transformOrigin;
+
+      /**
+       * @type {number|null}
+       */
+      this.translateX = translateX;
+
+      /**
+       * @type {number|null}
+       */
+      this.translateY = translateY;
+
+      /**
+       * @type {number|null}
+       */
+      this.translateZ = translateZ;
+
+      /**
+       * @type {number|'auto'|'inherit'|null}
+       */
+      this.width = width;
+
+      /**
+       * @type {number|null}
+       */
+      this.zIndex = zIndex;
+
+      Object.seal(this);
+   }
+
+   /**
+    * Copies given data to this instance.
+    *
+    * @param {TJSPositionData}   data - Copy from this instance.
+    *
+    * @returns {TJSPositionData} This instance.
+    */
+   copy(data)
+   {
+      this.height = data.height;
+      this.left = data.left;
+      this.maxHeight = data.maxHeight;
+      this.maxWidth = data.maxWidth;
+      this.minHeight = data.minHeight;
+      this.minWidth = data.minWidth;
+      this.rotateX = data.rotateX;
+      this.rotateY = data.rotateY;
+      this.rotateZ = data.rotateZ;
+      this.scale = data.scale;
+      this.top = data.top;
+      this.transformOrigin = data.transformOrigin;
+      this.translateX = data.translateX;
+      this.translateY = data.translateY;
+      this.translateZ = data.translateZ;
+      this.width = data.width;
+      this.zIndex = data.zIndex;
+
+      return this;
+   }
+}
+
 class PositionStateAPI
 {
-   /** @type {TJSPositionData} */
+   /** @type {import('./TJSPositionData').TJSPositionData} */
    #data;
 
    /**
-    * @type {Map<string, TJSPositionDataExtended>}
+    * @type {Map<string, import('./').TJSPositionDataExtended>}
     */
    #dataSaved = new Map();
 
-   /** @type {TJSPosition} */
+   /** @type {import('./').TJSPosition} */
    #position;
 
-   /** @type {TJSTransforms} */
+   /** @type {import('./transform').TJSTransforms} */
    #transforms;
 
    constructor(position, data, transforms)
@@ -2440,7 +2443,7 @@ class PositionStateAPI
     *
     * @param {string}   options.name - Saved data set name.
     *
-    * @returns {TJSPositionDataExtended} The saved data set.
+    * @returns {import('./').TJSPositionDataExtended} The saved data set.
     */
    get({ name })
    {
@@ -2452,7 +2455,7 @@ class PositionStateAPI
    /**
     * Returns any associated default data.
     *
-    * @returns {TJSPositionDataExtended} Associated default data.
+    * @returns {import('./').TJSPositionDataExtended} Associated default data.
     */
    getDefault()
    {
@@ -2466,7 +2469,7 @@ class PositionStateAPI
     *
     * @param {string}   options.name - Name to remove and retrieve.
     *
-    * @returns {TJSPositionDataExtended} Saved position data.
+    * @returns {import('./').TJSPositionDataExtended} Saved position data.
     */
    remove({ name })
    {
@@ -2550,7 +2553,8 @@ class PositionStateAPI
     *
     * @param {Function}          [params.interpolate=lerp] - Interpolation function.
     *
-    * @returns {TJSPositionDataExtended|Promise<TJSPositionDataExtended>} Saved position data.
+    * @returns {import('./').TJSPositionDataExtended | Promise<import('./').TJSPositionDataExtended>} Saved position
+    *          data.
     */
    restore({ name, remove = false, properties, silent = false, async = false, animateTo = false, duration = 0.1,
     ease = linear, interpolate = lerp })
@@ -2614,7 +2618,7 @@ class PositionStateAPI
     *
     * @param {...*}     [opts.extra] - Extra data to add to saved data.
     *
-    * @returns {TJSPositionData} Current position data
+    * @returns {import('./').TJSPositionData} Current position data
     */
    save({ name, ...extra })
    {
@@ -2676,7 +2680,7 @@ class StyleCache
       this.hasWillChange = false;
 
       /**
-       * @type {ResizeObserverData}
+       * @type {import('./').ResizeObserverData}
        */
       this.resizeObserved = {
          contentHeight: void 0,
@@ -2688,7 +2692,7 @@ class StyleCache
       /**
        * Provides a writable store to track offset & content width / height from an associated `resizeObserver` action.
        *
-       * @type {Writable<ResizeObserverData>}
+       * @type {import('#svelte/store').Writable<import('./').ResizeObserverData>}
        */
       const storeResizeObserved = writable(this.resizeObserved);
 
@@ -2826,21 +2830,21 @@ class TJSTransformData
     * Stores the individual transformed corner points of the window in screenspace clockwise from:
     * top left -> top right -> bottom right -> bottom left.
     *
-    * @type {Vector3[]}
+    * @type {import('../').Vector3[]}
     */
    #corners = [vec3.create(), vec3.create(), vec3.create(), vec3.create()];
 
    /**
     * Stores the current gl-matrix mat4 data.
     *
-    * @type {Matrix4}
+    * @type {import('../').Matrix4}
     */
    #mat4 = mat4.create();
 
    /**
     * Stores the pre & post origin translations to apply to matrix transforms.
     *
-    * @type {Matrix4[]}
+    * @type {import('../').Matrix4[]}
     */
    #originTranslations = [mat4.create(), mat4.create()];
 
@@ -2850,7 +2854,7 @@ class TJSTransformData
    get boundingRect() { return this.#boundingRect; }
 
    /**
-    * @returns {Vector3[]} The transformed corner points as vec3 in screen space.
+    * @returns {import('../').Vector3[]} The transformed corner points as vec3 in screen space.
     */
    get corners() { return this.#corners; }
 
@@ -2860,12 +2864,12 @@ class TJSTransformData
    get css() { return `matrix3d(${this.mat4.join(',')})`; }
 
    /**
-    * @returns {Matrix4} The transform matrix.
+    * @returns {import('../').Matrix4} The transform matrix.
     */
    get mat4() { return this.#mat4; }
 
    /**
-    * @returns {Matrix4[]} The pre / post translation matrices for origin translation.
+    * @returns {import('../').Matrix4[]} The pre / post translation matrices for origin translation.
     */
    get originTranslations() { return this.#originTranslations; }
 }
@@ -2900,14 +2904,15 @@ class AdapterValidators
    #enabled = true;
 
    /**
-    * @type {ValidatorData[]}
+    * @type {import('../').ValidatorData[]}
     */
    #validatorData;
 
    #mapUnsubscribe = new Map();
 
    /**
-    * @returns {[AdapterValidators, ValidatorData[]]} Returns this and internal storage for validator adapter.
+    * @returns {[AdapterValidators, import('../').ValidatorData[]]} Returns this and internal storage for validator
+    *          adapter.
     */
    constructor()
    {
@@ -2941,8 +2946,7 @@ class AdapterValidators
    /**
     * Provides an iterator for validators.
     *
-    * @returns {Generator<ValidatorData|undefined>} Generator / iterator of validators.
-    * @yields {ValidatorData}
+    * @yields {import('../').ValidatorData}
     */
    *[Symbol.iterator]()
    {
@@ -2955,7 +2959,7 @@ class AdapterValidators
    }
 
    /**
-    * @param {...(ValidatorFn|ValidatorData)}   validators -
+    * @param {...(import('../').ValidatorFn | import('../').ValidatorData)}   validators -
     */
    add(...validators)
    {
@@ -3078,7 +3082,7 @@ class AdapterValidators
    }
 
    /**
-    * @param {...(ValidatorFn|ValidatorData)}   validators -
+    * @param {...(import('../').ValidatorFn | import('../').ValidatorData)}   validators -
     */
    remove(...validators)
    {
@@ -3119,8 +3123,8 @@ class AdapterValidators
     * Remove validators by the provided callback. The callback takes 3 parameters: `id`, `validator`, and `weight`.
     * Any truthy value returned will remove that validator.
     *
-    * @param {function(*, ValidatorFn, number): boolean} callback - Callback function to evaluate each validator
-    *                                                                  entry.
+    * @param {function(*, import('../').ValidatorFn, number): boolean} callback - Callback function to evaluate each
+    *        validator entry.
     */
    removeBy(callback)
    {
@@ -3185,8 +3189,6 @@ class AdapterValidators
       // if (length !== this.#validatorData.length) { this.#indexUpdate(); }
    }
 }
-
-// Explicit import for TS declaration generation.
 
 class BasicBounds
 {
@@ -3338,9 +3340,9 @@ class BasicBounds
     * Provides a validator that respects transforms in positional data constraining the position to within the target
     * elements bounds.
     *
-    * @param {ValidationData}   valData - The associated validation data for position updates.
+    * @param {import('../').ValidationData}   valData - The associated validation data for position updates.
     *
-    * @returns {TJSPositionData} Potentially adjusted position data.
+    * @returns {import('../').TJSPositionData} Potentially adjusted position data.
     */
    validator(valData)
    {
@@ -3535,9 +3537,9 @@ class TransformBounds
     * Provides a validator that respects transforms in positional data constraining the position to within the target
     * elements bounds.
     *
-    * @param {ValidationData}   valData - The associated validation data for position updates.
+    * @param {import('../').ValidationData}   valData - The associated validation data for position updates.
     *
-    * @returns {TJSPositionData} Potentially adjusted position data.
+    * @returns {import('../').TJSPositionData} Potentially adjusted position data.
     */
    validator(valData)
    {
@@ -3608,13 +3610,13 @@ const s_SCALE_VECTOR = [1, 1, 1];
 /** @type {number[]} */
 const s_TRANSLATE_VECTOR = [0, 0, 0];
 
-/** @type {Matrix4} */
+/** @type {import('../').Matrix4} */
 const s_MAT4_RESULT = mat4.create();
 
-/** @type {Matrix4} */
+/** @type {import('../').Matrix4} */
 const s_MAT4_TEMP = mat4.create();
 
-/** @type {Vector3} */
+/** @type {import('../').Vector3} */
 const s_VEC3_TEMP = vec3.create();
 
 class TJSTransforms
@@ -3878,7 +3880,7 @@ class TJSTransforms
     * Collects all data including a bounding rect, transform matrix, and points array of the given {@link TJSPositionData}
     * instance with the applied local transform data.
     *
-    * @param {TJSPositionData} position - The position data to process.
+    * @param {import('../').TJSPositionData} position - The position data to process.
     *
     * @param {TJSTransformData} [output] - Optional TJSTransformData output instance.
     *
@@ -4000,9 +4002,9 @@ class TJSTransforms
     *
     * @param {object}   [data] - TJSPositionData instance or local transform data.
     *
-    * @param {Matrix4}  [output] - The output mat4 instance.
+    * @param {import('../').Matrix4}  [output] - The output mat4 instance.
     *
-    * @returns {Matrix4} Transform matrix.
+    * @returns {import('../').Matrix4} Transform matrix.
     */
    getMat4(data = this._data, output = mat4.create())
    {
@@ -4135,9 +4137,9 @@ class TJSTransforms
     *
     * @param {object}   [data] - TJSPositionData instance or local transform data.
     *
-    * @param {Matrix4}  [output] - The output mat4 instance.
+    * @param {import('../').Matrix4}  [output] - The output mat4 instance.
     *
-    * @returns {Matrix4} Transform matrix.
+    * @returns {import('../').Matrix4} Transform matrix.
     */
    getMat4Ortho(data = this._data, output = mat4.create())
    {
@@ -4280,9 +4282,9 @@ class TJSTransforms
  *
  * @param {number}   height - The TJSPositionData height or validation data height when 'auto'.
  *
- * @param {Matrix4[]}   output - Output Mat4 array.
+ * @param {import('../').Matrix4[]}   output - Output Mat4 array.
  *
- * @returns {Matrix4[]} Output Mat4 array.
+ * @returns {import('../').Matrix4[]} Output Mat4 array.
  */
 function s_GET_ORIGIN_TRANSLATION(transformOrigin, width, height, output)
 {
@@ -4401,12 +4403,12 @@ class UpdateElementData
       this.dimensionData = { width: 0, height: 0 };
 
       /**
-       * @type {PositionChangeSet}
+       * @type {import('../PositionChangeSet').PositionChangeSet}
        */
       this.changeSet = void 0;
 
       /**
-       * @type {TJSPositionOptions}
+       * @type {import('../').TJSPositionOptions}
        */
       this.options = void 0;
 
@@ -4418,12 +4420,12 @@ class UpdateElementData
       this.queued = false;
 
       /**
-       * @type {StyleCache}
+       * @type {import('../StyleCache').StyleCache}
        */
       this.styleCache = void 0;
 
       /**
-       * @type {TJSTransforms}
+       * @type {import('../transform').TJSTransforms}
        */
       this.transforms = void 0;
 
@@ -4441,14 +4443,14 @@ class UpdateElementData
       this.subscriptions = void 0;
 
       /**
-       * @type {import('svelte/store').Writable<{width: (number|"auto"), height: (number|"auto")}>}
+       * @type {import('#svelte/store').Writable<{width: (number|"auto"), height: (number|"auto")}>}
        */
       this.storeDimension = writable(this.dimensionData);
 
       // When there are subscribers set option to calculate transform updates; set to false when no subscribers.
 
       /**
-       * @type {import('svelte/store').Writable<TJSTransformData>}
+       * @type {import('#svelte/store').Writable<TJSTransformData>}
        */
       this.storeTransform = writable(this.transformData, () =>
       {
@@ -4466,30 +4468,6 @@ class UpdateElementData
       // Seal data backing readable stores.
       Object.seal(this.dimensionData);
    }
-}
-
-/**
- * Awaits `requestAnimationFrame` calls by the counter specified. This allows asynchronous applications for direct /
- * inline style modification amongst other direct animation techniques.
- *
- * @param {number}   [cntr=1] - A positive integer greater than 0 for amount of requestAnimationFrames to wait.
- *
- * @returns {Promise<number>} Returns current time equivalent to `performance.now()`.
- */
-async function nextAnimationFrame(cntr = 1)
-{
-   if (!Number.isInteger(cntr) || cntr < 1)
-   {
-      throw new TypeError(`nextAnimationFrame error: 'cntr' must be a positive integer greater than 0.`);
-   }
-
-   let currentTime = performance.now();
-   for (;--cntr >= 0;)
-   {
-      currentTime = await new Promise((resolve) => requestAnimationFrame(resolve));
-   }
-
-   return currentTime;
 }
 
 /**
@@ -4514,7 +4492,7 @@ class UpdateElementManager
     *
     * @param {HTMLElement}       el - An HTMLElement instance.
     *
-    * @param {UpdateElementData} updateData - An UpdateElementData instance.
+    * @param {import('./UpdateElementData').UpdateElementData} updateData - An UpdateElementData instance.
     *
     * @returns {Promise<number>} The unified next frame update promise. Returns `currentTime`.
     */
@@ -4598,7 +4576,7 @@ class UpdateElementManager
     *
     * @param {HTMLElement}       el - An HTMLElement instance.
     *
-    * @param {UpdateElementData} updateData - An UpdateElementData instance.
+    * @param {import('./UpdateElementData').UpdateElementData} updateData - An UpdateElementData instance.
     */
    static immediate(el, updateData)
    {
@@ -4626,7 +4604,7 @@ class UpdateElementManager
    }
 
    /**
-    * @param {UpdateElementData} updateData - Data change set.
+    * @param {import('./UpdateElementData').UpdateElementData} updateData - Data change set.
     */
    static updateSubscribers(updateData)
    {
@@ -4666,7 +4644,7 @@ class UpdateElementManager
  *
  * @param {HTMLElement} el - The target HTMLElement.
  *
- * @param {UpdateElementData} updateData - Update data.
+ * @param {import('./UpdateElementData').UpdateElementData} updateData - Update data.
  */
 function s_UPDATE_ELEMENT(el, updateData)
 {
@@ -4719,7 +4697,7 @@ function s_UPDATE_ELEMENT(el, updateData)
  *
  * @param {HTMLElement} el - The target HTMLElement.
  *
- * @param {UpdateElementData} updateData - Update data.
+ * @param {import('./UpdateElementData').UpdateElementData} updateData - Update data.
  */
 function s_UPDATE_ELEMENT_ORTHO(el, updateData)
 {
@@ -4759,7 +4737,7 @@ function s_UPDATE_ELEMENT_ORTHO(el, updateData)
  *
  * @param {HTMLElement} el - The target HTMLElement.
  *
- * @param {UpdateElementData} updateData - Update element data.
+ * @param {import('./UpdateElementData').UpdateElementData} updateData - Update element data.
  */
 function s_UPDATE_TRANSFORM(el, updateData)
 {
@@ -4833,7 +4811,7 @@ class TJSPosition
    /**
     * Stores ongoing options that are set in the constructor or by transform store subscription.
     *
-    * @type {TJSPositionOptions}
+    * @type {import('./').TJSPositionOptions}
     */
    #options = {
       calculateTransform: false,
@@ -4845,7 +4823,7 @@ class TJSPosition
    /**
     * The associated parent for positional data tracking. Used in validators.
     *
-    * @type {TJSPositionParent}
+    * @type {import('./').TJSPositionParent}
     */
    #parent;
 
@@ -4857,7 +4835,7 @@ class TJSPosition
    #positionChangeSet = new PositionChangeSet();
 
    /**
-    * @type {StorePosition}
+    * @type {import('./').StorePosition}
     */
    #stores;
 
@@ -4898,7 +4876,7 @@ class TJSPosition
    #validators;
 
    /**
-    * @type {ValidatorData[]}
+    * @type {import('./').ValidatorData[]}
     */
    #validatorData;
 
@@ -4941,7 +4919,7 @@ class TJSPosition
     *
     * @param {TJSPosition}          position - A position instance.
     *
-    * @param {TJSPositionOptions}   options - TJSPosition options.
+    * @param {import('./').TJSPositionOptions}   options - TJSPosition options.
     *
     * @returns {TJSPosition} A duplicate position instance.
     */
@@ -4960,10 +4938,10 @@ class TJSPosition
    }
 
    /**
-    * @param {TJSPositionParent|TJSPositionOptionsAll}   [parent] - A potential parent element or object w/ `elementTarget`
-    *                                                      getter. May also be the TJSPositionOptions object w/ 1 argument.
+    * @param {import('./').TJSPositionParent | import('./').TJSPositionOptionsAll}   [parent] - A potential parent
+    *        element or object w/ `elementTarget` getter. May also be the TJSPositionOptions object w/ 1 argument.
     *
-    * @param {TJSPositionOptionsAll}   [options] - Default values.
+    * @param {import('./').TJSPositionOptionsAll}   [options] - Default values.
     */
    constructor(parent, options)
    {
@@ -5227,7 +5205,7 @@ class TJSPosition
    /**
     * Returns the associated {@link TJSPositionParent} instance.
     *
-    * @returns {TJSPositionParent} The TJSPositionParent instance.
+    * @returns {import('./').TJSPositionParent} The TJSPositionParent instance.
     */
    get parent() { return this.#parent; }
 
@@ -5241,7 +5219,7 @@ class TJSPosition
    /**
     * Returns the derived writable stores for individual data variables.
     *
-    * @returns {StorePosition} Derived / writable stores.
+    * @returns {import('./').StorePosition} Derived / writable stores.
     */
    get stores() { return this.#stores; }
 
@@ -5280,7 +5258,7 @@ class TJSPosition
    /**
     * Sets the associated {@link TJSPositionParent} instance. Resets the style cache and default data.
     *
-    * @param {TJSPositionParent|void} parent - A TJSPositionParent instance.
+    * @param {import('./').TJSPositionParent | void} parent - A TJSPositionParent instance.
     */
    set parent(parent)
    {
@@ -5540,8 +5518,8 @@ class TJSPosition
     *
     * @param {object|TJSPositionData}  [position] - Target to assign current position data.
     *
-    * @param {TJSPositionGetOptions}   [options] - Defines options for specific keys and substituting null for numeric
-    *                                           default values.
+    * @param {import('./').TJSPositionGetOptions}   [options] - Defines options for specific keys and substituting null
+    *        for numeric default values.
     *
     * @returns {TJSPositionData} Passed in object with current position data.
     */
@@ -5615,7 +5593,7 @@ class TJSPosition
     * Updates to any target element are decoupled from the underlying TJSPosition data. This method returns this instance
     * that you can then await on the target element inline style update by using {@link TJSPosition.elementUpdated}.
     *
-    * @param {TJSPositionDataExtended} [position] - TJSPosition data to set.
+    * @param {import('./').TJSPositionDataExtended} [position] - TJSPosition data to set.
     *
     * @returns {TJSPosition} This TJSPosition instance.
     */
@@ -5870,7 +5848,7 @@ class TJSPosition
    }
 
    /**
-    * @param {TJSPositionDataExtended} opts -
+    * @param {import('./').TJSPositionDataExtended} opts -
     *
     * @param {number|null} opts.left -
     *
@@ -6112,7 +6090,7 @@ class TJSPosition
 const s_DATA_UPDATE = new TJSPositionData();
 
 /**
- * @type {ValidationData}
+ * @type {import('./').ValidationData}
  */
 const s_VALIDATION_DATA = {
    position: void 0,

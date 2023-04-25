@@ -1,7 +1,7 @@
 import {
    isApplicationShell,
    isObject,
-   parseSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
+   parseTJSSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Instantiates and attaches a Svelte component to the main inserted HTML.
@@ -50,7 +50,7 @@ export function loadSvelteConfig({ app, template, config, elementRootUpdate } = 
 
    const NewSvelteComponent = config.class;
 
-   const svelteConfig = parseSvelteConfig({ ...config, target }, app);
+   const svelteConfig = parseTJSSvelteConfig({ ...config, target }, app);
 
    const externalContext = svelteConfig.context.get('#external');
 

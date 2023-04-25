@@ -1,407 +1,5 @@
-import * as svelte_store from 'svelte/store';
-import * as _typhonjs_fvtt_svelte_animate from '@typhonjs-fvtt/svelte/animate';
-
-type quickToCallback = (...args: (number | object)[]) => any;
-type TJSPositionInitialHelper = {
-    /**
-     * - Returns the left position given the width of the browser window.
-     */
-    getLeft: (width: number) => number;
-    /**
-     * - Returns the top position given the height of the browser window.
-     */
-    getTop: (height: number) => number;
-};
-type TJSPositionGetOptions = {
-    /**
-     * - When provided only these keys are copied.
-     */
-    keys: Iterable<string>;
-    /**
-     * - When provided these keys are excluded.
-     */
-    exclude: Iterable<string>;
-    /**
-     * - When true any `null` values are converted into defaults.
-     */
-    numeric: boolean;
-};
-/**
- * - Options set in constructor.
- */
-type TJSPositionOptions = {
-    /**
-     * - When true always calculate transform data.
-     */
-    calculateTransform: boolean;
-    /**
-     * - Provides a helper for setting initial position data.
-     */
-    initialHelper: TJSPositionInitialHelper;
-    /**
-     * - Sets TJSPosition to orthographic mode using just transform / matrix3d for positioning.
-     */
-    ortho: boolean;
-    /**
-     * - Set to true when there are subscribers to the readable transform store.
-     */
-    transformSubscribed: boolean;
-};
-type TJSPositionOptionsAll = TJSPositionOptions & TJSPositionData;
-type TJSPositionParent = HTMLElement | object;
-type ResizeObserverData = {
-    /**
-     * -
-     */
-    contentHeight: number | undefined;
-    /**
-     * -
-     */
-    contentWidth: number | undefined;
-    /**
-     * -
-     */
-    offsetHeight: number | undefined;
-    /**
-     * -
-     */
-    offsetWidth: number | undefined;
-};
-/**
- * - Provides individual writable stores for {@link TJSPosition }.
- */
-type StorePosition = {
-    /**
-     * - Readable store for dimension
-     *   data.
-     */
-    dimension: svelte_store.Readable<{
-        width: number;
-        height: number;
-    }>;
-    /**
-     * - Readable store for current element.
-     */
-    element: svelte_store.Readable<HTMLElement>;
-    /**
-     * - Derived store for `left` updates.
-     */
-    left: svelte_store.Writable<number | null>;
-    /**
-     * - Derived store for `top` updates.
-     */
-    top: svelte_store.Writable<number | null>;
-    /**
-     * - Derived store for `width` updates.
-     */
-    width: svelte_store.Writable<number | 'auto' | null>;
-    /**
-     * - Derived store for `height` updates.
-     */
-    height: svelte_store.Writable<number | 'auto' | null>;
-    /**
-     * - Derived store for `maxHeight` updates.
-     */
-    maxHeight: svelte_store.Writable<number | null>;
-    /**
-     * - Derived store for `maxWidth` updates.
-     */
-    maxWidth: svelte_store.Writable<number | null>;
-    /**
-     * - Derived store for `minHeight` updates.
-     */
-    minHeight: svelte_store.Writable<number | null>;
-    /**
-     * - Derived store for `minWidth` updates.
-     */
-    minWidth: svelte_store.Writable<number | null>;
-    /**
-     * - Readable store for `contentHeight`.
-     */
-    resizeContentHeight: svelte_store.Readable<number | undefined>;
-    /**
-     * - Readable store for `contentWidth`.
-     */
-    resizeContentWidth: svelte_store.Readable<number | undefined>;
-    /**
-     * - Protected store for resize observer updates.
-     */
-    resizeObserved: svelte_store.Writable<ResizeObserverData>;
-    /**
-     * - Readable store for `offsetHeight`.
-     */
-    resizeOffsetHeight: svelte_store.Readable<number | undefined>;
-    /**
-     * - Readable store for `offsetWidth`.
-     */
-    resizeOffsetWidth: svelte_store.Readable<number | undefined>;
-    /**
-     * - Derived store for `rotate` updates.
-     */
-    rotate: svelte_store.Writable<number | null>;
-    /**
-     * - Derived store for `rotateX` updates.
-     */
-    rotateX: svelte_store.Writable<number | null>;
-    /**
-     * - Derived store for `rotateY` updates.
-     */
-    rotateY: svelte_store.Writable<number | null>;
-    /**
-     * - Derived store for `rotateZ` updates.
-     */
-    rotateZ: svelte_store.Writable<number | null>;
-    /**
-     * - Derived store for `scale` updates.
-     */
-    scale: svelte_store.Writable<number | null>;
-    /**
-     * - Readable store for transform data.
-     */
-    transform: svelte_store.Readable<TJSTransformData>;
-    /**
-     * - Derived store for `transformOrigin`.
-     */
-    transformOrigin: svelte_store.Writable<string>;
-    /**
-     * - Derived store for `translateX` updates.
-     */
-    translateX: svelte_store.Writable<number | null>;
-    /**
-     * - Derived store for `translateY` updates.
-     */
-    translateY: svelte_store.Writable<number | null>;
-    /**
-     * - Derived store for `translateZ` updates.
-     */
-    translateZ: svelte_store.Writable<number | null>;
-    /**
-     * - Derived store for `zIndex` updates.
-     */
-    zIndex: svelte_store.Writable<number | null>;
-};
-type TJSPositionDataExtended = {
-    /**
-     * -
-     */
-    height?: number | string | null;
-    /**
-     * -
-     */
-    left?: number | string | null;
-    /**
-     * -
-     */
-    maxHeight?: number | string | null;
-    /**
-     * -
-     */
-    maxWidth?: number | string | null;
-    /**
-     * -
-     */
-    minHeight?: number | string | null;
-    /**
-     * -
-     */
-    minWidth?: number | string | null;
-    /**
-     * -
-     */
-    rotateX?: number | string | null;
-    /**
-     * -
-     */
-    rotateY?: number | string | null;
-    /**
-     * -
-     */
-    rotateZ?: number | string | null;
-    /**
-     * -
-     */
-    scale?: number | string | null;
-    /**
-     * -
-     */
-    top?: number | string | null;
-    /**
-     * -
-     */
-    transformOrigin?: string | null;
-    /**
-     * -
-     */
-    translateX?: number | string | null;
-    /**
-     * -
-     */
-    translateY?: number | string | null;
-    /**
-     * -
-     */
-    translateZ?: number | string | null;
-    /**
-     * -
-     */
-    width?: number | string | null;
-    /**
-     * -
-     *
-     * Extended properties -----------------------------------------------------------------------------------------------
-     */
-    zIndex?: number | string | null;
-    /**
-     * - When true any associated element is updated immediately.
-     */
-    immediateElementUpdate?: boolean;
-    /**
-     * - Alias for `rotateZ`.
-     */
-    rotation?: number | null;
-};
-/**
- * - 4x4 Matrix; Format: column-major, when typed out it looks like row-major.
- */
-type Matrix4 = Float32Array;
-type ValidationData = {
-    /**
-     * -
-     */
-    position: TJSPositionData;
-    /**
-     * -
-     */
-    parent: TJSPositionParent;
-    /**
-     * -
-     */
-    el: HTMLElement;
-    /**
-     * -
-     */
-    computed: CSSStyleDeclaration;
-    /**
-     * -
-     */
-    transforms: TJSTransforms;
-    /**
-     * -
-     */
-    height: number;
-    /**
-     * -
-     */
-    width: number;
-    /**
-     * -
-     */
-    marginLeft: number | undefined;
-    /**
-     * -
-     */
-    marginTop: number | undefined;
-    /**
-     * -
-     */
-    maxHeight: number | undefined;
-    /**
-     * -
-     */
-    maxWidth: number | undefined;
-    /**
-     * -
-     */
-    minHeight: number | undefined;
-    /**
-     * -
-     */
-    minWidth: number | undefined;
-    /**
-     * - The rest of any data submitted to {@link TJSPosition.set }
-     */
-    rest: object;
-};
-/**
- * - TJSPosition validator function that takes a {@link TJSPositionData } instance potentially
- *                             modifying it or returning null if invalid.
- */
-type ValidatorFn = (valData: ValidationData) => TJSPositionData | null;
-type ValidatorData = {
-    /**
-     * - An ID associated with this validator. Can be used to remove the validator.
-     */
-    id?: any;
-    /**
-     * - TJSPosition validator function that takes a {@link TJSPositionData } instance
-     *   potentially modifying it or returning null if invalid.
-     */
-    validator: ValidatorFn;
-    /**
-     * - A number between 0 and 1 inclusive to position this validator against others.
-     */
-    weight?: number;
-    /**
-     * - Optional subscribe function following the Svelte store / subscribe pattern.
-     */
-    subscribe?: Function;
-};
-/**
- * Defines the
- *          position validator options.
- */
-type TJSPositionValidatorOptions = ValidatorFn | ValidatorData | Iterable<ValidatorFn | ValidatorData>;
-
-
-/**
- * Provides a TJSBasicAnimation implementation for TJSPosition animation.
- */
-declare class AnimationControl {
-    /**
-     * Defines a static empty / void animation control.
-     *
-     * @type {AnimationControl}
-     */
-    static "__#146906@#voidControl": AnimationControl;
-    /**
-     * Provides a static void / undefined AnimationControl that is automatically resolved.
-     *
-     * @returns {AnimationControl} Void AnimationControl
-     */
-    static get voidControl(): AnimationControl;
-    /**
-     * @param {object|null} [animationData] - Animation data from {@link AnimationAPI}.
-     *
-     * @param {boolean}     [willFinish] - Promise that tracks animation finished state.
-     */
-    constructor(animationData?: object | null, willFinish?: boolean);
-    /**
-     * Get a promise that resolves when animation is finished.
-     *
-     * @returns {Promise<void>}
-     */
-    get finished(): Promise<void>;
-    /**
-     * Returns whether this animation is currently active / animating.
-     *
-     * Note: a delayed animation may not be started / active yet. Use {@link AnimationControl.isFinished} to determine
-     * if an animation is actually finished.
-     *
-     * @returns {boolean} Animation active state.
-     */
-    get isActive(): boolean;
-    /**
-     * Returns whether this animation is completely finished.
-     *
-     * @returns {boolean} Animation finished state.
-     */
-    get isFinished(): boolean;
-    /**
-     * Cancels the animation.
-     */
-    cancel(): void;
-    #private;
-}
+import * as _svelte_store from 'svelte/store';
+import * as _svelte_lib_animate from '@typhonjs-fvtt/svelte/animate';
 
 /**
  * Defines stored positional data.
@@ -504,11 +102,241 @@ declare class TJSPositionData {
     copy(data: TJSPositionData): TJSPositionData;
 }
 
+/**
+ * Provides the output data for {@link TJSTransforms.getData}.
+ */
+declare class TJSTransformData {
+    /**
+     * @returns {DOMRect} The bounding rectangle.
+     */
+    get boundingRect(): DOMRect;
+    /**
+     * @returns {import('../').Vector3[]} The transformed corner points as vec3 in screen space.
+     */
+    get corners(): Float32Array[];
+    /**
+     * @returns {string} Returns the CSS style string for the transform matrix.
+     */
+    get css(): string;
+    /**
+     * @returns {import('../').Matrix4} The transform matrix.
+     */
+    get mat4(): Float32Array;
+    /**
+     * @returns {import('../').Matrix4[]} The pre / post translation matrices for origin translation.
+     */
+    get originTranslations(): Float32Array[];
+    #private;
+}
+
+declare class TJSTransforms {
+    _data: {};
+    /**
+     * @returns {boolean} Whether there are active transforms in local data.
+     */
+    get isActive(): boolean;
+    /**
+     * Sets the local rotateX data if the value is a finite number otherwise removes the local data.
+     *
+     * @param {number|null|undefined}   value - A value to set.
+     */
+    set rotateX(arg: number);
+    /**
+     * @returns {number|undefined} Any local rotateX data.
+     */
+    get rotateX(): number;
+    /**
+     * Sets the local rotateY data if the value is a finite number otherwise removes the local data.
+     *
+     * @param {number|null|undefined}   value - A value to set.
+     */
+    set rotateY(arg: number);
+    /**
+     * @returns {number|undefined} Any local rotateY data.
+     */
+    get rotateY(): number;
+    /**
+     * Sets the local rotateZ data if the value is a finite number otherwise removes the local data.
+     *
+     * @param {number|null|undefined}   value - A value to set.
+     */
+    set rotateZ(arg: number);
+    /**
+     * @returns {number|undefined} Any local rotateZ data.
+     */
+    get rotateZ(): number;
+    /**
+     * Sets the local scale data if the value is a finite number otherwise removes the local data.
+     *
+     * @param {number|null|undefined}   value - A value to set.
+     */
+    set scale(arg: number);
+    /**
+     * @returns {number|undefined} Any local rotateZ scale.
+     */
+    get scale(): number;
+    /**
+     * Sets the local translateX data if the value is a finite number otherwise removes the local data.
+     *
+     * @param {number|null|undefined}   value - A value to set.
+     */
+    set translateX(arg: number);
+    /**
+     * @returns {number|undefined} Any local translateZ data.
+     */
+    get translateX(): number;
+    /**
+     * Sets the local translateY data if the value is a finite number otherwise removes the local data.
+     *
+     * @param {number|null|undefined}   value - A value to set.
+     */
+    set translateY(arg: number);
+    /**
+     * @returns {number|undefined} Any local translateZ data.
+     */
+    get translateY(): number;
+    /**
+     * Sets the local translateZ data if the value is a finite number otherwise removes the local data.
+     *
+     * @param {number|null|undefined}   value - A value to set.
+     */
+    set translateZ(arg: number);
+    /**
+     * @returns {number|undefined} Any local translateZ data.
+     */
+    get translateZ(): number;
+    /**
+     * Returns the matrix3d CSS transform for the given position / transform data.
+     *
+     * @param {object} [data] - Optional position data otherwise use local stored transform data.
+     *
+     * @returns {string} The CSS matrix3d string.
+     */
+    getCSS(data?: object): string;
+    /**
+     * Returns the matrix3d CSS transform for the given position / transform data.
+     *
+     * @param {object} [data] - Optional position data otherwise use local stored transform data.
+     *
+     * @returns {string} The CSS matrix3d string.
+     */
+    getCSSOrtho(data?: object): string;
+    /**
+     * Collects all data including a bounding rect, transform matrix, and points array of the given {@link TJSPositionData}
+     * instance with the applied local transform data.
+     *
+     * @param {import('../').TJSPositionData} position - The position data to process.
+     *
+     * @param {TJSTransformData} [output] - Optional TJSTransformData output instance.
+     *
+     * @param {object} [validationData] - Optional validation data for adjustment parameters.
+     *
+     * @returns {TJSTransformData} The output TJSTransformData instance.
+     */
+    getData(position: TJSPositionData, output?: TJSTransformData, validationData?: object): TJSTransformData;
+    /**
+     * Creates a transform matrix based on local data applied in order it was added.
+     *
+     * If no data object is provided then the source is the local transform data. If another data object is supplied
+     * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
+     * construction of a transform matrix in advance of setting local data and is useful in collision detection.
+     *
+     * @param {object}   [data] - TJSPositionData instance or local transform data.
+     *
+     * @param {import('../').Matrix4}  [output] - The output mat4 instance.
+     *
+     * @returns {import('../').Matrix4} Transform matrix.
+     */
+    getMat4(data?: object, output?: Matrix4): Matrix4;
+    /**
+     * Provides an orthographic enhancement to convert left / top positional data to a translate operation.
+     *
+     * This transform matrix takes into account that the remaining operations are , but adds any left / top attributes from passed in data to
+     * translate X / Y.
+     *
+     * If no data object is provided then the source is the local transform data. If another data object is supplied
+     * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
+     * construction of a transform matrix in advance of setting local data and is useful in collision detection.
+     *
+     * @param {object}   [data] - TJSPositionData instance or local transform data.
+     *
+     * @param {import('../').Matrix4}  [output] - The output mat4 instance.
+     *
+     * @returns {import('../').Matrix4} Transform matrix.
+     */
+    getMat4Ortho(data?: object, output?: Matrix4): Matrix4;
+    /**
+     * Tests an object if it contains transform keys and the values are finite numbers.
+     *
+     * @param {object} data - An object to test for transform data.
+     *
+     * @returns {boolean} Whether the given TJSPositionData has transforms.
+     */
+    hasTransform(data: object): boolean;
+    /**
+     * Resets internal data from the given object containing valid transform keys.
+     *
+     * @param {object}   data - An object with transform data.
+     */
+    reset(data: object): void;
+    #private;
+}
+
+/**
+ * Provides a TJSBasicAnimation implementation for TJSPosition animation.
+ */
+declare class AnimationControl {
+    /**
+     * Defines a static empty / void animation control.
+     *
+     * @type {AnimationControl}
+     */
+    static "__#147018@#voidControl": AnimationControl;
+    /**
+     * Provides a static void / undefined AnimationControl that is automatically resolved.
+     *
+     * @returns {AnimationControl} Void AnimationControl
+     */
+    static get voidControl(): AnimationControl;
+    /**
+     * @param {object|null} [animationData] - Animation data from {@link AnimationAPI}.
+     *
+     * @param {boolean}     [willFinish] - Promise that tracks animation finished state.
+     */
+    constructor(animationData?: object | null, willFinish?: boolean);
+    /**
+     * Get a promise that resolves when animation is finished.
+     *
+     * @returns {Promise<void>}
+     */
+    get finished(): Promise<void>;
+    /**
+     * Returns whether this animation is currently active / animating.
+     *
+     * Note: a delayed animation may not be started / active yet. Use {@link AnimationControl.isFinished} to determine
+     * if an animation is actually finished.
+     *
+     * @returns {boolean} Animation active state.
+     */
+    get isActive(): boolean;
+    /**
+     * Returns whether this animation is completely finished.
+     *
+     * @returns {boolean} Animation finished state.
+     */
+    get isFinished(): boolean;
+    /**
+     * Cancels the animation.
+     */
+    cancel(): void;
+    #private;
+}
+
 declare class AnimationAPI {
     /**
-     * @param {TJSPosition}       position -
+     * @param {import('../').TJSPosition}       position -
      *
-     * @param {TJSPositionData}   data -
+     * @param {import('../').TJSPositionData}   data -
      */
     constructor(position: TJSPosition, data: TJSPositionData);
     /**
@@ -530,7 +358,7 @@ declare class AnimationAPI {
     /**
      * Provides a tween from given position data to the current position.
      *
-     * @param {TJSPositionDataExtended} fromData - The starting position.
+     * @param {import('../').TJSPositionDataExtended} fromData - The starting position.
      *
      * @param {object}         [opts] - Optional parameters.
      *
@@ -553,9 +381,9 @@ declare class AnimationAPI {
     /**
      * Provides a tween from given position data to the current position.
      *
-     * @param {TJSPositionDataExtended} fromData - The starting position.
+     * @param {import('../').TJSPositionDataExtended} fromData - The starting position.
      *
-     * @param {TJSPositionDataExtended} toData - The ending position.
+     * @param {import('../').TJSPositionDataExtended} toData - The ending position.
      *
      * @param {object}         [opts] - Optional parameters.
      *
@@ -578,7 +406,7 @@ declare class AnimationAPI {
     /**
      * Provides a tween to given position data from the current position.
      *
-     * @param {TJSPositionDataExtended} toData - The destination position.
+     * @param {import('../').TJSPositionDataExtended} toData - The destination position.
      *
      * @param {object}         [opts] - Optional parameters.
      *
@@ -611,7 +439,7 @@ declare class AnimationAPI {
      *
      * @param {Function}          [opts.interpolate=lerp] - Interpolation function.
      *
-     * @returns {quickToCallback} quick-to tween function.
+     * @returns {import('../').quickToCallback} quick-to tween function.
      */
     quickTo(keys: Iterable<string>, { duration, ease, interpolate }?: {
         duration?: number;
@@ -630,7 +458,7 @@ declare class PositionStateAPI {
      *
      * @param {string}   options.name - Saved data set name.
      *
-     * @returns {TJSPositionDataExtended} The saved data set.
+     * @returns {import('./').TJSPositionDataExtended} The saved data set.
      */
     get({ name }: {
         name: string;
@@ -638,7 +466,7 @@ declare class PositionStateAPI {
     /**
      * Returns any associated default data.
      *
-     * @returns {TJSPositionDataExtended} Associated default data.
+     * @returns {import('./').TJSPositionDataExtended} Associated default data.
      */
     getDefault(): TJSPositionDataExtended;
     /**
@@ -648,7 +476,7 @@ declare class PositionStateAPI {
      *
      * @param {string}   options.name - Name to remove and retrieve.
      *
-     * @returns {TJSPositionDataExtended} Saved position data.
+     * @returns {import('./').TJSPositionDataExtended} Saved position data.
      */
     remove({ name }: {
         name: string;
@@ -695,7 +523,8 @@ declare class PositionStateAPI {
      *
      * @param {Function}          [params.interpolate=lerp] - Interpolation function.
      *
-     * @returns {TJSPositionDataExtended|Promise<TJSPositionDataExtended>} Saved position data.
+     * @returns {import('./').TJSPositionDataExtended | Promise<import('./').TJSPositionDataExtended>} Saved position
+     *          data.
      */
     restore({ name, remove, properties, silent, async, animateTo, duration, ease, interpolate }: {
         name: string;
@@ -717,7 +546,7 @@ declare class PositionStateAPI {
      *
      * @param {...*}     [opts.extra] - Extra data to add to saved data.
      *
-     * @returns {TJSPositionData} Current position data
+     * @returns {import('./').TJSPositionData} Current position data
      */
     save({ name, ...extra }: {
         name: string;
@@ -736,33 +565,6 @@ declare class PositionStateAPI {
         name: string;
         data?: any[];
     }): void;
-    #private;
-}
-
-/**
- * Provides the output data for {@link TJSTransforms.getData}.
- */
-declare class TJSTransformData {
-    /**
-     * @returns {DOMRect} The bounding rectangle.
-     */
-    get boundingRect(): DOMRect;
-    /**
-     * @returns {Vector3[]} The transformed corner points as vec3 in screen space.
-     */
-    get corners(): Float32Array[];
-    /**
-     * @returns {string} Returns the CSS style string for the transform matrix.
-     */
-    get css(): string;
-    /**
-     * @returns {Matrix4} The transform matrix.
-     */
-    get mat4(): Float32Array;
-    /**
-     * @returns {Matrix4[]} The pre / post translation matrices for origin translation.
-     */
-    get originTranslations(): Float32Array[];
     #private;
 }
 
@@ -804,30 +606,47 @@ declare class AdapterValidators {
      */
     get length(): number;
     /**
-     * @param {...(ValidatorFn|ValidatorData)}   validators -
+     * @param {...(import('../').ValidatorFn | import('../').ValidatorData)}   validators -
      */
     add(...validators: (ValidatorFn | ValidatorData)[]): void;
     clear(): void;
     /**
-     * @param {...(ValidatorFn|ValidatorData)}   validators -
+     * @param {...(import('../').ValidatorFn | import('../').ValidatorData)}   validators -
      */
     remove(...validators: (ValidatorFn | ValidatorData)[]): void;
     /**
      * Remove validators by the provided callback. The callback takes 3 parameters: `id`, `validator`, and `weight`.
      * Any truthy value returned will remove that validator.
      *
-     * @param {function(*, ValidatorFn, number): boolean} callback - Callback function to evaluate each validator
-     *                                                                  entry.
+     * @param {function(*, import('../').ValidatorFn, number): boolean} callback - Callback function to evaluate each
+     *        validator entry.
      */
     removeBy(callback: (arg0: any, arg1: ValidatorFn, arg2: number) => boolean): void;
     removeById(...ids: any[]): void;
     /**
      * Provides an iterator for validators.
      *
-     * @returns {Generator<ValidatorData|undefined>} Generator / iterator of validators.
-     * @yields {ValidatorData}
+     * @yields {import('../').ValidatorData}
      */
-    [Symbol.iterator](): Generator<ValidatorData | undefined>;
+    [Symbol.iterator](): Generator<{
+        /**
+         * - An ID associated with this validator. Can be used to remove the validator.
+         */
+        id?: any;
+        /**
+         * - TJSPosition validator function that takes a {@link TJSPositionData } instance
+         * potentially modifying it or returning null if invalid.
+         */
+        validator: ValidatorFn;
+        /**
+         * - A number between 0 and 1 inclusive to position this validator against others.
+         */
+        weight?: number;
+        /**
+         * - Optional subscribe function following the Svelte store / subscribe pattern.
+         */
+        subscribe?: Function;
+    }, void, unknown>;
     #private;
 }
 
@@ -855,9 +674,9 @@ declare class BasicBounds {
      * Provides a validator that respects transforms in positional data constraining the position to within the target
      * elements bounds.
      *
-     * @param {ValidationData}   valData - The associated validation data for position updates.
+     * @param {import('../').ValidationData}   valData - The associated validation data for position updates.
      *
-     * @returns {TJSPositionData} Potentially adjusted position data.
+     * @returns {import('../').TJSPositionData} Potentially adjusted position data.
      */
     validator(valData: ValidationData): TJSPositionData;
     #private;
@@ -887,9 +706,9 @@ declare class TransformBounds {
      * Provides a validator that respects transforms in positional data constraining the position to within the target
      * elements bounds.
      *
-     * @param {ValidationData}   valData - The associated validation data for position updates.
+     * @param {import('../').ValidationData}   valData - The associated validation data for position updates.
      *
-     * @returns {TJSPositionData} Potentially adjusted position data.
+     * @returns {import('../').TJSPositionData} Potentially adjusted position data.
      */
     validator(valData: ValidationData): TJSPositionData;
     #private;
@@ -981,11 +800,11 @@ declare class AnimationGroupAPI {
      *
      * @returns {boolean} Is TJSPosition.
      */
-    static "__#146909@#isPosition"(object: any): boolean;
+    static "__#147021@#isPosition"(object: any): boolean;
     /**
      * Cancels any animation for given TJSPosition data.
      *
-     * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
+     * @param {import('../').TJSPosition | {position: import('../').TJSPosition} | Iterable<import('../').TJSPosition> | Iterable<{position: import('../').TJSPosition}>} position -
      */
     static cancel(position: TJSPosition | {
         position: TJSPosition;
@@ -999,9 +818,9 @@ declare class AnimationGroupAPI {
     /**
      * Gets all animation controls for the given position data.
      *
-     * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
+     * @param {import('../').TJSPosition | {position: import('../').TJSPosition} | Iterable<import('../').TJSPosition> | Iterable<{position: import('../').TJSPosition}>} position -
      *
-     * @returns {{position: TJSPosition, data: object|void, controls: AnimationControl[]}[]} Results array.
+     * @returns {{ position: import('../').TJSPosition, data: object | void, controls: import('./AnimationControl').AnimationControl[]}[]} Results array.
      */
     static getScheduled(position: TJSPosition | {
         position: TJSPosition;
@@ -1015,23 +834,23 @@ declare class AnimationGroupAPI {
     /**
      * Provides the `from` animation tween for one or more TJSPosition instances as a group.
      *
-     * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
+     * @param {import('../').TJSPosition | {position: import('../').TJSPosition} | Iterable<import('../').TJSPosition> | Iterable<{position: import('../').TJSPosition}>} position -
      *
      * @param {object|Function}   fromData -
      *
      * @param {object|Function}   options -
      *
-     * @returns {import('@typhonjs-fvtt/svelte/animate').TJSBasicAnimation} Basic animation control.
+     * @returns {import('#svelte-lib/animate').TJSBasicAnimation} Basic animation control.
      */
     static from(position: TJSPosition | {
         position: TJSPosition;
     } | Iterable<TJSPosition> | Iterable<{
         position: TJSPosition;
-    }>, fromData: object | Function, options: object | Function): _typhonjs_fvtt_svelte_animate.TJSBasicAnimation;
+    }>, fromData: object | Function, options: object | Function): _svelte_lib_animate.TJSBasicAnimation;
     /**
      * Provides the `fromTo` animation tween for one or more TJSPosition instances as a group.
      *
-     * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
+     * @param {import('../').TJSPosition | {position: import('../').TJSPosition} | Iterable<import('../').TJSPosition> | Iterable<{position: import('../').TJSPosition}>} position -
      *
      * @param {object|Function}   fromData -
      *
@@ -1039,39 +858,39 @@ declare class AnimationGroupAPI {
      *
      * @param {object|Function}   options -
      *
-     * @returns {import('@typhonjs-fvtt/svelte/animate').TJSBasicAnimation} Basic animation control.
+     * @returns {import('#svelte-lib/animate').TJSBasicAnimation} Basic animation control.
      */
     static fromTo(position: TJSPosition | {
         position: TJSPosition;
     } | Iterable<TJSPosition> | Iterable<{
         position: TJSPosition;
-    }>, fromData: object | Function, toData: object | Function, options: object | Function): _typhonjs_fvtt_svelte_animate.TJSBasicAnimation;
+    }>, fromData: object | Function, toData: object | Function, options: object | Function): _svelte_lib_animate.TJSBasicAnimation;
     /**
      * Provides the `to` animation tween for one or more TJSPosition instances as a group.
      *
-     * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
+     * @param {import('../').TJSPosition | {position: import('../').TJSPosition} | Iterable<import('../').TJSPosition> | Iterable<{position: import('../').TJSPosition}>} position -
      *
      * @param {object|Function}   toData -
      *
      * @param {object|Function}   options -
      *
-     * @returns {import('@typhonjs-fvtt/svelte/animate').TJSBasicAnimation} Basic animation control.
+     * @returns {import('#svelte-lib/animate').TJSBasicAnimation} Basic animation control.
      */
     static to(position: TJSPosition | {
         position: TJSPosition;
     } | Iterable<TJSPosition> | Iterable<{
         position: TJSPosition;
-    }>, toData: object | Function, options: object | Function): _typhonjs_fvtt_svelte_animate.TJSBasicAnimation;
+    }>, toData: object | Function, options: object | Function): _svelte_lib_animate.TJSBasicAnimation;
     /**
      * Provides the `to` animation tween for one or more TJSPosition instances as a group.
      *
-     * @param {TJSPosition|{position: TJSPosition}|Iterable<TJSPosition>|Iterable<{position: TJSPosition}>} position -
+     * @param {import('../').TJSPosition | {position: import('../').TJSPosition} | Iterable<import('../').TJSPosition> | Iterable<{position: import('../').TJSPosition}>} position -
      *
      * @param {Iterable<string>}  keys -
      *
      * @param {object|Function}   options -
      *
-     * @returns {quickToCallback} Basic animation control.
+     * @returns {import('../').quickToCallback} Basic animation control.
      */
     static quickTo(position: TJSPosition | {
         position: TJSPosition;
@@ -1088,14 +907,14 @@ declare class TJSPosition {
     /**
      * @type {{browserCentered: Centered, Centered: Centered}}
      */
-    static "__#146917@#positionInitial": {
+    static "__#147029@#positionInitial": {
         browserCentered: Centered;
         Centered: Centered;
     };
     /**
      * @type {{TransformBounds: TransformBounds, BasicBounds: BasicBounds, basicWindow: BasicBounds, transformWindow: TransformBounds}}
      */
-    static "__#146917@#positionValidators": {
+    static "__#147029@#positionValidators": {
         TransformBounds: TransformBounds;
         BasicBounds: BasicBounds;
         basicWindow: BasicBounds;
@@ -1139,16 +958,16 @@ declare class TJSPosition {
      *
      * @param {TJSPosition}          position - A position instance.
      *
-     * @param {TJSPositionOptions}   options - TJSPosition options.
+     * @param {import('./').TJSPositionOptions}   options - TJSPosition options.
      *
      * @returns {TJSPosition} A duplicate position instance.
      */
     static duplicate(position: TJSPosition, options: TJSPositionOptions): TJSPosition;
     /**
-     * @param {TJSPositionParent|TJSPositionOptionsAll}   [parent] - A potential parent element or object w/ `elementTarget`
-     *                                                      getter. May also be the TJSPositionOptions object w/ 1 argument.
+     * @param {import('./').TJSPositionParent | import('./').TJSPositionOptionsAll}   [parent] - A potential parent
+     *        element or object w/ `elementTarget` getter. May also be the TJSPositionOptions object w/ 1 argument.
      *
-     * @param {TJSPositionOptionsAll}   [options] - Default values.
+     * @param {import('./').TJSPositionOptionsAll}   [options] - Default values.
      */
     constructor(parent?: TJSPositionParent | TJSPositionOptionsAll, options?: TJSPositionOptionsAll);
     /**
@@ -1193,13 +1012,13 @@ declare class TJSPosition {
     /**
      * Sets the associated {@link TJSPositionParent} instance. Resets the style cache and default data.
      *
-     * @param {TJSPositionParent|void} parent - A TJSPositionParent instance.
+     * @param {import('./').TJSPositionParent | void} parent - A TJSPositionParent instance.
      */
     set parent(arg: any);
     /**
      * Returns the associated {@link TJSPositionParent} instance.
      *
-     * @returns {TJSPositionParent} The TJSPositionParent instance.
+     * @returns {import('./').TJSPositionParent} The TJSPositionParent instance.
      */
     get parent(): any;
     /**
@@ -1211,7 +1030,7 @@ declare class TJSPosition {
     /**
      * Returns the derived writable stores for individual data variables.
      *
-     * @returns {StorePosition} Derived / writable stores.
+     * @returns {import('./').StorePosition} Derived / writable stores.
      */
     get stores(): StorePosition;
     /**
@@ -1375,8 +1194,8 @@ declare class TJSPosition {
      *
      * @param {object|TJSPositionData}  [position] - Target to assign current position data.
      *
-     * @param {TJSPositionGetOptions}   [options] - Defines options for specific keys and substituting null for numeric
-     *                                           default values.
+     * @param {import('./').TJSPositionGetOptions}   [options] - Defines options for specific keys and substituting null
+     *        for numeric default values.
      *
      * @returns {TJSPositionData} Passed in object with current position data.
      */
@@ -1404,7 +1223,7 @@ declare class TJSPosition {
      * Updates to any target element are decoupled from the underlying TJSPosition data. This method returns this instance
      * that you can then await on the target element inline style update by using {@link TJSPosition.elementUpdated}.
      *
-     * @param {TJSPositionDataExtended} [position] - TJSPosition data to set.
+     * @param {import('./').TJSPositionDataExtended} [position] - TJSPosition data to set.
      *
      * @returns {TJSPosition} This TJSPosition instance.
      */
@@ -1420,157 +1239,364 @@ declare class TJSPosition {
     #private;
 }
 
-declare class TJSTransforms {
-    _data: {};
+type quickToCallback = (...args: (number | object)[]) => any;
+type TJSPositionInitialHelper = {
     /**
-     * @returns {boolean} Whether there are active transforms in local data.
+     * - Returns the left position given the width of the browser window.
      */
-    get isActive(): boolean;
+    getLeft: (width: number) => number;
     /**
-     * Sets the local rotateX data if the value is a finite number otherwise removes the local data.
-     *
-     * @param {number|null|undefined}   value - A value to set.
+     * - Returns the top position given the height of the browser window.
      */
-    set rotateX(arg: number);
+    getTop: (height: number) => number;
+};
+type TJSPositionGetOptions = {
     /**
-     * @returns {number|undefined} Any local rotateX data.
+     * - When provided only these keys are copied.
      */
-    get rotateX(): number;
+    keys: Iterable<string>;
     /**
-     * Sets the local rotateY data if the value is a finite number otherwise removes the local data.
-     *
-     * @param {number|null|undefined}   value - A value to set.
+     * - When provided these keys are excluded.
      */
-    set rotateY(arg: number);
+    exclude: Iterable<string>;
     /**
-     * @returns {number|undefined} Any local rotateY data.
+     * - When true any `null` values are converted into defaults.
      */
-    get rotateY(): number;
+    numeric: boolean;
+};
+/**
+ * - Options set in constructor.
+ */
+type TJSPositionOptions = {
     /**
-     * Sets the local rotateZ data if the value is a finite number otherwise removes the local data.
-     *
-     * @param {number|null|undefined}   value - A value to set.
+     * - When true always calculate transform data.
      */
-    set rotateZ(arg: number);
+    calculateTransform: boolean;
     /**
-     * @returns {number|undefined} Any local rotateZ data.
+     * - Provides a helper for setting initial position data.
      */
-    get rotateZ(): number;
+    initialHelper: TJSPositionInitialHelper;
     /**
-     * Sets the local scale data if the value is a finite number otherwise removes the local data.
-     *
-     * @param {number|null|undefined}   value - A value to set.
+     * - Sets TJSPosition to orthographic mode using just transform / matrix3d for positioning.
      */
-    set scale(arg: number);
+    ortho: boolean;
     /**
-     * @returns {number|undefined} Any local rotateZ scale.
+     * - Set to true when there are subscribers to the readable transform store.
      */
-    get scale(): number;
+    transformSubscribed: boolean;
+};
+type TJSPositionOptionsAll = TJSPositionOptions & TJSPositionData;
+type TJSPositionParent = HTMLElement | object;
+type ResizeObserverData = {
     /**
-     * Sets the local translateX data if the value is a finite number otherwise removes the local data.
-     *
-     * @param {number|null|undefined}   value - A value to set.
+     * -
      */
-    set translateX(arg: number);
+    contentHeight: number | undefined;
     /**
-     * @returns {number|undefined} Any local translateZ data.
+     * -
      */
-    get translateX(): number;
+    contentWidth: number | undefined;
     /**
-     * Sets the local translateY data if the value is a finite number otherwise removes the local data.
-     *
-     * @param {number|null|undefined}   value - A value to set.
+     * -
      */
-    set translateY(arg: number);
+    offsetHeight: number | undefined;
     /**
-     * @returns {number|undefined} Any local translateZ data.
+     * -
      */
-    get translateY(): number;
+    offsetWidth: number | undefined;
+};
+/**
+ * - Provides individual writable stores for {@link TJSPosition }.
+ */
+type StorePosition = {
     /**
-     * Sets the local translateZ data if the value is a finite number otherwise removes the local data.
-     *
-     * @param {number|null|undefined}   value - A value to set.
+     * - Readable store for dimension
+     *  data.
      */
-    set translateZ(arg: number);
+    dimension: _svelte_store.Readable<{
+        width: number;
+        height: number;
+    }>;
     /**
-     * @returns {number|undefined} Any local translateZ data.
+     * - Readable store for current element.
      */
-    get translateZ(): number;
+    element: _svelte_store.Readable<HTMLElement>;
     /**
-     * Returns the matrix3d CSS transform for the given position / transform data.
-     *
-     * @param {object} [data] - Optional position data otherwise use local stored transform data.
-     *
-     * @returns {string} The CSS matrix3d string.
+     * - Derived store for `left` updates.
      */
-    getCSS(data?: object): string;
+    left: _svelte_store.Writable<number | null>;
     /**
-     * Returns the matrix3d CSS transform for the given position / transform data.
-     *
-     * @param {object} [data] - Optional position data otherwise use local stored transform data.
-     *
-     * @returns {string} The CSS matrix3d string.
+     * - Derived store for `top` updates.
      */
-    getCSSOrtho(data?: object): string;
+    top: _svelte_store.Writable<number | null>;
     /**
-     * Collects all data including a bounding rect, transform matrix, and points array of the given {@link TJSPositionData}
-     * instance with the applied local transform data.
-     *
-     * @param {TJSPositionData} position - The position data to process.
-     *
-     * @param {TJSTransformData} [output] - Optional TJSTransformData output instance.
-     *
-     * @param {object} [validationData] - Optional validation data for adjustment parameters.
-     *
-     * @returns {TJSTransformData} The output TJSTransformData instance.
+     * - Derived store for `width` updates.
      */
-    getData(position: TJSPositionData, output?: TJSTransformData, validationData?: object): TJSTransformData;
+    width: _svelte_store.Writable<number | 'auto' | null>;
     /**
-     * Creates a transform matrix based on local data applied in order it was added.
-     *
-     * If no data object is provided then the source is the local transform data. If another data object is supplied
-     * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
-     * construction of a transform matrix in advance of setting local data and is useful in collision detection.
-     *
-     * @param {object}   [data] - TJSPositionData instance or local transform data.
-     *
-     * @param {Matrix4}  [output] - The output mat4 instance.
-     *
-     * @returns {Matrix4} Transform matrix.
+     * - Derived store for `height` updates.
      */
-    getMat4(data?: object, output?: Matrix4): Matrix4;
+    height: _svelte_store.Writable<number | 'auto' | null>;
     /**
-     * Provides an orthographic enhancement to convert left / top positional data to a translate operation.
-     *
-     * This transform matrix takes into account that the remaining operations are , but adds any left / top attributes from passed in data to
-     * translate X / Y.
-     *
-     * If no data object is provided then the source is the local transform data. If another data object is supplied
-     * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
-     * construction of a transform matrix in advance of setting local data and is useful in collision detection.
-     *
-     * @param {object}   [data] - TJSPositionData instance or local transform data.
-     *
-     * @param {Matrix4}  [output] - The output mat4 instance.
-     *
-     * @returns {Matrix4} Transform matrix.
+     * - Derived store for `maxHeight` updates.
      */
-    getMat4Ortho(data?: object, output?: Matrix4): Matrix4;
+    maxHeight: _svelte_store.Writable<number | null>;
     /**
-     * Tests an object if it contains transform keys and the values are finite numbers.
-     *
-     * @param {object} data - An object to test for transform data.
-     *
-     * @returns {boolean} Whether the given TJSPositionData has transforms.
+     * - Derived store for `maxWidth` updates.
      */
-    hasTransform(data: object): boolean;
+    maxWidth: _svelte_store.Writable<number | null>;
     /**
-     * Resets internal data from the given object containing valid transform keys.
-     *
-     * @param {object}   data - An object with transform data.
+     * - Derived store for `minHeight` updates.
      */
-    reset(data: object): void;
-    #private;
-}
+    minHeight: _svelte_store.Writable<number | null>;
+    /**
+     * - Derived store for `minWidth` updates.
+     */
+    minWidth: _svelte_store.Writable<number | null>;
+    /**
+     * - Readable store for `contentHeight`.
+     */
+    resizeContentHeight: _svelte_store.Readable<number | undefined>;
+    /**
+     * - Readable store for `contentWidth`.
+     */
+    resizeContentWidth: _svelte_store.Readable<number | undefined>;
+    /**
+     * - Protected store for resize observer updates.
+     */
+    resizeObserved: _svelte_store.Writable<ResizeObserverData>;
+    /**
+     * - Readable store for `offsetHeight`.
+     */
+    resizeOffsetHeight: _svelte_store.Readable<number | undefined>;
+    /**
+     * - Readable store for `offsetWidth`.
+     */
+    resizeOffsetWidth: _svelte_store.Readable<number | undefined>;
+    /**
+     * - Derived store for `rotate` updates.
+     */
+    rotate: _svelte_store.Writable<number | null>;
+    /**
+     * - Derived store for `rotateX` updates.
+     */
+    rotateX: _svelte_store.Writable<number | null>;
+    /**
+     * - Derived store for `rotateY` updates.
+     */
+    rotateY: _svelte_store.Writable<number | null>;
+    /**
+     * - Derived store for `rotateZ` updates.
+     */
+    rotateZ: _svelte_store.Writable<number | null>;
+    /**
+     * - Derived store for `scale` updates.
+     */
+    scale: _svelte_store.Writable<number | null>;
+    /**
+     * - Readable store for
+     * transform data.
+     */
+    transform: _svelte_store.Readable<TJSTransformData>;
+    /**
+     * - Derived store for `transformOrigin`.
+     */
+    transformOrigin: _svelte_store.Writable<string>;
+    /**
+     * - Derived store for `translateX` updates.
+     */
+    translateX: _svelte_store.Writable<number | null>;
+    /**
+     * - Derived store for `translateY` updates.
+     */
+    translateY: _svelte_store.Writable<number | null>;
+    /**
+     * - Derived store for `translateZ` updates.
+     */
+    translateZ: _svelte_store.Writable<number | null>;
+    /**
+     * - Derived store for `zIndex` updates.
+     */
+    zIndex: _svelte_store.Writable<number | null>;
+};
+type TJSPositionDataExtended = {
+    /**
+     * -
+     */
+    height?: number | string | null;
+    /**
+     * -
+     */
+    left?: number | string | null;
+    /**
+     * -
+     */
+    maxHeight?: number | string | null;
+    /**
+     * -
+     */
+    maxWidth?: number | string | null;
+    /**
+     * -
+     */
+    minHeight?: number | string | null;
+    /**
+     * -
+     */
+    minWidth?: number | string | null;
+    /**
+     * -
+     */
+    rotateX?: number | string | null;
+    /**
+     * -
+     */
+    rotateY?: number | string | null;
+    /**
+     * -
+     */
+    rotateZ?: number | string | null;
+    /**
+     * -
+     */
+    scale?: number | string | null;
+    /**
+     * -
+     */
+    top?: number | string | null;
+    /**
+     * -
+     */
+    transformOrigin?: string | null;
+    /**
+     * -
+     */
+    translateX?: number | string | null;
+    /**
+     * -
+     */
+    translateY?: number | string | null;
+    /**
+     * -
+     */
+    translateZ?: number | string | null;
+    /**
+     * -
+     */
+    width?: number | string | null;
+    /**
+     * -
+     *
+     * Extended properties -----------------------------------------------------------------------------------------------
+     */
+    zIndex?: number | string | null;
+    /**
+     * - When true any associated element is updated immediately.
+     */
+    immediateElementUpdate?: boolean;
+    /**
+     * - Alias for `rotateZ`.
+     */
+    rotation?: number | null;
+};
+/**
+ * - 3 Dimensional Vector.
+ */
+type Vector3 = Float32Array;
+/**
+ * - 4x4 Matrix; Format: column-major, when typed out it looks like row-major.
+ */
+type Matrix4 = Float32Array;
+/**
+ * - The supported transform origin strings.
+ */
+type TJSTransformOrigin = 'top left' | 'top center' | 'top right' | 'center left' | 'center' | 'center right' | 'bottom left' | 'bottom center' | 'bottom right';
+type ValidationData = {
+    /**
+     * -
+     */
+    position: TJSPositionData;
+    /**
+     * -
+     */
+    parent: TJSPositionParent;
+    /**
+     * -
+     */
+    el: HTMLElement;
+    /**
+     * -
+     */
+    computed: CSSStyleDeclaration;
+    /**
+     * -
+     */
+    transforms: TJSTransforms;
+    /**
+     * -
+     */
+    height: number;
+    /**
+     * -
+     */
+    width: number;
+    /**
+     * -
+     */
+    marginLeft: number | undefined;
+    /**
+     * -
+     */
+    marginTop: number | undefined;
+    /**
+     * -
+     */
+    maxHeight: number | undefined;
+    /**
+     * -
+     */
+    maxWidth: number | undefined;
+    /**
+     * -
+     */
+    minHeight: number | undefined;
+    /**
+     * -
+     */
+    minWidth: number | undefined;
+    /**
+     * - The rest of any data submitted to {@link TJSPosition.set }
+     */
+    rest: object;
+};
+/**
+ * - TJSPosition validator function that takes a {@link TJSPositionData } instance potentially
+ *                             modifying it or returning null if invalid.
+ */
+type ValidatorFn = (valData: ValidationData) => TJSPositionData | null;
+type ValidatorData = {
+    /**
+     * - An ID associated with this validator. Can be used to remove the validator.
+     */
+    id?: any;
+    /**
+     * - TJSPosition validator function that takes a {@link TJSPositionData } instance
+     * potentially modifying it or returning null if invalid.
+     */
+    validator: ValidatorFn;
+    /**
+     * - A number between 0 and 1 inclusive to position this validator against others.
+     */
+    weight?: number;
+    /**
+     * - Optional subscribe function following the Svelte store / subscribe pattern.
+     */
+    subscribe?: Function;
+};
+/**
+ * Defines the
+ *          position validator options.
+ */
+type TJSPositionValidatorOptions = ValidatorFn | ValidatorData | Iterable<ValidatorFn | ValidatorData>;
 
-export { TJSPosition, TJSPositionData, TJSPositionDataExtended, TJSPositionInitialHelper, TJSPositionValidatorOptions, TJSTransformData, TJSTransforms };
+export { Matrix4, ResizeObserverData, StorePosition, TJSPosition, TJSPositionData, TJSPositionDataExtended, TJSPositionGetOptions, TJSPositionInitialHelper, TJSPositionOptions, TJSPositionOptionsAll, TJSPositionParent, TJSPositionValidatorOptions, TJSTransformData, TJSTransformOrigin, TJSTransforms, ValidationData, ValidatorData, ValidatorFn, Vector3, quickToCallback };

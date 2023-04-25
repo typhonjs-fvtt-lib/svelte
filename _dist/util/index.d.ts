@@ -1,3 +1,5 @@
+import * as _svelte from 'svelte';
+
 /**
  * Provides several helpful utility methods for accessibility and keyboard navigation.
  */
@@ -63,7 +65,7 @@ declare class A11yHelper {
      *
      * @returns {string} Focusable selectors for `querySelectorAll`.
      */
-    static "__#198159@#getFocusableSelectors"(anchorHref?: boolean): string;
+    static "__#198316@#getFocusableSelectors"(anchorHref?: boolean): string;
     /**
      * Gets a A11yFocusSource object from the given DOM event allowing for optional X / Y screen space overrides.
      * Browsers (Firefox / Chrome) forwards a mouse event for the context menu keyboard button. Provides detection of
@@ -181,7 +183,7 @@ type A11yFocusSource = {
  */
 declare class ManagedPromise {
     /** @type {boolean} */
-    static "__#198160@#logging": boolean;
+    static "__#198317@#logging": boolean;
     /**
      * Sets global logging enabled state.
      *
@@ -242,8 +244,8 @@ declare class ManagedPromise {
 /**
  * Provides utility methods for checking browser capabilities.
  *
- * TODO: perhaps add support for various standard media query checks for level 4 & 5.
  * @see https://kilianvalkhof.com/2021/web/detecting-media-query-support-in-css-and-javascript/
+ * TODO: perhaps add support for various standard media query checks for level 4 & 5.
  */
 declare class BrowserSupports {
     /**
@@ -354,19 +356,28 @@ type StackingContext = {
 };
 
 /**
+ * Parses a pixel string / computed styles. Ex. `100px` returns `100`.
+ *
+ * @param {string}   value - Value to parse.
+ *
+ * @returns {number|undefined} The integer component of a pixel string.
+ */
+declare function styleParsePixels(value: string): number | undefined;
+
+/**
  * Provides a managed dynamic style sheet / element useful in configuring global CSS variables. When creating an
- * instance of StyleManager you must provide a "document key" / string for the style element added. The style element
+ * instance of TJSStyleManager you must provide a "document key" / string for the style element added. The style element
  * can be accessed via `document[docKey]`.
  *
- * Instances of StyleManager can also be versioned by supplying a positive integer greater than or equal to `1` via the
- * 'version' option. This version number is assigned to the associated style element. When a StyleManager instance is
- * created and there is an existing instance with a version that is lower than the current instance all CSS rules are
- * removed letting the higher version to take precedence. This isn't a perfect system and requires thoughtful
+ * Instances of TJSStyleManager can also be versioned by supplying a positive integer greater than or equal to `1` via
+ * the 'version' option. This version number is assigned to the associated style element. When a TJSStyleManager
+ * instance is created and there is an existing instance with a version that is lower than the current instance all CSS
+ * rules are removed letting the higher version to take precedence. This isn't a perfect system and requires thoughtful
  * construction of CSS variables exposed, but allows multiple independently compiled TRL packages to load the latest
- * CSS variables. It is recommended to always set `overwrite` option of {@link StyleManager.setProperty} and
- * {@link StyleManager.setProperties} to `false` when loading initial values.
+ * CSS variables. It is recommended to always set `overwrite` option of {@link TJSStyleManager.setProperty} and
+ * {@link TJSStyleManager.setProperties} to `false` when loading initial values.
  */
-declare class StyleManager {
+declare class TJSStyleManager {
     /**
      *
      * @param {object}   opts - Options.
@@ -378,7 +389,6 @@ declare class StyleManager {
      * @param {Document} [opts.document] - Target document to load styles into.
      *
      * @param {number}   [opts.version] - An integer representing the version / level of styles being managed.
-     *
      */
     constructor({ docKey, selector, document, version }?: {
         docKey: string;
@@ -395,15 +405,15 @@ declare class StyleManager {
      */
     get version(): number;
     /**
-     * Provides a copy constructor to duplicate an existing StyleManager instance into a new document.
+     * Provides a copy constructor to duplicate an existing TJSStyleManager instance into a new document.
      *
      * Note: This is used to support the `PopOut` module.
      *
      * @param {Document} [document] Target browser document to clone into.
      *
-     * @returns {StyleManager} New style manager instance.
+     * @returns {TJSStyleManager} New style manager instance.
      */
-    clone(document?: Document): StyleManager;
+    clone(document?: Document): TJSStyleManager;
     get(): {};
     /**
      * Gets a particular CSS variable.
@@ -416,12 +426,12 @@ declare class StyleManager {
     /**
      * Set rules by property / value; useful for CSS variables.
      *
-     * @param {Object<string, string>}  rules - An object with property / value string pairs to load.
+     * @param {{ [key: string]: string }}  rules - An object with property / value string pairs to load.
      *
      * @param {boolean}                 [overwrite=true] - When true overwrites any existing values.
      */
     setProperties(rules: {
-        [x: string]: string;
+        [key: string]: string;
     }, overwrite?: boolean): void;
     /**
      * Sets a particular property.
@@ -449,15 +459,6 @@ declare class StyleManager {
     removeProperty(key: string): string;
     #private;
 }
-
-/**
- * Parses a pixel string / computed styles. Ex. `100px` returns `100`.
- *
- * @param {string}   value - Value to parse.
- *
- * @returns {number|undefined} The integer component of a pixel string.
- */
-declare function styleParsePixels(value: string): number | undefined;
 
 /**
  * Provides a method to determine if the passed in object / Svelte component follows the application shell contract.
@@ -492,6 +493,53 @@ declare function isHMRProxy(comp: any): boolean;
 declare function isSvelteComponent(comp: any): boolean;
 
 /**
+ * Validates `config` argument whether it is a valid {@link TJSSvelteConfig}.
+ *
+ * @param {*}  config - The potential config object to validate.
+ *
+ * @param {boolean}  [raiseException=false] - If validation fails raise an exception.
+ *
+ * @returns {boolean} Is the config a valid TJSSvelteConfig.
+ *
+ * @throws {TypeError}  Any validation error when `raiseException` is enabled.
+ */
+declare function isTJSSvelteConfig(config: any, raiseException?: boolean): boolean;
+type TJSSvelteConfig = {
+    /**
+     * -
+     */
+    class: new (options: _svelte.ComponentConstructorOptions) => _svelte.SvelteComponent | _svelte.SvelteComponentTyped;
+    /**
+     * -
+     */
+    target?: Element | Document | ShadowRoot;
+    /**
+     * -
+     */
+    anchor?: Element;
+    /**
+     * -
+     */
+    props?: () => Record<string, any> | Record<string, any>;
+    /**
+     * -
+     */
+    context?: () => (Record<string, any> | Map<string, any>) | Map<string, any> | Record<string, any>;
+    /**
+     * -
+     */
+    hydrate?: boolean;
+    /**
+     * -
+     */
+    intro?: boolean;
+    /**
+     * -
+     */
+    $$inline?: boolean;
+};
+
+/**
  * Runs outro transition then destroys Svelte component.
  *
  * Workaround for https://github.com/sveltejs/svelte/issues/4056
@@ -510,7 +558,7 @@ declare function outroAndDestroy(instance: any): Promise<any>;
  *
  * @returns {object} The processed Svelte config object.
  */
-declare function parseSvelteConfig(config: object, thisArg?: any): object;
+declare function parseTJSSvelteConfig(config: object, thisArg?: any): object;
 
 /**
  * Wraps a callback in a debounced timeout.
@@ -687,4 +735,4 @@ type ParseDataTransferOptions = {
     types?: string[] | undefined;
 };
 
-export { A11yFocusSource, A11yHelper, BrowserSupports, ClipboardAccess, ManagedPromise, ParseDataTransferOptions, StackingContext, StyleManager, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, klona, normalizeString, outroAndDestroy, parseSvelteConfig, safeAccess, safeSet, striptags, styleParsePixels, uuidv4 };
+export { A11yFocusSource, A11yHelper, BrowserSupports, ClipboardAccess, ManagedPromise, ParseDataTransferOptions, StackingContext, TJSStyleManager, TJSSvelteConfig, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, isTJSSvelteConfig, klona, normalizeString, outroAndDestroy, parseTJSSvelteConfig, safeAccess, safeSet, striptags, styleParsePixels, uuidv4 };

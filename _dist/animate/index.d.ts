@@ -1,5 +1,5 @@
-import * as svelte_store from 'svelte/store';
-import * as svelte_animate from 'svelte/animate';
+import * as _svelte_store from 'svelte/store';
+import * as _svelte_animate from 'svelte/animate';
 
 /**
  * Svelte doesn't provide any events for the animate directive.
@@ -35,22 +35,22 @@ import * as svelte_animate from 'svelte/animate';
  *       <section animate:flipWithEvents />
  *    {/each}
  *
- * @param {(node: Element, { from: DOMRect, to: DOMRect }, params?: *) => import('svelte/animate').AnimationConfig} fn -
+ * @param {(node: Element, data: { from: DOMRect, to: DOMRect }, params?: *) => import('#svelte/animate').AnimationConfig} fn -
  *        A Svelte animation function.
  *
- * @param {import('svelte/store').Writable<boolean>} [store] - An optional boolean writable store that is set to true
+ * @param {import('#svelte/store').Writable<boolean>} [store] - An optional boolean writable store that is set to true
  *                                                             when animation is active.
  *
- * @returns {(node: Element, { from: DOMRect, to: DOMRect }, params?: *) => import('svelte/animate').AnimationConfig}
+ * @returns {(node: Element, data: { from: DOMRect, to: DOMRect }, params?: *) => import('#svelte/animate').AnimationConfig}
  *          Wrapped animation function.
  */
-declare function animateEvents(fn: (node: Element, { from: DOMRect, to: DOMRect }: {
-    from: any;
-    to: any;
-}, params?: any) => svelte_animate.AnimationConfig, store?: svelte_store.Writable<boolean>): (node: Element, { from: DOMRect, to: DOMRect }: {
-    from: any;
-    to: any;
-}, params?: any) => svelte_animate.AnimationConfig;
+declare function animateEvents(fn: (node: Element, data: {
+    from: DOMRect;
+    to: DOMRect;
+}, params?: any) => _svelte_animate.AnimationConfig, store?: _svelte_store.Writable<boolean>): (node: Element, data: {
+    from: DOMRect;
+    to: DOMRect;
+}, params?: any) => _svelte_animate.AnimationConfig;
 
 /**
  * Awaits `requestAnimationFrame` calls by the counter specified. This allows asynchronous applications for direct /

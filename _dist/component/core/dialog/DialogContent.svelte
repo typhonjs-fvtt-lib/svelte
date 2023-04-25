@@ -2,16 +2,16 @@
    import {
       getContext,
       onDestroy,
-      onMount }            from 'svelte';
+      onMount }               from 'svelte';
 
-   import { applyStyles }  from '@typhonjs-fvtt/svelte/action';
-   import { localize }     from '@typhonjs-fvtt/svelte/helper';
+   import { applyStyles }     from '@typhonjs-fvtt/svelte/action';
+   import { localize }        from '@typhonjs-fvtt/svelte/helper';
 
    import {
       A11yHelper,
       isObject,
       isSvelteComponent,
-      parseSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
+      parseTJSSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
 
    export let data = void 0;
    export let preventDefault = false;
@@ -142,7 +142,7 @@
          }
          else if (isObject(content))
          {
-            const svelteConfig = parseSvelteConfig(content, application);
+            const svelteConfig = parseTJSSvelteConfig(content, application);
             dialogClass = svelteConfig.class;
             dialogProps = svelteConfig.props ?? {};
 

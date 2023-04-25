@@ -376,13 +376,13 @@ function s_UPDATE_SUBSCRIBER(subscriber, contentWidth, contentHeight)
  *
  * @property {number} [offsetWidth] -
  *
- * @property {Writable<object> | Function} [resizedObserver] - Either a function or a writable store.
+ * @property {import('#svelte/store').Writable<object> | Function} [resizedObserver] - Either a function or a writable store.
  *
  * @property {Function} [setContentSize] - A function that is invoked with content width & height changes.
  *
  * @property {Function} [setDimension] - A function that is invoked with offset width & height changes.
  *
- * @property {{resizedObserver: Writable<object>}} [stores] - An object with a writable store.
+ * @property {{resizedObserver: import('#svelte/store').Writable<object>}} [stores] - An object with a writable store.
  */
 
 /**
@@ -393,7 +393,7 @@ function s_UPDATE_SUBSCRIBER(subscriber, contentWidth, contentHeight)
  *
  * @param {HTMLElement} element - The target scrollable HTML element.
  *
- * @param {import('svelte/store').Writable<number>}   store - A writable store that stores the element scrollTop.
+ * @param {import('#svelte/store').Writable<number>}   store - A writable store that stores the element scrollTop.
  *
  * @returns {{destroy: Function, update: Function}} Lifecycle functions.
  */
@@ -513,7 +513,7 @@ function autoBlur(node)
  *
  * @param {HTMLElement} node - Target element.
  *
- * @param {import('svelte/store').Writable<boolean>}  storeFocused - Update store for focus changes.
+ * @param {import('#svelte/store').Writable<boolean>}  storeFocused - Update store for focus changes.
  *
  * @returns {{update: (function(object): void), destroy: (function(): void)}} Action lifecycle methods.
  */
