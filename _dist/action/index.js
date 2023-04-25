@@ -1,6 +1,5 @@
 import { isUpdatableStore, isWritableStore } from '@typhonjs-fvtt/svelte/store';
-import { styleParsePixels, isObject, debounce } from '@typhonjs-fvtt/svelte/util';
-import { hasSetter, isIterable, isObject as isObject$1 } from '@typhonjs-fvtt/svelte/util';
+import { styleParsePixels, isObject, debounce, hasSetter, isIterable } from '@typhonjs-fvtt/svelte/util';
 import { cubicOut } from 'svelte/easing';
 
 /**
@@ -649,44 +648,11 @@ function keyforward(node, keyStore)
 }
 
 /**
- * Provides an action to apply style properties provided as an object.
- *
- * @param {HTMLElement} node - Target element
- *
- * @param {object}      properties - Key / value object of properties to set.
- *
- * @returns {Function} Update function.
- */
-function applyStyles(node, properties)
-{
-   /** Sets properties on node. */
-   function setProperties()
-   {
-      if (typeof properties !== 'object') { return; }
-
-      for (const prop of Object.keys(properties))
-      {
-         node.style.setProperty(`${prop}`, properties[prop]);
-      }
-   }
-
-   setProperties();
-
-   return {
-      update(newProperties)
-      {
-         properties = newProperties;
-         setProperties();
-      }
-   };
-}
-
-/**
  * Provides an action to apply a TJSPosition instance to a HTMLElement and invoke `position.parent`
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
- * @param {import('@typhonjs-svelte/lib/store/position').TJSPosition}          position - A position instance.
+ * @param {import('#svelte-lib/store/position').TJSPosition}   position - A position instance.
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
@@ -712,31 +678,32 @@ function applyPosition(node, position)
 }
 
 /**
- * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on a given {@link Position}
- * instance provided. When the attached boolean store state changes the draggable action is enabled or disabled.
+ * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on a given
+ * {@link TJSPosition} instance provided. When the attached boolean store state changes the draggable action is enabled
+ * or disabled.
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
  * @param {object}            params - Required parameters.
  *
- * @param {import('@typhonjs-svelte/lib/store/position').TJSPosition}   params.position - A position instance.
+ * @param {import('#svelte-lib/store/position').TJSPosition}   params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
  * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
  *
- * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
- *                                                                            state.
+ * @param {import('#svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
+ *        state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.
  *
  * @param {object}            [params.easeOptions] - Gsap `to / `quickTo` vars object.
  *
  * @param {Iterable<string>}  [params.hasTargetClassList] - When defined any event targets that have a class in this
- *                                                          list are allowed.
+ *        list are allowed.
  *
  * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
- *                                                             list are ignored.
+ *        list are ignored.
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
@@ -752,6 +719,13 @@ function draggable(node, { position, active = true, button = 0, storeDragging = 
    {
       throw new TypeError(`'ignoreTargetClassList' is not iterable.`);
    }
+
+   /**
+    * Used for direct call to `position.set`.
+    *
+    * @type {{top: number, left: number}}
+    */
+   const positionData = { left: 0, top: 0 };
 
    /**
     * Duplicate the app / Positionable starting position to track differences.
@@ -778,7 +752,7 @@ function draggable(node, { position, active = true, button = 0, storeDragging = 
    /**
     * Stores the quickTo callback to use for optimized tweening when easing is enabled.
     *
-    * @type {quickToCallback}
+    * @type {import('#svelte-lib/store/position').quickToCallback}
     */
    let quickTo = position.animate.quickTo(['top', 'left'], easeOptions);
 
@@ -915,10 +889,10 @@ function draggable(node, { position, active = true, button = 0, storeDragging = 
       }
       else
       {
-         s_POSITION_DATA.left = newLeft;
-         s_POSITION_DATA.top = newTop;
+         positionData.left = newLeft;
+         positionData.top = newTop;
 
-         position.set(s_POSITION_DATA);
+         position.set(positionData);
       }
    }
 
@@ -962,7 +936,7 @@ function draggable(node, { position, active = true, button = 0, storeDragging = 
 
          if (typeof options.ease === 'boolean') { ease = options.ease; }
 
-         if (isObject$1(options.easeOptions))
+         if (isObject(options.easeOptions))
          {
             easeOptions = options.easeOptions;
             quickTo.options(easeOptions);
@@ -1171,11 +1145,37 @@ class DraggableOptions
 draggable.options = (options) => new DraggableOptions(options);
 
 /**
- * Used for direct call to `position.set`.
+ * Provides an action to apply style properties provided as an object.
  *
- * @type {{top: number, left: number}}
+ * @param {HTMLElement} node - Target element
+ *
+ * @param {object}      properties - Key / value object of properties to set.
+ *
+ * @returns {Function} Update function.
  */
-const s_POSITION_DATA = { left: 0, top: 0 };
+function applyStyles(node, properties)
+{
+   /** Sets properties on node. */
+   function setProperties()
+   {
+      if (typeof properties !== 'object') { return; }
+
+      for (const prop of Object.keys(properties))
+      {
+         node.style.setProperty(`${prop}`, properties[prop]);
+      }
+   }
+
+   setProperties();
+
+   return {
+      update(newProperties)
+      {
+         properties = newProperties;
+         setProperties();
+      }
+   };
+}
 
 export { alwaysBlur, applyPosition, applyScrolltop, applyStyles, autoBlur, draggable, isFocused, keyforward, resizeObserver };
 //# sourceMappingURL=index.js.map

@@ -291,7 +291,7 @@ declare class AnimationControl {
      *
      * @type {AnimationControl}
      */
-    static "__#147018@#voidControl": AnimationControl;
+    static "__#147904@#voidControl": AnimationControl;
     /**
      * Provides a static void / undefined AnimationControl that is automatically resolved.
      *
@@ -800,7 +800,7 @@ declare class AnimationGroupAPI {
      *
      * @returns {boolean} Is TJSPosition.
      */
-    static "__#147021@#isPosition"(object: any): boolean;
+    static "__#147907@#isPosition"(object: any): boolean;
     /**
      * Cancels any animation for given TJSPosition data.
      *
@@ -907,14 +907,14 @@ declare class TJSPosition {
     /**
      * @type {{browserCentered: Centered, Centered: Centered}}
      */
-    static "__#147029@#positionInitial": {
+    static "__#147915@#positionInitial": {
         browserCentered: Centered;
         Centered: Centered;
     };
     /**
      * @type {{TransformBounds: TransformBounds, BasicBounds: BasicBounds, basicWindow: BasicBounds, transformWindow: TransformBounds}}
      */
-    static "__#147029@#positionValidators": {
+    static "__#147915@#positionValidators": {
         TransformBounds: TransformBounds;
         BasicBounds: BasicBounds;
         basicWindow: BasicBounds;
@@ -1287,6 +1287,13 @@ type TJSPositionOptions = {
 };
 type TJSPositionOptionsAll = TJSPositionOptions & TJSPositionData;
 type TJSPositionParent = HTMLElement | object;
+type TJSPositionable = {
+    /**
+     * - An instance of TJSPosition that manages application positional
+     * state.
+     */
+    position: TJSPosition;
+};
 type ResizeObserverData = {
     /**
      * -
@@ -1599,4 +1606,4 @@ type ValidatorData = {
  */
 type TJSPositionValidatorOptions = ValidatorFn | ValidatorData | Iterable<ValidatorFn | ValidatorData>;
 
-export { Matrix4, ResizeObserverData, StorePosition, TJSPosition, TJSPositionData, TJSPositionDataExtended, TJSPositionGetOptions, TJSPositionInitialHelper, TJSPositionOptions, TJSPositionOptionsAll, TJSPositionParent, TJSPositionValidatorOptions, TJSTransformData, TJSTransformOrigin, TJSTransforms, ValidationData, ValidatorData, ValidatorFn, Vector3, quickToCallback };
+export { Matrix4, ResizeObserverData, StorePosition, TJSPosition, TJSPositionData, TJSPositionDataExtended, TJSPositionGetOptions, TJSPositionInitialHelper, TJSPositionOptions, TJSPositionOptionsAll, TJSPositionParent, TJSPositionValidatorOptions, TJSPositionable, TJSTransformData, TJSTransformOrigin, TJSTransforms, ValidationData, ValidatorData, ValidatorFn, Vector3, quickToCallback };

@@ -1,5 +1,5 @@
 import * as _svelte_store from 'svelte/store';
-import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
+import * as _svelte_lib_store_position from '@typhonjs-fvtt/svelte/store/position';
 
 /**
  * Provides an action to always blur the element when any pointer up event occurs on the element.
@@ -75,17 +75,6 @@ declare function keyforward(node: HTMLElement, keyStore: {
     destroy: (() => void);
 };
 
-/**
- * Provides an action to apply style properties provided as an object.
- *
- * @param {HTMLElement} node - Target element
- *
- * @param {object}      properties - Key / value object of properties to set.
- *
- * @returns {Function} Update function.
- */
-declare function applyStyles(node: HTMLElement, properties: object): Function;
-
 type ResizeObserverTarget = object | Function;
 /**
  * Provides an action to monitor the given HTMLElement node with `ResizeObserver` posting width / height changes
@@ -135,46 +124,47 @@ declare namespace resizeObserver {
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
- * @param {import('@typhonjs-fvtt/svelte/store/position').TJSPosition}          position - A position instance.
+ * @param {import('#svelte-lib/store/position').TJSPosition}   position - A position instance.
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-declare function applyPosition(node: HTMLElement, position: _typhonjs_fvtt_svelte_store_position.TJSPosition): {
+declare function applyPosition(node: HTMLElement, position: _svelte_lib_store_position.TJSPosition): {
     update: Function;
     destroy: Function;
 };
 
 /**
- * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on a given {@link Position}
- * instance provided. When the attached boolean store state changes the draggable action is enabled or disabled.
+ * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on a given
+ * {@link TJSPosition} instance provided. When the attached boolean store state changes the draggable action is enabled
+ * or disabled.
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
  * @param {object}            params - Required parameters.
  *
- * @param {import('@typhonjs-fvtt/svelte/store/position').TJSPosition}   params.position - A position instance.
+ * @param {import('#svelte-lib/store/position').TJSPosition}   params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
  * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
  *
- * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
- *                                                                            state.
+ * @param {import('#svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
+ *        state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.
  *
  * @param {object}            [params.easeOptions] - Gsap `to / `quickTo` vars object.
  *
  * @param {Iterable<string>}  [params.hasTargetClassList] - When defined any event targets that have a class in this
- *                                                          list are allowed.
+ *        list are allowed.
  *
  * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
- *                                                             list are ignored.
+ *        list are ignored.
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
 declare function draggable(node: HTMLElement, { position, active, button, storeDragging, ease, easeOptions, hasTargetClassList, ignoreTargetClassList }: {
-    position: _typhonjs_fvtt_svelte_store_position.TJSPosition;
+    position: _svelte_lib_store_position.TJSPosition;
     active?: boolean;
     button?: number;
     storeDragging?: _svelte_store.Writable<boolean>;
@@ -240,5 +230,16 @@ declare class DraggableOptions {
     subscribe(handler: (arg0: DraggableOptions) => void): (() => void);
     #private;
 }
+
+/**
+ * Provides an action to apply style properties provided as an object.
+ *
+ * @param {HTMLElement} node - Target element
+ *
+ * @param {object}      properties - Key / value object of properties to set.
+ *
+ * @returns {Function} Update function.
+ */
+declare function applyStyles(node: HTMLElement, properties: object): Function;
 
 export { ResizeObserverTarget, alwaysBlur, applyPosition, applyScrolltop, applyStyles, autoBlur, draggable, isFocused, keyforward, resizeObserver };

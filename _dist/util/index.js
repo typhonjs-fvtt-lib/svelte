@@ -1664,6 +1664,7 @@ function isTJSSvelteConfig(config, raiseException = false)
    return true;
 }
 
+/* eslint-disable */  // jsdoc/valid-types doesn't like the Google closure constructor function. TODO: verify in future eslint-plugin-jsdoc version
 /**
  * @typedef {object} TJSSvelteConfig
  *
@@ -1683,6 +1684,7 @@ function isTJSSvelteConfig(config, raiseException = false)
  *
  * @property {boolean}  [$$inline] -
  */
+/* eslint-enable */
 
 /**
  * Runs outro transition then destroys Svelte component.
