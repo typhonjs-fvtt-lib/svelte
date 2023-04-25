@@ -39,7 +39,7 @@ import * as _svelte_animate from 'svelte/animate';
  *        A Svelte animation function.
  *
  * @param {import('#svelte/store').Writable<boolean>} [store] - An optional boolean writable store that is set to true
- *                                                             when animation is active.
+ *        when animation is active.
  *
  * @returns {(node: Element, data: { from: DOMRect, to: DOMRect }, params?: *) => import('#svelte/animate').AnimationConfig}
  *          Wrapped animation function.

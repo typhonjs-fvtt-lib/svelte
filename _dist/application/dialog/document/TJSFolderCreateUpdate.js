@@ -81,14 +81,14 @@ export class TJSFolderCreateUpdate extends TJSDialog
          return null;
       }
 
-      const label = localize(globalThis.Folder.metadata.label);
+      const label = localize(Folder.metadata.label);
 
       const data = globalThis.foundry.utils.mergeObject({
          name: localize('DOCUMENT.New', { type: label }),
          sorting: 'a',
       }, folderData);
 
-      const document = new globalThis.Folder(data);
+      const document = new Folder(data);
 
       return new TJSFolderCreateUpdate(document, options, dialogData).wait();
    }
@@ -106,7 +106,7 @@ export class TJSFolderCreateUpdate extends TJSDialog
     */
    static async showUpdate(document, options = {}, dialogData = {})
    {
-      if (!(document instanceof globalThis.Folder))
+      if (!(document instanceof Folder))
       {
          console.warn(`TJSFolderCreateUpdate - show - warning: 'document' is not a Folder.`);
          return null;
