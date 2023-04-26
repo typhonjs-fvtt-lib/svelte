@@ -840,7 +840,7 @@ declare class AnimationGroupAPI {
      *
      * @param {object|Function}   options -
      *
-     * @returns {import('#svelte-lib/animate').TJSBasicAnimation} Basic animation control.
+     * @returns {import('svelte-lib/animate').TJSBasicAnimation} Basic animation control.
      */
     static from(position: TJSPosition | {
         position: TJSPosition;
@@ -858,7 +858,7 @@ declare class AnimationGroupAPI {
      *
      * @param {object|Function}   options -
      *
-     * @returns {import('#svelte-lib/animate').TJSBasicAnimation} Basic animation control.
+     * @returns {import('svelte-lib/animate').TJSBasicAnimation} Basic animation control.
      */
     static fromTo(position: TJSPosition | {
         position: TJSPosition;
@@ -874,7 +874,7 @@ declare class AnimationGroupAPI {
      *
      * @param {object|Function}   options -
      *
-     * @returns {import('#svelte-lib/animate').TJSBasicAnimation} Basic animation control.
+     * @returns {import('svelte-lib/animate').TJSBasicAnimation} Basic animation control.
      */
     static to(position: TJSPosition | {
         position: TJSPosition;

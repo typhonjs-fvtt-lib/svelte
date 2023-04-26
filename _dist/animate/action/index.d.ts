@@ -114,7 +114,7 @@ declare function rippleFocus({ duration, background, selectors }?: {
  *
  * @param {object} opts - Options parameters.
  *
- * @param {import('#svelte/store').Writable<boolean>} opts.store - A boolean store.
+ * @param {import('svelte/store').Writable<boolean>} opts.store - A boolean store.
  *
  * @param {boolean} [opts.clickActive] - When false click events are not handled.
  *

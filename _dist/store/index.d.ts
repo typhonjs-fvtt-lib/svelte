@@ -1,5 +1,6 @@
 import * as _svelte_store from 'svelte/store';
 import { Writable, Readable } from 'svelte/store';
+import * as _typhonjs_fvtt_svelte_store_reducer from '@typhonjs-fvtt/svelte/store/reducer';
 import * as _typhonjs_fvtt_svelte_util from '@typhonjs-fvtt/svelte/util';
 
 /**
@@ -120,7 +121,7 @@ declare class TJSLocalStorage {
      *
      * @param {boolean}  [defaultValue] - A default value to set for the store.
      *
-     * @returns {import('#svelte/store').Writable} The new store.
+     * @returns {import('svelte/store').Writable} The new store.
      */
     static "__#148094@#createStore"(key: string, defaultValue?: boolean): _svelte_store.Writable<any>;
     /**
@@ -141,7 +142,7 @@ declare class TJSLocalStorage {
      *
      * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
      *
-     * @returns {import('#svelte/store').Writable} The Svelte store for this key.
+     * @returns {import('svelte/store').Writable} The Svelte store for this key.
      */
     getStore(key: string, defaultValue?: any): _svelte_store.Writable<any>;
     /**
@@ -173,7 +174,7 @@ declare class TJSSessionStorage {
      *
      * @param {boolean}  [defaultValue] - A default value to set for the store.
      *
-     * @returns {import('#svelte/store').Writable} The new store.
+     * @returns {import('svelte/store').Writable} The new store.
      */
     static "__#148095@#createStore"(key: string, defaultValue?: boolean): _svelte_store.Writable<any>;
     /**
@@ -194,7 +195,7 @@ declare class TJSSessionStorage {
      *
      * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
      *
-     * @returns {import('#svelte/store').Writable} The Svelte store for this key.
+     * @returns {import('svelte/store').Writable} The Svelte store for this key.
      */
     getStore(key: string, defaultValue?: any): _svelte_store.Writable<any>;
     /**
@@ -262,38 +263,38 @@ declare function isWritableStore(store: any): boolean;
  *
  * @template T
  *
- * @param {import('#svelte/store').Writable<T>} store - A store to wrap.
+ * @param {import('svelte/store').Writable<T>} store - A store to wrap.
  *
- * @param {(store?: import('#svelte/store').Writable<T>, value?: T) => void} setCallback - A callback to invoke after
+ * @param {(store?: import('svelte/store').Writable<T>, value?: T) => void} setCallback - A callback to invoke after
  *        store set.
  *
- * @returns {import('#svelte/store').Writable<T>} Wrapped store.
+ * @returns {import('svelte/store').Writable<T>} Wrapped store.
  */
 declare function storeCallback<T>(store: _svelte_store.Writable<T>, setCallback: (store?: _svelte_store.Writable<T>, value?: T) => void): _svelte_store.Writable<T>;
 /**
  * Subscribes to the given store with the update function provided and ignores the first automatic
  * update. All future updates are dispatched to the update function.
  *
- * @param {import('#svelte/store').Readable | import('#svelte/store').Writable} store -
+ * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
  *  Store to subscribe to...
  *
- * @param {import('#svelte/store').Updater} update - function to receive future updates.
+ * @param {import('svelte/store').Updater} update - function to receive future updates.
  *
- * @returns {import('#svelte/store').Unsubscriber} Store unsubscribe function.
+ * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
  */
 declare function subscribeIgnoreFirst(store: _svelte_store.Readable<any> | _svelte_store.Writable<any>, update: any): _svelte_store.Unsubscriber;
 /**
  * Subscribes to the given store with two update functions provided. The first function is invoked on the initial
  * subscription. All future updates are dispatched to the update function.
  *
- * @param {import('#svelte/store').Readable | import('#svelte/store').Writable} store -
+ * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
  *  Store to subscribe to...
  *
- * @param {import('#svelte/store').Updater} first - Function to receive first update.
+ * @param {import('svelte/store').Updater} first - Function to receive first update.
  *
- * @param {import('#svelte/store').Updater} update - Function to receive future updates.
+ * @param {import('svelte/store').Updater} update - Function to receive future updates.
  *
- * @returns {import('#svelte/store').Unsubscriber} Store unsubscribe function.
+ * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
  */
 declare function subscribeFirstRest(store: _svelte_store.Readable<any> | _svelte_store.Writable<any>, first: any, update: any): _svelte_store.Unsubscriber;
 
@@ -406,7 +407,7 @@ declare class TJSDocument {
     /**
      * @returns {EmbeddedAPI} Embedded store manager.
      */
-    get embedded(): EmbeddedAPI;
+    get embedded(): any;
     /**
      * Returns the options passed on last update.
      *
@@ -481,11 +482,11 @@ type TJSDocumentOptions = {
      */
     preDelete?: (doc: foundry.abstract.Document) => void;
 };
-type EmbeddedAPI = {
+type EmbeddedAPI<T> = {
     /**
      * - Creates an embedded collection store.
      */
-    create: (embeddedName: string, options: any) => any;
+    create: (embeddedName: string, options: _typhonjs_fvtt_svelte_store_reducer.DynOptionsMapCreate<string, any>) => _typhonjs_fvtt_svelte_store_reducer.DynMapReducer<string, T>;
     /**
      * - Destroys one or more embedded collection stores.
      */
@@ -493,7 +494,7 @@ type EmbeddedAPI = {
     /**
      * - Returns a specific existing embedded collection store.
      */
-    get: (embeddedName: string, storeName: string) => any;
+    get: (embeddedName: string, storeName: string) => _typhonjs_fvtt_svelte_store_reducer.DynMapReducer<string, T>;
 };
 
 /**

@@ -1,7 +1,7 @@
-import { isIterable, hasPrototype, isObject } from '@typhonjs-fvtt/svelte/util';
+import { isIterable } from '@typhonjs-fvtt/svelte/util';
 import { derived, get, writable as writable$2 } from 'svelte/store';
 import { noop, run_all, is_function } from 'svelte/internal';
-import { uuidv4, isPlainObject, getUUIDFromDataTransfer, isObject as isObject$1 } from '@typhonjs-fvtt/svelte/util';
+import { hasPrototype, isObject, uuidv4, isPlainObject, getUUIDFromDataTransfer } from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides a readable store to track keys actively pressed. KeyStore is designed to be used with the {@link keyforward}
@@ -2430,9 +2430,9 @@ class EmbeddedStoreManager
     *
     * @param {string} embeddedName -
     *
-    * @param {import('@typhonjs-fvtt/svelte/store').OptionsDynMapCreate<string, T>} options -
+    * @param {import('#svelte-fvtt/store/reducer').DynOptionsMapCreate<string, T>} options -
     *
-    * @returns {import('@typhonjs-fvtt/svelte/store').DynMapReducer<string, T>} DynMapReducer instance
+    * @returns {import('#svelte-fvtt/store/reducer').DynMapReducer<string, T>} DynMapReducer instance
     */
    create(embeddedName, options)
    {
@@ -2472,10 +2472,10 @@ class EmbeddedStoreManager
       /** @type {string} */
       let name;
 
-      /** @type {import('@typhonjs-fvtt/svelte/store').DataOptions<T>} */
+      /** @type {import('#svelte-fvtt/store/reducer').DynDataOptions<T>} */
       let rest = {};
 
-      /** @type {import('@typhonjs-fvtt/svelte/store').IDynMapReducerCtor<string, T>} */
+      /** @type {import('#svelte-fvtt/store/reducer').IDynMapReducerCtor<string, T>} */
       let ctor;
 
       if (typeof options === 'string')
@@ -2587,7 +2587,7 @@ class EmbeddedStoreManager
     *
     * @param {string} storeName -
     *
-    * @returns {import('@typhonjs-fvtt/svelte/store').DynMapReducer<string, T>} DynMapReducer instance.
+    * @returns {import('#svelte-fvtt/store/reducer').DynMapReducer<string, T>} DynMapReducer instance.
     */
    get(embeddedName, storeName)
    {
@@ -2965,7 +2965,7 @@ class TJSDocument
     */
    setOptions(options)
    {
-      if (!isObject$1(options))
+      if (!isObject(options))
       {
          throw new TypeError(`TJSDocument error: 'options' is not a plain object.`);
       }
@@ -3028,13 +3028,14 @@ class TJSDocument
  */
 
 /**
+ * @template T
  * @typedef {object} EmbeddedAPI
  *
- * @property {(embeddedName: string, options: import('@typhonjs-fvtt/runtime/svelte/store').OptionsDynMapCreate<string, any>) => import('@typhonjs-fvtt/runtime/svelte/store').DynMapReducer<string, T>} create - Creates an embedded collection store.
+ * @property {(embeddedName: string, options: import('#svelte-fvtt/store/reducer').DynOptionsMapCreate<string, any>) => import('#svelte-fvtt/store/reducer').DynMapReducer<string, T>} create - Creates an embedded collection store.
  *
  * @property {(embeddedName?: string, storeName?: string) => boolean} destroy - Destroys one or more embedded collection stores.
  *
- * @property {(embeddedName: string, storeName: string) => import('@typhonjs-fvtt/runtime/svelte/store').DynMapReducer<string, T>} get - Returns a specific existing embedded collection store.
+ * @property {(embeddedName: string, storeName: string) => import('#svelte-fvtt/store/reducer').DynMapReducer<string, T>} get - Returns a specific existing embedded collection store.
  */
 
 /**
@@ -3187,7 +3188,7 @@ class TJSDocumentCollection
           `TJSDocumentCollection set error: 'collection' is not a valid DocumentCollection or undefined.`);
       }
 
-      if (!isObject$1(options))
+      if (!isObject(options))
       {
          throw new TypeError(`TJSDocument set error: 'options' is not an object.`);
       }
@@ -3214,7 +3215,7 @@ class TJSDocumentCollection
     */
    setOptions(options)
    {
-      if (!isObject$1(options))
+      if (!isObject(options))
       {
          throw new TypeError(`TJSDocumentCollection error: 'options' is not an object.`);
       }
