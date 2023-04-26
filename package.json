@@ -68,6 +68,10 @@
       "types": "./_dist/store/position/index.d.ts",
       "import": "./_dist/store/position/index.js"
     },
+    "./store/reducer": {
+      "types": "./_dist/store/reducer/index.d.ts",
+      "import": "./_dist/store/reducer/index.js"
+    },
     "./transition": {
       "types": "./_dist/transition/index.d.ts",
       "import": "./_dist/transition/index.js"
