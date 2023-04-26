@@ -1,4 +1,5 @@
 import * as _svelte_store from 'svelte/store';
+import * as _svelte_lib_store_position from '@typhonjs-fvtt/svelte/store/position';
 
 /**
  * Provides an action to always blur the element when any pointer up event occurs on the element.
@@ -127,7 +128,7 @@ declare namespace resizeObserver {
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
-declare function applyPosition(node: HTMLElement, position: any): {
+declare function applyPosition(node: HTMLElement, position: _svelte_lib_store_position.TJSPosition): {
     update: Function;
     destroy: Function;
 };
@@ -163,7 +164,7 @@ declare function applyPosition(node: HTMLElement, position: any): {
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
 declare function draggable(node: HTMLElement, { position, active, button, storeDragging, ease, easeOptions, hasTargetClassList, ignoreTargetClassList }: {
-    position: any;
+    position: _svelte_lib_store_position.TJSPosition;
     active?: boolean;
     button?: number;
     storeDragging?: _svelte_store.Writable<boolean>;
