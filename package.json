@@ -66,6 +66,10 @@
       "types": "./_dist/store/index.d.ts",
       "import": "./_dist/store/index.js"
     },
+    "./store/document": {
+      "types": "./_dist/store/document/index.d.ts",
+      "import": "./_dist/store/document/index.js"
+    },
     "./store/position": {
       "types": "./_dist/store/position/index.d.ts",
       "import": "./_dist/store/position/index.js"

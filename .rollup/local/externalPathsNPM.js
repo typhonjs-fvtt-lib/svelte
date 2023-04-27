@@ -10,6 +10,7 @@ export const externalPathsNPM = {
    '@typhonjs-svelte/lib/plugin/system': '@typhonjs-fvtt/svelte/plugin/system',
    '@typhonjs-svelte/lib/store': '@typhonjs-fvtt/svelte/store',
    '@typhonjs-svelte/lib/store/position': '@typhonjs-fvtt/svelte/store/position',
+   '@typhonjs-svelte/lib/store/reducer': '@typhonjs-fvtt/svelte/store/reducer',
    '@typhonjs-svelte/lib/transition': '@typhonjs-fvtt/svelte/transition',
    '@typhonjs-svelte/lib/util': '@typhonjs-fvtt/svelte/util',
 
@@ -38,7 +39,9 @@ export const externalPathsNPM = {
    '@typhonjs-fvtt/svelte/plugin/data': '@typhonjs-fvtt/svelte/plugin/data',
    '@typhonjs-fvtt/svelte/plugin/system': '@typhonjs-fvtt/svelte/plugin/system',
    '@typhonjs-fvtt/svelte/store': '@typhonjs-fvtt/svelte/store',
+   '@typhonjs-fvtt/svelte/store/document': '@typhonjs-fvtt/svelte/store/document',
    '@typhonjs-fvtt/svelte/store/position': '@typhonjs-fvtt/svelte/store/position',
+   '@typhonjs-fvtt/svelte/store/reducer': '@typhonjs-fvtt/svelte/store/reducer',
    '@typhonjs-fvtt/svelte/transition': '@typhonjs-fvtt/svelte/transition',
    '@typhonjs-fvtt/svelte/util': '@typhonjs-fvtt/svelte/util',
 };

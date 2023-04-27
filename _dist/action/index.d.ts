@@ -20,7 +20,7 @@ declare function alwaysBlur(node: HTMLElement): {
  *
  * @param {HTMLElement} element - The target scrollable HTML element.
  *
- * @param {import('svelte/store').Writable<number>}   store - A writable store that stores the element scrollTop.
+ * @param {import('#svelte/store').Writable<number>}   store - A writable store that stores the element scrollTop.
  *
  * @returns {{destroy: Function, update: Function}} Lifecycle functions.
  */
@@ -48,7 +48,7 @@ declare function autoBlur(node: HTMLElement): {
  *
  * @param {HTMLElement} node - Target element.
  *
- * @param {import('svelte/store').Writable<boolean>}  storeFocused - Update store for focus changes.
+ * @param {import('#svelte/store').Writable<boolean>}  storeFocused - Update store for focus changes.
  *
  * @returns {{update: (function(object): void), destroy: (function(): void)}} Action lifecycle methods.
  */
@@ -124,7 +124,7 @@ declare namespace resizeObserver {
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
- * @param {import('svelte-lib/store/position').TJSPosition}   position - A position instance.
+ * @param {import('#svelte-lib/store/position').TJSPosition}   position - A position instance.
  *
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
@@ -142,13 +142,13 @@ declare function applyPosition(node: HTMLElement, position: _svelte_lib_store_po
  *
  * @param {object}            params - Required parameters.
  *
- * @param {import('svelte-lib/store/position').TJSPosition}   params.position - A position instance.
+ * @param {import('#svelte-lib/store/position').TJSPosition}   params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
  * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
  *
- * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
+ * @param {import('#svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
  *        state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.

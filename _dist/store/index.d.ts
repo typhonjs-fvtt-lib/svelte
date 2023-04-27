@@ -1,7 +1,5 @@
 import * as _svelte_store from 'svelte/store';
 import { Writable, Readable } from 'svelte/store';
-import * as _typhonjs_fvtt_svelte_store_reducer from '@typhonjs-fvtt/svelte/store/reducer';
-import * as _typhonjs_fvtt_svelte_util from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides a readable store to track keys actively pressed. KeyStore is designed to be used with the {@link keyforward}
@@ -121,7 +119,7 @@ declare class TJSLocalStorage {
      *
      * @param {boolean}  [defaultValue] - A default value to set for the store.
      *
-     * @returns {import('svelte/store').Writable} The new store.
+     * @returns {import('#svelte/store').Writable} The new store.
      */
     static "__#148094@#createStore"(key: string, defaultValue?: boolean): _svelte_store.Writable<any>;
     /**
@@ -142,7 +140,7 @@ declare class TJSLocalStorage {
      *
      * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
      *
-     * @returns {import('svelte/store').Writable} The Svelte store for this key.
+     * @returns {import('#svelte/store').Writable} The Svelte store for this key.
      */
     getStore(key: string, defaultValue?: any): _svelte_store.Writable<any>;
     /**
@@ -174,7 +172,7 @@ declare class TJSSessionStorage {
      *
      * @param {boolean}  [defaultValue] - A default value to set for the store.
      *
-     * @returns {import('svelte/store').Writable} The new store.
+     * @returns {import('#svelte/store').Writable} The new store.
      */
     static "__#148095@#createStore"(key: string, defaultValue?: boolean): _svelte_store.Writable<any>;
     /**
@@ -195,7 +193,7 @@ declare class TJSSessionStorage {
      *
      * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
      *
-     * @returns {import('svelte/store').Writable} The Svelte store for this key.
+     * @returns {import('#svelte/store').Writable} The Svelte store for this key.
      */
     getStore(key: string, defaultValue?: any): _svelte_store.Writable<any>;
     /**
@@ -263,38 +261,38 @@ declare function isWritableStore(store: any): boolean;
  *
  * @template T
  *
- * @param {import('svelte/store').Writable<T>} store - A store to wrap.
+ * @param {import('#svelte/store').Writable<T>} store - A store to wrap.
  *
- * @param {(store?: import('svelte/store').Writable<T>, value?: T) => void} setCallback - A callback to invoke after
+ * @param {(store?: import('#svelte/store').Writable<T>, value?: T) => void} setCallback - A callback to invoke after
  *        store set.
  *
- * @returns {import('svelte/store').Writable<T>} Wrapped store.
+ * @returns {import('#svelte/store').Writable<T>} Wrapped store.
  */
 declare function storeCallback<T>(store: _svelte_store.Writable<T>, setCallback: (store?: _svelte_store.Writable<T>, value?: T) => void): _svelte_store.Writable<T>;
 /**
  * Subscribes to the given store with the update function provided and ignores the first automatic
  * update. All future updates are dispatched to the update function.
  *
- * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
+ * @param {import('#svelte/store').Readable | import('#svelte/store').Writable} store -
  *  Store to subscribe to...
  *
- * @param {import('svelte/store').Updater} update - function to receive future updates.
+ * @param {import('#svelte/store').Updater} update - function to receive future updates.
  *
- * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
+ * @returns {import('#svelte/store').Unsubscriber} Store unsubscribe function.
  */
 declare function subscribeIgnoreFirst(store: _svelte_store.Readable<any> | _svelte_store.Writable<any>, update: any): _svelte_store.Unsubscriber;
 /**
  * Subscribes to the given store with two update functions provided. The first function is invoked on the initial
  * subscription. All future updates are dispatched to the update function.
  *
- * @param {import('svelte/store').Readable | import('svelte/store').Writable} store -
+ * @param {import('#svelte/store').Readable | import('#svelte/store').Writable} store -
  *  Store to subscribe to...
  *
- * @param {import('svelte/store').Updater} first - Function to receive first update.
+ * @param {import('#svelte/store').Updater} first - Function to receive first update.
  *
- * @param {import('svelte/store').Updater} update - Function to receive future updates.
+ * @param {import('#svelte/store').Updater} update - Function to receive future updates.
  *
- * @returns {import('svelte/store').Unsubscriber} Store unsubscribe function.
+ * @returns {import('#svelte/store').Unsubscriber} Store unsubscribe function.
  */
 declare function subscribeFirstRest(store: _svelte_store.Readable<any> | _svelte_store.Writable<any>, first: any, update: any): _svelte_store.Unsubscriber;
 
@@ -393,179 +391,6 @@ declare function propertyStore(
 ): Writable<any>;
 
 /**
- * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.
- * This makes documents reactive in a Svelte component, but otherwise provides subscriber functionality external to
- * Svelte.
- */
-declare class TJSDocument {
-    /**
-     * @param {foundry.abstract.Document | TJSDocumentOptions}  [document] - Document to wrap or TJSDocumentOptions.
-     *
-     * @param {TJSDocumentOptions}      [options] - TJSDocument options.
-     */
-    constructor(document?: foundry.abstract.Document | TJSDocumentOptions, options?: TJSDocumentOptions);
-    /**
-     * @returns {EmbeddedAPI} Embedded store manager.
-     */
-    get embedded(): any;
-    /**
-     * Returns the options passed on last update.
-     *
-     * @returns {object} Last update options.
-     */
-    get updateOptions(): any;
-    /**
-     * Returns the UUID assigned to this store.
-     *
-     * @returns {string} UUID
-     */
-    get uuidv4(): string;
-    /**
-     * Completely removes all internal subscribers, any optional delete callback, and unregisters from the
-     * ClientDocumentMixin `apps` tracking object.
-     */
-    destroy(): void;
-    /**
-     * @returns {foundry.abstract.Document | undefined} Current document
-     */
-    get(): foundry.abstract.Document | undefined;
-    /**
-     * @param {foundry.abstract.Document | undefined}  document - New document to set.
-     *
-     * @param {object}         [options] - New document update options to set.
-     */
-    set(document: foundry.abstract.Document | undefined, options?: object): void;
-    /**
-     * Potentially sets new document from data transfer object.
-     *
-     * @param {object}   data - Document transfer data.
-     *
-     * @param {import('@typhonjs-fvtt/svelte/util').ParseDataTransferOptions & TJSDocumentOptions}   [options] - Optional
-     *        parameters.
-     *
-     * @returns {Promise<boolean>} Returns true if new document set from data transfer blob.
-     */
-    setFromDataTransfer(data: object, options?: _typhonjs_fvtt_svelte_util.ParseDataTransferOptions & TJSDocumentOptions): Promise<boolean>;
-    /**
-     * Sets the document by Foundry UUID performing a lookup and setting the document if found.
-     *
-     * @param {string}   uuid - A Foundry UUID to lookup.
-     *
-     * @param {TJSDocumentOptions}   [options] - New document update options to set.
-     *
-     * @returns {Promise<boolean>} True if successfully set document from UUID.
-     */
-    setFromUUID(uuid: string, options?: TJSDocumentOptions): Promise<boolean>;
-    /**
-     * Sets options for this document wrapper / store.
-     *
-     * @param {TJSDocumentOptions}   options - Options for TJSDocument.
-     */
-    setOptions(options: TJSDocumentOptions): void;
-    /**
-     * @param {function(foundry.abstract.Document, object): void} handler - Callback function that is invoked on update / changes.
-     *
-     * @returns {(function(): void)} Unsubscribe function.
-     */
-    subscribe(handler: (arg0: foundry.abstract.Document, arg1: object) => void): (() => void);
-    #private;
-}
-type TJSDocumentOptions = {
-    /**
-     * - Optional post delete function to invoke when
-     * document is deleted _after_ subscribers have been notified.
-     */
-    delete?: (doc: foundry.abstract.Document) => void;
-    /**
-     * - Optional pre delete function to invoke when
-     * document is deleted _before_ subscribers are notified.
-     */
-    preDelete?: (doc: foundry.abstract.Document) => void;
-};
-type EmbeddedAPI<T> = {
-    /**
-     * - Creates an embedded collection store.
-     */
-    create: (embeddedName: string, options: _typhonjs_fvtt_svelte_store_reducer.DynOptionsMapCreate<string, any>) => _typhonjs_fvtt_svelte_store_reducer.DynMapReducer<string, T>;
-    /**
-     * - Destroys one or more embedded collection stores.
-     */
-    destroy: (embeddedName?: string, storeName?: string) => boolean;
-    /**
-     * - Returns a specific existing embedded collection store.
-     */
-    get: (embeddedName: string, storeName: string) => _typhonjs_fvtt_svelte_store_reducer.DynMapReducer<string, T>;
-};
-
-/**
- * Provides a wrapper implementing the Svelte store / subscriber protocol around any DocumentCollection. This makes
- * document collections reactive in a Svelte component, but otherwise provides subscriber functionality external to
- * Svelte.
- *
- * @template {globalThis.DocumentCollection} T
- */
-declare class TJSDocumentCollection<T extends globalThis.DocumentCollection> {
-    /**
-     * @param {T|TJSDocumentCollectionOptions}   [collection] - Collection to wrap or TJSDocumentCollectionOptions.
-     *
-     * @param {TJSDocumentCollectionOptions}     [options] - TJSDocumentCollection options.
-     */
-    constructor(collection?: T | TJSDocumentCollectionOptions, options?: TJSDocumentCollectionOptions);
-    /**
-     * Returns the options passed on last update.
-     *
-     * @returns {object} Last update options.
-     */
-    get updateOptions(): any;
-    /**
-     * Returns the UUID assigned to this store.
-     *
-     * @returns {*} UUID
-     */
-    get uuid(): any;
-    /**
-     * Completely removes all internal subscribers, any optional delete callback, and unregisters from the
-     * DocumentCollection `apps` tracking array.
-     */
-    destroy(): void;
-    /**
-     * @returns {T | undefined} Current collection
-     */
-    get(): T | undefined;
-    /**
-     * @param {T | undefined}  collection - New collection to set.
-     *
-     * @param {object}         [options] - New collection update options to set.
-     */
-    set(collection: T | undefined, options?: object): void;
-    /**
-     * Sets options for this collection wrapper / store.
-     *
-     * @param {TJSDocumentCollectionOptions}   options - Options for TJSDocumentCollection.
-     */
-    setOptions(options: TJSDocumentCollectionOptions): void;
-    /**
-     * @param {function(T, object): void} handler - Callback function that is invoked on update / changes.
-     *
-     * @returns {(function(): void)} Unsubscribe function.
-     */
-    subscribe(handler: (arg0: T, arg1: object) => void): (() => void);
-    #private;
-}
-type TJSDocumentCollectionOptions = {
-    /**
-     * - Optional post delete function
-     * to invoke when document is deleted _after_ subscribers have been notified.
-     */
-    delete?: (collection: globalThis.DocumentCollection) => void;
-    /**
-     * - Optional pre delete function to
-     * invoke when document is deleted _before_ subscribers are notified.
-     */
-    preDelete?: (collection: globalThis.DocumentCollection) => void;
-};
-
-/**
  * - Provides a Svelte store wrapping the Foundry `game` global variable. It is initialized
  * on the `ready` hook. You may use this store to access the global game state from a Svelte template. It is a read only
  * store and will receive no reactive updates during runtime.
@@ -576,4 +401,4 @@ type GameState = _svelte_store.Readable<any>;
  */
 declare const gameState: _svelte_store.Readable<any>;
 
-export { EmbeddedAPI, GameState, KeyStore, KeyStoreOptions, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, TJSLocalStorage, TJSSessionStorage, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, storeCallback, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { GameState, KeyStore, KeyStoreOptions, TJSLocalStorage, TJSSessionStorage, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, storeCallback, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };

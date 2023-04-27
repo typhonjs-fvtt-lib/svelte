@@ -5,7 +5,7 @@
       localize,
       radioBoxes }         from '@typhonjs-fvtt/svelte/helper';
 
-   import { TJSDocument }  from '@typhonjs-fvtt/svelte/store';
+   import { TJSDocument }  from '@typhonjs-fvtt/svelte/store/document';
 
    export let document = void 0;
 

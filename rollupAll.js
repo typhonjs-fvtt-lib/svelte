@@ -33,23 +33,23 @@ const replace = {
    '@typhonjs-svelte/lib/': '@typhonjs-fvtt/svelte/'
 };
 
-// /**
-//  * Filter out "Duplicate identifier 'DOMRect'" messages.
-//  *
-//  * TODO: NOTE - The filtering of 2300 is unwanted churn, but 1014 can be a valid error though currently there is no
-//  * great way to describe destructuring rest parameters as a function argument with JSDoc that Typescript agrees with.
-//  * See this issue:
-//  *
-//  * @param {import('typescript').Diagnostic} diagnostic -
-//  *
-//  * @param {string} message -
-//  *
-//  * @returns {boolean} Return true to filter message.
-//  */
-// const filterDiagnostic = (diagnostic, message) =>
-//  (diagnostic.code === 2300 && message === `Duplicate identifier 'DOMRect'.`) ||
-//   (diagnostic.code === 1014 && message === `A rest parameter must be last in a parameter list.`);
-//
+/**
+ * Filter out "Duplicate identifier 'DOMRect'" messages.
+ *
+ * TODO: NOTE - The filtering of 2300 is unwanted churn, but 1014 can be a valid error though currently there is no
+ * great way to describe destructuring rest parameters as a function argument with JSDoc that Typescript agrees with.
+ * See this issue:
+ *
+ * @param {import('typescript').Diagnostic} diagnostic -
+ *
+ * @param {string} message -
+ *
+ * @returns {boolean} Return true to filter message.
+ */
+const filterDiagnostic = (diagnostic, message) =>
+ (diagnostic.code === 2300 && message === `Duplicate identifier 'DOMRect'.`) ||
+  (diagnostic.code === 1014 && message === `A rest parameter must be last in a parameter list.`);
+
 // // We don't care about external warning messages for `@typhonjs-svelte/lib` imports.
 // const ignorePattern = /^@typhonjs-svelte\/lib/;
 //
@@ -61,7 +61,7 @@ const replace = {
 
 // Rollup plugin options for generateDTS.
 // const dtsPluginOptions = { bundlePackageExports: true, filterDiagnostic, onwarn, replace };
-const dtsPluginOptions = { bundlePackageExports: true, replace };
+const dtsPluginOptions = { bundlePackageExports: true, filterDiagnostic, replace };
 
 // -------------------------------------------------------------------------------------------------------------------
 
@@ -211,6 +211,24 @@ const rollupConfigs = [
    },
    {
       input: {
+         input: 'src/store/document/index.js',
+         plugins: [
+            importsExternal(),
+            resolve(s_RESOLVE_CONFIG),
+            generateDTS.plugin(dtsPluginOptions)
+         ]
+      },
+      output: {
+         file: '_dist/store/document/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap
+      }
+   },
+   {
+      input: {
          input: 'src/store/position/index.js',
          plugins: [
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/store/position`] }),
@@ -344,7 +362,9 @@ fs.copySync('./src/gsap/plugin', './_dist/gsap/plugin');
 
 // Common application generateDTS options.
 // const applicationDTSOptions = { filterDiagnostic, onwarn, replace };
-const applicationDTSOptions = { replace };
+const applicationDTSOptions = { filterDiagnostic, replace };
+
+console.log('Generating TS Declaration: ./_dist/application/index.js');
 
 await generateDTS({
    input: './_dist/application/index.js',
@@ -353,12 +373,16 @@ await generateDTS({
    ...applicationDTSOptions
 });
 
+console.log('Generating TS Declaration: ./_dist/application/dialog/index.js');
+
 await generateDTS({
    input: './_dist/application/dialog/index.js',
    output: './_types/application/dialog/index.d.mts',
    // prependGen: ['./_dist/application/typedefs.js'],
    ...applicationDTSOptions
 });
+
+console.log('Generating TS Declaration: ./_dist/application/legacy/index.js');
 
 await generateDTS({
    input: './_dist/application/legacy/index.js',
