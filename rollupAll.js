@@ -1,6 +1,6 @@
 import resolve                   from '@rollup/plugin-node-resolve';
 import { generateDTS }           from '@typhonjs-build-test/esm-d-ts';
-import { jsdocRemoveNodeByTags } from '@typhonjs-build-test/esm-d-ts/transformer';
+import { importsExternal }       from '@typhonjs-build-test/rollup-external-imports';
 import fs                        from 'fs-extra';
 import { rollup }                from 'rollup';
 
@@ -29,37 +29,39 @@ const sourcemap = s_SOURCEMAPS;
 // @typhonjs-svelte/lib. This will alter the JSDoc comments and import symbols.
 const replace = {
    _typhonjs_svelte_lib_: '_typhonjs_fvtt_svelte_',
+   _svelte_fvtt_: '_typhonjs_fvtt_svelte_',
    '@typhonjs-svelte/lib/': '@typhonjs-fvtt/svelte/'
 };
 
-/**
- * Filter out "Duplicate identifier 'DOMRect'" messages.
- *
- * TODO: NOTE - The filtering of 2300 is unwanted churn, but 1014 can be a valid error though currently there is no
- * great way to describe destructuring rest parameters as a function argument with JSDoc that Typescript agrees with.
- * See this issue:
- *
- * @param {import('typescript').Diagnostic} diagnostic -
- *
- * @param {string} message -
- *
- * @returns {boolean} Return true to filter message.
- */
-const filterDiagnostic = (diagnostic, message) =>
- (diagnostic.code === 2300 && message === `Duplicate identifier 'DOMRect'.`) ||
-  (diagnostic.code === 1014 && message === `A rest parameter must be last in a parameter list.`);
-
-// We don't care about external warning messages for `@typhonjs-svelte/lib` imports.
-const ignorePattern = /^@typhonjs-svelte\/lib/;
-
-const onwarn = (warning, warn) =>
-{
-   if (warning.code === 'UNRESOLVED_IMPORT' && ignorePattern.test(warning.exporter)) { return; }
-   warn(warning);
-};
+// /**
+//  * Filter out "Duplicate identifier 'DOMRect'" messages.
+//  *
+//  * TODO: NOTE - The filtering of 2300 is unwanted churn, but 1014 can be a valid error though currently there is no
+//  * great way to describe destructuring rest parameters as a function argument with JSDoc that Typescript agrees with.
+//  * See this issue:
+//  *
+//  * @param {import('typescript').Diagnostic} diagnostic -
+//  *
+//  * @param {string} message -
+//  *
+//  * @returns {boolean} Return true to filter message.
+//  */
+// const filterDiagnostic = (diagnostic, message) =>
+//  (diagnostic.code === 2300 && message === `Duplicate identifier 'DOMRect'.`) ||
+//   (diagnostic.code === 1014 && message === `A rest parameter must be last in a parameter list.`);
+//
+// // We don't care about external warning messages for `@typhonjs-svelte/lib` imports.
+// const ignorePattern = /^@typhonjs-svelte\/lib/;
+//
+// const onwarn = (warning, warn) =>
+// {
+//    if (warning.code === 'UNRESOLVED_IMPORT' && ignorePattern.test(warning.exporter)) { return; }
+//    warn(warning);
+// };
 
 // Rollup plugin options for generateDTS.
-const dtsPluginOptions = { bundlePackageExports: true, filterDiagnostic, onwarn, replace };
+// const dtsPluginOptions = { bundlePackageExports: true, filterDiagnostic, onwarn, replace };
+const dtsPluginOptions = { bundlePackageExports: true, replace };
 
 // -------------------------------------------------------------------------------------------------------------------
 
@@ -192,6 +194,7 @@ const rollupConfigs = [
       input: {
          input: 'src/store/index.js',
          plugins: [
+            importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/store`] }),
             resolve(s_RESOLVE_CONFIG),
             generateDTS.plugin(dtsPluginOptions)
@@ -340,7 +343,8 @@ fs.emptyDirSync('./_dist/gsap/plugin');
 fs.copySync('./src/gsap/plugin', './_dist/gsap/plugin');
 
 // Common application generateDTS options.
-const applicationDTSOptions = { filterDiagnostic, onwarn, replace, transformers: [jsdocRemoveNodeByTags('internal')] };
+// const applicationDTSOptions = { filterDiagnostic, onwarn, replace };
+const applicationDTSOptions = { replace };
 
 await generateDTS({
    input: './_dist/application/index.js',
