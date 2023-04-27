@@ -2,7 +2,7 @@ import { DynMapReducer }   from '@typhonjs-svelte/lib/store/reducer';
 
 import {
    hasPrototype,
-   isObject }              from '@typhonjs-svelte/lib/util';
+   isObject }              from '#svelte-fvtt/util';
 
 /**
  * Provides management of reactive embedded collections.
@@ -51,9 +51,9 @@ export class EmbeddedStoreManager
     *
     * @param {string} embeddedName -
     *
-    * @param {import('@typhonjs-fvtt/svelte/store').OptionsDynMapCreate<string, T>} options -
+    * @param {import('#svelte-fvtt/store/reducer').DynOptionsMapCreate<string, T>} options -
     *
-    * @returns {import('@typhonjs-fvtt/svelte/store').DynMapReducer<string, T>} DynMapReducer instance
+    * @returns {import('#svelte-fvtt/store/reducer').DynMapReducer<string, T>} DynMapReducer instance
     */
    create(embeddedName, options)
    {
@@ -93,10 +93,10 @@ export class EmbeddedStoreManager
       /** @type {string} */
       let name;
 
-      /** @type {import('@typhonjs-fvtt/svelte/store').DataOptions<T>} */
+      /** @type {import('#svelte-fvtt/store/reducer').DynDataOptions<T>} */
       let rest = {};
 
-      /** @type {import('@typhonjs-fvtt/svelte/store').IDynMapReducerCtor<string, T>} */
+      /** @type {import('#svelte-fvtt/store/reducer').IDynMapReducerCtor<string, T>} */
       let ctor;
 
       if (typeof options === 'string')
@@ -208,7 +208,7 @@ export class EmbeddedStoreManager
     *
     * @param {string} storeName -
     *
-    * @returns {import('@typhonjs-fvtt/svelte/store').DynMapReducer<string, T>} DynMapReducer instance.
+    * @returns {import('#svelte-fvtt/store/reducer').DynMapReducer<string, T>} DynMapReducer instance.
     */
    get(embeddedName, storeName)
    {

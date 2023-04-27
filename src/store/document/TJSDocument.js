@@ -2,7 +2,7 @@ import {
    getUUIDFromDataTransfer,
    isObject,
    isPlainObject,
-   uuidv4 } from '@typhonjs-fvtt/svelte/util';
+   uuidv4 } from '#svelte-fvtt/util';
 
 import { EmbeddedStoreManager } from './EmbeddedStoreManager.js';
 
@@ -328,11 +328,12 @@ export class TJSDocument
  */
 
 /**
+ * @template T
  * @typedef {object} EmbeddedAPI
  *
- * @property {(embeddedName: string, options: import('@typhonjs-fvtt/runtime/svelte/store').OptionsDynMapCreate<string, any>) => import('@typhonjs-fvtt/runtime/svelte/store').DynMapReducer<string, T>} create - Creates an embedded collection store.
+ * @property {(embeddedName: string, options: import('#svelte-fvtt/store/reducer').DynOptionsMapCreate<string, any>) => import('#svelte-fvtt/store/reducer').DynMapReducer<string, T>} create - Creates an embedded collection store.
  *
  * @property {(embeddedName?: string, storeName?: string) => boolean} destroy - Destroys one or more embedded collection stores.
  *
- * @property {(embeddedName: string, storeName: string) => import('@typhonjs-fvtt/runtime/svelte/store').DynMapReducer<string, T>} get - Returns a specific existing embedded collection store.
+ * @property {(embeddedName: string, storeName: string) => import('#svelte-fvtt/store/reducer').DynMapReducer<string, T>} get - Returns a specific existing embedded collection store.
  */
