@@ -291,7 +291,7 @@ declare class AnimationControl {
      *
      * @type {AnimationControl}
      */
-    static "__#173114@#voidControl": AnimationControl;
+    static "__#171035@#voidControl": AnimationControl;
     /**
      * Provides a static void / undefined AnimationControl that is automatically resolved.
      *
@@ -800,7 +800,7 @@ declare class AnimationGroupAPI {
      *
      * @returns {boolean} Is TJSPosition.
      */
-    static "__#173117@#isPosition"(object: any): boolean;
+    static "__#171038@#isPosition"(object: any): boolean;
     /**
      * Cancels any animation for given TJSPosition data.
      *
@@ -907,14 +907,14 @@ declare class TJSPosition {
     /**
      * @type {{browserCentered: Centered, Centered: Centered}}
      */
-    static "__#173125@#positionInitial": {
+    static "__#171046@#positionInitial": {
         browserCentered: Centered;
         Centered: Centered;
     };
     /**
      * @type {{TransformBounds: TransformBounds, BasicBounds: BasicBounds, basicWindow: BasicBounds, transformWindow: TransformBounds}}
      */
-    static "__#173125@#positionValidators": {
+    static "__#171046@#positionValidators": {
         TransformBounds: TransformBounds;
         BasicBounds: BasicBounds;
         basicWindow: BasicBounds;
@@ -1236,6 +1236,118 @@ declare class TJSPosition {
      * @returns {(function(): void)} Unsubscribe function.
      */
     subscribe(handler: (arg0: TJSPositionData) => void): (() => void);
+    #private;
+}
+
+/**
+ * Provides an action to apply a TJSPosition instance to a HTMLElement and invoke `position.parent`
+ *
+ * @param {HTMLElement}       node - The node associated with the action.
+ *
+ * @param {import('..').TJSPosition}   position - A position instance.
+ *
+ * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
+ */
+declare function applyPosition(node: HTMLElement, position: TJSPosition): {
+    update: Function;
+    destroy: Function;
+};
+
+/**
+ * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on a given
+ * {@link TJSPosition} instance provided. When the attached boolean store state changes the draggable action is enabled
+ * or disabled.
+ *
+ * @param {HTMLElement}       node - The node associated with the action.
+ *
+ * @param {object}            params - Required parameters.
+ *
+ * @param {import('..').TJSPosition}   params.position - A position instance.
+ *
+ * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
+ *
+ * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
+ *
+ * @param {import('#svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
+ *        state.
+ *
+ * @param {boolean}           [params.ease=true] - When true easing is enabled.
+ *
+ * @param {object}            [params.easeOptions] - Gsap `to / `quickTo` vars object.
+ *
+ * @param {Iterable<string>}  [params.hasTargetClassList] - When defined any event targets that have a class in this
+ *        list are allowed.
+ *
+ * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
+ *        list are ignored.
+ *
+ * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
+ */
+declare function draggable(node: HTMLElement, { position, active, button, storeDragging, ease, easeOptions, hasTargetClassList, ignoreTargetClassList }: {
+    position: TJSPosition;
+    active?: boolean;
+    button?: number;
+    storeDragging?: _svelte_store.Writable<boolean>;
+    ease?: boolean;
+    easeOptions?: object;
+    hasTargetClassList?: Iterable<string>;
+    ignoreTargetClassList?: Iterable<string>;
+}): {
+    update: Function;
+    destroy: Function;
+};
+declare namespace draggable {
+    /**
+     * Define a function to get a DraggableOptions instance.
+     *
+     * @param {{ ease?: boolean, easeOptions?: object }} options - Draggable options.
+     *
+     * @returns {DraggableOptions} A new options instance.
+     */
+    function options(options: {
+        ease?: boolean;
+        easeOptions?: any;
+    }): DraggableOptions;
+}
+declare class DraggableOptions {
+    constructor({ ease, easeOptions }?: {
+        ease: any;
+        easeOptions: any;
+    });
+    ease: any;
+    easeOptions: any;
+    /**
+     * @param {number}   duration - Set ease duration.
+     */
+    set easeDuration(arg: number);
+    /**
+     * @returns {number} Get ease duration
+     */
+    get easeDuration(): number;
+    /**
+     * @param {string|Function} value - Get easing function value.
+     */
+    set easeValue(arg: string | Function);
+    /**
+     * @returns {string|Function} Get easing function value.
+     */
+    get easeValue(): string | Function;
+    /**
+     * Resets all options data to default values.
+     */
+    reset(): void;
+    /**
+     * Resets easing options to default values.
+     */
+    resetEase(): void;
+    /**
+     *
+     * @param {function(DraggableOptions): void} handler - Callback function that is invoked on update / changes.
+     *                                                 Receives the DraggableOptions object / instance.
+     *
+     * @returns {(function(): void)} Unsubscribe function.
+     */
+    subscribe(handler: (arg0: DraggableOptions) => void): (() => void);
     #private;
 }
 
@@ -1606,4 +1718,4 @@ type ValidatorData = {
  */
 type TJSPositionValidatorOptions = ValidatorFn | ValidatorData | Iterable<ValidatorFn | ValidatorData>;
 
-export { Matrix4, ResizeObserverData, StorePosition, TJSPosition, TJSPositionData, TJSPositionDataExtended, TJSPositionGetOptions, TJSPositionInitialHelper, TJSPositionOptions, TJSPositionOptionsAll, TJSPositionParent, TJSPositionValidatorOptions, TJSPositionable, TJSTransformData, TJSTransformOrigin, TJSTransforms, ValidationData, ValidatorData, ValidatorFn, Vector3, quickToCallback };
+export { Matrix4, ResizeObserverData, StorePosition, TJSPosition, TJSPositionData, TJSPositionDataExtended, TJSPositionGetOptions, TJSPositionInitialHelper, TJSPositionOptions, TJSPositionOptionsAll, TJSPositionParent, TJSPositionValidatorOptions, TJSPositionable, TJSTransformData, TJSTransformOrigin, TJSTransforms, ValidationData, ValidatorData, ValidatorFn, Vector3, applyPosition, draggable, quickToCallback };

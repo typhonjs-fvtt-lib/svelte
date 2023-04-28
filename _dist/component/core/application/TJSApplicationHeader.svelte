@@ -2,10 +2,10 @@
    import { getContext }            from 'svelte';
    import { cubicOut }              from 'svelte/easing';
 
-   import {
-      draggable as dragDefault }    from '@typhonjs-fvtt/svelte/action';
-
    import { localize }              from '@typhonjs-fvtt/svelte/helper';
+
+   import {
+      draggable as dragDefault }    from '@typhonjs-fvtt/svelte/store/position';
 
    import {
       isObject,

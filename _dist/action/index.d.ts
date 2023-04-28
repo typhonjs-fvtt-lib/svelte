@@ -1,5 +1,4 @@
 import * as _svelte_store from 'svelte/store';
-import * as _svelte_lib_store_position from '@typhonjs-fvtt/svelte/store/position';
 
 /**
  * Provides an action to always blur the element when any pointer up event occurs on the element.
@@ -120,118 +119,6 @@ declare namespace resizeObserver {
 }
 
 /**
- * Provides an action to apply a TJSPosition instance to a HTMLElement and invoke `position.parent`
- *
- * @param {HTMLElement}       node - The node associated with the action.
- *
- * @param {import('#svelte-lib/store/position').TJSPosition}   position - A position instance.
- *
- * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
- */
-declare function applyPosition(node: HTMLElement, position: _svelte_lib_store_position.TJSPosition): {
-    update: Function;
-    destroy: Function;
-};
-
-/**
- * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on a given
- * {@link TJSPosition} instance provided. When the attached boolean store state changes the draggable action is enabled
- * or disabled.
- *
- * @param {HTMLElement}       node - The node associated with the action.
- *
- * @param {object}            params - Required parameters.
- *
- * @param {import('#svelte-lib/store/position').TJSPosition}   params.position - A position instance.
- *
- * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
- *
- * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
- *
- * @param {import('#svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
- *        state.
- *
- * @param {boolean}           [params.ease=true] - When true easing is enabled.
- *
- * @param {object}            [params.easeOptions] - Gsap `to / `quickTo` vars object.
- *
- * @param {Iterable<string>}  [params.hasTargetClassList] - When defined any event targets that have a class in this
- *        list are allowed.
- *
- * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
- *        list are ignored.
- *
- * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
- */
-declare function draggable(node: HTMLElement, { position, active, button, storeDragging, ease, easeOptions, hasTargetClassList, ignoreTargetClassList }: {
-    position: _svelte_lib_store_position.TJSPosition;
-    active?: boolean;
-    button?: number;
-    storeDragging?: _svelte_store.Writable<boolean>;
-    ease?: boolean;
-    easeOptions?: object;
-    hasTargetClassList?: Iterable<string>;
-    ignoreTargetClassList?: Iterable<string>;
-}): {
-    update: Function;
-    destroy: Function;
-};
-declare namespace draggable {
-    /**
-     * Define a function to get a DraggableOptions instance.
-     *
-     * @param {{ ease?: boolean, easeOptions?: object }} options - Draggable options.
-     *
-     * @returns {DraggableOptions} A new options instance.
-     */
-    function options(options: {
-        ease?: boolean;
-        easeOptions?: any;
-    }): DraggableOptions;
-}
-declare class DraggableOptions {
-    constructor({ ease, easeOptions }?: {
-        ease: any;
-        easeOptions: any;
-    });
-    ease: any;
-    easeOptions: any;
-    /**
-     * @param {number}   duration - Set ease duration.
-     */
-    set easeDuration(arg: number);
-    /**
-     * @returns {number} Get ease duration
-     */
-    get easeDuration(): number;
-    /**
-     * @param {string|Function} value - Get easing function value.
-     */
-    set easeValue(arg: string | Function);
-    /**
-     * @returns {string|Function} Get easing function value.
-     */
-    get easeValue(): string | Function;
-    /**
-     * Resets all options data to default values.
-     */
-    reset(): void;
-    /**
-     * Resets easing options to default values.
-     */
-    resetEase(): void;
-    /**
-     *
-     * @param {function(DraggableOptions): void} handler - Callback function that is invoked on update / changes.
-     *                                                 Receives the DraggableOptions object / instance.
-     *
-     * @returns {(function(): void)} Unsubscribe function.
-     */
-    subscribe(handler: (arg0: DraggableOptions) => void): (() => void);
-    #private;
-}
-
-/**
  * Provides an action to apply style properties provided as an object.
  *
  * @param {HTMLElement} node - Target element
@@ -242,4 +129,4 @@ declare class DraggableOptions {
  */
 declare function applyStyles(node: HTMLElement, properties: object): Function;
 
-export { ResizeObserverTarget, alwaysBlur, applyPosition, applyScrolltop, applyStyles, autoBlur, draggable, isFocused, keyforward, resizeObserver };
+export { ResizeObserverTarget, alwaysBlur, applyScrolltop, applyStyles, autoBlur, isFocused, keyforward, resizeObserver };
