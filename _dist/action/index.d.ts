@@ -56,24 +56,6 @@ declare function isFocused(node: HTMLElement, storeFocused: _svelte_store.Writab
     destroy: (() => void);
 };
 
-/**
- * Provides an action to forward on key down & up events. This can be any object that has associated `keydown` and
- * `keyup` methods. See {@link KeyStore} for a store implementation.
- *
- * @param {HTMLElement} node - Target element.
- *
- * @param {{keydown: Function, keyup: Function}}   keyStore - Object to forward events key down / up events to...
- *
- * @returns {{update: (function(object): void), destroy: (function(): void)}} Action lifecycle methods.
- */
-declare function keyforward(node: HTMLElement, keyStore: {
-    keydown: Function;
-    keyup: Function;
-}): {
-    update: ((arg0: object) => void);
-    destroy: (() => void);
-};
-
 type ResizeObserverTarget = object | Function;
 /**
  * Provides an action to monitor the given HTMLElement node with `ResizeObserver` posting width / height changes
@@ -129,4 +111,4 @@ declare namespace resizeObserver {
  */
 declare function applyStyles(node: HTMLElement, properties: object): Function;
 
-export { ResizeObserverTarget, alwaysBlur, applyScrolltop, applyStyles, autoBlur, isFocused, keyforward, resizeObserver };
+export { ResizeObserverTarget, alwaysBlur, applyScrolltop, applyStyles, autoBlur, isFocused, resizeObserver };

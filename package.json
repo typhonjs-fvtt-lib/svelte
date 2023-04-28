@@ -70,6 +70,10 @@
       "types": "./_dist/store/document/index.d.ts",
       "import": "./_dist/store/document/index.js"
     },
+    "./store/dom": {
+      "types": "./_dist/store/dom/index.d.ts",
+      "import": "./_dist/store/dom/index.js"
+    },
     "./store/position": {
       "types": "./_dist/store/position/index.d.ts",
       "import": "./_dist/store/position/index.js"
