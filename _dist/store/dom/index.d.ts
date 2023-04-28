@@ -116,11 +116,11 @@ type KeyStoreOptions = {
  *
  * @param {import('..').KeyStore}   keyStore - KeyStore to forward events key down / up events to...
  *
- * @returns {{update: (function(import('..').KeyStore): void), destroy: (function(): void)}} Action lifecycle methods.
+ * @returns {{update: (function(import('..').KeyStore): void), destroy: Function}} Action lifecycle methods.
  */
 declare function keyforward(node: HTMLElement, keyStore: KeyStore): {
     update: ((arg0: KeyStore) => void);
-    destroy: (() => void);
+    destroy: Function;
 };
 
 export { KeyStore, KeyStoreOptions, keyforward };

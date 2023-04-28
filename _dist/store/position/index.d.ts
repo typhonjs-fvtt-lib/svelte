@@ -291,7 +291,7 @@ declare class AnimationControl {
      *
      * @type {AnimationControl}
      */
-    static "__#195421@#voidControl": AnimationControl;
+    static "__#218823@#voidControl": AnimationControl;
     /**
      * Provides a static void / undefined AnimationControl that is automatically resolved.
      *
@@ -800,7 +800,7 @@ declare class AnimationGroupAPI {
      *
      * @returns {boolean} Is TJSPosition.
      */
-    static "__#195424@#isPosition"(object: any): boolean;
+    static "__#218826@#isPosition"(object: any): boolean;
     /**
      * Cancels any animation for given TJSPosition data.
      *
@@ -907,14 +907,14 @@ declare class TJSPosition {
     /**
      * @type {{browserCentered: Centered, Centered: Centered}}
      */
-    static "__#195432@#positionInitial": {
+    static "__#218834@#positionInitial": {
         browserCentered: Centered;
         Centered: Centered;
     };
     /**
      * @type {{TransformBounds: TransformBounds, BasicBounds: BasicBounds, basicWindow: BasicBounds, transformWindow: TransformBounds}}
      */
-    static "__#195432@#positionValidators": {
+    static "__#218834@#positionValidators": {
         TransformBounds: TransformBounds;
         BasicBounds: BasicBounds;
         basicWindow: BasicBounds;

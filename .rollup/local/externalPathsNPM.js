@@ -1,5 +1,6 @@
 export const externalPathsNPM = {
    '@typhonjs-svelte/lib/action': '@typhonjs-fvtt/svelte/action',
+   '@typhonjs-svelte/lib/action/dom': '@typhonjs-fvtt/svelte/action/dom',
    '@typhonjs-svelte/lib/animate': '@typhonjs-fvtt/svelte/animate',
    '@typhonjs-svelte/lib/component/core': '@typhonjs-fvtt/svelte/component/core',
    '@typhonjs-svelte/lib/component/standard': '@typhonjs-fvtt/svelte/component/standard',
@@ -25,6 +26,7 @@ export const externalPathsNPM = {
    'svelte/transition': 'svelte/transition',
 
    '@typhonjs-fvtt/svelte/action': '@typhonjs-fvtt/svelte/action',
+   '@typhonjs-fvtt/svelte/action/dom': '@typhonjs-fvtt/svelte/action/dom',
    '@typhonjs-fvtt/svelte/animate': '@typhonjs-fvtt/svelte/animate',
    '@typhonjs-fvtt/svelte/application': '@typhonjs-fvtt/svelte/application',
    '@typhonjs-fvtt/svelte/application/dialog': '@typhonjs-fvtt/svelte/application/dialog',

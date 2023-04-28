@@ -313,7 +313,7 @@ class KeyStore
  *
  * @param {import('..').KeyStore}   keyStore - KeyStore to forward events key down / up events to...
  *
- * @returns {{update: (function(import('..').KeyStore): void), destroy: (function(): void)}} Action lifecycle methods.
+ * @returns {{update: (function(import('..').KeyStore): void), destroy: Function}} Action lifecycle methods.
  */
 function keyforward(node, keyStore)
 {

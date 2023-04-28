@@ -86,6 +86,24 @@ const rollupConfigs = [
    },
    {
       input: {
+         input: 'src/action/dom/index.js',
+         plugins: [
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/action/dom`] }),
+            resolve(s_RESOLVE_CONFIG),
+            generateDTS.plugin(dtsPluginOptions)
+         ]
+      },
+      output: {
+         file: '_dist/action/dom/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap
+      }
+   },
+   {
+      input: {
          input: 'src/animate/index.js',
          plugins: [
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/animate`] }),

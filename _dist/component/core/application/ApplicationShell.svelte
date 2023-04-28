@@ -11,7 +11,7 @@
 
    import {
       applyStyles,
-      resizeObserver }                 from '@typhonjs-fvtt/svelte/action';
+      resizeObserver }                 from '@typhonjs-fvtt/svelte/action/dom';
 
    import {
       A11yHelper,

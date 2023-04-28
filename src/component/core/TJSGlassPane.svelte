@@ -1,5 +1,5 @@
 <script>
-   import { applyStyles }              from '@typhonjs-fvtt/svelte/action';
+   import { applyStyles }              from '@typhonjs-fvtt/svelte/action/dom';
 
    import {
       s_DEFAULT_TRANSITION,
