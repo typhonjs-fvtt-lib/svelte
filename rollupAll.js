@@ -301,6 +301,42 @@ const rollupConfigs = [
    },
    {
       input: {
+         input: 'src/store/storage/web/index.js',
+         plugins: [
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/store/storage/web`] }),
+            resolve(s_RESOLVE_CONFIG),
+            generateDTS.plugin(dtsPluginOptions)
+         ]
+      },
+      output: {
+         file: '_dist/store/storage/web/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap
+      }
+   },
+   {
+      input: {
+         input: 'src/store/storage/web/plugin/index.js',
+         plugins: [
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/store/storage/web/plugin`] }),
+            resolve(s_RESOLVE_CONFIG),
+            generateDTS.plugin(dtsPluginOptions)
+         ]
+      },
+      output: {
+         file: '_dist/store/storage/web/plugin/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap
+      }
+   },
+   {
+      input: {
          input: 'src/transition/index.js',
          plugins: [
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/transition`] }),
@@ -328,42 +364,6 @@ const rollupConfigs = [
       },
       output: {
          file: '_dist/util/index.js',
-         format: 'es',
-         generatedCode: { constBindings: true },
-         paths: externalPathsNPM,
-         plugins: outputPlugins,
-         sourcemap
-      }
-   },
-   {
-      input: {
-         input: 'src/plugin/data/index.js',
-         plugins: [
-            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/plugin/data`] }),
-            resolve(s_RESOLVE_CONFIG),
-            generateDTS.plugin(dtsPluginOptions)
-         ]
-      },
-      output: {
-         file: '_dist/plugin/data/index.js',
-         format: 'es',
-         generatedCode: { constBindings: true },
-         paths: externalPathsNPM,
-         plugins: outputPlugins,
-         sourcemap
-      }
-   },
-   {
-      input: {
-         input: 'src/plugin/system/index.js',
-         plugins: [
-            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/plugin/system`] }),
-            resolve(s_RESOLVE_CONFIG),
-            generateDTS.plugin(dtsPluginOptions)
-         ]
-      },
-      output: {
-         file: '_dist/plugin/system/index.js',
          format: 'es',
          generatedCode: { constBindings: true },
          paths: externalPathsNPM,

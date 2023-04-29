@@ -81,7 +81,7 @@ type SvelteApplicationOptions = {
      * - An instance of
      * TJSSessionStorage to share across SvelteApplications.
      */
-    sessionStorage?: import('@typhonjs-fvtt/svelte/store').TJSSessionStorage;
+    sessionStorage?: import('@typhonjs-fvtt/svelte/store/storage/web').TJSSessionStorage;
     /**
      * - A Svelte configuration object defining
      * the main component.
@@ -252,7 +252,6 @@ import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/sto
 import { TJSPosition } from '@typhonjs-fvtt/svelte/store/position';
 import * as svelte from 'svelte';
 import * as svelte_store from 'svelte/store';
-import * as _typhonjs_fvtt_svelte_store from '@typhonjs-fvtt/svelte/store';
 import * as _typhonjs_fvtt_svelte_util from '@typhonjs-fvtt/svelte/util';
 
 /**
@@ -551,7 +550,7 @@ declare class SvelteReactive {
     /**
      * @returns {import('@typhonjs-fvtt/svelte/store').TJSSessionStorage} Returns TJSSessionStorage instance.
      */
-    get sessionStorage(): _typhonjs_fvtt_svelte_store.TJSSessionStorage;
+    get sessionStorage(): any;
     /**
      * Returns the store for app options.
      *

@@ -2,8 +2,9 @@ import { derived, writable }  from 'svelte/store';
 
 import {
    propertyStore,
-   subscribeIgnoreFirst,
-   TJSSessionStorage }        from '@typhonjs-fvtt/svelte/store';
+   subscribeIgnoreFirst }     from '@typhonjs-fvtt/svelte/store';
+
+import { TJSSessionStorage }  from '@typhonjs-fvtt/svelte/store/storage/web';
 
 import {
    deepMerge,

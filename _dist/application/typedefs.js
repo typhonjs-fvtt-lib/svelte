@@ -46,7 +46,7 @@
  * @property {import('@typhonjs-svelte/lib/store/position').TJSPositionValidatorOptions}   [positionValidator] - A
  *           validator function or data or list of validators.
  *
- * @property {import('@typhonjs-svelte/lib/store').TJSSessionStorage}   [sessionStorage] - An instance of
+ * @property {import('@typhonjs-svelte/lib/store/storage/web').TJSSessionStorage}   [sessionStorage] - An instance of
  *           TJSSessionStorage to share across SvelteApplications.
  *
  * @property {import('@typhonjs-svelte/lib/util').TJSSvelteConfig}   [svelte] - A Svelte configuration object defining

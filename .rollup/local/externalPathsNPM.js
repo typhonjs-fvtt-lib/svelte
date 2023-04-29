@@ -13,6 +13,8 @@ export const externalPathsNPM = {
    '@typhonjs-svelte/lib/store/dom': '@typhonjs-fvtt/svelte/store/dom',
    '@typhonjs-svelte/lib/store/position': '@typhonjs-fvtt/svelte/store/position',
    '@typhonjs-svelte/lib/store/reducer': '@typhonjs-fvtt/svelte/store/reducer',
+   '@typhonjs-svelte/lib/store/storage/web': '@typhonjs-fvtt/svelte/store/storage/web',
+   '@typhonjs-svelte/lib/store/storage/web/plugin': '@typhonjs-fvtt/svelte/store/storage/web/plugin',
    '@typhonjs-svelte/lib/transition': '@typhonjs-fvtt/svelte/transition',
    '@typhonjs-svelte/lib/util': '@typhonjs-fvtt/svelte/util',
 

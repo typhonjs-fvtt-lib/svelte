@@ -86,6 +86,14 @@
       "types": "./_dist/store/reducer/index.d.ts",
       "import": "./_dist/store/reducer/index.js"
     },
+    "./store/storage/web": {
+      "types": "./_dist/store/storage/web/index.d.ts",
+      "import": "./_dist/store/storage/web/index.js"
+    },
+    "./store/storage/web/plugin": {
+      "types": "./_dist/store/storage/web/plugin/index.d.ts",
+      "import": "./_dist/store/storage/web/plugin/index.js"
+    },
     "./transition": {
       "types": "./_dist/transition/index.d.ts",
       "import": "./_dist/transition/index.js"
@@ -93,14 +101,6 @@
     "./util": {
       "types": "./_dist/util/index.d.ts",
       "import": "./_dist/util/index.js"
-    },
-    "./plugin/data": {
-      "types": "./_dist/plugin/data/index.d.ts",
-      "import": "./_dist/plugin/data/index.js"
-    },
-    "./plugin/system": {
-      "types": "./_dist/plugin/system/index.d.ts",
-      "import": "./_dist/plugin/system/index.js"
     },
     "./package.json": "./package.json"
   },

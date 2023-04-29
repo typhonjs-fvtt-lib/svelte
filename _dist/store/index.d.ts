@@ -1,112 +1,6 @@
 import * as _svelte_store from 'svelte/store';
 import { Writable, Readable } from 'svelte/store';
 
-declare class TJSLocalStorage {
-    /**
-     * Creates a new writable store for the given key.
-     *
-     * @param {string}   key - Key to lookup in stores map.
-     *
-     * @param {boolean}  [defaultValue] - A default value to set for the store.
-     *
-     * @returns {import('#svelte/store').Writable} The new store.
-     */
-    static "__#169390@#createStore"(key: string, defaultValue?: boolean): _svelte_store.Writable<any>;
-    /**
-     * Get value from the localStorage.
-     *
-     * @param {string}   key - Key to lookup in localStorage.
-     *
-     * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
-     *
-     * @returns {*} Value from session storage or if not defined any default value provided.
-     */
-    getItem(key: string, defaultValue?: any): any;
-    /**
-     * Returns the backing Svelte store for the given key; potentially sets a default value if the key
-     * is not already set.
-     *
-     * @param {string}   key - Key to lookup in localStorage.
-     *
-     * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
-     *
-     * @returns {import('#svelte/store').Writable} The Svelte store for this key.
-     */
-    getStore(key: string, defaultValue?: any): _svelte_store.Writable<any>;
-    /**
-     * Sets the value for the given key in localStorage.
-     *
-     * @param {string}   key - Key to lookup in localStorage.
-     *
-     * @param {*}        value - A value to set for this key.
-     */
-    setItem(key: string, value: any): void;
-    /**
-     * Convenience method to swap a boolean value stored in session storage.
-     *
-     * @param {string}   key - Key to lookup in localStorage.
-     *
-     * @param {boolean}  [defaultValue] - A default value to return if key not present in session storage.
-     *
-     * @returns {boolean} The boolean swap for the given key.
-     */
-    swapItemBoolean(key: string, defaultValue?: boolean): boolean;
-    #private;
-}
-
-declare class TJSSessionStorage {
-    /**
-     * Creates a new store for the given key.
-     *
-     * @param {string}   key - Key to lookup in stores map.
-     *
-     * @param {boolean}  [defaultValue] - A default value to set for the store.
-     *
-     * @returns {import('#svelte/store').Writable} The new store.
-     */
-    static "__#169391@#createStore"(key: string, defaultValue?: boolean): _svelte_store.Writable<any>;
-    /**
-     * Get value from the sessionStorage.
-     *
-     * @param {string}   key - Key to lookup in sessionStorage.
-     *
-     * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
-     *
-     * @returns {*} Value from session storage or if not defined any default value provided.
-     */
-    getItem(key: string, defaultValue?: any): any;
-    /**
-     * Returns the backing Svelte store for the given key; potentially sets a default value if the key
-     * is not already set.
-     *
-     * @param {string}   key - Key to lookup in sessionStorage.
-     *
-     * @param {*}        [defaultValue] - A default value to return if key not present in session storage.
-     *
-     * @returns {import('#svelte/store').Writable} The Svelte store for this key.
-     */
-    getStore(key: string, defaultValue?: any): _svelte_store.Writable<any>;
-    /**
-     * Sets the value for the given key in sessionStorage.
-     *
-     * @param {string}   key - Key to lookup in sessionStorage.
-     *
-     * @param {*}        value - A value to set for this key.
-     */
-    setItem(key: string, value: any): void;
-    /**
-     * Convenience method to swap a boolean value stored in session storage.
-     *
-     * @param {string}   key - Key to lookup in sessionStorage.
-     *
-     * @param {boolean}  [defaultValue] - A default value to return if key not present in session storage.
-     *
-     * @returns {boolean} The boolean swap for the given key.
-     */
-    swapItemBoolean(key: string, defaultValue?: boolean): boolean;
-    #private;
-}
-
 /**
  * Provides a basic test for a given variable to test if it has the shape of a readable store by having a `subscribe`
  * function.
@@ -281,14 +175,10 @@ declare function propertyStore(
 ): Writable<any>;
 
 /**
- * - Provides a Svelte store wrapping the Foundry `game` global variable. It is initialized
- * on the `ready` hook. You may use this store to access the global game state from a Svelte template. It is a read only
- * store and will receive no reactive updates during runtime.
+ * @type {import('svelte/store').Readable<globalThis.game>} Provides a Svelte store wrapping the Foundry `game` global
+ * variable. It is initialized on the `ready` hook. You may use this store to access the global game state from a
+ * Svelte template. It is a read only store and will receive no reactive updates during runtime.
  */
-type GameState = _svelte_store.Readable<any>;
-/**
- * @type {GameState} Provides a Svelte store wrapping the Foundry runtime / global game state.
- */
-declare const gameState: _svelte_store.Readable<any>;
+declare const gameState: _svelte_store.Readable<globalThis.game>;
 
-export { GameState, TJSLocalStorage, TJSSessionStorage, gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, storeCallback, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
+export { gameState, isReadableStore, isUpdatableStore, isWritableStore, propertyStore, storeCallback, subscribeFirstRest, subscribeIgnoreFirst, writableDerived };
