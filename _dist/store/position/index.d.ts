@@ -1,3 +1,5 @@
+import * as _svelte_lib_math_gl_matrix from '@typhonjs-fvtt/svelte/math/gl-matrix';
+import { Vec3, Mat4 } from '@typhonjs-fvtt/svelte/math/gl-matrix';
 import * as _svelte_store from 'svelte/store';
 import * as _svelte_lib_animate from '@typhonjs-fvtt/svelte/animate';
 
@@ -111,21 +113,21 @@ declare class TJSTransformData {
      */
     get boundingRect(): DOMRect;
     /**
-     * @returns {import('../').Vector3[]} The transformed corner points as vec3 in screen space.
+     * @returns {import('#svelte-lib/math/gl-matrix').Vec3[]} The transformed corner points as Vec3 in screen space.
      */
-    get corners(): Float32Array[];
+    get corners(): Vec3[];
     /**
      * @returns {string} Returns the CSS style string for the transform matrix.
      */
     get css(): string;
     /**
-     * @returns {import('../').Matrix4} The transform matrix.
+     * @returns {import('#svelte-lib/math/gl-matrix').Mat4} The transform matrix.
      */
-    get mat4(): Float32Array;
+    get mat4(): Mat4;
     /**
-     * @returns {import('../').Matrix4[]} The pre / post translation matrices for origin translation.
+     * @returns {import('#svelte-lib/math/gl-matrix').Mat4[]} The pre / post translation matrices for origin translation.
      */
-    get originTranslations(): Float32Array[];
+    get originTranslations(): Mat4[];
     #private;
 }
 
@@ -243,11 +245,11 @@ declare class TJSTransforms {
      *
      * @param {object}   [data] - TJSPositionData instance or local transform data.
      *
-     * @param {import('../').Matrix4}  [output] - The output mat4 instance.
+     * @param {import('#svelte-lib/math/gl-matrix').Mat4}  [output] - The output mat4 instance.
      *
-     * @returns {import('../').Matrix4} Transform matrix.
+     * @returns {import('#svelte-lib/math/gl-matrix').Mat4} Transform matrix.
      */
-    getMat4(data?: object, output?: Matrix4): Matrix4;
+    getMat4(data?: object, output?: _svelte_lib_math_gl_matrix.Mat4): _svelte_lib_math_gl_matrix.Mat4;
     /**
      * Provides an orthographic enhancement to convert left / top positional data to a translate operation.
      *
@@ -260,11 +262,11 @@ declare class TJSTransforms {
      *
      * @param {object}   [data] - TJSPositionData instance or local transform data.
      *
-     * @param {import('../').Matrix4}  [output] - The output mat4 instance.
+     * @param {import('#svelte-lib/math/gl-matrix').Mat4}  [output] - The output mat4 instance.
      *
-     * @returns {import('../').Matrix4} Transform matrix.
+     * @returns {import('#svelte-lib/math/gl-matrix').Mat4} Transform matrix.
      */
-    getMat4Ortho(data?: object, output?: Matrix4): Matrix4;
+    getMat4Ortho(data?: object, output?: _svelte_lib_math_gl_matrix.Mat4): _svelte_lib_math_gl_matrix.Mat4;
     /**
      * Tests an object if it contains transform keys and the values are finite numbers.
      *
@@ -291,7 +293,7 @@ declare class AnimationControl {
      *
      * @type {AnimationControl}
      */
-    static "__#218669@#voidControl": AnimationControl;
+    static "__#242380@#voidControl": AnimationControl;
     /**
      * Provides a static void / undefined AnimationControl that is automatically resolved.
      *
@@ -800,7 +802,7 @@ declare class AnimationGroupAPI {
      *
      * @returns {boolean} Is TJSPosition.
      */
-    static "__#218672@#isPosition"(object: any): boolean;
+    static "__#242383@#isPosition"(object: any): boolean;
     /**
      * Cancels any animation for given TJSPosition data.
      *
@@ -907,14 +909,14 @@ declare class TJSPosition {
     /**
      * @type {{browserCentered: Centered, Centered: Centered}}
      */
-    static "__#218680@#positionInitial": {
+    static "__#242391@#positionInitial": {
         browserCentered: Centered;
         Centered: Centered;
     };
     /**
      * @type {{TransformBounds: TransformBounds, BasicBounds: BasicBounds, basicWindow: BasicBounds, transformWindow: TransformBounds}}
      */
-    static "__#218680@#positionValidators": {
+    static "__#242391@#positionValidators": {
         TransformBounds: TransformBounds;
         BasicBounds: BasicBounds;
         basicWindow: BasicBounds;
@@ -1619,14 +1621,6 @@ type TJSPositionDataExtended = {
     rotation?: number | null;
 };
 /**
- * - 3 Dimensional Vector.
- */
-type Vector3 = Float32Array;
-/**
- * - 4x4 Matrix; Format: column-major, when typed out it looks like row-major.
- */
-type Matrix4 = Float32Array;
-/**
  * - The supported transform origin strings.
  */
 type TJSTransformOrigin = 'top left' | 'top center' | 'top right' | 'center left' | 'center' | 'center right' | 'bottom left' | 'bottom center' | 'bottom right';
@@ -1718,4 +1712,4 @@ type ValidatorData = {
  */
 type TJSPositionValidatorOptions = ValidatorFn | ValidatorData | Iterable<ValidatorFn | ValidatorData>;
 
-export { Matrix4, ResizeObserverData, StorePosition, TJSPosition, TJSPositionData, TJSPositionDataExtended, TJSPositionGetOptions, TJSPositionInitialHelper, TJSPositionOptions, TJSPositionOptionsAll, TJSPositionParent, TJSPositionValidatorOptions, TJSPositionable, TJSTransformData, TJSTransformOrigin, TJSTransforms, ValidationData, ValidatorData, ValidatorFn, Vector3, applyPosition, draggable, quickToCallback };
+export { ResizeObserverData, StorePosition, TJSPosition, TJSPositionData, TJSPositionDataExtended, TJSPositionGetOptions, TJSPositionInitialHelper, TJSPositionOptions, TJSPositionOptionsAll, TJSPositionParent, TJSPositionValidatorOptions, TJSPositionable, TJSTransformData, TJSTransformOrigin, TJSTransforms, ValidationData, ValidatorData, ValidatorFn, applyPosition, draggable, quickToCallback };

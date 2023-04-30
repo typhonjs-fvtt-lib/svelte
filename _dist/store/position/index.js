@@ -1,8 +1,9 @@
 import { propertyStore, subscribeIgnoreFirst } from '@typhonjs-fvtt/svelte/store';
 import { isObject, isPlainObject, isIterable, hasSetter, styleParsePixels } from '@typhonjs-fvtt/svelte/util';
 import { cubicOut, linear } from 'svelte/easing';
-import { mat4, vec3, degToRad, lerp } from '@typhonjs-fvtt/svelte/math';
+import { degToRad, lerp } from '@typhonjs-fvtt/svelte/math';
 import { writable } from 'svelte/store';
+import { Vec3, Mat4 } from '@typhonjs-fvtt/svelte/math/gl-matrix';
 import { nextAnimationFrame } from '@typhonjs-fvtt/svelte/animate';
 
 /**
@@ -2827,26 +2828,26 @@ class TJSTransformData
    #boundingRect = new DOMRect();
 
    /**
-    * Stores the individual transformed corner points of the window in screenspace clockwise from:
+    * Stores the individual transformed corner points of the window in screen space clockwise from:
     * top left -> top right -> bottom right -> bottom left.
     *
-    * @type {import('../').Vector3[]}
+    * @type {import('#svelte-lib/math/gl-matrix').Vec3[]}
     */
-   #corners = [vec3.create(), vec3.create(), vec3.create(), vec3.create()];
+   #corners = [Vec3.create(), Vec3.create(), Vec3.create(), Vec3.create()];
 
    /**
-    * Stores the current gl-matrix mat4 data.
+    * Stores the current gl-matrix Mat4 data.
     *
-    * @type {import('../').Matrix4}
+    * @type {import('#svelte-lib/math/gl-matrix').Mat4}
     */
-   #mat4 = mat4.create();
+   #mat4 = Mat4.create();
 
    /**
     * Stores the pre & post origin translations to apply to matrix transforms.
     *
-    * @type {import('../').Matrix4[]}
+    * @type {import('#svelte-lib/math/gl-matrix').Mat4[]}
     */
-   #originTranslations = [mat4.create(), mat4.create()];
+   #originTranslations = [Mat4.create(), Mat4.create()];
 
    /**
     * @returns {DOMRect} The bounding rectangle.
@@ -2854,7 +2855,7 @@ class TJSTransformData
    get boundingRect() { return this.#boundingRect; }
 
    /**
-    * @returns {import('../').Vector3[]} The transformed corner points as vec3 in screen space.
+    * @returns {import('#svelte-lib/math/gl-matrix').Vec3[]} The transformed corner points as Vec3 in screen space.
     */
    get corners() { return this.#corners; }
 
@@ -2864,12 +2865,12 @@ class TJSTransformData
    get css() { return `matrix3d(${this.mat4.join(',')})`; }
 
    /**
-    * @returns {import('../').Matrix4} The transform matrix.
+    * @returns {import('#svelte-lib/math/gl-matrix').Mat4} The transform matrix.
     */
    get mat4() { return this.#mat4; }
 
    /**
-    * @returns {import('../').Matrix4[]} The pre / post translation matrices for origin translation.
+    * @returns {import('#svelte-lib/math/gl-matrix').Mat4[]} The pre / post translation matrices for origin translation.
     */
    get originTranslations() { return this.#originTranslations; }
 }
@@ -3610,14 +3611,14 @@ const s_SCALE_VECTOR = [1, 1, 1];
 /** @type {number[]} */
 const s_TRANSLATE_VECTOR = [0, 0, 0];
 
-/** @type {import('../').Matrix4} */
-const s_MAT4_RESULT = mat4.create();
+/** @type {import('#svelte-lib/math/gl-matrix').Mat4} */
+const s_MAT4_RESULT = Mat4.create();
 
-/** @type {import('../').Matrix4} */
-const s_MAT4_TEMP = mat4.create();
+/** @type {import('#svelte-lib/math/gl-matrix').Mat4} */
+const s_MAT4_TEMP = Mat4.create();
 
-/** @type {import('../').Vector3} */
-const s_VEC3_TEMP = vec3.create();
+/** @type {import('#svelte-lib/math/gl-matrix').Vec3} */
+const s_VEC3_TEMP = Vec3.create();
 
 class TJSTransforms
 {
@@ -3921,28 +3922,28 @@ class TJSTransforms
 
          if (transformOriginDefault === position.transformOrigin)
          {
-            vec3.transformMat4(rect[0], rect[0], matrix);
-            vec3.transformMat4(rect[1], rect[1], matrix);
-            vec3.transformMat4(rect[2], rect[2], matrix);
-            vec3.transformMat4(rect[3], rect[3], matrix);
+            Vec3.transformMat4(rect[0], rect[0], matrix);
+            Vec3.transformMat4(rect[1], rect[1], matrix);
+            Vec3.transformMat4(rect[2], rect[2], matrix);
+            Vec3.transformMat4(rect[3], rect[3], matrix);
          }
          else
          {
-            vec3.transformMat4(rect[0], rect[0], translate[0]);
-            vec3.transformMat4(rect[0], rect[0], matrix);
-            vec3.transformMat4(rect[0], rect[0], translate[1]);
+            Vec3.transformMat4(rect[0], rect[0], translate[0]);
+            Vec3.transformMat4(rect[0], rect[0], matrix);
+            Vec3.transformMat4(rect[0], rect[0], translate[1]);
 
-            vec3.transformMat4(rect[1], rect[1], translate[0]);
-            vec3.transformMat4(rect[1], rect[1], matrix);
-            vec3.transformMat4(rect[1], rect[1], translate[1]);
+            Vec3.transformMat4(rect[1], rect[1], translate[0]);
+            Vec3.transformMat4(rect[1], rect[1], matrix);
+            Vec3.transformMat4(rect[1], rect[1], translate[1]);
 
-            vec3.transformMat4(rect[2], rect[2], translate[0]);
-            vec3.transformMat4(rect[2], rect[2], matrix);
-            vec3.transformMat4(rect[2], rect[2], translate[1]);
+            Vec3.transformMat4(rect[2], rect[2], translate[0]);
+            Vec3.transformMat4(rect[2], rect[2], matrix);
+            Vec3.transformMat4(rect[2], rect[2], translate[1]);
 
-            vec3.transformMat4(rect[3], rect[3], translate[0]);
-            vec3.transformMat4(rect[3], rect[3], matrix);
-            vec3.transformMat4(rect[3], rect[3], translate[1]);
+            Vec3.transformMat4(rect[3], rect[3], translate[0]);
+            Vec3.transformMat4(rect[3], rect[3], matrix);
+            Vec3.transformMat4(rect[3], rect[3], translate[1]);
          }
 
          rect[0][0] = position.left + rect[0][0];
@@ -3965,7 +3966,7 @@ class TJSTransforms
          rect[3][0] = position.left;
          rect[3][1] = position.top + height;
 
-         mat4.identity(output.mat4);
+         Mat4.identity(output.mat4);
       }
 
       let maxX = Number.MIN_SAFE_INTEGER;
@@ -4002,13 +4003,13 @@ class TJSTransforms
     *
     * @param {object}   [data] - TJSPositionData instance or local transform data.
     *
-    * @param {import('../').Matrix4}  [output] - The output mat4 instance.
+    * @param {import('#svelte-lib/math/gl-matrix').Mat4}  [output] - The output mat4 instance.
     *
-    * @returns {import('../').Matrix4} Transform matrix.
+    * @returns {import('#svelte-lib/math/gl-matrix').Mat4} Transform matrix.
     */
-   getMat4(data = this._data, output = mat4.create())
+   getMat4(data = this._data, output = Mat4.create())
    {
-      const matrix = mat4.identity(output);
+      const matrix = Mat4.identity(output);
 
       // Bitwise tracks applied transform keys from local transform data.
       let seenKeys = 0;
@@ -4024,23 +4025,23 @@ class TJSTransforms
          {
             case 'rotateX':
                seenKeys |= transformKeysBitwise.rotateX;
-               mat4.multiply(matrix, matrix, mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
+               Mat4.multiply(matrix, matrix, Mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
                break;
 
             case 'rotateY':
                seenKeys |= transformKeysBitwise.rotateY;
-               mat4.multiply(matrix, matrix, mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
+               Mat4.multiply(matrix, matrix, Mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
                break;
 
             case 'rotateZ':
                seenKeys |= transformKeysBitwise.rotateZ;
-               mat4.multiply(matrix, matrix, mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
+               Mat4.multiply(matrix, matrix, Mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
                break;
 
             case 'scale':
                seenKeys |= transformKeysBitwise.scale;
                s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data[key];
-               mat4.multiply(matrix, matrix, mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
+               Mat4.multiply(matrix, matrix, Mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
                break;
 
             case 'translateX':
@@ -4048,7 +4049,7 @@ class TJSTransforms
                s_TRANSLATE_VECTOR[0] = data.translateX;
                s_TRANSLATE_VECTOR[1] = 0;
                s_TRANSLATE_VECTOR[2] = 0;
-               mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+               Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
                break;
 
             case 'translateY':
@@ -4056,7 +4057,7 @@ class TJSTransforms
                s_TRANSLATE_VECTOR[0] = 0;
                s_TRANSLATE_VECTOR[1] = data.translateY;
                s_TRANSLATE_VECTOR[2] = 0;
-               mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+               Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
                break;
 
             case 'translateZ':
@@ -4064,7 +4065,7 @@ class TJSTransforms
                s_TRANSLATE_VECTOR[0] = 0;
                s_TRANSLATE_VECTOR[1] = 0;
                s_TRANSLATE_VECTOR[2] = data.translateZ;
-               mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+               Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
                break;
          }
       }
@@ -4082,41 +4083,41 @@ class TJSTransforms
             switch (key)
             {
                case 'rotateX':
-                  mat4.multiply(matrix, matrix, mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  Mat4.multiply(matrix, matrix, Mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
                   break;
 
                case 'rotateY':
-                  mat4.multiply(matrix, matrix, mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  Mat4.multiply(matrix, matrix, Mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
                   break;
 
                case 'rotateZ':
-                  mat4.multiply(matrix, matrix, mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  Mat4.multiply(matrix, matrix, Mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
                   break;
 
                case 'scale':
                   s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data[key];
-                  mat4.multiply(matrix, matrix, mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
+                  Mat4.multiply(matrix, matrix, Mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
                   break;
 
                case 'translateX':
                   s_TRANSLATE_VECTOR[0] = data[key];
                   s_TRANSLATE_VECTOR[1] = 0;
                   s_TRANSLATE_VECTOR[2] = 0;
-                  mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+                  Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
                   break;
 
                case 'translateY':
                   s_TRANSLATE_VECTOR[0] = 0;
                   s_TRANSLATE_VECTOR[1] = data[key];
                   s_TRANSLATE_VECTOR[2] = 0;
-                  mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+                  Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
                   break;
 
                case 'translateZ':
                   s_TRANSLATE_VECTOR[0] = 0;
                   s_TRANSLATE_VECTOR[1] = 0;
                   s_TRANSLATE_VECTOR[2] = data[key];
-                  mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+                  Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
                   break;
             }
          }
@@ -4137,13 +4138,13 @@ class TJSTransforms
     *
     * @param {object}   [data] - TJSPositionData instance or local transform data.
     *
-    * @param {import('../').Matrix4}  [output] - The output mat4 instance.
+    * @param {import('#svelte-lib/math/gl-matrix').Mat4}  [output] - The output mat4 instance.
     *
-    * @returns {import('../').Matrix4} Transform matrix.
+    * @returns {import('#svelte-lib/math/gl-matrix').Mat4} Transform matrix.
     */
-   getMat4Ortho(data = this._data, output = mat4.create())
+   getMat4Ortho(data = this._data, output = Mat4.create())
    {
-      const matrix = mat4.identity(output);
+      const matrix = Mat4.identity(output);
 
       // Attempt to retrieve values from passed in data otherwise default to 0.
       // Always perform the translation last regardless of order added to local transform data.
@@ -4151,13 +4152,13 @@ class TJSTransforms
       s_TRANSLATE_VECTOR[0] = (data.left ?? 0) + (data.translateX ?? 0);
       s_TRANSLATE_VECTOR[1] = (data.top ?? 0) + (data.translateY ?? 0);
       s_TRANSLATE_VECTOR[2] = data.translateZ ?? 0;
-      mat4.multiply(matrix, matrix, mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+      Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
 
       // Scale can also be applied out of order.
       if (data.scale !== null)
       {
          s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data.scale;
-         mat4.multiply(matrix, matrix, mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
+         Mat4.multiply(matrix, matrix, Mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
       }
 
       // Early out if there is not rotation data.
@@ -4179,17 +4180,17 @@ class TJSTransforms
          {
             case 'rotateX':
                seenKeys |= transformKeysBitwise.rotateX;
-               mat4.multiply(matrix, matrix, mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
+               Mat4.multiply(matrix, matrix, Mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
                break;
 
             case 'rotateY':
                seenKeys |= transformKeysBitwise.rotateY;
-               mat4.multiply(matrix, matrix, mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
+               Mat4.multiply(matrix, matrix, Mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
                break;
 
             case 'rotateZ':
                seenKeys |= transformKeysBitwise.rotateZ;
-               mat4.multiply(matrix, matrix, mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
+               Mat4.multiply(matrix, matrix, Mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
                break;
          }
       }
@@ -4207,15 +4208,15 @@ class TJSTransforms
             switch (key)
             {
                case 'rotateX':
-                  mat4.multiply(matrix, matrix, mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  Mat4.multiply(matrix, matrix, Mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
                   break;
 
                case 'rotateY':
-                  mat4.multiply(matrix, matrix, mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  Mat4.multiply(matrix, matrix, Mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
                   break;
 
                case 'rotateZ':
-                  mat4.multiply(matrix, matrix, mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  Mat4.multiply(matrix, matrix, Mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
                   break;
             }
          }
@@ -4282,9 +4283,9 @@ class TJSTransforms
  *
  * @param {number}   height - The TJSPositionData height or validation data height when 'auto'.
  *
- * @param {import('../').Matrix4[]}   output - Output Mat4 array.
+ * @param {import('#svelte-lib/math/gl-matrix').Mat4[]}   output - Output Mat4 array.
  *
- * @returns {import('../').Matrix4[]} Output Mat4 array.
+ * @returns {import('#svelte-lib/math/gl-matrix').Mat4[]} Output Mat4 array.
  */
 function s_GET_ORIGIN_TRANSLATION(transformOrigin, width, height, output)
 {
@@ -4294,83 +4295,83 @@ function s_GET_ORIGIN_TRANSLATION(transformOrigin, width, height, output)
    {
       case 'top left':
          vector[0] = vector[1] = 0;
-         mat4.fromTranslation(output[0], vector);
-         mat4.fromTranslation(output[1], vector);
+         Mat4.fromTranslation(output[0], vector);
+         Mat4.fromTranslation(output[1], vector);
          break;
 
       case 'top center':
          vector[0] = -width * 0.5;
          vector[1] = 0;
-         mat4.fromTranslation(output[0], vector);
+         Mat4.fromTranslation(output[0], vector);
          vector[0] = width * 0.5;
-         mat4.fromTranslation(output[1], vector);
+         Mat4.fromTranslation(output[1], vector);
          break;
 
       case 'top right':
          vector[0] = -width;
          vector[1] = 0;
-         mat4.fromTranslation(output[0], vector);
+         Mat4.fromTranslation(output[0], vector);
          vector[0] = width;
-         mat4.fromTranslation(output[1], vector);
+         Mat4.fromTranslation(output[1], vector);
          break;
 
       case 'center left':
          vector[0] = 0;
          vector[1] = -height * 0.5;
-         mat4.fromTranslation(output[0], vector);
+         Mat4.fromTranslation(output[0], vector);
          vector[1] = height * 0.5;
-         mat4.fromTranslation(output[1], vector);
+         Mat4.fromTranslation(output[1], vector);
          break;
 
       case null: // By default null / no transform is center.
       case 'center':
          vector[0] = -width * 0.5;
          vector[1] = -height * 0.5;
-         mat4.fromTranslation(output[0], vector);
+         Mat4.fromTranslation(output[0], vector);
          vector[0] = width * 0.5;
          vector[1] = height * 0.5;
-         mat4.fromTranslation(output[1], vector);
+         Mat4.fromTranslation(output[1], vector);
          break;
 
       case 'center right':
          vector[0] = -width;
          vector[1] = -height * 0.5;
-         mat4.fromTranslation(output[0], vector);
+         Mat4.fromTranslation(output[0], vector);
          vector[0] = width;
          vector[1] = height * 0.5;
-         mat4.fromTranslation(output[1], vector);
+         Mat4.fromTranslation(output[1], vector);
          break;
 
       case 'bottom left':
          vector[0] = 0;
          vector[1] = -height;
-         mat4.fromTranslation(output[0], vector);
+         Mat4.fromTranslation(output[0], vector);
          vector[1] = height;
-         mat4.fromTranslation(output[1], vector);
+         Mat4.fromTranslation(output[1], vector);
          break;
 
       case 'bottom center':
          vector[0] = -width * 0.5;
          vector[1] = -height;
-         mat4.fromTranslation(output[0], vector);
+         Mat4.fromTranslation(output[0], vector);
          vector[0] = width * 0.5;
          vector[1] = height;
-         mat4.fromTranslation(output[1], vector);
+         Mat4.fromTranslation(output[1], vector);
          break;
 
       case 'bottom right':
          vector[0] = -width;
          vector[1] = -height;
-         mat4.fromTranslation(output[0], vector);
+         Mat4.fromTranslation(output[0], vector);
          vector[0] = width;
          vector[1] = height;
-         mat4.fromTranslation(output[1], vector);
+         Mat4.fromTranslation(output[1], vector);
          break;
 
       // No valid transform origin parameter; set identity.
       default:
-         mat4.identity(output[0]);
-         mat4.identity(output[1]);
+         Mat4.identity(output[0]);
+         Mat4.identity(output[1]);
          break;
    }
 
