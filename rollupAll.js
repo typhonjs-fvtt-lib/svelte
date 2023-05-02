@@ -422,7 +422,7 @@ console.log('Generating TS Declaration: ./_dist/application/index.js');
 
 await generateDTS({
    input: './_dist/application/index.js',
-   output: './_types/application/index.d.mts',
+   output: './_dist/application/index.d.ts',
    prependGen: ['./_dist/application/typedefs.js'],
    ...applicationDTSOptions
 });
@@ -431,7 +431,7 @@ console.log('Generating TS Declaration: ./_dist/application/dialog/index.js');
 
 await generateDTS({
    input: './_dist/application/dialog/index.js',
-   output: './_types/application/dialog/index.d.mts',
+   output: './_dist/application/dialog/index.d.ts',
    // prependGen: ['./_dist/application/typedefs.js'],
    ...applicationDTSOptions
 });
@@ -440,7 +440,7 @@ console.log('Generating TS Declaration: ./_dist/application/legacy/index.js');
 
 await generateDTS({
    input: './_dist/application/legacy/index.js',
-   output: './_types/application/legacy/index.d.mts',
+   output: './_dist/application/legacy/index.d.ts',
    prependGen: ['./_dist/application/typedefs.js'],
    ...applicationDTSOptions
 });
