@@ -2,16 +2,6 @@ import * as _svelte_store from 'svelte/store';
 
 declare class TJSLocalStorage {
     /**
-     * Creates a new writable store for the given key.
-     *
-     * @param {string}   key - Key to lookup in stores map.
-     *
-     * @param {boolean}  [defaultValue] - A default value to set for the store.
-     *
-     * @returns {import('#svelte/store').Writable} The new store.
-     */
-    static "__#296260@#createStore"(key: string, defaultValue?: boolean): _svelte_store.Writable<any>;
-    /**
      * Get value from the localStorage.
      *
      * @param {string}   key - Key to lookup in localStorage.
@@ -54,16 +44,6 @@ declare class TJSLocalStorage {
 }
 
 declare class TJSSessionStorage {
-    /**
-     * Creates a new store for the given key.
-     *
-     * @param {string}   key - Key to lookup in stores map.
-     *
-     * @param {boolean}  [defaultValue] - A default value to set for the store.
-     *
-     * @returns {import('#svelte/store').Writable} The new store.
-     */
-    static "__#296261@#createStore"(key: string, defaultValue?: boolean): _svelte_store.Writable<any>;
     /**
      * Get value from the sessionStorage.
      *

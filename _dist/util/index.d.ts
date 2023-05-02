@@ -59,14 +59,6 @@ declare class A11yHelper {
         selectors?: string;
     }): Array<HTMLElement>;
     /**
-     * Returns the default focusable selectors query.
-     *
-     * @param {boolean}  [anchorHref=true] - When true anchors must have an HREF.
-     *
-     * @returns {string} Focusable selectors for `querySelectorAll`.
-     */
-    static "__#369737@#getFocusableSelectors"(anchorHref?: boolean): string;
-    /**
      * Gets a A11yFocusSource object from the given DOM event allowing for optional X / Y screen space overrides.
      * Browsers (Firefox / Chrome) forwards a mouse event for the context menu keyboard button. Provides detection of
      * when the context menu event is from the keyboard. Firefox as of (1/23) does not provide the correct screen space
@@ -182,8 +174,6 @@ type A11yFocusSource = {
  * Note: to enable debugging / log statements set the static `logging` variable to true.
  */
 declare class ManagedPromise {
-    /** @type {boolean} */
-    static "__#369738@#logging": boolean;
     /**
      * Sets global logging enabled state.
      *
@@ -664,7 +654,7 @@ declare function isObject(value: any): boolean;
 /**
  * Tests for whether the given value is a plain object.
  *
- * An object is plain if it is created by either: {}, new Object() or Object.create(null).
+ * An object is plain if it is created by either: `{}`, `new Object()` or `Object.create(null)`.
  *
  * @param {*} value - Any value
  *

@@ -289,12 +289,6 @@ declare class TJSTransforms {
  */
 declare class AnimationControl {
     /**
-     * Defines a static empty / void animation control.
-     *
-     * @type {AnimationControl}
-     */
-    static "__#242380@#voidControl": AnimationControl;
-    /**
      * Provides a static void / undefined AnimationControl that is automatically resolved.
      *
      * @returns {AnimationControl} Void AnimationControl
@@ -796,14 +790,6 @@ declare class Centered {
  */
 declare class AnimationGroupAPI {
     /**
-     * Checks of the given object is a TJSPosition instance by checking for AnimationAPI.
-     *
-     * @param {*}  object - Any data.
-     *
-     * @returns {boolean} Is TJSPosition.
-     */
-    static "__#242383@#isPosition"(object: any): boolean;
-    /**
      * Cancels any animation for given TJSPosition data.
      *
      * @param {import('../').TJSPosition | {position: import('../').TJSPosition} | Iterable<import('../').TJSPosition> | Iterable<{position: import('../').TJSPosition}>} position -
@@ -906,22 +892,6 @@ declare class AnimationGroupAPI {
  * stores for each independent variable.
  */
 declare class TJSPosition {
-    /**
-     * @type {{browserCentered: Centered, Centered: Centered}}
-     */
-    static "__#242391@#positionInitial": {
-        browserCentered: Centered;
-        Centered: Centered;
-    };
-    /**
-     * @type {{TransformBounds: TransformBounds, BasicBounds: BasicBounds, basicWindow: BasicBounds, transformWindow: TransformBounds}}
-     */
-    static "__#242391@#positionValidators": {
-        TransformBounds: TransformBounds;
-        BasicBounds: BasicBounds;
-        basicWindow: BasicBounds;
-        transformWindow: TransformBounds;
-    };
     /**
      * @returns {AnimationGroupAPI} Public Animation API.
      */

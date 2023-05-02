@@ -79,7 +79,7 @@ function isObject(value)
 /**
  * Tests for whether the given value is a plain object.
  *
- * An object is plain if it is created by either: {}, new Object() or Object.create(null).
+ * An object is plain if it is created by either: `{}`, `new Object()` or `Object.create(null)`.
  *
  * @param {*} value - Any value
  *
