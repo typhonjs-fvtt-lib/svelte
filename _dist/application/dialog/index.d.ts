@@ -1,7 +1,9 @@
+import { TJSDialog } from '@typhonjs-fvtt/svelte/application';
+
 /**
  * Provides a dialog for creating documents that by default is modal and not draggable.
  */
-declare class TJSDocumentCreate {
+declare class TJSDocumentCreate extends TJSDialog {
     /**
      * Create a new Document of the type specified by `documentCls` by rendering a dialog window to provide basic
      * creation details.
@@ -64,7 +66,7 @@ declare class TJSDocumentCreate {
  * accessors for the document assigned are available via the `this.reactive.document`. You may swap out the document at
  * any time by setting it to a different document.
  */
-declare class TJSDocumentDelete {
+declare class TJSDocumentDelete extends TJSDialog {
     /**
      * Shows a modal / non-draggable dialog to delete a document.
      *
@@ -279,7 +281,7 @@ declare class TJSDocumentDialog {
  * accessors for the document assigned are available via the `this.reactive.document`. You may swap out the document at
  * any time by setting it to a different document.
  */
-declare class TJSDocumentImport {
+declare class TJSDocumentImport extends TJSDialog {
     /**
      * Render an import dialog for updating the data related to this Document through an exported JSON file
      *
@@ -311,7 +313,7 @@ declare class TJSDocumentImport {
  * accessors for the document assigned are available via the `this.reactive.document`. You may swap out the document at
  * any time by setting it to a different document.
  */
-declare class TJSDocumentOwnership {
+declare class TJSDocumentOwnership extends TJSDialog {
     /**
      * Change permissions of a document by rendering a dialog to alter the default and all user / player permissions.
      *
@@ -340,7 +342,7 @@ declare class TJSDocumentOwnership {
  * accessors for the folder assigned are available via the `this.reactive.document`. You may swap out the folder at
  * any time by setting it to a different folder document.
  */
-declare class TJSFolderCreateUpdate {
+declare class TJSFolderCreateUpdate extends TJSDialog {
     /**
      * Create a new Folder by rendering a dialog window to provide basic creation details.
      *
@@ -382,7 +384,7 @@ declare class TJSFolderCreateUpdate {
  * accessors for the folder assigned are available via the `this.reactive.document`. You may swap out the folder at any
  * time by setting it to a different folder document.
  */
-declare class TJSFolderDelete {
+declare class TJSFolderDelete extends TJSDialog {
     /**
      * Deletes a folder and does delete sub-folders / documents.
      *
@@ -411,7 +413,7 @@ declare class TJSFolderDelete {
 /**
  * Provides a reactive dialog for exporting folders to a compendium that by default is modal and not draggable.
  */
-declare class TJSFolderExport {
+declare class TJSFolderExport extends TJSDialog {
     /**
      * Shows a modal / non-draggable dialog to export a folder to an eligible compendium pack.
      *
@@ -474,7 +476,7 @@ declare class TJSFolderExport {
  * accessors for the folder assigned are available via the `this.reactive.document`. You may swap out the folder at any
  * time by setting it to a different folder document.
  */
-declare class TJSFolderRemove {
+declare class TJSFolderRemove extends TJSDialog {
     /**
      * Removes a folder, but does not delete / remove subfolders / documents.
      *
@@ -503,7 +505,7 @@ declare class TJSFolderRemove {
  * additional set of accessors for the folder assigned are available via the `this.reactive.document`. You may swap out
  * the folder at any time by setting it to a different folder document.
  */
-declare class TJSFolderRolltable {
+declare class TJSFolderRolltable extends TJSDialog {
     /**
      * Create a RollTable from the contents of the Folder.
      *

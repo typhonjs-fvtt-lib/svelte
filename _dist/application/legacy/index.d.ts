@@ -248,12 +248,13 @@ type TJSDialogButtonData = {
     styles?: Record<string, string>;
 };
 
+import { SvelteApplication as SvelteApplication$1 } from '@typhonjs-fvtt/svelte/application';
 import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
 import { TJSPosition } from '@typhonjs-fvtt/svelte/store/position';
 import * as svelte from 'svelte';
 import * as svelte_store from 'svelte/store';
 
-declare class HandlebarsApplication {
+declare class HandlebarsApplication extends SvelteApplication$1 {
     /**
      * @inheritDoc
      */
