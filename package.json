@@ -7,7 +7,6 @@
   "contributors": [
     "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)"
   ],
-  "sideEffects": false,
   "imports": {
     "#svelte-fvtt/*": "@typhonjs-fvtt/svelte/*"
   },
@@ -109,6 +108,10 @@
     },
     "./package.json": "./package.json"
   },
+  "sideEffects": [
+    "./_dist/gsap/plugin/*.js",
+    "./_dist/gsap/plugin/bonus/*.js"
+  ],
   "dependencies": {
   },
   "devDependencies": {
