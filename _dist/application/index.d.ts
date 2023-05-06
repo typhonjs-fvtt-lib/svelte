@@ -1,258 +1,9 @@
-/**
- * - Application shell contract for Svelte components.
- */
-type MountedAppShell = {
-    /**
-     * - The root element / exported prop.
-     */
-    elementRoot: HTMLElement;
-    /**
-     * - The content element / exported prop.
-     */
-    elementContent?: HTMLElement;
-    /**
-     * - The target element / exported prop.
-     */
-    elementTarget?: HTMLElement;
-};
-type SvelteApplicationOptions = {
-    /**
-     * - If false the default slide close animation is not run.
-     */
-    defaultCloseAnimation?: boolean;
-    /**
-     * - If true then application shells are draggable.
-     */
-    draggable?: boolean;
-    /**
-     * - When true auto-management of app focus is enabled.
-     */
-    focusAuto?: boolean;
-    /**
-     * - When `focusAuto` and `focusKeep` is true; keeps internal focus.
-     */
-    focusKeep?: boolean;
-    /**
-     * - Defines A11yHelper focus source to
-     * apply when application closes.
-     */
-    focusSource?: import('@typhonjs-fvtt/svelte/util').A11yFocusSource;
-    /**
-     * - If true then the close header button is removed.
-     */
-    headerButtonNoClose?: boolean;
-    /**
-     * - If true then header button labels are removed.
-     */
-    headerButtonNoLabel?: boolean;
-    /**
-     * - If true then header title is hidden when minimized.
-     */
-    headerNoTitleMinimized?: boolean;
-    /**
-     * - Assigned to position. Number specifying minimum
-     * window height.
-     */
-    minHeight?: number;
-    /**
-     * - Assigned to position. Number specifying minimum
-     * window width.
-     */
-    minWidth?: number;
-    /**
-     * - If false then `position.set` does not take effect.
-     */
-    positionable?: boolean;
-    /**
-     * - A helper
-     * for initial position placement.
-     */
-    positionInitial?: import('@typhonjs-fvtt/svelte/store/position').TJSPositionInitialHelper;
-    /**
-     * - When true TJSPosition is optimized for orthographic use.
-     */
-    positionOrtho?: boolean;
-    /**
-     * - A
-     * validator function or data or list of validators.
-     */
-    positionValidator?: import('@typhonjs-fvtt/svelte/store/position').TJSPositionValidatorOptions;
-    /**
-     * - An instance of
-     * TJSSessionStorage to share across SvelteApplications.
-     */
-    sessionStorage?: import('@typhonjs-fvtt/svelte/store/storage/web').TJSSessionStorage;
-    /**
-     * - A Svelte configuration object defining
-     * the main component.
-     */
-    svelte?: import('@typhonjs-fvtt/svelte/util').TJSSvelteConfig;
-    /**
-     * - By
-     * default, 'top / left' respects rotation when minimizing.
-     */
-    transformOrigin?: import('@typhonjs-fvtt/svelte/store/position').TJSTransformOrigin;
-};
-type SvelteData = {
-    /**
-     * -
-     */
-    config: object;
-    /**
-     * -
-     */
-    component: import('svelte').SvelteComponent;
-    /**
-     * -
-     */
-    element: HTMLElement;
-    /**
-     * -
-     */
-    injectHTML: boolean;
-};
-type SvelteStores = {
-    /**
-     * - Update function for app options store.
-     */
-    appOptionsUpdate: any;
-    /**
-     * - Subscribes to local stores.
-     */
-    subscribe: Function;
-    /**
-     * - Update function for UI options store.
-     */
-    uiOptionsUpdate: any;
-    /**
-     * - Unsubscribes from local stores.
-     */
-    unsubscribe: Function;
-};
-/**
- * - Defines the common dialog configuration data.
- */
-type TJSDialogOptions = {
-    /**
-     * - Provides configuration of the dialog button bar.
-     */
-    buttons?: Record<string, TJSDialogButtonData>;
-    /**
-     * - A Svelte configuration object or HTML string content.
-     */
-    content: object | string;
-    /**
-     * - The default button ID to focus initially.
-     */
-    default?: string;
-    /**
-     * - The dialog is draggable when true.
-     */
-    draggable?: boolean;
-    /**
-     * - When true auto-management of app focus is enabled.
-     */
-    focusAuto?: boolean;
-    /**
-     * - When true the first focusable element that isn't a button is focused.
-     */
-    focusFirst?: boolean;
-    /**
-     * - When `focusAuto` and `focusKeep` is true; keeps internal focus.
-     */
-    focusKeep?: boolean;
-    /**
-     * - When true focus trapping / wrapping is enabled keeping focus inside app.
-     */
-    focusTrap?: boolean;
-    /**
-     * - When true the dialog is minimizable.
-     */
-    minimizable?: boolean;
-    /**
-     * - When true a modal dialog is displayed.
-     */
-    modal?: boolean;
-    /**
-     * - Additional options for modal dialog display.
-     */
-    modalOptions?: object;
-    /**
-     * - When true and an error is raised in dialog callback functions post a UI
-     * error notification.
-     */
-    notifyError?: boolean;
-    /**
-     * - Callback invoked when dialog is closed; no button
-     * option selected. When defined as a string any matching function by name exported from content Svelte
-     * component is invoked.
-     */
-    onClose?: string | ((application: TJSDialog) => any);
-    /**
-     * - When true and a Promise has been created by {@link TJSDialog.wait } and
-     * the Promise is not in the process of being resolved or rejected on close of the dialog any `onClose`
-     * function is invoked and any result that is undefined will cause the Promise to then be rejected.
-     */
-    rejectClose?: boolean;
-    /**
-     * - When true the dialog is resizable.
-     */
-    resizable?: boolean;
-    /**
-     * - When true and resolving any Promises and there are undefined results from
-     * any button callbacks the button ID is resolved.
-     */
-    resolveId?: boolean;
-    /**
-     * - The dialog window title.
-     */
-    title?: string;
-    /**
-     * - Transition options for the dialog.
-     */
-    transition?: object;
-    /**
-     * - A specific z-index for the dialog. Pass null for the dialog to act like other
-     * applications in regard bringing to top when activated.
-     */
-    zIndex?: number | null;
-};
-/**
- * - TJSDialog button data.
- */
-type TJSDialogButtonData = {
-    /**
-     * - When false the dialog does not automatically close when button selected.
-     */
-    autoClose?: boolean;
-    /**
-     * - Determines if the button is accessible providing a truthy value.
-     */
-    condition?: boolean | (() => boolean);
-    /**
-     * - Button label; will be localized.
-     */
-    label?: string;
-    /**
-     * - Button icon; you should supply the direct Font Awesome class names: IE "fas fa-check".
-     */
-    icon?: string;
-    /**
-     * - Callback for button press. When defined as a
-     * string any matching function by name exported from content Svelte component is invoked.
-     */
-    onPress?: string | ((application: TJSDialog) => any);
-    /**
-     * - Inline styles to apply to the button.
-     */
-    styles?: Record<string, string>;
-};
-
+import * as svelte from 'svelte';
+import * as _typhonjs_fvtt_svelte_store_storage_web from '@typhonjs-fvtt/svelte/store/storage/web';
 import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
 import { TJSPosition } from '@typhonjs-fvtt/svelte/store/position';
-import * as svelte from 'svelte';
-import * as svelte_store from 'svelte/store';
 import * as _typhonjs_fvtt_svelte_util from '@typhonjs-fvtt/svelte/util';
+import * as svelte_store from 'svelte/store';
 
 /**
  * Provides the ability the save / restore application state for positional and UI state such as minimized status.
@@ -420,7 +171,7 @@ declare class GetSvelteData {
      *
      * @returns {MountedAppShell|null} Any mounted application shell.
      */
-    get applicationShell(): MountedAppShell;
+    get applicationShell(): any;
     /**
      * Returns the indexed Svelte component.
      *
@@ -1097,7 +848,7 @@ declare class TJSDialogData {
      *
      * @type {string|((application: TJSDialog) => any)}
      */
-    onClose: string | ((application: TJSDialog) => any);
+    onClose: string | ((application: TJSDialog$1) => any);
     /**
      * When true and a Promise has been created by {@link TJSDialog.wait} and the Promise is not in the process of being
      * resolved or rejected on close of the dialog any `onClose` function is invoked and any result that is undefined
@@ -1209,7 +960,7 @@ declare class TJSDialogData {
  *
  * TODO: document all extended dialog data parameters such as transition options / modal transitions.
  */
-declare class TJSDialog extends SvelteApplication {
+declare class TJSDialog$1 extends SvelteApplication {
     /**
      * A helper factory method to create simple confirmation dialog windows which consist of simple yes / no prompts.
      * If you require more flexibility, a custom TJSDialog instance is preferred. The default focused button is 'yes'.
@@ -1245,10 +996,7 @@ declare class TJSDialog extends SvelteApplication {
      * // Logs 'YES result', 'NO Result', or null if the user closed the dialog without making a selection.
      * console.log(result);
      */
-    static confirm<T_1>({ onYes, onNo, ...data }?: TJSDialogOptions & {
-        onYes?: string | ((application: TJSDialog) => any);
-        onNo?: string | ((application: TJSDialog) => any);
-    }, options?: SvelteApplicationOptions): Promise<T_1>;
+    static confirm<T_1>({ onYes, onNo, ...data }?: any, options?: SvelteApplicationOptions): Promise<T_1>;
     /**
      * A helper factory method to display a basic "prompt" style TJSDialog with a single button.
      *
@@ -1284,11 +1032,7 @@ declare class TJSDialog extends SvelteApplication {
      * // Logs 'OK' or null if the user closed the dialog without making a selection.
      * console.log(result);
      */
-    static prompt<T_2>({ onOk, label, icon, ...data }?: TJSDialogOptions & {
-        onOk?: string | ((application: TJSDialog) => any);
-        label?: string;
-        icon?: string;
-    }, options?: SvelteApplicationOptions): Promise<T_2>;
+    static prompt<T_2>({ onOk, label, icon, ...data }?: any, options?: SvelteApplicationOptions): Promise<T_2>;
     /**
      * Creates an anonymous data defined TJSDialog returning a Promise that can be awaited upon for the user to make a
      * choice.
@@ -1350,4 +1094,254 @@ declare class TJSDialog extends SvelteApplication {
     #private;
 }
 
-export { SvelteApplication, TJSDialog };
+/**
+ * - Application shell contract for Svelte components.
+ */
+type MountedAppShell$1 = {
+    /**
+     * - The root element / exported prop.
+     */
+    elementRoot: HTMLElement;
+    /**
+     * - The content element / exported prop.
+     */
+    elementContent?: HTMLElement;
+    /**
+     * - The target element / exported prop.
+     */
+    elementTarget?: HTMLElement;
+};
+type SvelteApplicationOptions$1 = {
+    /**
+     * - If false the default slide close animation is not run.
+     */
+    defaultCloseAnimation?: boolean;
+    /**
+     * - If true then application shells are draggable.
+     */
+    draggable?: boolean;
+    /**
+     * - When true auto-management of app focus is enabled.
+     */
+    focusAuto?: boolean;
+    /**
+     * - When `focusAuto` and `focusKeep` is true; keeps internal focus.
+     */
+    focusKeep?: boolean;
+    /**
+     * - Defines A11yHelper focus source to
+     * apply when application closes.
+     */
+    focusSource?: _typhonjs_fvtt_svelte_util.A11yFocusSource;
+    /**
+     * - If true then the close header button is removed.
+     */
+    headerButtonNoClose?: boolean;
+    /**
+     * - If true then header button labels are removed.
+     */
+    headerButtonNoLabel?: boolean;
+    /**
+     * - If true then header title is hidden when minimized.
+     */
+    headerNoTitleMinimized?: boolean;
+    /**
+     * - Assigned to position. Number specifying minimum
+     * window height.
+     */
+    minHeight?: number;
+    /**
+     * - Assigned to position. Number specifying minimum
+     * window width.
+     */
+    minWidth?: number;
+    /**
+     * - If false then `position.set` does not take effect.
+     */
+    positionable?: boolean;
+    /**
+     * - A helper
+     * for initial position placement.
+     */
+    positionInitial?: _typhonjs_fvtt_svelte_store_position.TJSPositionInitialHelper;
+    /**
+     * - When true TJSPosition is optimized for orthographic use.
+     */
+    positionOrtho?: boolean;
+    /**
+     * - A
+     * validator function or data or list of validators.
+     */
+    positionValidator?: _typhonjs_fvtt_svelte_store_position.TJSPositionValidatorOptions;
+    /**
+     * - An instance of
+     * TJSSessionStorage to share across SvelteApplications.
+     */
+    sessionStorage?: _typhonjs_fvtt_svelte_store_storage_web.TJSSessionStorage;
+    /**
+     * - A Svelte configuration object defining
+     * the main component.
+     */
+    svelte?: _typhonjs_fvtt_svelte_util.TJSSvelteConfig;
+    /**
+     * - By
+     * default, 'top / left' respects rotation when minimizing.
+     */
+    transformOrigin?: _typhonjs_fvtt_svelte_store_position.TJSTransformOrigin;
+};
+type SvelteData$1 = {
+    /**
+     * -
+     */
+    config: object;
+    /**
+     * -
+     */
+    component: svelte.SvelteComponent;
+    /**
+     * -
+     */
+    element: HTMLElement;
+    /**
+     * -
+     */
+    injectHTML: boolean;
+};
+type SvelteStores$1 = {
+    /**
+     * - Update function for app options store.
+     */
+    appOptionsUpdate: any;
+    /**
+     * - Subscribes to local stores.
+     */
+    subscribe: Function;
+    /**
+     * - Update function for UI options store.
+     */
+    uiOptionsUpdate: any;
+    /**
+     * - Unsubscribes from local stores.
+     */
+    unsubscribe: Function;
+};
+/**
+ * - Defines the common dialog configuration data.
+ */
+type TJSDialogOptions$1 = {
+    /**
+     * - Provides configuration of the dialog button bar.
+     */
+    buttons?: Record<string, TJSDialogButtonData$1>;
+    /**
+     * - A Svelte configuration object or HTML string content.
+     */
+    content: object | string;
+    /**
+     * - The default button ID to focus initially.
+     */
+    default?: string;
+    /**
+     * - The dialog is draggable when true.
+     */
+    draggable?: boolean;
+    /**
+     * - When true auto-management of app focus is enabled.
+     */
+    focusAuto?: boolean;
+    /**
+     * - When true the first focusable element that isn't a button is focused.
+     */
+    focusFirst?: boolean;
+    /**
+     * - When `focusAuto` and `focusKeep` is true; keeps internal focus.
+     */
+    focusKeep?: boolean;
+    /**
+     * - When true focus trapping / wrapping is enabled keeping focus inside app.
+     */
+    focusTrap?: boolean;
+    /**
+     * - When true the dialog is minimizable.
+     */
+    minimizable?: boolean;
+    /**
+     * - When true a modal dialog is displayed.
+     */
+    modal?: boolean;
+    /**
+     * - Additional options for modal dialog display.
+     */
+    modalOptions?: object;
+    /**
+     * - When true and an error is raised in dialog callback functions post a UI
+     * error notification.
+     */
+    notifyError?: boolean;
+    /**
+     * - Callback invoked when dialog is closed; no button
+     * option selected. When defined as a string any matching function by name exported from content Svelte
+     * component is invoked.
+     */
+    onClose?: string | ((application: TJSDialog) => any);
+    /**
+     * - When true and a Promise has been created by {@link TJSDialog.wait } and
+     * the Promise is not in the process of being resolved or rejected on close of the dialog any `onClose`
+     * function is invoked and any result that is undefined will cause the Promise to then be rejected.
+     */
+    rejectClose?: boolean;
+    /**
+     * - When true the dialog is resizable.
+     */
+    resizable?: boolean;
+    /**
+     * - When true and resolving any Promises and there are undefined results from
+     * any button callbacks the button ID is resolved.
+     */
+    resolveId?: boolean;
+    /**
+     * - The dialog window title.
+     */
+    title?: string;
+    /**
+     * - Transition options for the dialog.
+     */
+    transition?: object;
+    /**
+     * - A specific z-index for the dialog. Pass null for the dialog to act like other
+     * applications in regard bringing to top when activated.
+     */
+    zIndex?: number | null;
+};
+/**
+ * - TJSDialog button data.
+ */
+type TJSDialogButtonData$1 = {
+    /**
+     * - When false the dialog does not automatically close when button selected.
+     */
+    autoClose?: boolean;
+    /**
+     * - Determines if the button is accessible providing a truthy value.
+     */
+    condition?: boolean | (() => boolean);
+    /**
+     * - Button label; will be localized.
+     */
+    label?: string;
+    /**
+     * - Button icon; you should supply the direct Font Awesome class names: IE "fas fa-check".
+     */
+    icon?: string;
+    /**
+     * - Callback for button press. When defined as a
+     * string any matching function by name exported from content Svelte component is invoked.
+     */
+    onPress?: string | ((application: TJSDialog) => any);
+    /**
+     * - Inline styles to apply to the button.
+     */
+    styles?: Record<string, string>;
+};
+
+export { MountedAppShell$1 as MountedAppShell, SvelteApplication, SvelteApplicationOptions$1 as SvelteApplicationOptions, SvelteData$1 as SvelteData, SvelteStores$1 as SvelteStores, TJSDialog$1 as TJSDialog, TJSDialogButtonData$1 as TJSDialogButtonData, TJSDialogOptions$1 as TJSDialogOptions };
