@@ -478,12 +478,12 @@
         display: var(--tjs-app-content-display, flex);
         flex-direction: var(--tjs-app-content-flex-direction, column);
         flex-wrap: var(--tjs-app-content-flex-wrap, nowrap);
-        flex: var(--tjs-app-content-flex-wrap, 1);
+        flex: var(--tjs-app-content-flex, 1);
         justify-content: var(--tjs-app-content-justify-content, flex-start);
         background: var(--tjs-app-content-background, none);
         padding: var(--tjs-app-content-padding, 8px);
         color: var(--tjs-app-content-color, #191813);
-        overflow: var(--tjs-app-content-color, hidden auto);
+        overflow: var(--tjs-app-content-overflow, hidden auto);
     }
 
     .tjs-window-app :global(.window-resizable-handle) {
