@@ -1,6 +1,6 @@
 import resolve                   from '@rollup/plugin-node-resolve';
 import { generateDTS }           from '@typhonjs-build-test/esm-d-ts';
-import { importsExternal }       from '@typhonjs-build-test/rollup-external-imports';
+import { importsExternal }       from '@typhonjs-build-test/rollup-plugin-pkg-imports';
 import fs                        from 'fs-extra';
 import { rollup }                from 'rollup';
 
