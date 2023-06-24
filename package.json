@@ -109,6 +109,7 @@
     "./package.json": "./package.json"
   },
   "sideEffects": [
+    "./_dist/component/core/index.js",
     "./_dist/gsap/plugin/*.js",
     "./_dist/gsap/plugin/bonus/*.js"
   ],
