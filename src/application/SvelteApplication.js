@@ -893,6 +893,10 @@ export class SvelteApplication extends Application
 
       await super._render(force, options);
 
+      // It is necessary to directly invoke `position.set` as TJSPosition uses accessors and is not a bare object, so
+      // the merging that occurs is `Application._render` does not take effect.
+      if (!this._minimized) { this.#position.set(options); }
+
       if (!this.#onMount)
       {
          // Add to visible apps tracked.
