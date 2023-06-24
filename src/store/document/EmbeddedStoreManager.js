@@ -17,7 +17,7 @@ export class EmbeddedStoreManager
     *
     * @type {RegExp}
     */
-   static #renderContextRegex = /(create|delete|update)(\w+)/;
+   static #renderContextRegex = /(?<action>create|delete|update)(?<sep>\.?)(?<name>\w+)/;
 
    /**
     * @type {Map<string, EmbeddedCollectionData>}
@@ -28,6 +28,11 @@ export class EmbeddedStoreManager
     * @type {foundry.abstract.Document[]}
     */
    #document;
+
+   /**
+    * @type {Map<string, string>}
+    */
+   #collectionToDocName = new Map();
 
    /**
     * @type {Set<string>}
@@ -229,36 +234,46 @@ export class EmbeddedStoreManager
          const existingEmbeddedNames = new Set(this.#name.keys());
 
          /** @type {string[]} */
-         const embeddedNames = Object.keys(doc.constructor?.metadata?.embedded ?? []);
+         const embeddedNames = Object.entries(doc.constructor?.metadata?.embedded ?? []);
+
+         this.#collectionToDocName.clear();
 
          // Remove all previously stored embedded name CRUD keys.
          this.#embeddedNames.clear();
 
-         for (const embeddedName of embeddedNames)
+         for (const [docName, collectionName] of embeddedNames)
          {
-            // Remove processed embedded name from existingEmbeddedNames set.
-            existingEmbeddedNames.delete(embeddedName);
+            // Remove processed embedded doc name from existingEmbeddedNames set.
+            existingEmbeddedNames.delete(docName);
 
-            // Update CRUD keys.
-            this.#embeddedNames.add(`create${embeddedName}`);
-            this.#embeddedNames.add(`delete${embeddedName}`);
-            this.#embeddedNames.add(`update${embeddedName}`);
+            // Update CRUD keys for v10.
+            this.#embeddedNames.add(`create${docName}`);
+            this.#embeddedNames.add(`delete${docName}`);
+            this.#embeddedNames.add(`update${docName}`);
+
+            // Update CRUD keys for v11.
+            this.#embeddedNames.add(`create.${collectionName}`);
+            this.#embeddedNames.add(`delete.${collectionName}`);
+            this.#embeddedNames.add(`update.${collectionName}`);
+
+            // v10 collection to doc name lookup.
+            this.#collectionToDocName.set(docName, docName);
+            this.#collectionToDocName.set(collectionName, docName);
 
             let collection = null;
 
             try
             {
                // Update any existing stores with the actual collection.
-               collection = doc.getEmbeddedCollection(embeddedName);
+               collection = doc.getEmbeddedCollection(docName);
             }
             catch (err)
             {
-               console.warn(`EmbeddedStoreManager.handleDocUpdate error: No valid embedded collection for: ${
-                embeddedName}`);
+               console.warn(`EmbeddedStoreManager.handleDocUpdate error: No valid embedded collection for: ${docName}`);
             }
 
             // Update EmbeddedData for new collection.
-            const embeddedData = this.#name.get(embeddedName);
+            const embeddedData = this.#name.get(docName);
             if (embeddedData)
             {
                embeddedData.collection = collection;
@@ -282,6 +297,7 @@ export class EmbeddedStoreManager
       }
       else // Reset all embedded reducer stores to null data.
       {
+         this.#collectionToDocName.clear();
          this.#embeddedNames.clear();
 
          for (const embeddedData of this.#name.values())
@@ -308,7 +324,9 @@ export class EmbeddedStoreManager
 
       if (match)
       {
-         const embeddedName = match[2];
+         const docOrCollectionName = match.groups.name;
+         const embeddedName = this.#collectionToDocName.get(docOrCollectionName);
+
          if (!this.#name.has(embeddedName)) { return; }
 
          for (const store of this.#name.get(embeddedName).stores.values())
