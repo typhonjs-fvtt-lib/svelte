@@ -50,9 +50,9 @@ export class TJSDialog extends SvelteApplication
    #managedPromise;
 
    /**
-    * @param {TJSDialogOptions}           data - Dialog options.
+    * @param {import('./').TJSDialogOptions}           data - Dialog options.
     *
-    * @param {SvelteApplicationOptions}   [options] - SvelteApplication options.
+    * @param {import('./').SvelteApplicationOptions}   [options] - SvelteApplication options.
     */
    constructor(data, options = {})
    {
@@ -80,7 +80,7 @@ export class TJSDialog extends SvelteApplication
     * content even if it changes. The default `DialogShell` / `svelte` options should not be changed and instead mount
     * the dialog content component by supplying a Svelte configuration object to dialog data `content` field.
     *
-    * @returns {SvelteApplicationOptions} Default options
+    * @returns {import('./').SvelteApplicationOptions} Default options
     */
    static get defaultOptions()
    {
@@ -230,7 +230,7 @@ export class TJSDialog extends SvelteApplication
     *
     * @template T
     *
-    * @param {TJSDialogOptions & {
+    * @param {import('./').TJSDialogOptions & {
     *    onYes?: string|((application: TJSDialog) => any),
     *    onNo?: string|((application: TJSDialog) => any)
     * }} [data] - Confirm dialog options.
@@ -243,7 +243,8 @@ export class TJSDialog extends SvelteApplication
     *        function. When defined as a string any matching function by name exported from content Svelte component is
     *        invoked.
     *
-    * @param {SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog constructor.
+    * @param {import('./').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
+    *        constructor.
     *
     * @returns {Promise<T>} A promise which resolves with result of yes / no callbacks or true / false.
     *
@@ -348,7 +349,7 @@ export class TJSDialog extends SvelteApplication
     *
     * @template T
     *
-    * @param {TJSDialogOptions & {
+    * @param {import('./').TJSDialogOptions & {
     *    onOk?: string|((application: TJSDialog) => any),
     *    label?: string,
     *    icon?: string
@@ -362,7 +363,8 @@ export class TJSDialog extends SvelteApplication
     *
     * @param {string}   [data.icon="fas fa-check"] - Set another icon besides `fas fa-check` for button.
     *
-    * @param {SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog constructor.
+    * @param {import('./').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
+    *        constructor.
     *
     * @returns {Promise<T>} The returned value from the provided callback function or `true` if the button
     *          is pressed.
@@ -401,9 +403,10 @@ export class TJSDialog extends SvelteApplication
     *
     * @template T
     *
-    * @param {TJSDialogOptions}  data - Dialog data passed to the TJSDialog constructor.
+    * @param {import('./').TJSDialogOptions}  data - Dialog data passed to the TJSDialog constructor.
     *
-    * @param {SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog constructor.
+    * @param {import('./').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
+    *        constructor.
     *
     * @returns {Promise<T>} A Promise that resolves to the chosen result.
     */

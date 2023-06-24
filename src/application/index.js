@@ -183,7 +183,7 @@ Hooks.on('PopOut:close', (app) =>
  * @property {boolean}  [notifyError=true] - When true and an error is raised in dialog callback functions post a UI
  *           error notification.
  *
- * @property {string|((application: TJSDialog) => any)} [onClose] - Callback invoked when dialog is closed; no button
+ * @property {string|((application: import('./').TJSDialog) => any)} [onClose] - Callback invoked when dialog is closed; no button
  *           option selected. When defined as a string any matching function by name exported from content Svelte
  *           component is invoked.
  *
@@ -215,8 +215,8 @@ Hooks.on('PopOut:close', (app) =>
  *
  * @property {string} [icon] - Button icon; you should supply the direct Font Awesome class names: IE "fas fa-check".
  *
- * @property {string|((application: TJSDialog) => any)} [onPress] - Callback for button press. When defined as a
- *           string any matching function by name exported from content Svelte component is invoked.
+ * @property {string|((application: import('./').TJSDialog) => any)} [onPress] - Callback for button press. When
+ *           defined as a string any matching function by name exported from content Svelte component is invoked.
  *
  * @property {Record<string, string>} [styles] - Inline styles to apply to the button.
  */
