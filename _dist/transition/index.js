@@ -1,5 +1,5 @@
 import { linear } from 'svelte/easing';
-import { lerp } from '@typhonjs-fvtt/svelte/math';
+import { lerp } from '@typhonjs-svelte/runtime-base/math/interpolate';
 import { fade, slide } from 'svelte/transition';
 
 /**

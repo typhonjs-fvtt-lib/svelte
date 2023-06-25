@@ -1,17 +1,4 @@
 /**
- * Performs linear interpolation between a start & end value by given amount between 0 - 1 inclusive.
- *
- * @param {number}   start - Start value.
- *
- * @param {number}   end - End value.
- *
- * @param {number}   amount - Current amount between 0 - 1 inclusive.
- *
- * @returns {number} Linear interpolated value between start & end.
- */
-declare function lerp(start: number, end: number, amount: number): number;
-
-/**
  * Provides a way to calculate velocity via effectively creating a "complementary filter".
  *
  * `velQuick` and `velSmooth` separately accumulate over time. `velInstant` and `velUsed` do not accumulate and are
@@ -127,4 +114,4 @@ declare function degToRad(deg: number): number;
  */
 declare function radToDeg(rad: number): number;
 
-export { TJSVelocityTrack, clamp, degToRad, lerp, radToDeg };
+export { TJSVelocityTrack, clamp, degToRad, radToDeg };

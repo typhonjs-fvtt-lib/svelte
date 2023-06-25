@@ -1,6 +1,7 @@
 import resolve                   from '@rollup/plugin-node-resolve';
 import { generateDTS }           from '@typhonjs-build-test/esm-d-ts';
 import { importsExternal }       from '@typhonjs-build-test/rollup-plugin-pkg-imports';
+import { getFileList }           from '@typhonjs-utils/file-util';
 import fs                        from 'fs-extra';
 import { rollup }                from 'rollup';
 
@@ -386,15 +387,52 @@ for (const config of rollupConfigs)
 fs.emptyDirSync('./_dist/application');
 fs.copySync('./src/application', './_dist/application');
 
+const appFiles = await getFileList({ dir: './_dist/application', resolve: true, walk: true });
+for (const appFile of appFiles)
+{
+   let fileData = fs.readFileSync(appFile, 'utf-8').toString();
+   fileData = fileData.replaceAll('#runtime/', '@typhonjs-svelte/runtime-base/');
+
+   // For types
+   // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');
+
+   fs.writeFileSync(appFile, fileData);
+}
+
+
 // Copy component core / dialog
 
 fs.emptyDirSync('./_dist/component');
 fs.copySync('./src/component', './_dist/component');
 
+const compFiles = await getFileList({ dir: './_dist/component', resolve: true, walk: true });
+for (const compFile of compFiles)
+{
+   let fileData = fs.readFileSync(compFile, 'utf-8').toString();
+   fileData = fileData.replaceAll('#runtime/', '@typhonjs-svelte/runtime-base/');
+
+   // For types
+   // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');
+
+   fs.writeFileSync(compFile, fileData);
+}
+
 // GSAP plugin loading code is also bespoke and must be copied over.
 
 fs.emptyDirSync('./_dist/gsap/plugin');
 fs.copySync('./src/gsap/plugin', './_dist/gsap/plugin');
+
+const gsapFiles = await getFileList({ dir: './_dist/gsap/plugin', resolve: true, walk: true });
+for (const gsapFile of gsapFiles)
+{
+   let fileData = fs.readFileSync(gsapFile, 'utf-8').toString();
+   fileData = fileData.replaceAll('#runtime/', '@typhonjs-svelte/runtime-base/');
+
+   // For types
+   // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');
+
+   fs.writeFileSync(gsapFile, fileData);
+}
 
 // Common application generateDTS options.
 // const applicationDTSOptions = { filterDiagnostic, onwarn, replace };

@@ -1,18 +1,4 @@
-/**
- * Performs linear interpolation between a start & end value by given amount between 0 - 1 inclusive.
- *
- * @param {number}   start - Start value.
- *
- * @param {number}   end - End value.
- *
- * @param {number}   amount - Current amount between 0 - 1 inclusive.
- *
- * @returns {number} Linear interpolated value between start & end.
- */
-function lerp(start, end, amount)
-{
-   return (1 - amount) * start + amount * end;
-}
+import { lerp } from '@typhonjs-svelte/runtime-base/math/interpolate';
 
 /**
  * Provides a way to calculate velocity via effectively creating a "complementary filter".
@@ -283,5 +269,5 @@ function radToDeg(rad)
    return rad * (180.0 / Math.PI);
 }
 
-export { TJSVelocityTrack, clamp, degToRad, lerp, radToDeg };
+export { TJSVelocityTrack, clamp, degToRad, radToDeg };
 //# sourceMappingURL=index.js.map

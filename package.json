@@ -8,7 +8,9 @@
     "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)"
   ],
   "imports": {
-    "#svelte-fvtt/*": "@typhonjs-fvtt/svelte/*"
+    "#runtime/*": "@typhonjs-svelte/runtime-base/*",
+    "#svelte-fvtt/*": "@typhonjs-fvtt/svelte/*",
+    "#svelte-lib/*": "@typhonjs-fvtt/svelte/*"
   },
   "exports": {
     "./action": {
