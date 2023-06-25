@@ -66,10 +66,6 @@
       "types": "./_dist/math/index.d.ts",
       "import": "./_dist/math/index.js"
     },
-    "./math/gl-matrix": {
-      "types": "./_dist/math/gl-matrix/index.d.ts",
-      "import": "./_dist/math/gl-matrix/index.js"
-    },
     "./store": {
       "types": "./_dist/store/index.d.ts",
       "import": "./_dist/store/index.js"
@@ -122,6 +118,7 @@
     "@typhonjs-config/eslint-config": "^0.6.0",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "@typhonjs-svelte/lib": "github:typhonjs-svelte/lib",
+    "@typhonjs-svelte/runtime-base": "github:typhonjs-svelte/runtime-base",
     "deepmerge": "^4.3.1",
     "eslint": "^8",
     "fs-extra": "^11.1.1",

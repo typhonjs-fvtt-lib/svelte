@@ -210,24 +210,6 @@ const rollupConfigs = [
    },
    {
       input: {
-         input: 'src/math/gl-matrix/index.js',
-         plugins: [
-            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/math/gl-matrix`] }),
-            resolve(s_RESOLVE_CONFIG),
-            generateDTS.plugin(dtsPluginOptions)
-         ]
-      },
-      output: {
-         file: '_dist/math/gl-matrix/index.js',
-         format: 'es',
-         generatedCode: { constBindings: true },
-         paths: externalPathsNPM,
-         plugins: outputPlugins,
-         sourcemap
-      }
-   },
-   {
-      input: {
          input: 'src/store/index.js',
          plugins: [
             importsExternal(),
