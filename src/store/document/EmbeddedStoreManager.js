@@ -1,4 +1,4 @@
-import { DynMapReducer }   from '@typhonjs-svelte/lib/store/reducer';
+import { DynMapReducer }   from '#runtime/data/struct/store/reducer';
 
 import {
    hasPrototype,
