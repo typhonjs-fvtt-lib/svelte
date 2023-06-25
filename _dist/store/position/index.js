@@ -5,7 +5,7 @@ import { lerp } from '@typhonjs-svelte/runtime-base/math/interpolate';
 import { writable } from 'svelte/store';
 import { Vec3, Mat4 } from '@typhonjs-svelte/runtime-base/math/gl-matrix';
 import { nextAnimationFrame } from '@typhonjs-fvtt/svelte/animate';
-import { degToRad } from '@typhonjs-svelte/runtime-base/math/util';
+import { degToRad, clamp } from '@typhonjs-svelte/runtime-base/math/util';
 
 /**
  * Provides a TJSBasicAnimation implementation for TJSPosition animation.
@@ -4131,7 +4131,7 @@ class BasicBounds
       if (typeof valData.position.width === 'number')
       {
          const maxW = valData.maxWidth ?? (this.#constrain ? boundsWidth : Number.MAX_SAFE_INTEGER);
-         valData.position.width = valData.width = Math.clamped(valData.position.width, valData.minWidth, maxW);
+         valData.position.width = valData.width = clamp(valData.position.width, valData.minWidth, maxW);
 
          if ((valData.width + valData.position.left + valData.marginLeft) > boundsWidth)
          {
@@ -4142,7 +4142,7 @@ class BasicBounds
       if (typeof valData.position.height === 'number')
       {
          const maxH = valData.maxHeight ?? (this.#constrain ? boundsHeight : Number.MAX_SAFE_INTEGER);
-         valData.position.height = valData.height = Math.clamped(valData.position.height, valData.minHeight, maxH);
+         valData.position.height = valData.height = clamp(valData.position.height, valData.minHeight, maxH);
 
          if ((valData.height + valData.position.top + valData.marginTop) > boundsHeight)
          {
@@ -4151,10 +4151,10 @@ class BasicBounds
       }
 
       const maxL = Math.max(boundsWidth - valData.width - valData.marginLeft, 0);
-      valData.position.left = Math.round(Math.clamped(valData.position.left, 0, maxL));
+      valData.position.left = Math.round(clamp(valData.position.left, 0, maxL));
 
       const maxT = Math.max(boundsHeight - valData.height - valData.marginTop, 0);
-      valData.position.top = Math.round(Math.clamped(valData.position.top, 0, maxT));
+      valData.position.top = Math.round(clamp(valData.position.top, 0, maxT));
 
       return valData.position;
    }
@@ -4330,7 +4330,7 @@ class TransformBounds
       if (typeof valData.position.width === 'number')
       {
          const maxW = valData.maxWidth ?? (this.#constrain ? boundsWidth : Number.MAX_SAFE_INTEGER);
-         valData.position.width = Math.clamped(valData.width, valData.minWidth, maxW);
+         valData.position.width = clamp(valData.width, valData.minWidth, maxW);
       }
 
       // Ensure min / max height constraints when position height is a number; not 'auto' or 'inherit'. If constrain
@@ -4338,7 +4338,7 @@ class TransformBounds
       if (typeof valData.position.height === 'number')
       {
          const maxH = valData.maxHeight ?? (this.#constrain ? boundsHeight : Number.MAX_SAFE_INTEGER);
-         valData.position.height = Math.clamped(valData.height, valData.minHeight, maxH);
+         valData.position.height = clamp(valData.height, valData.minHeight, maxH);
       }
 
       // Get transform data. First set constraints including any margin top / left as offsets and width / height. Used

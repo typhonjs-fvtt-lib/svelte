@@ -64,10 +64,6 @@
       "types": "./_dist/helper/index.d.ts",
       "import": "./_dist/helper/index.js"
     },
-    "./math": {
-      "types": "./_dist/math/index.d.ts",
-      "import": "./_dist/math/index.js"
-    },
     "./store": {
       "types": "./_dist/store/index.d.ts",
       "import": "./_dist/store/index.js"
