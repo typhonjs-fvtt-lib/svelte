@@ -5,7 +5,7 @@
       s_DEFAULT_TRANSITION,
       s_DEFAULT_TRANSITION_OPTIONS }   from '@typhonjs-fvtt/svelte/transition';
 
-   import { isObject }                 from '@typhonjs-fvtt/svelte/util';
+   import { isObject }                 from '#runtime/util/object';
 
    /** @type {string} */
    export let background = '#50505080';

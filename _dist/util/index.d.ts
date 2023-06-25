@@ -563,50 +563,6 @@ declare function parseTJSSvelteConfig(config: object, thisArg?: any): object;
  */
 declare function debounce(callback: Function, delay: number): Function;
 
-/**
- * Provides a method to determine if the passed in Svelte component has a getter accessor.
- *
- * @param {*}        object - An object.
- *
- * @param {string}   accessor - Accessor to test.
- *
- * @returns {boolean} Whether the component has the getter for accessor.
- */
-declare function hasGetter(object: any, accessor: string): boolean;
-/**
- * Provides a method to determine if the passed in Svelte component has a getter & setter accessor.
- *
- * @param {*}        object - An object.
- *
- * @param {string}   accessor - Accessor to test.
- *
- * @returns {boolean} Whether the component has the getter and setter for accessor.
- */
-declare function hasAccessor(object: any, accessor: string): boolean;
-/**
- * Provides a method to determine if the passed in Svelte component has a setter accessor.
- *
- * @param {*}        object - An object.
- *
- * @param {string}   accessor - Accessor to test.
- *
- * @returns {boolean} Whether the component has the setter for accessor.
- */
-declare function hasSetter(object: any, accessor: string): boolean;
-
-/**
- * Returns whether the target is or has the given prototype walking up the prototype chain.
- *
- * @param {*}  target - Any target to test.
- *
- * @param {Function} Prototype - Prototype function / class constructor to find.
- *
- * @returns {boolean} Target matches prototype.
- */
-declare function hasPrototype(target: any, Prototype: Function): boolean;
-
-declare function klona<T>(input: T): T;
-
 interface StateMachineOptions {
     readonly allowedTags?: Set<string>;
     readonly disallowedTags?: Set<string>;
@@ -614,98 +570,6 @@ interface StateMachineOptions {
     readonly encodePlaintextTagDelimiters: boolean;
 }
 declare function striptags(text: string, options?: Partial<StateMachineOptions>): string;
-
-/**
- * Recursively deep merges all source objects into the target object in place. Like `Object.assign` if you provide `{}`
- * as the target a copy is produced. If the target and source property are object literals they are merged.
- * Deleting keys is supported by specifying a property starting with `-=`.
- *
- * @param {object}      target - Target object.
- *
- * @param {...object}   sourceObj - One or more source objects.
- *
- * @returns {object}    Target object.
- */
-declare function deepMerge(target?: object, ...sourceObj: object[]): object;
-/**
- * Tests for whether an object is async iterable.
- *
- * @param {unknown} value - Any value.
- *
- * @returns {boolean} Whether value is async iterable.
- */
-declare function isAsyncIterable(value: unknown): value is AsyncIterable<unknown>;
-/**
- * Tests for whether an object is iterable.
- *
- * @param {unknown} value - Any value.
- *
- * @returns {boolean} Whether object is iterable.
- */
-declare function isIterable(value: unknown): value is Iterable<unknown>;
-/**
- * Tests for whether object is not null and a typeof object.
- *
- * @param {unknown} value - Any value.
- *
- * @returns {boolean} Is it an object.
- */
-declare function isObject(value: unknown): value is Record<string, unknown>;
-/**
- * Tests for whether the given value is a plain object.
- *
- * An object is plain if it is created by either: `{}`, `new Object()` or `Object.create(null)`.
- *
- * @param {unknown} value - Any value
- *
- * @returns {boolean} Is it a plain object.
- */
-declare function isPlainObject(value: unknown): value is JSONObject;
-/**
- * Provides a way to safely access an objects data / entries given an accessor string which describes the
- * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
- * to walk.
- *
- * @param {object}   data - An object to access entry data.
- *
- * @param {string}   accessor - A string describing the entries to access with keys separated by `.`.
- *
- * @param {any}      [defaultValue] - (Optional) A default value to return if an entry for accessor is not found.
- *
- * @returns {object} The data object.
- */
-declare function safeAccess(data: object, accessor: string, defaultValue?: any): any;
-/**
- * Provides a way to safely set an objects data / entries given an accessor string which describes the
- * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
- * to walk.
- *
- * @param {object}   data - An object to access entry data.
- *
- * @param {string}   accessor - A string describing the entries to access.
- *
- * @param {any}      value - A new value to set if an entry for accessor is found.
- *
- * @param {SafeSetOperation}   [operation='set'] - Operation to perform including: 'add', 'div', 'mult', 'set',
- *        'set-undefined', 'sub'.
- *
- * @param {boolean}  [createMissing=true] - If true missing accessor entries will be created as objects
- *        automatically.
- *
- * @returns {boolean} True if successful.
- */
-declare function safeSet(data: object, accessor: string, value: any, operation?: SafeSetOperation, createMissing?: boolean): boolean;
-/**
- * Defines the operation to perform for `safeSet`.
- */
-type SafeSetOperation = 'add' | 'div' | 'mult' | 'set' | 'set-undefined' | 'sub';
-type Primitive = bigint | boolean | null | number | string | symbol | undefined;
-type JSONValue = Primitive | JSONObject | JSONArray;
-interface JSONObject {
-    [key: string]: JSONValue;
-}
-interface JSONArray extends Array<JSONValue> {
-}
 
 /**
  * Attempts to create a Foundry UUID from standard drop data. This may not work for all systems.
@@ -736,4 +600,4 @@ type ParseDataTransferOptions = {
     types?: string[] | undefined;
 };
 
-export { A11yFocusSource, A11yHelper, BrowserSupports, ClipboardAccess, ManagedPromise, ParseDataTransferOptions, StackingContext, TJSStyleManager, TJSSvelteConfig, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isAsyncIterable, isHMRProxy, isIterable, isObject, isPlainObject, isSvelteComponent, isTJSSvelteConfig, klona, normalizeString, outroAndDestroy, parseTJSSvelteConfig, safeAccess, safeSet, striptags, styleParsePixels, uuidv4 };
+export { A11yFocusSource, A11yHelper, BrowserSupports, ClipboardAccess, ManagedPromise, ParseDataTransferOptions, StackingContext, TJSStyleManager, TJSSvelteConfig, debounce, getStackingContext, getUUIDFromDataTransfer, hashCode, isApplicationShell, isHMRProxy, isSvelteComponent, isTJSSvelteConfig, normalizeString, outroAndDestroy, parseTJSSvelteConfig, striptags, styleParsePixels, uuidv4 };

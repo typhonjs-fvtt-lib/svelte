@@ -5,7 +5,7 @@ import { TJSPosition }  from '@typhonjs-svelte/lib/store/position';
 import {
    isIterable,
    isObject,
-   isPlainObject }      from '@typhonjs-fvtt/svelte/util';
+   isPlainObject }      from '#runtime/util/object';
 
 import { GsapPosition } from './GsapPosition.js';
 import { TimelineImpl } from './TimelineImpl.js';

@@ -4,7 +4,7 @@ import { TJSPosition }  from '@typhonjs-svelte/lib/store/position';
 
 import {
    isIterable,
-   isObject }           from '@typhonjs-fvtt/svelte/util';
+   isObject }           from '#runtime/util/object';
 
 import { TimelineImpl } from './TimelineImpl.js';
 /**

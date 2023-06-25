@@ -7,9 +7,9 @@
    import {
       draggable as dragDefault }    from '@typhonjs-fvtt/svelte/store/position';
 
-   import {
-      isObject,
-      isSvelteComponent }           from '@typhonjs-fvtt/svelte/util';
+   import { isSvelteComponent }     from '@typhonjs-fvtt/svelte/util';
+
+   import { isObject }              from '@typhonjs-svelte/runtime-base/util/object';
 
    import TJSHeaderButton           from './TJSHeaderButton.svelte';
 

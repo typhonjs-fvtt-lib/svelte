@@ -1,4 +1,4 @@
-import { isObject } from '@typhonjs-fvtt/svelte/util';
+import { isObject } from '@typhonjs-svelte/runtime-base/util/object';
 
 /**
  * Provides a helper class for {@link SvelteApplication} by combining all methods that work on the {@link SvelteData[]}

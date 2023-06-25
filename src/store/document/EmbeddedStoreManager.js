@@ -2,7 +2,7 @@ import { DynMapReducer }   from '@typhonjs-svelte/lib/store/reducer';
 
 import {
    hasPrototype,
-   isObject }              from '#svelte-fvtt/util';
+   isObject }              from '#runtime/util/object';
 
 /**
  * Provides management of reactive embedded collections.

@@ -15,7 +15,7 @@
     */
    import { applyStyles }   from '@typhonjs-fvtt/svelte/action/dom';
    import { localize }      from '@typhonjs-fvtt/svelte/helper';
-   import { isObject }      from '@typhonjs-fvtt/svelte/util';
+   import { isObject }      from '@typhonjs-svelte/runtime-base/util/object';
 
    export let button = void 0;
 

@@ -1,9 +1,10 @@
 import { DialogShell }        from '@typhonjs-fvtt/svelte/component/core';
 
+import { ManagedPromise }     from '@typhonjs-fvtt/svelte/util';
+
 import {
    deepMerge,
-   isObject,
-   ManagedPromise }           from '@typhonjs-fvtt/svelte/util';
+   isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
 
 import { TJSDialogData }      from './internal/TJSDialogData.js';
 import { SvelteApplication }  from './SvelteApplication.js';

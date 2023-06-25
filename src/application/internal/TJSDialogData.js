@@ -1,7 +1,7 @@
 import {
    deepMerge,
    safeAccess,
-   safeSet }   from '@typhonjs-fvtt/svelte/util';
+   safeSet }   from '#runtime/util/object';
 
 /**
  * Provides storage for all dialog options adding `get`, `merge` and `set` methods that safely access and update

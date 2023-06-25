@@ -1,7 +1,7 @@
 import { linear }             from 'svelte/easing';
 
 import { lerp }               from '#runtime/math/interpolate';
-import { isObject }           from '@typhonjs-fvtt/svelte/util';
+import { isObject }           from '#runtime/util/object';
 
 /**
  * Provides the ability the save / restore application state for positional and UI state such as minimized status.

@@ -1,19 +1,21 @@
-import { TJSPosition }        from '@typhonjs-svelte/lib/store/position';
+import { TJSPosition }  from '@typhonjs-svelte/lib/store/position';
 
 import {
    A11yHelper,
-   deepMerge,
-   hasGetter,
    isApplicationShell,
    isHMRProxy,
-   isObject,
-   outroAndDestroy }          from '@typhonjs-fvtt/svelte/util';
+   outroAndDestroy }    from '@typhonjs-fvtt/svelte/util';
+
+import {
+   deepMerge,
+   hasGetter,
+   isObject }           from '#runtime/util/object';
 
 import {
    ApplicationState,
    GetSvelteData,
    loadSvelteConfig,
-   SvelteReactive }           from '../internal/index.js';
+   SvelteReactive }     from '../internal/index.js';
 
 /**
  * Provides a Svelte aware extension to FormApplication to control the app lifecycle appropriately. You can

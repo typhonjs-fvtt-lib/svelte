@@ -13,9 +13,9 @@
       applyStyles,
       resizeObserver }                 from '@typhonjs-fvtt/svelte/action/dom';
 
-   import {
-      A11yHelper,
-      isObject }                       from '@typhonjs-fvtt/svelte/util';
+   import { A11yHelper }               from '@typhonjs-fvtt/svelte/util';
+
+   import { isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
 
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
    import TJSApplicationHeader         from './TJSApplicationHeader.svelte';

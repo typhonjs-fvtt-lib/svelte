@@ -6,7 +6,7 @@ import {
 
 import {
    deepMerge,
-   isObject }                 from '@typhonjs-fvtt/svelte/util';
+   isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
 
 export class HandlebarsApplication extends SvelteApplication
 {

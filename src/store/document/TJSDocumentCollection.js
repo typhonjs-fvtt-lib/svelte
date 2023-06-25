@@ -1,7 +1,8 @@
+import { uuidv4 }    from '@typhonjs-fvtt/svelte/util';
+
 import {
    isObject,
-   isPlainObject,
-   uuidv4 }       from '@typhonjs-fvtt/svelte/util';
+   isPlainObject }   from '#runtime/util/object';
 
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any DocumentCollection. This makes

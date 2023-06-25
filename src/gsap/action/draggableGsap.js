@@ -2,7 +2,7 @@ import { TJSVelocityTrack }   from '#runtime/math/physics';
 
 import {
    isIterable,
-   isObject }                 from '@typhonjs-fvtt/svelte/util';
+   isObject }                 from '#runtime/util/object';
 
 import { GsapCompose }        from '../compose/GsapCompose.js';
 

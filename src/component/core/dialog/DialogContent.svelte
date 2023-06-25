@@ -12,9 +12,10 @@
 
    import {
       A11yHelper,
-      isObject,
       isSvelteComponent,
       parseTJSSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
+
+   import { isObject }        from '#runtime/util/object';
 
    export let data = void 0;
    export let preventDefault = false;

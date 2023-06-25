@@ -1,10 +1,12 @@
 import {
    getUUIDFromDataTransfer,
-   isObject,
-   isPlainObject,
-   uuidv4 } from '#svelte-fvtt/util';
+   uuidv4 }                      from '#svelte-fvtt/util';
 
-import { EmbeddedStoreManager } from './EmbeddedStoreManager.js';
+import {
+   isObject,
+   isPlainObject }               from '#runtime/util/object';
+
+import { EmbeddedStoreManager }  from './EmbeddedStoreManager.js';
 
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.

@@ -1,4 +1,5 @@
-import { hasPrototype, isObject, uuidv4, isPlainObject, getUUIDFromDataTransfer } from '@typhonjs-fvtt/svelte/util';
+import { uuidv4, getUUIDFromDataTransfer } from '@typhonjs-fvtt/svelte/util';
+import { hasPrototype, isObject, isPlainObject } from '@typhonjs-svelte/runtime-base/util/object';
 
 class DynReducerUtils {
     /**

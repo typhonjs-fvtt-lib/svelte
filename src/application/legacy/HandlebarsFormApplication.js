@@ -4,7 +4,7 @@ import {
 
 import {
    deepMerge,
-   isObject }                    from '@typhonjs-fvtt/svelte/util';
+   isObject }                    from '#runtime/util/object';
 
 import { SvelteFormApplication } from './SvelteFormApplication.js';
 

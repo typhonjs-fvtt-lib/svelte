@@ -1,16 +1,4 @@
-/**
- * Tests for whether an object is iterable.
- *
- * @param {unknown} value - Any value.
- *
- * @returns {boolean} Whether object is iterable.
- */
-function isIterable(value) {
-    if (value === null || value === void 0 || typeof value !== 'object') {
-        return false;
-    }
-    return Symbol.iterator in value;
-}
+import { isIterable } from '@typhonjs-svelte/runtime-base/util/object';
 
 /**
  * Provides a readable store to track keys actively pressed. KeyStore is designed to be used with the {@link keyforward}

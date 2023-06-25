@@ -1,4 +1,5 @@
-import { isObject, uuidv4, debounce, klona, normalizeString, isIterable } from '@typhonjs-fvtt/svelte/util';
+import { uuidv4, debounce, normalizeString } from '@typhonjs-fvtt/svelte/util';
+import { isObject, klona, isIterable } from '@typhonjs-svelte/runtime-base/util/object';
 import { writable, get } from 'svelte/store';
 
 class DynReducerUtils {

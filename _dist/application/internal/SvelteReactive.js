@@ -9,7 +9,7 @@ import { TJSSessionStorage }  from '@typhonjs-fvtt/svelte/store/storage/web';
 import {
    deepMerge,
    safeAccess,
-   safeSet }                  from '@typhonjs-fvtt/svelte/util';
+   safeSet }                  from '@typhonjs-svelte/runtime-base/util/object';
 
 /**
  * Contains the reactive functionality / Svelte stores associated with SvelteApplication and retrievable by

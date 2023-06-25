@@ -1,7 +1,7 @@
 <script>
    import { getContext }    from 'svelte';
 
-   import { isObject }      from '@typhonjs-fvtt/svelte/util';
+   import { isObject }      from '#runtime/util/object';
 
    export let warn = false;
    export let children = void 0;

@@ -7,7 +7,7 @@
 
    import { fade }         from 'svelte/transition';
 
-   import { isObject }     from '@typhonjs-fvtt/svelte/util';
+   import { isObject }     from '@typhonjs-svelte/runtime-base/util/object';
 
    import ApplicationShell from '../application/ApplicationShell.svelte';
    import DialogContent    from './DialogContent.svelte';
