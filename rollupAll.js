@@ -71,6 +71,7 @@ const rollupConfigs = [
       input: {
          input: 'src/action/index.js',
          plugins: [
+            importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/action`] }),
             resolve(s_RESOLVE_CONFIG),
             generateDTS.plugin(dtsPluginOptions)
@@ -89,6 +90,7 @@ const rollupConfigs = [
       input: {
          input: 'src/action/dom/index.js',
          plugins: [
+            importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/action/dom`] }),
             resolve(s_RESOLVE_CONFIG),
             generateDTS.plugin(dtsPluginOptions)
@@ -107,6 +109,7 @@ const rollupConfigs = [
       input: {
          input: 'src/animate/index.js',
          plugins: [
+            importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/animate`] }),
             resolve(s_RESOLVE_CONFIG),
             generateDTS.plugin(dtsPluginOptions)
@@ -125,6 +128,7 @@ const rollupConfigs = [
       input: {
          input: 'src/animate/action/index.js',
          plugins: [
+            importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/animate/action`] }),
             resolve(s_RESOLVE_CONFIG),
             generateDTS.plugin(dtsPluginOptions)
@@ -143,6 +147,7 @@ const rollupConfigs = [
       input: {
          input: 'src/gsap/index.js',
          plugins: [
+            importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/gsap`] }),
             generateDTS.plugin(dtsPluginOptions)
          ]
@@ -160,6 +165,7 @@ const rollupConfigs = [
       input: {
          input: 'src/handler/index.js',
          plugins: [
+            importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/handler`] }),
             resolve(s_RESOLVE_CONFIG),
             generateDTS.plugin(dtsPluginOptions)
@@ -178,6 +184,7 @@ const rollupConfigs = [
       input: {
          input: 'src/helper/index.js',
          plugins: [
+            importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/helper`] }),
             generateDTS.plugin(dtsPluginOptions)
          ]
@@ -195,6 +202,7 @@ const rollupConfigs = [
       input: {
          input: 'src/math/index.js',
          plugins: [
+            importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/math`] }),
             resolve(s_RESOLVE_CONFIG),
             generateDTS.plugin(dtsPluginOptions)
@@ -268,6 +276,7 @@ const rollupConfigs = [
       input: {
          input: 'src/store/position/index.js',
          plugins: [
+            importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/store/position`] }),
             resolve(s_RESOLVE_CONFIG),
             generateDTS.plugin(dtsPluginOptions)
@@ -286,6 +295,7 @@ const rollupConfigs = [
       input: {
          input: 'src/store/reducer/index.js',
          plugins: [
+            importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/store/reducer`] }),
             resolve(s_RESOLVE_CONFIG),
             generateDTS.plugin(dtsPluginOptions)
@@ -304,6 +314,7 @@ const rollupConfigs = [
       input: {
          input: 'src/store/storage/web/index.js',
          plugins: [
+            importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/store/storage/web`] }),
             resolve(s_RESOLVE_CONFIG),
             generateDTS.plugin(dtsPluginOptions)
@@ -322,6 +333,7 @@ const rollupConfigs = [
       input: {
          input: 'src/store/storage/web/plugin/index.js',
          plugins: [
+            importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/store/storage/web/plugin`] }),
             resolve(s_RESOLVE_CONFIG),
             generateDTS.plugin(dtsPluginOptions)
@@ -340,6 +352,7 @@ const rollupConfigs = [
       input: {
          input: 'src/transition/index.js',
          plugins: [
+            importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/transition`] }),
             resolve(s_RESOLVE_CONFIG),
             generateDTS.plugin(dtsPluginOptions)
@@ -358,6 +371,7 @@ const rollupConfigs = [
       input: {
          input: 'src/util/index.js',
          plugins: [
+            importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/util`] }),
             resolve(s_RESOLVE_CONFIG),
             generateDTS.plugin(dtsPluginOptions)

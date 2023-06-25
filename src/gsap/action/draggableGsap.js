@@ -1,4 +1,4 @@
-import { TJSVelocityTrack }   from '@typhonjs-fvtt/svelte/math';
+import { TJSVelocityTrack }   from '#runtime/math/physics';
 
 import {
    isIterable,

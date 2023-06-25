@@ -1,5 +1,5 @@
 import * as svelteEasingFunc from 'svelte/easing';
-import { TJSVelocityTrack } from '@typhonjs-fvtt/svelte/math';
+import { TJSVelocityTrack } from '@typhonjs-svelte/runtime-base/math/physics';
 import { isIterable, isObject, isPlainObject } from '@typhonjs-fvtt/svelte/util';
 import { TJSPosition } from '@typhonjs-fvtt/svelte/store/position';
 
