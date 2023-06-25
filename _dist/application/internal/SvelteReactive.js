@@ -11,9 +11,6 @@ import {
    safeAccess,
    safeSet }                  from '@typhonjs-fvtt/svelte/util';
 
-// Explicit import for TS declaration generation.
-import { SvelteApplication }  from '../SvelteApplication.js';  // eslint-disable-line no-unused-vars
-
 /**
  * Contains the reactive functionality / Svelte stores associated with SvelteApplication and retrievable by
  * {@link SvelteApplication.reactive}.
@@ -72,7 +69,7 @@ import { SvelteApplication }  from '../SvelteApplication.js';  // eslint-disable
 export class SvelteReactive
 {
    /**
-    * @type {SvelteApplication}
+    * @type {import('../SvelteApplication').SvelteApplication}
     */
    #application;
 
@@ -127,7 +124,7 @@ export class SvelteReactive
    #storeUnsubscribe = [];
 
    /**
-    * @param {SvelteApplication} application - The host Foundry application.
+    * @param {import('../SvelteApplication').SvelteApplication} application - The host Foundry application.
     */
    constructor(application)
    {

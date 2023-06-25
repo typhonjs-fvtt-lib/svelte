@@ -25,7 +25,7 @@ export class SvelteApplication extends Application
    /**
     * Stores the first mounted component which follows the application shell contract.
     *
-    * @type {MountedAppShell[]|null[]} Application shell.
+    * @type {import('./').MountedAppShell[]|null[]} Application shell.
     */
    #applicationShellHolder = [null];
 
@@ -81,7 +81,7 @@ export class SvelteApplication extends Application
    /**
     * Stores SvelteData entries with instantiated Svelte components.
     *
-    * @type {SvelteData[]}
+    * @type {import('./').SvelteData[]}
     */
    #svelteData = [];
 
@@ -96,7 +96,7 @@ export class SvelteApplication extends Application
    /**
     * Contains methods to interact with the Svelte stores.
     *
-    * @type {SvelteStores}
+    * @type {import('./').SvelteStores}
     */
    #stores;
 
@@ -143,7 +143,7 @@ export class SvelteApplication extends Application
    /**
     * Specifies the default options that SvelteApplication supports.
     *
-    * @returns {SvelteApplicationOptions} options - Application options.
+    * @returns {import('./').SvelteApplicationOptions} options - Application options.
     * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
     *
     * @internal
@@ -892,6 +892,10 @@ export class SvelteApplication extends Application
       }
 
       await super._render(force, options);
+
+      // It is necessary to directly invoke `position.set` as TJSPosition uses accessors and is not a bare object, so
+      // the merging that occurs is `Application._render` does not take effect.
+      if (!this._minimized) { this.#position.set(options); }
 
       if (!this.#onMount)
       {

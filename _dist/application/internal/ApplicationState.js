@@ -3,9 +3,6 @@ import { linear }             from 'svelte/easing';
 import { lerp }               from '@typhonjs-fvtt/svelte/math';
 import { isObject }           from '@typhonjs-fvtt/svelte/util';
 
-// Explicit import for TS declaration generation.
-import { SvelteApplication }  from '../SvelteApplication.js';  // eslint-disable-line no-unused-vars
-
 /**
  * Provides the ability the save / restore application state for positional and UI state such as minimized status.
  *
@@ -13,14 +10,14 @@ import { SvelteApplication }  from '../SvelteApplication.js';  // eslint-disable
  */
 export class ApplicationState
 {
-   /** @type {SvelteApplication} */
+   /** @type {import('../SvelteApplication').SvelteApplication} */
    #application;
 
    /** @type {Map<string, ApplicationStateData>} */
    #dataSaved = new Map();
 
    /**
-    * @param {SvelteApplication}   application - The application.
+    * @param {import('../SvelteApplication').SvelteApplication}   application - The application.
     */
    constructor(application)
    {
@@ -184,8 +181,9 @@ export class ApplicationState
     *
     * @param {Function}          [opts.interpolate=lerp] - Interpolation function.
     *
-    * @returns {SvelteApplication|Promise<SvelteApplication>} When synchronous the application or Promise when
-    *                                                             animating resolving with application.
+    * @returns {(import('../SvelteApplication').SvelteApplication |
+    *    Promise<import('../SvelteApplication').SvelteApplication>)} When synchronous the application or Promise when
+    *    animating resolving with application.
     */
    set(data, { async = false, animateTo = false, duration = 0.1, ease = linear, interpolate = lerp } = {})
    {

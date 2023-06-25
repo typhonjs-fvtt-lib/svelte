@@ -1,4 +1,4 @@
-import * as _typhonjs_fvtt_svelte_store_reducer from '@typhonjs-fvtt/svelte/store/reducer';
+import * as _svelte_fvtt_store_reducer from '@typhonjs-fvtt/svelte/store/reducer';
 import * as _typhonjs_fvtt_svelte_util from '@typhonjs-fvtt/svelte/util';
 
 /**
@@ -95,7 +95,7 @@ type EmbeddedAPI<T> = {
     /**
      * - Creates an embedded collection store.
      */
-    create: (embeddedName: string, options: _typhonjs_fvtt_svelte_store_reducer.DynOptionsMapCreate<string, any>) => _typhonjs_fvtt_svelte_store_reducer.DynMapReducer<string, T>;
+    create: (embeddedName: string, options: _svelte_fvtt_store_reducer.DynOptionsMapCreate<string, any>) => _svelte_fvtt_store_reducer.DynMapReducer<string, T>;
     /**
      * - Destroys one or more embedded collection stores.
      */
@@ -103,7 +103,7 @@ type EmbeddedAPI<T> = {
     /**
      * - Returns a specific existing embedded collection store.
      */
-    get: (embeddedName: string, storeName: string) => _typhonjs_fvtt_svelte_store_reducer.DynMapReducer<string, T>;
+    get: (embeddedName: string, storeName: string) => _svelte_fvtt_store_reducer.DynMapReducer<string, T>;
 };
 
 /**

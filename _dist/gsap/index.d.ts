@@ -1,6 +1,6 @@
 import * as svelte_store from 'svelte/store';
-import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
-import { TJSPosition } from '@typhonjs-fvtt/svelte/store/position';
+import * as _typhonjs_svelte_lib_store_position from '@typhonjs-svelte/lib/store/position';
+import { TJSPosition } from '@typhonjs-svelte/lib/store/position';
 
 declare let gsap: any;
 declare const easingFunc: {};
@@ -17,7 +17,7 @@ declare const easingList: string[];
  *
  * @param {object}            params - Required parameters.
  *
- * @param {import('@typhonjs-fvtt/svelte/store/position').TJSPosition}   params.position - A position instance.
+ * @param {import('@typhonjs-svelte/lib/store/position').TJSPosition}   params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
@@ -43,7 +43,7 @@ declare const easingList: string[];
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
 declare function draggableGsap(node: HTMLElement, { position, active, button, storeDragging, ease, inertia, easeOptions, inertiaOptions, hasTargetClassList, ignoreTargetClassList }: {
-    position: _typhonjs_fvtt_svelte_store_position.TJSPosition;
+    position: _typhonjs_svelte_lib_store_position.TJSPosition;
     active?: boolean;
     button?: number;
     storeDragging?: svelte_store.Writable<boolean>;

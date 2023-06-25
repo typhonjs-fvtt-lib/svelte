@@ -1,64 +1,5 @@
 import { hasPrototype, isObject, uuidv4, isPlainObject, getUUIDFromDataTransfer } from '@typhonjs-fvtt/svelte/util';
 
-new Set();
-
-// we need to store the information for multiple documents because a Svelte application could also contain iframes
-// https://github.com/sveltejs/svelte/issues/3624
-new Map();
-// flush() calls callbacks in this order:
-// 1. All beforeUpdate callbacks, in order: parents before children
-// 2. All bind:this callbacks, in reverse order: children before parents.
-// 3. All afterUpdate callbacks, in order: parents before children. EXCEPT
-//    for afterUpdates called during the initial onMount, which are called in
-//    reverse order: children before parents.
-// Since callbacks might update component values, which could trigger another
-// call to flush(), the following steps guard against this:
-// 1. During beforeUpdate, any updated components will be added to the
-//    dirty_components array and will cause a reentrant call to flush(). Because
-//    the flush index is kept outside the function, the reentrant call will pick
-//    up where the earlier call left off and go through all dirty components. The
-//    current_component value is saved and restored so that the reentrant call will
-//    not interfere with the "parent" flush() call.
-// 2. bind:this callbacks cannot trigger new flush() calls.
-// 3. During afterUpdate, any updated components will NOT have their afterUpdate
-//    callback called a second time; the seen_callbacks set, outside the flush()
-//    function, guarantees this behavior.
-new Set();
-new Set();
-
-const _boolean_attributes = [
-    'allowfullscreen',
-    'allowpaymentrequest',
-    'async',
-    'autofocus',
-    'autoplay',
-    'checked',
-    'controls',
-    'default',
-    'defer',
-    'disabled',
-    'formnovalidate',
-    'hidden',
-    'inert',
-    'ismap',
-    'loop',
-    'multiple',
-    'muted',
-    'nomodule',
-    'novalidate',
-    'open',
-    'playsinline',
-    'readonly',
-    'required',
-    'reversed',
-    'selected'
-];
-/**
- * List of HTML boolean attributes (e.g. `<input disabled>`).
- * Source: https://html.spec.whatwg.org/multipage/indices.html
- */
-new Set([..._boolean_attributes]);
-
 class DynReducerUtils {
     /**
      * Checks for array equality between two arrays of numbers.
@@ -1458,7 +1399,7 @@ class EmbeddedStoreManager
     *
     * @type {RegExp}
     */
-   static #renderContextRegex = /(create|delete|update)(\w+)/;
+   static #renderContextRegex = /(?<action>create|delete|update)(?<sep>\.?)(?<name>\w+)/;
 
    /**
     * @type {Map<string, EmbeddedCollectionData>}
@@ -1469,6 +1410,11 @@ class EmbeddedStoreManager
     * @type {foundry.abstract.Document[]}
     */
    #document;
+
+   /**
+    * @type {Map<string, string>}
+    */
+   #collectionToDocName = new Map();
 
    /**
     * @type {Set<string>}
@@ -1670,36 +1616,46 @@ class EmbeddedStoreManager
          const existingEmbeddedNames = new Set(this.#name.keys());
 
          /** @type {string[]} */
-         const embeddedNames = Object.keys(doc.constructor?.metadata?.embedded ?? []);
+         const embeddedNames = Object.entries(doc.constructor?.metadata?.embedded ?? []);
+
+         this.#collectionToDocName.clear();
 
          // Remove all previously stored embedded name CRUD keys.
          this.#embeddedNames.clear();
 
-         for (const embeddedName of embeddedNames)
+         for (const [docName, collectionName] of embeddedNames)
          {
-            // Remove processed embedded name from existingEmbeddedNames set.
-            existingEmbeddedNames.delete(embeddedName);
+            // Remove processed embedded doc name from existingEmbeddedNames set.
+            existingEmbeddedNames.delete(docName);
 
-            // Update CRUD keys.
-            this.#embeddedNames.add(`create${embeddedName}`);
-            this.#embeddedNames.add(`delete${embeddedName}`);
-            this.#embeddedNames.add(`update${embeddedName}`);
+            // Update CRUD keys for v10.
+            this.#embeddedNames.add(`create${docName}`);
+            this.#embeddedNames.add(`delete${docName}`);
+            this.#embeddedNames.add(`update${docName}`);
+
+            // Update CRUD keys for v11.
+            this.#embeddedNames.add(`create.${collectionName}`);
+            this.#embeddedNames.add(`delete.${collectionName}`);
+            this.#embeddedNames.add(`update.${collectionName}`);
+
+            // v10 collection to doc name lookup.
+            this.#collectionToDocName.set(docName, docName);
+            this.#collectionToDocName.set(collectionName, docName);
 
             let collection = null;
 
             try
             {
                // Update any existing stores with the actual collection.
-               collection = doc.getEmbeddedCollection(embeddedName);
+               collection = doc.getEmbeddedCollection(docName);
             }
             catch (err)
             {
-               console.warn(`EmbeddedStoreManager.handleDocUpdate error: No valid embedded collection for: ${
-                embeddedName}`);
+               console.warn(`EmbeddedStoreManager.handleDocUpdate error: No valid embedded collection for: ${docName}`);
             }
 
             // Update EmbeddedData for new collection.
-            const embeddedData = this.#name.get(embeddedName);
+            const embeddedData = this.#name.get(docName);
             if (embeddedData)
             {
                embeddedData.collection = collection;
@@ -1723,6 +1679,7 @@ class EmbeddedStoreManager
       }
       else // Reset all embedded reducer stores to null data.
       {
+         this.#collectionToDocName.clear();
          this.#embeddedNames.clear();
 
          for (const embeddedData of this.#name.values())
@@ -1749,7 +1706,9 @@ class EmbeddedStoreManager
 
       if (match)
       {
-         const embeddedName = match[2];
+         const docOrCollectionName = match.groups.name;
+         const embeddedName = this.#collectionToDocName.get(docOrCollectionName);
+
          if (!this.#name.has(embeddedName)) { return; }
 
          for (const store of this.#name.get(embeddedName).stores.values())

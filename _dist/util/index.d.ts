@@ -628,39 +628,39 @@ declare function striptags(text: string, options?: Partial<StateMachineOptions>)
  */
 declare function deepMerge(target?: object, ...sourceObj: object[]): object;
 /**
- * Tests for whether an object is iterable.
- *
- * @param {*} value - Any value.
- *
- * @returns {boolean} Whether object is iterable.
- */
-declare function isIterable(value: any): boolean;
-/**
  * Tests for whether an object is async iterable.
  *
- * @param {*} value - Any value.
+ * @param {unknown} value - Any value.
  *
  * @returns {boolean} Whether value is async iterable.
  */
-declare function isIterableAsync(value: any): boolean;
+declare function isAsyncIterable(value: unknown): value is AsyncIterable<unknown>;
+/**
+ * Tests for whether an object is iterable.
+ *
+ * @param {unknown} value - Any value.
+ *
+ * @returns {boolean} Whether object is iterable.
+ */
+declare function isIterable(value: unknown): value is Iterable<unknown>;
 /**
  * Tests for whether object is not null and a typeof object.
  *
- * @param {*} value - Any value.
+ * @param {unknown} value - Any value.
  *
  * @returns {boolean} Is it an object.
  */
-declare function isObject(value: any): boolean;
+declare function isObject(value: unknown): value is Record<string, unknown>;
 /**
  * Tests for whether the given value is a plain object.
  *
  * An object is plain if it is created by either: `{}`, `new Object()` or `Object.create(null)`.
  *
- * @param {*} value - Any value
+ * @param {unknown} value - Any value
  *
  * @returns {boolean} Is it a plain object.
  */
-declare function isPlainObject(value: any): boolean;
+declare function isPlainObject(value: unknown): value is JSONObject;
 /**
  * Provides a way to safely access an objects data / entries given an accessor string which describes the
  * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
@@ -668,13 +668,13 @@ declare function isPlainObject(value: any): boolean;
  *
  * @param {object}   data - An object to access entry data.
  *
- * @param {string}   accessor - A string describing the entries to access.
+ * @param {string}   accessor - A string describing the entries to access with keys separated by `.`.
  *
- * @param {*}        defaultValue - (Optional) A default value to return if an entry for accessor is not found.
+ * @param {any}      [defaultValue] - (Optional) A default value to return if an entry for accessor is not found.
  *
  * @returns {object} The data object.
  */
-declare function safeAccess(data: object, accessor: string, defaultValue?: any): object;
+declare function safeAccess(data: object, accessor: string, defaultValue?: any): any;
 /**
  * Provides a way to safely set an objects data / entries given an accessor string which describes the
  * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
@@ -684,17 +684,28 @@ declare function safeAccess(data: object, accessor: string, defaultValue?: any):
  *
  * @param {string}   accessor - A string describing the entries to access.
  *
- * @param {*}        value - A new value to set if an entry for accessor is found.
+ * @param {any}      value - A new value to set if an entry for accessor is found.
  *
- * @param {string}   [operation='set'] - Operation to perform including: 'add', 'div', 'mult', 'set',
- *                                       'set-undefined', 'sub'.
+ * @param {SafeSetOperation}   [operation='set'] - Operation to perform including: 'add', 'div', 'mult', 'set',
+ *        'set-undefined', 'sub'.
  *
  * @param {boolean}  [createMissing=true] - If true missing accessor entries will be created as objects
- *                                          automatically.
+ *        automatically.
  *
  * @returns {boolean} True if successful.
  */
-declare function safeSet(data: object, accessor: string, value: any, operation?: string, createMissing?: boolean): boolean;
+declare function safeSet(data: object, accessor: string, value: any, operation?: SafeSetOperation, createMissing?: boolean): boolean;
+/**
+ * Defines the operation to perform for `safeSet`.
+ */
+type SafeSetOperation = 'add' | 'div' | 'mult' | 'set' | 'set-undefined' | 'sub';
+type Primitive = bigint | boolean | null | number | string | symbol | undefined;
+type JSONValue = Primitive | JSONObject | JSONArray;
+interface JSONObject {
+    [key: string]: JSONValue;
+}
+interface JSONArray extends Array<JSONValue> {
+}
 
 /**
  * Attempts to create a Foundry UUID from standard drop data. This may not work for all systems.
@@ -725,4 +736,4 @@ type ParseDataTransferOptions = {
     types?: string[] | undefined;
 };
 
-export { A11yFocusSource, A11yHelper, BrowserSupports, ClipboardAccess, ManagedPromise, ParseDataTransferOptions, StackingContext, TJSStyleManager, TJSSvelteConfig, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, isTJSSvelteConfig, klona, normalizeString, outroAndDestroy, parseTJSSvelteConfig, safeAccess, safeSet, striptags, styleParsePixels, uuidv4 };
+export { A11yFocusSource, A11yHelper, BrowserSupports, ClipboardAccess, ManagedPromise, ParseDataTransferOptions, StackingContext, TJSStyleManager, TJSSvelteConfig, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isAsyncIterable, isHMRProxy, isIterable, isObject, isPlainObject, isSvelteComponent, isTJSSvelteConfig, klona, normalizeString, outroAndDestroy, parseTJSSvelteConfig, safeAccess, safeSet, striptags, styleParsePixels, uuidv4 };

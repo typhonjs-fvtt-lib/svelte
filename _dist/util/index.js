@@ -4,9 +4,7 @@ import { group_outros, transition_out, check_outros } from 'svelte/internal';
  * Provides common object manipulation utilities including depth traversal, obtaining accessors, safely setting values /
  * equality tests, and validation.
  */
-
 const s_TAG_OBJECT = '[object Object]';
-
 /**
  * Recursively deep merges all source objects into the target object in place. Like `Object.assign` if you provide `{}`
  * as the target a copy is produced. If the target and source property are object literals they are merged.
@@ -18,81 +16,69 @@ const s_TAG_OBJECT = '[object Object]';
  *
  * @returns {object}    Target object.
  */
-function deepMerge(target = {}, ...sourceObj)
-{
-   if (Object.prototype.toString.call(target) !== s_TAG_OBJECT)
-   {
-      throw new TypeError(`deepMerge error: 'target' is not an 'object'.`);
-   }
-
-   for (let cntr = 0; cntr < sourceObj.length; cntr++)
-   {
-      if (Object.prototype.toString.call(sourceObj[cntr]) !== s_TAG_OBJECT)
-      {
-         throw new TypeError(`deepMerge error: 'sourceObj[${cntr}]' is not an 'object'.`);
-      }
-   }
-
-   return _deepMerge(target, ...sourceObj);
+function deepMerge(target = {}, ...sourceObj) {
+    if (Object.prototype.toString.call(target) !== s_TAG_OBJECT) {
+        throw new TypeError(`deepMerge error: 'target' is not an 'object'.`);
+    }
+    for (let cntr = 0; cntr < sourceObj.length; cntr++) {
+        if (Object.prototype.toString.call(sourceObj[cntr]) !== s_TAG_OBJECT) {
+            throw new TypeError(`deepMerge error: 'sourceObj[${cntr}]' is not an 'object'.`);
+        }
+    }
+    return _deepMerge(target, ...sourceObj);
 }
-
-/**
- * Tests for whether an object is iterable.
- *
- * @param {*} value - Any value.
- *
- * @returns {boolean} Whether object is iterable.
- */
-function isIterable(value)
-{
-   if (value === null || value === void 0 || typeof value !== 'object') { return false; }
-
-   return typeof value[Symbol.iterator] === 'function';
-}
-
 /**
  * Tests for whether an object is async iterable.
  *
- * @param {*} value - Any value.
+ * @param {unknown} value - Any value.
  *
  * @returns {boolean} Whether value is async iterable.
  */
-function isIterableAsync(value)
-{
-   if (value === null || value === void 0 || typeof value !== 'object') { return false; }
-
-   return typeof value[Symbol.asyncIterator] === 'function';
+function isAsyncIterable(value) {
+    if (typeof value !== 'object' || value === null || value === void 0) {
+        return false;
+    }
+    return Symbol.asyncIterator in value;
 }
-
+/**
+ * Tests for whether an object is iterable.
+ *
+ * @param {unknown} value - Any value.
+ *
+ * @returns {boolean} Whether object is iterable.
+ */
+function isIterable(value) {
+    if (value === null || value === void 0 || typeof value !== 'object') {
+        return false;
+    }
+    return Symbol.iterator in value;
+}
 /**
  * Tests for whether object is not null and a typeof object.
  *
- * @param {*} value - Any value.
+ * @param {unknown} value - Any value.
  *
  * @returns {boolean} Is it an object.
  */
-function isObject(value)
-{
-   return value !== null && typeof value === 'object';
+function isObject(value) {
+    return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
-
 /**
  * Tests for whether the given value is a plain object.
  *
  * An object is plain if it is created by either: `{}`, `new Object()` or `Object.create(null)`.
  *
- * @param {*} value - Any value
+ * @param {unknown} value - Any value
  *
  * @returns {boolean} Is it a plain object.
  */
-function isPlainObject(value)
-{
-   if (Object.prototype.toString.call(value) !== s_TAG_OBJECT) { return false; }
-
-   const prototype = Object.getPrototypeOf(value);
-   return prototype === null || prototype === Object.prototype;
+function isPlainObject(value) {
+    if (Object.prototype.toString.call(value) !== s_TAG_OBJECT) {
+        return false;
+    }
+    const prototype = Object.getPrototypeOf(value);
+    return prototype === null || prototype === Object.prototype;
 }
-
 /**
  * Provides a way to safely access an objects data / entries given an accessor string which describes the
  * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
@@ -100,31 +86,30 @@ function isPlainObject(value)
  *
  * @param {object}   data - An object to access entry data.
  *
- * @param {string}   accessor - A string describing the entries to access.
+ * @param {string}   accessor - A string describing the entries to access with keys separated by `.`.
  *
- * @param {*}        defaultValue - (Optional) A default value to return if an entry for accessor is not found.
+ * @param {any}      [defaultValue] - (Optional) A default value to return if an entry for accessor is not found.
  *
  * @returns {object} The data object.
  */
-function safeAccess(data, accessor, defaultValue = void 0)
-{
-   if (typeof data !== 'object') { return defaultValue; }
-   if (typeof accessor !== 'string') { return defaultValue; }
-
-   const access = accessor.split('.');
-
-   // Walk through the given object by the accessor indexes.
-   for (let cntr = 0; cntr < access.length; cntr++)
-   {
-      // If the next level of object access is undefined or null then return the empty string.
-      if (typeof data[access[cntr]] === 'undefined' || data[access[cntr]] === null) { return defaultValue; }
-
-      data = data[access[cntr]];
-   }
-
-   return data;
+function safeAccess(data, accessor, defaultValue) {
+    if (typeof data !== 'object') {
+        return defaultValue;
+    }
+    if (typeof accessor !== 'string') {
+        return defaultValue;
+    }
+    const access = accessor.split('.');
+    // Walk through the given object by the accessor indexes.
+    for (let cntr = 0; cntr < access.length; cntr++) {
+        // If the next level of object access is undefined or null then return the empty string.
+        if (typeof data[access[cntr]] === 'undefined' || data[access[cntr]] === null) {
+            return defaultValue;
+        }
+        data = data[access[cntr]];
+    }
+    return data;
 }
-
 /**
  * Provides a way to safely set an objects data / entries given an accessor string which describes the
  * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
@@ -134,78 +119,71 @@ function safeAccess(data, accessor, defaultValue = void 0)
  *
  * @param {string}   accessor - A string describing the entries to access.
  *
- * @param {*}        value - A new value to set if an entry for accessor is found.
+ * @param {any}      value - A new value to set if an entry for accessor is found.
  *
- * @param {string}   [operation='set'] - Operation to perform including: 'add', 'div', 'mult', 'set',
- *                                       'set-undefined', 'sub'.
+ * @param {SafeSetOperation}   [operation='set'] - Operation to perform including: 'add', 'div', 'mult', 'set',
+ *        'set-undefined', 'sub'.
  *
  * @param {boolean}  [createMissing=true] - If true missing accessor entries will be created as objects
- *                                          automatically.
+ *        automatically.
  *
  * @returns {boolean} True if successful.
  */
-function safeSet(data, accessor, value, operation = 'set', createMissing = true)
-{
-   if (typeof data !== 'object') { throw new TypeError(`safeSet Error: 'data' is not an 'object'.`); }
-   if (typeof accessor !== 'string') { throw new TypeError(`safeSet Error: 'accessor' is not a 'string'.`); }
-
-   const access = accessor.split('.');
-
-   // Walk through the given object by the accessor indexes.
-   for (let cntr = 0; cntr < access.length; cntr++)
-   {
-      // If data is an array perform validation that the accessor is a positive integer otherwise quit.
-      if (Array.isArray(data))
-      {
-         const number = (+access[cntr]);
-
-         if (!Number.isInteger(number) || number < 0) { return false; }
-      }
-
-      if (cntr === access.length - 1)
-      {
-         switch (operation)
-         {
-            case 'add':
-               data[access[cntr]] += value;
-               break;
-
-            case 'div':
-               data[access[cntr]] /= value;
-               break;
-
-            case 'mult':
-               data[access[cntr]] *= value;
-               break;
-
-            case 'set':
-               data[access[cntr]] = value;
-               break;
-
-            case 'set-undefined':
-               if (typeof data[access[cntr]] === 'undefined') { data[access[cntr]] = value; }
-               break;
-
-            case 'sub':
-               data[access[cntr]] -= value;
-               break;
-         }
-      }
-      else
-      {
-         // If createMissing is true and the next level of object access is undefined then create a new object entry.
-         if (createMissing && typeof data[access[cntr]] === 'undefined') { data[access[cntr]] = {}; }
-
-         // Abort if the next level is null or not an object and containing a value.
-         if (data[access[cntr]] === null || typeof data[access[cntr]] !== 'object') { return false; }
-
-         data = data[access[cntr]];
-      }
-   }
-
-   return true;
+function safeSet(data, accessor, value, operation = 'set', createMissing = true) {
+    if (typeof data !== 'object') {
+        throw new TypeError(`safeSet Error: 'data' is not an 'object'.`);
+    }
+    if (typeof accessor !== 'string') {
+        throw new TypeError(`safeSet Error: 'accessor' is not a 'string'.`);
+    }
+    const access = accessor.split('.');
+    // Walk through the given object by the accessor indexes.
+    for (let cntr = 0; cntr < access.length; cntr++) {
+        // If data is an array perform validation that the accessor is a positive integer otherwise quit.
+        if (Array.isArray(data)) {
+            const number = (+access[cntr]);
+            if (!Number.isInteger(number) || number < 0) {
+                return false;
+            }
+        }
+        if (cntr === access.length - 1) {
+            switch (operation) {
+                case 'add':
+                    data[access[cntr]] += value;
+                    break;
+                case 'div':
+                    data[access[cntr]] /= value;
+                    break;
+                case 'mult':
+                    data[access[cntr]] *= value;
+                    break;
+                case 'set':
+                    data[access[cntr]] = value;
+                    break;
+                case 'set-undefined':
+                    if (typeof data[access[cntr]] === 'undefined') {
+                        data[access[cntr]] = value;
+                    }
+                    break;
+                case 'sub':
+                    data[access[cntr]] -= value;
+                    break;
+            }
+        }
+        else {
+            // If createMissing is true and the next level of object access is undefined then create a new object entry.
+            if (createMissing && typeof data[access[cntr]] === 'undefined') {
+                data[access[cntr]] = {};
+            }
+            // Abort if the next level is null or not an object and containing a value.
+            if (data[access[cntr]] === null || typeof data[access[cntr]] !== 'object') {
+                return false;
+            }
+            data = data[access[cntr]];
+        }
+    }
+    return true;
 }
-
 /**
  * Internal implementation for `deepMerge`.
  *
@@ -215,33 +193,25 @@ function safeSet(data, accessor, value, operation = 'set', createMissing = true)
  *
  * @returns {object}    Target object.
  */
-function _deepMerge(target = {}, ...sourceObj)
-{
-   // Iterate and merge all source objects into target.
-   for (let cntr = 0; cntr < sourceObj.length; cntr++)
-   {
-      const obj = sourceObj[cntr];
-
-      for (const prop in obj)
-      {
-         if (Object.prototype.hasOwnProperty.call(obj, prop))
-         {
-            // Handle the special property starting with '-=' to delete keys.
-            if (prop.startsWith('-='))
-            {
-               delete target[prop.slice(2)];
-               continue;
+function _deepMerge(target = {}, ...sourceObj) {
+    // Iterate and merge all source objects into target.
+    for (let cntr = 0; cntr < sourceObj.length; cntr++) {
+        const obj = sourceObj[cntr];
+        for (const prop in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+                // Handle the special property starting with '-=' to delete keys.
+                if (prop.startsWith('-=')) {
+                    delete target[prop.slice(2)];
+                    continue;
+                }
+                // If target already has prop and both target[prop] and obj[prop] are object literals then merge them
+                // otherwise assign obj[prop] to target[prop].
+                target[prop] = Object.prototype.hasOwnProperty.call(target, prop) && target[prop]?.constructor === Object &&
+                    obj[prop]?.constructor === Object ? _deepMerge({}, target[prop], obj[prop]) : obj[prop];
             }
-
-            // If target already has prop and both target[prop] and obj[prop] are object literals then merge them
-            // otherwise assign obj[prop] to target[prop].
-            target[prop] = Object.prototype.hasOwnProperty.call(target, prop) && target[prop]?.constructor === Object &&
-            obj[prop]?.constructor === Object ? _deepMerge({}, target[prop], obj[prop]) : obj[prop];
-         }
-      }
-   }
-
-   return target;
+        }
+    }
+    return target;
 }
 
 /**
@@ -2364,5 +2334,5 @@ function getUUIDFromDataTransfer(data, { actor = true, compendium = true, world 
  * @property {string[]|undefined}   [types] - Require the `data.type` to match entry in `types`.
  */
 
-export { A11yHelper, BrowserSupports, ClipboardAccess, ManagedPromise, TJSStyleManager, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isHMRProxy, isIterable, isIterableAsync, isObject, isPlainObject, isSvelteComponent, isTJSSvelteConfig, klona, normalizeString, outroAndDestroy, parseTJSSvelteConfig, safeAccess, safeSet, striptags, styleParsePixels, uuidv4 };
+export { A11yHelper, BrowserSupports, ClipboardAccess, ManagedPromise, TJSStyleManager, debounce, deepMerge, getStackingContext, getUUIDFromDataTransfer, hasAccessor, hasGetter, hasPrototype, hasSetter, hashCode, isApplicationShell, isAsyncIterable, isHMRProxy, isIterable, isObject, isPlainObject, isSvelteComponent, isTJSSvelteConfig, klona, normalizeString, outroAndDestroy, parseTJSSvelteConfig, safeAccess, safeSet, striptags, styleParsePixels, uuidv4 };
 //# sourceMappingURL=index.js.map

@@ -1,10 +1,11 @@
 import { propertyStore, subscribeIgnoreFirst } from '@typhonjs-fvtt/svelte/store';
 import { isObject, isPlainObject, isIterable, hasSetter, styleParsePixels } from '@typhonjs-fvtt/svelte/util';
 import { cubicOut, linear } from 'svelte/easing';
-import { degToRad, lerp } from '@typhonjs-fvtt/svelte/math';
+import { lerp } from '@typhonjs-fvtt/svelte/math';
 import { writable } from 'svelte/store';
-import { Vec3, Mat4 } from '@typhonjs-fvtt/svelte/math/gl-matrix';
+import { Vec3, Mat4 } from '@typhonjs-svelte/runtime-base/math/gl-matrix';
 import { nextAnimationFrame } from '@typhonjs-fvtt/svelte/animate';
+import { degToRad } from '@typhonjs-svelte/runtime-base/math/util';
 
 /**
  * Provides a TJSBasicAnimation implementation for TJSPosition animation.
@@ -2831,21 +2832,21 @@ class TJSTransformData
     * Stores the individual transformed corner points of the window in screen space clockwise from:
     * top left -> top right -> bottom right -> bottom left.
     *
-    * @type {import('#svelte-lib/math/gl-matrix').Vec3[]}
+    * @type {import('#runtime/math/gl-matrix').Vec3[]}
     */
    #corners = [Vec3.create(), Vec3.create(), Vec3.create(), Vec3.create()];
 
    /**
     * Stores the current gl-matrix Mat4 data.
     *
-    * @type {import('#svelte-lib/math/gl-matrix').Mat4}
+    * @type {import('#runtime/math/gl-matrix').Mat4}
     */
    #mat4 = Mat4.create();
 
    /**
     * Stores the pre & post origin translations to apply to matrix transforms.
     *
-    * @type {import('#svelte-lib/math/gl-matrix').Mat4[]}
+    * @type {import('#runtime/math/gl-matrix').Mat4[]}
     */
    #originTranslations = [Mat4.create(), Mat4.create()];
 
@@ -2855,7 +2856,7 @@ class TJSTransformData
    get boundingRect() { return this.#boundingRect; }
 
    /**
-    * @returns {import('#svelte-lib/math/gl-matrix').Vec3[]} The transformed corner points as Vec3 in screen space.
+    * @returns {import('#runtime/math/gl-matrix').Vec3[]} The transformed corner points as Vec3 in screen space.
     */
    get corners() { return this.#corners; }
 
@@ -2865,14 +2866,787 @@ class TJSTransformData
    get css() { return `matrix3d(${this.mat4.join(',')})`; }
 
    /**
-    * @returns {import('#svelte-lib/math/gl-matrix').Mat4} The transform matrix.
+    * @returns {import('#runtime/math/gl-matrix').Mat4} The transform matrix.
     */
    get mat4() { return this.#mat4; }
 
    /**
-    * @returns {import('#svelte-lib/math/gl-matrix').Mat4[]} The pre / post translation matrices for origin translation.
+    * @returns {import('#runtime/math/gl-matrix').Mat4[]} The pre / post translation matrices for origin translation.
     */
    get originTranslations() { return this.#originTranslations; }
+}
+
+/** @type {number[]} */
+const s_SCALE_VECTOR = [1, 1, 1];
+
+/** @type {number[]} */
+const s_TRANSLATE_VECTOR = [0, 0, 0];
+
+/** @type {import('#runtime/math/gl-matrix').Mat4} */
+const s_MAT4_RESULT = Mat4.create();
+
+/** @type {import('#runtime/math/gl-matrix').Mat4} */
+const s_MAT4_TEMP = Mat4.create();
+
+/** @type {import('#runtime/math/gl-matrix').Vec3} */
+const s_VEC3_TEMP = Vec3.create();
+
+class TJSTransforms
+{
+   /**
+    * Stores the transform keys in the order added.
+    *
+    * @type {string[]}
+    */
+   #orderList = [];
+
+   constructor()
+   {
+      this._data = {};
+   }
+
+   /**
+    * @returns {boolean} Whether there are active transforms in local data.
+    */
+   get isActive() { return this.#orderList.length > 0; }
+
+   /**
+    * @returns {number|undefined} Any local rotateX data.
+    */
+   get rotateX() { return this._data.rotateX; }
+
+   /**
+    * @returns {number|undefined} Any local rotateY data.
+    */
+   get rotateY() { return this._data.rotateY; }
+
+   /**
+    * @returns {number|undefined} Any local rotateZ data.
+    */
+   get rotateZ() { return this._data.rotateZ; }
+
+   /**
+    * @returns {number|undefined} Any local rotateZ scale.
+    */
+   get scale() { return this._data.scale; }
+
+   /**
+    * @returns {number|undefined} Any local translateZ data.
+    */
+   get translateX() { return this._data.translateX; }
+
+   /**
+    * @returns {number|undefined} Any local translateZ data.
+    */
+   get translateY() { return this._data.translateY; }
+
+   /**
+    * @returns {number|undefined} Any local translateZ data.
+    */
+   get translateZ() { return this._data.translateZ; }
+
+   /**
+    * Sets the local rotateX data if the value is a finite number otherwise removes the local data.
+    *
+    * @param {number|null|undefined}   value - A value to set.
+    */
+   set rotateX(value)
+   {
+      if (Number.isFinite(value))
+      {
+         if (this._data.rotateX === void 0) { this.#orderList.push('rotateX'); }
+
+         this._data.rotateX = value;
+      }
+      else
+      {
+         if (this._data.rotateX !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'rotateX');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
+
+         delete this._data.rotateX;
+      }
+   }
+
+   /**
+    * Sets the local rotateY data if the value is a finite number otherwise removes the local data.
+    *
+    * @param {number|null|undefined}   value - A value to set.
+    */
+   set rotateY(value)
+   {
+      if (Number.isFinite(value))
+      {
+         if (this._data.rotateY === void 0) { this.#orderList.push('rotateY'); }
+
+         this._data.rotateY = value;
+      }
+      else
+      {
+         if (this._data.rotateY !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'rotateY');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
+
+         delete this._data.rotateY;
+      }
+   }
+
+   /**
+    * Sets the local rotateZ data if the value is a finite number otherwise removes the local data.
+    *
+    * @param {number|null|undefined}   value - A value to set.
+    */
+   set rotateZ(value)
+   {
+      if (Number.isFinite(value))
+      {
+         if (this._data.rotateZ === void 0) { this.#orderList.push('rotateZ'); }
+
+         this._data.rotateZ = value;
+      }
+
+      else
+      {
+         if (this._data.rotateZ !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'rotateZ');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
+
+         delete this._data.rotateZ;
+      }
+   }
+
+   /**
+    * Sets the local scale data if the value is a finite number otherwise removes the local data.
+    *
+    * @param {number|null|undefined}   value - A value to set.
+    */
+   set scale(value)
+   {
+      if (Number.isFinite(value))
+      {
+         if (this._data.scale === void 0) { this.#orderList.push('scale'); }
+
+         this._data.scale = value;
+      }
+      else
+      {
+         if (this._data.scale !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'scale');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
+
+         delete this._data.scale;
+      }
+   }
+
+   /**
+    * Sets the local translateX data if the value is a finite number otherwise removes the local data.
+    *
+    * @param {number|null|undefined}   value - A value to set.
+    */
+   set translateX(value)
+   {
+      if (Number.isFinite(value))
+      {
+         if (this._data.translateX === void 0) { this.#orderList.push('translateX'); }
+
+         this._data.translateX = value;
+      }
+
+      else
+      {
+         if (this._data.translateX !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'translateX');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
+
+         delete this._data.translateX;
+      }
+   }
+
+   /**
+    * Sets the local translateY data if the value is a finite number otherwise removes the local data.
+    *
+    * @param {number|null|undefined}   value - A value to set.
+    */
+   set translateY(value)
+   {
+      if (Number.isFinite(value))
+      {
+         if (this._data.translateY === void 0) { this.#orderList.push('translateY'); }
+
+         this._data.translateY = value;
+      }
+
+      else
+      {
+         if (this._data.translateY !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'translateY');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
+
+         delete this._data.translateY;
+      }
+   }
+
+   /**
+    * Sets the local translateZ data if the value is a finite number otherwise removes the local data.
+    *
+    * @param {number|null|undefined}   value - A value to set.
+    */
+   set translateZ(value)
+   {
+      if (Number.isFinite(value))
+      {
+         if (this._data.translateZ === void 0) { this.#orderList.push('translateZ'); }
+
+         this._data.translateZ = value;
+      }
+
+      else
+      {
+         if (this._data.translateZ !== void 0)
+         {
+            const index = this.#orderList.findIndex((entry) => entry === 'translateZ');
+            if (index >= 0) { this.#orderList.splice(index, 1); }
+         }
+
+         delete this._data.translateZ;
+      }
+   }
+
+   /**
+    * Returns the matrix3d CSS transform for the given position / transform data.
+    *
+    * @param {object} [data] - Optional position data otherwise use local stored transform data.
+    *
+    * @returns {string} The CSS matrix3d string.
+    */
+   getCSS(data = this._data)
+   {
+      return `matrix3d(${this.getMat4(data, s_MAT4_RESULT).join(',')})`;
+   }
+
+   /**
+    * Returns the matrix3d CSS transform for the given position / transform data.
+    *
+    * @param {object} [data] - Optional position data otherwise use local stored transform data.
+    *
+    * @returns {string} The CSS matrix3d string.
+    */
+   getCSSOrtho(data = this._data)
+   {
+      return `matrix3d(${this.getMat4Ortho(data, s_MAT4_RESULT).join(',')})`;
+   }
+
+   /**
+    * Collects all data including a bounding rect, transform matrix, and points array of the given {@link TJSPositionData}
+    * instance with the applied local transform data.
+    *
+    * @param {import('../').TJSPositionData} position - The position data to process.
+    *
+    * @param {TJSTransformData} [output] - Optional TJSTransformData output instance.
+    *
+    * @param {object} [validationData] - Optional validation data for adjustment parameters.
+    *
+    * @returns {TJSTransformData} The output TJSTransformData instance.
+    */
+   getData(position, output = new TJSTransformData(), validationData = {})
+   {
+      const valWidth = validationData.width ?? 0;
+      const valHeight = validationData.height ?? 0;
+      const valOffsetTop = validationData.offsetTop ?? validationData.marginTop ?? 0;
+      const valOffsetLeft = validationData.offsetLeft ?? validationData.offsetLeft ?? 0;
+
+      position.top += valOffsetTop;
+      position.left += valOffsetLeft;
+
+      const width = Number.isFinite(position.width) ? position.width : valWidth;
+      const height = Number.isFinite(position.height) ? position.height : valHeight;
+
+      const rect = output.corners;
+
+      if (this.hasTransform(position))
+      {
+         rect[0][0] = rect[0][1] = rect[0][2] = 0;
+         rect[1][0] = width;
+         rect[1][1] = rect[1][2] = 0;
+         rect[2][0] = width;
+         rect[2][1] = height;
+         rect[2][2] = 0;
+         rect[3][0] = 0;
+         rect[3][1] = height;
+         rect[3][2] = 0;
+
+         const matrix = this.getMat4(position, output.mat4);
+
+         const translate = s_GET_ORIGIN_TRANSLATION(position.transformOrigin, width, height, output.originTranslations);
+
+         if (transformOriginDefault === position.transformOrigin)
+         {
+            Vec3.transformMat4(rect[0], rect[0], matrix);
+            Vec3.transformMat4(rect[1], rect[1], matrix);
+            Vec3.transformMat4(rect[2], rect[2], matrix);
+            Vec3.transformMat4(rect[3], rect[3], matrix);
+         }
+         else
+         {
+            Vec3.transformMat4(rect[0], rect[0], translate[0]);
+            Vec3.transformMat4(rect[0], rect[0], matrix);
+            Vec3.transformMat4(rect[0], rect[0], translate[1]);
+
+            Vec3.transformMat4(rect[1], rect[1], translate[0]);
+            Vec3.transformMat4(rect[1], rect[1], matrix);
+            Vec3.transformMat4(rect[1], rect[1], translate[1]);
+
+            Vec3.transformMat4(rect[2], rect[2], translate[0]);
+            Vec3.transformMat4(rect[2], rect[2], matrix);
+            Vec3.transformMat4(rect[2], rect[2], translate[1]);
+
+            Vec3.transformMat4(rect[3], rect[3], translate[0]);
+            Vec3.transformMat4(rect[3], rect[3], matrix);
+            Vec3.transformMat4(rect[3], rect[3], translate[1]);
+         }
+
+         rect[0][0] = position.left + rect[0][0];
+         rect[0][1] = position.top + rect[0][1];
+         rect[1][0] = position.left + rect[1][0];
+         rect[1][1] = position.top + rect[1][1];
+         rect[2][0] = position.left + rect[2][0];
+         rect[2][1] = position.top + rect[2][1];
+         rect[3][0] = position.left + rect[3][0];
+         rect[3][1] = position.top + rect[3][1];
+      }
+      else
+      {
+         rect[0][0] = position.left;
+         rect[0][1] = position.top;
+         rect[1][0] = position.left + width;
+         rect[1][1] = position.top;
+         rect[2][0] = position.left + width;
+         rect[2][1] = position.top + height;
+         rect[3][0] = position.left;
+         rect[3][1] = position.top + height;
+
+         Mat4.identity(output.mat4);
+      }
+
+      let maxX = Number.MIN_SAFE_INTEGER;
+      let maxY = Number.MIN_SAFE_INTEGER;
+      let minX = Number.MAX_SAFE_INTEGER;
+      let minY = Number.MAX_SAFE_INTEGER;
+
+      for (let cntr = 4; --cntr >= 0;)
+      {
+         if (rect[cntr][0] > maxX) { maxX = rect[cntr][0]; }
+         if (rect[cntr][0] < minX) { minX = rect[cntr][0]; }
+         if (rect[cntr][1] > maxY) { maxY = rect[cntr][1]; }
+         if (rect[cntr][1] < minY) { minY = rect[cntr][1]; }
+      }
+
+      const boundingRect = output.boundingRect;
+      boundingRect.x = minX;
+      boundingRect.y = minY;
+      boundingRect.width = maxX - minX;
+      boundingRect.height = maxY - minY;
+
+      position.top -= valOffsetTop;
+      position.left -= valOffsetLeft;
+
+      return output;
+   }
+
+   /**
+    * Creates a transform matrix based on local data applied in order it was added.
+    *
+    * If no data object is provided then the source is the local transform data. If another data object is supplied
+    * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
+    * construction of a transform matrix in advance of setting local data and is useful in collision detection.
+    *
+    * @param {object}   [data] - TJSPositionData instance or local transform data.
+    *
+    * @param {import('#runtime/math/gl-matrix').Mat4}  [output] - The output mat4 instance.
+    *
+    * @returns {import('#runtime/math/gl-matrix').Mat4} Transform matrix.
+    */
+   getMat4(data = this._data, output = Mat4.create())
+   {
+      const matrix = Mat4.identity(output);
+
+      // Bitwise tracks applied transform keys from local transform data.
+      let seenKeys = 0;
+
+      const orderList = this.#orderList;
+
+      // First apply ordered transforms from local transform data.
+      for (let cntr = 0; cntr < orderList.length; cntr++)
+      {
+         const key = orderList[cntr];
+
+         switch (key)
+         {
+            case 'rotateX':
+               seenKeys |= transformKeysBitwise.rotateX;
+               Mat4.multiply(matrix, matrix, Mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
+               break;
+
+            case 'rotateY':
+               seenKeys |= transformKeysBitwise.rotateY;
+               Mat4.multiply(matrix, matrix, Mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
+               break;
+
+            case 'rotateZ':
+               seenKeys |= transformKeysBitwise.rotateZ;
+               Mat4.multiply(matrix, matrix, Mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
+               break;
+
+            case 'scale':
+               seenKeys |= transformKeysBitwise.scale;
+               s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data[key];
+               Mat4.multiply(matrix, matrix, Mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
+               break;
+
+            case 'translateX':
+               seenKeys |= transformKeysBitwise.translateX;
+               s_TRANSLATE_VECTOR[0] = data.translateX;
+               s_TRANSLATE_VECTOR[1] = 0;
+               s_TRANSLATE_VECTOR[2] = 0;
+               Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+               break;
+
+            case 'translateY':
+               seenKeys |= transformKeysBitwise.translateY;
+               s_TRANSLATE_VECTOR[0] = 0;
+               s_TRANSLATE_VECTOR[1] = data.translateY;
+               s_TRANSLATE_VECTOR[2] = 0;
+               Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+               break;
+
+            case 'translateZ':
+               seenKeys |= transformKeysBitwise.translateZ;
+               s_TRANSLATE_VECTOR[0] = 0;
+               s_TRANSLATE_VECTOR[1] = 0;
+               s_TRANSLATE_VECTOR[2] = data.translateZ;
+               Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+               break;
+         }
+      }
+
+      // Now apply any new keys not set in local transform data that have not been applied yet.
+      if (data !== this._data)
+      {
+         for (let cntr = 0; cntr < transformKeys.length; cntr++)
+         {
+            const key = transformKeys[cntr];
+
+            // Reject bad / no data or if the key has already been applied.
+            if (data[key] === null || (seenKeys & transformKeysBitwise[key]) > 0) { continue; }
+
+            switch (key)
+            {
+               case 'rotateX':
+                  Mat4.multiply(matrix, matrix, Mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+
+               case 'rotateY':
+                  Mat4.multiply(matrix, matrix, Mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+
+               case 'rotateZ':
+                  Mat4.multiply(matrix, matrix, Mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+
+               case 'scale':
+                  s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data[key];
+                  Mat4.multiply(matrix, matrix, Mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
+                  break;
+
+               case 'translateX':
+                  s_TRANSLATE_VECTOR[0] = data[key];
+                  s_TRANSLATE_VECTOR[1] = 0;
+                  s_TRANSLATE_VECTOR[2] = 0;
+                  Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+                  break;
+
+               case 'translateY':
+                  s_TRANSLATE_VECTOR[0] = 0;
+                  s_TRANSLATE_VECTOR[1] = data[key];
+                  s_TRANSLATE_VECTOR[2] = 0;
+                  Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+                  break;
+
+               case 'translateZ':
+                  s_TRANSLATE_VECTOR[0] = 0;
+                  s_TRANSLATE_VECTOR[1] = 0;
+                  s_TRANSLATE_VECTOR[2] = data[key];
+                  Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+                  break;
+            }
+         }
+      }
+
+      return matrix;
+   }
+
+   /**
+    * Provides an orthographic enhancement to convert left / top positional data to a translate operation.
+    *
+    * This transform matrix takes into account that the remaining operations are , but adds any left / top attributes from passed in data to
+    * translate X / Y.
+    *
+    * If no data object is provided then the source is the local transform data. If another data object is supplied
+    * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
+    * construction of a transform matrix in advance of setting local data and is useful in collision detection.
+    *
+    * @param {object}   [data] - TJSPositionData instance or local transform data.
+    *
+    * @param {import('#runtime/math/gl-matrix').Mat4}  [output] - The output mat4 instance.
+    *
+    * @returns {import('#runtime/math/gl-matrix').Mat4} Transform matrix.
+    */
+   getMat4Ortho(data = this._data, output = Mat4.create())
+   {
+      const matrix = Mat4.identity(output);
+
+      // Attempt to retrieve values from passed in data otherwise default to 0.
+      // Always perform the translation last regardless of order added to local transform data.
+      // Add data.left to translateX and data.top to translateY.
+      s_TRANSLATE_VECTOR[0] = (data.left ?? 0) + (data.translateX ?? 0);
+      s_TRANSLATE_VECTOR[1] = (data.top ?? 0) + (data.translateY ?? 0);
+      s_TRANSLATE_VECTOR[2] = data.translateZ ?? 0;
+      Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
+
+      // Scale can also be applied out of order.
+      if (data.scale !== null)
+      {
+         s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data.scale;
+         Mat4.multiply(matrix, matrix, Mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
+      }
+
+      // Early out if there is not rotation data.
+      if (data.rotateX === null && data.rotateY === null && data.rotateZ === null) { return matrix; }
+
+      // Rotation transforms must be applied in the order they are added.
+
+      // Bitwise tracks applied transform keys from local transform data.
+      let seenKeys = 0;
+
+      const orderList = this.#orderList;
+
+      // First apply ordered transforms from local transform data.
+      for (let cntr = 0; cntr < orderList.length; cntr++)
+      {
+         const key = orderList[cntr];
+
+         switch (key)
+         {
+            case 'rotateX':
+               seenKeys |= transformKeysBitwise.rotateX;
+               Mat4.multiply(matrix, matrix, Mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
+               break;
+
+            case 'rotateY':
+               seenKeys |= transformKeysBitwise.rotateY;
+               Mat4.multiply(matrix, matrix, Mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
+               break;
+
+            case 'rotateZ':
+               seenKeys |= transformKeysBitwise.rotateZ;
+               Mat4.multiply(matrix, matrix, Mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
+               break;
+         }
+      }
+
+      // Now apply any new keys not set in local transform data that have not been applied yet.
+      if (data !== this._data)
+      {
+         for (let cntr = 0; cntr < transformKeys.length; cntr++)
+         {
+            const key = transformKeys[cntr];
+
+            // Reject bad / no data or if the key has already been applied.
+            if (data[key] === null || (seenKeys & transformKeysBitwise[key]) > 0) { continue; }
+
+            switch (key)
+            {
+               case 'rotateX':
+                  Mat4.multiply(matrix, matrix, Mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+
+               case 'rotateY':
+                  Mat4.multiply(matrix, matrix, Mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+
+               case 'rotateZ':
+                  Mat4.multiply(matrix, matrix, Mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
+                  break;
+            }
+         }
+      }
+
+      return matrix;
+   }
+
+   /**
+    * Tests an object if it contains transform keys and the values are finite numbers.
+    *
+    * @param {object} data - An object to test for transform data.
+    *
+    * @returns {boolean} Whether the given TJSPositionData has transforms.
+    */
+   hasTransform(data)
+   {
+      for (const key of transformKeys)
+      {
+         if (Number.isFinite(data[key])) { return true; }
+      }
+
+      return false;
+   }
+
+   /**
+    * Resets internal data from the given object containing valid transform keys.
+    *
+    * @param {object}   data - An object with transform data.
+    */
+   reset(data)
+   {
+      for (const key in data)
+      {
+         if (transformKeys.includes(key))
+         {
+            if (Number.isFinite(data[key]))
+            {
+               this._data[key] = data[key];
+            }
+            else
+            {
+               const index = this.#orderList.findIndex((entry) => entry === key);
+               if (index >= 0) { this.#orderList.splice(index, 1); }
+
+               delete this._data[key];
+            }
+         }
+      }
+   }
+}
+
+/**
+ * Returns the translations necessary to translate a matrix operation based on the `transformOrigin` parameter of the
+ * given position instance. The first entry / index 0 is the pre-translation and last entry / index 1 is the post-
+ * translation.
+ *
+ * This method is used internally, but may be useful if you need the origin translation matrices to transform
+ * bespoke points based on any `transformOrigin` set in {@link TJSPositionData}.
+ *
+ * @param {string}   transformOrigin - The transform origin attribute from TJSPositionData.
+ *
+ * @param {number}   width - The TJSPositionData width or validation data width when 'auto'.
+ *
+ * @param {number}   height - The TJSPositionData height or validation data height when 'auto'.
+ *
+ * @param {import('#runtime/math/gl-matrix').Mat4[]}   output - Output Mat4 array.
+ *
+ * @returns {import('#runtime/math/gl-matrix').Mat4[]} Output Mat4 array.
+ */
+function s_GET_ORIGIN_TRANSLATION(transformOrigin, width, height, output)
+{
+   const vector = s_VEC3_TEMP;
+
+   switch (transformOrigin)
+   {
+      case 'top left':
+         vector[0] = vector[1] = 0;
+         Mat4.fromTranslation(output[0], vector);
+         Mat4.fromTranslation(output[1], vector);
+         break;
+
+      case 'top center':
+         vector[0] = -width * 0.5;
+         vector[1] = 0;
+         Mat4.fromTranslation(output[0], vector);
+         vector[0] = width * 0.5;
+         Mat4.fromTranslation(output[1], vector);
+         break;
+
+      case 'top right':
+         vector[0] = -width;
+         vector[1] = 0;
+         Mat4.fromTranslation(output[0], vector);
+         vector[0] = width;
+         Mat4.fromTranslation(output[1], vector);
+         break;
+
+      case 'center left':
+         vector[0] = 0;
+         vector[1] = -height * 0.5;
+         Mat4.fromTranslation(output[0], vector);
+         vector[1] = height * 0.5;
+         Mat4.fromTranslation(output[1], vector);
+         break;
+
+      case null: // By default null / no transform is center.
+      case 'center':
+         vector[0] = -width * 0.5;
+         vector[1] = -height * 0.5;
+         Mat4.fromTranslation(output[0], vector);
+         vector[0] = width * 0.5;
+         vector[1] = height * 0.5;
+         Mat4.fromTranslation(output[1], vector);
+         break;
+
+      case 'center right':
+         vector[0] = -width;
+         vector[1] = -height * 0.5;
+         Mat4.fromTranslation(output[0], vector);
+         vector[0] = width;
+         vector[1] = height * 0.5;
+         Mat4.fromTranslation(output[1], vector);
+         break;
+
+      case 'bottom left':
+         vector[0] = 0;
+         vector[1] = -height;
+         Mat4.fromTranslation(output[0], vector);
+         vector[1] = height;
+         Mat4.fromTranslation(output[1], vector);
+         break;
+
+      case 'bottom center':
+         vector[0] = -width * 0.5;
+         vector[1] = -height;
+         Mat4.fromTranslation(output[0], vector);
+         vector[0] = width * 0.5;
+         vector[1] = height;
+         Mat4.fromTranslation(output[1], vector);
+         break;
+
+      case 'bottom right':
+         vector[0] = -width;
+         vector[1] = -height;
+         Mat4.fromTranslation(output[0], vector);
+         vector[0] = width;
+         vector[1] = height;
+         Mat4.fromTranslation(output[1], vector);
+         break;
+
+      // No valid transform origin parameter; set identity.
+      default:
+         Mat4.identity(output[0]);
+         Mat4.identity(output[1]);
+         break;
+   }
+
+   return output;
 }
 
 /**
@@ -3603,779 +4377,6 @@ class TransformBounds
 
       return valData.position;
    }
-}
-
-/** @type {number[]} */
-const s_SCALE_VECTOR = [1, 1, 1];
-
-/** @type {number[]} */
-const s_TRANSLATE_VECTOR = [0, 0, 0];
-
-/** @type {import('#svelte-lib/math/gl-matrix').Mat4} */
-const s_MAT4_RESULT = Mat4.create();
-
-/** @type {import('#svelte-lib/math/gl-matrix').Mat4} */
-const s_MAT4_TEMP = Mat4.create();
-
-/** @type {import('#svelte-lib/math/gl-matrix').Vec3} */
-const s_VEC3_TEMP = Vec3.create();
-
-class TJSTransforms
-{
-   /**
-    * Stores the transform keys in the order added.
-    *
-    * @type {string[]}
-    */
-   #orderList = [];
-
-   constructor()
-   {
-      this._data = {};
-   }
-
-   /**
-    * @returns {boolean} Whether there are active transforms in local data.
-    */
-   get isActive() { return this.#orderList.length > 0; }
-
-   /**
-    * @returns {number|undefined} Any local rotateX data.
-    */
-   get rotateX() { return this._data.rotateX; }
-
-   /**
-    * @returns {number|undefined} Any local rotateY data.
-    */
-   get rotateY() { return this._data.rotateY; }
-
-   /**
-    * @returns {number|undefined} Any local rotateZ data.
-    */
-   get rotateZ() { return this._data.rotateZ; }
-
-   /**
-    * @returns {number|undefined} Any local rotateZ scale.
-    */
-   get scale() { return this._data.scale; }
-
-   /**
-    * @returns {number|undefined} Any local translateZ data.
-    */
-   get translateX() { return this._data.translateX; }
-
-   /**
-    * @returns {number|undefined} Any local translateZ data.
-    */
-   get translateY() { return this._data.translateY; }
-
-   /**
-    * @returns {number|undefined} Any local translateZ data.
-    */
-   get translateZ() { return this._data.translateZ; }
-
-   /**
-    * Sets the local rotateX data if the value is a finite number otherwise removes the local data.
-    *
-    * @param {number|null|undefined}   value - A value to set.
-    */
-   set rotateX(value)
-   {
-      if (Number.isFinite(value))
-      {
-         if (this._data.rotateX === void 0) { this.#orderList.push('rotateX'); }
-
-         this._data.rotateX = value;
-      }
-      else
-      {
-         if (this._data.rotateX !== void 0)
-         {
-            const index = this.#orderList.findIndex((entry) => entry === 'rotateX');
-            if (index >= 0) { this.#orderList.splice(index, 1); }
-         }
-
-         delete this._data.rotateX;
-      }
-   }
-
-   /**
-    * Sets the local rotateY data if the value is a finite number otherwise removes the local data.
-    *
-    * @param {number|null|undefined}   value - A value to set.
-    */
-   set rotateY(value)
-   {
-      if (Number.isFinite(value))
-      {
-         if (this._data.rotateY === void 0) { this.#orderList.push('rotateY'); }
-
-         this._data.rotateY = value;
-      }
-      else
-      {
-         if (this._data.rotateY !== void 0)
-         {
-            const index = this.#orderList.findIndex((entry) => entry === 'rotateY');
-            if (index >= 0) { this.#orderList.splice(index, 1); }
-         }
-
-         delete this._data.rotateY;
-      }
-   }
-
-   /**
-    * Sets the local rotateZ data if the value is a finite number otherwise removes the local data.
-    *
-    * @param {number|null|undefined}   value - A value to set.
-    */
-   set rotateZ(value)
-   {
-      if (Number.isFinite(value))
-      {
-         if (this._data.rotateZ === void 0) { this.#orderList.push('rotateZ'); }
-
-         this._data.rotateZ = value;
-      }
-
-      else
-      {
-         if (this._data.rotateZ !== void 0)
-         {
-            const index = this.#orderList.findIndex((entry) => entry === 'rotateZ');
-            if (index >= 0) { this.#orderList.splice(index, 1); }
-         }
-
-         delete this._data.rotateZ;
-      }
-   }
-
-   /**
-    * Sets the local scale data if the value is a finite number otherwise removes the local data.
-    *
-    * @param {number|null|undefined}   value - A value to set.
-    */
-   set scale(value)
-   {
-      if (Number.isFinite(value))
-      {
-         if (this._data.scale === void 0) { this.#orderList.push('scale'); }
-
-         this._data.scale = value;
-      }
-      else
-      {
-         if (this._data.scale !== void 0)
-         {
-            const index = this.#orderList.findIndex((entry) => entry === 'scale');
-            if (index >= 0) { this.#orderList.splice(index, 1); }
-         }
-
-         delete this._data.scale;
-      }
-   }
-
-   /**
-    * Sets the local translateX data if the value is a finite number otherwise removes the local data.
-    *
-    * @param {number|null|undefined}   value - A value to set.
-    */
-   set translateX(value)
-   {
-      if (Number.isFinite(value))
-      {
-         if (this._data.translateX === void 0) { this.#orderList.push('translateX'); }
-
-         this._data.translateX = value;
-      }
-
-      else
-      {
-         if (this._data.translateX !== void 0)
-         {
-            const index = this.#orderList.findIndex((entry) => entry === 'translateX');
-            if (index >= 0) { this.#orderList.splice(index, 1); }
-         }
-
-         delete this._data.translateX;
-      }
-   }
-
-   /**
-    * Sets the local translateY data if the value is a finite number otherwise removes the local data.
-    *
-    * @param {number|null|undefined}   value - A value to set.
-    */
-   set translateY(value)
-   {
-      if (Number.isFinite(value))
-      {
-         if (this._data.translateY === void 0) { this.#orderList.push('translateY'); }
-
-         this._data.translateY = value;
-      }
-
-      else
-      {
-         if (this._data.translateY !== void 0)
-         {
-            const index = this.#orderList.findIndex((entry) => entry === 'translateY');
-            if (index >= 0) { this.#orderList.splice(index, 1); }
-         }
-
-         delete this._data.translateY;
-      }
-   }
-
-   /**
-    * Sets the local translateZ data if the value is a finite number otherwise removes the local data.
-    *
-    * @param {number|null|undefined}   value - A value to set.
-    */
-   set translateZ(value)
-   {
-      if (Number.isFinite(value))
-      {
-         if (this._data.translateZ === void 0) { this.#orderList.push('translateZ'); }
-
-         this._data.translateZ = value;
-      }
-
-      else
-      {
-         if (this._data.translateZ !== void 0)
-         {
-            const index = this.#orderList.findIndex((entry) => entry === 'translateZ');
-            if (index >= 0) { this.#orderList.splice(index, 1); }
-         }
-
-         delete this._data.translateZ;
-      }
-   }
-
-   /**
-    * Returns the matrix3d CSS transform for the given position / transform data.
-    *
-    * @param {object} [data] - Optional position data otherwise use local stored transform data.
-    *
-    * @returns {string} The CSS matrix3d string.
-    */
-   getCSS(data = this._data)
-   {
-      return `matrix3d(${this.getMat4(data, s_MAT4_RESULT).join(',')})`;
-   }
-
-   /**
-    * Returns the matrix3d CSS transform for the given position / transform data.
-    *
-    * @param {object} [data] - Optional position data otherwise use local stored transform data.
-    *
-    * @returns {string} The CSS matrix3d string.
-    */
-   getCSSOrtho(data = this._data)
-   {
-      return `matrix3d(${this.getMat4Ortho(data, s_MAT4_RESULT).join(',')})`;
-   }
-
-   /**
-    * Collects all data including a bounding rect, transform matrix, and points array of the given {@link TJSPositionData}
-    * instance with the applied local transform data.
-    *
-    * @param {import('../').TJSPositionData} position - The position data to process.
-    *
-    * @param {TJSTransformData} [output] - Optional TJSTransformData output instance.
-    *
-    * @param {object} [validationData] - Optional validation data for adjustment parameters.
-    *
-    * @returns {TJSTransformData} The output TJSTransformData instance.
-    */
-   getData(position, output = new TJSTransformData(), validationData = {})
-   {
-      const valWidth = validationData.width ?? 0;
-      const valHeight = validationData.height ?? 0;
-      const valOffsetTop = validationData.offsetTop ?? validationData.marginTop ?? 0;
-      const valOffsetLeft = validationData.offsetLeft ?? validationData.offsetLeft ?? 0;
-
-      position.top += valOffsetTop;
-      position.left += valOffsetLeft;
-
-      const width = Number.isFinite(position.width) ? position.width : valWidth;
-      const height = Number.isFinite(position.height) ? position.height : valHeight;
-
-      const rect = output.corners;
-
-      if (this.hasTransform(position))
-      {
-         rect[0][0] = rect[0][1] = rect[0][2] = 0;
-         rect[1][0] = width;
-         rect[1][1] = rect[1][2] = 0;
-         rect[2][0] = width;
-         rect[2][1] = height;
-         rect[2][2] = 0;
-         rect[3][0] = 0;
-         rect[3][1] = height;
-         rect[3][2] = 0;
-
-         const matrix = this.getMat4(position, output.mat4);
-
-         const translate = s_GET_ORIGIN_TRANSLATION(position.transformOrigin, width, height, output.originTranslations);
-
-         if (transformOriginDefault === position.transformOrigin)
-         {
-            Vec3.transformMat4(rect[0], rect[0], matrix);
-            Vec3.transformMat4(rect[1], rect[1], matrix);
-            Vec3.transformMat4(rect[2], rect[2], matrix);
-            Vec3.transformMat4(rect[3], rect[3], matrix);
-         }
-         else
-         {
-            Vec3.transformMat4(rect[0], rect[0], translate[0]);
-            Vec3.transformMat4(rect[0], rect[0], matrix);
-            Vec3.transformMat4(rect[0], rect[0], translate[1]);
-
-            Vec3.transformMat4(rect[1], rect[1], translate[0]);
-            Vec3.transformMat4(rect[1], rect[1], matrix);
-            Vec3.transformMat4(rect[1], rect[1], translate[1]);
-
-            Vec3.transformMat4(rect[2], rect[2], translate[0]);
-            Vec3.transformMat4(rect[2], rect[2], matrix);
-            Vec3.transformMat4(rect[2], rect[2], translate[1]);
-
-            Vec3.transformMat4(rect[3], rect[3], translate[0]);
-            Vec3.transformMat4(rect[3], rect[3], matrix);
-            Vec3.transformMat4(rect[3], rect[3], translate[1]);
-         }
-
-         rect[0][0] = position.left + rect[0][0];
-         rect[0][1] = position.top + rect[0][1];
-         rect[1][0] = position.left + rect[1][0];
-         rect[1][1] = position.top + rect[1][1];
-         rect[2][0] = position.left + rect[2][0];
-         rect[2][1] = position.top + rect[2][1];
-         rect[3][0] = position.left + rect[3][0];
-         rect[3][1] = position.top + rect[3][1];
-      }
-      else
-      {
-         rect[0][0] = position.left;
-         rect[0][1] = position.top;
-         rect[1][0] = position.left + width;
-         rect[1][1] = position.top;
-         rect[2][0] = position.left + width;
-         rect[2][1] = position.top + height;
-         rect[3][0] = position.left;
-         rect[3][1] = position.top + height;
-
-         Mat4.identity(output.mat4);
-      }
-
-      let maxX = Number.MIN_SAFE_INTEGER;
-      let maxY = Number.MIN_SAFE_INTEGER;
-      let minX = Number.MAX_SAFE_INTEGER;
-      let minY = Number.MAX_SAFE_INTEGER;
-
-      for (let cntr = 4; --cntr >= 0;)
-      {
-         if (rect[cntr][0] > maxX) { maxX = rect[cntr][0]; }
-         if (rect[cntr][0] < minX) { minX = rect[cntr][0]; }
-         if (rect[cntr][1] > maxY) { maxY = rect[cntr][1]; }
-         if (rect[cntr][1] < minY) { minY = rect[cntr][1]; }
-      }
-
-      const boundingRect = output.boundingRect;
-      boundingRect.x = minX;
-      boundingRect.y = minY;
-      boundingRect.width = maxX - minX;
-      boundingRect.height = maxY - minY;
-
-      position.top -= valOffsetTop;
-      position.left -= valOffsetLeft;
-
-      return output;
-   }
-
-   /**
-    * Creates a transform matrix based on local data applied in order it was added.
-    *
-    * If no data object is provided then the source is the local transform data. If another data object is supplied
-    * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
-    * construction of a transform matrix in advance of setting local data and is useful in collision detection.
-    *
-    * @param {object}   [data] - TJSPositionData instance or local transform data.
-    *
-    * @param {import('#svelte-lib/math/gl-matrix').Mat4}  [output] - The output mat4 instance.
-    *
-    * @returns {import('#svelte-lib/math/gl-matrix').Mat4} Transform matrix.
-    */
-   getMat4(data = this._data, output = Mat4.create())
-   {
-      const matrix = Mat4.identity(output);
-
-      // Bitwise tracks applied transform keys from local transform data.
-      let seenKeys = 0;
-
-      const orderList = this.#orderList;
-
-      // First apply ordered transforms from local transform data.
-      for (let cntr = 0; cntr < orderList.length; cntr++)
-      {
-         const key = orderList[cntr];
-
-         switch (key)
-         {
-            case 'rotateX':
-               seenKeys |= transformKeysBitwise.rotateX;
-               Mat4.multiply(matrix, matrix, Mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
-               break;
-
-            case 'rotateY':
-               seenKeys |= transformKeysBitwise.rotateY;
-               Mat4.multiply(matrix, matrix, Mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
-               break;
-
-            case 'rotateZ':
-               seenKeys |= transformKeysBitwise.rotateZ;
-               Mat4.multiply(matrix, matrix, Mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
-               break;
-
-            case 'scale':
-               seenKeys |= transformKeysBitwise.scale;
-               s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data[key];
-               Mat4.multiply(matrix, matrix, Mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
-               break;
-
-            case 'translateX':
-               seenKeys |= transformKeysBitwise.translateX;
-               s_TRANSLATE_VECTOR[0] = data.translateX;
-               s_TRANSLATE_VECTOR[1] = 0;
-               s_TRANSLATE_VECTOR[2] = 0;
-               Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
-               break;
-
-            case 'translateY':
-               seenKeys |= transformKeysBitwise.translateY;
-               s_TRANSLATE_VECTOR[0] = 0;
-               s_TRANSLATE_VECTOR[1] = data.translateY;
-               s_TRANSLATE_VECTOR[2] = 0;
-               Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
-               break;
-
-            case 'translateZ':
-               seenKeys |= transformKeysBitwise.translateZ;
-               s_TRANSLATE_VECTOR[0] = 0;
-               s_TRANSLATE_VECTOR[1] = 0;
-               s_TRANSLATE_VECTOR[2] = data.translateZ;
-               Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
-               break;
-         }
-      }
-
-      // Now apply any new keys not set in local transform data that have not been applied yet.
-      if (data !== this._data)
-      {
-         for (let cntr = 0; cntr < transformKeys.length; cntr++)
-         {
-            const key = transformKeys[cntr];
-
-            // Reject bad / no data or if the key has already been applied.
-            if (data[key] === null || (seenKeys & transformKeysBitwise[key]) > 0) { continue; }
-
-            switch (key)
-            {
-               case 'rotateX':
-                  Mat4.multiply(matrix, matrix, Mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
-                  break;
-
-               case 'rotateY':
-                  Mat4.multiply(matrix, matrix, Mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
-                  break;
-
-               case 'rotateZ':
-                  Mat4.multiply(matrix, matrix, Mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
-                  break;
-
-               case 'scale':
-                  s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data[key];
-                  Mat4.multiply(matrix, matrix, Mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
-                  break;
-
-               case 'translateX':
-                  s_TRANSLATE_VECTOR[0] = data[key];
-                  s_TRANSLATE_VECTOR[1] = 0;
-                  s_TRANSLATE_VECTOR[2] = 0;
-                  Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
-                  break;
-
-               case 'translateY':
-                  s_TRANSLATE_VECTOR[0] = 0;
-                  s_TRANSLATE_VECTOR[1] = data[key];
-                  s_TRANSLATE_VECTOR[2] = 0;
-                  Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
-                  break;
-
-               case 'translateZ':
-                  s_TRANSLATE_VECTOR[0] = 0;
-                  s_TRANSLATE_VECTOR[1] = 0;
-                  s_TRANSLATE_VECTOR[2] = data[key];
-                  Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
-                  break;
-            }
-         }
-      }
-
-      return matrix;
-   }
-
-   /**
-    * Provides an orthographic enhancement to convert left / top positional data to a translate operation.
-    *
-    * This transform matrix takes into account that the remaining operations are , but adds any left / top attributes from passed in data to
-    * translate X / Y.
-    *
-    * If no data object is provided then the source is the local transform data. If another data object is supplied
-    * then the stored local transform order is applied then all remaining transform keys are applied. This allows the
-    * construction of a transform matrix in advance of setting local data and is useful in collision detection.
-    *
-    * @param {object}   [data] - TJSPositionData instance or local transform data.
-    *
-    * @param {import('#svelte-lib/math/gl-matrix').Mat4}  [output] - The output mat4 instance.
-    *
-    * @returns {import('#svelte-lib/math/gl-matrix').Mat4} Transform matrix.
-    */
-   getMat4Ortho(data = this._data, output = Mat4.create())
-   {
-      const matrix = Mat4.identity(output);
-
-      // Attempt to retrieve values from passed in data otherwise default to 0.
-      // Always perform the translation last regardless of order added to local transform data.
-      // Add data.left to translateX and data.top to translateY.
-      s_TRANSLATE_VECTOR[0] = (data.left ?? 0) + (data.translateX ?? 0);
-      s_TRANSLATE_VECTOR[1] = (data.top ?? 0) + (data.translateY ?? 0);
-      s_TRANSLATE_VECTOR[2] = data.translateZ ?? 0;
-      Mat4.multiply(matrix, matrix, Mat4.fromTranslation(s_MAT4_TEMP, s_TRANSLATE_VECTOR));
-
-      // Scale can also be applied out of order.
-      if (data.scale !== null)
-      {
-         s_SCALE_VECTOR[0] = s_SCALE_VECTOR[1] = data.scale;
-         Mat4.multiply(matrix, matrix, Mat4.fromScaling(s_MAT4_TEMP, s_SCALE_VECTOR));
-      }
-
-      // Early out if there is not rotation data.
-      if (data.rotateX === null && data.rotateY === null && data.rotateZ === null) { return matrix; }
-
-      // Rotation transforms must be applied in the order they are added.
-
-      // Bitwise tracks applied transform keys from local transform data.
-      let seenKeys = 0;
-
-      const orderList = this.#orderList;
-
-      // First apply ordered transforms from local transform data.
-      for (let cntr = 0; cntr < orderList.length; cntr++)
-      {
-         const key = orderList[cntr];
-
-         switch (key)
-         {
-            case 'rotateX':
-               seenKeys |= transformKeysBitwise.rotateX;
-               Mat4.multiply(matrix, matrix, Mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
-               break;
-
-            case 'rotateY':
-               seenKeys |= transformKeysBitwise.rotateY;
-               Mat4.multiply(matrix, matrix, Mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
-               break;
-
-            case 'rotateZ':
-               seenKeys |= transformKeysBitwise.rotateZ;
-               Mat4.multiply(matrix, matrix, Mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
-               break;
-         }
-      }
-
-      // Now apply any new keys not set in local transform data that have not been applied yet.
-      if (data !== this._data)
-      {
-         for (let cntr = 0; cntr < transformKeys.length; cntr++)
-         {
-            const key = transformKeys[cntr];
-
-            // Reject bad / no data or if the key has already been applied.
-            if (data[key] === null || (seenKeys & transformKeysBitwise[key]) > 0) { continue; }
-
-            switch (key)
-            {
-               case 'rotateX':
-                  Mat4.multiply(matrix, matrix, Mat4.fromXRotation(s_MAT4_TEMP, degToRad(data[key])));
-                  break;
-
-               case 'rotateY':
-                  Mat4.multiply(matrix, matrix, Mat4.fromYRotation(s_MAT4_TEMP, degToRad(data[key])));
-                  break;
-
-               case 'rotateZ':
-                  Mat4.multiply(matrix, matrix, Mat4.fromZRotation(s_MAT4_TEMP, degToRad(data[key])));
-                  break;
-            }
-         }
-      }
-
-      return matrix;
-   }
-
-   /**
-    * Tests an object if it contains transform keys and the values are finite numbers.
-    *
-    * @param {object} data - An object to test for transform data.
-    *
-    * @returns {boolean} Whether the given TJSPositionData has transforms.
-    */
-   hasTransform(data)
-   {
-      for (const key of transformKeys)
-      {
-         if (Number.isFinite(data[key])) { return true; }
-      }
-
-      return false;
-   }
-
-   /**
-    * Resets internal data from the given object containing valid transform keys.
-    *
-    * @param {object}   data - An object with transform data.
-    */
-   reset(data)
-   {
-      for (const key in data)
-      {
-         if (transformKeys.includes(key))
-         {
-            if (Number.isFinite(data[key]))
-            {
-               this._data[key] = data[key];
-            }
-            else
-            {
-               const index = this.#orderList.findIndex((entry) => entry === key);
-               if (index >= 0) { this.#orderList.splice(index, 1); }
-
-               delete this._data[key];
-            }
-         }
-      }
-   }
-}
-
-/**
- * Returns the translations necessary to translate a matrix operation based on the `transformOrigin` parameter of the
- * given position instance. The first entry / index 0 is the pre-translation and last entry / index 1 is the post-
- * translation.
- *
- * This method is used internally, but may be useful if you need the origin translation matrices to transform
- * bespoke points based on any `transformOrigin` set in {@link TJSPositionData}.
- *
- * @param {string}   transformOrigin - The transform origin attribute from TJSPositionData.
- *
- * @param {number}   width - The TJSPositionData width or validation data width when 'auto'.
- *
- * @param {number}   height - The TJSPositionData height or validation data height when 'auto'.
- *
- * @param {import('#svelte-lib/math/gl-matrix').Mat4[]}   output - Output Mat4 array.
- *
- * @returns {import('#svelte-lib/math/gl-matrix').Mat4[]} Output Mat4 array.
- */
-function s_GET_ORIGIN_TRANSLATION(transformOrigin, width, height, output)
-{
-   const vector = s_VEC3_TEMP;
-
-   switch (transformOrigin)
-   {
-      case 'top left':
-         vector[0] = vector[1] = 0;
-         Mat4.fromTranslation(output[0], vector);
-         Mat4.fromTranslation(output[1], vector);
-         break;
-
-      case 'top center':
-         vector[0] = -width * 0.5;
-         vector[1] = 0;
-         Mat4.fromTranslation(output[0], vector);
-         vector[0] = width * 0.5;
-         Mat4.fromTranslation(output[1], vector);
-         break;
-
-      case 'top right':
-         vector[0] = -width;
-         vector[1] = 0;
-         Mat4.fromTranslation(output[0], vector);
-         vector[0] = width;
-         Mat4.fromTranslation(output[1], vector);
-         break;
-
-      case 'center left':
-         vector[0] = 0;
-         vector[1] = -height * 0.5;
-         Mat4.fromTranslation(output[0], vector);
-         vector[1] = height * 0.5;
-         Mat4.fromTranslation(output[1], vector);
-         break;
-
-      case null: // By default null / no transform is center.
-      case 'center':
-         vector[0] = -width * 0.5;
-         vector[1] = -height * 0.5;
-         Mat4.fromTranslation(output[0], vector);
-         vector[0] = width * 0.5;
-         vector[1] = height * 0.5;
-         Mat4.fromTranslation(output[1], vector);
-         break;
-
-      case 'center right':
-         vector[0] = -width;
-         vector[1] = -height * 0.5;
-         Mat4.fromTranslation(output[0], vector);
-         vector[0] = width;
-         vector[1] = height * 0.5;
-         Mat4.fromTranslation(output[1], vector);
-         break;
-
-      case 'bottom left':
-         vector[0] = 0;
-         vector[1] = -height;
-         Mat4.fromTranslation(output[0], vector);
-         vector[1] = height;
-         Mat4.fromTranslation(output[1], vector);
-         break;
-
-      case 'bottom center':
-         vector[0] = -width * 0.5;
-         vector[1] = -height;
-         Mat4.fromTranslation(output[0], vector);
-         vector[0] = width * 0.5;
-         vector[1] = height;
-         Mat4.fromTranslation(output[1], vector);
-         break;
-
-      case 'bottom right':
-         vector[0] = -width;
-         vector[1] = -height;
-         Mat4.fromTranslation(output[0], vector);
-         vector[0] = width;
-         vector[1] = height;
-         Mat4.fromTranslation(output[1], vector);
-         break;
-
-      // No valid transform origin parameter; set identity.
-      default:
-         Mat4.identity(output[0]);
-         Mat4.identity(output[1]);
-         break;
-   }
-
-   return output;
 }
 
 class UpdateElementData
@@ -6222,14 +6223,18 @@ function draggable(node, { position, active = true, button = 0, storeDragging = 
    let quickTo = position.animate.quickTo(['top', 'left'], easeOptions);
 
    /**
-    * Remember event handlers associated with this action so they may be later unregistered.
+    * Remember event handlers associated with this action, so they may be later unregistered.
     *
-    * @type {object}
+    * @type {({ [key: string]: [
+    *    keyof HTMLElementEventMap,
+    *    (this:HTMLElement, ev: HTMLElementEventMap[keyof HTMLElementEventMap]) => any,
+    *    boolean | AddEventListenerOptions]
+    * })}
     */
    const handlers = {
-      dragDown: ['pointerdown', (e) => onDragPointerDown(e), false],
-      dragMove: ['pointermove', (e) => onDragPointerChange(e), false],
-      dragUp: ['pointerup', (e) => onDragPointerUp(e), false]
+      dragDown: ['pointerdown', onDragPointerDown, false],
+      dragMove: ['pointermove', onDragPointerChange, false],
+      dragUp: ['pointerup', onDragPointerUp, false]
    };
 
    /**
@@ -6440,6 +6445,9 @@ class DraggableOptions
 {
    #ease = false;
 
+   /**
+    * @type {{ duration: number, ease: (t: number) => number | string }}
+    */
    #easeOptions = { duration: 0.1, ease: cubicOut };
 
    /**
@@ -6449,6 +6457,14 @@ class DraggableOptions
     */
    #subscriptions = [];
 
+   /**
+    *
+    * @param {object} [opts] - Optional parameters.
+    *
+    * @param {boolean}  [opts.ease] -
+    *
+    * @param {object}   [opts.easeOptions] -
+    */
    constructor({ ease, easeOptions } = {})
    {
       // Define the following getters directly on this instance and make them enumerable. This allows them to be

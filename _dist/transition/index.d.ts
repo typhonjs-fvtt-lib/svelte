@@ -32,9 +32,7 @@ declare function rotate(node: HTMLElement, options: {
     initial?: number;
 }): {
     duration: number;
-    css: (() => string);
-    delay: number;
-    easing: (x: number) => number;
+    css: (() => any);
 };
 
 /**
@@ -75,9 +73,7 @@ declare function rotateFade(node: HTMLElement, options: {
     initial?: number;
 }): {
     duration: number;
-    css: (() => string);
-    delay: number;
-    easing: (x: number) => number;
+    css: (() => any);
 };
 
 /**
@@ -109,9 +105,7 @@ declare function slideFade(node: HTMLElement, options: {
     easingSlide?: Function;
 }): {
     duration: number;
-    css: (() => string);
-    delay: number;
-    easing: (x: number) => number;
+    css: (() => any);
 };
 
 /**

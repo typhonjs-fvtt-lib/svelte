@@ -1,8 +1,8 @@
 import * as svelte from 'svelte';
-import * as _typhonjs_fvtt_svelte_store_storage_web from '@typhonjs-fvtt/svelte/store/storage/web';
-import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
-import { TJSPosition } from '@typhonjs-fvtt/svelte/store/position';
-import * as _typhonjs_fvtt_svelte_util from '@typhonjs-fvtt/svelte/util';
+import * as _typhonjs_svelte_lib_store_storage_web from '@typhonjs-svelte/lib/store/storage/web';
+import * as _typhonjs_svelte_lib_store_position from '@typhonjs-svelte/lib/store/position';
+import { TJSPosition } from '@typhonjs-svelte/lib/store/position';
+import * as _typhonjs_svelte_lib_util from '@typhonjs-svelte/lib/util';
 import * as svelte_store from 'svelte/store';
 
 /**
@@ -12,7 +12,7 @@ import * as svelte_store from 'svelte/store';
  */
 declare class ApplicationState {
     /**
-     * @param {SvelteApplication}   application - The application.
+     * @param {import('../SvelteApplication').SvelteApplication}   application - The application.
      */
     constructor(application: SvelteApplication);
     /**
@@ -122,8 +122,9 @@ declare class ApplicationState {
      *
      * @param {Function}          [opts.interpolate=lerp] - Interpolation function.
      *
-     * @returns {SvelteApplication|Promise<SvelteApplication>} When synchronous the application or Promise when
-     *                                                             animating resolving with application.
+     * @returns {(import('../SvelteApplication').SvelteApplication |
+     *    Promise<import('../SvelteApplication').SvelteApplication>)} When synchronous the application or Promise when
+     *    animating resolving with application.
      */
     set(data: ApplicationStateData, { async, animateTo, duration, ease, interpolate }?: {
         async?: boolean;
@@ -131,14 +132,14 @@ declare class ApplicationState {
         duration?: number;
         ease?: Function;
         interpolate?: Function;
-    }): SvelteApplication | Promise<SvelteApplication>;
+    }): (SvelteApplication | Promise<SvelteApplication>);
     #private;
 }
 type ApplicationStateData = {
     /**
      * - Application position.
      */
-    position: _typhonjs_fvtt_svelte_store_position.TJSPositionDataExtended;
+    position: _typhonjs_svelte_lib_store_position.TJSPositionDataExtended;
     /**
      * - Any application saved position state for #beforeMinimized
      */
@@ -288,7 +289,7 @@ declare class GetSvelteData {
  */
 declare class SvelteReactive {
     /**
-     * @param {SvelteApplication} application - The host Foundry application.
+     * @param {import('../SvelteApplication').SvelteApplication} application - The host Foundry application.
      */
     constructor(application: SvelteApplication);
     /**
@@ -299,7 +300,7 @@ declare class SvelteReactive {
      */
     initialize(): SvelteStores | void;
     /**
-     * @returns {import('@typhonjs-fvtt/svelte/store').TJSSessionStorage} Returns TJSSessionStorage instance.
+     * @returns {import('@typhonjs-svelte/lib/store').TJSSessionStorage} Returns TJSSessionStorage instance.
      */
     get sessionStorage(): any;
     /**
@@ -758,11 +759,11 @@ declare class SvelteApplication {
      * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
      * to update to using the {@link TJSPosition.validators} functionality.
      *
-     * @param {import('@typhonjs-fvtt/svelte/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
+     * @param {import('@typhonjs-svelte/lib/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
      *
      * @returns {TJSPosition} The updated position object for the application containing the new values
      */
-    setPosition(position?: _typhonjs_fvtt_svelte_store_position.TJSPositionDataExtended): TJSPosition;
+    setPosition(position?: _typhonjs_svelte_lib_store_position.TJSPositionDataExtended): TJSPosition;
     #private;
 }
 
@@ -772,13 +773,13 @@ declare class SvelteApplication {
  */
 declare class TJSDialogData {
     /**
-     * @param {SvelteApplication} application - The host Foundry application.
+     * @param {import('../').SvelteApplication} application - The host Foundry application.
      */
     constructor(application: SvelteApplication);
     /**
      * Provides configuration of the dialog button bar.
      *
-     * @type {Record<string, TJSDialogButtonData>}
+     * @type {Record<string, import('../').TJSDialogButtonData>}
      */
     buttons: Record<string, TJSDialogButtonData>;
     /**
@@ -846,9 +847,9 @@ declare class TJSDialogData {
      * Callback invoked when dialog is closed; no button option selected. When defined as a string any matching function
      * by name exported from content Svelte component is invoked.
      *
-     * @type {string|((application: TJSDialog) => any)}
+     * @type {string|((application: import('../').TJSDialog) => any)}
      */
-    onClose: string | ((application: TJSDialog$1) => any);
+    onClose: string | ((application: TJSDialog) => any);
     /**
      * When true and a Promise has been created by {@link TJSDialog.wait} and the Promise is not in the process of being
      * resolved or rejected on close of the dialog any `onClose` function is invoked and any result that is undefined
@@ -960,7 +961,7 @@ declare class TJSDialogData {
  *
  * TODO: document all extended dialog data parameters such as transition options / modal transitions.
  */
-declare class TJSDialog$1 extends SvelteApplication {
+declare class TJSDialog extends SvelteApplication {
     /**
      * A helper factory method to create simple confirmation dialog windows which consist of simple yes / no prompts.
      * If you require more flexibility, a custom TJSDialog instance is preferred. The default focused button is 'yes'.
@@ -968,7 +969,7 @@ declare class TJSDialog$1 extends SvelteApplication {
      *
      * @template T
      *
-     * @param {TJSDialogOptions & {
+     * @param {import('./').TJSDialogOptions & {
      *    onYes?: string|((application: TJSDialog) => any),
      *    onNo?: string|((application: TJSDialog) => any)
      * }} [data] - Confirm dialog options.
@@ -981,7 +982,8 @@ declare class TJSDialog$1 extends SvelteApplication {
      *        function. When defined as a string any matching function by name exported from content Svelte component is
      *        invoked.
      *
-     * @param {SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog constructor.
+     * @param {import('./').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
+     *        constructor.
      *
      * @returns {Promise<T>} A promise which resolves with result of yes / no callbacks or true / false.
      *
@@ -996,13 +998,16 @@ declare class TJSDialog$1 extends SvelteApplication {
      * // Logs 'YES result', 'NO Result', or null if the user closed the dialog without making a selection.
      * console.log(result);
      */
-    static confirm<T_1>({ onYes, onNo, ...data }?: any, options?: SvelteApplicationOptions): Promise<T_1>;
+    static confirm<T_1>({ onYes, onNo, ...data }?: TJSDialogOptions & {
+        onYes?: string | ((application: TJSDialog) => any);
+        onNo?: string | ((application: TJSDialog) => any);
+    }, options?: SvelteApplicationOptions$1): Promise<T_1>;
     /**
      * A helper factory method to display a basic "prompt" style TJSDialog with a single button.
      *
      * @template T
      *
-     * @param {TJSDialogOptions & {
+     * @param {import('./').TJSDialogOptions & {
      *    onOk?: string|((application: TJSDialog) => any),
      *    label?: string,
      *    icon?: string
@@ -1016,7 +1021,8 @@ declare class TJSDialog$1 extends SvelteApplication {
      *
      * @param {string}   [data.icon="fas fa-check"] - Set another icon besides `fas fa-check` for button.
      *
-     * @param {SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog constructor.
+     * @param {import('./').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
+     *        constructor.
      *
      * @returns {Promise<T>} The returned value from the provided callback function or `true` if the button
      *          is pressed.
@@ -1032,7 +1038,11 @@ declare class TJSDialog$1 extends SvelteApplication {
      * // Logs 'OK' or null if the user closed the dialog without making a selection.
      * console.log(result);
      */
-    static prompt<T_2>({ onOk, label, icon, ...data }?: any, options?: SvelteApplicationOptions): Promise<T_2>;
+    static prompt<T_2>({ onOk, label, icon, ...data }?: TJSDialogOptions & {
+        onOk?: string | ((application: TJSDialog) => any);
+        label?: string;
+        icon?: string;
+    }, options?: SvelteApplicationOptions$1): Promise<T_2>;
     /**
      * Creates an anonymous data defined TJSDialog returning a Promise that can be awaited upon for the user to make a
      * choice.
@@ -1041,19 +1051,20 @@ declare class TJSDialog$1 extends SvelteApplication {
      *
      * @template T
      *
-     * @param {TJSDialogOptions}  data - Dialog data passed to the TJSDialog constructor.
+     * @param {import('./').TJSDialogOptions}  data - Dialog data passed to the TJSDialog constructor.
      *
-     * @param {SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog constructor.
+     * @param {import('./').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
+     *        constructor.
      *
      * @returns {Promise<T>} A Promise that resolves to the chosen result.
      */
-    static wait<T_3>(data: TJSDialogOptions, options?: SvelteApplicationOptions): Promise<T_3>;
+    static wait<T_3>(data: TJSDialogOptions, options?: SvelteApplicationOptions$1): Promise<T_3>;
     /**
-     * @param {TJSDialogOptions}           data - Dialog options.
+     * @param {import('./').TJSDialogOptions}           data - Dialog options.
      *
-     * @param {SvelteApplicationOptions}   [options] - SvelteApplication options.
+     * @param {import('./').SvelteApplicationOptions}   [options] - SvelteApplication options.
      */
-    constructor(data: TJSDialogOptions, options?: SvelteApplicationOptions);
+    constructor(data: TJSDialogOptions, options?: SvelteApplicationOptions$1);
     /**
      * Sets the dialog data; this is reactive.
      *
@@ -1067,9 +1078,9 @@ declare class TJSDialog$1 extends SvelteApplication {
      */
     get data(): TJSDialogData;
     /**
-     * @returns {import('@typhonjs-fvtt/svelte/util').ManagedPromise} Returns the managed promise.
+     * @returns {import('@typhonjs-svelte/lib/util').ManagedPromise} Returns the managed promise.
      */
-    get managedPromise(): _typhonjs_fvtt_svelte_util.ManagedPromise;
+    get managedPromise(): _typhonjs_svelte_lib_util.ManagedPromise;
     /**
      * Brings to top or renders this dialog returning a Promise that is resolved any button pressed or when the dialog
      * is closed.
@@ -1132,7 +1143,7 @@ type SvelteApplicationOptions$1 = {
      * - Defines A11yHelper focus source to
      * apply when application closes.
      */
-    focusSource?: _typhonjs_fvtt_svelte_util.A11yFocusSource;
+    focusSource?: _typhonjs_svelte_lib_util.A11yFocusSource;
     /**
      * - If true then the close header button is removed.
      */
@@ -1163,7 +1174,7 @@ type SvelteApplicationOptions$1 = {
      * - A helper
      * for initial position placement.
      */
-    positionInitial?: _typhonjs_fvtt_svelte_store_position.TJSPositionInitialHelper;
+    positionInitial?: _typhonjs_svelte_lib_store_position.TJSPositionInitialHelper;
     /**
      * - When true TJSPosition is optimized for orthographic use.
      */
@@ -1172,22 +1183,22 @@ type SvelteApplicationOptions$1 = {
      * - A
      * validator function or data or list of validators.
      */
-    positionValidator?: _typhonjs_fvtt_svelte_store_position.TJSPositionValidatorOptions;
+    positionValidator?: _typhonjs_svelte_lib_store_position.TJSPositionValidatorOptions;
     /**
      * - An instance of
      * TJSSessionStorage to share across SvelteApplications.
      */
-    sessionStorage?: _typhonjs_fvtt_svelte_store_storage_web.TJSSessionStorage;
+    sessionStorage?: _typhonjs_svelte_lib_store_storage_web.TJSSessionStorage;
     /**
      * - A Svelte configuration object defining
      * the main component.
      */
-    svelte?: _typhonjs_fvtt_svelte_util.TJSSvelteConfig;
+    svelte?: _typhonjs_svelte_lib_util.TJSSvelteConfig;
     /**
      * - By
      * default, 'top / left' respects rotation when minimizing.
      */
-    transformOrigin?: _typhonjs_fvtt_svelte_store_position.TJSTransformOrigin;
+    transformOrigin?: _typhonjs_svelte_lib_store_position.TJSTransformOrigin;
 };
 type SvelteData$1 = {
     /**
@@ -1228,11 +1239,11 @@ type SvelteStores$1 = {
 /**
  * - Defines the common dialog configuration data.
  */
-type TJSDialogOptions$1 = {
+type TJSDialogOptions = {
     /**
      * - Provides configuration of the dialog button bar.
      */
-    buttons?: Record<string, TJSDialogButtonData$1>;
+    buttons?: Record<string, TJSDialogButtonData>;
     /**
      * - A Svelte configuration object or HTML string content.
      */
@@ -1316,7 +1327,7 @@ type TJSDialogOptions$1 = {
 /**
  * - TJSDialog button data.
  */
-type TJSDialogButtonData$1 = {
+type TJSDialogButtonData = {
     /**
      * - When false the dialog does not automatically close when button selected.
      */
@@ -1334,8 +1345,8 @@ type TJSDialogButtonData$1 = {
      */
     icon?: string;
     /**
-     * - Callback for button press. When defined as a
-     * string any matching function by name exported from content Svelte component is invoked.
+     * - Callback for button press. When
+     * defined as a string any matching function by name exported from content Svelte component is invoked.
      */
     onPress?: string | ((application: TJSDialog) => any);
     /**
@@ -1344,4 +1355,4 @@ type TJSDialogButtonData$1 = {
     styles?: Record<string, string>;
 };
 
-export { MountedAppShell$1 as MountedAppShell, SvelteApplication, SvelteApplicationOptions$1 as SvelteApplicationOptions, SvelteData$1 as SvelteData, SvelteStores$1 as SvelteStores, TJSDialog$1 as TJSDialog, TJSDialogButtonData$1 as TJSDialogButtonData, TJSDialogOptions$1 as TJSDialogOptions };
+export { MountedAppShell$1 as MountedAppShell, SvelteApplication, SvelteApplicationOptions$1 as SvelteApplicationOptions, SvelteData$1 as SvelteData, SvelteStores$1 as SvelteStores, TJSDialog, TJSDialogButtonData, TJSDialogOptions };

@@ -1,5 +1,5 @@
 import * as _svelte_store from 'svelte/store';
-import { Writable, Readable } from 'svelte/store';
+import { Writable, Updater, Readable } from 'svelte/store';
 
 /**
  * Provides a basic test for a given variable to test if it has the shape of a readable store by having a `subscribe`
@@ -122,7 +122,7 @@ declare function writableDerived<S extends Stores, T>(
 
 declare function writableDerived<S extends Stores, T>(
     origins: S,
-    derive: (values: StoresValues<S>, set: (value: T) => void) => void,
+    derive: (values: StoresValues<S>, set: (value: T) => void, update: Updater<T>) => void,
     reflect: (reflecting: T, old: StoresValues<S>) => SetValues<S>,
     initial?: T
 ): Writable<T>;

@@ -1,7 +1,7 @@
-import * as _svelte_lib_math_gl_matrix from '@typhonjs-fvtt/svelte/math/gl-matrix';
-import { Vec3, Mat4 } from '@typhonjs-fvtt/svelte/math/gl-matrix';
+import * as _runtime_math_gl_matrix from '@typhonjs-svelte/runtime-base/math/gl-matrix';
+import { Vec3, Mat4 } from '@typhonjs-svelte/runtime-base/math/gl-matrix';
 import * as _svelte_store from 'svelte/store';
-import * as _svelte_lib_animate from '@typhonjs-fvtt/svelte/animate';
+import * as _svelte_lib_animate from '@typhonjs-svelte/lib/animate';
 
 /**
  * Defines stored positional data.
@@ -113,7 +113,7 @@ declare class TJSTransformData {
      */
     get boundingRect(): DOMRect;
     /**
-     * @returns {import('#svelte-lib/math/gl-matrix').Vec3[]} The transformed corner points as Vec3 in screen space.
+     * @returns {import('#runtime/math/gl-matrix').Vec3[]} The transformed corner points as Vec3 in screen space.
      */
     get corners(): Vec3[];
     /**
@@ -121,11 +121,11 @@ declare class TJSTransformData {
      */
     get css(): string;
     /**
-     * @returns {import('#svelte-lib/math/gl-matrix').Mat4} The transform matrix.
+     * @returns {import('#runtime/math/gl-matrix').Mat4} The transform matrix.
      */
     get mat4(): Mat4;
     /**
-     * @returns {import('#svelte-lib/math/gl-matrix').Mat4[]} The pre / post translation matrices for origin translation.
+     * @returns {import('#runtime/math/gl-matrix').Mat4[]} The pre / post translation matrices for origin translation.
      */
     get originTranslations(): Mat4[];
     #private;
@@ -245,11 +245,11 @@ declare class TJSTransforms {
      *
      * @param {object}   [data] - TJSPositionData instance or local transform data.
      *
-     * @param {import('#svelte-lib/math/gl-matrix').Mat4}  [output] - The output mat4 instance.
+     * @param {import('#runtime/math/gl-matrix').Mat4}  [output] - The output mat4 instance.
      *
-     * @returns {import('#svelte-lib/math/gl-matrix').Mat4} Transform matrix.
+     * @returns {import('#runtime/math/gl-matrix').Mat4} Transform matrix.
      */
-    getMat4(data?: object, output?: _svelte_lib_math_gl_matrix.Mat4): _svelte_lib_math_gl_matrix.Mat4;
+    getMat4(data?: object, output?: _runtime_math_gl_matrix.Mat4): _runtime_math_gl_matrix.Mat4;
     /**
      * Provides an orthographic enhancement to convert left / top positional data to a translate operation.
      *
@@ -262,11 +262,11 @@ declare class TJSTransforms {
      *
      * @param {object}   [data] - TJSPositionData instance or local transform data.
      *
-     * @param {import('#svelte-lib/math/gl-matrix').Mat4}  [output] - The output mat4 instance.
+     * @param {import('#runtime/math/gl-matrix').Mat4}  [output] - The output mat4 instance.
      *
-     * @returns {import('#svelte-lib/math/gl-matrix').Mat4} Transform matrix.
+     * @returns {import('#runtime/math/gl-matrix').Mat4} Transform matrix.
      */
-    getMat4Ortho(data?: object, output?: _svelte_lib_math_gl_matrix.Mat4): _svelte_lib_math_gl_matrix.Mat4;
+    getMat4Ortho(data?: object, output?: _runtime_math_gl_matrix.Mat4): _runtime_math_gl_matrix.Mat4;
     /**
      * Tests an object if it contains transform keys and the values are finite numbers.
      *
@@ -1282,11 +1282,19 @@ declare namespace draggable {
     }): DraggableOptions;
 }
 declare class DraggableOptions {
+    /**
+     *
+     * @param {object} [opts] - Optional parameters.
+     *
+     * @param {boolean}  [opts.ease] -
+     *
+     * @param {object}   [opts.easeOptions] -
+     */
     constructor({ ease, easeOptions }?: {
-        ease: any;
-        easeOptions: any;
+        ease?: boolean;
+        easeOptions?: object;
     });
-    ease: any;
+    ease: boolean;
     easeOptions: any;
     /**
      * @param {number}   duration - Set ease duration.
