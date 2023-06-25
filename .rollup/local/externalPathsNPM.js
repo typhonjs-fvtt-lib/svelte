@@ -61,7 +61,6 @@ export const externalPathsNPM = {
    '@typhonjs-fvtt/svelte/handler': '@typhonjs-fvtt/svelte/handler',
    '@typhonjs-fvtt/svelte/helper': '@typhonjs-fvtt/svelte/helper',
    '@typhonjs-fvtt/svelte/math': '@typhonjs-fvtt/svelte/math',
-   '@typhonjs-fvtt/svelte/math/gl-matrix': '@typhonjs-fvtt/svelte/math/gl-matrix',
    '@typhonjs-fvtt/svelte/store': '@typhonjs-fvtt/svelte/store',
    '@typhonjs-fvtt/svelte/store/document': '@typhonjs-fvtt/svelte/store/document',
    '@typhonjs-fvtt/svelte/store/dom': '@typhonjs-fvtt/svelte/store/dom',
