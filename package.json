@@ -13,10 +13,6 @@
     "#svelte-lib/*": "@typhonjs-fvtt/svelte/*"
   },
   "exports": {
-    "./action": {
-      "types": "./_dist/action/index.d.ts",
-      "import": "./_dist/action/index.js"
-    },
     "./action/dom": {
       "types": "./_dist/action/dom/index.d.ts",
       "import": "./_dist/action/dom/index.js"

@@ -69,25 +69,6 @@ const dtsPluginOptions = { bundlePackageExports: true, filterDiagnostic, replace
 const rollupConfigs = [
    {
       input: {
-         input: 'src/action/index.js',
-         plugins: [
-            importsExternal(),
-            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/action`] }),
-            resolve(s_RESOLVE_CONFIG),
-            generateDTS.plugin(dtsPluginOptions)
-         ]
-      },
-      output: {
-         file: '_dist/action/index.js',
-         format: 'es',
-         generatedCode: { constBindings: true },
-         paths: externalPathsNPM,
-         plugins: outputPlugins,
-         sourcemap
-      }
-   },
-   {
-      input: {
          input: 'src/action/dom/index.js',
          plugins: [
             importsExternal(),
