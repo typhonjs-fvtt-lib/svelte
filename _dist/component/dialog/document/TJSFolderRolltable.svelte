@@ -1,8 +1,8 @@
 <script>
-   import { getContext }      from 'svelte';
+   import { getContext }    from 'svelte';
 
-   import { localize }        from '@typhonjs-fvtt/svelte/helper';
-   import { TJSDocument }     from '@typhonjs-fvtt/svelte/store/document';
+   import { localize }      from '@typhonjs-fvtt/svelte/helper';
+   import { TJSDocument }   from '@typhonjs-fvtt/svelte/store/fvtt';
 
    export let document = void 0;
 

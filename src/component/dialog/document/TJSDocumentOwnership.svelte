@@ -3,9 +3,9 @@
 
    import {
       localize,
-      selectOptions }      from '@typhonjs-fvtt/svelte/helper';
+      selectOptions }      from '#svelte-fvtt/helper';
 
-   import { TJSDocument }  from '@typhonjs-fvtt/svelte/store/document';
+   import { TJSDocument }  from '#svelte-fvtt/store/fvtt';
 
    export let document = void 0;
 

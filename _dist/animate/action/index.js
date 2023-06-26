@@ -1,6 +1,6 @@
 import { Timing } from '@typhonjs-svelte/runtime-base/util';
 import { tick } from 'svelte';
-import { subscribeFirstRest } from '@typhonjs-fvtt/svelte/store';
+import { subscribeFirstRest } from '@typhonjs-svelte/runtime-base/util/store';
 
 /**
  * Defines an `Element.animate` animation from provided keyframes and options.

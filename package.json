@@ -56,17 +56,17 @@
       "types": "./_dist/helper/index.d.ts",
       "import": "./_dist/helper/index.js"
     },
-    "./store": {
-      "types": "./_dist/store/index.d.ts",
-      "import": "./_dist/store/index.js"
-    },
-    "./store/document": {
-      "types": "./_dist/store/document/index.d.ts",
-      "import": "./_dist/store/document/index.js"
+    "./store/derived": {
+      "types": "./_dist/store/derived/index.d.ts",
+      "import": "./_dist/store/derived/index.js"
     },
     "./store/dom": {
       "types": "./_dist/store/dom/index.d.ts",
       "import": "./_dist/store/dom/index.js"
+    },
+    "./store/fvtt": {
+      "types": "./_dist/store/fvtt/index.d.ts",
+      "import": "./_dist/store/fvtt/index.js"
     },
     "./store/position": {
       "types": "./_dist/store/position/index.d.ts",

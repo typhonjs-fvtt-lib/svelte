@@ -162,34 +162,16 @@ const rollupConfigs = [
    },
    {
       input: {
-         input: 'src/store/index.js',
+         input: 'src/store/derived/index.js',
          plugins: [
             importsExternal(),
-            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/store`] }),
+            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/store/derived`] }),
             resolve(s_RESOLVE_CONFIG),
             generateDTS.plugin(dtsPluginOptions)
          ]
       },
       output: {
-         file: '_dist/store/index.js',
-         format: 'es',
-         generatedCode: { constBindings: true },
-         paths: externalPathsNPM,
-         plugins: outputPlugins,
-         sourcemap
-      }
-   },
-   {
-      input: {
-         input: 'src/store/document/index.js',
-         plugins: [
-            importsExternal(),
-            resolve(s_RESOLVE_CONFIG),
-            generateDTS.plugin(dtsPluginOptions)
-         ]
-      },
-      output: {
-         file: '_dist/store/document/index.js',
+         file: '_dist/store/derived/index.js',
          format: 'es',
          generatedCode: { constBindings: true },
          paths: externalPathsNPM,
@@ -208,6 +190,24 @@ const rollupConfigs = [
       },
       output: {
          file: '_dist/store/dom/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap
+      }
+   },
+   {
+      input: {
+         input: 'src/store/fvtt/index.js',
+         plugins: [
+            importsExternal(),
+            resolve(s_RESOLVE_CONFIG),
+            generateDTS.plugin(dtsPluginOptions)
+         ]
+      },
+      output: {
+         file: '_dist/store/fvtt/index.js',
          format: 'es',
          generatedCode: { constBindings: true },
          paths: externalPathsNPM,
@@ -348,7 +348,10 @@ const appFiles = await getFileList({ dir: './_dist/application', resolve: true, 
 for (const appFile of appFiles)
 {
    let fileData = fs.readFileSync(appFile, 'utf-8').toString();
+
    fileData = fileData.replaceAll('#runtime/', '@typhonjs-svelte/runtime-base/');
+   fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
+   fileData = fileData.replaceAll('#svelte-lib/', '@typhonjs-fvtt/svelte/');
 
    // For types
    // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');
@@ -366,7 +369,10 @@ const compFiles = await getFileList({ dir: './_dist/component', resolve: true, w
 for (const compFile of compFiles)
 {
    let fileData = fs.readFileSync(compFile, 'utf-8').toString();
+
    fileData = fileData.replaceAll('#runtime/', '@typhonjs-svelte/runtime-base/');
+   fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
+   fileData = fileData.replaceAll('#svelte-lib/', '@typhonjs-fvtt/svelte/');
 
    // For types
    // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');
@@ -383,7 +389,10 @@ const gsapFiles = await getFileList({ dir: './_dist/gsap/plugin', resolve: true,
 for (const gsapFile of gsapFiles)
 {
    let fileData = fs.readFileSync(gsapFile, 'utf-8').toString();
+
    fileData = fileData.replaceAll('#runtime/', '@typhonjs-svelte/runtime-base/');
+   fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
+   fileData = fileData.replaceAll('#svelte-lib/', '@typhonjs-fvtt/svelte/');
 
    // For types
    // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');

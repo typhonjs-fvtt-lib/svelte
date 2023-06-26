@@ -3,7 +3,7 @@
 
    import {
       localize,
-      selectOptions }       from '@typhonjs-fvtt/svelte/helper';
+      selectOptions }       from '#svelte-fvtt/helper';
 
    export let documentCls = void 0;
    export let data = {};

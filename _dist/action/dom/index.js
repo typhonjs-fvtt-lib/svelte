@@ -1,5 +1,5 @@
-import { isUpdatableStore, isWritableStore } from '@typhonjs-fvtt/svelte/store';
 import { Timing } from '@typhonjs-svelte/runtime-base/util';
+import { isUpdatableStore, isWritableStore } from '@typhonjs-svelte/runtime-base/util/store';
 import { StyleParse } from '@typhonjs-svelte/runtime-base/util/browser';
 import { isObject } from '@typhonjs-svelte/runtime-base/util/object';
 

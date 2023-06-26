@@ -3,6 +3,74 @@ import { Hashing } from '@typhonjs-svelte/runtime-base/util';
 import { hasPrototype, isObject, isPlainObject } from '@typhonjs-svelte/runtime-base/util/object';
 import { DynMapReducer } from '@typhonjs-svelte/runtime-base/data/struct/store/reducer';
 
+function noop() { }
+function safe_not_equal(a, b) {
+    return a != a ? b == b : a !== b || ((a && typeof a === 'object') || typeof a === 'function');
+}
+
+const subscriber_queue = [];
+/**
+ * Create a `Writable` store that allows both updating and reading by subscription.
+ * @param {*=}value initial value
+ * @param {StartStopNotifier=} start
+ */
+function writable(value, start = noop) {
+    let stop;
+    const subscribers = new Set();
+    function set(new_value) {
+        if (safe_not_equal(value, new_value)) {
+            value = new_value;
+            if (stop) { // store is ready
+                const run_queue = !subscriber_queue.length;
+                for (const subscriber of subscribers) {
+                    subscriber[1]();
+                    subscriber_queue.push(subscriber, value);
+                }
+                if (run_queue) {
+                    for (let i = 0; i < subscriber_queue.length; i += 2) {
+                        subscriber_queue[i][0](subscriber_queue[i + 1]);
+                    }
+                    subscriber_queue.length = 0;
+                }
+            }
+        }
+    }
+    function update(fn) {
+        set(fn(value));
+    }
+    function subscribe(run, invalidate = noop) {
+        const subscriber = [run, invalidate];
+        subscribers.add(subscriber);
+        if (subscribers.size === 1) {
+            stop = start(set) || noop;
+        }
+        run(value);
+        return () => {
+            subscribers.delete(subscriber);
+            if (subscribers.size === 0 && stop) {
+                stop();
+                stop = null;
+            }
+        };
+    }
+    return { set, update, subscribe };
+}
+
+const _storeGameState = writable(void 0);
+
+/**
+ * @type {import('svelte/store').Readable<globalThis.game>} Provides a Svelte store wrapping the Foundry `game` global
+ * variable. It is initialized on the `ready` hook. You may use this store to access the global game state from a
+ * Svelte template. It is a read only store and will receive no reactive updates during runtime.
+ */
+const gameState = {
+   subscribe: _storeGameState.subscribe,
+};
+
+Object.freeze(gameState);
+
+Hooks.once('ready', () => _storeGameState.set(game));
+
 /**
  * Provides management of reactive embedded collections.
  *
@@ -919,5 +987,5 @@ class TJSDocumentCollection
  *           invoke when document is deleted _before_ subscribers are notified.
  */
 
-export { TJSDocument, TJSDocumentCollection };
+export { TJSDocument, TJSDocumentCollection, gameState };
 //# sourceMappingURL=index.js.map
