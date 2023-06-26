@@ -1,8 +1,8 @@
 import * as svelte from 'svelte';
+import * as _typhonjs_svelte_lib_util from '@typhonjs-svelte/lib/util';
 import * as _typhonjs_svelte_lib_store_storage_web from '@typhonjs-svelte/lib/store/storage/web';
 import * as _typhonjs_svelte_lib_store_position from '@typhonjs-svelte/lib/store/position';
 import { TJSPosition } from '@typhonjs-svelte/lib/store/position';
-import * as _typhonjs_svelte_lib_util from '@typhonjs-svelte/lib/util';
 import * as svelte_store from 'svelte/store';
 
 /**
@@ -1080,7 +1080,7 @@ declare class TJSDialog extends SvelteApplication {
     /**
      * @returns {import('@typhonjs-svelte/lib/util').ManagedPromise} Returns the managed promise.
      */
-    get managedPromise(): _typhonjs_svelte_lib_util.ManagedPromise;
+    get managedPromise(): any;
     /**
      * Brings to top or renders this dialog returning a Promise that is resolved any button pressed or when the dialog
      * is closed.
@@ -1143,7 +1143,7 @@ type SvelteApplicationOptions$1 = {
      * - Defines A11yHelper focus source to
      * apply when application closes.
      */
-    focusSource?: _typhonjs_svelte_lib_util.A11yFocusSource;
+    focusSource?: any;
     /**
      * - If true then the close header button is removed.
      */

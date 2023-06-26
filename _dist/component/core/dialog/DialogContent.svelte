@@ -11,9 +11,10 @@
    import { localize }        from '@typhonjs-fvtt/svelte/helper';
 
    import {
-      A11yHelper,
       isSvelteComponent,
       parseTJSSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
+
+   import { A11yHelper }      from '@typhonjs-svelte/runtime-base/util/browser';
 
    import { isObject }        from '@typhonjs-svelte/runtime-base/util/object';
 

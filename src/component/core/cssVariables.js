@@ -1,3 +1,3 @@
-import { TJSStyleManager } from '@typhonjs-fvtt/svelte/util';
+import { TJSStyleManager } from '#runtime/util/browser';
 
 export const cssVariables = new TJSStyleManager({ docKey: '#__trl-root-styles', version: 1 });

@@ -1,5 +1,5 @@
 <script>
-   import { A11yHelper }        from '@typhonjs-fvtt/svelte/util';
+   import { A11yHelper }    from '#runtime/util/browser';
 
    /** @type {HTMLElement} */
    export let elementRoot = void 0;

@@ -13,7 +13,7 @@
       applyStyles,
       resizeObserver }                 from '@typhonjs-fvtt/svelte/action/dom';
 
-   import { A11yHelper }               from '@typhonjs-fvtt/svelte/util';
+   import { A11yHelper }               from '@typhonjs-svelte/runtime-base/util/browser';
 
    import { isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
 

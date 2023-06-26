@@ -1,6 +1,6 @@
 import { DialogShell }        from '@typhonjs-fvtt/svelte/component/core';
 
-import { ManagedPromise }     from '@typhonjs-fvtt/svelte/util';
+import { ManagedPromise }     from '@typhonjs-svelte/runtime-base/util/async';
 
 import {
    deepMerge,

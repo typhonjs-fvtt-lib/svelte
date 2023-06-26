@@ -3,7 +3,7 @@ import { isObject, isPlainObject, isIterable, hasSetter } from '@typhonjs-svelte
 import { cubicOut, linear } from 'svelte/easing';
 import { lerp } from '@typhonjs-svelte/runtime-base/math/interpolate';
 import { writable } from 'svelte/store';
-import { styleParsePixels } from '@typhonjs-fvtt/svelte/util';
+import { StyleParse } from '@typhonjs-svelte/runtime-base/util/browser';
 import { Vec3, Mat4 } from '@typhonjs-svelte/runtime-base/math/gl-matrix';
 import { nextAnimationFrame } from '@typhonjs-fvtt/svelte/animate';
 import { degToRad, clamp } from '@typhonjs-svelte/runtime-base/math/util';
@@ -2793,14 +2793,14 @@ class StyleCache
 
       this.computed = globalThis.getComputedStyle(el);
 
-      this.marginLeft = styleParsePixels(el.style.marginLeft) ?? styleParsePixels(this.computed.marginLeft);
-      this.marginTop = styleParsePixels(el.style.marginTop) ?? styleParsePixels(this.computed.marginTop);
-      this.maxHeight = styleParsePixels(el.style.maxHeight) ?? styleParsePixels(this.computed.maxHeight);
-      this.maxWidth = styleParsePixels(el.style.maxWidth) ?? styleParsePixels(this.computed.maxWidth);
+      this.marginLeft = StyleParse.pixels(el.style.marginLeft) ?? StyleParse.pixels(this.computed.marginLeft);
+      this.marginTop = StyleParse.pixels(el.style.marginTop) ?? StyleParse.pixels(this.computed.marginTop);
+      this.maxHeight = StyleParse.pixels(el.style.maxHeight) ?? StyleParse.pixels(this.computed.maxHeight);
+      this.maxWidth = StyleParse.pixels(el.style.maxWidth) ?? StyleParse.pixels(this.computed.maxWidth);
 
       // Note that the computed styles for below will always be 0px / 0 when no style is active.
-      this.minHeight = styleParsePixels(el.style.minHeight) ?? styleParsePixels(this.computed.minHeight);
-      this.minWidth = styleParsePixels(el.style.minWidth) ?? styleParsePixels(this.computed.minWidth);
+      this.minHeight = StyleParse.pixels(el.style.minHeight) ?? StyleParse.pixels(this.computed.minHeight);
+      this.minWidth = StyleParse.pixels(el.style.minWidth) ?? StyleParse.pixels(this.computed.minWidth);
 
       // Tracks if there already is a will-change property on the inline or computed styles.
       const willChange = el.style.willChange !== '' ? el.style.willChange : this.computed.willChange;

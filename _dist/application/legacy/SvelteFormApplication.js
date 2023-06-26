@@ -1,10 +1,11 @@
 import { TJSPosition }  from '@typhonjs-svelte/lib/store/position';
 
 import {
-   A11yHelper,
    isApplicationShell,
    isHMRProxy,
    outroAndDestroy }    from '@typhonjs-fvtt/svelte/util';
+
+import { A11yHelper }   from '@typhonjs-svelte/runtime-base/util/browser';
 
 import {
    deepMerge,
