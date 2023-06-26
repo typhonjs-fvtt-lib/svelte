@@ -1,4 +1,4 @@
-import { debounce } from '@typhonjs-fvtt/svelte/util';
+import { Timing } from '@typhonjs-svelte/runtime-base/util';
 import { tick } from 'svelte';
 import { subscribeFirstRest } from '@typhonjs-fvtt/svelte/store';
 
@@ -24,7 +24,7 @@ import { subscribeFirstRest } from '@typhonjs-fvtt/svelte/store';
  *
  * @returns {Function} Actual action.
  */
-function animate({ duration = 600, keyframes = [], options, event = 'click', debounce: debounce$1 } = {})
+function animate({ duration = 600, keyframes = [], options, event = 'click', debounce } = {})
 {
    return (element) =>
    {
@@ -36,7 +36,7 @@ function animate({ duration = 600, keyframes = [], options, event = 'click', deb
          element.animate(keyframes, typeof options === 'object' && options !== null ? options : duration);
       }
 
-      const eventFn = Number.isInteger(debounce$1) && debounce$1 > 0 ? debounce(createAnimation, debounce$1) :
+      const eventFn = Number.isInteger(debounce) && debounce > 0 ? Timing.debounce(createAnimation, debounce) :
        createAnimation;
 
       element.addEventListener(event, eventFn);
@@ -108,7 +108,7 @@ function composable(...actions)
  * @returns {Function} Actual action.
  */
 function ripple({ duration = 600, background = 'rgba(255, 255, 255, 0.7)', events = ['click', 'keyup'],
- keyCode = 'Enter', debounce: debounce$1 } = {})
+ keyCode = 'Enter', debounce } = {})
 {
    return (element) =>
    {
@@ -173,8 +173,11 @@ function ripple({ duration = 600, background = 'rgba(255, 255, 255, 0.7)', event
          if (event?.code === keyCode) { createRipple(event); }
       }
 
-      const eventFn = Number.isInteger(debounce$1) && debounce$1 > 0 ? debounce(createRipple, debounce$1) : createRipple;
-      const keyEventFn = Number.isInteger(debounce$1) && debounce$1 > 0 ? debounce(keyHandler, debounce$1) : keyHandler;
+      const eventFn = Number.isInteger(debounce) && debounce > 0 ? Timing.debounce(createRipple, debounce) :
+       createRipple;
+
+      const keyEventFn = Number.isInteger(debounce) && debounce > 0 ? Timing.debounce(keyHandler, debounce) :
+       keyHandler;
 
       for (const event of events)
       {

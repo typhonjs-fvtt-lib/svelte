@@ -163,25 +163,6 @@ const rollupConfigs = [
    },
    {
       input: {
-         input: 'src/handler/index.js',
-         plugins: [
-            importsExternal(),
-            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/handler`] }),
-            resolve(s_RESOLVE_CONFIG),
-            generateDTS.plugin(dtsPluginOptions)
-         ]
-      },
-      output: {
-         file: '_dist/handler/index.js',
-         format: 'es',
-         generatedCode: { constBindings: true },
-         paths: externalPathsNPM,
-         plugins: outputPlugins,
-         sourcemap
-      }
-   },
-   {
-      input: {
          input: 'src/helper/index.js',
          plugins: [
             importsExternal(),

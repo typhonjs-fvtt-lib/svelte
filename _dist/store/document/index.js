@@ -1,4 +1,5 @@
-import { uuidv4, getUUIDFromDataTransfer } from '@typhonjs-fvtt/svelte/util';
+import { getUUIDFromDataTransfer } from '@typhonjs-fvtt/svelte/util';
+import { Hashing } from '@typhonjs-svelte/runtime-base/util';
 import { hasPrototype, isObject, isPlainObject } from '@typhonjs-svelte/runtime-base/util/object';
 import { DynMapReducer } from '@typhonjs-svelte/runtime-base/data/struct/store/reducer';
 
@@ -381,7 +382,7 @@ class TJSDocument
     */
    constructor(document, options = {})
    {
-      this.#uuidv4 = `tjs-document-${uuidv4()}`;
+      this.#uuidv4 = `tjs-document-${Hashing.uuidv4()}`;
 
       if (isPlainObject(document)) // Handle case when only options are passed into ctor.
       {

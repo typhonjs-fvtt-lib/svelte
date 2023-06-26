@@ -1,53 +1,6 @@
 import * as _svelte from 'svelte';
 
 /**
- * Provides a solid string hashing algorithm.
- *
- * Sourced from: https://stackoverflow.com/a/52171480
- *
- * @param {string}   str - String to hash.
- *
- * @param {number}   seed - A seed value altering the hash.
- *
- * @returns {number} Hash code.
- */
-declare function hashCode(str: string, seed?: number): number;
-
-/**
- * Generates a UUID v4 compliant ID. Please use a complete UUID generation package for guaranteed compliance.
- *
- * This code is an evolution of the following Gist.
- * https://gist.github.com/jed/982883
- *
- * There is a public domain / free copy license attached to it that is not a standard OSS license...
- * https://gist.github.com/jed/982883#file-license-txt
- *
- * @returns {string} UUIDv4
- */
-declare function uuidv4(): string;
-declare namespace uuidv4 {
-    /**
-     * Validates that the given string is formatted as a UUIDv4 string.
-     *
-     * @param {string}   uuid - UUID string to test.
-     *
-     * @returns {boolean} Is UUIDv4 string.
-     */
-    function isValid(uuid: string): boolean;
-}
-
-/**
- * Normalizes a string.
- *
- * @param {string}   query - A string to normalize for comparisons.
- *
- * @returns {string} Cleaned string.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
- */
-declare function normalizeString(query: string): string;
-
-/**
  * Provides a method to determine if the passed in object / Svelte component follows the application shell contract.
  * This involves ensuring that the accessors defined in `applicationShellContract`.
  *
@@ -148,27 +101,6 @@ declare function outroAndDestroy(instance: any): Promise<any>;
 declare function parseTJSSvelteConfig(config: object, thisArg?: any): object;
 
 /**
- * Wraps a callback in a debounced timeout.
- *
- * Delay execution of the callback function until the function has not been called for the given delay in milliseconds.
- *
- * @param {Function} callback - A function to execute once the debounced threshold has been passed.
- *
- * @param {number}   delay - An amount of time in milliseconds to delay.
- *
- * @returns {Function} A wrapped function that can be called to debounce execution.
- */
-declare function debounce(callback: Function, delay: number): Function;
-
-interface StateMachineOptions {
-    readonly allowedTags?: Set<string>;
-    readonly disallowedTags?: Set<string>;
-    readonly tagReplacementText: string;
-    readonly encodePlaintextTagDelimiters: boolean;
-}
-declare function striptags(text: string, options?: Partial<StateMachineOptions>): string;
-
-/**
  * Attempts to create a Foundry UUID from standard drop data. This may not work for all systems.
  *
  * @param {object}   data - Drop transfer data.
@@ -197,4 +129,4 @@ type ParseDataTransferOptions = {
     types?: string[] | undefined;
 };
 
-export { ParseDataTransferOptions, TJSSvelteConfig, debounce, getUUIDFromDataTransfer, hashCode, isApplicationShell, isHMRProxy, isSvelteComponent, isTJSSvelteConfig, normalizeString, outroAndDestroy, parseTJSSvelteConfig, striptags, uuidv4 };
+export { ParseDataTransferOptions, TJSSvelteConfig, getUUIDFromDataTransfer, isApplicationShell, isHMRProxy, isSvelteComponent, isTJSSvelteConfig, outroAndDestroy, parseTJSSvelteConfig };

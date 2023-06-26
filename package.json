@@ -56,10 +56,6 @@
     "./gsap/plugin/bonus/*": {
       "import": "./_dist/gsap/plugin/bonus/*.js"
     },
-    "./handler": {
-      "types": "./_dist/handler/index.d.ts",
-      "import": "./_dist/handler/index.js"
-    },
     "./helper": {
       "types": "./_dist/helper/index.d.ts",
       "import": "./_dist/helper/index.js"

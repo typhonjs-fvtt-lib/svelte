@@ -1,4 +1,4 @@
-import { uuidv4 }    from '@typhonjs-fvtt/svelte/util';
+import { Hashing }   from '#runtime/util';
 
 import {
    isObject,

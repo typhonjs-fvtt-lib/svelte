@@ -1,5 +1,5 @@
 import { isUpdatableStore, isWritableStore } from '@typhonjs-fvtt/svelte/store';
-import { debounce } from '@typhonjs-fvtt/svelte/util';
+import { Timing } from '@typhonjs-svelte/runtime-base/util';
 import { StyleParse } from '@typhonjs-svelte/runtime-base/util/browser';
 import { isObject } from '@typhonjs-svelte/runtime-base/util/object';
 
@@ -444,7 +444,7 @@ function applyScrolltop(element, store)
 
    let unsubscribe = store.subscribe(storeUpdate);
 
-   const resizeControl = resizeObserver(element, debounce(() =>
+   const resizeControl = resizeObserver(element, Timing.debounce(() =>
    {
       if (element.isConnected) { store.set(element.scrollTop); }
    }, 500));
@@ -459,7 +459,7 @@ function applyScrolltop(element, store)
       store.set(event.target.scrollTop);
    }
 
-   const debounceFn = debounce((e) => onScroll(e), 500);
+   const debounceFn = Timing.debounce((e) => onScroll(e), 500);
 
    element.addEventListener('scroll', debounceFn);
 

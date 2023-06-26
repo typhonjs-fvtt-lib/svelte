@@ -1,5 +1,5 @@
 import { DynArrayReducer } from '@typhonjs-svelte/runtime-base/data/struct/store/reducer';
-import { uuidv4, debounce, normalizeString } from '@typhonjs-fvtt/svelte/util';
+import { Hashing, Timing, Strings } from '@typhonjs-svelte/runtime-base/util';
 import { isObject, klona, isIterable } from '@typhonjs-svelte/runtime-base/util/object';
 import { writable, get } from 'svelte/store';
 
@@ -95,9 +95,9 @@ class ObjectEntryStore
       this.#data = data;
 
       // If an id is missing then add it.
-      if (typeof data.id !== 'string') { this.#data.id = uuidv4(); }
+      if (typeof data.id !== 'string') { this.#data.id = Hashing.uuidv4(); }
 
-      if (!uuidv4.isValid(data.id)) { throw new Error(`'data.id' (${data.id}) is not a valid UUIDv4 string.`); }
+      if (!Hashing.isUuidv4(data.id)) { throw new Error(`'data.id' (${data.id}) is not a valid UUIDv4 string.`); }
    }
 
    /**
@@ -249,7 +249,7 @@ class ArrayObjectStore
 
       // Prepare a debounced callback that is used for all child store entry subscriptions.
       this.#updateSubscribersBound = childDebounce === 0 ? this.updateSubscribers.bind(this) :
-       debounce((data) => this.updateSubscribers(data), childDebounce);
+       Timing.debounce((data) => this.updateSubscribers(data), childDebounce);
    }
 
    /**
@@ -313,7 +313,7 @@ class ArrayObjectStore
    {
       if (!isObject(entryData)) { throw new TypeError(`'entryData' is not an object.`); }
 
-      if (typeof entryData.id !== 'string') { entryData.id = uuidv4(); }
+      if (typeof entryData.id !== 'string') { entryData.id = Hashing.uuidv4(); }
 
       if (this.#data.findIndex((entry) => entry.id === entryData.id) >= 0)
       {
@@ -338,7 +338,7 @@ class ArrayObjectStore
    {
       const store = new this.#StoreClass(entryData, this);
 
-      if (!uuidv4.isValid(store.id))
+      if (!Hashing.isUuidv4(store.id))
       {
          throw new Error(`'store.id' (${store.id}) is not a UUIDv4 compliant string.`);
       }
@@ -403,7 +403,7 @@ class ArrayObjectStore
       if (storeEntryData)
       {
          const data = klona(storeEntryData.store.toJSON());
-         data.id = uuidv4();
+         data.id = Hashing.uuidv4();
 
          // Allow StoreClass to statically perform any specialized duplication.
          this.#StoreClass?.duplicate?.(data, this);
@@ -681,7 +681,7 @@ class CrudArrayObjectStore extends ArrayObjectStore
     */
    updateSubscribers(update)
    {
-      if (this.#crudDispatch && isObject(update) && uuidv4.isValid(update.id))
+      if (this.#crudDispatch && isObject(update) && Hashing.isUuidv4(update.id))
       {
          const result = this.#crudDispatch({
             action: 'update',
@@ -757,7 +757,7 @@ function regexObjectQuery(properties, { caseSensitive = false, store } = {})
 
       if (typeof current === 'string')
       {
-         keyword = normalizeString(current);
+         keyword = Strings.normalize(current);
          regex = new RegExp(RegExp.escape(keyword), caseSensitive ? '' : 'i');
       }
       else
@@ -782,14 +782,14 @@ function regexObjectQuery(properties, { caseSensitive = false, store } = {})
       {
          for (const property of properties)
          {
-            if (regex.test(normalizeString(data?.[property]))) { return true; }
+            if (regex.test(Strings.normalize(data?.[property]))) { return true; }
          }
 
          return false;
       }
       else
       {
-         return regex.test(normalizeString(data?.[properties]));
+         return regex.test(Strings.normalize(data?.[properties]));
       }
    }
 
@@ -814,7 +814,7 @@ function regexObjectQuery(properties, { caseSensitive = false, store } = {})
    {
       if (typeof value === 'string')
       {
-         keyword = normalizeString(value);
+         keyword = Strings.normalize(value);
          regex = new RegExp(RegExp.escape(keyword), caseSensitive ? '' : 'i');
          storeKeyword.set(keyword);
       }

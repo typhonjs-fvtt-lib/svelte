@@ -1,12 +1,12 @@
-import {
-   getUUIDFromDataTransfer,
-   uuidv4 }                      from '#svelte-fvtt/util';
+import { getUUIDFromDataTransfer }  from '#svelte-fvtt/util';
+
+import { Hashing }                  from '#runtime/util';
 
 import {
    isObject,
-   isPlainObject }               from '#runtime/util/object';
+   isPlainObject }                  from '#runtime/util/object';
 
-import { EmbeddedStoreManager }  from './EmbeddedStoreManager.js';
+import { EmbeddedStoreManager }     from './EmbeddedStoreManager.js';
 
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.
@@ -46,7 +46,7 @@ export class TJSDocument
     */
    constructor(document, options = {})
    {
-      this.#uuidv4 = `tjs-document-${uuidv4()}`;
+      this.#uuidv4 = `tjs-document-${Hashing.uuidv4()}`;
 
       if (isPlainObject(document)) // Handle case when only options are passed into ctor.
       {
