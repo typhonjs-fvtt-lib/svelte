@@ -1,8 +1,8 @@
 import * as svelte from 'svelte';
-import * as _typhonjs_svelte_lib_util from '@typhonjs-svelte/lib/util';
-import * as _typhonjs_svelte_lib_store_storage_web from '@typhonjs-svelte/lib/store/storage/web';
-import * as _typhonjs_svelte_lib_store_position from '@typhonjs-svelte/lib/store/position';
-import { TJSPosition } from '@typhonjs-svelte/lib/store/position';
+import * as _typhonjs_fvtt_svelte_util from '@typhonjs-fvtt/svelte/util';
+import * as _typhonjs_fvtt_svelte_store_storage_web from '@typhonjs-fvtt/svelte/store/storage/web';
+import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
+import { TJSPosition } from '@typhonjs-fvtt/svelte/store/position';
 import * as svelte_store from 'svelte/store';
 
 /**
@@ -139,7 +139,7 @@ type ApplicationStateData = {
     /**
      * - Application position.
      */
-    position: _typhonjs_svelte_lib_store_position.TJSPositionDataExtended;
+    position: _typhonjs_fvtt_svelte_store_position.TJSPositionDataExtended;
     /**
      * - Any application saved position state for #beforeMinimized
      */
@@ -300,7 +300,7 @@ declare class SvelteReactive {
      */
     initialize(): SvelteStores | void;
     /**
-     * @returns {import('@typhonjs-svelte/lib/store').TJSSessionStorage} Returns TJSSessionStorage instance.
+     * @returns {import('@typhonjs-fvtt/svelte/store').TJSSessionStorage} Returns TJSSessionStorage instance.
      */
     get sessionStorage(): any;
     /**
@@ -759,11 +759,11 @@ declare class SvelteApplication {
      * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
      * to update to using the {@link TJSPosition.validators} functionality.
      *
-     * @param {import('@typhonjs-svelte/lib/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
+     * @param {import('@typhonjs-fvtt/svelte/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
      *
      * @returns {TJSPosition} The updated position object for the application containing the new values
      */
-    setPosition(position?: _typhonjs_svelte_lib_store_position.TJSPositionDataExtended): TJSPosition;
+    setPosition(position?: _typhonjs_fvtt_svelte_store_position.TJSPositionDataExtended): TJSPosition;
     #private;
 }
 
@@ -1078,7 +1078,7 @@ declare class TJSDialog extends SvelteApplication {
      */
     get data(): TJSDialogData;
     /**
-     * @returns {import('@typhonjs-svelte/lib/util').ManagedPromise} Returns the managed promise.
+     * @returns {import('@typhonjs-fvtt/svelte/util').ManagedPromise} Returns the managed promise.
      */
     get managedPromise(): any;
     /**
@@ -1174,7 +1174,7 @@ type SvelteApplicationOptions$1 = {
      * - A helper
      * for initial position placement.
      */
-    positionInitial?: _typhonjs_svelte_lib_store_position.TJSPositionInitialHelper;
+    positionInitial?: _typhonjs_fvtt_svelte_store_position.TJSPositionInitialHelper;
     /**
      * - When true TJSPosition is optimized for orthographic use.
      */
@@ -1183,22 +1183,22 @@ type SvelteApplicationOptions$1 = {
      * - A
      * validator function or data or list of validators.
      */
-    positionValidator?: _typhonjs_svelte_lib_store_position.TJSPositionValidatorOptions;
+    positionValidator?: _typhonjs_fvtt_svelte_store_position.TJSPositionValidatorOptions;
     /**
      * - An instance of
      * TJSSessionStorage to share across SvelteApplications.
      */
-    sessionStorage?: _typhonjs_svelte_lib_store_storage_web.TJSSessionStorage;
+    sessionStorage?: _typhonjs_fvtt_svelte_store_storage_web.TJSSessionStorage;
     /**
      * - A Svelte configuration object defining
      * the main component.
      */
-    svelte?: _typhonjs_svelte_lib_util.TJSSvelteConfig;
+    svelte?: _typhonjs_fvtt_svelte_util.TJSSvelteConfig;
     /**
      * - By
      * default, 'top / left' respects rotation when minimizing.
      */
-    transformOrigin?: _typhonjs_svelte_lib_store_position.TJSTransformOrigin;
+    transformOrigin?: _typhonjs_fvtt_svelte_store_position.TJSTransformOrigin;
 };
 type SvelteData$1 = {
     /**

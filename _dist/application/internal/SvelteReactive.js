@@ -78,7 +78,7 @@ export class SvelteReactive
     */
    #initialized = false;
 
-   /** @type {import('@typhonjs-svelte/lib/store').TJSSessionStorage} */
+   /** @type {import('@typhonjs-fvtt/svelte/store').TJSSessionStorage} */
    #sessionStorage;
 
    /**
@@ -164,7 +164,7 @@ export class SvelteReactive
 // Store getters -----------------------------------------------------------------------------------------------------
 
    /**
-    * @returns {import('@typhonjs-svelte/lib/store').TJSSessionStorage} Returns TJSSessionStorage instance.
+    * @returns {import('@typhonjs-fvtt/svelte/store').TJSSessionStorage} Returns TJSSessionStorage instance.
     */
    get sessionStorage()
    {

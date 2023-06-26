@@ -1,6 +1,6 @@
 import { SvelteApplication as SvelteApplication$1 } from '@typhonjs-fvtt/svelte/application';
-import * as _typhonjs_svelte_lib_store_position from '@typhonjs-svelte/lib/store/position';
-import { TJSPosition } from '@typhonjs-svelte/lib/store/position';
+import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
+import { TJSPosition } from '@typhonjs-fvtt/svelte/store/position';
 import * as svelte from 'svelte';
 import * as svelte_store from 'svelte/store';
 
@@ -126,11 +126,11 @@ declare class SvelteApplication {
      * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
      * to update to using the {@link TJSPosition.validators} functionality.
      *
-     * @param {import('@typhonjs-svelte/lib/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
+     * @param {import('@typhonjs-fvtt/svelte/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
      *
      * @returns {TJSPosition} The updated position object for the application containing the new values
      */
-    setPosition(position?: _typhonjs_svelte_lib_store_position.TJSPositionDataExtended): TJSPosition;
+    setPosition(position?: _typhonjs_fvtt_svelte_store_position.TJSPositionDataExtended): TJSPosition;
     #private;
 }
 
@@ -268,7 +268,7 @@ type ApplicationStateData = {
     /**
      * - Application position.
      */
-    position: _typhonjs_svelte_lib_store_position.TJSPositionDataExtended;
+    position: _typhonjs_fvtt_svelte_store_position.TJSPositionDataExtended;
     /**
      * - Any application saved position state for #beforeMinimized
      */
@@ -429,7 +429,7 @@ declare class SvelteReactive {
      */
     initialize(): SvelteStores | void;
     /**
-     * @returns {import('@typhonjs-svelte/lib/store').TJSSessionStorage} Returns TJSSessionStorage instance.
+     * @returns {import('@typhonjs-fvtt/svelte/store').TJSSessionStorage} Returns TJSSessionStorage instance.
      */
     get sessionStorage(): any;
     /**
@@ -868,11 +868,11 @@ declare class SvelteFormApplication {
      * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
      * to update to using the {@link TJSPosition.validators} functionality.
      *
-     * @param {import('@typhonjs-svelte/lib/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
+     * @param {import('@typhonjs-fvtt/svelte/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
      *
      * @returns {TJSPosition} The updated position object for the application containing the new values
      */
-    setPosition(position?: _typhonjs_svelte_lib_store_position.TJSPositionDataExtended): TJSPosition;
+    setPosition(position?: _typhonjs_fvtt_svelte_store_position.TJSPositionDataExtended): TJSPosition;
     #private;
 }
 
