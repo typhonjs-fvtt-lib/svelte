@@ -1,5 +1,3 @@
-import { getUUIDFromDataTransfer }  from '#svelte-fvtt/util';
-
 import { Hashing }                  from '#runtime/util';
 
 import {
@@ -172,6 +170,66 @@ export class TJSDocument
    get() { return this.#document[0]; }
 
    /**
+    * Attempts to create a Foundry UUID from standard drop data. This may not work for all systems.
+    *
+    * @param {object}   data - Drop transfer data.
+    *
+    * @param {object}   [opts] - Optional parameters.
+    *
+    * @param {boolean}  [opts.actor=true] - Accept actor owned documents.
+    *
+    * @param {boolean}  [opts.compendium=true] - Accept compendium documents.
+    *
+    * @param {boolean}  [opts.world=true] - Accept world documents.
+    *
+    * @param {string[]|undefined}   [opts.types] - Require the `data.type` to match entry in `types`.
+    *
+    * @returns {string|undefined} Foundry UUID for drop data.
+    */
+   static getUUIDFromDataTransfer(data, { actor = true, compendium = true, world = true, types = void 0 } = {})
+   {
+      if (typeof data !== 'object') { return void 0; }
+      if (Array.isArray(types) && !types.includes(data.type)) { return void 0; }
+
+      let uuid = void 0;
+
+      if (typeof data.uuid === 'string') // v10 and above provides a full UUID.
+      {
+         const isCompendium = data.uuid.startsWith('Compendium');
+
+         if (isCompendium && compendium)
+         {
+            uuid = data.uuid;
+         }
+         else if (world)
+         {
+            uuid = data.uuid;
+         }
+      }
+      else // v9 and below parsing.
+      {
+         if (actor && world && data.actorId && data.type)
+         {
+            uuid = `Actor.${data.actorId}.${data.type}.${data.data._id}`;
+         }
+         else if (typeof data.id === 'string') // v9 and below uses `id`
+         {
+            if (compendium && typeof data.pack === 'string')
+            {
+               uuid = `Compendium.${data.pack}.${data.id}`;
+            }
+            else if (world)
+            {
+               uuid = `${data.type}.${data.id}`;
+            }
+         }
+      }
+
+      return uuid;
+   }
+
+
+   /**
     * @param {foundry.abstract.Document | undefined}  document - New document to set.
     *
     * @param {object}         [options] - New document update options to set.
@@ -229,7 +287,7 @@ export class TJSDocument
     */
    async setFromDataTransfer(data, options)
    {
-      return this.setFromUUID(getUUIDFromDataTransfer(data, options), options);
+      return this.setFromUUID(TJSDocument.getUUIDFromDataTransfer(data, options), options);
    }
 
    /**

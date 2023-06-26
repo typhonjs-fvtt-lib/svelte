@@ -15,6 +15,29 @@ declare const gameState: svelte_store.Readable<globalThis.game>;
  */
 declare class TJSDocument {
     /**
+     * Attempts to create a Foundry UUID from standard drop data. This may not work for all systems.
+     *
+     * @param {object}   data - Drop transfer data.
+     *
+     * @param {object}   [opts] - Optional parameters.
+     *
+     * @param {boolean}  [opts.actor=true] - Accept actor owned documents.
+     *
+     * @param {boolean}  [opts.compendium=true] - Accept compendium documents.
+     *
+     * @param {boolean}  [opts.world=true] - Accept world documents.
+     *
+     * @param {string[]|undefined}   [opts.types] - Require the `data.type` to match entry in `types`.
+     *
+     * @returns {string|undefined} Foundry UUID for drop data.
+     */
+    static getUUIDFromDataTransfer(data: object, { actor, compendium, world, types }?: {
+        actor?: boolean;
+        compendium?: boolean;
+        world?: boolean;
+        types?: string[] | undefined;
+    }): string | undefined;
+    /**
      * @param {foundry.abstract.Document | TJSDocumentOptions}  [document] - Document to wrap or TJSDocumentOptions.
      *
      * @param {TJSDocumentOptions}      [options] - TJSDocument options.
