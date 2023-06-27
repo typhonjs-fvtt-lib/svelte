@@ -1,7 +1,7 @@
 import * as _runtime_math_gl_matrix from '@typhonjs-svelte/runtime-base/math/gl-matrix';
 import { Vec3, Mat4 } from '@typhonjs-svelte/runtime-base/math/gl-matrix';
 import * as _svelte_store from 'svelte/store';
-import * as _svelte_lib_animate from '@typhonjs-svelte/lib/animate';
+import * as _typhonjs_fvtt_svelte_animate from '@typhonjs-fvtt/svelte/animate';
 import * as svelte_action from 'svelte/action';
 
 /**
@@ -829,13 +829,13 @@ declare class AnimationGroupAPI {
      *
      * @param {object|Function}   options -
      *
-     * @returns {import('#svelte-lib/animate').TJSBasicAnimation} Basic animation control.
+     * @returns {import('@typhonjs-fvtt/svelte/animate').TJSBasicAnimation} Basic animation control.
      */
     static from(position: TJSPosition | {
         position: TJSPosition;
     } | Iterable<TJSPosition> | Iterable<{
         position: TJSPosition;
-    }>, fromData: object | Function, options: object | Function): _svelte_lib_animate.TJSBasicAnimation;
+    }>, fromData: object | Function, options: object | Function): _typhonjs_fvtt_svelte_animate.TJSBasicAnimation;
     /**
      * Provides the `fromTo` animation tween for one or more TJSPosition instances as a group.
      *
@@ -847,13 +847,13 @@ declare class AnimationGroupAPI {
      *
      * @param {object|Function}   options -
      *
-     * @returns {import('#svelte-lib/animate').TJSBasicAnimation} Basic animation control.
+     * @returns {import('@typhonjs-fvtt/svelte/animate').TJSBasicAnimation} Basic animation control.
      */
     static fromTo(position: TJSPosition | {
         position: TJSPosition;
     } | Iterable<TJSPosition> | Iterable<{
         position: TJSPosition;
-    }>, fromData: object | Function, toData: object | Function, options: object | Function): _svelte_lib_animate.TJSBasicAnimation;
+    }>, fromData: object | Function, toData: object | Function, options: object | Function): _typhonjs_fvtt_svelte_animate.TJSBasicAnimation;
     /**
      * Provides the `to` animation tween for one or more TJSPosition instances as a group.
      *
@@ -863,13 +863,13 @@ declare class AnimationGroupAPI {
      *
      * @param {object|Function}   options -
      *
-     * @returns {import('#svelte-lib/animate').TJSBasicAnimation} Basic animation control.
+     * @returns {import('@typhonjs-fvtt/svelte/animate').TJSBasicAnimation} Basic animation control.
      */
     static to(position: TJSPosition | {
         position: TJSPosition;
     } | Iterable<TJSPosition> | Iterable<{
         position: TJSPosition;
-    }>, toData: object | Function, options: object | Function): _svelte_lib_animate.TJSBasicAnimation;
+    }>, toData: object | Function, options: object | Function): _typhonjs_fvtt_svelte_animate.TJSBasicAnimation;
     /**
      * Provides the `to` animation tween for one or more TJSPosition instances as a group.
      *

@@ -1,4 +1,4 @@
-import * as _svelte_fvtt_store_position from '@typhonjs-fvtt/svelte/store/position';
+import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
 import * as svelte_store from 'svelte/store';
 
 declare let gsap: any;
@@ -16,7 +16,7 @@ declare const easingList: string[];
  *
  * @param {object}            params - Required parameters.
  *
- * @param {import('#svelte-fvtt/store/position').TJSPosition}   params.position - A position instance.
+ * @param {import('@typhonjs-fvtt/svelte/store/position').TJSPosition}   params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
@@ -43,7 +43,7 @@ declare const easingList: string[];
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
 declare function draggableGsap(node: HTMLElement, { position, active, button, storeDragging, ease, inertia, easeOptions, inertiaOptions, hasTargetClassList, ignoreTargetClassList }: {
-    position: _svelte_fvtt_store_position.TJSPosition;
+    position: _typhonjs_fvtt_svelte_store_position.TJSPosition;
     active?: boolean;
     button?: number;
     storeDragging?: svelte_store.Writable<boolean>;
@@ -287,16 +287,16 @@ type GsapPositionOptions = {
      */
     initialProps?: Iterable<string>;
 };
-type GSAPTarget = (string | object | _svelte_fvtt_store_position.TJSPosition | Iterable<_svelte_fvtt_store_position.TJSPosition> | Array<HTMLElement | object>);
+type GSAPTarget = (string | object | _typhonjs_fvtt_svelte_store_position.TJSPosition | Iterable<_typhonjs_fvtt_svelte_store_position.TJSPosition> | Array<HTMLElement | object>);
 type PositionInfo = {
     /**
      * -
      */
-    position: _svelte_fvtt_store_position.TJSPosition[];
+    position: _typhonjs_fvtt_svelte_store_position.TJSPosition[];
     /**
      * -
      */
-    positionData: _svelte_fvtt_store_position.TJSPositionDataExtended[];
+    positionData: _typhonjs_fvtt_svelte_store_position.TJSPositionDataExtended[];
     /**
      * - Contains the full data object when a list of object w/ position is used.
      */

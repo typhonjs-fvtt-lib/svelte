@@ -28,8 +28,9 @@ const sourcemap = s_SOURCEMAPS;
 
 // Provides naive search / replace of bundled declaration file rewriting the re-bundled definitions from
 // @typhonjs-svelte/lib. This will alter the JSDoc comments and import symbols.
-const replace = {
+const dtsReplace = {
    _typhonjs_svelte_lib_: '_typhonjs_fvtt_svelte_',
+   _svelte_lib_: '_typhonjs_fvtt_svelte_',
    _svelte_fvtt_: '_typhonjs_fvtt_svelte_',
    '#svelte-fvtt/': '@typhonjs-fvtt/svelte/',
    '#svelte-lib/': '@typhonjs-fvtt/svelte/',
@@ -63,8 +64,8 @@ const filterDiagnostic = (diagnostic, message) =>
 // };
 
 // Rollup plugin options for generateDTS.
-// const dtsPluginOptions = { bundlePackageExports: true, filterDiagnostic, onwarn, replace };
-const dtsPluginOptions = { bundlePackageExports: true, filterDiagnostic, replace };
+// const dtsPluginOptions = { bundlePackageExports: true, filterDiagnostic, onwarn, dtsReplace };
+const dtsPluginOptions = { bundlePackageExports: true, filterDiagnostic, dtsReplace };
 
 // -------------------------------------------------------------------------------------------------------------------
 
@@ -409,8 +410,8 @@ for (const gsapFile of gsapFiles)
 }
 
 // Common application generateDTS options.
-// const applicationDTSOptions = { filterDiagnostic, onwarn, replace };
-const applicationDTSOptions = { filterDiagnostic, replace };
+// const applicationDTSOptions = { filterDiagnostic, onwarn, dtsReplace };
+const applicationDTSOptions = { filterDiagnostic, dtsReplace };
 
 console.log('Generating TS Declaration: ./_dist/application/index.js');
 
