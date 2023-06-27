@@ -7,17 +7,17 @@ import { isObject }        from '#runtime/util/object';
 /**
  * Instantiates and attaches a Svelte component to the main inserted HTML.
  *
- * @param {object}            opts - Optional parameters.
+ * @param {object}            [opts] - Optional parameters.
  *
- * @param {object}            opts.app - The target application
+ * @param {object}            [opts.app] - The target application
  *
- * @param {HTMLElement}       opts.template - Any HTML template.
+ * @param {HTMLElement}       [opts.template] - Any HTML template.
  *
- * @param {object}            opts.config - Svelte component options
+ * @param {object}            [opts.config] - Svelte component options
  *
- * @param {Function}          opts.elementRootUpdate - A callback to assign to the external context.
+ * @param {Function}          [opts.elementRootUpdate] - A callback to assign to the external context.
  *
- * @returns {SvelteData} The config + instantiated Svelte component.
+ * @returns {import('#svelte-fvtt/application').SvelteData} The config + instantiated Svelte component.
  */
 export function loadSvelteConfig({ app, template, config, elementRootUpdate } = {})
 {

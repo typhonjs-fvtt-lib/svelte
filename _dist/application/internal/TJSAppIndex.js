@@ -7,14 +7,14 @@ export class TJSAppIndex
    /**
     * Stores all visible / rendered apps.
     *
-    * @type {Map<string, SvelteApplication>}
+    * @type {Map<string, import('@typhonjs-fvtt/svelte/application').SvelteApplication>}
     */
    static #visibleApps = new Map();
 
    /**
     * Adds a SvelteApplication to all visible apps tracked.
     *
-    * @param {SvelteApplication} app - A SvelteApplication
+    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplication} app - A SvelteApplication
     *
     * @package
     */
@@ -26,7 +26,7 @@ export class TJSAppIndex
    /**
     * Removes a SvelteApplication from all visible apps tracked.
     *
-    * @param {SvelteApplication} app - A SvelteApplication
+    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplication} app - A SvelteApplication
     *
     * @package
     */
@@ -40,7 +40,7 @@ export class TJSAppIndex
     *
     * @param {string}   key - App ID.
     *
-    * @returns {SvelteApplication} Associated app.
+    * @returns {import('@typhonjs-fvtt/svelte/application').SvelteApplication} Associated app.
     */
    static get(key)
    {
@@ -68,7 +68,7 @@ export class TJSAppIndex
    }
 
    /**
-    * @returns {IterableIterator<SvelteApplication>} All visible apps.
+    * @returns {IterableIterator<import('@typhonjs-fvtt/svelte/application').SvelteApplication>} All visible apps.
     */
    static values()
    {

@@ -2,7 +2,8 @@ import { TJSDialog }                from '@typhonjs-fvtt/svelte/application';
 import { TJSDocumentOwnership
     as TJSDocumentOwnershipImpl }   from '@typhonjs-fvtt/svelte/component/dialog';
 import { localize }                 from '@typhonjs-fvtt/svelte/helper';
-import { hasSetter }                from '@typhonjs-fvtt/svelte/util';
+
+import { hasSetter }                from '@typhonjs-svelte/runtime-base/util/object';
 
 /**
  * Provides a reactive dialog for permission control that by default is modal and not draggable. An additional set of
@@ -14,9 +15,10 @@ export class TJSDocumentOwnership extends TJSDialog
    /**
     * @param {foundry.abstract.Document} document - Document instance to modify.
     *
-    * @param {SvelteApplicationOptions} [options] - Rest of options to pass to TJSDialog / Application.
+    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} [options] - Rest of options to pass to
+    *        TJSDialog / Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('@typhonjs-fvtt/svelte/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     */
    constructor(document, options = {}, dialogData = {})
    {
@@ -64,9 +66,10 @@ export class TJSDocumentOwnership extends TJSDialog
     *
     * @param {foundry.abstract.Document} document - Document instance to modify.
     *
-    * @param {SvelteApplicationOptions} [options] - Rest of options to pass to TJSDialog / Application.
+    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} [options] - Rest of options to pass to
+    *        TJSDialog / Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('@typhonjs-fvtt/svelte/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<foundry.abstract.Document|null>} The modified document or 'null' if the user closed the dialog
     *          via `<Esc>` or the close header button.

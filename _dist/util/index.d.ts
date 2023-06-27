@@ -100,33 +100,4 @@ declare function outroAndDestroy(instance: any): Promise<any>;
  */
 declare function parseTJSSvelteConfig(config: object, thisArg?: any): object;
 
-/**
- * Attempts to create a Foundry UUID from standard drop data. This may not work for all systems.
- *
- * @param {object}   data - Drop transfer data.
- *
- * @param {ParseDataTransferOptions}   opts - Optional parameters.
- *
- * @returns {string|undefined} Foundry UUID for drop data.
- */
-declare function getUUIDFromDataTransfer(data: object, { actor, compendium, world, types }?: ParseDataTransferOptions): string | undefined;
-type ParseDataTransferOptions = {
-    /**
-     * - Accept actor owned documents.
-     */
-    actor?: boolean;
-    /**
-     * - Accept compendium documents.
-     */
-    compendium?: boolean;
-    /**
-     * - Accept world documents.
-     */
-    world?: boolean;
-    /**
-     * - Require the `data.type` to match entry in `types`.
-     */
-    types?: string[] | undefined;
-};
-
-export { ParseDataTransferOptions, TJSSvelteConfig, getUUIDFromDataTransfer, isApplicationShell, isHMRProxy, isSvelteComponent, isTJSSvelteConfig, outroAndDestroy, parseTJSSvelteConfig };
+export { TJSSvelteConfig, isApplicationShell, isHMRProxy, isSvelteComponent, isTJSSvelteConfig, outroAndDestroy, parseTJSSvelteConfig };

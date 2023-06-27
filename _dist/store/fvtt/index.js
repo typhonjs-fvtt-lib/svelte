@@ -86,7 +86,7 @@ class EmbeddedStoreManager
    static #renderContextRegex = /(?<action>create|delete|update)(?<sep>\.?)(?<name>\w+)/;
 
    /**
-    * @type {Map<string, EmbeddedCollectionData>}
+    * @type {Map<string, EmbeddedCollectionData<any>>}
     */
    #name = new Map();
 
@@ -122,9 +122,9 @@ class EmbeddedStoreManager
     *
     * @param {string} embeddedName -
     *
-    * @param {import('#svelte-fvtt/store/reducer').DynOptionsMapCreate<string, T>} options -
+    * @param {import('#runtime/data/struct/store/reducer').DynOptionsMapCreate<string, T>} options -
     *
-    * @returns {import('#svelte-fvtt/store/reducer').DynMapReducer<string, T>} DynMapReducer instance
+    * @returns {import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} DynMapReducer instance
     */
    create(embeddedName, options)
    {
@@ -164,10 +164,10 @@ class EmbeddedStoreManager
       /** @type {string} */
       let name;
 
-      /** @type {import('#svelte-fvtt/store/reducer').DynDataOptions<T>} */
+      /** @type {import('#runtime/data/struct/store/reducer').DynDataOptions<T>} */
       let rest = {};
 
-      /** @type {import('#svelte-fvtt/store/reducer').IDynMapReducerCtor<string, T>} */
+      /** @type {import('#runtime/data/struct/store/reducer').IDynMapReducerCtor<string, T>} */
       let ctor;
 
       if (typeof options === 'string')
@@ -279,7 +279,7 @@ class EmbeddedStoreManager
     *
     * @param {string} storeName -
     *
-    * @returns {import('#svelte-fvtt/store/reducer').DynMapReducer<string, T>} DynMapReducer instance.
+    * @returns {import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} DynMapReducer instance.
     */
    get(embeddedName, storeName)
    {
@@ -299,7 +299,7 @@ class EmbeddedStoreManager
       {
          const existingEmbeddedNames = new Set(this.#name.keys());
 
-         /** @type {string[]} */
+         /** @type {[string, string][]} */
          const embeddedNames = Object.entries(doc.constructor?.metadata?.embedded ?? []);
 
          this.#collectionToDocName.clear();
@@ -404,11 +404,13 @@ class EmbeddedStoreManager
 }
 
 /**
+ * @template T
+ *
  * @typedef {object} EmbeddedCollectionData
  *
  * @property {foundry.abstract.Collection} collection -
  *
- * @property {Map<string, import('@typhonjs-fvtt/svelte/store').DynMapReducer<string, T>>} stores -
+ * @property {Map<string, import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>>} stores -
  */
 
 /**
@@ -685,7 +687,7 @@ class TJSDocument
     *
     * @param {object}   data - Document transfer data.
     *
-    * @param {import('@typhonjs-fvtt/svelte/util').ParseDataTransferOptions & TJSDocumentOptions}   [options] - Optional
+    * @param {{ actor?: boolean, compendium?: boolean, world?: boolean, types?: string[] } & TJSDocumentOptions}   [options] - Optional
     *        parameters.
     *
     * @returns {Promise<boolean>} Returns true if new document set from data transfer blob.
@@ -694,6 +696,20 @@ class TJSDocument
    {
       return this.setFromUUID(TJSDocument.getUUIDFromDataTransfer(data, options), options);
    }
+
+   /*
+{ actor?: boolean, compendium?: boolean, world?: boolean, types?: string[] }
+   @param {object}   [opts] - Optional parameters.
+
+@param {boolean}  [opts.actor=true] - Accept actor owned documents.
+
+@param {boolean}  [opts.compendium=true] - Accept compendium documents.
+
+@param {boolean}  [opts.world=true] - Accept world documents.
+
+@param {string[]|undefined}   [opts.types] - Require the `data.type` to match entry in `types`.
+
+    */
 
    /**
     * Sets the document by Foundry UUID performing a lookup and setting the document if found.
@@ -796,11 +812,11 @@ class TJSDocument
  * @template T
  * @typedef {object} EmbeddedAPI
  *
- * @property {(embeddedName: string, options: import('#svelte-fvtt/store/reducer').DynOptionsMapCreate<string, any>) => import('#svelte-fvtt/store/reducer').DynMapReducer<string, T>} create - Creates an embedded collection store.
+ * @property {(embeddedName: string, options: import('#runtime/data/struct/store/reducer').DynOptionsMapCreate<string, any>) => import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} create - Creates an embedded collection store.
  *
  * @property {(embeddedName?: string, storeName?: string) => boolean} destroy - Destroys one or more embedded collection stores.
  *
- * @property {(embeddedName: string, storeName: string) => import('#svelte-fvtt/store/reducer').DynMapReducer<string, T>} get - Returns a specific existing embedded collection store.
+ * @property {(embeddedName: string, storeName: string) => import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} get - Returns a specific existing embedded collection store.
  */
 
 /**
@@ -831,7 +847,7 @@ class TJSDocumentCollection
     */
    constructor(collection, options = {})
    {
-      this.#uuid = `tjs-collection-${uuidv4()}`;
+      this.#uuid = `tjs-collection-${Hashing.uuidv4()}`;
 
       if (isPlainObject(collection)) // Handle case when only options are passed into ctor.
       {

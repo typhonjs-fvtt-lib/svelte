@@ -5,9 +5,9 @@
  *
  * A helper to create a set of <option> elements in a <select> block based on a provided dictionary.
  * The provided keys are the option values while the provided values are human-readable labels.
- * This helper supports both single-select as well as multi-select input fields.
+ * This helper supports both single-select and multi-select input fields.
  *
- * @param {object} choices                     A mapping of radio checkbox values to human readable labels
+ * @param {object} choices                     A mapping of radio checkbox values to human-readable labels
  *
  * @param {object} options                     Helper options
  *
@@ -23,6 +23,8 @@
  *
  * @param {boolean} [options.inverted=false]   Use the choice object value as the option value, and the key as the label
  *                                             instead of vice-versa
+ *
+ * @param {boolean} [options.sort=false]       When true sort by label name.
  *
  * @returns {string} The <options> HTML element(s).
  *

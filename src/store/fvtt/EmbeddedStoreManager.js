@@ -20,7 +20,7 @@ export class EmbeddedStoreManager
    static #renderContextRegex = /(?<action>create|delete|update)(?<sep>\.?)(?<name>\w+)/;
 
    /**
-    * @type {Map<string, EmbeddedCollectionData>}
+    * @type {Map<string, EmbeddedCollectionData<any>>}
     */
    #name = new Map();
 
@@ -56,9 +56,9 @@ export class EmbeddedStoreManager
     *
     * @param {string} embeddedName -
     *
-    * @param {import('#svelte-fvtt/store/reducer').DynOptionsMapCreate<string, T>} options -
+    * @param {import('#runtime/data/struct/store/reducer').DynOptionsMapCreate<string, T>} options -
     *
-    * @returns {import('#svelte-fvtt/store/reducer').DynMapReducer<string, T>} DynMapReducer instance
+    * @returns {import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} DynMapReducer instance
     */
    create(embeddedName, options)
    {
@@ -98,10 +98,10 @@ export class EmbeddedStoreManager
       /** @type {string} */
       let name;
 
-      /** @type {import('#svelte-fvtt/store/reducer').DynDataOptions<T>} */
+      /** @type {import('#runtime/data/struct/store/reducer').DynDataOptions<T>} */
       let rest = {};
 
-      /** @type {import('#svelte-fvtt/store/reducer').IDynMapReducerCtor<string, T>} */
+      /** @type {import('#runtime/data/struct/store/reducer').IDynMapReducerCtor<string, T>} */
       let ctor;
 
       if (typeof options === 'string')
@@ -213,7 +213,7 @@ export class EmbeddedStoreManager
     *
     * @param {string} storeName -
     *
-    * @returns {import('#svelte-fvtt/store/reducer').DynMapReducer<string, T>} DynMapReducer instance.
+    * @returns {import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} DynMapReducer instance.
     */
    get(embeddedName, storeName)
    {
@@ -233,7 +233,7 @@ export class EmbeddedStoreManager
       {
          const existingEmbeddedNames = new Set(this.#name.keys());
 
-         /** @type {string[]} */
+         /** @type {[string, string][]} */
          const embeddedNames = Object.entries(doc.constructor?.metadata?.embedded ?? []);
 
          this.#collectionToDocName.clear();
@@ -338,9 +338,11 @@ export class EmbeddedStoreManager
 }
 
 /**
+ * @template T
+ *
  * @typedef {object} EmbeddedCollectionData
  *
  * @property {foundry.abstract.Collection} collection -
  *
- * @property {Map<string, import('@typhonjs-fvtt/svelte/store').DynMapReducer<string, T>>} stores -
+ * @property {Map<string, import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>>} stores -
  */

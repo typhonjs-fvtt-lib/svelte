@@ -56,7 +56,7 @@ export class GsapPosition
    /**
     * @param {TJSPosition} tjsPosition - TJSPosition instance.
     *
-    * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
     *
     * @param {object}   vars - GSAP vars object for `from`.
     *
@@ -94,7 +94,7 @@ export class GsapPosition
    /**
     * @param {TJSPosition} tjsPosition - TJSPosition instance.
     *
-    * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
     *
     * @param {object}   fromVars - GSAP fromVars object for `fromTo`
     *
@@ -139,7 +139,7 @@ export class GsapPosition
    /**
     * @param {TJSPosition} tjsPosition - TJSPosition instance.
     *
-    * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
     *
     * @param {string}   key - Property of position to manipulate.
     *
@@ -175,13 +175,14 @@ export class GsapPosition
    }
 
    /**
-    * @param {TJSPosition|Iterable<TJSPosition>}   tjsPosition - TJSPosition instance.
+    * @param {TJSPosition | Iterable<TJSPosition>}   tjsPosition - TJSPosition instance.
     *
-    * @param {object|GsapData}               arg1 - Either an object defining timelineOptions or GsapData.
+    * @param {object | import('../').GsapData}  arg1 - Either an object defining timelineOptions or GsapData.
     *
-    * @param {GsapData|GsapPositionOptions}  [arg2] - When arg1 is defined as an object; arg2 defines GsapData.
+    * @param {import('../').GsapData | import('../').GsapPositionOptions}  [arg2] - When arg1 is defined as an object;
+    *        arg2 defines GsapData.
     *
-    * @param {GsapPositionOptions}           [arg3] - Options for filtering and initial data population.
+    * @param {import('../').GsapPositionOptions}   [arg3] - Options for filtering and initial data population.
     *
     * @returns {object} GSAP timeline
     */
@@ -194,7 +195,7 @@ export class GsapPosition
       // If arg1 is an array then take it as `gsapData` otherwise select arg2.
       const gsapData = isIterable(arg1) || typeof arg1 === 'function' ? arg1 : arg2;
 
-      /** @type {GsapPositionOptions} */
+      /** @type {import('../').GsapPositionOptions} */
       const options = gsapData === arg1 ? arg2 : arg3;
 
       if (typeof timelineOptions !== 'object')
@@ -338,9 +339,9 @@ export class GsapPosition
    }
 
    /**
-    * @param {TJSPosition|TJSPosition[]} tjsPosition - TJSPosition instance.
+    * @param {TJSPosition | TJSPosition[]} tjsPosition - TJSPosition instance.
     *
-    * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
     *
     * @param {object}   vars - GSAP vars object for `to`.
     *
@@ -384,7 +385,7 @@ class TimelinePositionImpl
    /**
     * Gets the target from GSAP data entry.
     *
-    * @param {import('@typhonjs-svelte/lib/store/position').TJSPositionDataExtended|import('@typhonjs-svelte/lib/store/position').TJSPositionDataExtended[]}  positionData - PositionInfo data.
+    * @param {import('#svelte-fvtt/store/position').TJSPositionDataExtended|import('#svelte-fvtt/store/position').TJSPositionDataExtended[]}  positionData - PositionInfo data.
     *
     * @param {HTMLElement|HTMLElement[]}  elements - One or more HTMLElements.
     *
@@ -392,7 +393,7 @@ class TimelinePositionImpl
     *
     * @param {number}         cntr - Current GSAP data entry index.
     *
-    * @returns {import('@typhonjs-svelte/lib/store/position').TJSPositionDataExtended|import('@typhonjs-svelte/lib/store/position').TJSPositionDataExtended[]|HTMLElement|HTMLElement[]} The target object or HTMLElement.
+    * @returns {import('#svelte-fvtt/store/position').TJSPositionDataExtended|import('#svelte-fvtt/store/position').TJSPositionDataExtended[]|HTMLElement|HTMLElement[]} The target object or HTMLElement.
     */
    static getTarget(positionData, elements, entry, cntr)
    {
@@ -542,11 +543,11 @@ class TimelinePositionImpl
  *
  * @param {object[]|Function}             [gsapData] -
  *
- * @returns {PositionInfo} A PositionInfo instance.
+ * @returns {import('../').PositionInfo} A PositionInfo instance.
  */
 function s_GET_POSITIONINFO(tjsPositions, vars, filter, gsapData)
 {
-   /** @type {PositionInfo} */
+   /** @type {import('../').PositionInfo} */
    const positionInfo = {
       position: [],
       positionData: [],
@@ -717,17 +718,3 @@ function s_VALIDATE_GSAPDATA_ENTRY(gsapData)
       index++;
    }
 }
-
-/**
- * @typedef {object} PositionInfo
- *
- * @property {TJSPosition[]}              position -
- *
- * @property {import('@typhonjs-svelte/lib/store/position').TJSPositionDataExtended[]}  positionData -
- *
- * @property {object[]}                data - Contains the full data object when a list of object w/ position is used.
- *
- * @property {HTMLElement[]}           elements -
- *
- * @property {Array<object[]>}         gsapData -
- */

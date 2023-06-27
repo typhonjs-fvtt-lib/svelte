@@ -16,9 +16,10 @@ export class TJSDocumentImport extends TJSDialog
     *
     * @param {foundry.abstract.Document} document - The document to import JSON to...
     *
-    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
+    * @param {import('#svelte-fvtt/application').SvelteApplicationOptions} [options] - Options to pass to TJSDialog /
+    *        Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('#svelte-fvtt/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     */
    constructor(document, options, dialogData = {})
    {
@@ -53,7 +54,7 @@ export class TJSDocumentImport extends TJSDialog
        * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with
        *                             Document.
        *
-       * @memberof SvelteApplication.reactive
+       * @memberof import('#svelte-fvtt/application').SvelteApplication.reactive
        */
       Object.defineProperty(this.reactive, 'document', {
          get: () => this.svelte?.dialogComponent?.document,
@@ -70,9 +71,10 @@ export class TJSDocumentImport extends TJSDialog
     *
     * @param {foundry.abstract.Document} document - The document to import JSON to...
     *
-    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
+    * @param {import('#svelte-fvtt/application').SvelteApplicationOptions} [options] - Options to pass to TJSDialog /
+    *        Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('#svelte-fvtt/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<foundry.abstract.Document|boolean|null>} The document after import completes or a falsy value;
     *          either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header

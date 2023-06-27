@@ -2,7 +2,8 @@ import { TJSDialog }          from '@typhonjs-fvtt/svelte/application';
 import { TJSFolderRemove
     as TJSFolderRemoveImpl }  from '@typhonjs-fvtt/svelte/component/dialog';
 import { localize }           from '@typhonjs-fvtt/svelte/helper';
-import { hasSetter }          from '@typhonjs-fvtt/svelte/util';
+
+import { hasSetter }          from '@typhonjs-svelte/runtime-base/util/object';
 
 /**
  * Provides a reactive dialog for removing a folder that by default is modal and not draggable. An additional set of
@@ -14,9 +15,10 @@ export class TJSFolderRemove extends TJSDialog
    /**
     * @param {globalThis.Folder} document - Folder to remove.
     *
-    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
+    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} [options] - Options to pass to TJSDialog /
+    *        Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('@typhonjs-fvtt/svelte/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     */
    constructor(document, options = {}, dialogData = {})
    {
@@ -67,9 +69,10 @@ export class TJSFolderRemove extends TJSDialog
     *
     * @param {globalThis.Folder} document - Folder to remove.
     *
-    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
+    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} [options] - Options to pass to TJSDialog /
+    *        Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('@typhonjs-fvtt/svelte/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<globalThis.Folder|boolean|null>} The removed Folder or a falsy value; either 'false' for
     *          cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.

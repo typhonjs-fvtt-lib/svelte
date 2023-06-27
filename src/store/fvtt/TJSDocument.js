@@ -280,7 +280,7 @@ export class TJSDocument
     *
     * @param {object}   data - Document transfer data.
     *
-    * @param {import('@typhonjs-fvtt/svelte/util').ParseDataTransferOptions & TJSDocumentOptions}   [options] - Optional
+    * @param {{ actor?: boolean, compendium?: boolean, world?: boolean, types?: string[] } & TJSDocumentOptions}   [options] - Optional
     *        parameters.
     *
     * @returns {Promise<boolean>} Returns true if new document set from data transfer blob.
@@ -289,6 +289,20 @@ export class TJSDocument
    {
       return this.setFromUUID(TJSDocument.getUUIDFromDataTransfer(data, options), options);
    }
+
+   /*
+{ actor?: boolean, compendium?: boolean, world?: boolean, types?: string[] }
+   @param {object}   [opts] - Optional parameters.
+
+@param {boolean}  [opts.actor=true] - Accept actor owned documents.
+
+@param {boolean}  [opts.compendium=true] - Accept compendium documents.
+
+@param {boolean}  [opts.world=true] - Accept world documents.
+
+@param {string[]|undefined}   [opts.types] - Require the `data.type` to match entry in `types`.
+
+    */
 
    /**
     * Sets the document by Foundry UUID performing a lookup and setting the document if found.
@@ -391,9 +405,9 @@ export class TJSDocument
  * @template T
  * @typedef {object} EmbeddedAPI
  *
- * @property {(embeddedName: string, options: import('#svelte-fvtt/store/reducer').DynOptionsMapCreate<string, any>) => import('#svelte-fvtt/store/reducer').DynMapReducer<string, T>} create - Creates an embedded collection store.
+ * @property {(embeddedName: string, options: import('#runtime/data/struct/store/reducer').DynOptionsMapCreate<string, any>) => import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} create - Creates an embedded collection store.
  *
  * @property {(embeddedName?: string, storeName?: string) => boolean} destroy - Destroys one or more embedded collection stores.
  *
- * @property {(embeddedName: string, storeName: string) => import('#svelte-fvtt/store/reducer').DynMapReducer<string, T>} get - Returns a specific existing embedded collection store.
+ * @property {(embeddedName: string, storeName: string) => import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} get - Returns a specific existing embedded collection store.
  */

@@ -671,7 +671,7 @@ class CrudArrayObjectStore extends ArrayObjectStore
  *
  * @param {boolean}  [opts.caseSensitive=false] - When true regex test is case-sensitive.
  *
- * @param {import('#svelte/store').Writable<string>}  [opts.store=void] - Use the provided store to instead of creating
+ * @param {import('#svelte/store').Writable<string>}  [opts.store] - Use the provided store to instead of creating
  *        a default writable store.
  *
  * @returns {((data: object) => boolean) & import('#svelte/store').Writable<string>} The query string filter.
@@ -696,7 +696,7 @@ function regexObjectQuery(properties, { caseSensitive = false, store } = {})
       if (typeof current === 'string')
       {
          keyword = Strings.normalize(current);
-         regex = new RegExp(RegExp.escape(keyword), caseSensitive ? '' : 'i');
+         regex = new RegExp(Strings.escape(keyword), caseSensitive ? '' : 'i');
       }
       else
       {
@@ -753,7 +753,7 @@ function regexObjectQuery(properties, { caseSensitive = false, store } = {})
       if (typeof value === 'string')
       {
          keyword = Strings.normalize(value);
-         regex = new RegExp(RegExp.escape(keyword), caseSensitive ? '' : 'i');
+         regex = new RegExp(Strings.escape(keyword), caseSensitive ? '' : 'i');
          storeKeyword.set(keyword);
       }
    };

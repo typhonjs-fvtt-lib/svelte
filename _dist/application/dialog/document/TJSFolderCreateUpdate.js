@@ -2,7 +2,8 @@ import { TJSDialog }                from '@typhonjs-fvtt/svelte/application';
 import { TJSFolderCreateUpdate
     as TJSFolderCreateUpdateImpl }  from '@typhonjs-fvtt/svelte/component/dialog';
 import { localize }                 from '@typhonjs-fvtt/svelte/helper';
-import { hasSetter }                from '@typhonjs-fvtt/svelte/util';
+
+import { hasSetter }                from '@typhonjs-svelte/runtime-base/util/object';
 
 /**
  * Provides a reactive dialog for modifying folders that by default is modal and not draggable. An additional set of
@@ -18,7 +19,7 @@ export class TJSFolderCreateUpdate extends TJSDialog
     *
     * @param {object} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('@typhonjs-fvtt/svelte/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     */
    constructor(document, options = {}, dialogData = {})
    {
@@ -100,7 +101,7 @@ export class TJSFolderCreateUpdate extends TJSDialog
     *
     * @param {object} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('@typhonjs-fvtt/svelte/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<globalThis.Folder|null>} The modified Folder or null if the dialog is closed.
     */

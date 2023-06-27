@@ -94,7 +94,7 @@ Hooks.on('PopOut:close', (app) =>
  *
  * @property {boolean}  [focusKeep=false] - When `focusAuto` and `focusKeep` is true; keeps internal focus.
  *
- * @property {import('@typhonjs-svelte/lib/util').A11yFocusSource}   [focusSource] - Defines A11yHelper focus source to
+ * @property {import('#runtime/util/browser').A11yFocusSource}   [focusSource] - Defines A11yHelper focus source to
  *           apply when application closes.
  *
  * @property {boolean}  [headerButtonNoClose=false] - If true then the close header button is removed.
@@ -111,21 +111,21 @@ Hooks.on('PopOut:close', (app) =>
  *
  * @property {boolean}  [positionable=true] - If false then `position.set` does not take effect.
  *
- * @property {import('@typhonjs-svelte/lib/store/position').TJSPositionInitialHelper}   [positionInitial] - A helper
+ * @property {import('#svelte-fvtt/store/position').TJSPositionInitialHelper}   [positionInitial] - A helper
  *           for initial position placement.
  *
  * @property {boolean}  [positionOrtho=true] - When true TJSPosition is optimized for orthographic use.
  *
- * @property {import('@typhonjs-svelte/lib/store/position').TJSPositionValidatorOptions}   [positionValidator] - A
+ * @property {import('#svelte-fvtt/store/position').TJSPositionValidatorOptions}   [positionValidator] - A
  *           validator function or data or list of validators.
  *
- * @property {import('@typhonjs-svelte/lib/store/storage/web').TJSSessionStorage}   [sessionStorage] - An instance of
+ * @property {import('#svelte-fvtt/store/storage/web').TJSSessionStorage}   [sessionStorage] - An instance of
  *           TJSSessionStorage to share across SvelteApplications.
  *
- * @property {import('@typhonjs-svelte/lib/util').TJSSvelteConfig}   [svelte] - A Svelte configuration object defining
+ * @property {import('#svelte-fvtt/util').TJSSvelteConfig}   [svelte] - A Svelte configuration object defining
  *           the main component.
  *
- * @property {import('@typhonjs-svelte/lib/store/position').TJSTransformOrigin}   [transformOrigin='top left'] - By
+ * @property {import('#svelte-fvtt/store/position').TJSTransformOrigin}   [transformOrigin='top left'] - By
  *           default, 'top / left' respects rotation when minimizing.
  */
 
@@ -160,7 +160,7 @@ Hooks.on('PopOut:close', (app) =>
  *
  * @property {Record<string, TJSDialogButtonData>}  [buttons={}] - Provides configuration of the dialog button bar.
  *
- * @property {object|string}  content - A Svelte configuration object or HTML string content.
+ * @property {object|string}  [content] - A Svelte configuration object or HTML string content.
  *
  * @property {string}   [default] - The default button ID to focus initially.
  *

@@ -78,7 +78,7 @@ export class SvelteReactive
     */
    #initialized = false;
 
-   /** @type {import('@typhonjs-svelte/lib/store').TJSSessionStorage} */
+   /** @type {import('#svelte-fvtt/store/storage/web').TJSSessionStorage} */
    #sessionStorage;
 
    /**
@@ -142,7 +142,8 @@ export class SvelteReactive
    /**
     * Initializes reactive support. Package private for internal use.
     *
-    * @returns {SvelteStores|void} Internal methods to interact with Svelte stores.
+    * @returns {import('#svelte-fvtt/application').SvelteStores | undefined} Internal methods to interact with Svelte
+    *          stores.
     * @package
     */
    initialize()
@@ -164,7 +165,7 @@ export class SvelteReactive
 // Store getters -----------------------------------------------------------------------------------------------------
 
    /**
-    * @returns {import('@typhonjs-svelte/lib/store').TJSSessionStorage} Returns TJSSessionStorage instance.
+    * @returns {import('#svelte-fvtt/store/storage/web').TJSSessionStorage} Returns TJSSessionStorage instance.
     */
    get sessionStorage()
    {
@@ -631,11 +632,11 @@ export class SvelteReactive
     * to remove the close button and {@link SvelteApplicationOptions.headerButtonNoLabel} to true and labels will be
     * removed from the header buttons.
     *
-    * @param {object} opts - Optional parameters (for internal use)
+    * @param {object} [opts] - Optional parameters (for internal use)
     *
-    * @param {boolean} opts.headerButtonNoClose - The value for `headerButtonNoClose`.
+    * @param {boolean} [opts.headerButtonNoClose] - The value for `headerButtonNoClose`.
     *
-    * @param {boolean} opts.headerButtonNoLabel - The value for `headerButtonNoLabel`.
+    * @param {boolean} [opts.headerButtonNoLabel] - The value for `headerButtonNoLabel`.
     */
    updateHeaderButtons({ headerButtonNoClose = this.#application.options.headerButtonNoClose,
     headerButtonNoLabel = this.#application.options.headerButtonNoLabel } = {})
@@ -663,51 +664,51 @@ export class SvelteReactive
 }
 
 /**
- * @typedef {object} StoreAppOptions - Provides a custom readable Svelte store for Application options state.
+ * @typedef {object} StoreAppOptions Provides a custom readable Svelte store for Application options state.
  *
- * @property {import('svelte/store').Readable<object>} subscribe - Subscribe to all app options updates.
+ * @property {import('svelte/store').Readable<object>} subscribe Subscribe to all app options updates.
  *
- * @property {import('svelte/store').Writable<boolean>} draggable - Derived store for `draggable` updates.
+ * @property {import('svelte/store').Writable<boolean>} draggable Derived store for `draggable` updates.
  *
- * @property {import('svelte/store').Writable<boolean>} focusAuto - Derived store for `focusAuto` updates.
+ * @property {import('svelte/store').Writable<boolean>} focusAuto Derived store for `focusAuto` updates.
  *
- * @property {import('svelte/store').Writable<boolean>} focusKeep - Derived store for `focusKeep` updates.
+ * @property {import('svelte/store').Writable<boolean>} focusKeep Derived store for `focusKeep` updates.
  *
- * @property {import('svelte/store').Writable<boolean>} focusTrap - Derived store for `focusTrap` updates.
+ * @property {import('svelte/store').Writable<boolean>} focusTrap Derived store for `focusTrap` updates.
  *
- * @property {import('svelte/store').Writable<boolean>} headerButtonNoClose - Derived store for `headerButtonNoClose`
- *                                                                            updates.
+ * @property {import('svelte/store').Writable<boolean>} headerButtonNoClose Derived store for `headerButtonNoClose`
+ * updates.
  *
- * @property {import('svelte/store').Writable<boolean>} headerButtonNoLabel - Derived store for `headerButtonNoLabel`
- *                                                                            updates.
+ * @property {import('svelte/store').Writable<boolean>} headerButtonNoLabel Derived store for `headerButtonNoLabel`
+ * updates.
  *
- * @property {import('svelte/store').Writable<string>} headerIcon - Derived store for `headerIcon` updates.
+ * @property {import('svelte/store').Writable<string>} headerIcon Derived store for `headerIcon` updates.
  *
- * @property {import('svelte/store').Writable<boolean>} headerNoTitleMinimized - Derived store for
- *                                                                               `headerNoTitleMinimized` updates.
+ * @property {import('svelte/store').Writable<boolean>} headerNoTitleMinimized Derived store for
+ * `headerNoTitleMinimized` updates.
  *
- * @property {import('svelte/store').Writable<boolean>} minimizable - Derived store for `minimizable` updates.
+ * @property {import('svelte/store').Writable<boolean>} minimizable Derived store for `minimizable` updates.
  *
- * @property {import('svelte/store').Writable<boolean>} popOut - Derived store for `popOut` updates.
+ * @property {import('svelte/store').Writable<boolean>} popOut Derived store for `popOut` updates.
  *
- * @property {import('svelte/store').Writable<boolean>} positionable - Derived store for `positionable` updates.
+ * @property {import('svelte/store').Writable<boolean>} positionable Derived store for `positionable` updates.
  *
- * @property {import('svelte/store').Writable<boolean>} resizable - Derived store for `resizable` updates.
+ * @property {import('svelte/store').Writable<boolean>} resizable Derived store for `resizable` updates.
  *
- * @property {import('svelte/store').Writable<string>} title - Derived store for `title` updates.
+ * @property {import('svelte/store').Writable<string>} title Derived store for `title` updates.
  */
 
 /**
- * @typedef {object} StoreUIOptions - Provides a custom readable Svelte store for UI options state.
+ * @typedef {object} StoreUIOptions Provides a custom readable Svelte store for UI options state.
  *
- * @property {import('svelte/store').Readable.subscribe} subscribe - Subscribe to all UI options updates.
+ * @property {import('svelte/store').Readable.subscribe} subscribe Subscribe to all UI options updates.
  *
- * @property {import('svelte/store').Writable<boolean>} dragging - Derived store for `dragging` updates.
+ * @property {import('svelte/store').Writable<boolean>} dragging Derived store for `dragging` updates.
  *
- * @property {import('svelte/store').Readable<globalThis.ApplicationHeaderButton[]>} headerButtons - Derived store for
- *                                                                                   `headerButtons` updates.
+ * @property {import('svelte/store').Readable<globalThis.ApplicationHeaderButton[]>} headerButtons Derived store for
+ * `headerButtons` updates.
  *
- * @property {import('svelte/store').Readable<boolean>} minimized - Derived store for `minimized` updates.
+ * @property {import('svelte/store').Readable<boolean>} minimized Derived store for `minimized` updates.
  *
- * @property {import('svelte/store').Writable<boolean>} resizing - Derived store for `resizing` updates.
+ * @property {import('svelte/store').Writable<boolean>} resizing Derived store for `resizing` updates.
  */

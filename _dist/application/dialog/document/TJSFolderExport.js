@@ -21,9 +21,10 @@ export class TJSFolderExport extends TJSDialog
     *
     * @param {boolean} [opts.keepId=true] - Keep document IDs.
     *
-    * @param {...SvelteApplicationOptions} [opts.options] - Rest of options to pass to TJSDialog / Application.
+    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} [opts.options] - Rest of options to pass to
+    *        TJSDialog / Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('@typhonjs-fvtt/svelte/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<globalThis.CompendiumCollection|boolean|null>} The compendium collection the folder is exported
     *          to or a falsy value; either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>`
@@ -87,9 +88,10 @@ export class TJSFolderExport extends TJSDialog
     *
     * @param {boolean} [opts.keepId=true] - Keep document IDs.
     *
-    * @param {...SvelteApplicationOptions} [opts.options] - Rest of options to pass to TJSDialog / Application.
+    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} [opts.options] - Rest of options to pass to
+    *        TJSDialog / Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('@typhonjs-fvtt/svelte/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<globalThis.CompendiumCollection|boolean|null>} The compendium collection the folder is exported
     *          to or a falsy value; either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>`

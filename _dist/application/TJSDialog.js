@@ -112,7 +112,7 @@ export class TJSDialog extends SvelteApplication
    get data() { return this.#data; }
 
    /**
-    * @returns {import('@typhonjs-fvtt/svelte/util').ManagedPromise} Returns the managed promise.
+    * @returns {import('@typhonjs-svelte/runtime-base/util/async').ManagedPromise} Returns the managed promise.
     */
    get managedPromise() { return this.#managedPromise; }
 

@@ -21,7 +21,7 @@ import * as _svelte_transition from 'svelte/transition';
  *
  * @param {number}      [options.initial=0] - Initial rotation in degrees.
  *
- * @returns {{duration: number, css: (function(*=): string), delay: number, easing: (x: number) => number}}
+ * @returns {{duration: number, css: (function(*): string), delay: number, easing: (x: number) => number}}
  *  Transition object.
  */
 declare function rotate(node: HTMLElement, options: {
@@ -32,7 +32,9 @@ declare function rotate(node: HTMLElement, options: {
     initial?: number;
 }): {
     duration: number;
-    css: (() => any);
+    css: ((arg0: any) => string);
+    delay: number;
+    easing: (x: number) => number;
 };
 
 /**
@@ -60,7 +62,7 @@ declare function rotate(node: HTMLElement, options: {
  *
  * @param {number}      [options.initial=0] - Initial rotation in degrees.
  *
- * @returns {{duration: number, css: (function(*=): string), delay: number, easing: (x: number) => number}}
+ * @returns {{duration: number, css: (function(*): string), delay: number, easing: (x: number) => number}}
  *  Transition object.
  */
 declare function rotateFade(node: HTMLElement, options: {
@@ -73,7 +75,9 @@ declare function rotateFade(node: HTMLElement, options: {
     initial?: number;
 }): {
     duration: number;
-    css: (() => any);
+    css: ((arg0: any) => string);
+    delay: number;
+    easing: (x: number) => number;
 };
 
 /**
@@ -94,7 +98,7 @@ declare function rotateFade(node: HTMLElement, options: {
  *
  * @param {Function}    [options.easingSlide=linear] - The easing function to apply to the slide transition.
  *
- * @returns {{duration: number, css: (function(*=): string), delay: number, easing: (x: number) => number}}
+ * @returns {{duration: number, css: (function(*): string), delay: number, easing: (x: number) => number}}
  *  Transition object.
  */
 declare function slideFade(node: HTMLElement, options: {
@@ -105,7 +109,9 @@ declare function slideFade(node: HTMLElement, options: {
     easingSlide?: Function;
 }): {
     duration: number;
-    css: (() => any);
+    css: ((arg0: any) => string);
+    delay: number;
+    easing: (x: number) => number;
 };
 
 /**

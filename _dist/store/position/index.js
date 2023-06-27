@@ -493,10 +493,9 @@ class AnimationAPI
    #instanceCount = 0;
 
    /**
-    * Provides a bound function to pass as data to AnimationManager to invoke
+    * Provides a bound function to pass as data to AnimationManager to invoke `AnimationAPI.#cleanupInstance`.
     *
     * @type {Function}
-    * @see {AnimationAPI.#cleanupInstance}
     */
    #cleanup;
 
@@ -3151,8 +3150,8 @@ class TJSTransforms
    }
 
    /**
-    * Collects all data including a bounding rect, transform matrix, and points array of the given {@link TJSPositionData}
-    * instance with the applied local transform data.
+    * Collects all data including a bounding rect, transform matrix, and points array of the given
+    * {@link TJSPositionData} instance with the applied local transform data.
     *
     * @param {import('../').TJSPositionData} position - The position data to process.
     *
@@ -6122,7 +6121,7 @@ Object.seal(s_VALIDATION_DATA);
  *
  * @param {import('..').TJSPosition}   position - A position instance.
  *
- * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
+ * @returns {import('svelte/action').ActionReturn<import('..').TJSPosition>} The action lifecycle methods.
  */
 function applyPosition(node, position)
 {
@@ -6134,7 +6133,7 @@ function applyPosition(node, position)
          // Sanity case to short circuit update if positions are the same instance.
          if (newPosition === position && newPosition.parent === position.parent) { return; }
 
-         if (hasSetter(position)) { position.parent = void 0; }
+         if (hasSetter(position, 'parent')) { position.parent = void 0; }
 
          position = newPosition;
 
@@ -6173,7 +6172,7 @@ function applyPosition(node, position)
  * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
  *        list are ignored.
  *
- * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
+ * @returns {import('#svelte/action').ActionReturn} The action lifecycle methods.
  */
 function draggable(node, { position, active = true, button = 0, storeDragging = void 0, ease = false,
  easeOptions = { duration: 0.1, ease: cubicOut }, hasTargetClassList, ignoreTargetClassList })
@@ -6227,11 +6226,7 @@ function draggable(node, { position, active = true, button = 0, storeDragging = 
    /**
     * Remember event handlers associated with this action, so they may be later unregistered.
     *
-    * @type {({ [key: string]: [
-    *    keyof HTMLElementEventMap,
-    *    (this:HTMLElement, ev: HTMLElementEventMap[keyof HTMLElementEventMap]) => any,
-    *    boolean | AddEventListenerOptions]
-    * })}
+    *  @type {{ [key: string]: [string, Function, boolean] }}
     */
    const handlers = {
       dragDown: ['pointerdown', onDragPointerDown, false],

@@ -27,7 +27,7 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Stores the first mounted component which follows the application shell contract.
     *
-    * @type {MountedAppShell[]|null[]} Application shell.
+    * @type {import('@typhonjs-fvtt/svelte/application').MountedAppShell[] | null[]} Application shell.
     */
    #applicationShellHolder = [null];
 
@@ -83,7 +83,7 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Stores SvelteData entries with instantiated Svelte components.
     *
-    * @type {SvelteData[]}
+    * @type {import('@typhonjs-fvtt/svelte/application').SvelteData[]}
     */
    #svelteData = [];
 
@@ -98,7 +98,7 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Contains methods to interact with the Svelte stores.
     *
-    * @type {SvelteStores}
+    * @type {import('@typhonjs-fvtt/svelte/application').SvelteStores}
     */
    #stores;
 
@@ -143,7 +143,7 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Specifies the default options that SvelteFormApplication supports.
     *
-    * @returns {SvelteApplicationOptions} options - Application options.
+    * @returns {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} options - Application options.
     * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
     *
     * @internal
@@ -338,14 +338,6 @@ export class SvelteFormApplication extends FormApplication
       {
          /**
           * A hook event that fires whenever this Application is closed.
-          *
-          * @param {Application} app                     The Application instance being closed
-          *
-          * @param {jQuery[]} html                       The application HTML when it is closed
-          *
-          * @function closeApplication
-          *
-          * @memberof hookEvents
           */
          Hooks.call(`close${cls.name}`, this, el);
       }

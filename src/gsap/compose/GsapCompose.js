@@ -19,11 +19,12 @@ import { TimelineImpl } from './TimelineImpl.js';
 export class GsapCompose
 {
    /**
-    * @param {GSAPTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   vars - GSAP vars object for `from`.
     *
-    * @param {GsapPositionOptions} [options] - Options for filtering and initial data population for TJSPosition tweens.
+    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population for
+    *        TJSPosition tweens.
     *
     * @returns {object} GSAP tween
     */
@@ -41,13 +42,13 @@ export class GsapCompose
    }
 
    /**
-    * @param {GSAPTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   fromVars - GSAP fromVars object for `fromTo`
     *
     * @param {object}   toVars - GSAP toVars object for `fromTo`.
     *
-    * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
     *
     * @returns {object} GSAP tween
     */
@@ -83,13 +84,13 @@ export class GsapCompose
    }
 
    /**
-    * @param {GSAPTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {string}   key - Property of position to manipulate.
     *
     * @param {object}   vars - GSAP vars object for `quickTo`.
     *
-    * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
     *
     * @returns {Function}  GSAP quickTo function.
     */
@@ -134,13 +135,14 @@ export class GsapCompose
    }
 
    /**
-    * @param {GSAPTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
     *
-    * @param {object|GsapData}   [arg1] - Either an object defining timeline options or GsapData.
+    * @param {object | import('../').GsapData}   [arg1] - Either an object defining timeline options or GsapData.
     *
-    * @param {GsapData|GsapPositionOptions} [arg2] - When arg1 is defined as an object; arg2 defines GsapData.
+    * @param {import('../').GsapData | import('../').GsapPositionOptions} [arg2] - When arg1 is defined as an object;
+    *        arg2 defines GsapData.
     *
-    * @param {GsapPositionOptions} [arg3] - Options for filtering and initial data population.
+    * @param {import('../').GsapPositionOptions} [arg3] - Options for filtering and initial data population.
     *
     * @returns {object} GSAP timeline
     */
@@ -164,7 +166,7 @@ export class GsapCompose
       // If arg1 is an array then take it as `gsapData` otherwise select arg2.
       const gsapData = isIterable(arg1) ? arg1 : arg2;
 
-      /** @type {GsapPositionOptions} */
+      /** @type {import('../').GsapPositionOptions} */
       const options = gsapData === arg1 ? arg2 : arg3;
 
       if (typeof timelineOptions !== 'object')
@@ -250,11 +252,11 @@ export class GsapCompose
    }
 
    /**
-    * @param {GSAPTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   vars - GSAP vars object for `to`.
     *
-    * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
     *
     * @returns {object} GSAP tween
     */
@@ -273,11 +275,9 @@ export class GsapCompose
 }
 
 /**
- *
- *
  * @param {string}            operation - GsapPosition function to invoke.
  *
- * @param {TJSPosition|object}   [target] -
+ * @param {TJSPosition | object}   [target] -
  *
  * @param {object}            [options] -
  *
@@ -381,23 +381,3 @@ function s_VALIDATE_OPTIONS(entry, cntr)
       }
    }
 }
-
-/**
- * @typedef {Iterable<object>|Function} GsapData
- */
-
-/**
- * @typedef {object} GsapPositionOptions
- *
- * @property {Function} [filter] - An optional filter function to adjust position data in `onUpdate` callbacks. This is
- *                                 useful if you need to transform any data from GSAP / plugins into data TJSPosition can
- *                                 utilize.
- *
- * @property {Iterable<string>} [initialProps] - Provides an iterable of property keys to assign to initial position
- *                                               data. This is useful when you are using GSAP plugins that manipulate
- *                                               data automatically; Ex. MotionPathPlugin
- */
-
-/**
- * @typedef {string|object|TJSPosition|Iterable<TJSPosition>|Array<HTMLElement|object>} GSAPTarget
- */

@@ -32,7 +32,7 @@ export class TJSDocumentCollection
     */
    constructor(collection, options = {})
    {
-      this.#uuid = `tjs-collection-${uuidv4()}`;
+      this.#uuid = `tjs-collection-${Hashing.uuidv4()}`;
 
       if (isPlainObject(collection)) // Handle case when only options are passed into ctor.
       {

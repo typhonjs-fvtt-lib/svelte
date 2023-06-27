@@ -27,7 +27,7 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Stores the first mounted component which follows the application shell contract.
     *
-    * @type {MountedAppShell[]|null[]} Application shell.
+    * @type {import('#svelte-fvtt/application').MountedAppShell[] | null[]} Application shell.
     */
    #applicationShellHolder = [null];
 
@@ -83,7 +83,7 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Stores SvelteData entries with instantiated Svelte components.
     *
-    * @type {SvelteData[]}
+    * @type {import('#svelte-fvtt/application').SvelteData[]}
     */
    #svelteData = [];
 
@@ -98,7 +98,7 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Contains methods to interact with the Svelte stores.
     *
-    * @type {SvelteStores}
+    * @type {import('#svelte-fvtt/application').SvelteStores}
     */
    #stores;
 
@@ -143,7 +143,7 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Specifies the default options that SvelteFormApplication supports.
     *
-    * @returns {SvelteApplicationOptions} options - Application options.
+    * @returns {import('#svelte-fvtt/application').SvelteApplicationOptions} options - Application options.
     * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
     *
     * @internal
@@ -338,14 +338,6 @@ export class SvelteFormApplication extends FormApplication
       {
          /**
           * A hook event that fires whenever this Application is closed.
-          *
-          * @param {Application} app                     The Application instance being closed
-          *
-          * @param {jQuery[]} html                       The application HTML when it is closed
-          *
-          * @function closeApplication
-          *
-          * @memberof hookEvents
           */
          Hooks.call(`close${cls.name}`, this, el);
       }
@@ -950,7 +942,7 @@ export class SvelteFormApplication extends FormApplication
     * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
     * to update to using the {@link TJSPosition.validators} functionality.
     *
-    * @param {import('@typhonjs-svelte/lib/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
+    * @param {import('#svelte-fvtt/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
     *
     * @returns {TJSPosition} The updated position object for the application containing the new values
     */

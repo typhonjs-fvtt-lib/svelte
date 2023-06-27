@@ -31,6 +31,8 @@ const sourcemap = s_SOURCEMAPS;
 const replace = {
    _typhonjs_svelte_lib_: '_typhonjs_fvtt_svelte_',
    _svelte_fvtt_: '_typhonjs_fvtt_svelte_',
+   '#svelte-fvtt/': '@typhonjs-fvtt/svelte/',
+   '#svelte-lib/': '@typhonjs-fvtt/svelte/',
    '@typhonjs-svelte/lib/': '@typhonjs-fvtt/svelte/'
 };
 

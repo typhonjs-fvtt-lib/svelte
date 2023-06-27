@@ -23,7 +23,7 @@ import { fade, slide } from 'svelte/transition';
  *
  * @param {number}      [options.initial=0] - Initial rotation in degrees.
  *
- * @returns {{duration: number, css: (function(*=): string), delay: number, easing: (x: number) => number}}
+ * @returns {{duration: number, css: (function(*): string), delay: number, easing: (x: number) => number}}
  *  Transition object.
  */
 function rotate(node, options)
@@ -70,7 +70,7 @@ function rotate(node, options)
  *
  * @param {number}      [options.initial=0] - Initial rotation in degrees.
  *
- * @returns {{duration: number, css: (function(*=): string), delay: number, easing: (x: number) => number}}
+ * @returns {{duration: number, css: (function(*): string), delay: number, easing: (x: number) => number}}
  *  Transition object.
  */
 function rotateFade(node, options)
@@ -115,7 +115,7 @@ function rotateFade(node, options)
  *
  * @param {Function}    [options.easingSlide=linear] - The easing function to apply to the slide transition.
  *
- * @returns {{duration: number, css: (function(*=): string), delay: number, easing: (x: number) => number}}
+ * @returns {{duration: number, css: (function(*): string), delay: number, easing: (x: number) => number}}
  *  Transition object.
  */
 function slideFade(node, options)

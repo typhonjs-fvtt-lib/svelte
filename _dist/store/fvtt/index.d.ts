@@ -1,5 +1,5 @@
 import * as svelte_store from 'svelte/store';
-import * as _typhonjs_fvtt_svelte_util from '@typhonjs-fvtt/svelte/util';
+import * as _runtime_data_struct_store_reducer from '@typhonjs-svelte/runtime-base/data/struct/store/reducer';
 
 /**
  * @type {import('svelte/store').Readable<globalThis.game>} Provides a Svelte store wrapping the Foundry `game` global
@@ -79,12 +79,17 @@ declare class TJSDocument {
      *
      * @param {object}   data - Document transfer data.
      *
-     * @param {import('@typhonjs-fvtt/svelte/util').ParseDataTransferOptions & TJSDocumentOptions}   [options] - Optional
+     * @param {{ actor?: boolean, compendium?: boolean, world?: boolean, types?: string[] } & TJSDocumentOptions}   [options] - Optional
      *        parameters.
      *
      * @returns {Promise<boolean>} Returns true if new document set from data transfer blob.
      */
-    setFromDataTransfer(data: object, options?: _typhonjs_fvtt_svelte_util.ParseDataTransferOptions & TJSDocumentOptions): Promise<boolean>;
+    setFromDataTransfer(data: object, options?: {
+        actor?: boolean;
+        compendium?: boolean;
+        world?: boolean;
+        types?: string[];
+    } & TJSDocumentOptions): Promise<boolean>;
     /**
      * Sets the document by Foundry UUID performing a lookup and setting the document if found.
      *
@@ -125,7 +130,7 @@ type EmbeddedAPI<T> = {
     /**
      * - Creates an embedded collection store.
      */
-    create: (embeddedName: string, options: any) => any;
+    create: (embeddedName: string, options: _runtime_data_struct_store_reducer.DynOptionsMapCreate<string, any>) => _runtime_data_struct_store_reducer.DynMapReducer<string, T>;
     /**
      * - Destroys one or more embedded collection stores.
      */
@@ -133,7 +138,7 @@ type EmbeddedAPI<T> = {
     /**
      * - Returns a specific existing embedded collection store.
      */
-    get: (embeddedName: string, storeName: string) => any;
+    get: (embeddedName: string, storeName: string) => _runtime_data_struct_store_reducer.DynMapReducer<string, T>;
 };
 
 /**

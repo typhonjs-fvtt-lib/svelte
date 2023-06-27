@@ -1,10 +1,16 @@
+import * as _typhonjs_fvtt_svelte_application from '@typhonjs-fvtt/svelte/application';
 import { SvelteApplication as SvelteApplication$1 } from '@typhonjs-fvtt/svelte/application';
 import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
 import { TJSPosition } from '@typhonjs-fvtt/svelte/store/position';
 import * as svelte from 'svelte';
 import * as svelte_store from 'svelte/store';
+import { TJSSessionStorage } from '@typhonjs-fvtt/svelte/store/storage/web';
 
 declare class HandlebarsApplication extends SvelteApplication$1 {
+    /**
+     * @inheritDoc
+     */
+    constructor(options: any);
     #private;
 }
 
@@ -14,11 +20,11 @@ declare class HandlebarsApplication extends SvelteApplication$1 {
  */
 declare class SvelteApplication {
     /**
-     * @param {SvelteApplicationOptions} options - The options for the application.
+     * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} options - The options for the application.
      *
      * @inheritDoc
      */
-    constructor(options?: SvelteApplicationOptions);
+    constructor(options?: _typhonjs_fvtt_svelte_application.SvelteApplicationOptions);
     /**
      * Returns the content element if an application shell is mounted.
      *
@@ -284,24 +290,26 @@ type ApplicationStateData = {
 };
 
 /**
- * Provides a helper class for {@link SvelteApplication} by combining all methods that work on the {@link SvelteData[]}
+ * Provides a helper class for {@link SvelteApplication} by combining all methods that work on the {@link SvelteData}
  * of mounted components. This class is instantiated and can be retrieved by the getter `svelte` via SvelteApplication.
  */
 declare class GetSvelteData {
     /**
      * Keep a direct reference to the SvelteData array in an associated {@link SvelteApplication}.
      *
-     * @param {MountedAppShell[]|null[]}  applicationShellHolder - A reference to the MountedAppShell array.
+     * @param {import('@typhonjs-fvtt/svelte/application').MountedAppShell[] | null[]}  applicationShellHolder - A reference to
+     *        the MountedAppShell array.
      *
-     * @param {SvelteData[]}  svelteData - A reference to the SvelteData array of mounted components.
+     * @param {import('@typhonjs-fvtt/svelte/application').SvelteData[]}  svelteData - A reference to the SvelteData array of
+     *        mounted components.
      */
-    constructor(applicationShellHolder: MountedAppShell[] | null[], svelteData: SvelteData[]);
+    constructor(applicationShellHolder: _typhonjs_fvtt_svelte_application.MountedAppShell[] | null[], svelteData: _typhonjs_fvtt_svelte_application.SvelteData[]);
     /**
      * Returns any mounted {@link MountedAppShell}.
      *
-     * @returns {MountedAppShell|null} Any mounted application shell.
+     * @returns {import('@typhonjs-fvtt/svelte/application').MountedAppShell | null} Any mounted application shell.
      */
-    get applicationShell(): any;
+    get applicationShell(): _typhonjs_fvtt_svelte_application.MountedAppShell;
     /**
      * Returns the indexed Svelte component.
      *
@@ -329,29 +337,29 @@ declare class GetSvelteData {
      *
      * @param {number}   index -
      *
-     * @returns {SvelteData} The loaded Svelte config + component.
+     * @returns {import('@typhonjs-fvtt/svelte/application').SvelteData} The loaded Svelte config + component.
      */
-    data(index: number): SvelteData;
+    data(index: number): _typhonjs_fvtt_svelte_application.SvelteData;
     /**
      * Returns the {@link SvelteData} instance for a given component.
      *
      * @param {object} component - Svelte component.
      *
-     * @returns {SvelteData} -  The loaded Svelte config + component.
+     * @returns {import('@typhonjs-fvtt/svelte/application').SvelteData} -  The loaded Svelte config + component.
      */
-    dataByComponent(component: object): SvelteData;
+    dataByComponent(component: object): _typhonjs_fvtt_svelte_application.SvelteData;
     /**
      * Returns the SvelteData entries iterator.
      *
-     * @returns {IterableIterator<[number, SvelteData]>} SvelteData entries iterator.
+     * @returns {IterableIterator<[number, import('@typhonjs-fvtt/svelte/application').SvelteData]>} SvelteData entries iterator.
      */
-    dataEntries(): IterableIterator<[number, SvelteData]>;
+    dataEntries(): IterableIterator<[number, _typhonjs_fvtt_svelte_application.SvelteData]>;
     /**
      * Returns the SvelteData values iterator.
      *
-     * @returns {IterableIterator<SvelteData>} SvelteData values iterator.
+     * @returns {IterableIterator<import('@typhonjs-fvtt/svelte/application').SvelteData>} SvelteData values iterator.
      */
-    dataValues(): IterableIterator<SvelteData>;
+    dataValues(): IterableIterator<_typhonjs_fvtt_svelte_application.SvelteData>;
     /**
      * Returns the length of the mounted Svelte component list.
      *
@@ -424,14 +432,15 @@ declare class SvelteReactive {
     /**
      * Initializes reactive support. Package private for internal use.
      *
-     * @returns {SvelteStores|void} Internal methods to interact with Svelte stores.
+     * @returns {import('@typhonjs-fvtt/svelte/application').SvelteStores | undefined} Internal methods to interact with Svelte
+     *          stores.
      * @package
      */
-    initialize(): SvelteStores | void;
+    initialize(): _typhonjs_fvtt_svelte_application.SvelteStores | undefined;
     /**
-     * @returns {import('@typhonjs-fvtt/svelte/store').TJSSessionStorage} Returns TJSSessionStorage instance.
+     * @returns {import('@typhonjs-fvtt/svelte/store/storage/web').TJSSessionStorage} Returns TJSSessionStorage instance.
      */
-    get sessionStorage(): any;
+    get sessionStorage(): TJSSessionStorage;
     /**
      * Returns the store for app options.
      *
@@ -667,105 +676,105 @@ declare class SvelteReactive {
      * to remove the close button and {@link SvelteApplicationOptions.headerButtonNoLabel} to true and labels will be
      * removed from the header buttons.
      *
-     * @param {object} opts - Optional parameters (for internal use)
+     * @param {object} [opts] - Optional parameters (for internal use)
      *
-     * @param {boolean} opts.headerButtonNoClose - The value for `headerButtonNoClose`.
+     * @param {boolean} [opts.headerButtonNoClose] - The value for `headerButtonNoClose`.
      *
-     * @param {boolean} opts.headerButtonNoLabel - The value for `headerButtonNoLabel`.
+     * @param {boolean} [opts.headerButtonNoLabel] - The value for `headerButtonNoLabel`.
      */
     updateHeaderButtons({ headerButtonNoClose, headerButtonNoLabel }?: {
-        headerButtonNoClose: boolean;
-        headerButtonNoLabel: boolean;
+        headerButtonNoClose?: boolean;
+        headerButtonNoLabel?: boolean;
     }): void;
     #private;
 }
 /**
- * - Provides a custom readable Svelte store for Application options state.
+ * Provides a custom readable Svelte store for Application options state.
  */
 type StoreAppOptions = {
     /**
-     * - Subscribe to all app options updates.
+     * Subscribe to all app options updates.
      */
     subscribe: svelte_store.Readable<object>;
     /**
-     * - Derived store for `draggable` updates.
+     * Derived store for `draggable` updates.
      */
     draggable: svelte_store.Writable<boolean>;
     /**
-     * - Derived store for `focusAuto` updates.
+     * Derived store for `focusAuto` updates.
      */
     focusAuto: svelte_store.Writable<boolean>;
     /**
-     * - Derived store for `focusKeep` updates.
+     * Derived store for `focusKeep` updates.
      */
     focusKeep: svelte_store.Writable<boolean>;
     /**
-     * - Derived store for `focusTrap` updates.
+     * Derived store for `focusTrap` updates.
      */
     focusTrap: svelte_store.Writable<boolean>;
     /**
-     * - Derived store for `headerButtonNoClose`
-     *   updates.
+     * Derived store for `headerButtonNoClose`
+     * updates.
      */
     headerButtonNoClose: svelte_store.Writable<boolean>;
     /**
-     * - Derived store for `headerButtonNoLabel`
-     *   updates.
+     * Derived store for `headerButtonNoLabel`
+     * updates.
      */
     headerButtonNoLabel: svelte_store.Writable<boolean>;
     /**
-     * - Derived store for `headerIcon` updates.
+     * Derived store for `headerIcon` updates.
      */
     headerIcon: svelte_store.Writable<string>;
     /**
-     * - Derived store for
-     *   `headerNoTitleMinimized` updates.
+     * Derived store for
+     * `headerNoTitleMinimized` updates.
      */
     headerNoTitleMinimized: svelte_store.Writable<boolean>;
     /**
-     * - Derived store for `minimizable` updates.
+     * Derived store for `minimizable` updates.
      */
     minimizable: svelte_store.Writable<boolean>;
     /**
-     * - Derived store for `popOut` updates.
+     * Derived store for `popOut` updates.
      */
     popOut: svelte_store.Writable<boolean>;
     /**
-     * - Derived store for `positionable` updates.
+     * Derived store for `positionable` updates.
      */
     positionable: svelte_store.Writable<boolean>;
     /**
-     * - Derived store for `resizable` updates.
+     * Derived store for `resizable` updates.
      */
     resizable: svelte_store.Writable<boolean>;
     /**
-     * - Derived store for `title` updates.
+     * Derived store for `title` updates.
      */
     title: svelte_store.Writable<string>;
 };
 /**
- * - Provides a custom readable Svelte store for UI options state.
+ * Provides a custom readable Svelte store for UI options state.
  */
 type StoreUIOptions = {
     /**
-     * - Subscribe to all UI options updates.
+     * Subscribe to all UI options updates.
      */
     subscribe: any;
     /**
-     * - Derived store for `dragging` updates.
+     * Derived store for `dragging` updates.
      */
     dragging: svelte_store.Writable<boolean>;
     /**
-     * - Derived store for
+     * Derived store for
      * `headerButtons` updates.
      */
     headerButtons: svelte_store.Readable<globalThis.ApplicationHeaderButton[]>;
     /**
-     * - Derived store for `minimized` updates.
+     * Derived store for `minimized` updates.
      */
     minimized: svelte_store.Readable<boolean>;
     /**
-     * - Derived store for `resizing` updates.
+     * Derived store for `resizing` updates.
      */
     resizing: svelte_store.Writable<boolean>;
 };

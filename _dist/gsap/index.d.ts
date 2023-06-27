@@ -1,6 +1,5 @@
+import * as _svelte_fvtt_store_position from '@typhonjs-fvtt/svelte/store/position';
 import * as svelte_store from 'svelte/store';
-import * as _typhonjs_svelte_lib_store_position from '@typhonjs-svelte/lib/store/position';
-import { TJSPosition } from '@typhonjs-svelte/lib/store/position';
 
 declare let gsap: any;
 declare const easingFunc: {};
@@ -8,8 +7,8 @@ declare const easingList: string[];
 
 /**
  * Provides an action to enable pointer dragging of an HTMLElement using GSAP `to` or `quickTo` to invoke `position.set`
- * on a given {@link Position} instance provided. You may provide a `easeOptions` object sent to the tween to modify the
- * duration / easing. When the attached boolean store state changes the draggable action is enabled or disabled.
+ * on a given {@link TJSPosition} instance provided. You may provide a `easeOptions` object sent to the tween to modify
+ * the duration / easing. When the attached boolean store state changes the draggable action is enabled or disabled.
  *
  * Note: Requires GSAP `3.10+` for `quickTo` support.
  *
@@ -17,21 +16,22 @@ declare const easingList: string[];
  *
  * @param {object}            params - Required parameters.
  *
- * @param {import('@typhonjs-svelte/lib/store/position').TJSPosition}   params.position - A position instance.
+ * @param {import('#svelte-fvtt/store/position').TJSPosition}   params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
- * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
+ * @param {number}            [params.button=0] - MouseEvent button;
+ *        {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
  *
  * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
- *                                                                            state.
+ *        state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.
  *
  * @param {boolean}           [params.inertia=false] - When true inertia easing is enabled.
  *
  * @param {object}            [params.easeOptions] - Gsap `to / `quickTo` vars object.
- *u
+ *
  * @param {object}            [params.inertiaOptions] - Inertia Options.
  *
  * @param {Iterable<string>}  [params.hasTargetClassList] - When defined any event targets that has any class in this
@@ -43,7 +43,7 @@ declare const easingList: string[];
  * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
  */
 declare function draggableGsap(node: HTMLElement, { position, active, button, storeDragging, ease, inertia, easeOptions, inertiaOptions, hasTargetClassList, ignoreTargetClassList }: {
-    position: _typhonjs_svelte_lib_store_position.TJSPosition;
+    position: _svelte_fvtt_store_position.TJSPosition;
     active?: boolean;
     button?: number;
     storeDragging?: svelte_store.Writable<boolean>;
@@ -185,23 +185,24 @@ declare class DraggableGsapOptions {
  */
 declare class GsapCompose {
     /**
-     * @param {GSAPTarget} target - A standard GSAP target or TJSPosition.
+     * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
      *
      * @param {object}   vars - GSAP vars object for `from`.
      *
-     * @param {GsapPositionOptions} [options] - Options for filtering and initial data population for TJSPosition tweens.
+     * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population for
+     *        TJSPosition tweens.
      *
      * @returns {object} GSAP tween
      */
     static from(target: GSAPTarget, vars: object, options?: GsapPositionOptions): object;
     /**
-     * @param {GSAPTarget} target - A standard GSAP target or TJSPosition.
+     * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
      *
      * @param {object}   fromVars - GSAP fromVars object for `fromTo`
      *
      * @param {object}   toVars - GSAP toVars object for `fromTo`.
      *
-     * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
+     * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
      *
      * @returns {object} GSAP tween
      */
@@ -216,13 +217,13 @@ declare class GsapCompose {
      */
     static hasMethod(name: string): boolean;
     /**
-     * @param {GSAPTarget} target - A standard GSAP target or TJSPosition.
+     * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
      *
      * @param {string}   key - Property of position to manipulate.
      *
      * @param {object}   vars - GSAP vars object for `quickTo`.
      *
-     * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
+     * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
      *
      * @returns {Function}  GSAP quickTo function.
      */
@@ -242,44 +243,29 @@ declare class GsapCompose {
      */
     static registerPlugin(...args: Function[]): void;
     /**
-     * @param {GSAPTarget} target - A standard GSAP target or TJSPosition.
+     * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
      *
-     * @param {object|GsapData}   [arg1] - Either an object defining timeline options or GsapData.
+     * @param {object | import('../').GsapData}   [arg1] - Either an object defining timeline options or GsapData.
      *
-     * @param {GsapData|GsapPositionOptions} [arg2] - When arg1 is defined as an object; arg2 defines GsapData.
+     * @param {import('../').GsapData | import('../').GsapPositionOptions} [arg2] - When arg1 is defined as an object;
+     *        arg2 defines GsapData.
      *
-     * @param {GsapPositionOptions} [arg3] - Options for filtering and initial data population.
+     * @param {import('../').GsapPositionOptions} [arg3] - Options for filtering and initial data population.
      *
      * @returns {object} GSAP timeline
      */
     static timeline(target: GSAPTarget, arg1?: object | GsapData, arg2?: GsapData | GsapPositionOptions, arg3?: GsapPositionOptions): object;
     /**
-     * @param {GSAPTarget} target - A standard GSAP target or TJSPosition.
+     * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
      *
      * @param {object}   vars - GSAP vars object for `to`.
      *
-     * @param {GsapPositionOptions} [options] - Options for filtering and initial data population.
+     * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
      *
      * @returns {object} GSAP tween
      */
     static to(target: GSAPTarget, vars: object, options?: GsapPositionOptions): object;
 }
-type GsapData = Iterable<object> | Function;
-type GsapPositionOptions = {
-    /**
-     * - An optional filter function to adjust position data in `onUpdate` callbacks. This is
-     *    useful if you need to transform any data from GSAP / plugins into data TJSPosition can
-     *    utilize.
-     */
-    filter?: Function;
-    /**
-     * - Provides an iterable of property keys to assign to initial position
-     *    data. This is useful when you are using GSAP plugins that manipulate
-     *    data automatically; Ex. MotionPathPlugin
-     */
-    initialProps?: Iterable<string>;
-};
-type GSAPTarget = string | object | TJSPosition | Iterable<TJSPosition> | Array<HTMLElement | object>;
 
 /**
  * @param {string}   name - Name of GSAP plugin to load.
@@ -288,4 +274,41 @@ type GSAPTarget = string | object | TJSPosition | Iterable<TJSPosition> | Array<
  */
 declare function gsapLoadPlugin(name: string): Promise<any>;
 
-export { GSAPTarget, GsapCompose, GsapData, GsapPositionOptions, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };
+type GsapData = Iterable<object> | Function;
+type GsapPositionOptions = {
+    /**
+     * An optional filter function to adjust position data in `onUpdate` callbacks. This is
+     * useful if you need to transform any data from GSAP / plugins into data TJSPosition can utilize.
+     */
+    filter?: Function;
+    /**
+     * Provides an iterable of property keys to assign to initial position
+     * data. This is useful when you are using GSAP plugins that manipulate data automatically; Ex. MotionPathPlugin
+     */
+    initialProps?: Iterable<string>;
+};
+type GSAPTarget = (string | object | _svelte_fvtt_store_position.TJSPosition | Iterable<_svelte_fvtt_store_position.TJSPosition> | Array<HTMLElement | object>);
+type PositionInfo = {
+    /**
+     * -
+     */
+    position: _svelte_fvtt_store_position.TJSPosition[];
+    /**
+     * -
+     */
+    positionData: _svelte_fvtt_store_position.TJSPositionDataExtended[];
+    /**
+     * - Contains the full data object when a list of object w/ position is used.
+     */
+    data: object[];
+    /**
+     * -
+     */
+    elements: HTMLElement[];
+    /**
+     * -
+     */
+    gsapData: Array<object[]>;
+};
+
+export { GSAPTarget, GsapCompose, GsapData, GsapPositionOptions, PositionInfo, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };

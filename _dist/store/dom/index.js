@@ -301,7 +301,7 @@ class KeyStore
  *
  * @param {import('..').KeyStore}   keyStore - KeyStore to forward events key down / up events to...
  *
- * @returns {{update: (function(import('..').KeyStore): void), destroy: Function}} Action lifecycle methods.
+ * @returns {import('svelte/action').ActionReturn<import('..').KeyStore>} Action lifecycle methods.
  */
 function keyforward(node, keyStore)
 {

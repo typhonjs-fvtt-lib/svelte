@@ -12,8 +12,8 @@ const s_HAS_QUICK_TO = false;
 
 /**
  * Provides an action to enable pointer dragging of an HTMLElement using GSAP `to` or `quickTo` to invoke `position.set`
- * on a given {@link Position} instance provided. You may provide a `easeOptions` object sent to the tween to modify the
- * duration / easing. When the attached boolean store state changes the draggable action is enabled or disabled.
+ * on a given {@link TJSPosition} instance provided. You may provide a `easeOptions` object sent to the tween to modify
+ * the duration / easing. When the attached boolean store state changes the draggable action is enabled or disabled.
  *
  * Note: Requires GSAP `3.10+` for `quickTo` support.
  *
@@ -21,21 +21,22 @@ const s_HAS_QUICK_TO = false;
  *
  * @param {object}            params - Required parameters.
  *
- * @param {import('@typhonjs-svelte/lib/store/position').TJSPosition}   params.position - A position instance.
+ * @param {import('#svelte-fvtt/store/position').TJSPosition}   params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
- * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
+ * @param {number}            [params.button=0] - MouseEvent button;
+ *        {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
  *
  * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
- *                                                                            state.
+ *        state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.
  *
  * @param {boolean}           [params.inertia=false] - When true inertia easing is enabled.
  *
  * @param {object}            [params.easeOptions] - Gsap `to / `quickTo` vars object.
- *u
+ *
  * @param {object}            [params.inertiaOptions] - Inertia Options.
  *
  * @param {Iterable<string>}  [params.hasTargetClassList] - When defined any event targets that has any class in this
@@ -101,9 +102,9 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
     * @type {object}
     */
    const handlers = {
-      dragDown: ['pointerdown', (e) => onDragPointerDown(e), false],
-      dragMove: ['pointermove', (e) => onDragPointerChange(e), false],
-      dragUp: ['pointerup', (e) => onDragPointerUp(e), false]
+      dragDown: ['pointerdown', onDragPointerDown, false],
+      dragMove: ['pointermove', onDragPointerChange, false],
+      dragUp: ['pointerup', onDragPointerUp, false]
    };
 
    /**

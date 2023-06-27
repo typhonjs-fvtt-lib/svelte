@@ -1,27 +1,29 @@
 import { isObject } from '#runtime/util/object';
 
 /**
- * Provides a helper class for {@link SvelteApplication} by combining all methods that work on the {@link SvelteData[]}
+ * Provides a helper class for {@link SvelteApplication} by combining all methods that work on the {@link SvelteData}
  * of mounted components. This class is instantiated and can be retrieved by the getter `svelte` via SvelteApplication.
  */
 export class GetSvelteData
 {
    /**
-    * @type {MountedAppShell[]|null[]}
+    * @type {import('#svelte-fvtt/application').MountedAppShell[] | null[]}
     */
    #applicationShellHolder;
 
    /**
-    * @type {SvelteData[]}
+    * @type {import('#svelte-fvtt/application').SvelteData[]}
     */
    #svelteData;
 
    /**
     * Keep a direct reference to the SvelteData array in an associated {@link SvelteApplication}.
     *
-    * @param {MountedAppShell[]|null[]}  applicationShellHolder - A reference to the MountedAppShell array.
+    * @param {import('#svelte-fvtt/application').MountedAppShell[] | null[]}  applicationShellHolder - A reference to
+    *        the MountedAppShell array.
     *
-    * @param {SvelteData[]}  svelteData - A reference to the SvelteData array of mounted components.
+    * @param {import('#svelte-fvtt/application').SvelteData[]}  svelteData - A reference to the SvelteData array of
+    *        mounted components.
     */
    constructor(applicationShellHolder, svelteData)
    {
@@ -32,7 +34,7 @@ export class GetSvelteData
    /**
     * Returns any mounted {@link MountedAppShell}.
     *
-    * @returns {MountedAppShell|null} Any mounted application shell.
+    * @returns {import('#svelte-fvtt/application').MountedAppShell | null} Any mounted application shell.
     */
    get applicationShell() { return this.#applicationShellHolder[0]; }
 
@@ -82,7 +84,7 @@ export class GetSvelteData
     *
     * @param {number}   index -
     *
-    * @returns {SvelteData} The loaded Svelte config + component.
+    * @returns {import('#svelte-fvtt/application').SvelteData} The loaded Svelte config + component.
     */
    data(index)
    {
@@ -94,7 +96,7 @@ export class GetSvelteData
     *
     * @param {object} component - Svelte component.
     *
-    * @returns {SvelteData} -  The loaded Svelte config + component.
+    * @returns {import('#svelte-fvtt/application').SvelteData} -  The loaded Svelte config + component.
     */
    dataByComponent(component)
    {
@@ -109,7 +111,7 @@ export class GetSvelteData
    /**
     * Returns the SvelteData entries iterator.
     *
-    * @returns {IterableIterator<[number, SvelteData]>} SvelteData entries iterator.
+    * @returns {IterableIterator<[number, import('#svelte-fvtt/application').SvelteData]>} SvelteData entries iterator.
     */
    dataEntries()
    {
@@ -119,7 +121,7 @@ export class GetSvelteData
    /**
     * Returns the SvelteData values iterator.
     *
-    * @returns {IterableIterator<SvelteData>} SvelteData values iterator.
+    * @returns {IterableIterator<import('#svelte-fvtt/application').SvelteData>} SvelteData values iterator.
     */
    dataValues()
    {
