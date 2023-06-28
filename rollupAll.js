@@ -239,25 +239,6 @@ const rollupConfigs = [
    },
    {
       input: {
-         input: 'src/store/reducer/index.js',
-         plugins: [
-            importsExternal(),
-            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/store/reducer`] }),
-            resolve(s_RESOLVE_CONFIG),
-            generateDTS.plugin(dtsPluginOptions)
-         ]
-      },
-      output: {
-         file: '_dist/store/reducer/index.js',
-         format: 'es',
-         generatedCode: { constBindings: true },
-         paths: externalPathsNPM,
-         plugins: outputPlugins,
-         sourcemap
-      }
-   },
-   {
-      input: {
          input: 'src/store/storage/web/index.js',
          plugins: [
             importsExternal(),
