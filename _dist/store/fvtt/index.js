@@ -1,74 +1,7 @@
+import { writable } from 'svelte/store';
 import { Hashing } from '@typhonjs-svelte/runtime-base/util';
 import { hasPrototype, isObject, isPlainObject } from '@typhonjs-svelte/runtime-base/util/object';
 import { DynMapReducer } from '@typhonjs-svelte/runtime-base/data/struct/store/reducer';
-
-function noop() { }
-function safe_not_equal(a, b) {
-    return a != a ? b == b : a !== b || ((a && typeof a === 'object') || typeof a === 'function');
-}
-
-const subscriber_queue = [];
-/**
- * Create a `Writable` store that allows both updating and reading by subscription.
- * @param {*=}value initial value
- * @param {StartStopNotifier=} start
- */
-function writable(value, start = noop) {
-    let stop;
-    const subscribers = new Set();
-    function set(new_value) {
-        if (safe_not_equal(value, new_value)) {
-            value = new_value;
-            if (stop) { // store is ready
-                const run_queue = !subscriber_queue.length;
-                for (const subscriber of subscribers) {
-                    subscriber[1]();
-                    subscriber_queue.push(subscriber, value);
-                }
-                if (run_queue) {
-                    for (let i = 0; i < subscriber_queue.length; i += 2) {
-                        subscriber_queue[i][0](subscriber_queue[i + 1]);
-                    }
-                    subscriber_queue.length = 0;
-                }
-            }
-        }
-    }
-    function update(fn) {
-        set(fn(value));
-    }
-    function subscribe(run, invalidate = noop) {
-        const subscriber = [run, invalidate];
-        subscribers.add(subscriber);
-        if (subscribers.size === 1) {
-            stop = start(set) || noop;
-        }
-        run(value);
-        return () => {
-            subscribers.delete(subscriber);
-            if (subscribers.size === 0 && stop) {
-                stop();
-                stop = null;
-            }
-        };
-    }
-    return { set, update, subscribe };
-}
-
-const _storeGameState = writable(void 0);
-
-/**
- * @type {import('svelte/store').Readable<globalThis.game>} Provides a Svelte store wrapping the Foundry `game` global
- * variable. It is initialized on the `ready` hook. You may use this store to access the global game state from a
- * Svelte template. It is a read only store and will receive no reactive updates during runtime.
- */
-const gameState = {
-   subscribe: _storeGameState.subscribe,
-};
-
-Object.freeze(gameState);
-
-Hooks.once('ready', () => _storeGameState.set(game));
 
 /**
  * Provides management of reactive embedded collections.
@@ -118,16 +51,25 @@ class EmbeddedStoreManager
    }
 
    /**
-    * @template T
+    * @template [T=import('./types').NamedDocumentConstructor]
     *
-    * @param {string} embeddedName -
+    * @param {T} FoundryDoc - A Foundry document class / constructor.
     *
-    * @param {import('#runtime/data/struct/store/reducer').DynOptionsMapCreate<string, T>} options -
+    * @param {import('#runtime/data/struct/store/reducer').DynOptionsMapCreate<string, T>} options - DynMapReducer
+    *        creation options.
     *
-    * @returns {import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} DynMapReducer instance
+    * @returns {import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} DynMapReducer instance.
     */
-   create(embeddedName, options)
+   create(FoundryDoc, options)
    {
+      const docName = FoundryDoc?.documentName;
+
+      if (typeof docName !== 'string')
+      {
+         throw new TypeError(
+          `EmbeddedStoreManager.create error: 'FoundryDoc' does not have a valid 'documentName' property.`);
+      }
+
       /** @type {foundry.abstract.Document} */
       const doc = this.#document[0];
 
@@ -137,28 +79,28 @@ class EmbeddedStoreManager
       {
          try
          {
-            collection = doc.getEmbeddedCollection(embeddedName);
+            collection = doc.getEmbeddedCollection(docName);
          }
          catch (err)
          {
-            console.warn(`EmbeddedStoreManager.create error: No valid embedded collection for: ${embeddedName}`);
+            console.warn(`EmbeddedStoreManager.create error: No valid embedded collection for: ${docName}`);
          }
       }
 
       let embeddedData;
 
-      if (!this.#name.has(embeddedName))
+      if (!this.#name.has(docName))
       {
          embeddedData = {
             collection,
             stores: new Map()
          };
 
-         this.#name.set(embeddedName, embeddedData);
+         this.#name.set(docName, embeddedData);
       }
       else
       {
-         embeddedData = this.#name.get(embeddedName);
+         embeddedData = this.#name.get(docName);
       }
 
       /** @type {string} */
@@ -195,7 +137,10 @@ class EmbeddedStoreManager
 
       name = name ?? ctor?.name;
 
-      if (typeof name !== 'string') { throw new TypeError(`EmbeddedStoreManager.create error: 'name' is not a string.`); }
+      if (typeof name !== 'string')
+      {
+         throw new TypeError(`EmbeddedStoreManager.create error: 'name' is not a string.`);
+      }
 
       if (embeddedData.stores.has(name))
       {
@@ -211,22 +156,24 @@ class EmbeddedStoreManager
    }
 
    /**
+    * @template [T=import('./types').NamedDocumentConstructor]
+    *
     * Destroys and removes embedded collection stores. Invoking this method with no parameters destroys all stores.
     * Invoking with an embedded name destroys all stores for that particular collection. If you provide an embedded and
     * store name just that particular store is destroyed and removed.
     *
-    * @param {string}   [embeddedName] - Specific embedded collection name.
+    * @param {T}   [FoundryDoc] - A Foundry document class / constructor.
     *
     * @param {string}   [storeName] - Specific store name.
     *
     * @returns {boolean} One or more stores destroyed?
     */
-   destroy(embeddedName, storeName)
+   destroy(FoundryDoc, storeName)
    {
       let count = 0;
 
       // Destroy all embedded stores
-      if (embeddedName === void 0)
+      if (FoundryDoc === void 0)
       {
          for (const embeddedData of this.#name.values())
          {
@@ -240,31 +187,42 @@ class EmbeddedStoreManager
 
          this.#name.clear();
       }
-      else if (typeof embeddedName === 'string' && storeName === void 0)
+      else
       {
-         const embeddedData = this.#name.get(embeddedName);
-         if (embeddedData)
+         const docName = FoundryDoc?.documentName;
+
+         if (typeof docName !== 'string')
          {
-            embeddedData.collection = null;
-            for (const store of embeddedData.stores.values())
-            {
-               store.destroy();
-               count++;
-            }
+            throw new TypeError(
+             `EmbeddedStoreManager.delete error: 'FoundryDoc' does not have a valid 'documentName' property.`);
          }
 
-         this.#name.delete(embeddedName);
-      }
-      else if (typeof embeddedName === 'string' && storeName === 'string')
-      {
-         const embeddedData = this.#name.get(embeddedName);
-         if (embeddedData)
+         if (storeName === void 0)
          {
-            const store = embeddedData.stores.get(storeName);
-            if (store)
+            const embeddedData = this.#name.get(docName);
+            if (embeddedData)
             {
-               store.destroy();
-               count++;
+               embeddedData.collection = null;
+               for (const store of embeddedData.stores.values())
+               {
+                  store.destroy();
+                  count++;
+               }
+            }
+
+            this.#name.delete(docName);
+         }
+         else if (storeName === 'string')
+         {
+            const embeddedData = this.#name.get(docName);
+            if (embeddedData)
+            {
+               const store = embeddedData.stores.get(storeName);
+               if (store)
+               {
+                  store.destroy();
+                  count++;
+               }
             }
          }
       }
@@ -273,19 +231,28 @@ class EmbeddedStoreManager
    }
 
    /**
-    * @template T
+    * @template [T=import('./types').NamedDocumentConstructor]
     *
-    * @param {string} embeddedName -
+    * @param {T} FoundryDoc - A Foundry document class / constructor.
     *
-    * @param {string} storeName -
+    * @param {string} storeName - Name of the embedded collection to retrieve.
     *
-    * @returns {import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} DynMapReducer instance.
+    * @returns {import('#runtime/data/struct/store/reducer').DynMapReducer<string, InstanceType<T>>} DynMapReducer
+    *          instance.
     */
-   get(embeddedName, storeName)
+   get(FoundryDoc, storeName)
    {
-      if (!this.#name.has(embeddedName)) { return void 0; }
+      const docName = FoundryDoc?.documentName;
 
-      return this.#name.get(embeddedName).stores.get(storeName);
+      if (typeof docName !== 'string')
+      {
+         throw new TypeError(
+          `EmbeddedStoreManager.get error: 'FoundryDoc' does not have a valid 'documentName' property.`);
+      }
+
+      if (!this.#name.has(docName)) { return void 0; }
+
+      return this.#name.get(docName).stores.get(storeName);
    }
 
    /**
@@ -429,6 +396,10 @@ class TJSDocument
     * @type {EmbeddedStoreManager}
     */
    #embeddedStoreManager;
+
+   /**
+    * @type {import('./types').EmbeddedAPI}
+    */
    #embeddedAPI;
 
    /**
@@ -465,17 +436,19 @@ class TJSDocument
    }
 
    /**
-    * @returns {EmbeddedAPI} Embedded store manager.
+    * @returns {import('./types').EmbeddedAPI} Embedded store manager.
     */
    get embedded()
    {
       if (!this.#embeddedAPI)
       {
          this.#embeddedStoreManager = new EmbeddedStoreManager(this.#document);
+
+         /** @type {import('./types').EmbeddedAPI} */
          this.#embeddedAPI = {
-            create: (embeddedName, options) => this.#embeddedStoreManager.create(embeddedName, options),
-            destroy: (embeddedName, storeName) => this.#embeddedStoreManager.destroy(embeddedName, storeName),
-            get: (embeddedName, storeName) => this.#embeddedStoreManager.get(embeddedName, storeName)
+            create: (doc, options) => this.#embeddedStoreManager.create(doc, options),
+            destroy: (doc, storeName) => this.#embeddedStoreManager.destroy(doc, storeName),
+            get: (doc, storeName) => this.#embeddedStoreManager.get(doc, storeName)
          };
       }
 
@@ -697,20 +670,6 @@ class TJSDocument
       return this.setFromUUID(TJSDocument.getUUIDFromDataTransfer(data, options), options);
    }
 
-   /*
-{ actor?: boolean, compendium?: boolean, world?: boolean, types?: string[] }
-   @param {object}   [opts] - Optional parameters.
-
-@param {boolean}  [opts.actor=true] - Accept actor owned documents.
-
-@param {boolean}  [opts.compendium=true] - Accept compendium documents.
-
-@param {boolean}  [opts.world=true] - Accept world documents.
-
-@param {string[]|undefined}   [opts.types] - Require the `data.type` to match entry in `types`.
-
-    */
-
    /**
     * Sets the document by Foundry UUID performing a lookup and setting the document if found.
     *
@@ -806,17 +765,6 @@ class TJSDocument
  *
  * @property {(doc: foundry.abstract.Document) => void} [preDelete] - Optional pre delete function to invoke when
  *           document is deleted _before_ subscribers are notified.
- */
-
-/**
- * @template T
- * @typedef {object} EmbeddedAPI
- *
- * @property {(embeddedName: string, options: import('#runtime/data/struct/store/reducer').DynOptionsMapCreate<string, any>) => import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} create - Creates an embedded collection store.
- *
- * @property {(embeddedName?: string, storeName?: string) => boolean} destroy - Destroys one or more embedded collection stores.
- *
- * @property {(embeddedName: string, storeName: string) => import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} get - Returns a specific existing embedded collection store.
  */
 
 /**
@@ -1061,6 +1009,21 @@ class TJSDocumentCollection
  * @property {(collection: globalThis.DocumentCollection) => void} [preDelete] - Optional pre delete function to
  *           invoke when document is deleted _before_ subscribers are notified.
  */
+
+const _storeGameState = writable(void 0);
+
+/**
+ * @type {import('#svelte/store').Readable<globalThis.game>} Provides a Svelte store wrapping the Foundry `game` global
+ * variable. It is initialized on the `ready` hook. You may use this store to access the global game state from a
+ * Svelte template. It is a read only store and will receive no reactive updates during runtime.
+ */
+const gameState = {
+   subscribe: _storeGameState.subscribe,
+};
+
+Object.freeze(gameState);
+
+Hooks.once('ready', () => _storeGameState.set(game));
 
 export { TJSDocument, TJSDocumentCollection, gameState };
 //# sourceMappingURL=index.js.map

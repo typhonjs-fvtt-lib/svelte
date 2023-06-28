@@ -1,4 +1,4 @@
-import * as svelteEasingFunc from 'svelte/easing';
+import * as svelteEasingFunc from '#svelte/easing';
 
 let gsap = void 0;
 

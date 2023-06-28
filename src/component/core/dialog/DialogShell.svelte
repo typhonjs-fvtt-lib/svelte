@@ -3,9 +3,9 @@
       getContext,
       onDestroy,
       onMount,
-      setContext }         from 'svelte';
+      setContext }         from '#svelte';
 
-   import { fade }         from 'svelte/transition';
+   import { fade }         from '#svelte/transition';
 
    import { isObject }     from '#runtime/util/object';
 

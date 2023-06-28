@@ -11,7 +11,7 @@
    import {
       getContext,
       onMount,
-      setContext }                     from 'svelte';
+      setContext }                     from '#svelte';
 
    import {
       applyStyles,

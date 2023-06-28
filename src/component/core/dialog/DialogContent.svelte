@@ -5,7 +5,7 @@
    import {
       getContext,
       onDestroy,
-      onMount }               from 'svelte';
+      onMount }               from '#svelte';
 
    import { applyStyles }     from '@typhonjs-fvtt/svelte/action/dom';
    import { localize }        from '@typhonjs-fvtt/svelte/helper';

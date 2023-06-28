@@ -10,7 +10,9 @@
   "imports": {
     "#runtime/*": "@typhonjs-svelte/runtime-base/*",
     "#svelte-fvtt/*": "@typhonjs-fvtt/svelte/*",
-    "#svelte-lib/*": "@typhonjs-fvtt/svelte/*"
+    "#svelte-lib/*": "@typhonjs-fvtt/svelte/*",
+    "#svelte/*": "svelte/*",
+    "#svelte": "svelte"
   },
   "exports": {
     "./action/dom": {

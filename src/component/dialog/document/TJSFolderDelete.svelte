@@ -1,5 +1,5 @@
 <script>
-   import { getContext }    from 'svelte';
+   import { getContext }    from '#svelte';
 
    import { localize }      from '#svelte-fvtt/helper';
    import { TJSDocument }   from '#svelte-fvtt/store/fvtt';

@@ -1,12 +1,30 @@
-import * as svelte_store from 'svelte/store';
-import * as _runtime_data_struct_store_reducer from '@typhonjs-svelte/runtime-base/data/struct/store/reducer';
+import { DynOptionsMapCreate, DynMapReducer } from '@typhonjs-svelte/runtime-base/data/struct/store/reducer';
+import * as _svelte_store from 'svelte/store';
 
 /**
- * @type {import('svelte/store').Readable<globalThis.game>} Provides a Svelte store wrapping the Foundry `game` global
- * variable. It is initialized on the `ready` hook. You may use this store to access the global game state from a
- * Svelte template. It is a read only store and will receive no reactive updates during runtime.
+ * Provides the public embedded reactive collection API.
  */
-declare const gameState: svelte_store.Readable<globalThis.game>;
+interface EmbeddedAPI {
+    /**
+     * Creates an embedded collection store.
+     */
+    create<T extends NamedDocumentConstructor>(doc: T, options: DynOptionsMapCreate<string, InstanceType<T>>): DynMapReducer<string, InstanceType<T>>;
+    /**
+     * - Destroys one or more embedded collection stores.
+     */
+    destroy<T extends NamedDocumentConstructor>(doc?: T, storeName?: string): boolean;
+    /**
+     * - Returns a specific existing embedded collection store.
+     */
+    get<T extends NamedDocumentConstructor>(doc: T, storeName: string): DynMapReducer<string, InstanceType<T>>;
+}
+/**
+ * Provides a basic duck type for Foundry documents. Expects a constructor / class w/ static property `name`.
+ */
+interface NamedDocumentConstructor {
+    new (...args: any[]): any;
+    readonly documentName: string;
+}
 
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.
@@ -44,9 +62,9 @@ declare class TJSDocument {
      */
     constructor(document?: foundry.abstract.Document | TJSDocumentOptions, options?: TJSDocumentOptions);
     /**
-     * @returns {EmbeddedAPI} Embedded store manager.
+     * @returns {import('./types').EmbeddedAPI} Embedded store manager.
      */
-    get embedded(): any;
+    get embedded(): EmbeddedAPI;
     /**
      * Returns the options passed on last update.
      *
@@ -126,20 +144,6 @@ type TJSDocumentOptions = {
      */
     preDelete?: (doc: foundry.abstract.Document) => void;
 };
-type EmbeddedAPI<T> = {
-    /**
-     * - Creates an embedded collection store.
-     */
-    create: (embeddedName: string, options: _runtime_data_struct_store_reducer.DynOptionsMapCreate<string, any>) => _runtime_data_struct_store_reducer.DynMapReducer<string, T>;
-    /**
-     * - Destroys one or more embedded collection stores.
-     */
-    destroy: (embeddedName?: string, storeName?: string) => boolean;
-    /**
-     * - Returns a specific existing embedded collection store.
-     */
-    get: (embeddedName: string, storeName: string) => _runtime_data_struct_store_reducer.DynMapReducer<string, T>;
-};
 
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any DocumentCollection. This makes
@@ -209,4 +213,11 @@ type TJSDocumentCollectionOptions = {
     preDelete?: (collection: globalThis.DocumentCollection) => void;
 };
 
-export { EmbeddedAPI, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, gameState };
+/**
+ * @type {import('#svelte/store').Readable<globalThis.game>} Provides a Svelte store wrapping the Foundry `game` global
+ * variable. It is initialized on the `ready` hook. You may use this store to access the global game state from a
+ * Svelte template. It is a read only store and will receive no reactive updates during runtime.
+ */
+declare const gameState: _svelte_store.Readable<globalThis.game>;
+
+export { TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, gameState };

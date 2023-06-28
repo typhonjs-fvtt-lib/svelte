@@ -1,5 +1,5 @@
 <script>
-   import { getContext }    from 'svelte';
+   import { getContext }    from '#svelte';
 
    import { isObject }      from '#runtime/util/object';
 

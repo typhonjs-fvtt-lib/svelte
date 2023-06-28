@@ -338,6 +338,7 @@ for (const appFile of appFiles)
    fileData = fileData.replaceAll('#runtime/', '@typhonjs-svelte/runtime-base/');
    fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
    fileData = fileData.replaceAll('#svelte-lib/', '@typhonjs-fvtt/svelte/');
+   fileData = fileData.replaceAll('\'#svelte', '\'svelte');
 
    // For types
    // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');
@@ -361,6 +362,7 @@ for (const compFile of compFiles)
    fileData = fileData.replaceAll('#runtime/', '@typhonjs-svelte/runtime-base/');
    fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
    fileData = fileData.replaceAll('#svelte-lib/', '@typhonjs-fvtt/svelte/');
+   fileData = fileData.replaceAll('\'#svelte', '\'svelte');
 
    // For types
    // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');
@@ -383,6 +385,7 @@ for (const gsapFile of gsapFiles)
    fileData = fileData.replaceAll('#runtime/', '@typhonjs-svelte/runtime-base/');
    fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
    fileData = fileData.replaceAll('#svelte-lib/', '@typhonjs-fvtt/svelte/');
+   fileData = fileData.replaceAll('\'#svelte', '\'svelte');
 
    // For types
    // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');

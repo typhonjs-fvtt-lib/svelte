@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable } from '#svelte/store';
 
 /**
  * Provides the internal context to all application shells.
@@ -31,7 +31,7 @@ export class AppShellContextInternal
 /**
  * @typedef {object} InternalAppStores
  *
- * @property {import('svelte/store').Writable<HTMLElement>} elementContent - The window content element.
+ * @property {import('#svelte/store').Writable<HTMLElement>} elementContent - The window content element.
  *
- * @property {import('svelte/store').Writable<HTMLElement>} elementRoot - The window root element.
+ * @property {import('#svelte/store').Writable<HTMLElement>} elementRoot - The window root element.
  */

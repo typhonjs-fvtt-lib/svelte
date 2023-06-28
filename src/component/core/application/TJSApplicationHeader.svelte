@@ -1,6 +1,6 @@
 <script>
-   import { getContext }            from 'svelte';
-   import { cubicOut }              from 'svelte/easing';
+   import { getContext }            from '#svelte';
+   import { cubicOut }              from '#svelte/easing';
 
    import { localize }              from '@typhonjs-fvtt/svelte/helper';
 

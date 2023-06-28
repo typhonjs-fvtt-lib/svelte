@@ -1,4 +1,4 @@
-import { linear }             from 'svelte/easing';
+import { linear }             from '#svelte/easing';
 
 import { lerp }               from '#runtime/math/interpolate';
 import { isObject }           from '#runtime/util/object';

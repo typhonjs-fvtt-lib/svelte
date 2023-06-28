@@ -86,7 +86,7 @@ export function loadSvelteConfig({ app, template, config, elementRootUpdate } = 
 
    // Create the Svelte component.
    /**
-    * @type {import('svelte').SvelteComponent}
+    * @type {import('#svelte').SvelteComponent}
     */
    const component = new NewSvelteComponent(svelteConfig);
 

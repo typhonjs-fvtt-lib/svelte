@@ -1,5 +1,5 @@
 import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
-import * as svelte_store from 'svelte/store';
+import * as _svelte_store from 'svelte/store';
 
 declare let gsap: any;
 declare const easingFunc: {};
@@ -23,7 +23,7 @@ declare const easingList: string[];
  * @param {number}            [params.button=0] - MouseEvent button;
  *        {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
  *
- * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
+ * @param {import('#svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
  *        state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.
@@ -46,7 +46,7 @@ declare function draggableGsap(node: HTMLElement, { position, active, button, st
     position: _typhonjs_fvtt_svelte_store_position.TJSPosition;
     active?: boolean;
     button?: number;
-    storeDragging?: svelte_store.Writable<boolean>;
+    storeDragging?: _svelte_store.Writable<boolean>;
     ease?: boolean;
     inertia?: boolean;
     easeOptions?: object;
