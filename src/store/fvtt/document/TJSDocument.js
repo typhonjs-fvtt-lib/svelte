@@ -22,6 +22,10 @@ export class TJSDocument
     * @type {EmbeddedStoreManager}
     */
    #embeddedStoreManager;
+
+   /**
+    * @type {import('./types').EmbeddedAPI}
+    */
    #embeddedAPI;
 
    /**
@@ -58,17 +62,19 @@ export class TJSDocument
    }
 
    /**
-    * @returns {EmbeddedAPI} Embedded store manager.
+    * @returns {import('./types').EmbeddedAPI} Embedded store manager.
     */
    get embedded()
    {
       if (!this.#embeddedAPI)
       {
          this.#embeddedStoreManager = new EmbeddedStoreManager(this.#document);
+
+         /** @type {import('./types').EmbeddedAPI} */
          this.#embeddedAPI = {
-            create: (embeddedName, options) => this.#embeddedStoreManager.create(embeddedName, options),
-            destroy: (embeddedName, storeName) => this.#embeddedStoreManager.destroy(embeddedName, storeName),
-            get: (embeddedName, storeName) => this.#embeddedStoreManager.get(embeddedName, storeName)
+            create: (doc, options) => this.#embeddedStoreManager.create(doc, options),
+            destroy: (doc, storeName) => this.#embeddedStoreManager.destroy(doc, storeName),
+            get: (doc, storeName) => this.#embeddedStoreManager.get(doc, storeName)
          };
       }
 
@@ -290,20 +296,6 @@ export class TJSDocument
       return this.setFromUUID(TJSDocument.getUUIDFromDataTransfer(data, options), options);
    }
 
-   /*
-{ actor?: boolean, compendium?: boolean, world?: boolean, types?: string[] }
-   @param {object}   [opts] - Optional parameters.
-
-@param {boolean}  [opts.actor=true] - Accept actor owned documents.
-
-@param {boolean}  [opts.compendium=true] - Accept compendium documents.
-
-@param {boolean}  [opts.world=true] - Accept world documents.
-
-@param {string[]|undefined}   [opts.types] - Require the `data.type` to match entry in `types`.
-
-    */
-
    /**
     * Sets the document by Foundry UUID performing a lookup and setting the document if found.
     *
@@ -399,15 +391,4 @@ export class TJSDocument
  *
  * @property {(doc: foundry.abstract.Document) => void} [preDelete] - Optional pre delete function to invoke when
  *           document is deleted _before_ subscribers are notified.
- */
-
-/**
- * @template T
- * @typedef {object} EmbeddedAPI
- *
- * @property {(embeddedName: string, options: import('#runtime/data/struct/store/reducer').DynOptionsMapCreate<string, any>) => import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} create - Creates an embedded collection store.
- *
- * @property {(embeddedName?: string, storeName?: string) => boolean} destroy - Destroys one or more embedded collection stores.
- *
- * @property {(embeddedName: string, storeName: string) => import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} get - Returns a specific existing embedded collection store.
  */

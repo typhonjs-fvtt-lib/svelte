@@ -52,16 +52,25 @@ export class EmbeddedStoreManager
    }
 
    /**
-    * @template T
+    * @template [T=import('./types').NamedDocumentConstructor]
     *
-    * @param {string} embeddedName -
+    * @param {T} FoundryDoc - A Foundry document class / constructor.
     *
-    * @param {import('#runtime/data/struct/store/reducer').DynOptionsMapCreate<string, T>} options -
+    * @param {import('#runtime/data/struct/store/reducer').DynOptionsMapCreate<string, T>} options - DynMapReducer
+    *        creation options.
     *
-    * @returns {import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} DynMapReducer instance
+    * @returns {import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} DynMapReducer instance.
     */
-   create(embeddedName, options)
+   create(FoundryDoc, options)
    {
+      const docName = FoundryDoc?.documentName;
+
+      if (typeof docName !== 'string')
+      {
+         throw new TypeError(
+          `EmbeddedStoreManager.create error: 'FoundryDoc' does not have a valid 'documentName' property.`);
+      }
+
       /** @type {foundry.abstract.Document} */
       const doc = this.#document[0];
 
@@ -71,28 +80,28 @@ export class EmbeddedStoreManager
       {
          try
          {
-            collection = doc.getEmbeddedCollection(embeddedName);
+            collection = doc.getEmbeddedCollection(docName);
          }
          catch (err)
          {
-            console.warn(`EmbeddedStoreManager.create error: No valid embedded collection for: ${embeddedName}`);
+            console.warn(`EmbeddedStoreManager.create error: No valid embedded collection for: ${docName}`);
          }
       }
 
       let embeddedData;
 
-      if (!this.#name.has(embeddedName))
+      if (!this.#name.has(docName))
       {
          embeddedData = {
             collection,
             stores: new Map()
          };
 
-         this.#name.set(embeddedName, embeddedData);
+         this.#name.set(docName, embeddedData);
       }
       else
       {
-         embeddedData = this.#name.get(embeddedName);
+         embeddedData = this.#name.get(docName);
       }
 
       /** @type {string} */
@@ -129,7 +138,10 @@ export class EmbeddedStoreManager
 
       name = name ?? ctor?.name;
 
-      if (typeof name !== 'string') { throw new TypeError(`EmbeddedStoreManager.create error: 'name' is not a string.`); }
+      if (typeof name !== 'string')
+      {
+         throw new TypeError(`EmbeddedStoreManager.create error: 'name' is not a string.`);
+      }
 
       if (embeddedData.stores.has(name))
       {
@@ -145,22 +157,24 @@ export class EmbeddedStoreManager
    }
 
    /**
+    * @template [T=import('./types').NamedDocumentConstructor]
+    *
     * Destroys and removes embedded collection stores. Invoking this method with no parameters destroys all stores.
     * Invoking with an embedded name destroys all stores for that particular collection. If you provide an embedded and
     * store name just that particular store is destroyed and removed.
     *
-    * @param {string}   [embeddedName] - Specific embedded collection name.
+    * @param {T}   [FoundryDoc] - A Foundry document class / constructor.
     *
     * @param {string}   [storeName] - Specific store name.
     *
     * @returns {boolean} One or more stores destroyed?
     */
-   destroy(embeddedName, storeName)
+   destroy(FoundryDoc, storeName)
    {
       let count = 0;
 
       // Destroy all embedded stores
-      if (embeddedName === void 0)
+      if (FoundryDoc === void 0)
       {
          for (const embeddedData of this.#name.values())
          {
@@ -174,31 +188,42 @@ export class EmbeddedStoreManager
 
          this.#name.clear();
       }
-      else if (typeof embeddedName === 'string' && storeName === void 0)
+      else
       {
-         const embeddedData = this.#name.get(embeddedName);
-         if (embeddedData)
+         const docName = FoundryDoc?.documentName;
+
+         if (typeof docName !== 'string')
          {
-            embeddedData.collection = null;
-            for (const store of embeddedData.stores.values())
-            {
-               store.destroy();
-               count++;
-            }
+            throw new TypeError(
+             `EmbeddedStoreManager.delete error: 'FoundryDoc' does not have a valid 'documentName' property.`);
          }
 
-         this.#name.delete(embeddedName);
-      }
-      else if (typeof embeddedName === 'string' && storeName === 'string')
-      {
-         const embeddedData = this.#name.get(embeddedName);
-         if (embeddedData)
+         if (storeName === void 0)
          {
-            const store = embeddedData.stores.get(storeName);
-            if (store)
+            const embeddedData = this.#name.get(docName);
+            if (embeddedData)
             {
-               store.destroy();
-               count++;
+               embeddedData.collection = null;
+               for (const store of embeddedData.stores.values())
+               {
+                  store.destroy();
+                  count++;
+               }
+            }
+
+            this.#name.delete(docName);
+         }
+         else if (storeName === 'string')
+         {
+            const embeddedData = this.#name.get(docName);
+            if (embeddedData)
+            {
+               const store = embeddedData.stores.get(storeName);
+               if (store)
+               {
+                  store.destroy();
+                  count++;
+               }
             }
          }
       }
@@ -207,19 +232,28 @@ export class EmbeddedStoreManager
    }
 
    /**
-    * @template T
+    * @template [T=import('./types').NamedDocumentConstructor]
     *
-    * @param {string} embeddedName -
+    * @param {T} FoundryDoc - A Foundry document class / constructor.
     *
-    * @param {string} storeName -
+    * @param {string} storeName - Name of the embedded collection to retrieve.
     *
-    * @returns {import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} DynMapReducer instance.
+    * @returns {import('#runtime/data/struct/store/reducer').DynMapReducer<string, InstanceType<T>>} DynMapReducer
+    *          instance.
     */
-   get(embeddedName, storeName)
+   get(FoundryDoc, storeName)
    {
-      if (!this.#name.has(embeddedName)) { return void 0; }
+      const docName = FoundryDoc?.documentName;
 
-      return this.#name.get(embeddedName).stores.get(storeName);
+      if (typeof docName !== 'string')
+      {
+         throw new TypeError(
+          `EmbeddedStoreManager.get error: 'FoundryDoc' does not have a valid 'documentName' property.`);
+      }
+
+      if (!this.#name.has(docName)) { return void 0; }
+
+      return this.#name.get(docName).stores.get(storeName);
    }
 
    /**
