@@ -351,8 +351,8 @@
         class="app window-app {application.options.classes.join(' ')}"
         data-appid={application.appId}
         bind:this={elementRoot}
-        in:inTransition={inTransitionOptions}
-        out:outTransition={outTransitionOptions}
+        in:inTransition|global={inTransitionOptions}
+        out:outTransition|global={outTransitionOptions}
         on:close:popup|preventDefault|stopPropagation={onClosePopup}
         on:keydown|capture={onKeydown}
         on:pointerdown={onPointerdownApp}
