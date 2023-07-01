@@ -394,7 +394,7 @@ function s_UPDATE_SUBSCRIBER(subscriber, contentWidth, contentHeight)
 /**
  * @typedef {object} ResizeObserverObjectExtended Provides extended attributes supported for observed resize updates.
  *
- * @property {import('#svelte/store').Writable<ResizeObserverObject> | ResizeObserverFunction} [resizedObserver] Either
+ * @property {import('svelte/store').Writable<ResizeObserverObject> | ResizeObserverFunction} [resizedObserver] Either
  *           a function or a writable store.
  *
  * @property {(contentWidth: number, contentHeight: number) => void} [setContentBounds] - A function that is invoked
@@ -403,7 +403,7 @@ function s_UPDATE_SUBSCRIBER(subscriber, contentWidth, contentHeight)
  * @property {(offsetWidth: number, offsetHeight: number) => void} [setDimension] - A function that is invoked with
  *           offset width & height changes.
  *
- * @property {{resizedObserver: import('#svelte/store').Writable<ResizeObserverObject>}} [stores] - An object with a
+ * @property {{resizedObserver: import('svelte/store').Writable<ResizeObserverObject>}} [stores] - An object with a
  *           `stores` attribute and subsequent `resizedObserver` writable store.
  */
 
@@ -415,10 +415,10 @@ function s_UPDATE_SUBSCRIBER(subscriber, contentWidth, contentHeight)
  *
  * @param {HTMLElement} element - The target scrollable HTML element.
  *
- * @param {import('#svelte/store').Writable<number>}   store - A writable store that stores the element scrollTop.
+ * @param {import('svelte/store').Writable<number>}   store - A writable store that stores the element scrollTop.
  *
  * @returns {{
- *    update: (function(import('#svelte/store').Writable<number>): void),
+ *    update: (function(import('svelte/store').Writable<number>): void),
  *    destroy: (function(): void)
  * }} Lifecycle functions.
  */
@@ -571,9 +571,9 @@ function autoBlur(node)
  *
  * @param {HTMLElement} node - Target element.
  *
- * @param {import('#svelte/store').Writable<boolean>}  storeFocused - Update store for focus changes.
+ * @param {import('svelte/store').Writable<boolean>}  storeFocused - Update store for focus changes.
  *
- * @returns {{update: (function(import('#svelte/store').Writable<boolean>): void), destroy: Function}} Action lifecycle
+ * @returns {{update: (function(import('svelte/store').Writable<boolean>): void), destroy: Function}} Action lifecycle
  *          methods.
  */
 function isFocused(node, storeFocused)

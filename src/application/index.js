@@ -134,7 +134,7 @@ Hooks.on('PopOut:close', (app) =>
  *
  * @property {object}                           config -
  *
- * @property {import('#svelte').SvelteComponent} component -
+ * @property {import('svelte').SvelteComponent} component -
  *
  * @property {HTMLElement}                      element -
  *
@@ -144,11 +144,11 @@ Hooks.on('PopOut:close', (app) =>
 /**
  * @typedef {object} SvelteStores
  *
- * @property {import('#svelte/store').Writable.update} appOptionsUpdate - Update function for app options store.
+ * @property {import('svelte/store').Writable.update} appOptionsUpdate - Update function for app options store.
  *
  * @property {Function} subscribe - Subscribes to local stores.
  *
- * @property {import('#svelte/store').Writable.update} uiOptionsUpdate - Update function for UI options store.
+ * @property {import('svelte/store').Writable.update} uiOptionsUpdate - Update function for UI options store.
  *
  * @property {Function} unsubscribe - Unsubscribes from local stores.
  */

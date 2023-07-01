@@ -1,3 +1,5 @@
+import * as svelte_store from 'svelte/store';
+
 /**
  * Defines an `Element.animate` animation from provided keyframes and options.
  *
@@ -112,14 +114,14 @@ declare function rippleFocus({ duration, background, selectors }?: {
  *
  * @param {object} opts - Options parameters.
  *
- * @param {import('#svelte/store').Writable<boolean>} opts.store - A boolean store.
+ * @param {import('svelte/store').Writable<boolean>} opts.store - A boolean store.
  *
  * @param {boolean} [opts.clickActive] - When false click events are not handled.
  *
  * @returns {object} Destroy callback.
  */
 declare function toggleDetails(details: HTMLDetailsElement, { store, clickActive }?: {
-    store: any;
+    store: svelte_store.Writable<boolean>;
     clickActive?: boolean;
 }): object;
 

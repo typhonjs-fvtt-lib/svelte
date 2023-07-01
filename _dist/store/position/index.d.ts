@@ -1,5 +1,6 @@
 import * as _runtime_math_gl_matrix from '@typhonjs-svelte/runtime-base/math/gl-matrix';
 import { Vec3, Mat4 } from '@typhonjs-svelte/runtime-base/math/gl-matrix';
+import * as svelte_store from 'svelte/store';
 import * as _typhonjs_fvtt_svelte_animate from '@typhonjs-fvtt/svelte/animate';
 import * as svelte_action from 'svelte/action';
 
@@ -1237,7 +1238,7 @@ declare function applyPosition(node: HTMLElement, position: TJSPosition): svelte
  *
  * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
  *
- * @param {import('#svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
+ * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
  *        state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.
@@ -1250,18 +1251,18 @@ declare function applyPosition(node: HTMLElement, position: TJSPosition): svelte
  * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
  *        list are ignored.
  *
- * @returns {import('#svelte/action').ActionReturn} The action lifecycle methods.
+ * @returns {import('svelte/action').ActionReturn} The action lifecycle methods.
  */
 declare function draggable(node: HTMLElement, { position, active, button, storeDragging, ease, easeOptions, hasTargetClassList, ignoreTargetClassList }: {
     position: TJSPosition;
     active?: boolean;
     button?: number;
-    storeDragging?: any;
+    storeDragging?: svelte_store.Writable<boolean>;
     ease?: boolean;
     easeOptions?: object;
     hasTargetClassList?: Iterable<string>;
     ignoreTargetClassList?: Iterable<string>;
-}): any;
+}): svelte_action.ActionReturn;
 declare namespace draggable {
     /**
      * Define a function to get a DraggableOptions instance.
@@ -1404,110 +1405,113 @@ type ResizeObserverData = {
 type StorePosition = {
     /**
      * - Readable store for dimension
-     *  data.
+     *   data.
      */
-    dimension: any;
+    dimension: svelte_store.Readable<{
+        width: number;
+        height: number;
+    }>;
     /**
      * - Readable store for current element.
      */
-    element: any;
+    element: svelte_store.Readable<HTMLElement>;
     /**
      * - Derived store for `left` updates.
      */
-    left: any;
+    left: svelte_store.Writable<number | null>;
     /**
      * - Derived store for `top` updates.
      */
-    top: any;
+    top: svelte_store.Writable<number | null>;
     /**
      * - Derived store for `width` updates.
      */
-    width: any;
+    width: svelte_store.Writable<number | 'auto' | null>;
     /**
      * - Derived store for `height` updates.
      */
-    height: any;
+    height: svelte_store.Writable<number | 'auto' | null>;
     /**
      * - Derived store for `maxHeight` updates.
      */
-    maxHeight: any;
+    maxHeight: svelte_store.Writable<number | null>;
     /**
      * - Derived store for `maxWidth` updates.
      */
-    maxWidth: any;
+    maxWidth: svelte_store.Writable<number | null>;
     /**
      * - Derived store for `minHeight` updates.
      */
-    minHeight: any;
+    minHeight: svelte_store.Writable<number | null>;
     /**
      * - Derived store for `minWidth` updates.
      */
-    minWidth: any;
+    minWidth: svelte_store.Writable<number | null>;
     /**
      * - Readable store for `contentHeight`.
      */
-    resizeContentHeight: any;
+    resizeContentHeight: svelte_store.Readable<number | undefined>;
     /**
      * - Readable store for `contentWidth`.
      */
-    resizeContentWidth: any;
+    resizeContentWidth: svelte_store.Readable<number | undefined>;
     /**
      * - Protected store for resize observer updates.
      */
-    resizeObserved: any;
+    resizeObserved: svelte_store.Writable<ResizeObserverData>;
     /**
      * - Readable store for `offsetHeight`.
      */
-    resizeOffsetHeight: any;
+    resizeOffsetHeight: svelte_store.Readable<number | undefined>;
     /**
      * - Readable store for `offsetWidth`.
      */
-    resizeOffsetWidth: any;
+    resizeOffsetWidth: svelte_store.Readable<number | undefined>;
     /**
      * - Derived store for `rotate` updates.
      */
-    rotate: any;
+    rotate: svelte_store.Writable<number | null>;
     /**
      * - Derived store for `rotateX` updates.
      */
-    rotateX: any;
+    rotateX: svelte_store.Writable<number | null>;
     /**
      * - Derived store for `rotateY` updates.
      */
-    rotateY: any;
+    rotateY: svelte_store.Writable<number | null>;
     /**
      * - Derived store for `rotateZ` updates.
      */
-    rotateZ: any;
+    rotateZ: svelte_store.Writable<number | null>;
     /**
      * - Derived store for `scale` updates.
      */
-    scale: any;
+    scale: svelte_store.Writable<number | null>;
     /**
      * - Readable store for
      * transform data.
      */
-    transform: any;
+    transform: svelte_store.Readable<TJSTransformData>;
     /**
      * - Derived store for `transformOrigin`.
      */
-    transformOrigin: any;
+    transformOrigin: svelte_store.Writable<string>;
     /**
      * - Derived store for `translateX` updates.
      */
-    translateX: any;
+    translateX: svelte_store.Writable<number | null>;
     /**
      * - Derived store for `translateY` updates.
      */
-    translateY: any;
+    translateY: svelte_store.Writable<number | null>;
     /**
      * - Derived store for `translateZ` updates.
      */
-    translateZ: any;
+    translateZ: svelte_store.Writable<number | null>;
     /**
      * - Derived store for `zIndex` updates.
      */
-    zIndex: any;
+    zIndex: svelte_store.Writable<number | null>;
 };
 type TJSPositionDataExtended = {
     /**

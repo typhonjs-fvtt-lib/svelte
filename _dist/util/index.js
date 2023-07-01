@@ -131,7 +131,7 @@ function isTJSSvelteConfig(config, raiseException = false)
 /**
  * @typedef {object} TJSSvelteConfig
  *
- * @property {{ new(options: import('#svelte').ComponentConstructorOptions): import('#svelte').SvelteComponent | import('#svelte').SvelteComponentTyped }} class -
+ * @property {{ new(options: import('svelte').ComponentConstructorOptions): import('svelte').SvelteComponent | import('svelte').SvelteComponentTyped }} class -
  *
  * @property {Element|Document|ShadowRoot}   [target=document.body] -
  *

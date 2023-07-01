@@ -1,3 +1,5 @@
+import * as svelte from 'svelte';
+
 /**
  * Provides a method to determine if the passed in object / Svelte component follows the application shell contract.
  * This involves ensuring that the accessors defined in `applicationShellContract`.
@@ -46,7 +48,7 @@ type TJSSvelteConfig = {
     /**
      * -
      */
-    class: new (options: any) => any | any;
+    class: new (options: svelte.ComponentConstructorOptions) => svelte.SvelteComponent | svelte.SvelteComponentTyped;
     /**
      * -
      */

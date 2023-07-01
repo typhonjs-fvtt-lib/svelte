@@ -34,7 +34,8 @@ const dtsReplace = {
    _svelte_fvtt_: '_typhonjs_fvtt_svelte_',
    '#svelte-fvtt/': '@typhonjs-fvtt/svelte/',
    '#svelte-lib/': '@typhonjs-fvtt/svelte/',
-   '@typhonjs-svelte/lib/': '@typhonjs-fvtt/svelte/'
+   '@typhonjs-svelte/lib/': '@typhonjs-fvtt/svelte/',
+   '/\\/\\/ <reference.*\\/>': ''   // Svelte v4 types currently add triple slash references.
 };
 
 /**

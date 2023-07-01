@@ -1282,7 +1282,7 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  * @param {number}            [params.button=0] - MouseEvent button;
  *        {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
  *
- * @param {import('#svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
+ * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
  *        state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.

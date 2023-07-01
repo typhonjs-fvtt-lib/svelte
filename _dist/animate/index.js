@@ -34,13 +34,13 @@ import { isWritableStore } from '@typhonjs-svelte/runtime-base/util/store';
  *       <section animate:flipWithEvents />
  *    {/each}
  *
- * @param {(node: Element, data: { from: DOMRect, to: DOMRect }, params?: *) => import('#svelte/animate').AnimationConfig} fn -
+ * @param {(node: Element, data: { from: DOMRect, to: DOMRect }, params?: *) => import('svelte/animate').AnimationConfig} fn -
  *        A Svelte animation function.
  *
- * @param {import('#svelte/store').Writable<boolean>} [store] - An optional boolean writable store that is set to true
+ * @param {import('svelte/store').Writable<boolean>} [store] - An optional boolean writable store that is set to true
  *        when animation is active.
  *
- * @returns {(node: Element, data: { from: DOMRect, to: DOMRect }, params?: *) => import('#svelte/animate').AnimationConfig}
+ * @returns {(node: Element, data: { from: DOMRect, to: DOMRect }, params?: *) => import('svelte/animate').AnimationConfig}
  *          Wrapped animation function.
  */
 function animateEvents(fn, store = void 0)

@@ -1,3 +1,5 @@
+import * as svelte_store from 'svelte/store';
+
 /**
  * Provides an action to always blur the element when any pointer up event occurs on the element.
  *
@@ -17,15 +19,15 @@ declare function alwaysBlur(node: HTMLElement): {
  *
  * @param {HTMLElement} element - The target scrollable HTML element.
  *
- * @param {import('#svelte/store').Writable<number>}   store - A writable store that stores the element scrollTop.
+ * @param {import('svelte/store').Writable<number>}   store - A writable store that stores the element scrollTop.
  *
  * @returns {{
- *    update: (function(import('#svelte/store').Writable<number>): void),
+ *    update: (function(import('svelte/store').Writable<number>): void),
  *    destroy: (function(): void)
  * }} Lifecycle functions.
  */
-declare function applyScrolltop(element: HTMLElement, store: any): {
-    update: ((arg0: any) => void);
+declare function applyScrolltop(element: HTMLElement, store: svelte_store.Writable<number>): {
+    update: ((arg0: svelte_store.Writable<number>) => void);
     destroy: (() => void);
 };
 
@@ -61,13 +63,13 @@ declare function autoBlur(node: HTMLElement): {
  *
  * @param {HTMLElement} node - Target element.
  *
- * @param {import('#svelte/store').Writable<boolean>}  storeFocused - Update store for focus changes.
+ * @param {import('svelte/store').Writable<boolean>}  storeFocused - Update store for focus changes.
  *
- * @returns {{update: (function(import('#svelte/store').Writable<boolean>): void), destroy: Function}} Action lifecycle
+ * @returns {{update: (function(import('svelte/store').Writable<boolean>): void), destroy: Function}} Action lifecycle
  *          methods.
  */
-declare function isFocused(node: HTMLElement, storeFocused: any): {
-    update: ((arg0: any) => void);
+declare function isFocused(node: HTMLElement, storeFocused: svelte_store.Writable<boolean>): {
+    update: ((arg0: svelte_store.Writable<boolean>) => void);
     destroy: Function;
 };
 
@@ -109,7 +111,7 @@ type ResizeObserverObjectExtended = {
      * Either
      * a function or a writable store.
      */
-    resizedObserver?: any | ResizeObserverFunction;
+    resizedObserver?: svelte_store.Writable<ResizeObserverObject> | ResizeObserverFunction;
     /**
      * - A function that is invoked
      * with content width & height changes.
@@ -125,7 +127,7 @@ type ResizeObserverObjectExtended = {
      * `stores` attribute and subsequent `resizedObserver` writable store.
      */
     stores?: {
-        resizedObserver: any;
+        resizedObserver: svelte_store.Writable<ResizeObserverObject>;
     };
 };
 /**

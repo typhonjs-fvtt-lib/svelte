@@ -54,7 +54,7 @@ export class GetSvelteData
    /**
     * Returns the Svelte component entries iterator.
     *
-    * @returns {Generator<Array<number|import('#svelte').SvelteComponent>>} Svelte component entries iterator.
+    * @returns {Generator<Array<number|import('svelte').SvelteComponent>>} Svelte component entries iterator.
     * @yields
     */
    *componentEntries()
@@ -68,7 +68,7 @@ export class GetSvelteData
    /**
     * Returns the Svelte component values iterator.
     *
-    * @returns {Generator<import('#svelte').SvelteComponent>} Svelte component values iterator.
+    * @returns {Generator<import('svelte').SvelteComponent>} Svelte component values iterator.
     * @yields
     */
    *componentValues()
