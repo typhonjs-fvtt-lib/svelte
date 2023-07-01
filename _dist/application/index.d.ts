@@ -1,7 +1,7 @@
 import * as svelte from 'svelte';
 import * as _typhonjs_fvtt_svelte_util from '@typhonjs-fvtt/svelte/util';
-import * as _typhonjs_fvtt_svelte_store_storage_web from '@typhonjs-fvtt/svelte/store/storage/web';
-import { TJSWebStorage } from '@typhonjs-fvtt/svelte/store/storage/web';
+import * as _typhonjs_svelte_runtime_base_svelte_store_web_storage from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
+import { TJSWebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
 import { TJSPosition } from '@typhonjs-fvtt/svelte/store/position';
 import * as _typhonjs_svelte_runtime_base_util_browser from '@typhonjs-svelte/runtime-base/util/browser';
@@ -307,7 +307,7 @@ declare class SvelteReactive {
      */
     initialize(): _typhonjs_fvtt_svelte_application.SvelteStores | undefined;
     /**
-     * @returns {import('@typhonjs-fvtt/svelte/store/storage/web').TJSWebStorage} Returns TJSWebStorage (session) instance.
+     * @returns {import('@typhonjs-svelte/runtime-base/svelte/store/web-storage').TJSWebStorage} Returns TJSWebStorage (session) instance.
      */
     get sessionStorage(): TJSWebStorage;
     /**
@@ -1195,7 +1195,7 @@ type SvelteApplicationOptions = {
      * - An instance of
      * TJSWebStorage (session) to share across SvelteApplications.
      */
-    sessionStorage?: _typhonjs_fvtt_svelte_store_storage_web.TJSWebStorage;
+    sessionStorage?: _typhonjs_svelte_runtime_base_svelte_store_web_storage.TJSWebStorage;
     /**
      * - A Svelte configuration object defining
      * the main component.

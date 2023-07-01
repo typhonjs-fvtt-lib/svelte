@@ -139,8 +139,8 @@
       <div class=tjs-glass-pane-background
            bind:this={backgroundEl}
            style:background={background}
-           in:inTransition={inTransitionOptions}
-           out:outTransition={outTransitionOptions}
+           in:inTransition|global={inTransitionOptions}
+           out:outTransition|global={outTransitionOptions}
            use:applyStyles={styles} />
 
       <div class=tjs-glass-pane-container bind:this={containerEl}>
@@ -150,8 +150,8 @@
       <div class=tjs-glass-pane-background
            bind:this={backgroundEl}
            style:background={background}
-           in:inTransition={inTransitionOptions}
-           out:outTransition={outTransitionOptions}
+           in:inTransition|global={inTransitionOptions}
+           out:outTransition|global={outTransitionOptions}
            use:applyStyles={styles} >
          <slot />
       </div>

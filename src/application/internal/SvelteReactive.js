@@ -4,7 +4,7 @@ import { propertyStore }         from '#svelte-fvtt/store/derived';
 
 import {
    TJSSessionStorage,
-   TJSWebStorage }               from '#svelte-fvtt/store/storage/web';
+   TJSWebStorage }               from '#runtime/svelte/store/web-storage';
 
 import {
    deepMerge,
@@ -80,7 +80,7 @@ export class SvelteReactive
     */
    #initialized = false;
 
-   /** @type {import('#svelte-fvtt/store/storage/web').TJSWebStorage} */
+   /** @type {import('#runtime/svelte/store/web-storage').TJSWebStorage} */
    #sessionStorage;
 
    /**
@@ -168,7 +168,7 @@ export class SvelteReactive
 // Store getters -----------------------------------------------------------------------------------------------------
 
    /**
-    * @returns {import('#svelte-fvtt/store/storage/web').TJSWebStorage} Returns TJSWebStorage (session) instance.
+    * @returns {import('#runtime/svelte/store/web-storage').TJSWebStorage} Returns TJSWebStorage (session) instance.
     */
    get sessionStorage()
    {

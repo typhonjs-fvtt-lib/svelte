@@ -4,7 +4,7 @@ import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/sto
 import { TJSPosition } from '@typhonjs-fvtt/svelte/store/position';
 import * as svelte from 'svelte';
 import * as svelte_store from 'svelte/store';
-import { TJSWebStorage } from '@typhonjs-fvtt/svelte/store/storage/web';
+import { TJSWebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 
 declare class HandlebarsApplication extends SvelteApplication$1 {
     /**
@@ -438,7 +438,7 @@ declare class SvelteReactive {
      */
     initialize(): _typhonjs_fvtt_svelte_application.SvelteStores | undefined;
     /**
-     * @returns {import('@typhonjs-fvtt/svelte/store/storage/web').TJSWebStorage} Returns TJSWebStorage (session) instance.
+     * @returns {import('@typhonjs-svelte/runtime-base/svelte/store/web-storage').TJSWebStorage} Returns TJSWebStorage (session) instance.
      */
     get sessionStorage(): TJSWebStorage;
     /**
