@@ -346,6 +346,7 @@
 <svelte:options accessors={true}/>
 
 {#if inTransition || outTransition}
+   <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
    <div id={application.id}
         class="app window-app {application.options.classes.join(' ')}"
         data-appid={application.appId}
@@ -357,6 +358,7 @@
         on:pointerdown={onPointerdownApp}
         use:applyStyles={stylesApp}
         use:appResizeObserver={resizeObservedApp}
+        role=application
         tabindex=-1>
       <TJSApplicationHeader {draggable} {draggableOptions} />
       <section class=window-content
@@ -371,6 +373,7 @@
       <TJSFocusWrap {elementRoot} />
    </div>
 {:else}
+   <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
    <div id={application.id}
         class="app window-app {application.options.classes.join(' ')}"
         data-appid={application.appId}
@@ -380,6 +383,7 @@
         on:pointerdown={onPointerdownApp}
         use:applyStyles={stylesApp}
         use:appResizeObserver={resizeObservedApp}
+        role=application
         tabindex=-1>
       <TJSApplicationHeader {draggable} {draggableOptions} />
       <section class=window-content

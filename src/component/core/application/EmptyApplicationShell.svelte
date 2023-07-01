@@ -302,6 +302,7 @@
 <svelte:options accessors={true}/>
 
 {#if inTransition || outTransition}
+    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
          class={application.options.classes.join(' ')}
          data-appid={application.appId}
@@ -313,11 +314,13 @@
          on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
          use:appResizeObserver={resizeObservedApp}
+         role=application
          tabindex=-1>
         <slot />
         <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
     </div>
 {:else}
+    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
          class={application.options.classes.join(' ')}
          data-appid={application.appId}
@@ -327,6 +330,7 @@
          on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
          use:appResizeObserver={resizeObservedApp}
+         role=application
          tabindex=-1>
         <slot />
         <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
