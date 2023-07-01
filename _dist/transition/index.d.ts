@@ -1,5 +1,3 @@
-import * as _svelte_transition from 'svelte/transition';
-
 /**
  * Provides a rotate transition. For options `easing` is applied to to the rotate transition. The default easing is
  * linear.
@@ -124,10 +122,10 @@ declare function slideFade(node: HTMLElement, options: {
  * @returns {(node: Element, data: { from: DOMRect, to: DOMRect }, params?: object) => import('#svelte/transition').TransitionConfig} -
  *          Transition function converted to an animation.
  */
-declare function toAnimation(fn: (node: Element, params?: object) => _svelte_transition.TransitionConfig): (node: Element, data: {
+declare function toAnimation(fn: (node: Element, params?: object) => any): (node: Element, data: {
     from: DOMRect;
     to: DOMRect;
-}, params?: object) => _svelte_transition.TransitionConfig;
+}, params?: object) => any;
 
 declare function s_DEFAULT_TRANSITION(): any;
 declare const s_DEFAULT_TRANSITION_OPTIONS: {};

@@ -1,5 +1,3 @@
-import * as _svelte_store from 'svelte/store';
-
 /**
  * Provides an action to always blur the element when any pointer up event occurs on the element.
  *
@@ -26,8 +24,8 @@ declare function alwaysBlur(node: HTMLElement): {
  *    destroy: (function(): void)
  * }} Lifecycle functions.
  */
-declare function applyScrolltop(element: HTMLElement, store: _svelte_store.Writable<number>): {
-    update: ((arg0: _svelte_store.Writable<number>) => void);
+declare function applyScrolltop(element: HTMLElement, store: any): {
+    update: ((arg0: any) => void);
     destroy: (() => void);
 };
 
@@ -68,8 +66,8 @@ declare function autoBlur(node: HTMLElement): {
  * @returns {{update: (function(import('#svelte/store').Writable<boolean>): void), destroy: Function}} Action lifecycle
  *          methods.
  */
-declare function isFocused(node: HTMLElement, storeFocused: _svelte_store.Writable<boolean>): {
-    update: ((arg0: _svelte_store.Writable<boolean>) => void);
+declare function isFocused(node: HTMLElement, storeFocused: any): {
+    update: ((arg0: any) => void);
     destroy: Function;
 };
 
@@ -111,7 +109,7 @@ type ResizeObserverObjectExtended = {
      * Either
      * a function or a writable store.
      */
-    resizedObserver?: _svelte_store.Writable<ResizeObserverObject> | ResizeObserverFunction;
+    resizedObserver?: any | ResizeObserverFunction;
     /**
      * - A function that is invoked
      * with content width & height changes.
@@ -127,7 +125,7 @@ type ResizeObserverObjectExtended = {
      * `stores` attribute and subsequent `resizedObserver` writable store.
      */
     stores?: {
-        resizedObserver: _svelte_store.Writable<ResizeObserverObject>;
+        resizedObserver: any;
     };
 };
 /**

@@ -1,5 +1,3 @@
-import * as _svelte_store from 'svelte/store';
-
 /**
  * Defines an `Element.animate` animation from provided keyframes and options.
  *
@@ -121,7 +119,7 @@ declare function rippleFocus({ duration, background, selectors }?: {
  * @returns {object} Destroy callback.
  */
 declare function toggleDetails(details: HTMLDetailsElement, { store, clickActive }?: {
-    store: _svelte_store.Writable<boolean>;
+    store: any;
     clickActive?: boolean;
 }): object;
 

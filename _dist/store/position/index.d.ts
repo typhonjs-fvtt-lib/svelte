@@ -1,6 +1,5 @@
 import * as _runtime_math_gl_matrix from '@typhonjs-svelte/runtime-base/math/gl-matrix';
 import { Vec3, Mat4 } from '@typhonjs-svelte/runtime-base/math/gl-matrix';
-import * as _svelte_store from 'svelte/store';
 import * as _typhonjs_fvtt_svelte_animate from '@typhonjs-fvtt/svelte/animate';
 import * as svelte_action from 'svelte/action';
 
@@ -1257,12 +1256,12 @@ declare function draggable(node: HTMLElement, { position, active, button, storeD
     position: TJSPosition;
     active?: boolean;
     button?: number;
-    storeDragging?: _svelte_store.Writable<boolean>;
+    storeDragging?: any;
     ease?: boolean;
     easeOptions?: object;
     hasTargetClassList?: Iterable<string>;
     ignoreTargetClassList?: Iterable<string>;
-}): svelte_action.ActionReturn;
+}): any;
 declare namespace draggable {
     /**
      * Define a function to get a DraggableOptions instance.
@@ -1407,111 +1406,108 @@ type StorePosition = {
      * - Readable store for dimension
      *  data.
      */
-    dimension: _svelte_store.Readable<{
-        width: number;
-        height: number;
-    }>;
+    dimension: any;
     /**
      * - Readable store for current element.
      */
-    element: _svelte_store.Readable<HTMLElement>;
+    element: any;
     /**
      * - Derived store for `left` updates.
      */
-    left: _svelte_store.Writable<number | null>;
+    left: any;
     /**
      * - Derived store for `top` updates.
      */
-    top: _svelte_store.Writable<number | null>;
+    top: any;
     /**
      * - Derived store for `width` updates.
      */
-    width: _svelte_store.Writable<number | 'auto' | null>;
+    width: any;
     /**
      * - Derived store for `height` updates.
      */
-    height: _svelte_store.Writable<number | 'auto' | null>;
+    height: any;
     /**
      * - Derived store for `maxHeight` updates.
      */
-    maxHeight: _svelte_store.Writable<number | null>;
+    maxHeight: any;
     /**
      * - Derived store for `maxWidth` updates.
      */
-    maxWidth: _svelte_store.Writable<number | null>;
+    maxWidth: any;
     /**
      * - Derived store for `minHeight` updates.
      */
-    minHeight: _svelte_store.Writable<number | null>;
+    minHeight: any;
     /**
      * - Derived store for `minWidth` updates.
      */
-    minWidth: _svelte_store.Writable<number | null>;
+    minWidth: any;
     /**
      * - Readable store for `contentHeight`.
      */
-    resizeContentHeight: _svelte_store.Readable<number | undefined>;
+    resizeContentHeight: any;
     /**
      * - Readable store for `contentWidth`.
      */
-    resizeContentWidth: _svelte_store.Readable<number | undefined>;
+    resizeContentWidth: any;
     /**
      * - Protected store for resize observer updates.
      */
-    resizeObserved: _svelte_store.Writable<ResizeObserverData>;
+    resizeObserved: any;
     /**
      * - Readable store for `offsetHeight`.
      */
-    resizeOffsetHeight: _svelte_store.Readable<number | undefined>;
+    resizeOffsetHeight: any;
     /**
      * - Readable store for `offsetWidth`.
      */
-    resizeOffsetWidth: _svelte_store.Readable<number | undefined>;
+    resizeOffsetWidth: any;
     /**
      * - Derived store for `rotate` updates.
      */
-    rotate: _svelte_store.Writable<number | null>;
+    rotate: any;
     /**
      * - Derived store for `rotateX` updates.
      */
-    rotateX: _svelte_store.Writable<number | null>;
+    rotateX: any;
     /**
      * - Derived store for `rotateY` updates.
      */
-    rotateY: _svelte_store.Writable<number | null>;
+    rotateY: any;
     /**
      * - Derived store for `rotateZ` updates.
      */
-    rotateZ: _svelte_store.Writable<number | null>;
+    rotateZ: any;
     /**
      * - Derived store for `scale` updates.
      */
-    scale: _svelte_store.Writable<number | null>;
+    scale: any;
     /**
      * - Readable store for
      * transform data.
      */
-    transform: _svelte_store.Readable<TJSTransformData>;
+    transform: any;
     /**
      * - Derived store for `transformOrigin`.
      */
-    transformOrigin: _svelte_store.Writable<string>;
+    transformOrigin: any;
     /**
      * - Derived store for `translateX` updates.
      */
-    translateX: _svelte_store.Writable<number | null>;
+    translateX: any;
     /**
      * - Derived store for `translateY` updates.
      */
-    translateY: _svelte_store.Writable<number | null>;
+    translateY: any;
     /**
      * - Derived store for `translateZ` updates.
      */
-    translateZ: _svelte_store.Writable<number | null>;
+    translateZ: any;
     /**
      * - Derived store for `zIndex` updates.
      */
-    zIndex: _svelte_store.Writable<number | null>;
+    zIndex: any;
 };
 type TJSPositionDataExtended = {
     /**

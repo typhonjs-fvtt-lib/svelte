@@ -1,6 +1,3 @@
-import * as _svelte_store from 'svelte/store';
-import * as _svelte_animate from 'svelte/animate';
-
 /**
  * Svelte doesn't provide any events for the animate directive.
  *
@@ -47,10 +44,10 @@ import * as _svelte_animate from 'svelte/animate';
 declare function animateEvents(fn: (node: Element, data: {
     from: DOMRect;
     to: DOMRect;
-}, params?: any) => _svelte_animate.AnimationConfig, store?: _svelte_store.Writable<boolean>): (node: Element, data: {
+}, params?: any) => any, store?: any): (node: Element, data: {
     from: DOMRect;
     to: DOMRect;
-}, params?: any) => _svelte_animate.AnimationConfig;
+}, params?: any) => any;
 
 /**
  * Awaits `requestAnimationFrame` calls by the counter specified. This allows asynchronous applications for direct /

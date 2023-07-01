@@ -164,13 +164,13 @@ export class SvelteApplication extends Application
          headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.
          headerIcon: void 0,              // Sets a header icon given an image URL.
          headerNoTitleMinimized: false,   // If true then header title is hidden when application is minimized.
-         minHeight: MIN_WINDOW_HEIGHT,    // Assigned to position. Number specifying minimum window height.
-         minWidth: MIN_WINDOW_WIDTH,      // Assigned to position. Number specifying minimum window width.
+         minHeight: globalThis.MIN_WINDOW_HEIGHT,  // Assigned to position. Number specifying minimum window height.
+         minWidth: globalThis.MIN_WINDOW_WIDTH,    // Assigned to position. Number specifying minimum window width.
          positionable: true,              // If false then `position.set` does not take effect.
          positionInitial: TJSPosition.Initial.browserCentered,      // A helper for initial position placement.
          positionOrtho: true,             // When true TJSPosition is optimized for orthographic use.
          positionValidator: TJSPosition.Validators.transformWindow, // A function providing the default validator.
-         sessionStorage: void 0,          // An instance of SessionStorage to share across SvelteApplications.
+         sessionStorage: void 0,          // An instance of TJSWebStorage (session) to share across SvelteApplications.
          svelte: void 0,                  // A Svelte configuration object.
          transformOrigin: 'top left'      // By default, 'top / left' respects rotation when minimizing.
       });

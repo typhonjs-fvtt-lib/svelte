@@ -119,8 +119,8 @@ Hooks.on('PopOut:close', (app) =>
  * @property {import('#svelte-fvtt/store/position').TJSPositionValidatorOptions}   [positionValidator] - A
  *           validator function or data or list of validators.
  *
- * @property {import('#svelte-fvtt/store/storage/web').TJSSessionStorage}   [sessionStorage] - An instance of
- *           TJSSessionStorage to share across SvelteApplications.
+ * @property {import('#svelte-fvtt/store/storage/web').TJSWebStorage}   [sessionStorage] - An instance of
+ *           TJSWebStorage (session) to share across SvelteApplications.
  *
  * @property {import('#svelte-fvtt/util').TJSSvelteConfig}   [svelte] - A Svelte configuration object defining
  *           the main component.

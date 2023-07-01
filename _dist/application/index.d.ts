@@ -1,7 +1,7 @@
 import * as svelte from 'svelte';
 import * as _typhonjs_fvtt_svelte_util from '@typhonjs-fvtt/svelte/util';
 import * as _typhonjs_fvtt_svelte_store_storage_web from '@typhonjs-fvtt/svelte/store/storage/web';
-import { TJSSessionStorage } from '@typhonjs-fvtt/svelte/store/storage/web';
+import { TJSWebStorage } from '@typhonjs-fvtt/svelte/store/storage/web';
 import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
 import { TJSPosition } from '@typhonjs-fvtt/svelte/store/position';
 import * as _typhonjs_svelte_runtime_base_util_browser from '@typhonjs-svelte/runtime-base/util/browser';
@@ -266,9 +266,9 @@ declare class GetSvelteData {
  * - {@link SvelteReactive.resizable}
  * - {@link SvelteReactive.title}
  *
- * An instance of TJSSessionStorage is accessible via {@link SvelteReactive.sessionStorage}. Optionally you can pass
- * in an existing instance that can be shared across multiple SvelteApplications by setting
- * {@link SvelteApplicationOptions.sessionStorage}.
+ * An instance of TJSWebStorage (session) / TJSSessionStorage is accessible via {@link SvelteReactive.sessionStorage}.
+ * Optionally you can pass in an existing TJSWebStorage instance that can be shared across multiple SvelteApplications
+ * by setting {@link SvelteApplicationOptions.sessionStorage}.
  *
  * -------------------------------------------------------------------------------------------------------------------
  *
@@ -307,9 +307,9 @@ declare class SvelteReactive {
      */
     initialize(): _typhonjs_fvtt_svelte_application.SvelteStores | undefined;
     /**
-     * @returns {import('@typhonjs-fvtt/svelte/store/storage/web').TJSSessionStorage} Returns TJSSessionStorage instance.
+     * @returns {import('@typhonjs-fvtt/svelte/store/storage/web').TJSWebStorage} Returns TJSWebStorage (session) instance.
      */
-    get sessionStorage(): TJSSessionStorage;
+    get sessionStorage(): TJSWebStorage;
     /**
      * Returns the store for app options.
      *
@@ -1193,9 +1193,9 @@ type SvelteApplicationOptions = {
     positionValidator?: _typhonjs_fvtt_svelte_store_position.TJSPositionValidatorOptions;
     /**
      * - An instance of
-     * TJSSessionStorage to share across SvelteApplications.
+     * TJSWebStorage (session) to share across SvelteApplications.
      */
-    sessionStorage?: _typhonjs_fvtt_svelte_store_storage_web.TJSSessionStorage;
+    sessionStorage?: _typhonjs_fvtt_svelte_store_storage_web.TJSWebStorage;
     /**
      * - A Svelte configuration object defining
      * the main component.

@@ -1,5 +1,4 @@
 import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
-import * as _svelte_store from 'svelte/store';
 
 declare let gsap: any;
 declare const easingFunc: {};
@@ -46,7 +45,7 @@ declare function draggableGsap(node: HTMLElement, { position, active, button, st
     position: _typhonjs_fvtt_svelte_store_position.TJSPosition;
     active?: boolean;
     button?: number;
-    storeDragging?: _svelte_store.Writable<boolean>;
+    storeDragging?: any;
     ease?: boolean;
     inertia?: boolean;
     easeOptions?: object;

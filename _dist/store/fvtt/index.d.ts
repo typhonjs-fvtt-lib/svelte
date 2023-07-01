@@ -1,5 +1,4 @@
 import { DynOptionsMapCreate, DynMapReducer } from '@typhonjs-svelte/runtime-base/data/struct/store/reducer';
-import * as _svelte_store from 'svelte/store';
 
 /**
  * Provides the public embedded reactive collection API.
@@ -218,6 +217,6 @@ type TJSDocumentCollectionOptions = {
  * variable. It is initialized on the `ready` hook. You may use this store to access the global game state from a
  * Svelte template. It is a read only store and will receive no reactive updates during runtime.
  */
-declare const gameState: _svelte_store.Readable<globalThis.game>;
+declare const gameState: any;
 
 export { TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentOptions, gameState };

@@ -2,7 +2,9 @@ import { derived, writable }     from 'svelte/store';
 
 import { propertyStore }         from '@typhonjs-fvtt/svelte/store/derived';
 
-import { TJSSessionStorage }     from '@typhonjs-fvtt/svelte/store/storage/web';
+import {
+   TJSSessionStorage,
+   TJSWebStorage }               from '@typhonjs-fvtt/svelte/store/storage/web';
 
 import {
    deepMerge,
@@ -39,9 +41,9 @@ import { subscribeIgnoreFirst }  from '@typhonjs-svelte/runtime-base/util/store'
  * - {@link SvelteReactive.resizable}
  * - {@link SvelteReactive.title}
  *
- * An instance of TJSSessionStorage is accessible via {@link SvelteReactive.sessionStorage}. Optionally you can pass
- * in an existing instance that can be shared across multiple SvelteApplications by setting
- * {@link SvelteApplicationOptions.sessionStorage}.
+ * An instance of TJSWebStorage (session) / TJSSessionStorage is accessible via {@link SvelteReactive.sessionStorage}.
+ * Optionally you can pass in an existing TJSWebStorage instance that can be shared across multiple SvelteApplications
+ * by setting {@link SvelteApplicationOptions.sessionStorage}.
  *
  * -------------------------------------------------------------------------------------------------------------------
  *
@@ -78,7 +80,7 @@ export class SvelteReactive
     */
    #initialized = false;
 
-   /** @type {import('@typhonjs-fvtt/svelte/store/storage/web').TJSSessionStorage} */
+   /** @type {import('@typhonjs-fvtt/svelte/store/storage/web').TJSWebStorage} */
    #sessionStorage;
 
    /**
@@ -131,11 +133,12 @@ export class SvelteReactive
       this.#application = application;
       const optionsSessionStorage = application?.options?.sessionStorage;
 
-      if (optionsSessionStorage !== void 0 && !(optionsSessionStorage instanceof TJSSessionStorage))
+      if (optionsSessionStorage !== void 0 && !(optionsSessionStorage instanceof TJSWebStorage))
       {
-         throw new TypeError(`'options.sessionStorage' is not an instance of TJSSessionStorage.`);
+         throw new TypeError(`'options.sessionStorage' is not an instance of TJSWebStorage.`);
       }
 
+      // If no external web storage API instance is available then create a TJSSessionStorage instance.
       this.#sessionStorage = optionsSessionStorage !== void 0 ? optionsSessionStorage : new TJSSessionStorage();
    }
 
@@ -165,7 +168,7 @@ export class SvelteReactive
 // Store getters -----------------------------------------------------------------------------------------------------
 
    /**
-    * @returns {import('@typhonjs-fvtt/svelte/store/storage/web').TJSSessionStorage} Returns TJSSessionStorage instance.
+    * @returns {import('@typhonjs-fvtt/svelte/store/storage/web').TJSWebStorage} Returns TJSWebStorage (session) instance.
     */
    get sessionStorage()
    {
