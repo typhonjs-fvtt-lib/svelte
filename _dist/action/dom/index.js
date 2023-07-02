@@ -8,7 +8,7 @@ import { isObject } from '@typhonjs-svelte/runtime-base/util/object';
  *
  * @param {HTMLElement}   node - The node to handle always blur on pointer up.
  *
- * @returns {{destroy: Function}} Lifecycle functions.
+ * @returns {import('svelte/action').ActionReturn} Lifecycle functions.
  */
 function alwaysBlur(node)
 {
@@ -51,7 +51,7 @@ function alwaysBlur(node)
  *
  * @param {ResizeObserverTarget} target - An object or function to update with observed width & height changes.
  *
- * @returns {{update: (function(ResizeObserverTarget): void), destroy: Function}} The action lifecycle methods.
+ * @returns {import('svelte/action').ActionReturn<ResizeObserverTarget>} The action lifecycle methods.
  * @see {@link https://github.com/sveltejs/svelte/issues/4233}
  */
 function resizeObserver(node, target)
@@ -59,6 +59,9 @@ function resizeObserver(node, target)
    ResizeObserverManager.add(node, target);
 
    return {
+      /**
+       * @param {ResizeObserverTarget} newTarget - An object or function to update with observed width & height changes.
+       */
       update: (newTarget) =>
       {
          ResizeObserverManager.remove(node, target);
@@ -417,10 +420,7 @@ function s_UPDATE_SUBSCRIBER(subscriber, contentWidth, contentHeight)
  *
  * @param {import('svelte/store').Writable<number>}   store - A writable store that stores the element scrollTop.
  *
- * @returns {{
- *    update: (function(import('svelte/store').Writable<number>): void),
- *    destroy: (function(): void)
- * }} Lifecycle functions.
+ * @returns {import('svelte/action').ActionReturn<import('svelte/store').Writable<number>>} Lifecycle functions.
  */
 function applyScrolltop(element, store)
 {
@@ -464,6 +464,9 @@ function applyScrolltop(element, store)
    element.addEventListener('scroll', debounceFn);
 
    return {
+      /**
+       * @param {import('svelte/store').Writable<number>} newStore - A writable store that stores the element scrollTop.
+       */
       update: (newStore) =>
       {
          unsubscribe();
@@ -493,7 +496,7 @@ function applyScrolltop(element, store)
  *
  * @param {Record<string, string>}  properties - Key / value object of properties to set.
  *
- * @returns {{update: (function(Record<string, string>): void) }} Update function.
+ * @returns {import('svelte/action').ActionReturn<Record<string, string>>} Lifecycle functions.
  */
 function applyStyles(node, properties)
 {
@@ -511,7 +514,10 @@ function applyStyles(node, properties)
    setProperties();
 
    return {
-      update(newProperties)
+      /**
+       * @param {Record<string, string>}  newProperties - Key / value object of properties to set.
+       */
+      update: (newProperties) =>
       {
          properties = newProperties;
          setProperties();
@@ -525,7 +531,7 @@ function applyStyles(node, properties)
  *
  * @param {HTMLElement}   node - The node to handle automatic blur on focus loss.
  *
- * @returns {{destroy: Function}} Lifecycle functions.
+ * @returns {import('svelte/action').ActionReturn} Lifecycle functions.
  */
 function autoBlur(node)
 {
@@ -573,8 +579,7 @@ function autoBlur(node)
  *
  * @param {import('svelte/store').Writable<boolean>}  storeFocused - Update store for focus changes.
  *
- * @returns {{update: (function(import('svelte/store').Writable<boolean>): void), destroy: Function}} Action lifecycle
- *          methods.
+ * @returns {import('svelte/action').ActionReturn<import('svelte/store').Writable<boolean>>} Lifecycle functions.
  */
 function isFocused(node, storeFocused)
 {
@@ -629,7 +634,10 @@ function isFocused(node, storeFocused)
    activateListeners();
 
    return {
-      update: (newStoreFocused) =>  // eslint-disable-line no-shadow
+      /**
+       * @param {import('svelte/store').Writable<boolean>}  newStoreFocused - Update store for focus changes.
+       */
+      update: (newStoreFocused) =>
       {
          storeFocused = newStoreFocused;
          setFocused(localFocused);

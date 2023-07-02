@@ -6172,7 +6172,7 @@ function applyPosition(node, position)
  * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
  *        list are ignored.
  *
- * @returns {import('svelte/action').ActionReturn} The action lifecycle methods.
+ * @returns {import('svelte/action').ActionReturn<Record<string, any>>} Lifecycle functions.
  */
 function draggable(node, { position, active = true, button = 0, storeDragging = void 0, ease = false,
  easeOptions = { duration: 0.1, ease: cubicOut }, hasTargetClassList, ignoreTargetClassList })

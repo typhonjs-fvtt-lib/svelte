@@ -1,4 +1,5 @@
 import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
+import * as svelte_action from 'svelte/action';
 import * as svelte_store from 'svelte/store';
 
 declare let gsap: any;
@@ -40,7 +41,7 @@ declare const easingList: string[];
  * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
  *                                                             list are ignored.
  *
- * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
+ * @returns {import('svelte/action').ActionReturn<Record<string, any>>} Lifecycle functions.
  */
 declare function draggableGsap(node: HTMLElement, { position, active, button, storeDragging, ease, inertia, easeOptions, inertiaOptions, hasTargetClassList, ignoreTargetClassList }: {
     position: _typhonjs_fvtt_svelte_store_position.TJSPosition;
@@ -53,10 +54,7 @@ declare function draggableGsap(node: HTMLElement, { position, active, button, st
     inertiaOptions?: object;
     hasTargetClassList?: Iterable<string>;
     ignoreTargetClassList?: Iterable<string>;
-}): {
-    update: Function;
-    destroy: Function;
-};
+}): svelte_action.ActionReturn<Record<string, any>>;
 declare namespace draggableGsap {
     /**
      * Define a function to get a DraggableGsapOptions instance.

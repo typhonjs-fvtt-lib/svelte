@@ -22,11 +22,11 @@ import { subscribeFirstRest } from '@typhonjs-svelte/runtime-base/util/store';
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/animate
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API/Keyframe_Formats
  *
- * @returns {Function} Actual action.
+ * @returns {import('svelte/action').Action} Actual action.
  */
 function animate({ duration = 600, keyframes = [], options, event = 'click', debounce } = {})
 {
-   return (element) =>
+   return /** @returns {import('svelte/action').ActionReturn} */ (element) =>
    {
       /**
        * Creates WAAPI animation.
@@ -52,9 +52,9 @@ function animate({ duration = 600, keyframes = [], options, event = 'click', deb
  *
  * Note: The update function passes the same variable to all update functions of each action.
  *
- * @param {...Function} actions - One or more composable action functions to combine.
+ * @param {...import('svelte/action').Action} actions - One or more composable action functions to combine.
  *
- * @returns {Function} Composed action.
+ * @returns {import('svelte/action').Action<HTMLElement, any>} Composed action.
  */
 function composable(...actions)
 {
@@ -105,7 +105,7 @@ function composable(...actions)
  *
  * @param {number}   [opts.debounce=undefined] - Add a debounce to incoming events in milliseconds.
  *
- * @returns {Function} Actual action.
+ * @returns {import('svelte/action').Action} Actual action.
  */
 function ripple({ duration = 600, background = 'rgba(255, 255, 255, 0.7)', events = ['click', 'keyup'],
  keyCode = 'Enter', debounce } = {})
@@ -231,7 +231,7 @@ function ripple({ duration = 600, background = 'rgba(255, 255, 255, 0.7)', event
  *
  * @param {string}   [opts.selectors] - A valid CSS selectors string.
  *
- * @returns {Function} Actual action.
+ * @returns {import('svelte/action').Action} Actual action.
  */
 function rippleFocus({ duration = 300, background = 'rgba(255, 255, 255, 0.7)', selectors } = {})
 {
@@ -377,7 +377,7 @@ function rippleFocus({ duration = 300, background = 'rgba(255, 255, 255, 0.7)', 
  *
  * @param {boolean} [opts.clickActive] - When false click events are not handled.
  *
- * @returns {object} Destroy callback.
+ * @returns {import('svelte/action').ActionReturn} Lifecycle functions.
  */
 function toggleDetails(details, { store, clickActive = true } = {})
 {

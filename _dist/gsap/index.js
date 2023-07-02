@@ -1299,7 +1299,7 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
  *                                                             list are ignored.
  *
- * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
+ * @returns {import('svelte/action').ActionReturn<Record<string, any>>} Lifecycle functions.
  */
 function draggableGsap(node, { position, active = true, button = 0, storeDragging = void 0, ease = true,
  inertia = false, easeOptions = { duration: 0.1, ease: 'power3.out' },

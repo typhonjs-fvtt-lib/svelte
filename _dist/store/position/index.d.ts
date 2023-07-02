@@ -1251,7 +1251,7 @@ declare function applyPosition(node: HTMLElement, position: TJSPosition): svelte
  * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
  *        list are ignored.
  *
- * @returns {import('svelte/action').ActionReturn} The action lifecycle methods.
+ * @returns {import('svelte/action').ActionReturn<Record<string, any>>} Lifecycle functions.
  */
 declare function draggable(node: HTMLElement, { position, active, button, storeDragging, ease, easeOptions, hasTargetClassList, ignoreTargetClassList }: {
     position: TJSPosition;
@@ -1262,7 +1262,7 @@ declare function draggable(node: HTMLElement, { position, active, button, storeD
     easeOptions?: object;
     hasTargetClassList?: Iterable<string>;
     ignoreTargetClassList?: Iterable<string>;
-}): svelte_action.ActionReturn;
+}): svelte_action.ActionReturn<Record<string, any>>;
 declare namespace draggable {
     /**
      * Define a function to get a DraggableOptions instance.

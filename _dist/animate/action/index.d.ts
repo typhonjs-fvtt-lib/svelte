@@ -1,3 +1,4 @@
+import * as svelte_action from 'svelte/action';
 import * as svelte_store from 'svelte/store';
 
 /**
@@ -20,7 +21,7 @@ import * as svelte_store from 'svelte/store';
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/animate
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API/Keyframe_Formats
  *
- * @returns {Function} Actual action.
+ * @returns {import('svelte/action').Action} Actual action.
  */
 declare function animate({ duration, keyframes, options, event, debounce }?: {
     duration?: number;
@@ -28,18 +29,18 @@ declare function animate({ duration, keyframes, options, event, debounce }?: {
     options?: object;
     event?: string;
     debounce?: number;
-}): Function;
+}): svelte_action.Action;
 
 /**
  * Combines multiple composable actions.
  *
  * Note: The update function passes the same variable to all update functions of each action.
  *
- * @param {...Function} actions - One or more composable action functions to combine.
+ * @param {...import('svelte/action').Action} actions - One or more composable action functions to combine.
  *
- * @returns {Function} Composed action.
+ * @returns {import('svelte/action').Action<HTMLElement, any>} Composed action.
  */
-declare function composable(...actions: Function[]): Function;
+declare function composable(...actions: svelte_action.Action[]): svelte_action.Action<HTMLElement, any>;
 
 /**
  * Defines the classic Material Design ripple effect as an action. `ripple` is a wrapper around the returned action.
@@ -63,7 +64,7 @@ declare function composable(...actions: Function[]): Function;
  *
  * @param {number}   [opts.debounce=undefined] - Add a debounce to incoming events in milliseconds.
  *
- * @returns {Function} Actual action.
+ * @returns {import('svelte/action').Action} Actual action.
  */
 declare function ripple({ duration, background, events, keyCode, debounce }?: {
     duration?: number;
@@ -71,7 +72,7 @@ declare function ripple({ duration, background, events, keyCode, debounce }?: {
     events?: Iterable<string>;
     keyCode?: string;
     debounce?: number;
-}): Function;
+}): svelte_action.Action;
 
 /**
  * Defines the classic Material Design ripple effect as an action that is attached to an elements focus and blur events.
@@ -94,13 +95,13 @@ declare function ripple({ duration, background, events, keyCode, debounce }?: {
  *
  * @param {string}   [opts.selectors] - A valid CSS selectors string.
  *
- * @returns {Function} Actual action.
+ * @returns {import('svelte/action').Action} Actual action.
  */
 declare function rippleFocus({ duration, background, selectors }?: {
     duration?: number;
     background?: string;
     selectors?: string;
-}): Function;
+}): svelte_action.Action;
 
 /**
  * Provides a toggle action for `details` HTML elements. The boolean store provided controls animation.
@@ -118,11 +119,11 @@ declare function rippleFocus({ duration, background, selectors }?: {
  *
  * @param {boolean} [opts.clickActive] - When false click events are not handled.
  *
- * @returns {object} Destroy callback.
+ * @returns {import('svelte/action').ActionReturn} Lifecycle functions.
  */
 declare function toggleDetails(details: HTMLDetailsElement, { store, clickActive }?: {
     store: svelte_store.Writable<boolean>;
     clickActive?: boolean;
-}): object;
+}): svelte_action.ActionReturn;
 
 export { animate, composable, ripple, rippleFocus, toggleDetails };

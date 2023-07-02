@@ -1,3 +1,4 @@
+import * as svelte_action from 'svelte/action';
 import * as svelte_store from 'svelte/store';
 
 /**
@@ -5,11 +6,9 @@ import * as svelte_store from 'svelte/store';
  *
  * @param {HTMLElement}   node - The node to handle always blur on pointer up.
  *
- * @returns {{destroy: Function}} Lifecycle functions.
+ * @returns {import('svelte/action').ActionReturn} Lifecycle functions.
  */
-declare function alwaysBlur(node: HTMLElement): {
-    destroy: Function;
-};
+declare function alwaysBlur(node: HTMLElement): svelte_action.ActionReturn;
 
 /**
  * Provides an action to save `scrollTop` of an element with a vertical scrollbar. This action should be used on the
@@ -21,15 +20,9 @@ declare function alwaysBlur(node: HTMLElement): {
  *
  * @param {import('svelte/store').Writable<number>}   store - A writable store that stores the element scrollTop.
  *
- * @returns {{
- *    update: (function(import('svelte/store').Writable<number>): void),
- *    destroy: (function(): void)
- * }} Lifecycle functions.
+ * @returns {import('svelte/action').ActionReturn<import('svelte/store').Writable<number>>} Lifecycle functions.
  */
-declare function applyScrolltop(element: HTMLElement, store: svelte_store.Writable<number>): {
-    update: ((arg0: svelte_store.Writable<number>) => void);
-    destroy: (() => void);
-};
+declare function applyScrolltop(element: HTMLElement, store: svelte_store.Writable<number>): svelte_action.ActionReturn<svelte_store.Writable<number>>;
 
 /**
  * Provides an action to apply style properties provided as an object.
@@ -38,11 +31,9 @@ declare function applyScrolltop(element: HTMLElement, store: svelte_store.Writab
  *
  * @param {Record<string, string>}  properties - Key / value object of properties to set.
  *
- * @returns {{update: (function(Record<string, string>): void) }} Update function.
+ * @returns {import('svelte/action').ActionReturn<Record<string, string>>} Lifecycle functions.
  */
-declare function applyStyles(node: HTMLElement, properties: Record<string, string>): {
-    update: ((arg0: Record<string, string>) => void);
-};
+declare function applyStyles(node: HTMLElement, properties: Record<string, string>): svelte_action.ActionReturn<Record<string, string>>;
 
 /**
  * Provides an action to blur the element when any pointer down event occurs outside the element. This can be useful
@@ -50,11 +41,9 @@ declare function applyStyles(node: HTMLElement, properties: Record<string, strin
  *
  * @param {HTMLElement}   node - The node to handle automatic blur on focus loss.
  *
- * @returns {{destroy: Function}} Lifecycle functions.
+ * @returns {import('svelte/action').ActionReturn} Lifecycle functions.
  */
-declare function autoBlur(node: HTMLElement): {
-    destroy: Function;
-};
+declare function autoBlur(node: HTMLElement): svelte_action.ActionReturn;
 
 /**
  * Provides an action to monitor focus state of a given element and set an associated store with current focus state.
@@ -65,13 +54,9 @@ declare function autoBlur(node: HTMLElement): {
  *
  * @param {import('svelte/store').Writable<boolean>}  storeFocused - Update store for focus changes.
  *
- * @returns {{update: (function(import('svelte/store').Writable<boolean>): void), destroy: Function}} Action lifecycle
- *          methods.
+ * @returns {import('svelte/action').ActionReturn<import('svelte/store').Writable<boolean>>} Lifecycle functions.
  */
-declare function isFocused(node: HTMLElement, storeFocused: svelte_store.Writable<boolean>): {
-    update: ((arg0: svelte_store.Writable<boolean>) => void);
-    destroy: Function;
-};
+declare function isFocused(node: HTMLElement, storeFocused: svelte_store.Writable<boolean>): svelte_action.ActionReturn<svelte_store.Writable<boolean>>;
 
 /**
  * A function that receives offset / content height & width.
@@ -154,13 +139,10 @@ type ResizeObserverObjectExtended = {
  *
  * @param {ResizeObserverTarget} target - An object or function to update with observed width & height changes.
  *
- * @returns {{update: (function(ResizeObserverTarget): void), destroy: Function}} The action lifecycle methods.
+ * @returns {import('svelte/action').ActionReturn<ResizeObserverTarget>} The action lifecycle methods.
  * @see {@link https://github.com/sveltejs/svelte/issues/4233}
  */
-declare function resizeObserver(node: HTMLElement, target: ResizeObserverTarget): {
-    update: ((arg0: ResizeObserverTarget) => void);
-    destroy: Function;
-};
+declare function resizeObserver(node: HTMLElement, target: ResizeObserverTarget): svelte_action.ActionReturn<ResizeObserverTarget>;
 declare namespace resizeObserver {
     /**
      * Provides a function that when invoked with an element updates the cached styles for each subscriber of the element.
