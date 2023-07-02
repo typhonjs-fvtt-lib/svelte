@@ -15,10 +15,6 @@
     "#svelte": "svelte"
   },
   "exports": {
-    "./action/dom": {
-      "types": "./_dist/action/dom/index.d.ts",
-      "import": "./_dist/action/dom/index.js"
-    },
     "./animate": {
       "types": "./_dist/animate/index.d.ts",
       "import": "./_dist/animate/index.js"

@@ -1,8 +1,6 @@
 <script>
-   import { applyStyles }              from '@typhonjs-fvtt/svelte/action/dom';
-
+   import { applyStyles }              from '#runtime/svelte/action/dom';
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
-
    import { isObject }                 from '#runtime/util/object';
 
    /** @type {string} */

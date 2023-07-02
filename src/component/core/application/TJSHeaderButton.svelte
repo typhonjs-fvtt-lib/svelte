@@ -13,9 +13,10 @@
     * - {Record<string, string>}    styles: Additional inline styles to apply to button.
     * - {string}                    title: Tooltip title.
     */
-   import { applyStyles }   from '@typhonjs-fvtt/svelte/action/dom';
-   import { localize }      from '@typhonjs-fvtt/svelte/helper';
+   import { applyStyles }   from '#runtime/svelte/action/dom';
    import { isObject }      from '#runtime/util/object';
+
+   import { localize }      from '@typhonjs-fvtt/svelte/helper';
 
    export let button = void 0;
 

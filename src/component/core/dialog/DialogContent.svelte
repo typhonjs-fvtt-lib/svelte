@@ -7,7 +7,8 @@
       onDestroy,
       onMount }               from '#svelte';
 
-   import { applyStyles }     from '@typhonjs-fvtt/svelte/action/dom';
+   import { applyStyles }     from '#runtime/svelte/action/dom';
+
    import { localize }        from '@typhonjs-fvtt/svelte/helper';
 
    import {

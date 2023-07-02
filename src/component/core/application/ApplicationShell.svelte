@@ -11,12 +11,10 @@
 
    import {
       applyStyles,
-      resizeObserver }                 from '@typhonjs-fvtt/svelte/action/dom';
+      resizeObserver }                 from '#runtime/svelte/action/dom';
 
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
-
    import { A11yHelper }               from '#runtime/util/browser';
-
    import { isObject }                 from '#runtime/util/object';
 
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
