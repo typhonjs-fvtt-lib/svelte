@@ -91,7 +91,7 @@ function isSvelteComponent(comp)
       return true;
    }
 
-   return typeof window !== void 0 ?
+   return typeof window !== 'undefined' ?
     typeof comp.prototype.$destroy === 'function' && typeof comp.prototype.$on === 'function' : // client-side
      typeof comp.render === 'function'; // server-side
 }

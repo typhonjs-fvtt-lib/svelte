@@ -1,4 +1,4 @@
-import { propertyStore } from '@typhonjs-fvtt/svelte/store/derived';
+import { propertyStore } from '@typhonjs-svelte/runtime-base/svelte/store/writable-derived';
 import { isObject, isPlainObject, isIterable, hasSetter } from '@typhonjs-svelte/runtime-base/util/object';
 import { subscribeIgnoreFirst } from '@typhonjs-svelte/runtime-base/util/store';
 import { cubicOut, linear } from 'svelte/easing';

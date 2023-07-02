@@ -58,10 +58,6 @@
       "types": "./_dist/helper/index.d.ts",
       "import": "./_dist/helper/index.js"
     },
-    "./store/derived": {
-      "types": "./_dist/store/derived/index.d.ts",
-      "import": "./_dist/store/derived/index.js"
-    },
     "./store/dom": {
       "types": "./_dist/store/dom/index.d.ts",
       "import": "./_dist/store/dom/index.js"

@@ -1,10 +1,10 @@
 import { derived, writable }     from 'svelte/store';
 
-import { propertyStore }         from '@typhonjs-fvtt/svelte/store/derived';
-
 import {
    TJSSessionStorage,
    TJSWebStorage }               from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
+
+import { propertyStore }         from '@typhonjs-svelte/runtime-base/svelte/store/writable-derived';
 
 import {
    deepMerge,
