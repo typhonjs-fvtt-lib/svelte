@@ -63,23 +63,23 @@ declare function animateEvents(fn: (node: Element, data: {
 declare function nextAnimationFrame(cntr?: number): Promise<number>;
 
 /**
- * - Defines a type for basic animation control.
+ * Defines a type for basic animation control.
  */
 type TJSBasicAnimation = {
     /**
-     * - True if animation is active; note: delayed animations are not active until start.
+     * True if animation is active; note: delayed animations are not active until start.
      */
     isActive: boolean;
     /**
-     * - True if animation is completely finished.
+     * True if animation is completely finished.
      */
     isFinished: boolean;
     /**
-     * - A Promise that is resolved when animation is finished.
+     * A Promise that is resolved when animation is finished.
      */
     finished: Promise<void>;
     /**
-     * - A function that cancels animation.
+     * A function that cancels animation.
      */
     cancel: Function;
 };

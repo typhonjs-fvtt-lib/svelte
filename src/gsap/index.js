@@ -39,7 +39,7 @@ export * from './util/index.js';
  *
  * @property {import('#svelte-fvtt/store/position').TJSPositionDataExtended[]}   positionData -
  *
- * @property {object[]}                data - Contains the full data object when a list of object w/ position is used.
+ * @property {object[]}                data Contains the full data object when a list of object w/ position is used.
  *
  * @property {HTMLElement[]}           elements -
  *

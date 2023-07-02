@@ -385,13 +385,13 @@ function s_UPDATE_SUBSCRIBER(subscriber, contentWidth, contentHeight)
 /**
  * @typedef {object} ResizeObserverObject A direct object to update observed resize updates.
  *
- * @property {number} [contentHeight] - Direct attribute to store contentHeight.
+ * @property {number} [contentHeight] Direct attribute to store contentHeight.
  *
- * @property {number} [contentWidth] - Direct attribute to store contentWidth.
+ * @property {number} [contentWidth] Direct attribute to store contentWidth.
  *
- * @property {number} [offsetHeight] - Direct attribute to store offsetHeight.
+ * @property {number} [offsetHeight] Direct attribute to store offsetHeight.
  *
- * @property {number} [offsetWidth] - Direct attribute to store offsetWidth.
+ * @property {number} [offsetWidth] Direct attribute to store offsetWidth.
  */
 
 /**

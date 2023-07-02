@@ -272,19 +272,19 @@ declare class ApplicationState {
 }
 type ApplicationStateData = {
     /**
-     * - Application position.
+     * Application position.
      */
     position: _typhonjs_fvtt_svelte_store_position.TJSPositionDataExtended;
     /**
-     * - Any application saved position state for #beforeMinimized
+     * Any application saved position state for #beforeMinimized
      */
     beforeMinimized: object;
     /**
-     * - Application options.
+     * Application options.
      */
     options: object;
     /**
-     * - Application UI state.
+     * Application UI state.
      */
     ui: object;
 };

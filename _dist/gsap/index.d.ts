@@ -8,8 +8,9 @@ declare const easingList: string[];
 
 /**
  * Provides an action to enable pointer dragging of an HTMLElement using GSAP `to` or `quickTo` to invoke `position.set`
- * on a given {@link TJSPosition} instance provided. You may provide a `easeOptions` object sent to the tween to modify
- * the duration / easing. When the attached boolean store state changes the draggable action is enabled or disabled.
+ * on a given {@link import('#runtime/svelte/store/position').TJSPosition} instance provided. You may provide a
+ * `easeOptions` object sent to the tween to modify the duration / easing. When the attached boolean store state
+ * changes the draggable action is enabled or disabled.
  *
  * Note: Requires GSAP `3.10+` for `quickTo` support.
  *
@@ -296,7 +297,7 @@ type PositionInfo = {
      */
     positionData: _typhonjs_fvtt_svelte_store_position.TJSPositionDataExtended[];
     /**
-     * - Contains the full data object when a list of object w/ position is used.
+     * Contains the full data object when a list of object w/ position is used.
      */
     data: object[];
     /**

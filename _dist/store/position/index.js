@@ -37,7 +37,7 @@ class AnimationControl
    static get voidControl() { return this.#voidControl; }
 
    /**
-    * @param {object|null} [animationData] - Animation data from {@link AnimationAPI}.
+    * @param {object|null} [animationData] - Animation data from {@link import('./AnimationAPI').AnimationAPI}.
     *
     * @param {boolean}     [willFinish] - Promise that tracks animation finished state.
     */
@@ -276,7 +276,7 @@ class AnimationManager
    }
 
    /**
-    * Gets all {@link AnimationControl} instances for a given TJSPosition instance.
+    * Gets all {@link import('./AnimationControl').AnimationControl} instances for a given TJSPosition instance.
     *
     * @param {import('../').TJSPosition} position - TJSPosition instance.
     *
@@ -343,8 +343,8 @@ Object.freeze(transformKeys);
 const relativeRegex = /^([-+*])=(-?[\d]*\.?[\d]+)$/;
 
 /**
- * Provides numeric defaults for all parameters. This is used by {@link TJSPosition.get} to optionally provide
- * numeric defaults.
+ * Provides numeric defaults for all parameters. This is used by {@link import('./').TJSPosition.get} to optionally
+ * provide numeric defaults.
  *
  * @type {{rotation: number, scale: number, minWidth: null, minHeight: null, translateZ: number, top: number, left: number, maxHeight: null, translateY: number, translateX: number, width: number, transformOrigin: null, rotateX: number, rotateY: number, height: number, maxWidth: null, zIndex: null, rotateZ: number}}
  */
@@ -375,7 +375,7 @@ const numericDefaults = {
 Object.freeze(numericDefaults);
 
 /**
- * Sets numeric defaults for a {@link TJSPositionData} like object.
+ * Sets numeric defaults for a {@link import('./').TJSPositionData} like object.
  *
  * @param {object}   data - A TJSPositionData like object.
  */
@@ -395,7 +395,7 @@ function setNumericDefaults(data)
 }
 
 /**
- * Defines bitwise keys for transforms used in {@link TJSTransforms.getMat4}.
+ * Defines bitwise keys for transforms used in {@link import('./').TJSTransforms.getMat4}.
  *
  * @type {object}
  */
@@ -1202,7 +1202,8 @@ class AnimationGroupControl
 }
 
 /**
- * Provides a public API for grouping multiple {@link TJSPosition} animations together with the AnimationManager.
+ * Provides a public API for grouping multiple {@link import('..').TJSPosition} animations together with the
+ * AnimationManager.
  *
  * Note: To remove cyclic dependencies as this class provides the TJSPosition static / group Animation API `instanceof`
  * checks are not done against TJSPosition. Instead, a check for the animate property being an instanceof
@@ -2532,8 +2533,8 @@ class PositionStateAPI
    /**
     * Restores a saved positional state returning the data. Several optional parameters are available
     * to control whether the restore action occurs silently (no store / inline styles updates), animates
-    * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
-    * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
+-   * to the stored data, or simply sets the stored data. Restoring via {@link import('./animation').AnimationAPI.to}
+    * allows specification of the duration, easing, and interpolate functions along with configuring a Promise to be
     * returned if awaiting the end of the animation.
     *
     * @param {object}            params - Parameters
@@ -2813,7 +2814,7 @@ class StyleCache
 }
 
 /**
- * Provides the output data for {@link TJSTransforms.getData}.
+ * Provides the output data for {@link import('./').TJSTransforms.getData}.
  */
 class TJSTransformData
 {
@@ -3151,7 +3152,7 @@ class TJSTransforms
 
    /**
     * Collects all data including a bounding rect, transform matrix, and points array of the given
-    * {@link TJSPositionData} instance with the applied local transform data.
+    * {@link import('../').TJSPositionData} instance with the applied local transform data.
     *
     * @param {import('../').TJSPositionData} position - The position data to process.
     *
@@ -3547,7 +3548,7 @@ class TJSTransforms
  * translation.
  *
  * This method is used internally, but may be useful if you need the origin translation matrices to transform
- * bespoke points based on any `transformOrigin` set in {@link TJSPositionData}.
+ * bespoke points based on any `transformOrigin` set in {@link import('../').TJSPositionData}.
  *
  * @param {string}   transformOrigin - The transform origin attribute from TJSPositionData.
  *
@@ -3652,8 +3653,8 @@ function s_GET_ORIGIN_TRANSLATION(transformOrigin, width, height, output)
 
 /**
  * Provides the storage and sequencing of managed position validators. Each validator added may be a bespoke function or
- * a {@link ValidatorData} object containing an `id`, `validator`, and `weight` attributes; `validator` is the only
- * required attribute.
+ * a {@link import('..').ValidatorData} object containing an `id`, `validator`, and `weight` attributes; `validator` is
+ * the only required attribute.
  *
  * The `id` attribute can be anything that creates a unique ID for the validator; recommended strings or numbers. This
  * allows validators to be removed by ID easily.
@@ -4474,10 +4475,11 @@ class UpdateElementData
 }
 
 /**
- * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link TJSPosition.elementUpdated} to await
- * on the returned promise that is resolved with the current render time via `nextAnimationFrame` /
- * `requestAnimationFrame`. This allows the underlying data model to be updated immediately while updates to the
- * element are in sync with the browser and potentially in the future be further throttled.
+ * Decouples updates to any parent target HTMLElement inline styles. Invoke
+ * {@link import('..').TJSPosition.elementUpdated} to await on the returned promise that is resolved with the current
+ * render time via `nextAnimationFrame` / `requestAnimationFrame`. This allows the underlying data model to be updated
+ * immediately while updates to the element are in sync with the browser and potentially in the future be further
+ * throttled.
  *
  * @param {HTMLElement} el - The target HTMLElement.
  */
@@ -4640,10 +4642,11 @@ class UpdateElementManager
 }
 
 /**
- * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link TJSPosition.elementUpdated} to await
- * on the returned promise that is resolved with the current render time via `nextAnimationFrame` /
- * `requestAnimationFrame`. This allows the underlying data model to be updated immediately while updates to the
- * element are in sync with the browser and potentially in the future be further throttled.
+ * Decouples updates to any parent target HTMLElement inline styles. Invoke
+ * {@link import('..').TJSPosition.elementUpdated} to await on the returned promise that is resolved with the current
+ * render time via `nextAnimationFrame` / `requestAnimationFrame`. This allows the underlying data model to be updated
+ * immediately while updates to the element are in sync with the browser and potentially in the future be further
+ * throttled.
  *
  * @param {HTMLElement} el - The target HTMLElement.
  *
@@ -4693,10 +4696,11 @@ function s_UPDATE_ELEMENT(el, updateData)
 }
 
 /**
- * Decouples updates to any parent target HTMLElement inline styles. Invoke {@link TJSPosition.elementUpdated} to await
- * on the returned promise that is resolved with the current render time via `nextAnimationFrame` /
- * `requestAnimationFrame`. This allows the underlying data model to be updated immediately while updates to the
- * element are in sync with the browser and potentially in the future be further throttled.
+ * Decouples updates to any parent target HTMLElement inline styles. Invoke
+ * {@link import('..').TJSPosition.elementUpdated} to await on the returned promise that is resolved with the current
+ * render time via `nextAnimationFrame` / `requestAnimationFrame`. This allows the underlying data model to be updated
+ * immediately while updates to the element are in sync with the browser and potentially in the future be further
+ * throttled.
  *
  * @param {HTMLElement} el - The target HTMLElement.
  *
@@ -5206,7 +5210,7 @@ class TJSPosition
    }
 
    /**
-    * Returns the associated {@link TJSPositionParent} instance.
+    * Returns the associated {@link import('./').TJSPositionParent} instance.
     *
     * @returns {import('./').TJSPositionParent} The TJSPositionParent instance.
     */
@@ -5259,7 +5263,7 @@ class TJSPosition
    }
 
    /**
-    * Sets the associated {@link TJSPositionParent} instance. Resets the style cache and default data.
+    * Sets the associated {@link import('./').TJSPositionParent} instance. Resets the style cache and default data.
     *
     * @param {import('./').TJSPositionParent | void} parent - A TJSPositionParent instance.
     */
@@ -5582,9 +5586,9 @@ class TJSPosition
     * reactive and in control of updating inline styles for the application.
     *
     * Note: the logic for updating position is improved and changes a few aspects from the default
-    * {@link Application.setPosition}. The gate on `popOut` is removed, so to ensure no positional application occurs
-    * popOut applications can set `this.options.positionable` to false ensuring no positional inline styles are
-    * applied.
+    * {@link globalThis.Application.setPosition}. The gate on `popOut` is removed, so to ensure no positional
+    * application occurs popOut applications can set `this.options.positionable` to false ensuring no positional inline
+    * styles are applied.
     *
     * The initial set call on an application with a target element will always set width / height as this is
     * necessary for correct calculations.
@@ -6146,8 +6150,8 @@ function applyPosition(node, position)
 
 /**
  * Provides an action to enable pointer dragging of an HTMLElement and invoke `position.set` on a given
- * {@link TJSPosition} instance provided. When the attached boolean store state changes the draggable action is enabled
- * or disabled.
+ * {@link import('..').TJSPosition} instance provided. When the attached boolean store state changes the draggable
+ * action is enabled or disabled.
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *

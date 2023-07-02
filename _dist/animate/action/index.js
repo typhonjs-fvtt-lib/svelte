@@ -26,7 +26,7 @@ import { subscribeFirstRest } from '@typhonjs-svelte/runtime-base/util/store';
  */
 function animate({ duration = 600, keyframes = [], options, event = 'click', debounce } = {})
 {
-   return /** @returns {import('svelte/action').ActionReturn} */ (element) =>
+   return (element) =>
    {
       /**
        * Creates WAAPI animation.

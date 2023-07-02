@@ -1,8 +1,8 @@
 import { isIterable } from '@typhonjs-svelte/runtime-base/util/object';
 
 /**
- * Provides a readable store to track keys actively pressed. KeyStore is designed to be used with the {@link keyforward}
- * action.
+ * Provides a readable store to track keys actively pressed. KeyStore is designed to be used with the
+ * {@link import('./').keyforward} action.
  */
 class KeyStore
 {
@@ -286,16 +286,16 @@ class KeyStore
 /**
  * @typedef {object} KeyStoreOptions
  *
- * @property {boolean}  [preventDefault=true] - Invoke `preventDefault` on key events.
+ * @property {boolean}  [preventDefault=true] Invoke `preventDefault` on key events.
  *
- * @property {boolean}  [useCode=true] - When true use `event.code` otherwise use `event.key` to get active key.
+ * @property {boolean}  [useCode=true] When true use `event.code` otherwise use `event.key` to get active key.
  *
- * @property {boolean}  [stopPropagation=true] - Invoke `stopPropagation` on key events.
+ * @property {boolean}  [stopPropagation=true] Invoke `stopPropagation` on key events.
  */
 
 /**
  * Provides an action to forward on key down & up events. This can be any object that has associated `keydown` and
- * `keyup` methods. See {@link KeyStore} for a store implementation.
+ * `keyup` methods. See {@link import('..').KeyStore} for a store implementation.
  *
  * @param {HTMLElement} node - Target element.
  *

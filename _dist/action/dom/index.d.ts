@@ -72,19 +72,19 @@ type ResizeObserverTarget = ResizeObserverObject | ResizeObserverObjectExtended 
  */
 type ResizeObserverObject = {
     /**
-     * - Direct attribute to store contentHeight.
+     * Direct attribute to store contentHeight.
      */
     contentHeight?: number;
     /**
-     * - Direct attribute to store contentWidth.
+     * Direct attribute to store contentWidth.
      */
     contentWidth?: number;
     /**
-     * - Direct attribute to store offsetHeight.
+     * Direct attribute to store offsetHeight.
      */
     offsetHeight?: number;
     /**
-     * - Direct attribute to store offsetWidth.
+     * Direct attribute to store offsetWidth.
      */
     offsetWidth?: number;
 };

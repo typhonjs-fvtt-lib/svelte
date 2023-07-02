@@ -386,9 +386,9 @@ export class TJSDocument
 /**
  * @typedef {object} TJSDocumentOptions
  *
- * @property {(doc: foundry.abstract.Document) => void} [delete] - Optional post delete function to invoke when
+ * @property {(doc: foundry.abstract.Document) => void} [delete] Optional post delete function to invoke when
  *           document is deleted _after_ subscribers have been notified.
  *
- * @property {(doc: foundry.abstract.Document) => void} [preDelete] - Optional pre delete function to invoke when
+ * @property {(doc: foundry.abstract.Document) => void} [preDelete] Optional pre delete function to invoke when
  *           document is deleted _before_ subscribers are notified.
  */

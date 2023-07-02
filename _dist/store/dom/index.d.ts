@@ -1,8 +1,8 @@
 import * as svelte_action from 'svelte/action';
 
 /**
- * Provides a readable store to track keys actively pressed. KeyStore is designed to be used with the {@link keyforward}
- * action.
+ * Provides a readable store to track keys actively pressed. KeyStore is designed to be used with the
+ * {@link import('./').keyforward} action.
  */
 declare class KeyStore {
     /**
@@ -97,22 +97,22 @@ declare class KeyStore {
 }
 type KeyStoreOptions = {
     /**
-     * - Invoke `preventDefault` on key events.
+     * Invoke `preventDefault` on key events.
      */
     preventDefault?: boolean;
     /**
-     * - When true use `event.code` otherwise use `event.key` to get active key.
+     * When true use `event.code` otherwise use `event.key` to get active key.
      */
     useCode?: boolean;
     /**
-     * - Invoke `stopPropagation` on key events.
+     * Invoke `stopPropagation` on key events.
      */
     stopPropagation?: boolean;
 };
 
 /**
  * Provides an action to forward on key down & up events. This can be any object that has associated `keydown` and
- * `keyup` methods. See {@link KeyStore} for a store implementation.
+ * `keyup` methods. See {@link import('..').KeyStore} for a store implementation.
  *
  * @param {HTMLElement} node - Target element.
  *
