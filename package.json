@@ -74,10 +74,6 @@
       "types": "./_dist/store/storage/web/plugin/index.d.ts",
       "import": "./_dist/store/storage/web/plugin/index.js"
     },
-    "./transition": {
-      "types": "./_dist/transition/index.d.ts",
-      "import": "./_dist/transition/index.js"
-    },
     "./util": {
       "types": "./_dist/util/index.d.ts",
       "import": "./_dist/util/index.js"

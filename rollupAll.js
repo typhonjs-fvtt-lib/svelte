@@ -240,25 +240,6 @@ const rollupConfigs = [
    },
    {
       input: {
-         input: 'src/transition/index.js',
-         plugins: [
-            importsExternal(),
-            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/transition`] }),
-            resolve(s_RESOLVE_CONFIG),
-            generateDTS.plugin(dtsPluginOptions)
-         ]
-      },
-      output: {
-         file: '_dist/transition/index.js',
-         format: 'es',
-         generatedCode: { constBindings: true },
-         paths: externalPathsNPM,
-         plugins: outputPlugins,
-         sourcemap
-      }
-   },
-   {
-      input: {
          input: 'src/util/index.js',
          plugins: [
             importsExternal(),
