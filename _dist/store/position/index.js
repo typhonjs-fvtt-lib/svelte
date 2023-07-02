@@ -4,9 +4,8 @@ import { subscribeIgnoreFirst } from '@typhonjs-svelte/runtime-base/util/store';
 import { cubicOut, linear } from 'svelte/easing';
 import { lerp } from '@typhonjs-svelte/runtime-base/math/interpolate';
 import { writable } from 'svelte/store';
-import { StyleParse } from '@typhonjs-svelte/runtime-base/util/browser';
+import { StyleParse, nextAnimationFrame } from '@typhonjs-svelte/runtime-base/util/browser';
 import { Vec3, Mat4 } from '@typhonjs-svelte/runtime-base/math/gl-matrix';
-import { nextAnimationFrame } from '@typhonjs-fvtt/svelte/animate';
 import { degToRad, clamp } from '@typhonjs-svelte/runtime-base/math/util';
 
 /**
