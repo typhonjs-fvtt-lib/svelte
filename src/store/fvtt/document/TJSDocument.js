@@ -7,6 +7,8 @@ import {
 import { EmbeddedStoreManager }     from './EmbeddedStoreManager.js';
 
 /**
+ * @template [T=globalThis.foundry.abstract.Document]
+ *
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.
  * This makes documents reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
@@ -14,7 +16,7 @@ import { EmbeddedStoreManager }     from './EmbeddedStoreManager.js';
 export class TJSDocument
 {
    /**
-    * @type {foundry.abstract.Document[]}
+    * @type {T[]}
     */
    #document = [void 0];
 
@@ -38,11 +40,18 @@ export class TJSDocument
     */
    #options = { delete: void 0, preDelete: void 0 };
 
+   /**
+    * @type {((value: T, updateOptions?: TJSDocumentUpdateOptions) => void)[]}
+    */
    #subscriptions = [];
+
+   /**
+    * @type {TJSDocumentUpdateOptions}
+    */
    #updateOptions;
 
    /**
-    * @param {foundry.abstract.Document | TJSDocumentOptions}  [document] - Document to wrap or TJSDocumentOptions.
+    * @param {T | TJSDocumentOptions}  [document] - Document to wrap or TJSDocumentOptions.
     *
     * @param {TJSDocumentOptions}      [options] - TJSDocument options.
     */
@@ -84,7 +93,7 @@ export class TJSDocument
    /**
     * Returns the options passed on last update.
     *
-    * @returns {object} Last update options.
+    * @returns {TJSDocumentUpdateOptions} Last update options.
     */
    get updateOptions() { return this.#updateOptions ?? {}; }
 
@@ -171,7 +180,7 @@ export class TJSDocument
    }
 
    /**
-    * @returns {foundry.abstract.Document | undefined} Current document
+    * @returns {T} Current document
     */
    get() { return this.#document[0]; }
 
@@ -236,7 +245,7 @@ export class TJSDocument
 
 
    /**
-    * @param {foundry.abstract.Document | undefined}  document - New document to set.
+    * @param {T | undefined}  document - New document to set.
     *
     * @param {object}         [options] - New document update options to set.
     */
@@ -272,7 +281,7 @@ export class TJSDocument
 
    /**
     *
-    * @param {foundry.abstract.Document | undefined} doc -
+    * @param {T | undefined} doc -
     */
    #setDocument(doc)
    {
@@ -362,9 +371,10 @@ export class TJSDocument
    }
 
    /**
-    * @param {function(foundry.abstract.Document, object): void} handler - Callback function that is invoked on update / changes.
+    * @param {(value: T, updateOptions?: TJSDocumentUpdateOptions) => void} handler - Callback function that is
+    * invoked on update / changes.
     *
-    * @returns {(function(): void)} Unsubscribe function.
+    * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
     */
    subscribe(handler)
    {
@@ -386,9 +396,19 @@ export class TJSDocument
 /**
  * @typedef {object} TJSDocumentOptions
  *
- * @property {(doc: foundry.abstract.Document) => void} [delete] Optional post delete function to invoke when
- *           document is deleted _after_ subscribers have been notified.
+ * @property {(doc: globalThis.foundry.abstract.Document) => void} [delete] Optional post delete function to invoke when
+ * document is deleted _after_ subscribers have been notified.
  *
- * @property {(doc: foundry.abstract.Document) => void} [preDelete] Optional pre delete function to invoke when
- *           document is deleted _before_ subscribers are notified.
+ * @property {(doc: globalThis.foundry.abstract.Document) => void} [preDelete] Optional pre delete function to invoke
+ * when document is deleted _before_ subscribers are notified.
+ */
+
+/**
+ * @typedef TJSDocumentUpdateOptions Provides data regarding the latest document change.
+ *
+ * @property {string}   [action] The update action. Useful for filtering.
+ *
+ * @property {string}   [renderContext] The update action. Useful for filtering.
+ *
+ * @property {object[]|string[]} data Foundry data associated with document changes.
  */

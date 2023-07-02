@@ -9,7 +9,7 @@ import {
  * document collections reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
  *
- * @template {globalThis.DocumentCollection} T
+ * @template [T=globalThis.DocumentCollection]
  */
 export class TJSDocumentCollection
 {
@@ -22,11 +22,18 @@ export class TJSDocumentCollection
     */
    #options = { delete: void 0, preDelete: void 0 };
 
+   /**
+    * @type {((value: T, updateOptions?: TJSDocumentCollectionUpdateOptions<T>) => void)[]}
+    */
    #subscriptions = [];
+
+   /**
+    * @type {TJSDocumentCollectionUpdateOptions<T>}
+    */
    #updateOptions;
 
    /**
-    * @param {T|TJSDocumentCollectionOptions}   [collection] - Collection to wrap or TJSDocumentCollectionOptions.
+    * @param {T | TJSDocumentCollectionOptions}   [collection] - Collection to wrap or TJSDocumentCollectionOptions.
     *
     * @param {TJSDocumentCollectionOptions}     [options] - TJSDocumentCollection options.
     */
@@ -48,7 +55,7 @@ export class TJSDocumentCollection
    /**
     * Returns the options passed on last update.
     *
-    * @returns {object} Last update options.
+    * @returns {TJSDocumentCollectionUpdateOptions<T>} Last update options.
     */
    get updateOptions() { return this.#updateOptions ?? {}; }
 
@@ -68,7 +75,7 @@ export class TJSDocumentCollection
    {
       const collection = this.#collection;
 
-      if (collection instanceof DocumentCollection)
+      if (collection instanceof globalThis.DocumentCollection)
       {
          const index = collection?.apps?.findIndex((sub) => sub === this.#collectionCallback);
          if (index >= 0) { collection?.apps?.splice(index, 1); }
@@ -99,7 +106,7 @@ export class TJSDocumentCollection
    {
       const collection = this.#collection;
 
-      if (collection instanceof DocumentCollection)
+      if (collection instanceof globalThis.DocumentCollection)
       {
          const index = collection?.apps?.findIndex((sub) => sub === this.#collectionCallback);
          if (index >= 0) { collection?.apps?.splice(index, 1); }
@@ -129,7 +136,7 @@ export class TJSDocumentCollection
    }
 
    /**
-    * @returns {T | undefined} Current collection
+    * @returns {T} Current collection
     */
    get() { return this.#collection; }
 
@@ -148,7 +155,7 @@ export class TJSDocumentCollection
          this.#collectionCallback = void 0;
       }
 
-      if (collection !== void 0 && !(collection instanceof DocumentCollection))
+      if (collection !== void 0 && !(collection instanceof globalThis.DocumentCollection))
       {
          throw new TypeError(
           `TJSDocumentCollection set error: 'collection' is not a valid DocumentCollection or undefined.`);
@@ -159,7 +166,7 @@ export class TJSDocumentCollection
          throw new TypeError(`TJSDocument set error: 'options' is not an object.`);
       }
 
-      if (collection instanceof DocumentCollection)
+      if (collection instanceof globalThis.DocumentCollection)
       {
          this.#collectionCallback = {
             close: this.#deleted.bind(this),
@@ -212,9 +219,10 @@ export class TJSDocumentCollection
    }
 
    /**
-    * @param {function(T, object): void} handler - Callback function that is invoked on update / changes.
+    * @param {(value: T, updateOptions?: TJSDocumentCollectionUpdateOptions<T>) => void} handler - Callback function
+    * that is invoked on update / changes.
     *
-    * @returns {(function(): void)} Unsubscribe function.
+    * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
     */
    subscribe(handler)
    {
@@ -245,4 +253,17 @@ export class TJSDocumentCollection
  *
  * @property {(collection: globalThis.DocumentCollection) => void} [preDelete] Optional pre delete function to
  *           invoke when document is deleted _before_ subscribers are notified.
+ */
+
+/**
+ * @template T
+ * @typedef TJSDocumentCollectionUpdateOptions Provides data regarding the latest collection change.
+ *
+ * @property {string}   action The update action. Useful for filtering.
+ *
+ * @property {string}   documentType The document name.
+ *
+ * @property {T[]}      documents associated documents that changed.
+ *
+ * @property {object[]|string[]} data Foundry data associated with document changes.
  */

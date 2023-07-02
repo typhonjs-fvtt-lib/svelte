@@ -21,7 +21,7 @@ class KeyStore
    /**
     * Stores the subscribers.
     *
-    * @type {(function(KeyStore): void)[]}
+    * @type {import('svelte/store').Subscriber<KeyStore>[]}
     */
    #subscriptions = [];
 
@@ -254,9 +254,10 @@ class KeyStore
    // Store subscriber implementation --------------------------------------------------------------------------------
 
    /**
-    * @param {function(KeyStore): void} handler - Callback function that is invoked on update / changes.
+    * @param {import('svelte/store').Subscriber<KeyStore>} handler - Callback function that is invoked on update /
+    *        changes.
     *
-    * @returns {(function(): void)} Unsubscribe function.
+    * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
     */
    subscribe(handler)
    {

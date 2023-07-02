@@ -1203,13 +1203,12 @@ declare class TJSPosition {
      */
     set(position?: TJSPositionDataExtended): TJSPosition;
     /**
+     * @param {import('svelte/store').Subscriber<TJSPositionData>} handler - Callback function that is invoked on
+     *        update / changes. Receives a copy of the TJSPositionData.
      *
-     * @param {function(TJSPositionData): void} handler - Callback function that is invoked on update / changes. Receives
-     *                                                 a copy of the TJSPositionData.
-     *
-     * @returns {(function(): void)} Unsubscribe function.
+     * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
      */
-    subscribe(handler: (arg0: TJSPositionData) => void): (() => void);
+    subscribe(handler: svelte_store.Subscriber<TJSPositionData>): svelte_store.Unsubscriber;
     #private;
 }
 
@@ -1318,12 +1317,12 @@ declare class DraggableOptions {
     resetEase(): void;
     /**
      *
-     * @param {function(DraggableOptions): void} handler - Callback function that is invoked on update / changes.
-     *                                                 Receives the DraggableOptions object / instance.
+     * @param {import('svelte/store').Subscriber<DraggableOptions>} handler - Callback function that is invoked on
+     *        update / changes. Receives the DraggableOptions object / instance.
      *
-     * @returns {(function(): void)} Unsubscribe function.
+     * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
      */
-    subscribe(handler: (arg0: DraggableOptions) => void): (() => void);
+    subscribe(handler: svelte_store.Subscriber<DraggableOptions>): svelte_store.Unsubscriber;
     #private;
 }
 

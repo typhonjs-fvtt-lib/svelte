@@ -167,12 +167,12 @@ declare class DraggableGsapOptions {
     /**
      * Store subscribe method.
      *
-     * @param {function(DraggableGsapOptions): void} handler - Callback function that is invoked on update / changes.
-     *                                                         Receives the DraggableOptions object / instance.
+     * @param {import('svelte/store').Subscriber<DraggableGsapOptions>} handler - Callback function that is invoked on
+     * update / changes. Receives the DraggableOptions object / instance.
      *
-     * @returns {(function(): void)} Unsubscribe function.
+     * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
      */
-    subscribe(handler: (arg0: DraggableGsapOptions) => void): (() => void);
+    subscribe(handler: svelte_store.Subscriber<DraggableGsapOptions>): svelte_store.Unsubscriber;
     #private;
 }
 

@@ -1,3 +1,4 @@
+import * as svelte_store from 'svelte/store';
 import * as svelte_action from 'svelte/action';
 
 /**
@@ -82,11 +83,12 @@ declare class KeyStore {
      */
     value(key: string): number;
     /**
-     * @param {function(KeyStore): void} handler - Callback function that is invoked on update / changes.
+     * @param {import('svelte/store').Subscriber<KeyStore>} handler - Callback function that is invoked on update /
+     *        changes.
      *
-     * @returns {(function(): void)} Unsubscribe function.
+     * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
      */
-    subscribe(handler: (arg0: KeyStore) => void): (() => void);
+    subscribe(handler: svelte_store.Subscriber<KeyStore>): svelte_store.Unsubscriber;
     /**
      * Updates subscribers.
      *
