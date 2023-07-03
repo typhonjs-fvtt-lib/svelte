@@ -124,25 +124,6 @@ const rollupConfigs = [
          plugins: outputPlugins,
          sourcemap
       }
-   },
-   {
-      input: {
-         input: 'src/store/storage/web/plugin/index.js',
-         plugins: [
-            importsExternal(),
-            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/store/storage/web/plugin`] }),
-            resolve(s_RESOLVE_CONFIG),
-            generateDTS.plugin(dtsPluginOptions)
-         ]
-      },
-      output: {
-         file: '_dist/store/storage/web/plugin/index.js',
-         format: 'es',
-         generatedCode: { constBindings: true },
-         paths: externalPathsNPM,
-         plugins: outputPlugins,
-         sourcemap
-      }
    }
 ];
 
