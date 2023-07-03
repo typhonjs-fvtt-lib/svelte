@@ -1,9 +1,8 @@
 import { TJSPosition }  from '@typhonjs-fvtt/svelte/store/position';
 
 import {
-   isApplicationShell,
    isHMRProxy,
-   outroAndDestroy }    from '@typhonjs-fvtt/svelte/util';
+   outroAndDestroy }    from '@typhonjs-svelte/runtime-base/svelte/util';
 
 import { A11yHelper }   from '@typhonjs-svelte/runtime-base/util/browser';
 
@@ -16,6 +15,7 @@ import {
    ApplicationState,
    GetSvelteData,
    loadSvelteConfig,
+   isApplicationShell,
    SvelteReactive }     from '../internal/index.js';
 
 /**

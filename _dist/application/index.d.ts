@@ -1,5 +1,5 @@
 import * as svelte from 'svelte';
-import * as _typhonjs_fvtt_svelte_util from '@typhonjs-fvtt/svelte/util';
+import * as _typhonjs_svelte_runtime_base_svelte_util from '@typhonjs-svelte/runtime-base/svelte/util';
 import * as _typhonjs_svelte_runtime_base_svelte_store_web_storage from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import { TJSWebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
@@ -1200,7 +1200,7 @@ type SvelteApplicationOptions = {
      * A Svelte configuration object defining
      * the main component.
      */
-    svelte?: _typhonjs_fvtt_svelte_util.TJSSvelteConfig;
+    svelte?: _typhonjs_svelte_runtime_base_svelte_util.TJSSvelteConfig;
     /**
      * By default,
      * 'top / left' respects rotation when minimizing.

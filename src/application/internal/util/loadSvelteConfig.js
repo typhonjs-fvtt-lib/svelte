@@ -1,8 +1,8 @@
-import {
-   isApplicationShell,
-   parseTJSSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
+import { parseTJSSvelteConfig }  from '#runtime/svelte/util';
 
-import { isObject }        from '#runtime/util/object';
+import { isApplicationShell }    from './isApplicationShell.js';
+
+import { isObject }              from '#runtime/util/object';
 
 /**
  * Instantiates and attaches a Svelte component to the main inserted HTML.

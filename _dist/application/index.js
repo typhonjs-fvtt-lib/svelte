@@ -122,7 +122,7 @@ Hooks.on('PopOut:close', (app) =>
  * @property {import('@typhonjs-svelte/runtime-base/svelte/store/web-storage').TJSWebStorage}   [sessionStorage] An instance of
  *           TJSWebStorage (session) to share across SvelteApplications.
  *
- * @property {import('@typhonjs-fvtt/svelte/util').TJSSvelteConfig}   [svelte] A Svelte configuration object defining
+ * @property {import('@typhonjs-svelte/runtime-base/svelte/util').TJSSvelteConfig}   [svelte] A Svelte configuration object defining
  *           the main component.
  *
  * @property {import('@typhonjs-fvtt/svelte/store/position').TJSTransformOrigin}   [transformOrigin='top left'] By default,

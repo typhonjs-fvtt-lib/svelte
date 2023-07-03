@@ -122,7 +122,7 @@ Hooks.on('PopOut:close', (app) =>
  * @property {import('#runtime/svelte/store/web-storage').TJSWebStorage}   [sessionStorage] An instance of
  *           TJSWebStorage (session) to share across SvelteApplications.
  *
- * @property {import('#svelte-fvtt/util').TJSSvelteConfig}   [svelte] A Svelte configuration object defining
+ * @property {import('#runtime/svelte/util').TJSSvelteConfig}   [svelte] A Svelte configuration object defining
  *           the main component.
  *
  * @property {import('#svelte-fvtt/store/position').TJSTransformOrigin}   [transformOrigin='top left'] By default,

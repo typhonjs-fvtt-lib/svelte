@@ -2,14 +2,13 @@
    import { getContext }            from '#svelte';
    import { cubicOut }              from '#svelte/easing';
 
+   import { isSvelteComponent }     from '#runtime/svelte/util';
+   import { isObject }              from '#runtime/util/object';
+
    import { localize }              from '@typhonjs-fvtt/svelte/helper';
 
    import {
       draggable as dragDefault }    from '@typhonjs-fvtt/svelte/store/position';
-
-   import { isSvelteComponent }     from '@typhonjs-fvtt/svelte/util';
-
-   import { isObject }              from '#runtime/util/object';
 
    import TJSHeaderButton           from './TJSHeaderButton.svelte';
 

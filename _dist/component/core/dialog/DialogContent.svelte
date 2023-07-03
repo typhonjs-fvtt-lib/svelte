@@ -9,15 +9,14 @@
 
    import { applyStyles }     from '@typhonjs-svelte/runtime-base/svelte/action/dom';
 
-   import { localize }        from '@typhonjs-fvtt/svelte/helper';
-
    import {
       isSvelteComponent,
-      parseTJSSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
+      parseTJSSvelteConfig }  from '@typhonjs-svelte/runtime-base/svelte/util';
 
    import { A11yHelper }      from '@typhonjs-svelte/runtime-base/util/browser';
-
    import { isObject }        from '@typhonjs-svelte/runtime-base/util/object';
+
+   import { localize }        from '@typhonjs-fvtt/svelte/helper';
 
    export let data = void 0;
    export let preventDefault = false;

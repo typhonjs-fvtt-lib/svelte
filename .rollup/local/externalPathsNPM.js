@@ -2,7 +2,6 @@ export const externalPathsNPM = {
    '@typhonjs-svelte/lib/store/dom': '@typhonjs-fvtt/svelte/store/dom',
    '@typhonjs-svelte/lib/store/position': '@typhonjs-fvtt/svelte/store/position',
    '@typhonjs-svelte/lib/store/storage/web/plugin': '@typhonjs-fvtt/svelte/store/storage/web/plugin',
-   '@typhonjs-svelte/lib/util': '@typhonjs-fvtt/svelte/util',
 
    // TODO: WE CAN REMOVE THIS SECTION? OR REPLACE WITH REGEX?
    '@typhonjs-svelte/runtime-base/data/compress': '@typhonjs-svelte/runtime-base/data/compress',
@@ -31,6 +30,7 @@ export const externalPathsNPM = {
    '@typhonjs-svelte/runtime-base/svelte/store/writable-derived': '@typhonjs-svelte/runtime-base/svelte/store/writable-derived',
    '@typhonjs-svelte/runtime-base/svelte/store/web-storage/msgpack': '@typhonjs-svelte/runtime-base/svelte/store/web-storage/msgpack',
    '@typhonjs-svelte/runtime-base/svelte/transition': '@typhonjs-svelte/runtime-base/svelte/transition',
+   '@typhonjs-svelte/runtime-base/svelte/util': '@typhonjs-svelte/runtime-base/svelte/util',
    '@typhonjs-svelte/runtime-base/util': '@typhonjs-svelte/runtime-base/util',
    '@typhonjs-svelte/runtime-base/util/animate': '@typhonjs-svelte/runtime-base/util/animate',
    '@typhonjs-svelte/runtime-base/util/async': '@typhonjs-svelte/runtime-base/util/async',
@@ -60,5 +60,4 @@ export const externalPathsNPM = {
    '@typhonjs-fvtt/svelte/store/fvtt': '@typhonjs-fvtt/svelte/store/fvtt',
    '@typhonjs-fvtt/svelte/store/position': '@typhonjs-fvtt/svelte/store/position',
    '@typhonjs-fvtt/svelte/store/storage/web/plugin': '@typhonjs-fvtt/svelte/store/storage/web/plugin',
-   '@typhonjs-fvtt/svelte/util': '@typhonjs-fvtt/svelte/util',
 };

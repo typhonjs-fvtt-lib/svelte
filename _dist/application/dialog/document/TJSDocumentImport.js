@@ -1,8 +1,11 @@
+import { hasSetter }             from '@typhonjs-svelte/runtime-base/util/object';
+
 import { TJSDialog }             from '@typhonjs-fvtt/svelte/application';
+
 import { TJSDocumentImport
     as TJSDocumentImportImpl }   from '@typhonjs-fvtt/svelte/component/dialog';
+
 import { localize }              from '@typhonjs-fvtt/svelte/helper';
-import { hasSetter }             from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides a reactive dialog for importing documents that by default is modal and not draggable. An additional set of
