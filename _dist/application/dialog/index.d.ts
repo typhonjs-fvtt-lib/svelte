@@ -513,7 +513,7 @@ declare class TJSFolderExport extends TJSDialog {
         get(accessor: string, defaultValue?: any): any;
         merge(data: object): void;
         set(accessor: string, value: any): boolean;
-        "__#182709@#private": any;
+        "__#157675@#private": any;
     } | {
         content: {
             class: any;
