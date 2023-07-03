@@ -1,9 +1,10 @@
 <script>
    import { getContext }   from 'svelte';
 
+   import { isObject }     from '@typhonjs-svelte/runtime-base/util/object';
+
    import { localize }     from '@typhonjs-fvtt/svelte/helper';
    import { TJSDocument }  from '@typhonjs-fvtt/svelte/store/fvtt';
-   import { isObject } from "../../../../../../typhonjs-svelte/runtime-base/_dist/util/object/index.js";
 
    /** @type {foundry.abstract.Document} */
    export let document = void 0;
