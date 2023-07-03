@@ -1,4 +1,4 @@
-import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
+import * as _runtime_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import * as svelte_action from 'svelte/action';
 import * as svelte_store from 'svelte/store';
 
@@ -18,7 +18,7 @@ declare const easingList: string[];
  *
  * @param {object}            params - Required parameters.
  *
- * @param {import('@typhonjs-fvtt/svelte/store/position').TJSPosition}   params.position - A position instance.
+ * @param {import('#runtime/svelte/store/position').TJSPosition}   params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
@@ -45,7 +45,7 @@ declare const easingList: string[];
  * @returns {import('svelte/action').ActionReturn<Record<string, any>>} Lifecycle functions.
  */
 declare function draggableGsap(node: HTMLElement, { position, active, button, storeDragging, ease, inertia, easeOptions, inertiaOptions, hasTargetClassList, ignoreTargetClassList }: {
-    position: _typhonjs_fvtt_svelte_store_position.TJSPosition;
+    position: _runtime_svelte_store_position.TJSPosition;
     active?: boolean;
     button?: number;
     storeDragging?: svelte_store.Writable<boolean>;
@@ -286,16 +286,16 @@ type GsapPositionOptions = {
      */
     initialProps?: Iterable<string>;
 };
-type GSAPTarget = (string | object | _typhonjs_fvtt_svelte_store_position.TJSPosition | Iterable<_typhonjs_fvtt_svelte_store_position.TJSPosition> | Array<HTMLElement | object>);
+type GSAPTarget = (string | object | _runtime_svelte_store_position.TJSPosition | Iterable<_runtime_svelte_store_position.TJSPosition> | Array<HTMLElement | object>);
 type PositionInfo = {
     /**
      * -
      */
-    position: _typhonjs_fvtt_svelte_store_position.TJSPosition[];
+    position: _runtime_svelte_store_position.TJSPosition[];
     /**
      * -
      */
-    positionData: _typhonjs_fvtt_svelte_store_position.TJSPositionDataExtended[];
+    positionData: _runtime_svelte_store_position.TJSPositionDataExtended[];
     /**
      * Contains the full data object when a list of object w/ position is used.
      */

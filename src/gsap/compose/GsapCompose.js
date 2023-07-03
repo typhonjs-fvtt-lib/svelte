@@ -1,6 +1,6 @@
 import { gsap }         from '../gsap.js';
 
-import { TJSPosition }  from '@typhonjs-svelte/lib/store/position';
+import { TJSPosition }  from '#runtime/svelte/store/position';
 
 import {
    isIterable,

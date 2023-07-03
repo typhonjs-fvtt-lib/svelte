@@ -1,7 +1,7 @@
 import * as svelteEasingFunc from 'svelte/easing';
 import { TJSVelocityTrack } from '@typhonjs-svelte/runtime-base/math/physics';
 import { isIterable, isObject, isPlainObject } from '@typhonjs-svelte/runtime-base/util/object';
-import { TJSPosition } from '@typhonjs-fvtt/svelte/store/position';
+import { TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 
 let gsap = void 0;
 
@@ -556,7 +556,10 @@ class TimelinePositionImpl
    /**
     * Gets the target from GSAP data entry.
     *
-    * @param {import('#svelte-fvtt/store/position').TJSPositionDataExtended|import('#svelte-fvtt/store/position').TJSPositionDataExtended[]}  positionData - PositionInfo data.
+    * @param {(
+    *    import('#runtime/svelte/store/position').TJSPositionDataExtended |
+    *    import('#runtime/svelte/store/position').TJSPositionDataExtended[]
+    * )}  positionData - PositionInfo data.
     *
     * @param {HTMLElement|HTMLElement[]}  elements - One or more HTMLElements.
     *
@@ -564,7 +567,11 @@ class TimelinePositionImpl
     *
     * @param {number}         cntr - Current GSAP data entry index.
     *
-    * @returns {import('#svelte-fvtt/store/position').TJSPositionDataExtended|import('#svelte-fvtt/store/position').TJSPositionDataExtended[]|HTMLElement|HTMLElement[]} The target object or HTMLElement.
+    * @returns {(
+    *    import('#runtime/svelte/store/position').TJSPositionDataExtended |
+    *    import('#runtime/svelte/store/position').TJSPositionDataExtended[] |
+    *    HTMLElement|HTMLElement[]
+    * )} The target object or HTMLElement.
     */
    static getTarget(positionData, elements, entry, cntr)
    {
@@ -1276,7 +1283,7 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  *
  * @param {object}            params - Required parameters.
  *
- * @param {import('#svelte-fvtt/store/position').TJSPosition}   params.position - A position instance.
+ * @param {import('#runtime/svelte/store/position').TJSPosition}   params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *

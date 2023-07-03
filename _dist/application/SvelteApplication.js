@@ -1,4 +1,4 @@
-import { TJSPosition }  from '@typhonjs-fvtt/svelte/store/position';
+import { TJSPosition }  from '@typhonjs-svelte/runtime-base/svelte/store/position';
 
 import {
    isHMRProxy,
@@ -942,7 +942,7 @@ export class SvelteApplication extends Application
     * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
     * to update to using the {@link TJSPosition.validators} functionality.
     *
-    * @param {import('@typhonjs-fvtt/svelte/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
+    * @param {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
     *
     * @returns {TJSPosition} The updated position object for the application containing the new values
     */

@@ -1,6 +1,6 @@
 import { gsap }         from '../gsap.js';
 
-import { TJSPosition }  from '@typhonjs-svelte/lib/store/position';
+import { TJSPosition }  from '#runtime/svelte/store/position';
 
 import {
    isIterable,
@@ -385,7 +385,10 @@ class TimelinePositionImpl
    /**
     * Gets the target from GSAP data entry.
     *
-    * @param {import('#svelte-fvtt/store/position').TJSPositionDataExtended|import('#svelte-fvtt/store/position').TJSPositionDataExtended[]}  positionData - PositionInfo data.
+    * @param {(
+    *    import('#runtime/svelte/store/position').TJSPositionDataExtended |
+    *    import('#runtime/svelte/store/position').TJSPositionDataExtended[]
+    * )}  positionData - PositionInfo data.
     *
     * @param {HTMLElement|HTMLElement[]}  elements - One or more HTMLElements.
     *
@@ -393,7 +396,11 @@ class TimelinePositionImpl
     *
     * @param {number}         cntr - Current GSAP data entry index.
     *
-    * @returns {import('#svelte-fvtt/store/position').TJSPositionDataExtended|import('#svelte-fvtt/store/position').TJSPositionDataExtended[]|HTMLElement|HTMLElement[]} The target object or HTMLElement.
+    * @returns {(
+    *    import('#runtime/svelte/store/position').TJSPositionDataExtended |
+    *    import('#runtime/svelte/store/position').TJSPositionDataExtended[] |
+    *    HTMLElement|HTMLElement[]
+    * )} The target object or HTMLElement.
     */
    static getTarget(positionData, elements, entry, cntr)
    {

@@ -2,8 +2,8 @@ import * as svelte from 'svelte';
 import * as _typhonjs_svelte_runtime_base_svelte_util from '@typhonjs-svelte/runtime-base/svelte/util';
 import * as _typhonjs_svelte_runtime_base_svelte_store_web_storage from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import { TJSWebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
-import * as _typhonjs_fvtt_svelte_store_position from '@typhonjs-fvtt/svelte/store/position';
-import { TJSPosition } from '@typhonjs-fvtt/svelte/store/position';
+import * as _typhonjs_svelte_runtime_base_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
+import { TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import * as _typhonjs_svelte_runtime_base_util_browser from '@typhonjs-svelte/runtime-base/util/browser';
 import * as _typhonjs_fvtt_svelte_application from '@typhonjs-fvtt/svelte/application';
 import * as svelte_store from 'svelte/store';
@@ -143,7 +143,7 @@ type ApplicationStateData = {
     /**
      * Application position.
      */
-    position: _typhonjs_fvtt_svelte_store_position.TJSPositionDataExtended;
+    position: _typhonjs_svelte_runtime_base_svelte_store_position.TJSPositionDataExtended;
     /**
      * Any application saved position state for #beforeMinimized
      */
@@ -766,11 +766,11 @@ declare class SvelteApplication {
      * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
      * to update to using the {@link TJSPosition.validators} functionality.
      *
-     * @param {import('@typhonjs-fvtt/svelte/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
+     * @param {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
      *
      * @returns {TJSPosition} The updated position object for the application containing the new values
      */
-    setPosition(position?: _typhonjs_fvtt_svelte_store_position.TJSPositionDataExtended): TJSPosition;
+    setPosition(position?: _typhonjs_svelte_runtime_base_svelte_store_position.TJSPositionDataExtended): TJSPosition;
     #private;
 }
 
@@ -1178,10 +1178,10 @@ type SvelteApplicationOptions = {
      */
     positionable?: boolean;
     /**
-     * A helper for initial
-     * position placement.
+     * A helper for
+     * initial position placement.
      */
-    positionInitial?: _typhonjs_fvtt_svelte_store_position.TJSPositionInitialHelper;
+    positionInitial?: _typhonjs_svelte_runtime_base_svelte_store_position.TJSPositionInitialHelper;
     /**
      * When true TJSPosition is optimized for orthographic use.
      */
@@ -1190,7 +1190,7 @@ type SvelteApplicationOptions = {
      * A validator
      * function or data or list of validators.
      */
-    positionValidator?: _typhonjs_fvtt_svelte_store_position.TJSPositionValidatorOptions;
+    positionValidator?: _typhonjs_svelte_runtime_base_svelte_store_position.TJSPositionValidatorOptions;
     /**
      * An instance of
      * TJSWebStorage (session) to share across SvelteApplications.
@@ -1205,7 +1205,7 @@ type SvelteApplicationOptions = {
      * By default,
      * 'top / left' respects rotation when minimizing.
      */
-    transformOrigin?: _typhonjs_fvtt_svelte_store_position.TJSTransformOrigin;
+    transformOrigin?: _typhonjs_svelte_runtime_base_svelte_store_position.TJSTransformOrigin;
 };
 type SvelteData = {
     /**

@@ -8,7 +8,7 @@
    import { localize }              from '@typhonjs-fvtt/svelte/helper';
 
    import {
-      draggable as dragDefault }    from '@typhonjs-fvtt/svelte/store/position';
+      draggable as dragDefault }    from '#runtime/svelte/store/position';
 
    import TJSHeaderButton           from './TJSHeaderButton.svelte';
 

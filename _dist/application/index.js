@@ -111,12 +111,12 @@ Hooks.on('PopOut:close', (app) =>
  *
  * @property {boolean}  [positionable=true] If false then `position.set` does not take effect.
  *
- * @property {import('@typhonjs-fvtt/svelte/store/position').TJSPositionInitialHelper}   [positionInitial] A helper for initial
- *           position placement.
+ * @property {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionInitialHelper}   [positionInitial] A helper for
+ *           initial position placement.
  *
  * @property {boolean}  [positionOrtho=true] When true TJSPosition is optimized for orthographic use.
  *
- * @property {import('@typhonjs-fvtt/svelte/store/position').TJSPositionValidatorOptions}   [positionValidator] A validator
+ * @property {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionValidatorOptions}   [positionValidator] A validator
  *           function or data or list of validators.
  *
  * @property {import('@typhonjs-svelte/runtime-base/svelte/store/web-storage').TJSWebStorage}   [sessionStorage] An instance of
@@ -125,7 +125,7 @@ Hooks.on('PopOut:close', (app) =>
  * @property {import('@typhonjs-svelte/runtime-base/svelte/util').TJSSvelteConfig}   [svelte] A Svelte configuration object defining
  *           the main component.
  *
- * @property {import('@typhonjs-fvtt/svelte/store/position').TJSTransformOrigin}   [transformOrigin='top left'] By default,
+ * @property {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSTransformOrigin}   [transformOrigin='top left'] By default,
  *           'top / left' respects rotation when minimizing.
  */
 

@@ -22,7 +22,7 @@ const s_HAS_QUICK_TO = false;
  *
  * @param {object}            params - Required parameters.
  *
- * @param {import('#svelte-fvtt/store/position').TJSPosition}   params.position - A position instance.
+ * @param {import('#runtime/svelte/store/position').TJSPosition}   params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *

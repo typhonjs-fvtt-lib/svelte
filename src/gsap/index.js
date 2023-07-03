@@ -24,8 +24,8 @@ export * from './util/index.js';
  * @typedef {(
  *    string |
  *    object |
- *    import('#svelte-fvtt/store/position').TJSPosition |
- *    Iterable<import('#svelte-fvtt/store/position').TJSPosition> |
+ *    import('#runtime/svelte/store/position').TJSPosition |
+ *    Iterable<import('#runtime/svelte/store/position').TJSPosition> |
  *    Array<HTMLElement | object>
  * )} GSAPTarget
  */
@@ -35,9 +35,9 @@ export * from './util/index.js';
 /**
  * @typedef {object} PositionInfo
  *
- * @property {import('#svelte-fvtt/store/position').TJSPosition[]}    position -
+ * @property {import('#runtime/svelte/store/position').TJSPosition[]}    position -
  *
- * @property {import('#svelte-fvtt/store/position').TJSPositionDataExtended[]}   positionData -
+ * @property {import('#runtime/svelte/store/position').TJSPositionDataExtended[]}   positionData -
  *
  * @property {object[]}                data Contains the full data object when a list of object w/ position is used.
  *

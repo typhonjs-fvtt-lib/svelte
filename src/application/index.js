@@ -111,12 +111,12 @@ Hooks.on('PopOut:close', (app) =>
  *
  * @property {boolean}  [positionable=true] If false then `position.set` does not take effect.
  *
- * @property {import('#svelte-fvtt/store/position').TJSPositionInitialHelper}   [positionInitial] A helper for initial
- *           position placement.
+ * @property {import('#runtime/svelte/store/position').TJSPositionInitialHelper}   [positionInitial] A helper for
+ *           initial position placement.
  *
  * @property {boolean}  [positionOrtho=true] When true TJSPosition is optimized for orthographic use.
  *
- * @property {import('#svelte-fvtt/store/position').TJSPositionValidatorOptions}   [positionValidator] A validator
+ * @property {import('#runtime/svelte/store/position').TJSPositionValidatorOptions}   [positionValidator] A validator
  *           function or data or list of validators.
  *
  * @property {import('#runtime/svelte/store/web-storage').TJSWebStorage}   [sessionStorage] An instance of
@@ -125,7 +125,7 @@ Hooks.on('PopOut:close', (app) =>
  * @property {import('#runtime/svelte/util').TJSSvelteConfig}   [svelte] A Svelte configuration object defining
  *           the main component.
  *
- * @property {import('#svelte-fvtt/store/position').TJSTransformOrigin}   [transformOrigin='top left'] By default,
+ * @property {import('#runtime/svelte/store/position').TJSTransformOrigin}   [transformOrigin='top left'] By default,
  *           'top / left' respects rotation when minimizing.
  */
 

@@ -328,7 +328,7 @@ export class ApplicationState
 /**
  * @typedef {object} ApplicationStateData
  *
- * @property {import('#svelte-fvtt/store/position').TJSPositionDataExtended}   position Application position.
+ * @property {import('#runtime/svelte/store/position').TJSPositionDataExtended}   position Application position.
  *
  * @property {object}         beforeMinimized Any application saved position state for #beforeMinimized
  *
