@@ -1,61 +1,13 @@
+/**
+ * Provide any path remapping from parent modules. Currently, there is no remapping, but once @typhonjs-svelte/lib
+ * becomes active again those subpath exports need to be remapped to `@typhonjs-fvtt/svelte/*
+ *
+ * The keys in the object below are added to the Rollup external option and the key / value is added to the Rollup path
+ * options.
+ *
+ * Note: There are regex patterns added for static external exports in `externalRegexNPM`.
+ *
+ * @type {{}}
+ */
 export const externalPathsNPM = {
-   '@typhonjs-svelte/lib/store/storage/web/plugin': '@typhonjs-fvtt/svelte/store/storage/web/plugin',
-
-   // TODO: WE CAN REMOVE THIS SECTION? OR REPLACE WITH REGEX?
-   '@typhonjs-svelte/runtime-base/data/compress': '@typhonjs-svelte/runtime-base/data/compress',
-   '@typhonjs-svelte/runtime-base/data/format/base64': '@typhonjs-svelte/runtime-base/data/format/base64',
-   '@typhonjs-svelte/runtime-base/data/format/json5': '@typhonjs-svelte/runtime-base/data/format/json5',
-   '@typhonjs-svelte/runtime-base/data/format/msgpack': '@typhonjs-svelte/runtime-base/data/format/msgpack',
-   '@typhonjs-svelte/runtime-base/data/format/msgpack/compress': '@typhonjs-svelte/runtime-base/data/format/msgpack/compress',
-   '@typhonjs-svelte/runtime-base/data/format/unicode': '@typhonjs-svelte/runtime-base/data/format/unicode',
-   '@typhonjs-svelte/runtime-base/data/struct/cache/quick-lru': '@typhonjs-svelte/runtime-base/data/struct/cache/quick-lru',
-   '@typhonjs-svelte/runtime-base/data/struct/hash/array': '@typhonjs-svelte/runtime-base/data/struct/hash/array',
-   '@typhonjs-svelte/runtime-base/data/struct/search/trie': '@typhonjs-svelte/runtime-base/data/struct/search/trie',
-   '@typhonjs-svelte/runtime-base/data/struct/search/trie/query': '@typhonjs-svelte/runtime-base/data/struct/search/trie/query',
-   '@typhonjs-svelte/runtime-base/math/gl-matrix': '@typhonjs-svelte/runtime-base/math/gl-matrix',
-   '@typhonjs-svelte/runtime-base/math/interpolate': '@typhonjs-svelte/runtime-base/math/interpolate',
-   '@typhonjs-svelte/runtime-base/math/physics': '@typhonjs-svelte/runtime-base/math/physics',
-   '@typhonjs-svelte/runtime-base/math/util': '@typhonjs-svelte/runtime-base/math/util',
-   '@typhonjs-svelte/runtime-base/plugin/manager': '@typhonjs-svelte/runtime-base/plugin/manager',
-   '@typhonjs-svelte/runtime-base/plugin/manager/eventbus': '@typhonjs-svelte/runtime-base/plugin/manager/eventbus',
-   '@typhonjs-svelte/runtime-base/plugin/manager/eventbus/buses': '@typhonjs-svelte/runtime-base/plugin/manager/eventbus/buses',
-   '@typhonjs-svelte/runtime-base/svelte/action/animate': '@typhonjs-svelte/runtime-base/svelte/action/animate',
-   '@typhonjs-svelte/runtime-base/svelte/action/dom': '@typhonjs-svelte/runtime-base/svelte/action/dom',
-   '@typhonjs-svelte/runtime-base/svelte/animate': '@typhonjs-svelte/runtime-base/svelte/animate',
-   '@typhonjs-svelte/runtime-base/svelte/store/dom': '@typhonjs-svelte/runtime-base/svelte/store/dom',
-   '@typhonjs-svelte/runtime-base/svelte/store/position': '@typhonjs-svelte/runtime-base/svelte/store/position',
-   '@typhonjs-svelte/runtime-base/svelte/store/reducer': '@typhonjs-svelte/runtime-base/svelte/store/reducer',
-   '@typhonjs-svelte/runtime-base/svelte/store/reducer/array-object': '@typhonjs-svelte/runtime-base/svelte/store/reducer/array-object',
-   '@typhonjs-svelte/runtime-base/svelte/store/web-storage': '@typhonjs-svelte/runtime-base/svelte/store/web-storage',
-   '@typhonjs-svelte/runtime-base/svelte/store/writable-derived': '@typhonjs-svelte/runtime-base/svelte/store/writable-derived',
-   '@typhonjs-svelte/runtime-base/svelte/store/web-storage/msgpack': '@typhonjs-svelte/runtime-base/svelte/store/web-storage/msgpack',
-   '@typhonjs-svelte/runtime-base/svelte/transition': '@typhonjs-svelte/runtime-base/svelte/transition',
-   '@typhonjs-svelte/runtime-base/svelte/util': '@typhonjs-svelte/runtime-base/svelte/util',
-   '@typhonjs-svelte/runtime-base/util': '@typhonjs-svelte/runtime-base/util',
-   '@typhonjs-svelte/runtime-base/util/animate': '@typhonjs-svelte/runtime-base/util/animate',
-   '@typhonjs-svelte/runtime-base/util/async': '@typhonjs-svelte/runtime-base/util/async',
-   '@typhonjs-svelte/runtime-base/util/browser': '@typhonjs-svelte/runtime-base/util/browser',
-   '@typhonjs-svelte/runtime-base/util/object': '@typhonjs-svelte/runtime-base/util/object',
-   '@typhonjs-svelte/runtime-base/util/store': '@typhonjs-svelte/runtime-base/util/store',
-
-   // Exclude as external, but do not translate module references.
-   'svelte': 'svelte',
-   'svelte/animate': 'svelte/animate',
-   'svelte/easing': 'svelte/easing',
-   'svelte/internal': 'svelte/internal',
-   'svelte/motion': 'svelte/motion',
-   'svelte/store': 'svelte/store',
-   'svelte/transition': 'svelte/transition',
-
-   '@typhonjs-fvtt/svelte/application': '@typhonjs-fvtt/svelte/application',
-   '@typhonjs-fvtt/svelte/application/dialog': '@typhonjs-fvtt/svelte/application/dialog',
-   '@typhonjs-fvtt/svelte/application/legacy': '@typhonjs-fvtt/svelte/application/legacy',
-   '@typhonjs-fvtt/svelte/component/core': '@typhonjs-fvtt/svelte/component/core',
-   '@typhonjs-fvtt/svelte/component/dialog': '@typhonjs-fvtt/svelte/component/dialog',
-   '@typhonjs-fvtt/svelte/gsap': '@typhonjs-fvtt/svelte/gsap',
-   '@typhonjs-fvtt/svelte/gsap/plugin': '@typhonjs-fvtt/svelte/gsap/plugin',
-   '@typhonjs-fvtt/svelte/gsap/plugin/bonus': '@typhonjs-fvtt/svelte/gsap/plugin/bonus',
-   '@typhonjs-fvtt/svelte/helper': '@typhonjs-fvtt/svelte/helper',
-   '@typhonjs-fvtt/svelte/store/fvtt': '@typhonjs-fvtt/svelte/store/fvtt',
-   '@typhonjs-fvtt/svelte/store/storage/web/plugin': '@typhonjs-fvtt/svelte/store/storage/web/plugin',
 };
