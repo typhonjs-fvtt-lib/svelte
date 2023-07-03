@@ -1,5 +1,5 @@
 import * as svelte_store from 'svelte/store';
-import { DynOptionsMapCreate, DynMapReducer } from '@typhonjs-svelte/runtime-base/data/struct/store/reducer';
+import { DynOptionsMapCreate, DynMapReducer } from '@typhonjs-svelte/runtime-base/svelte/store/reducer';
 
 /**
  * Provides the public embedded reactive collection API.

@@ -1,5 +1,4 @@
 export const externalPathsNPM = {
-   '@typhonjs-svelte/lib/store/position': '@typhonjs-fvtt/svelte/store/position',
    '@typhonjs-svelte/lib/store/storage/web/plugin': '@typhonjs-fvtt/svelte/store/storage/web/plugin',
 
    // TODO: WE CAN REMOVE THIS SECTION? OR REPLACE WITH REGEX?
@@ -13,8 +12,6 @@ export const externalPathsNPM = {
    '@typhonjs-svelte/runtime-base/data/struct/hash/array': '@typhonjs-svelte/runtime-base/data/struct/hash/array',
    '@typhonjs-svelte/runtime-base/data/struct/search/trie': '@typhonjs-svelte/runtime-base/data/struct/search/trie',
    '@typhonjs-svelte/runtime-base/data/struct/search/trie/query': '@typhonjs-svelte/runtime-base/data/struct/search/trie/query',
-   '@typhonjs-svelte/runtime-base/data/struct/store/reducer': '@typhonjs-svelte/runtime-base/data/struct/store/reducer',
-   '@typhonjs-svelte/runtime-base/data/struct/store/reducer/array-object': '@typhonjs-svelte/runtime-base/data/struct/store/reducer/array-object',
    '@typhonjs-svelte/runtime-base/math/gl-matrix': '@typhonjs-svelte/runtime-base/math/gl-matrix',
    '@typhonjs-svelte/runtime-base/math/interpolate': '@typhonjs-svelte/runtime-base/math/interpolate',
    '@typhonjs-svelte/runtime-base/math/physics': '@typhonjs-svelte/runtime-base/math/physics',
@@ -26,6 +23,9 @@ export const externalPathsNPM = {
    '@typhonjs-svelte/runtime-base/svelte/action/dom': '@typhonjs-svelte/runtime-base/svelte/action/dom',
    '@typhonjs-svelte/runtime-base/svelte/animate': '@typhonjs-svelte/runtime-base/svelte/animate',
    '@typhonjs-svelte/runtime-base/svelte/store/dom': '@typhonjs-svelte/runtime-base/svelte/store/dom',
+   '@typhonjs-svelte/runtime-base/svelte/store/position': '@typhonjs-svelte/runtime-base/svelte/store/position',
+   '@typhonjs-svelte/runtime-base/svelte/store/reducer': '@typhonjs-svelte/runtime-base/svelte/store/reducer',
+   '@typhonjs-svelte/runtime-base/svelte/store/reducer/array-object': '@typhonjs-svelte/runtime-base/svelte/store/reducer/array-object',
    '@typhonjs-svelte/runtime-base/svelte/store/web-storage': '@typhonjs-svelte/runtime-base/svelte/store/web-storage',
    '@typhonjs-svelte/runtime-base/svelte/store/writable-derived': '@typhonjs-svelte/runtime-base/svelte/store/writable-derived',
    '@typhonjs-svelte/runtime-base/svelte/store/web-storage/msgpack': '@typhonjs-svelte/runtime-base/svelte/store/web-storage/msgpack',
@@ -57,6 +57,5 @@ export const externalPathsNPM = {
    '@typhonjs-fvtt/svelte/gsap/plugin/bonus': '@typhonjs-fvtt/svelte/gsap/plugin/bonus',
    '@typhonjs-fvtt/svelte/helper': '@typhonjs-fvtt/svelte/helper',
    '@typhonjs-fvtt/svelte/store/fvtt': '@typhonjs-fvtt/svelte/store/fvtt',
-   '@typhonjs-fvtt/svelte/store/position': '@typhonjs-fvtt/svelte/store/position',
    '@typhonjs-fvtt/svelte/store/storage/web/plugin': '@typhonjs-fvtt/svelte/store/storage/web/plugin',
 };

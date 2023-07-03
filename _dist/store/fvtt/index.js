@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 import { Hashing } from '@typhonjs-svelte/runtime-base/util';
 import { hasPrototype, isObject, isPlainObject } from '@typhonjs-svelte/runtime-base/util/object';
-import { DynMapReducer } from '@typhonjs-svelte/runtime-base/data/struct/store/reducer';
+import { DynMapReducer } from '@typhonjs-svelte/runtime-base/svelte/store/reducer';
 
 /**
  * Provides management of reactive embedded collections.
@@ -55,10 +55,10 @@ class EmbeddedStoreManager
     *
     * @param {T} FoundryDoc - A Foundry document class / constructor.
     *
-    * @param {import('#runtime/data/struct/store/reducer').DynOptionsMapCreate<string, T>} options - DynMapReducer
+    * @param {import('#runtime/svelte/store/reducer').DynOptionsMapCreate<string, T>} options - DynMapReducer
     *        creation options.
     *
-    * @returns {import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>} DynMapReducer instance.
+    * @returns {import('#runtime/svelte/store/reducer').DynMapReducer<string, T>} DynMapReducer instance.
     */
    create(FoundryDoc, options)
    {
@@ -106,10 +106,10 @@ class EmbeddedStoreManager
       /** @type {string} */
       let name;
 
-      /** @type {import('#runtime/data/struct/store/reducer').DynDataOptions<T>} */
+      /** @type {import('#runtime/svelte/store/reducer').DynDataOptions<T>} */
       let rest = {};
 
-      /** @type {import('#runtime/data/struct/store/reducer').IDynMapReducerCtor<string, T>} */
+      /** @type {import('#runtime/svelte/store/reducer').IDynMapReducerCtor<string, T>} */
       let ctor;
 
       if (typeof options === 'string')
@@ -237,7 +237,7 @@ class EmbeddedStoreManager
     *
     * @param {string} storeName - Name of the embedded collection to retrieve.
     *
-    * @returns {import('#runtime/data/struct/store/reducer').DynMapReducer<string, InstanceType<T>>} DynMapReducer
+    * @returns {import('#runtime/svelte/store/reducer').DynMapReducer<string, InstanceType<T>>} DynMapReducer
     *          instance.
     */
    get(FoundryDoc, storeName)
@@ -377,7 +377,7 @@ class EmbeddedStoreManager
  *
  * @property {foundry.abstract.Collection} collection -
  *
- * @property {Map<string, import('#runtime/data/struct/store/reducer').DynMapReducer<string, T>>} stores -
+ * @property {Map<string, import('#runtime/svelte/store/reducer').DynMapReducer<string, T>>} stores -
  */
 
 /**

@@ -1,6 +1,6 @@
 import type {
    DynOptionsMapCreate,
-   DynMapReducer } from '#runtime/data/struct/store/reducer';
+   DynMapReducer } from '#runtime/svelte/store/reducer';
 
 /**
  * Provides the public embedded reactive collection API.
