@@ -203,7 +203,7 @@ export class TJSDocument
     */
    static getUUIDFromDataTransfer(data, { actor = true, compendium = true, world = true, types = void 0 } = {})
    {
-      if (typeof data !== 'object') { return void 0; }
+      if (!isObject(data)) { return void 0; }
       if (Array.isArray(types) && !types.includes(data.type)) { return void 0; }
 
       let uuid = void 0;
@@ -247,7 +247,7 @@ export class TJSDocument
    /**
     * @param {T | undefined}  document - New document to set.
     *
-    * @param {object}         [options] - New document update options to set.
+    * @param {TJSDocumentUpdateOptions}   [options] - New document update options to set.
     */
    set(document, options = {})
    {
@@ -261,7 +261,7 @@ export class TJSDocument
          throw new TypeError(`TJSDocument set error: 'document' is not a valid Document or undefined.`);
       }
 
-      if (options === null || typeof options !== 'object')
+      if (!isObject(options))
       {
          throw new TypeError(`TJSDocument set error: 'options' is not an object.`);
       }
@@ -410,5 +410,5 @@ export class TJSDocument
  *
  * @property {string}   [renderContext] The update action. Useful for filtering.
  *
- * @property {object[]|string[]} data Foundry data associated with document changes.
+ * @property {object[]|string[]} [data] Foundry data associated with document changes.
  */

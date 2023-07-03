@@ -442,7 +442,7 @@ class DraggableGsapOptions
          get: () => { return this.#easeOptions; },
          set: (newEaseOptions) =>
          {
-            if (newEaseOptions === null || typeof newEaseOptions !== 'object')
+            if (!isObject(newEaseOptions))
             {
                throw new TypeError(`'easeOptions' is not an object.`);
             }
@@ -490,7 +490,7 @@ class DraggableGsapOptions
          get: () => { return this.#inertiaOptions; },
          set: (newInertiaOptions) =>
          {
-            if (newInertiaOptions === null || typeof newInertiaOptions !== 'object')
+            if (!isObject(newInertiaOptions))
             {
                throw new TypeError(`'inertiaOptions' is not an object.`);
             }
@@ -507,7 +507,7 @@ class DraggableGsapOptions
 
             if (newInertiaOptions.duration !== void 0)
             {
-               if (newInertiaOptions.duration === null || typeof newInertiaOptions.duration !== 'object')
+               if (!isObject(newInertiaOptions.duration))
                {
                   throw new TypeError(`'inertiaOptions.duration' is not an object.`);
                }
@@ -677,7 +677,7 @@ class DraggableGsapOptions
     */
    set inertiaDuration(duration)
    {
-      if (typeof duration !== 'object' && !Number.isFinite(duration.min) && !Number.isFinite(duration.max))
+      if (!isObject(duration) && !Number.isFinite(duration.min) && !Number.isFinite(duration.max))
       {
          throw new TypeError(`'duration' is not an object with 'min' & 'max' properties as finite numbers.`);
       }

@@ -1,3 +1,5 @@
+import { isObject } from '@typhonjs-svelte/runtime-base/util/object';
+
 /**
  * A helper to create a set of radio checkbox input elements in a named set.
  * The provided keys are the possible radio values while the provided values are human readable labels.
@@ -184,7 +186,7 @@ function selectOptions(choices, options)
  */
 function localize(stringId, data)
 {
-   const result = typeof data !== 'object' ? globalThis.game.i18n.localize(stringId) :
+   const result = !isObject(data) ? globalThis.game.i18n.localize(stringId) :
     globalThis.game.i18n.format(stringId, data);
 
    return result !== void 0 ? result : '';

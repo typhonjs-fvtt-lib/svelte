@@ -30,7 +30,7 @@ export class GsapCompose
     */
    static from(target, vars, options)
    {
-      if (typeof vars !== 'object')
+      if (!isObject(vars))
       {
          throw new TypeError(`GsapCompose.from error: 'vars' is not an object.`);
       }
@@ -54,12 +54,12 @@ export class GsapCompose
     */
    static fromTo(target, fromVars, toVars, options)
    {
-      if (typeof fromVars !== 'object')
+      if (!isObject(fromVars))
       {
          throw new TypeError(`GsapCompose.fromTo error: 'fromVars' is not an object.`);
       }
 
-      if (typeof toVars !== 'object')
+      if (!isObject(toVars))
       {
          throw new TypeError(`GsapCompose.fromTo error: 'toVars' is not an object.`);
       }
@@ -101,7 +101,7 @@ export class GsapCompose
          throw new TypeError(`GsapCompose.quickTo error: 'key' is not a string.`);
       }
 
-      if (typeof vars !== 'object')
+      if (!isObject(vars))
       {
          throw new TypeError(`GsapCompose.quickTo error: 'vars' is not an object.`);
       }
@@ -169,7 +169,7 @@ export class GsapCompose
       /** @type {import('../').GsapPositionOptions} */
       const options = gsapData === arg1 ? arg2 : arg3;
 
-      if (typeof timelineOptions !== 'object')
+      if (!isObject(timelineOptions))
       {
          throw new TypeError(`GsapCompose.timeline error: 'timelineOptions' is not an object.`);
       }
@@ -179,7 +179,7 @@ export class GsapCompose
          throw new TypeError(`GsapCompose.timeline error: 'gsapData' is not an iterable list.`);
       }
 
-      if (options !== void 0 && typeof options !== 'object')
+      if (options !== void 0 && !isObject(options))
       {
          throw new TypeError(`GsapCompose.from error: 'options' is not an object.`);
       }
@@ -189,7 +189,7 @@ export class GsapCompose
 
       for (const entry of gsapData)
       {
-         if (typeof entry !== 'object')
+         if (!isObject(entry))
          {
             throw new TypeError(`GsapCompose.timeline error: 'gsapData[${index}]' is not an object.`);
          }
@@ -262,7 +262,7 @@ export class GsapCompose
     */
    static to(target, vars, options)
    {
-      if (typeof vars !== 'object')
+      if (!isObject(vars))
       {
          throw new TypeError(`GsapCompose.to error: 'vars' is not an object.`);
       }
@@ -354,7 +354,7 @@ function s_VALIDATE_OPTIONS(entry, cntr)
       {
          const vars = entry.vars;
 
-         if (typeof vars !== 'object')
+         if (!isObject(vars))
          {
             throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'vars' object.`);
          }
@@ -367,12 +367,12 @@ function s_VALIDATE_OPTIONS(entry, cntr)
          const fromVars = entry.fromVars;
          const toVars = entry.toVars;
 
-         if (typeof fromVars !== 'object')
+         if (!isObject(fromVars))
          {
             throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'fromVars' object.`);
          }
 
-         if (typeof toVars !== 'object')
+         if (!isObject(toVars))
          {
             throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'toVars' object.`);
          }

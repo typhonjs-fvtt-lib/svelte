@@ -91,9 +91,9 @@ declare class TJSDocument<T = globalThis.foundry.abstract.Document> {
     /**
      * @param {T | undefined}  document - New document to set.
      *
-     * @param {object}         [options] - New document update options to set.
+     * @param {TJSDocumentUpdateOptions}   [options] - New document update options to set.
      */
-    set(document: T | undefined, options?: object): void;
+    set(document: T | undefined, options?: TJSDocumentUpdateOptions): void;
     /**
      * Potentially sets new document from data transfer object.
      *
@@ -162,7 +162,7 @@ type TJSDocumentUpdateOptions = {
     /**
      * Foundry data associated with document changes.
      */
-    data: object[] | string[];
+    data?: object[] | string[];
 };
 
 /**

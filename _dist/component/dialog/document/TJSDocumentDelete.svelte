@@ -3,6 +3,7 @@
 
    import { localize }     from '@typhonjs-fvtt/svelte/helper';
    import { TJSDocument }  from '@typhonjs-fvtt/svelte/store/fvtt';
+   import { isObject } from "../../../../../../typhonjs-svelte/runtime-base/_dist/util/object/index.js";
 
    /** @type {foundry.abstract.Document} */
    export let document = void 0;
@@ -22,7 +23,7 @@
    let name = document?.id ? document.name : '';
    let type = localize(document.constructor.metadata.label);
 
-   $: if (typeof context !== 'object')
+   $: if (!isObject(context))
    {
       throw new TypeError(`TJSDocumentDelete error: 'context' is not an object.`);
    }
