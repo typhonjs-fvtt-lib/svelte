@@ -9,7 +9,7 @@ import {
  * document collections reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
  *
- * @template [T=globalThis.DocumentCollection]
+ * @template [T=DocumentCollection]
  */
 export class TJSDocumentCollection
 {
@@ -75,7 +75,7 @@ export class TJSDocumentCollection
    {
       const collection = this.#collection;
 
-      if (collection instanceof globalThis.DocumentCollection)
+      if (collection instanceof DocumentCollection)
       {
          const index = collection?.apps?.findIndex((sub) => sub === this.#collectionCallback);
          if (index >= 0) { collection?.apps?.splice(index, 1); }
@@ -106,7 +106,7 @@ export class TJSDocumentCollection
    {
       const collection = this.#collection;
 
-      if (collection instanceof globalThis.DocumentCollection)
+      if (collection instanceof DocumentCollection)
       {
          const index = collection?.apps?.findIndex((sub) => sub === this.#collectionCallback);
          if (index >= 0) { collection?.apps?.splice(index, 1); }
@@ -155,7 +155,7 @@ export class TJSDocumentCollection
          this.#collectionCallback = void 0;
       }
 
-      if (collection !== void 0 && !(collection instanceof globalThis.DocumentCollection))
+      if (collection !== void 0 && !(collection instanceof DocumentCollection))
       {
          throw new TypeError(
           `TJSDocumentCollection set error: 'collection' is not a valid DocumentCollection or undefined.`);
@@ -166,7 +166,7 @@ export class TJSDocumentCollection
          throw new TypeError(`TJSDocument set error: 'options' is not an object.`);
       }
 
-      if (collection instanceof globalThis.DocumentCollection)
+      if (collection instanceof DocumentCollection)
       {
          this.#collectionCallback = {
             close: this.#deleted.bind(this),
@@ -248,10 +248,10 @@ export class TJSDocumentCollection
 /**
  * @typedef TJSDocumentCollectionOptions
  *
- * @property {(collection: globalThis.DocumentCollection) => void} [delete] Optional post delete function
+ * @property {(collection: DocumentCollection) => void} [delete] Optional post delete function
  *           to invoke when document is deleted _after_ subscribers have been notified.
  *
- * @property {(collection: globalThis.DocumentCollection) => void} [preDelete] Optional pre delete function to
+ * @property {(collection: DocumentCollection) => void} [preDelete] Optional pre delete function to
  *           invoke when document is deleted _before_ subscribers are notified.
  */
 

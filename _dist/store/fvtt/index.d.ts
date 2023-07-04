@@ -173,9 +173,9 @@ type TJSDocumentUpdateOptions = {
  * document collections reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
  *
- * @template [T=globalThis.DocumentCollection]
+ * @template [T=DocumentCollection]
  */
-declare class TJSDocumentCollection<T = globalThis.DocumentCollection> {
+declare class TJSDocumentCollection<T = DocumentCollection> {
     /**
      * @param {T | TJSDocumentCollectionOptions}   [collection] - Collection to wrap or TJSDocumentCollectionOptions.
      *
@@ -229,12 +229,12 @@ type TJSDocumentCollectionOptions = {
      * Optional post delete function
      * to invoke when document is deleted _after_ subscribers have been notified.
      */
-    delete?: (collection: globalThis.DocumentCollection) => void;
+    delete?: (collection: DocumentCollection) => void;
     /**
      * Optional pre delete function to
      * invoke when document is deleted _before_ subscribers are notified.
      */
-    preDelete?: (collection: globalThis.DocumentCollection) => void;
+    preDelete?: (collection: DocumentCollection) => void;
 };
 /**
  * Provides data regarding the latest collection change.
