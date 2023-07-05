@@ -12,7 +12,7 @@ const s_HAS_QUICK_TO = false;
 
 /**
  * Provides an action to enable pointer dragging of an HTMLElement using GSAP `to` or `quickTo` to invoke `position.set`
- * on a given {@link import('#runtime/svelte/store/position').TJSPosition} instance provided. You may provide a
+ * on a given {@link TJSPosition} instance provided. You may provide a
  * `easeOptions` object sent to the tween to modify the duration / easing. When the attached boolean store state
  * changes the draggable action is enabled or disabled.
  *
