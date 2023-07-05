@@ -222,7 +222,8 @@ export class SvelteApplication extends Application
     */
    _activateCoreListeners(html)
    {
-      super._activateCoreListeners(typeof this.options.template === 'string' ? html : [this.#elementTarget]);
+      super._activateCoreListeners(typeof this.options.template === 'string' ? html :
+       [this.popOut ? this.#elementTarget?.firstChild : this.#elementTarget]);
    }
 
    /**
@@ -992,7 +993,7 @@ export class SvelteApplication extends Application
             this.position.set(this.position.get());
          }
 
-         super._activateCoreListeners([this.#elementTarget]);
+         super._activateCoreListeners([this.popOut ? this.#elementTarget?.firstChild : this.#elementTarget]);
 
          this.onSvelteRemount({ element: this._element[0], elementContent: this.#elementContent, elementTarget:
           this.#elementTarget });
