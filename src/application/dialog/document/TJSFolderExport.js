@@ -42,6 +42,10 @@ export class TJSFolderExport extends TJSDialog
          return globalThis.ui.notifications.warn(localize("FOLDER.ExportWarningNone", { type: document.type }));
       }
 
+      /**
+       * @type {object}
+       * @internal
+       */
       this.data = {
          modal: typeof dialogData?.modal === 'boolean' ? dialogData.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
