@@ -192,6 +192,19 @@
     */
    function onKeydown(event)
    {
+      // TODO: Note this handling is specifically for Foundry v11+ as the platform KeyboardManager uses
+      // `document.querySelector(':focus')` to short circuit keyboard handling internally to KeyboarManager.
+      // ApplicationShell manages containing focus programmatically and this prevents the Foundry KeyboardManager from
+      // activating. We need to check if this key event target is currently the `elementRoot` or `elementContent` and
+      // the event matches any KeyboardManager actions and if so blur current focus.
+      if ((event.target === elementRoot || event.target === elementContent) &&
+       KeyboardManager && KeyboardManager?._getMatchingActions?.(
+        KeyboardManager?.getKeyboardEventContext?.(event))?.length)
+      {
+         event.target?.blur();
+         return;
+      }
+
       if (focusWrapEnabled && event.shiftKey && event.code === 'Tab')
       {
          // Collect all focusable elements from `elementRoot` and ignore TJSFocusWrap.

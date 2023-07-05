@@ -224,7 +224,8 @@ export class SvelteFormApplication extends FormApplication
    {
       if (this.options.suppressFormInit) { return; }
 
-      super._activateCoreListeners(typeof this.options.template === 'string' ? html : [this.#elementTarget]);
+      super._activateCoreListeners(typeof this.options.template === 'string' ? html :
+       [this.popOut ? this.#elementTarget?.firstChild : this.#elementTarget]);
    }
 
    /**
@@ -990,7 +991,7 @@ export class SvelteFormApplication extends FormApplication
             this.position.set(this.position.get());
          }
 
-         super._activateCoreListeners([this.#elementTarget]);
+         super._activateCoreListeners([this.popOut ? this.#elementTarget?.firstChild : this.#elementTarget]);
 
          this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent, elementTarget:
           this.#elementTarget });
