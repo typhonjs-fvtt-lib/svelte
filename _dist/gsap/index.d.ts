@@ -1,10 +1,119 @@
 import * as _runtime_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
-import * as svelte_action from 'svelte/action';
 import * as svelte_store from 'svelte/store';
+import { Subscriber, Unsubscriber } from 'svelte/store';
+import * as svelte_action from 'svelte/action';
 
 declare let gsap: any;
 declare const easingFunc: {};
 declare const easingList: string[];
+
+/**
+ * Provides a store / object to make updating / setting draggableGsap options much easier.
+ */
+interface IDraggableGsapOptions {
+    ease: boolean;
+    easeOptions: {
+        duration: number;
+        ease: string;
+    };
+    inertia: boolean;
+    inertiaOptions: {
+        end?: Number | [] | Function;
+        duration: {
+            min: number;
+            max: number;
+        };
+        resistance: number;
+        velocityScale: number;
+    };
+    /**
+     * @returns {number} Get ease duration
+     */
+    get easeDuration(): number;
+    /**
+     * @returns {string | Function} Get easing function value.
+     */
+    get easeValue(): string | Function;
+    /**
+     * @returns {number} Get inertia duration max time (seconds)
+     */
+    get inertiaDurationMax(): number;
+    /**
+     * @returns {number} Get inertia duration min time (seconds)
+     */
+    get inertiaDurationMin(): number;
+    /**
+     * @returns {number |Array | Function} Get inertia end.
+     * @see `end` {@link https://greensock.com/docs/v3/Plugins/InertiaPlugin}
+     */
+    get inertiaEnd(): number | Function | any[];
+    /**
+     * @returns {number} Get inertia resistance (1000 is default).
+     */
+    get inertiaResistance(): number;
+    /**
+     * @returns {number} Get inertia velocity scale.
+     */
+    get inertiaVelocityScale(): number;
+    /**
+     * @param {number}   duration - Set ease duration.
+     */
+    set easeDuration(duration: number);
+    /**
+     * @param {string | Function} value - Get easing function value.
+     */
+    set easeValue(value: string | Function);
+    /**
+     * @param {{min: number, max: number}} duration - Set inertia duration min & max.
+     */
+    set inertiaDuration(duration: {
+        min: number;
+        max: number;
+    });
+    /**
+     * @param {number}   max - Set inertia duration max.
+     */
+    set inertiaDurationMax(max: number);
+    /**
+     * @param {number}   min - Set inertia duration min.
+     */
+    set inertiaDurationMin(min: number);
+    /**
+     * @param {number |Array | Function} end - Set inertia end.
+     *
+     * @see `end` {@link https://greensock.com/docs/v3/Plugins/InertiaPlugin}
+     */
+    set inertiaEnd(end: number | Function | any[]);
+    /**
+     * @param {number}   resistance - Set inertia resistance. Default: 1000
+     */
+    set inertiaResistance(resistance: number);
+    /**
+     * @param {number}   velocityScale - Set inertia velocity scale.
+     */
+    set inertiaVelocityScale(velocityScale: number);
+    /**
+     * Resets all options data to default values.
+     */
+    reset(): void;
+    /**
+     * Resets easing options to default values.
+     */
+    resetEase(): void;
+    /**
+     * Resets inertia options to default values.
+     */
+    resetInertia(): void;
+    /**
+     * Store subscribe method.
+     *
+     * @param {Subscriber<IDraggableGsapOptions>} handler - Callback function that is invoked on update / changes.
+     *        Receives the DraggableOptions object / instance.
+     *
+     * @returns {Unsubscriber} Unsubscribe function.
+     */
+    subscribe(handler: Subscriber<IDraggableGsapOptions>): Unsubscriber;
+}
 
 /**
  * Provides an action to enable pointer dragging of an HTMLElement using GSAP `to` or `quickTo` to invoke `position.set`
@@ -63,117 +172,14 @@ declare namespace draggableGsap {
      * @param {{ ease?: boolean, easeOptions?: object, inertia?: boolean, inertiaOptions?: object }} options -
      *        DraggableGsapOptions.
      *
-     * @returns {DraggableGsapOptions} A new options instance.
+     * @returns {import('./types').IDraggableGsapOptions} A new options instance.
      */
     function options(options: {
         ease?: boolean;
         easeOptions?: any;
         inertia?: boolean;
         inertiaOptions?: any;
-    }): DraggableGsapOptions;
-}
-/**
- * Provides a store / object to make updating / setting draggableGsap options much easier.
- */
-declare class DraggableGsapOptions {
-    constructor({ ease, easeOptions, inertia, inertiaOptions }?: {
-        ease: any;
-        easeOptions: any;
-        inertia: any;
-        inertiaOptions: any;
-    });
-    ease: any;
-    easeOptions: any;
-    inertia: any;
-    inertiaOptions: any;
-    /**
-     * @param {number}   duration - Set ease duration.
-     */
-    set easeDuration(arg: number);
-    /**
-     * @returns {number} Get ease duration
-     */
-    get easeDuration(): number;
-    /**
-     * @param {string|Function} value - Get easing function value.
-     */
-    set easeValue(arg: string | Function);
-    /**
-     * @returns {string|Function} Get easing function value.
-     */
-    get easeValue(): string | Function;
-    /**
-     * @param {number|Array|Function} end - Set inertia end.
-     *
-     * @see `end` {@link https://greensock.com/docs/v3/Plugins/InertiaPlugin}
-     */
-    set inertiaEnd(arg: number | Function | any[]);
-    /**
-     * @returns {number|Array|Function} Get inertia end.
-     * @see `end` {@link https://greensock.com/docs/v3/Plugins/InertiaPlugin}
-     */
-    get inertiaEnd(): number | Function | any[];
-    /**
-     * @param {number}   max - Set inertia duration max.
-     */
-    set inertiaDurationMax(arg: number);
-    /**
-     * @returns {number} Get inertia duration max time (seconds)
-     */
-    get inertiaDurationMax(): number;
-    /**
-     * @param {number}   min - Set inertia duration min.
-     */
-    set inertiaDurationMin(arg: number);
-    /**
-     * @returns {number} Get inertia duration min time (seconds)
-     */
-    get inertiaDurationMin(): number;
-    /**
-     * @param {number}   resistance - Set inertia resistance. Default: 1000
-     */
-    set inertiaResistance(arg: number);
-    /**
-     * @returns {number} Get inertia resistance (1000 is default).
-     */
-    get inertiaResistance(): number;
-    /**
-     * @param {number}   velocityScale - Set inertia velocity scale.
-     */
-    set inertiaVelocityScale(arg: number);
-    /**
-     * @returns {number} Get inertia velocity scale.
-     */
-    get inertiaVelocityScale(): number;
-    /**
-     * @param {{min: number, max: number}} duration - Set inertia duration min & max.
-     */
-    set inertiaDuration(arg: {
-        min: number;
-        max: number;
-    });
-    /**
-     * Resets all options data to default values.
-     */
-    reset(): void;
-    /**
-     * Resets easing options to default values.
-     */
-    resetEase(): void;
-    /**
-     * Resets inertia options to default values.
-     */
-    resetInertia(): void;
-    /**
-     * Store subscribe method.
-     *
-     * @param {import('svelte/store').Subscriber<DraggableGsapOptions>} handler - Callback function that is invoked on
-     * update / changes. Receives the DraggableOptions object / instance.
-     *
-     * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
-     */
-    subscribe(handler: svelte_store.Subscriber<DraggableGsapOptions>): svelte_store.Unsubscriber;
-    #private;
+    }): IDraggableGsapOptions;
 }
 
 /**
@@ -310,4 +316,4 @@ type PositionInfo = {
     gsapData: Array<object[]>;
 };
 
-export { DraggableGsapOptions, GSAPTarget, GsapCompose, GsapData, GsapPositionOptions, PositionInfo, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };
+export { GSAPTarget, GsapCompose, GsapData, GsapPositionOptions, IDraggableGsapOptions, PositionInfo, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };

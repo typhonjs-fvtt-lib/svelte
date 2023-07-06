@@ -819,11 +819,11 @@ class DraggableGsapOptions
  * @param {{ ease?: boolean, easeOptions?: object, inertia?: boolean, inertiaOptions?: object }} options -
  *        DraggableGsapOptions.
  *
- * @returns {DraggableGsapOptions} A new options instance.
+ * @returns {import('./types').IDraggableGsapOptions} A new options instance.
  */
 draggableGsap.options = (options) => new DraggableGsapOptions(options);
 
-export { draggableGsap, DraggableGsapOptions };
+export { draggableGsap };
 
 /**
  * Extra options for GsapCompose.

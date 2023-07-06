@@ -2049,7 +2049,7 @@ class DraggableGsapOptions
  * @param {{ ease?: boolean, easeOptions?: object, inertia?: boolean, inertiaOptions?: object }} options -
  *        DraggableGsapOptions.
  *
- * @returns {DraggableGsapOptions} A new options instance.
+ * @returns {import('./types').IDraggableGsapOptions} A new options instance.
  */
 draggableGsap.options = (options) => new DraggableGsapOptions(options);
 
@@ -2094,5 +2094,5 @@ async function gsapLoadPlugin(name)
    }
 }
 
-export { DraggableGsapOptions, GsapCompose, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };
+export { GsapCompose, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };
 //# sourceMappingURL=index.js.map
