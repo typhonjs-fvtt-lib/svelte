@@ -637,4 +637,4 @@ declare class TJSLiveGameSettings {
  */
 declare const gameState: svelte_store.Readable<globalThis.game>;
 
-export { GameSetting, GameSettingData, GameSettingOptions, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentCollectionUpdateOptions, TJSDocumentOptions, TJSDocumentUpdateOptions, TJSGameSettings, TJSLiveGameSettings, gameState };
+export { EmbeddedAPI, GameSetting, GameSettingData, GameSettingOptions, NamedDocumentConstructor, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentCollectionUpdateOptions, TJSDocumentOptions, TJSDocumentUpdateOptions, TJSGameSettings, TJSLiveGameSettings, gameState };
