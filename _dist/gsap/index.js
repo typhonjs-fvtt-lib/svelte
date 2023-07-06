@@ -2094,5 +2094,5 @@ async function gsapLoadPlugin(name)
    }
 }
 
-export { GsapCompose, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };
+export { DraggableGsapOptions, GsapCompose, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };
 //# sourceMappingURL=index.js.map

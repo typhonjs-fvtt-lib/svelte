@@ -823,7 +823,7 @@ class DraggableGsapOptions
  */
 draggableGsap.options = (options) => new DraggableGsapOptions(options);
 
-export { draggableGsap };
+export { draggableGsap, DraggableGsapOptions };
 
 /**
  * Extra options for GsapCompose.

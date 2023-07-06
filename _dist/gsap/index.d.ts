@@ -310,4 +310,4 @@ type PositionInfo = {
     gsapData: Array<object[]>;
 };
 
-export { GSAPTarget, GsapCompose, GsapData, GsapPositionOptions, PositionInfo, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };
+export { DraggableGsapOptions, GSAPTarget, GsapCompose, GsapData, GsapPositionOptions, PositionInfo, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };
