@@ -33,7 +33,7 @@ export class TJSGameSettings
     */
    #stores = new Map();
 
-   /** @type {UIControl} */
+   /** @type {import('./types').IUIControl} */
    #uiControl;
 
    /**
@@ -64,6 +64,7 @@ export class TJSGameSettings
    /**
     * Provides an iterator / generator to return stored settings data.
     *
+    * @returns {IterableIterator<GameSettingData>} An iterator of all game setting data.
     * @yields {GameSettingData}
     */
    *[Symbol.iterator]()
@@ -83,7 +84,7 @@ export class TJSGameSettings
    }
 
    /**
-    * @returns {UIControl} The associated UIControl.
+    * @returns {import('./types').IUIControl} The associated UIControl.
     */
    get uiControl()
    {
@@ -116,7 +117,7 @@ export class TJSGameSettings
     *
     * @param {string}   key - Game setting key.
     *
-    * @returns {import('svelte/store').Readable|undefined} The associated store for the given game setting key.
+    * @returns {import('svelte/store').Readable | undefined} The associated store for the given game setting key.
     */
    getReadableStore(key)
    {
@@ -136,7 +137,7 @@ export class TJSGameSettings
     *
     * @param {string}   key - Game setting key.
     *
-    * @returns {import('svelte/store').Writable|undefined} The associated store for the given game setting key.
+    * @returns {import('svelte/store').Writable | undefined} The associated store for the given game setting key.
     */
    getStore(key)
    {
@@ -148,7 +149,7 @@ export class TJSGameSettings
     *
     * @param {string}   key - Game setting key.
     *
-    * @returns {import('svelte/store').Writable|undefined} The associated store for the given game setting key.
+    * @returns {import('svelte/store').Writable | undefined} The associated store for the given game setting key.
     */
    getWritableStore(key)
    {

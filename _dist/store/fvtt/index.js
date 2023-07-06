@@ -850,7 +850,7 @@ class TJSDocumentCollection
    /**
     * Returns the UUID assigned to this store.
     *
-    * @returns {*} UUID
+    * @returns {string} UUID
     */
    get uuid() { return this.#uuid; }
 
@@ -1063,7 +1063,7 @@ class TJSDocumentCollection
  */
 class UIControl
 {
-   /** @type {TJSSettingsCustomSection[]} */
+   /** @type {import('./types').TJSSettingsCustomSection[]} */
    #sections = [];
 
    /** @type {import('./').TJSGameSettings} */
@@ -1104,7 +1104,7 @@ class UIControl
    }
 
    /**
-    * @returns {{showSettings: import('svelte/store').Readable<boolean>}} Returns the managed stores.
+    * @returns {{ showSettings: import('svelte/store').Readable<boolean> }} Returns the managed stores.
     */
    get stores()
    {
@@ -1125,7 +1125,7 @@ class UIControl
    /**
     * Adds a custom section / folder defined by the provided TJSSettingsCustomSection options object.
     *
-    * @param {TJSSettingsCustomSection} options - The configuration object for the custom section.
+    * @param {import('./types').TJSSettingsCustomSection} options - The configuration object for the custom section.
     */
    addSection(options)
    {
@@ -1190,9 +1190,9 @@ class UIControl
    /**
     * Creates the UISettingsData object by parsing stored settings in
     *
-    * @param {TJSSettingsCreateOptions} [options] - Optional parameters.
+    * @param {import('./types').TJSSettingsCreateOptions} [options] - Optional parameters.
     *
-    * @returns {TJSSettingsUIData} Parsed UI settings data.
+    * @returns {import('./types').TJSSettingsUIData} Parsed UI settings data.
     */
    create(options)
    {
@@ -1210,7 +1210,7 @@ class UIControl
     * when `settings` is created and current value. If there is a difference then show a modal dialog asking the user
     * if they want to reload for those settings to take effect.
     *
-    * @param {TJSSettingsUIData}   settings - The UI data object initiated w/ `create`.
+    * @param {import('./types').TJSSettingsUIData}   settings - The UI data object initiated w/ `create`.
     */
    #destroy(settings)
    {
@@ -1254,9 +1254,9 @@ class UIControl
    }
 
    /**
-    * @param {TJSSettingsCreateOptions} [options] - Optional parameters.
+    * @param {import('./types').TJSSettingsCreateOptions} [options] - Optional parameters.
     *
-    * @returns {TJSSettingsUIData} Parsed UI settings data.
+    * @returns {import('./types').TJSSettingsUIData} Parsed UI settings data.
     */
    #parseSettings({ efx = 'ripple', storage } = {})
    {
@@ -1501,51 +1501,6 @@ class UIControl
 }
 
 /**
- * @typedef {object} TJSSettingsCreateOptions
- *
- * @property {string} [efx=ripple] Defines the effects added to TJS components; ripple by default.
- *
- * @property {import('#runtime/svelte/store/web-storage').TJSWebStorage} [storage] - TRL TJSWebStorage (session)
- * instance to serialize folder state and scrollbar position.
- */
-
-/**
- * @typedef {object} TJSSettingsCustomSection
- *
- * @property {Function} class Svelte component constructor function for custom section.
- *
- * @property {Function} [props] Svelte component constructor function for custom section.
- *
- * @property {object} [styles] Inline styles for the section element.
- *
- * @property {string|TJSSettingsCustomSectionFolder} [folder] A folder label or TJSSettingsCustomSectionFolder object.
- */
-
-/**
- * @typedef {object} TJSSettingsCustomSectionFolder
- *
- * @property {string} label The folder label.
- *
- * @property {object} [summaryEnd] A Svelte component config object defining TJSSvgFolder summary end component.
- *
- * @property {object} [styles] Inline styles for the `TJSSvgFolder`; useful for setting CSS variables.
- */
-
-/**
- * @typedef {object} TJSSettingsUIData
- *
- * @property {{label: string, settings: object[]}[]} folders Sorted folders with associated settings and label.
- *
- * @property {object[]} topLevel Top level settings data.
- *
- * @property {object[]} sections Custom sections.
- *
- * @property {import('svelte/store').Writable<number>} storeScrollbar The store for `applyScrolltop`.
- *
- * @property {Function} [destroy] The bound destroy callback function for received of TJSSettingsUIData.
- */
-
-/**
  * Registers game settings and creates a backing Svelte store for each setting. The Svelte store will update the
  * Foundry game settings and vice versa when changes occur to the Foundry game settings the updated data is set to the
  * store.
@@ -1568,7 +1523,7 @@ class TJSGameSettings
     */
    #stores = new Map();
 
-   /** @type {UIControl} */
+   /** @type {import('./types').IUIControl} */
    #uiControl;
 
    /**
@@ -1599,6 +1554,7 @@ class TJSGameSettings
    /**
     * Provides an iterator / generator to return stored settings data.
     *
+    * @returns {IterableIterator<GameSettingData>} An iterator of all game setting data.
     * @yields {GameSettingData}
     */
    *[Symbol.iterator]()
@@ -1618,7 +1574,7 @@ class TJSGameSettings
    }
 
    /**
-    * @returns {UIControl} The associated UIControl.
+    * @returns {import('./types').IUIControl} The associated UIControl.
     */
    get uiControl()
    {
@@ -1651,7 +1607,7 @@ class TJSGameSettings
     *
     * @param {string}   key - Game setting key.
     *
-    * @returns {import('svelte/store').Readable|undefined} The associated store for the given game setting key.
+    * @returns {import('svelte/store').Readable | undefined} The associated store for the given game setting key.
     */
    getReadableStore(key)
    {
@@ -1671,7 +1627,7 @@ class TJSGameSettings
     *
     * @param {string}   key - Game setting key.
     *
-    * @returns {import('svelte/store').Writable|undefined} The associated store for the given game setting key.
+    * @returns {import('svelte/store').Writable | undefined} The associated store for the given game setting key.
     */
    getStore(key)
    {
@@ -1683,7 +1639,7 @@ class TJSGameSettings
     *
     * @param {string}   key - Game setting key.
     *
-    * @returns {import('svelte/store').Writable|undefined} The associated store for the given game setting key.
+    * @returns {import('svelte/store').Writable | undefined} The associated store for the given game setting key.
     */
    getWritableStore(key)
    {
@@ -2102,7 +2058,8 @@ class TJSLiveGameSettings
    /**
     * Returns an iterator / generator of all setting entries.
     *
-    * @yields {string}
+    * @returns {IterableIterator<[key: string, value: any]>} An iterator returning setting entries.
+    * @yields {[key: string, value: any]}
     */
    *entries()
    {
@@ -2117,6 +2074,7 @@ class TJSLiveGameSettings
    /**
     * Returns an iterator / generator of all setting keys.
     *
+    * @returns {IterableIterator<string>} An iterator returning setting keys.
     * @yields {string}
     */
    *keys()
@@ -2153,7 +2111,8 @@ class TJSLiveGameSettings
    /**
     * Returns an iterator / generator of all values.
     *
-    * @yields {*}
+    * @returns {IterableIterator<any>} An iterator returning setting values.
+    * @yields {any}
     */
    *values()
    {

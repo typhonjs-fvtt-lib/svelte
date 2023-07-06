@@ -17,7 +17,7 @@ import { localize }           from '#svelte-fvtt/helper';
  */
 export class UIControl
 {
-   /** @type {TJSSettingsCustomSection[]} */
+   /** @type {import('./types').TJSSettingsCustomSection[]} */
    #sections = [];
 
    /** @type {import('./').TJSGameSettings} */
@@ -58,7 +58,7 @@ export class UIControl
    }
 
    /**
-    * @returns {{showSettings: import('svelte/store').Readable<boolean>}} Returns the managed stores.
+    * @returns {{ showSettings: import('svelte/store').Readable<boolean> }} Returns the managed stores.
     */
    get stores()
    {
@@ -79,7 +79,7 @@ export class UIControl
    /**
     * Adds a custom section / folder defined by the provided TJSSettingsCustomSection options object.
     *
-    * @param {TJSSettingsCustomSection} options - The configuration object for the custom section.
+    * @param {import('./types').TJSSettingsCustomSection} options - The configuration object for the custom section.
     */
    addSection(options)
    {
@@ -144,9 +144,9 @@ export class UIControl
    /**
     * Creates the UISettingsData object by parsing stored settings in
     *
-    * @param {TJSSettingsCreateOptions} [options] - Optional parameters.
+    * @param {import('./types').TJSSettingsCreateOptions} [options] - Optional parameters.
     *
-    * @returns {TJSSettingsUIData} Parsed UI settings data.
+    * @returns {import('./types').TJSSettingsUIData} Parsed UI settings data.
     */
    create(options)
    {
@@ -164,7 +164,7 @@ export class UIControl
     * when `settings` is created and current value. If there is a difference then show a modal dialog asking the user
     * if they want to reload for those settings to take effect.
     *
-    * @param {TJSSettingsUIData}   settings - The UI data object initiated w/ `create`.
+    * @param {import('./types').TJSSettingsUIData}   settings - The UI data object initiated w/ `create`.
     */
    #destroy(settings)
    {
@@ -208,9 +208,9 @@ export class UIControl
    }
 
    /**
-    * @param {TJSSettingsCreateOptions} [options] - Optional parameters.
+    * @param {import('./types').TJSSettingsCreateOptions} [options] - Optional parameters.
     *
-    * @returns {TJSSettingsUIData} Parsed UI settings data.
+    * @returns {import('./types').TJSSettingsUIData} Parsed UI settings data.
     */
    #parseSettings({ efx = 'ripple', storage } = {})
    {
@@ -453,48 +453,3 @@ export class UIControl
       return this.#showSettings;
    }
 }
-
-/**
- * @typedef {object} TJSSettingsCreateOptions
- *
- * @property {string} [efx=ripple] Defines the effects added to TJS components; ripple by default.
- *
- * @property {import('#runtime/svelte/store/web-storage').TJSWebStorage} [storage] - TRL TJSWebStorage (session)
- * instance to serialize folder state and scrollbar position.
- */
-
-/**
- * @typedef {object} TJSSettingsCustomSection
- *
- * @property {Function} class Svelte component constructor function for custom section.
- *
- * @property {Function} [props] Svelte component constructor function for custom section.
- *
- * @property {object} [styles] Inline styles for the section element.
- *
- * @property {string|TJSSettingsCustomSectionFolder} [folder] A folder label or TJSSettingsCustomSectionFolder object.
- */
-
-/**
- * @typedef {object} TJSSettingsCustomSectionFolder
- *
- * @property {string} label The folder label.
- *
- * @property {object} [summaryEnd] A Svelte component config object defining TJSSvgFolder summary end component.
- *
- * @property {object} [styles] Inline styles for the `TJSSvgFolder`; useful for setting CSS variables.
- */
-
-/**
- * @typedef {object} TJSSettingsUIData
- *
- * @property {{label: string, settings: object[]}[]} folders Sorted folders with associated settings and label.
- *
- * @property {object[]} topLevel Top level settings data.
- *
- * @property {object[]} sections Custom sections.
- *
- * @property {import('svelte/store').Writable<number>} storeScrollbar The store for `applyScrolltop`.
- *
- * @property {Function} [destroy] The bound destroy callback function for received of TJSSettingsUIData.
- */

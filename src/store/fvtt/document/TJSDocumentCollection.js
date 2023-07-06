@@ -62,7 +62,7 @@ export class TJSDocumentCollection
    /**
     * Returns the UUID assigned to this store.
     *
-    * @returns {*} UUID
+    * @returns {string} UUID
     */
    get uuid() { return this.#uuid; }
 

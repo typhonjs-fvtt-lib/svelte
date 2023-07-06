@@ -1,8 +1,9 @@
 
 
 import * as svelte_store from 'svelte/store';
+import { Readable, Writable } from 'svelte/store';
 import { DynOptionsMapCreate, DynMapReducer } from '@typhonjs-svelte/runtime-base/svelte/store/reducer';
-import * as _runtime_svelte_store_web_storage from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
+import { TJSWebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 
 /**
  * Provides the public embedded reactive collection API.
@@ -191,9 +192,9 @@ declare class TJSDocumentCollection<T = DocumentCollection> {
     /**
      * Returns the UUID assigned to this store.
      *
-     * @returns {*} UUID
+     * @returns {string} UUID
      */
-    get uuid(): any;
+    get uuid(): string;
     /**
      * Completely removes all internal subscribers, any optional delete callback, and unregisters from the
      * DocumentCollection `apps` tracking array.
@@ -263,27 +264,23 @@ type TJSDocumentCollectionUpdateOptions<T> = {
  * for UI display by TJSSettingsEdit. The store `showSettings` is utilized in TJSSettingsSwap component to provide
  * an easy way to flip between settings component or any main slotted component.
  */
-declare class UIControl {
+interface IUIControl {
     /**
-     * @param {import('./').TJSGameSettings}   settings -
+     * @returns {{showSettings: Readable<boolean>}} Returns the managed stores.
      */
-    constructor(settings: TJSGameSettings);
-    /**
-     * Sets current `showSettings` state.
-     *
-     * @param {boolean}  showSettings - New `showSettings` state.
-     */
-    set showSettings(arg: boolean);
+    get stores(): {
+        showSettings: Readable<boolean>;
+    };
     /**
      * @returns {boolean} Current `showSettings` state.
      */
     get showSettings(): boolean;
     /**
-     * @returns {{showSettings: import('svelte/store').Readable<boolean>}} Returns the managed stores.
+     * Sets current `showSettings` state.
+     *
+     * @param {boolean}  showSettings - New `showSettings` state.
      */
-    get stores(): {
-        showSettings: svelte_store.Readable<boolean>;
-    };
+    set showSettings(showSettings: boolean);
     /**
      * Adds a custom section / folder defined by the provided TJSSettingsCustomSection options object.
      *
@@ -304,7 +301,6 @@ declare class UIControl {
      * @returns {boolean} New `showSettings` state.
      */
     swapShowSettings(): boolean;
-    #private;
 }
 type TJSSettingsCreateOptions = {
     /**
@@ -312,10 +308,9 @@ type TJSSettingsCreateOptions = {
      */
     efx?: string;
     /**
-     * - TRL TJSWebStorage (session)
-     * instance to serialize folder state and scrollbar position.
+     * TRL TJSWebStorage (session) instance to serialize folder state and scrollbar position.
      */
-    storage?: _runtime_svelte_store_web_storage.TJSWebStorage;
+    storage?: TJSWebStorage;
 };
 type TJSSettingsCustomSection = {
     /**
@@ -368,7 +363,7 @@ type TJSSettingsUIData = {
     /**
      * The store for `applyScrolltop`.
      */
-    storeScrollbar: svelte_store.Writable<number>;
+    storeScrollbar: Writable<number>;
     /**
      * The bound destroy callback function for received of TJSSettingsUIData.
      */
@@ -397,15 +392,15 @@ declare class TJSGameSettings {
      */
     get namespace(): string;
     /**
-     * @returns {UIControl} The associated UIControl.
+     * @returns {import('./types').IUIControl} The associated UIControl.
      */
-    get uiControl(): UIControl;
+    get uiControl(): IUIControl;
     /**
      * Returns a readable Game Settings store for the associated key.
      *
      * @param {string}   key - Game setting key.
      *
-     * @returns {import('svelte/store').Readable|undefined} The associated store for the given game setting key.
+     * @returns {import('svelte/store').Readable | undefined} The associated store for the given game setting key.
      */
     getReadableStore(key: string): svelte_store.Readable<any> | undefined;
     /**
@@ -413,7 +408,7 @@ declare class TJSGameSettings {
      *
      * @param {string}   key - Game setting key.
      *
-     * @returns {import('svelte/store').Writable|undefined} The associated store for the given game setting key.
+     * @returns {import('svelte/store').Writable | undefined} The associated store for the given game setting key.
      */
     getStore(key: string): svelte_store.Writable<any> | undefined;
     /**
@@ -421,7 +416,7 @@ declare class TJSGameSettings {
      *
      * @param {string}   key - Game setting key.
      *
-     * @returns {import('svelte/store').Writable|undefined} The associated store for the given game setting key.
+     * @returns {import('svelte/store').Writable | undefined} The associated store for the given game setting key.
      */
     getWritableStore(key: string): svelte_store.Writable<any> | undefined;
     /**
@@ -465,9 +460,10 @@ declare class TJSGameSettings {
     /**
      * Provides an iterator / generator to return stored settings data.
      *
+     * @returns {IterableIterator<GameSettingData>} An iterator of all game setting data.
      * @yields {GameSettingData}
      */
-    [Symbol.iterator](): Generator<GameSettingOptions, void, unknown>;
+    [Symbol.iterator](): IterableIterator<GameSettingData>;
     #private;
 }
 type GameSettingOptions = {
@@ -591,15 +587,17 @@ declare class TJSLiveGameSettings {
     /**
      * Returns an iterator / generator of all setting entries.
      *
-     * @yields {string}
+     * @returns {IterableIterator<[key: string, value: any]>} An iterator returning setting entries.
+     * @yields {[key: string, value: any]}
      */
-    entries(): Generator<any[], void, unknown>;
+    entries(): IterableIterator<[key: string, value: any]>;
     /**
      * Returns an iterator / generator of all setting keys.
      *
+     * @returns {IterableIterator<string>} An iterator returning setting keys.
      * @yields {string}
      */
-    keys(): Generator<string, void, unknown>;
+    keys(): IterableIterator<string>;
     /**
      * Returns a string / JSON stringify of the current setting data.
      *
@@ -617,9 +615,10 @@ declare class TJSLiveGameSettings {
     /**
      * Returns an iterator / generator of all values.
      *
-     * @yields {*}
+     * @returns {IterableIterator<any>} An iterator returning setting values.
+     * @yields {any}
      */
-    values(): Generator<any, void, unknown>;
+    values(): IterableIterator<any>;
     /**
      * @param {(value: TJSLiveGameSettings, key?: string) => void} handler - Callback function that is invoked on
      * update / changes.
@@ -637,4 +636,4 @@ declare class TJSLiveGameSettings {
  */
 declare const gameState: svelte_store.Readable<globalThis.game>;
 
-export { EmbeddedAPI, GameSetting, GameSettingData, GameSettingOptions, NamedDocumentConstructor, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentCollectionUpdateOptions, TJSDocumentOptions, TJSDocumentUpdateOptions, TJSGameSettings, TJSLiveGameSettings, gameState };
+export { EmbeddedAPI, GameSetting, GameSettingData, GameSettingOptions, IUIControl, NamedDocumentConstructor, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentCollectionUpdateOptions, TJSDocumentOptions, TJSDocumentUpdateOptions, TJSGameSettings, TJSLiveGameSettings, TJSSettingsCreateOptions, TJSSettingsCustomSection, TJSSettingsCustomSectionFolder, TJSSettingsUIData, gameState };
