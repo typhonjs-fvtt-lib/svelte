@@ -58,7 +58,7 @@ declare class SvelteApplication {
     /**
      * Provides a mechanism to update the UI options store for maximized.
      *
-     * Note: the sanity check is duplicated from {@link Application.maximize} the store is updated _before_
+     * Note: the sanity check is duplicated from {@link globalThis.Application.maximize} the store is updated _before_
      * performing the rest of animations. This allows application shells to remove / show any resize handlers
      * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
      * to animate the content area.
@@ -76,7 +76,7 @@ declare class SvelteApplication {
     /**
      * Provides a mechanism to update the UI options store for minimized.
      *
-     * Note: the sanity check is duplicated from {@link Application.minimize} the store is updated _before_
+     * Note: the sanity check is duplicated from {@link globalThis.Application.minimize} the store is updated _before_
      * performing the rest of animations. This allows application shells to remove / show any resize handlers
      * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
      * to animate the content area.
@@ -821,7 +821,7 @@ declare class SvelteFormApplication {
     /**
      * Provides a mechanism to update the UI options store for maximized.
      *
-     * Note: the sanity check is duplicated from {@link Application.maximize} the store is updated _before_
+     * Note: the sanity check is duplicated from {@link globalThis.Application.maximize} the store is updated _before_
      * performing the rest of animations. This allows application shells to remove / show any resize handlers
      * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
      * to animate the content area.
@@ -839,7 +839,7 @@ declare class SvelteFormApplication {
     /**
      * Provides a mechanism to update the UI options store for minimized.
      *
-     * Note: the sanity check is duplicated from {@link Application.minimize} the store is updated _before_
+     * Note: the sanity check is duplicated from {@link globalThis.Application.minimize} the store is updated _before_
      * performing the rest of animations. This allows application shells to remove / show any resize handlers
      * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
      * to animate the content area.
