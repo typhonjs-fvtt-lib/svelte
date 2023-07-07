@@ -1,7 +1,7 @@
 import * as _typhonjs_fvtt_svelte_application from '@typhonjs-fvtt/svelte/application';
 import { SvelteApplication as SvelteApplication$1 } from '@typhonjs-fvtt/svelte/application';
 import * as _typhonjs_svelte_runtime_base_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
-import { TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
+import { TJSPositionDataExtended, TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import * as svelte from 'svelte';
 import * as svelte_store from 'svelte/store';
 import { TJSWebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
@@ -20,141 +20,93 @@ declare class HandlebarsApplication extends SvelteApplication$1 {
 }
 
 /**
- * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
- * load one or more components from `defaultOptions`.
+ * Provides a helper class for {@link SvelteApplication} by combining all methods that work on the {@link SvelteData}
+ * of mounted components. This class is instantiated and can be retrieved by the getter `svelte` via SvelteApplication.
  */
-declare class SvelteApplication {
+declare class GetSvelteData {
     /**
-     * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} options - The options for the application.
+     * Keep a direct reference to the SvelteData array in an associated {@link SvelteApplication}.
      *
-     * @inheritDoc
+     * @param {import('@typhonjs-fvtt/svelte/application').MountedAppShell[] | null[]}  applicationShellHolder - A reference to
+     *        the MountedAppShell array.
+     *
+     * @param {import('@typhonjs-fvtt/svelte/application').SvelteData[]}  svelteData - A reference to the SvelteData array of
+     *        mounted components.
      */
-    constructor(options?: _typhonjs_fvtt_svelte_application.SvelteApplicationOptions);
+    constructor(applicationShellHolder: _typhonjs_fvtt_svelte_application.MountedAppShell[] | null[], svelteData: _typhonjs_fvtt_svelte_application.SvelteData[]);
     /**
-     * Returns the content element if an application shell is mounted.
+     * Returns any mounted {@link MountedAppShell}.
      *
-     * @returns {HTMLElement} Content element.
+     * @returns {import('@typhonjs-fvtt/svelte/application').MountedAppShell | null} Any mounted application shell.
      */
-    get elementContent(): HTMLElement;
+    get applicationShell(): _typhonjs_fvtt_svelte_application.MountedAppShell;
     /**
-     * Returns the target element or main element if no target defined.
+     * Returns the indexed Svelte component.
      *
-     * @returns {HTMLElement} Target element.
+     * @param {number}   index -
+     *
+     * @returns {object} The loaded Svelte component.
      */
-    get elementTarget(): HTMLElement;
+    component(index: number): object;
     /**
-     * Returns the reactive accessors & Svelte stores for SvelteApplication.
+     * Returns the Svelte component entries iterator.
      *
-     * @returns {SvelteReactive} The reactive accessors & Svelte stores.
+     * @returns {Generator<Array<number|import('svelte').SvelteComponent>>} Svelte component entries iterator.
+     * @yields
      */
-    get reactive(): SvelteReactive;
+    componentEntries(): Generator<Array<number | svelte.SvelteComponent>>;
     /**
-     * Returns the application state manager.
+     * Returns the Svelte component values iterator.
      *
-     * @returns {ApplicationState} The application state manager.
+     * @returns {Generator<import('svelte').SvelteComponent>} Svelte component values iterator.
+     * @yields
      */
-    get state(): ApplicationState;
+    componentValues(): Generator<svelte.SvelteComponent>;
     /**
-     * Returns the Svelte helper class w/ various methods to access mounted Svelte components.
+     * Returns the indexed SvelteData entry.
      *
-     * @returns {GetSvelteData} GetSvelteData
+     * @param {number}   index -
+     *
+     * @returns {import('@typhonjs-fvtt/svelte/application').SvelteData} The loaded Svelte config + component.
      */
-    get svelte(): GetSvelteData;
+    data(index: number): _typhonjs_fvtt_svelte_application.SvelteData;
     /**
-     * Provides a mechanism to update the UI options store for maximized.
+     * Returns the {@link SvelteData} instance for a given component.
      *
-     * Note: the sanity check is duplicated from {@link Application.maximize} the store is updated _before_
-     * performing the rest of animations. This allows application shells to remove / show any resize handlers
-     * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
-     * to animate the content area.
+     * @param {object} component - Svelte component.
      *
-     * @param {object}   [opts] - Optional parameters.
-     *
-     * @param {boolean}  [opts.animate=true] - When true perform default maximizing animation.
-     *
-     * @param {number}   [opts.duration=0.1] - Controls content area animation duration in seconds.
+     * @returns {import('@typhonjs-fvtt/svelte/application').SvelteData} -  The loaded Svelte config + component.
      */
-    maximize({ animate, duration }?: {
-        animate?: boolean;
-        duration?: number;
-    }): Promise<void>;
+    dataByComponent(component: object): _typhonjs_fvtt_svelte_application.SvelteData;
     /**
-     * Provides a mechanism to update the UI options store for minimized.
+     * Returns the SvelteData entries iterator.
      *
-     * Note: the sanity check is duplicated from {@link Application.minimize} the store is updated _before_
-     * performing the rest of animations. This allows application shells to remove / show any resize handlers
-     * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
-     * to animate the content area.
-     *
-     * @param {object}   [opts] - Optional parameters
-     *
-     * @param {boolean}  [opts.animate=true] - When true perform default minimizing animation.
-     *
-     * @param {number}   [opts.duration=0.1] - Controls content area animation duration in seconds.
+     * @returns {IterableIterator<[number, import('@typhonjs-fvtt/svelte/application').SvelteData]>} SvelteData entries iterator.
      */
-    minimize({ animate, duration }?: {
-        animate?: boolean;
-        duration?: number;
-    }): Promise<void>;
+    dataEntries(): IterableIterator<[number, _typhonjs_fvtt_svelte_application.SvelteData]>;
     /**
-     * Provides a callback after all Svelte components are initialized.
+     * Returns the SvelteData values iterator.
      *
-     * @param {object}      [opts] - Optional parameters.
-     *
-     * @param {HTMLElement} [opts.element] - HTMLElement container for main application element.
-     *
-     * @param {HTMLElement} [opts.elementContent] - HTMLElement container for content area of application shells.
-     *
-     * @param {HTMLElement} [opts.elementTarget] - HTMLElement container for main application target element.
+     * @returns {IterableIterator<import('@typhonjs-fvtt/svelte/application').SvelteData>} SvelteData values iterator.
      */
-    onSvelteMount({ element, elementContent, elementTarget }?: {
-        element?: HTMLElement;
-        elementContent?: HTMLElement;
-        elementTarget?: HTMLElement;
-    }): void;
+    dataValues(): IterableIterator<_typhonjs_fvtt_svelte_application.SvelteData>;
     /**
-     * Provides a callback after the main application shell is remounted. This may occur during HMR / hot module
-     * replacement or directly invoked from the `elementRootUpdate` callback passed to the application shell component
-     * context.
+     * Returns the length of the mounted Svelte component list.
      *
-     * @param {object}      [opts] - Optional parameters.
-     *
-     * @param {HTMLElement} [opts.element] - HTMLElement container for main application element.
-     *
-     * @param {HTMLElement} [opts.elementContent] - HTMLElement container for content area of application shells.
-     *
-     * @param {HTMLElement} [opts.elementTarget] - HTMLElement container for main application target element.
+     * @returns {number} Length of mounted Svelte component list.
      */
-    onSvelteRemount({ element, elementContent, elementTarget }?: {
-        element?: HTMLElement;
-        elementContent?: HTMLElement;
-        elementTarget?: HTMLElement;
-    }): void;
-    /**
-     * All calculation and updates of position are implemented in {@link TJSPosition.set}. This allows position to be fully
-     * reactive and in control of updating inline styles for the application.
-     *
-     * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
-     * to update to using the {@link TJSPosition.validators} functionality.
-     *
-     * @param {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
-     *
-     * @returns {TJSPosition} The updated position object for the application containing the new values
-     */
-    setPosition(position?: _typhonjs_svelte_runtime_base_svelte_store_position.TJSPositionDataExtended): TJSPosition;
+    get length(): number;
     #private;
 }
 
 /**
+ * @template T
+ *
  * Provides the ability the save / restore application state for positional and UI state such as minimized status.
  *
  * You can restore a saved state with animation; please see the options of {@link ApplicationState.restore}.
  */
-declare class ApplicationState {
-    /**
-     * @param {import('../SvelteApplication').SvelteApplication}   application - The application.
-     */
-    constructor(application: SvelteApplication);
+declare interface ApplicationState<T> {
     /**
      * Returns current application state along with any extra data passed into method.
      *
@@ -246,8 +198,6 @@ declare class ApplicationState {
      * Note: If serializing application state any minimized apps will use the before minimized state on initial render
      * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
      *
-     * TODO: THIS METHOD NEEDS TO BE REFACTORED WHEN TRL IS MADE INTO A STANDALONE FRAMEWORK.
-     *
      * @param {ApplicationStateData}   data - Saved data set name.
      *
      * @param {object}            [opts] - Optional parameters
@@ -272,14 +222,13 @@ declare class ApplicationState {
         duration?: number;
         ease?: Function;
         interpolate?: Function;
-    }): (SvelteApplication | Promise<SvelteApplication>);
-    #private;
+    }): (T | Promise<T>);
 }
 type ApplicationStateData = {
     /**
      * Application position.
      */
-    position: _typhonjs_svelte_runtime_base_svelte_store_position.TJSPositionDataExtended;
+    position: TJSPositionDataExtended;
     /**
      * Any application saved position state for #beforeMinimized
      */
@@ -295,82 +244,128 @@ type ApplicationStateData = {
 };
 
 /**
- * Provides a helper class for {@link SvelteApplication} by combining all methods that work on the {@link SvelteData}
- * of mounted components. This class is instantiated and can be retrieved by the getter `svelte` via SvelteApplication.
+ * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
+ * load one or more components from `defaultOptions`.
  */
-declare class GetSvelteData {
+declare class SvelteApplication {
     /**
-     * Keep a direct reference to the SvelteData array in an associated {@link SvelteApplication}.
+     * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} options - The options for the application.
      *
-     * @param {import('@typhonjs-fvtt/svelte/application').MountedAppShell[] | null[]}  applicationShellHolder - A reference to
-     *        the MountedAppShell array.
-     *
-     * @param {import('@typhonjs-fvtt/svelte/application').SvelteData[]}  svelteData - A reference to the SvelteData array of
-     *        mounted components.
+     * @inheritDoc
      */
-    constructor(applicationShellHolder: _typhonjs_fvtt_svelte_application.MountedAppShell[] | null[], svelteData: _typhonjs_fvtt_svelte_application.SvelteData[]);
+    constructor(options?: _typhonjs_fvtt_svelte_application.SvelteApplicationOptions);
     /**
-     * Returns any mounted {@link MountedAppShell}.
+     * Returns the content element if an application shell is mounted.
      *
-     * @returns {import('@typhonjs-fvtt/svelte/application').MountedAppShell | null} Any mounted application shell.
+     * @returns {HTMLElement} Content element.
      */
-    get applicationShell(): _typhonjs_fvtt_svelte_application.MountedAppShell;
+    get elementContent(): HTMLElement;
     /**
-     * Returns the indexed Svelte component.
+     * Returns the target element or main element if no target defined.
      *
-     * @param {number}   index -
-     *
-     * @returns {object} The loaded Svelte component.
+     * @returns {HTMLElement} Target element.
      */
-    component(index: number): object;
+    get elementTarget(): HTMLElement;
     /**
-     * Returns the Svelte component entries iterator.
+     * Returns the reactive accessors & Svelte stores for SvelteApplication.
      *
-     * @returns {Generator<Array<number|import('svelte').SvelteComponent>>} Svelte component entries iterator.
-     * @yields
+     * @returns {SvelteReactive} The reactive accessors & Svelte stores.
      */
-    componentEntries(): Generator<Array<number | svelte.SvelteComponent>>;
+    get reactive(): SvelteReactive;
     /**
-     * Returns the Svelte component values iterator.
+     * Returns the application state manager.
      *
-     * @returns {Generator<import('svelte').SvelteComponent>} Svelte component values iterator.
-     * @yields
+     * @returns {import('./internal/state-app/types').ApplicationState<SvelteApplication>} The application state manager.
      */
-    componentValues(): Generator<svelte.SvelteComponent>;
+    get state(): ApplicationState<SvelteApplication>;
     /**
-     * Returns the indexed SvelteData entry.
+     * Returns the Svelte helper class w/ various methods to access mounted Svelte components.
      *
-     * @param {number}   index -
-     *
-     * @returns {import('@typhonjs-fvtt/svelte/application').SvelteData} The loaded Svelte config + component.
+     * @returns {GetSvelteData} GetSvelteData
      */
-    data(index: number): _typhonjs_fvtt_svelte_application.SvelteData;
+    get svelte(): GetSvelteData;
     /**
-     * Returns the {@link SvelteData} instance for a given component.
+     * Provides a mechanism to update the UI options store for maximized.
      *
-     * @param {object} component - Svelte component.
+     * Note: the sanity check is duplicated from {@link Application.maximize} the store is updated _before_
+     * performing the rest of animations. This allows application shells to remove / show any resize handlers
+     * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
+     * to animate the content area.
      *
-     * @returns {import('@typhonjs-fvtt/svelte/application').SvelteData} -  The loaded Svelte config + component.
+     * @param {object}   [opts] - Optional parameters.
+     *
+     * @param {boolean}  [opts.animate=true] - When true perform default maximizing animation.
+     *
+     * @param {number}   [opts.duration=0.1] - Controls content area animation duration in seconds.
      */
-    dataByComponent(component: object): _typhonjs_fvtt_svelte_application.SvelteData;
+    maximize({ animate, duration }?: {
+        animate?: boolean;
+        duration?: number;
+    }): Promise<void>;
     /**
-     * Returns the SvelteData entries iterator.
+     * Provides a mechanism to update the UI options store for minimized.
      *
-     * @returns {IterableIterator<[number, import('@typhonjs-fvtt/svelte/application').SvelteData]>} SvelteData entries iterator.
+     * Note: the sanity check is duplicated from {@link Application.minimize} the store is updated _before_
+     * performing the rest of animations. This allows application shells to remove / show any resize handlers
+     * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
+     * to animate the content area.
+     *
+     * @param {object}   [opts] - Optional parameters
+     *
+     * @param {boolean}  [opts.animate=true] - When true perform default minimizing animation.
+     *
+     * @param {number}   [opts.duration=0.1] - Controls content area animation duration in seconds.
      */
-    dataEntries(): IterableIterator<[number, _typhonjs_fvtt_svelte_application.SvelteData]>;
+    minimize({ animate, duration }?: {
+        animate?: boolean;
+        duration?: number;
+    }): Promise<void>;
     /**
-     * Returns the SvelteData values iterator.
+     * Provides a callback after all Svelte components are initialized.
      *
-     * @returns {IterableIterator<import('@typhonjs-fvtt/svelte/application').SvelteData>} SvelteData values iterator.
+     * @param {object}      [opts] - Optional parameters.
+     *
+     * @param {HTMLElement} [opts.element] - HTMLElement container for main application element.
+     *
+     * @param {HTMLElement} [opts.elementContent] - HTMLElement container for content area of application shells.
+     *
+     * @param {HTMLElement} [opts.elementTarget] - HTMLElement container for main application target element.
      */
-    dataValues(): IterableIterator<_typhonjs_fvtt_svelte_application.SvelteData>;
+    onSvelteMount({ element, elementContent, elementTarget }?: {
+        element?: HTMLElement;
+        elementContent?: HTMLElement;
+        elementTarget?: HTMLElement;
+    }): void;
     /**
-     * Returns the length of the mounted Svelte component list.
+     * Provides a callback after the main application shell is remounted. This may occur during HMR / hot module
+     * replacement or directly invoked from the `elementRootUpdate` callback passed to the application shell component
+     * context.
      *
-     * @returns {number} Length of mounted Svelte component list.
+     * @param {object}      [opts] - Optional parameters.
+     *
+     * @param {HTMLElement} [opts.element] - HTMLElement container for main application element.
+     *
+     * @param {HTMLElement} [opts.elementContent] - HTMLElement container for content area of application shells.
+     *
+     * @param {HTMLElement} [opts.elementTarget] - HTMLElement container for main application target element.
      */
-    get length(): number;
+    onSvelteRemount({ element, elementContent, elementTarget }?: {
+        element?: HTMLElement;
+        elementContent?: HTMLElement;
+        elementTarget?: HTMLElement;
+    }): void;
+    /**
+     * All calculation and updates of position are implemented in {@link TJSPosition.set}. This allows position to be fully
+     * reactive and in control of updating inline styles for the application.
+     *
+     * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
+     * to update to using the {@link TJSPosition.validators} functionality.
+     *
+     * @param {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
+     *
+     * @returns {TJSPosition} The updated position object for the application containing the new values
+     */
+    setPosition(position?: _typhonjs_svelte_runtime_base_svelte_store_position.TJSPositionDataExtended): TJSPosition;
     #private;
 }
 
@@ -836,9 +831,10 @@ declare class SvelteFormApplication {
     /**
      * Returns the application state manager.
      *
-     * @returns {ApplicationState} The application state manager.
+     * @returns {import('@typhonjs-fvtt/svelte/application').ApplicationState<SvelteFormApplication>} The application state
+     *          manager.
      */
-    get state(): ApplicationState;
+    get state(): _typhonjs_fvtt_svelte_application.ApplicationState<SvelteFormApplication>;
     /**
      * Returns the Svelte helper class w/ various methods to access mounted Svelte components.
      *

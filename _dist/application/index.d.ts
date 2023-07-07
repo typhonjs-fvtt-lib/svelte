@@ -3,22 +3,20 @@ import * as _typhonjs_svelte_runtime_base_svelte_util from '@typhonjs-svelte/run
 import * as _typhonjs_svelte_runtime_base_svelte_store_web_storage from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import { TJSWebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import * as _typhonjs_svelte_runtime_base_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
-import { TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
+import { TJSPositionDataExtended, TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import * as _typhonjs_svelte_runtime_base_util_browser from '@typhonjs-svelte/runtime-base/util/browser';
 import * as _typhonjs_fvtt_svelte_application from '@typhonjs-fvtt/svelte/application';
 import * as svelte_store from 'svelte/store';
 import { ManagedPromise } from '@typhonjs-svelte/runtime-base/util/async';
 
 /**
+ * @template T
+ *
  * Provides the ability the save / restore application state for positional and UI state such as minimized status.
  *
  * You can restore a saved state with animation; please see the options of {@link ApplicationState.restore}.
  */
-declare class ApplicationState {
-    /**
-     * @param {import('../SvelteApplication').SvelteApplication}   application - The application.
-     */
-    constructor(application: SvelteApplication);
+declare interface ApplicationState<T> {
     /**
      * Returns current application state along with any extra data passed into method.
      *
@@ -110,8 +108,6 @@ declare class ApplicationState {
      * Note: If serializing application state any minimized apps will use the before minimized state on initial render
      * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
      *
-     * TODO: THIS METHOD NEEDS TO BE REFACTORED WHEN TRL IS MADE INTO A STANDALONE FRAMEWORK.
-     *
      * @param {ApplicationStateData}   data - Saved data set name.
      *
      * @param {object}            [opts] - Optional parameters
@@ -136,14 +132,13 @@ declare class ApplicationState {
         duration?: number;
         ease?: Function;
         interpolate?: Function;
-    }): (SvelteApplication | Promise<SvelteApplication>);
-    #private;
+    }): (T | Promise<T>);
 }
 type ApplicationStateData = {
     /**
      * Application position.
      */
-    position: _typhonjs_svelte_runtime_base_svelte_store_position.TJSPositionDataExtended;
+    position: TJSPositionDataExtended;
     /**
      * Any application saved position state for #beforeMinimized
      */
@@ -699,9 +694,9 @@ declare class SvelteApplication {
     /**
      * Returns the application state manager.
      *
-     * @returns {ApplicationState} The application state manager.
+     * @returns {import('./internal/state-app/types').ApplicationState<SvelteApplication>} The application state manager.
      */
-    get state(): ApplicationState;
+    get state(): ApplicationState<SvelteApplication>;
     /**
      * Returns the Svelte helper class w/ various methods to access mounted Svelte components.
      *
@@ -1363,4 +1358,4 @@ type TJSDialogButtonData = {
     styles?: Record<string, string>;
 };
 
-export { MountedAppShell, SvelteApplication, SvelteApplicationOptions, SvelteData, TJSDialog, TJSDialogButtonData, TJSDialogOptions };
+export { ApplicationState, ApplicationStateData, MountedAppShell, SvelteApplication, SvelteApplicationOptions, SvelteData, TJSDialog, TJSDialogButtonData, TJSDialogOptions };

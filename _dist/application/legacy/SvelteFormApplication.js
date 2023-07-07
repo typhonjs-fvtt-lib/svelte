@@ -37,7 +37,7 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Stores and manages application state for saving / restoring / serializing.
     *
-    * @type {ApplicationState}
+    * @type {ApplicationState<SvelteFormApplication>}
     */
    #applicationState;
 
@@ -112,6 +112,7 @@ export class SvelteFormApplication extends FormApplication
    {
       super(object, options);
 
+      /** @type {ApplicationState<SvelteFormApplication>} */
       this.#applicationState = new ApplicationState(this);
 
       // Initialize TJSPosition with the position object set by Application.
@@ -200,7 +201,8 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Returns the application state manager.
     *
-    * @returns {ApplicationState} The application state manager.
+    * @returns {import('@typhonjs-fvtt/svelte/application').ApplicationState<SvelteFormApplication>} The application state
+    *          manager.
     */
    get state() { return this.#applicationState; }
 

@@ -1,23 +1,25 @@
-import { linear }             from 'svelte/easing';
+import { linear }             from '#svelte/easing';
 
-import { lerp }               from '@typhonjs-svelte/runtime-base/math/interpolate';
-import { isObject }           from '@typhonjs-svelte/runtime-base/util/object';
+import { lerp }               from '#runtime/math/interpolate';
+import { isObject }           from '#runtime/util/object';
 
 /**
+ * @template T
+ *
  * Provides the ability the save / restore application state for positional and UI state such as minimized status.
  *
  * You can restore a saved state with animation; please see the options of {@link ApplicationState.restore}.
  */
 export class ApplicationState
 {
-   /** @type {import('../SvelteApplication').SvelteApplication} */
+   /** @type {T} */
    #application;
 
    /** @type {Map<string, ApplicationStateData>} */
    #dataSaved = new Map();
 
    /**
-    * @param {import('../SvelteApplication').SvelteApplication}   application - The application.
+    * @param {T}   application - The application.
     */
    constructor(application)
    {
@@ -181,9 +183,7 @@ export class ApplicationState
     *
     * @param {Function}          [opts.interpolate=lerp] - Interpolation function.
     *
-    * @returns {(import('../SvelteApplication').SvelteApplication |
-    *    Promise<import('../SvelteApplication').SvelteApplication>)} When synchronous the application or Promise when
-    *    animating resolving with application.
+    * @returns {T | Promise<T>} When synchronous the application or Promise when animating resolving with application.
     */
    set(data, { async = false, animateTo = false, duration = 0.1, ease = linear, interpolate = lerp } = {})
    {
@@ -328,7 +328,7 @@ export class ApplicationState
 /**
  * @typedef {object} ApplicationStateData
  *
- * @property {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionDataExtended}   position Application position.
+ * @property {import('#runtime/svelte/store/position').TJSPositionDataExtended}   position Application position.
  *
  * @property {object}         beforeMinimized Any application saved position state for #beforeMinimized
  *
