@@ -28,7 +28,7 @@ export class SvelteApplication extends Application
    /**
     * Stores the first mounted component which follows the application shell contract.
     *
-    * @type {import('@typhonjs-fvtt/svelte/application').MountedAppShell[]|null[]} Application shell.
+    * @type {import('./internal/state-svelte/types').MountedAppShell[]|null[]} Application shell.
     */
    #applicationShellHolder = [null];
 
@@ -84,13 +84,13 @@ export class SvelteApplication extends Application
    /**
     * Stores SvelteData entries with instantiated Svelte components.
     *
-    * @type {import('@typhonjs-fvtt/svelte/application').SvelteData[]}
+    * @type {import('./internal/state-svelte/types').SvelteData[]}
     */
    #svelteData = [];
 
    /**
     * Provides a helper class that combines multiple methods for interacting with the mounted components tracked in
-    * {@link SvelteData}.
+    * #svelteData.
     *
     * @type {GetSvelteData}
     */
@@ -208,7 +208,7 @@ export class SvelteApplication extends Application
    /**
     * Returns the Svelte helper class w/ various methods to access mounted Svelte components.
     *
-    * @returns {GetSvelteData} GetSvelteData
+    * @returns {import('./internal/state-svelte/types').GetSvelteData} GetSvelteData
     */
    get svelte() { return this.#getSvelteData; }
 

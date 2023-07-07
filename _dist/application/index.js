@@ -74,16 +74,6 @@ Hooks.on('PopOut:close', (app) =>
 // From: SvelteApplication.js ----------------------------------------------------------------------------------------
 
 /**
- * @typedef {object} MountedAppShell Application shell contract for Svelte components.
- *
- * @property {HTMLElement} elementRoot The root element / exported prop.
- *
- * @property {HTMLElement} [elementContent] The content element / exported prop.
- *
- * @property {HTMLElement} [elementTarget] The target element / exported prop.
- */
-
-/**
  * @typedef {object} SvelteApplicationOptions Options for SvelteApplication. Note: that this extends the Foundry
  * {@link ApplicationOptions}.
  *
@@ -128,18 +118,6 @@ Hooks.on('PopOut:close', (app) =>
  *
  * @property {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSTransformOrigin}   [transformOrigin='top left'] By default,
  *           'top / left' respects rotation when minimizing.
- */
-
-/**
- * @typedef {object} SvelteData
- *
- * @property {object}                           config -
- *
- * @property {import('svelte').SvelteComponent} component -
- *
- * @property {HTMLElement}                      element -
- *
- * @property {boolean}                          injectHTML -
  */
 
 // From: TJSDialog.js ------------------------------------------------------------------------------------------------

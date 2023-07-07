@@ -2,8 +2,9 @@ import * as _typhonjs_fvtt_svelte_application from '@typhonjs-fvtt/svelte/applic
 import { SvelteApplication as SvelteApplication$1 } from '@typhonjs-fvtt/svelte/application';
 import * as _typhonjs_svelte_runtime_base_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import { TJSPositionDataExtended, TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
-import * as svelte from 'svelte';
 import * as svelte_store from 'svelte/store';
+import { SvelteComponent } from 'svelte';
+import { TJSSvelteConfig } from '@typhonjs-svelte/runtime-base/svelte/util';
 import { TJSWebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 
 /**
@@ -20,84 +21,106 @@ declare class HandlebarsApplication extends SvelteApplication$1 {
 }
 
 /**
- * Provides a helper class for {@link SvelteApplication} by combining all methods that work on the {@link SvelteData}
- * of mounted components. This class is instantiated and can be retrieved by the getter `svelte` via SvelteApplication.
+ * Provides a mechanism to retrieve and query all mounted Svelte components including the main application shell.
  */
-declare class GetSvelteData {
-    /**
-     * Keep a direct reference to the SvelteData array in an associated {@link SvelteApplication}.
-     *
-     * @param {import('@typhonjs-fvtt/svelte/application').MountedAppShell[] | null[]}  applicationShellHolder - A reference to
-     *        the MountedAppShell array.
-     *
-     * @param {import('@typhonjs-fvtt/svelte/application').SvelteData[]}  svelteData - A reference to the SvelteData array of
-     *        mounted components.
-     */
-    constructor(applicationShellHolder: _typhonjs_fvtt_svelte_application.MountedAppShell[] | null[], svelteData: _typhonjs_fvtt_svelte_application.SvelteData[]);
+declare interface GetSvelteData {
     /**
      * Returns any mounted {@link MountedAppShell}.
      *
-     * @returns {import('@typhonjs-fvtt/svelte/application').MountedAppShell | null} Any mounted application shell.
+     * @returns {MountedAppShell | null} Any mounted application shell.
      */
-    get applicationShell(): _typhonjs_fvtt_svelte_application.MountedAppShell;
+    get applicationShell(): MountedAppShell;
     /**
      * Returns the indexed Svelte component.
      *
-     * @param {number}   index -
+     * @param {number}   index - The index of Svelte component to retrieve.
      *
-     * @returns {object} The loaded Svelte component.
+     * @returns {SvelteComponent} The loaded Svelte component.
      */
     component(index: number): object;
     /**
      * Returns the Svelte component entries iterator.
      *
-     * @returns {Generator<Array<number|import('svelte').SvelteComponent>>} Svelte component entries iterator.
+     * @returns {IterableIterator<[number, SvelteComponent]>} Svelte component entries iterator.
      * @yields
      */
-    componentEntries(): Generator<Array<number | svelte.SvelteComponent>>;
+    componentEntries(): IterableIterator<[number, SvelteComponent]>;
     /**
      * Returns the Svelte component values iterator.
      *
-     * @returns {Generator<import('svelte').SvelteComponent>} Svelte component values iterator.
+     * @returns {IterableIterator<SvelteComponent>} Svelte component values iterator.
      * @yields
      */
-    componentValues(): Generator<svelte.SvelteComponent>;
+    componentValues(): IterableIterator<SvelteComponent>;
     /**
      * Returns the indexed SvelteData entry.
      *
-     * @param {number}   index -
+     * @param {number}   index - The index of SvelteData instance to retrieve.
      *
-     * @returns {import('@typhonjs-fvtt/svelte/application').SvelteData} The loaded Svelte config + component.
+     * @returns {SvelteData} The loaded Svelte config + component.
      */
-    data(index: number): _typhonjs_fvtt_svelte_application.SvelteData;
+    data(index: number): SvelteData;
     /**
      * Returns the {@link SvelteData} instance for a given component.
      *
-     * @param {object} component - Svelte component.
+     * @param {SvelteComponent} component - Svelte component.
      *
-     * @returns {import('@typhonjs-fvtt/svelte/application').SvelteData} -  The loaded Svelte config + component.
+     * @returns {SvelteData} -  The loaded Svelte config + component.
      */
-    dataByComponent(component: object): _typhonjs_fvtt_svelte_application.SvelteData;
+    dataByComponent(component: SvelteComponent): SvelteData;
     /**
      * Returns the SvelteData entries iterator.
      *
-     * @returns {IterableIterator<[number, import('@typhonjs-fvtt/svelte/application').SvelteData]>} SvelteData entries iterator.
+     * @returns {IterableIterator<[number, SvelteData]>} SvelteData entries iterator.
      */
-    dataEntries(): IterableIterator<[number, _typhonjs_fvtt_svelte_application.SvelteData]>;
+    dataEntries(): IterableIterator<[number, SvelteData]>;
     /**
      * Returns the SvelteData values iterator.
      *
-     * @returns {IterableIterator<import('@typhonjs-fvtt/svelte/application').SvelteData>} SvelteData values iterator.
+     * @returns {IterableIterator<SvelteData>} SvelteData values iterator.
      */
-    dataValues(): IterableIterator<_typhonjs_fvtt_svelte_application.SvelteData>;
+    dataValues(): IterableIterator<SvelteData>;
     /**
      * Returns the length of the mounted Svelte component list.
      *
      * @returns {number} Length of mounted Svelte component list.
      */
     get length(): number;
-    #private;
 }
+/**
+ * Application shell contract for Svelte components.
+ */
+type MountedAppShell = {
+    /**
+     * The root element / exported prop.
+     */
+    elementRoot: HTMLElement;
+    /**
+     * The content element / exported prop.
+     */
+    elementContent?: HTMLElement;
+    /**
+     * The target element / exported prop.
+     */
+    elementTarget?: HTMLElement;
+};
+/**
+ * Provides access to a mounted Svelte component.
+ */
+type SvelteData = {
+    /**
+     * The TJSSvelteConfig for this component.
+     */
+    config: TJSSvelteConfig;
+    /**
+     * The svelte component instance.
+     */
+    component: SvelteComponent;
+    /**
+     * The main bound element.
+     */
+    element: HTMLElement;
+};
 
 /**
  * @template T
@@ -281,7 +304,7 @@ declare class SvelteApplication {
     /**
      * Returns the Svelte helper class w/ various methods to access mounted Svelte components.
      *
-     * @returns {GetSvelteData} GetSvelteData
+     * @returns {import('./internal/state-svelte/types').GetSvelteData} GetSvelteData
      */
     get svelte(): GetSvelteData;
     /**
@@ -838,9 +861,9 @@ declare class SvelteFormApplication {
     /**
      * Returns the Svelte helper class w/ various methods to access mounted Svelte components.
      *
-     * @returns {GetSvelteData} GetSvelteData
+     * @returns {import('@typhonjs-fvtt/svelte/application').GetSvelteData} GetSvelteData
      */
-    get svelte(): GetSvelteData;
+    get svelte(): _typhonjs_fvtt_svelte_application.GetSvelteData;
     /**
      * Provides a mechanism to update the UI options store for maximized.
      *

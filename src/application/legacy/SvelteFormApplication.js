@@ -92,7 +92,7 @@ export class SvelteFormApplication extends FormApplication
 
    /**
     * Provides a helper class that combines multiple methods for interacting with the mounted components tracked in
-    * {@link SvelteData}.
+    * #svelteData
     *
     * @type {GetSvelteData}
     */
@@ -209,7 +209,7 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Returns the Svelte helper class w/ various methods to access mounted Svelte components.
     *
-    * @returns {GetSvelteData} GetSvelteData
+    * @returns {import('#svelte-fvtt/application').GetSvelteData} GetSvelteData
     */
    get svelte() { return this.#getSvelteData; }
 
