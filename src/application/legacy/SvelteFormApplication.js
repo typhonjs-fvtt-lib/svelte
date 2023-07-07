@@ -20,7 +20,10 @@ import {
 
 /**
  * Provides a Svelte aware extension to FormApplication to control the app lifecycle appropriately. You can
- * declaratively load one or more components from `defaultOptions`.
+ * declaratively load one or more components from `defaultOptions`. It is not recommended that you use or depend on
+ * this class as it only exists to support {@link HandlebarsFormApplication} due to the OOP nature of the Foundry VTT
+ * platform. This should only be an interim or stepwise solution as you convert your package over to fully using TRL &
+ * Svelte.
  */
 export class SvelteFormApplication extends FormApplication
 {
@@ -611,7 +614,7 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Provides a mechanism to update the UI options store for maximized.
     *
-    * Note: the sanity check is duplicated from {@link globalThis.Application.maximize} the store is updated _before_
+    * Note: the sanity check is duplicated from {@link Application.maximize} the store is updated _before_
     * performing the rest of animations. This allows application shells to remove / show any resize handlers
     * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
     * to animate the content area.
@@ -713,7 +716,7 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Provides a mechanism to update the UI options store for minimized.
     *
-    * Note: the sanity check is duplicated from {@link globalThis.Application.minimize} the store is updated _before_
+    * Note: the sanity check is duplicated from {@link Application.minimize} the store is updated _before_
     * performing the rest of animations. This allows application shells to remove / show any resize handlers
     * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
     * to animate the content area.

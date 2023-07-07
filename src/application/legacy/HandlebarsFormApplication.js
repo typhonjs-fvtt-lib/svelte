@@ -8,6 +8,12 @@ import {
 
 import { SvelteFormApplication } from './SvelteFormApplication.js';
 
+/**
+ * Provides legacy support for Handlebars rendering while still gaining aspects of reactivity with a Svelte powered
+ * application shell. You may use HandlebarsFormApplication in a similar manner as the core Foundry `FormApplication`
+ * class. This should only be an interim or stepwise solution as you convert your package over to fully using TRL &
+ * Svelte.
+ */
 export class HandlebarsFormApplication extends SvelteFormApplication
 {
    /**
