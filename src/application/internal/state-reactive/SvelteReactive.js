@@ -86,7 +86,7 @@ export class SvelteReactive
    /**
     * The Application option store which is injected into mounted Svelte component context under the `external` key.
     *
-    * @type {StoreAppOptions}
+    * @type {import('./types').StoreAppOptions}
     */
    #storeAppOptions;
 
@@ -107,7 +107,7 @@ export class SvelteReactive
    /**
     * The UI option store which is injected into mounted Svelte component context under the `external` key.
     *
-    * @type {StoreUIOptions}
+    * @type {import('./types').StoreUIOptions}
     */
    #storeUIState;
 
@@ -147,6 +147,7 @@ export class SvelteReactive
     *
     * @returns {SvelteReactiveStores | undefined} Internal methods to interact with Svelte stores.
     * @package
+    * @internal
     */
    initialize()
    {
@@ -177,14 +178,14 @@ export class SvelteReactive
    /**
     * Returns the store for app options.
     *
-    * @returns {StoreAppOptions} App options store.
+    * @returns {import('./types').StoreAppOptions} App options store.
     */
    get storeAppOptions() { return this.#storeAppOptions; }
 
    /**
     * Returns the store for UI options.
     *
-    * @returns {StoreUIOptions} UI options store.
+    * @returns {import('./types').StoreUIOptions} UI options store.
     */
    get storeUIState() { return this.#storeUIState; }
 
@@ -368,7 +369,7 @@ export class SvelteReactive
    /**
     * Sets `this.options.headerIcon` which is reactive for application shells.
     *
-    * @param {string|void}  headerIcon - Sets the headerButtonNoLabel option.
+    * @param {string | undefined}  headerIcon - Sets the headerButtonNoLabel option.
     */
    set headerIcon(headerIcon)
    {
@@ -410,7 +411,7 @@ export class SvelteReactive
    }
 
    /**
-    * Sets `this.options.positionable` enabling / disabling {@link SvelteApplication.position.set}.
+    * Sets `this.options.positionable` enabling / disabling {@link SvelteApplication.position}.
     *
     * @param {boolean}  positionable - Sets the positionable option.
     */
@@ -434,7 +435,7 @@ export class SvelteReactive
     *
     * Note: Will set empty string if title is undefined or null.
     *
-    * @param {string|undefined|null}   title - Application title; will be localized, so a translation key is fine.
+    * @param {string | undefined | null}   title - Application title; will be localized, so a translation key is fine.
     */
    set title(title)
    {
@@ -490,7 +491,7 @@ export class SvelteReactive
     *
     * @param {string}   accessor - The path / key to set. You can set multiple levels.
     *
-    * @param {*}        value - Value to set.
+    * @param {any}      value - Value to set.
     */
    setOptions(accessor, value)
    {
@@ -510,7 +511,7 @@ export class SvelteReactive
     * stores are provided for essential options which are commonly used.
     *
     * These stores are injected into all Svelte components mounted under the `external` context: `storeAppOptions` and
-    * ` storeUIState`.
+    * `storeUIState`.
     */
    #storesInitialize()
    {
@@ -523,7 +524,7 @@ export class SvelteReactive
        * Create custom store. The main subscribe method for all app options changes is provided along with derived
        * writable stores for all reactive options.
        *
-       * @type {StoreAppOptions}
+       * @type {import('./types').StoreAppOptions}
        */
       const storeAppOptions = {
          subscribe: writableAppOptions.subscribe,
@@ -561,7 +562,7 @@ export class SvelteReactive
       this.#storeUIStateUpdate = writableUIOptions.update;
 
       /**
-       * @type {StoreUIOptions}
+       * @type {import('./types').StoreUIOptions}
        */
       const storeUIState = {
          subscribe: writableUIOptions.subscribe,
@@ -677,55 +678,4 @@ export class SvelteReactive
  * for UI state stores.
  *
  * @property {Function} unsubscribe Unsubscribes from local stores.
- */
-
-
-/**
- * @typedef {object} StoreAppOptions Provides a custom readable Svelte store for Application options state.
- *
- * @property {import('svelte/store').Readable<object>} subscribe Subscribe to all app options updates.
- *
- * @property {import('svelte/store').Writable<boolean>} draggable Derived store for `draggable` updates.
- *
- * @property {import('svelte/store').Writable<boolean>} focusAuto Derived store for `focusAuto` updates.
- *
- * @property {import('svelte/store').Writable<boolean>} focusKeep Derived store for `focusKeep` updates.
- *
- * @property {import('svelte/store').Writable<boolean>} focusTrap Derived store for `focusTrap` updates.
- *
- * @property {import('svelte/store').Writable<boolean>} headerButtonNoClose Derived store for `headerButtonNoClose`
- * updates.
- *
- * @property {import('svelte/store').Writable<boolean>} headerButtonNoLabel Derived store for `headerButtonNoLabel`
- * updates.
- *
- * @property {import('svelte/store').Writable<string>} headerIcon Derived store for `headerIcon` updates.
- *
- * @property {import('svelte/store').Writable<boolean>} headerNoTitleMinimized Derived store for
- * `headerNoTitleMinimized` updates.
- *
- * @property {import('svelte/store').Writable<boolean>} minimizable Derived store for `minimizable` updates.
- *
- * @property {import('svelte/store').Writable<boolean>} popOut Derived store for `popOut` updates.
- *
- * @property {import('svelte/store').Writable<boolean>} positionable Derived store for `positionable` updates.
- *
- * @property {import('svelte/store').Writable<boolean>} resizable Derived store for `resizable` updates.
- *
- * @property {import('svelte/store').Writable<string>} title Derived store for `title` updates.
- */
-
-/**
- * @typedef {object} StoreUIOptions Provides a custom readable Svelte store for UI options state.
- *
- * @property {import('svelte/store').Readable.subscribe} subscribe Subscribe to all UI options updates.
- *
- * @property {import('svelte/store').Writable<boolean>} dragging Derived store for `dragging` updates.
- *
- * @property {import('svelte/store').Readable<globalThis.ApplicationHeaderButton[]>} headerButtons Derived store for
- * `headerButtons` updates.
- *
- * @property {import('svelte/store').Readable<boolean>} minimized Derived store for `minimized` updates.
- *
- * @property {import('svelte/store').Writable<boolean>} resizing Derived store for `resizing` updates.
  */

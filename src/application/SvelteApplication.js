@@ -99,7 +99,7 @@ export class SvelteApplication extends Application
    /**
     * Contains methods to interact with the Svelte stores.
     *
-    * @type {import('./internal/SvelteReactive').SvelteReactiveStores}
+    * @type {import('./internal/state-reactive/SvelteReactive').SvelteReactiveStores}
     */
    #stores;
 
@@ -194,7 +194,7 @@ export class SvelteApplication extends Application
    /**
     * Returns the reactive accessors & Svelte stores for SvelteApplication.
     *
-    * @returns {SvelteReactive} The reactive accessors & Svelte stores.
+    * @returns {import('./internal/state-reactive/types').SvelteReactive} The reactive accessors & Svelte stores.
     */
    get reactive() { return this.#reactive; }
 
@@ -821,30 +821,20 @@ export class SvelteApplication extends Application
    /**
     * Provides a callback after all Svelte components are initialized.
     *
-    * @param {object}      [opts] - Optional parameters.
-    *
-    * @param {HTMLElement} [opts.element] - HTMLElement container for main application element.
-    *
-    * @param {HTMLElement} [opts.elementContent] - HTMLElement container for content area of application shells.
-    *
-    * @param {HTMLElement} [opts.elementTarget] - HTMLElement container for main application target element.
+    * @param {import('./internal/state-svelte/types').MountedAppShell} [mountedAppShell] - The mounted app shell
+    *        elements.
     */
-   onSvelteMount({ element, elementContent, elementTarget } = {}) {} // eslint-disable-line no-unused-vars
+   onSvelteMount(mountedAppShell) {} // eslint-disable-line no-unused-vars
 
    /**
     * Provides a callback after the main application shell is remounted. This may occur during HMR / hot module
     * replacement or directly invoked from the `elementRootUpdate` callback passed to the application shell component
     * context.
     *
-    * @param {object}      [opts] - Optional parameters.
-    *
-    * @param {HTMLElement} [opts.element] - HTMLElement container for main application element.
-    *
-    * @param {HTMLElement} [opts.elementContent] - HTMLElement container for content area of application shells.
-    *
-    * @param {HTMLElement} [opts.elementTarget] - HTMLElement container for main application target element.
+    * @param {import('./internal/state-svelte/types').MountedAppShell} [mountedAppShell] - The mounted app shell
+    *        elements.
     */
-   onSvelteRemount({ element, elementContent, elementTarget } = {}) {} // eslint-disable-line no-unused-vars
+   onSvelteRemount(mountedAppShell) {} // eslint-disable-line no-unused-vars
 
    /**
     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
@@ -946,7 +936,8 @@ export class SvelteApplication extends Application
     *
     * @param {import('#runtime/svelte/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
     *
-    * @returns {TJSPosition} The updated position object for the application containing the new values
+    * @returns {TJSPosition} The updated position object for the application containing the new values.
+    * @ignore
     */
    setPosition(position)
    {

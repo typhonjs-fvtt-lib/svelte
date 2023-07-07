@@ -101,7 +101,7 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Contains methods to interact with the Svelte stores.
     *
-    * @type {import('../internal/SvelteReactive').SvelteReactiveStores}
+    * @type {import('../internal/state-reactive/SvelteReactive').SvelteReactiveStores}
     */
    #stores;
 
@@ -194,7 +194,7 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Returns the reactive accessors & Svelte stores for SvelteFormApplication.
     *
-    * @returns {SvelteReactive} The reactive accessors & Svelte stores.
+    * @returns {import('@typhonjs-fvtt/svelte/application').SvelteReactive} The reactive accessors & Svelte stores.
     */
    get reactive() { return this.#reactive; }
 
@@ -843,15 +843,18 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Provides a callback after all Svelte components are initialized.
     *
-    * @param {object}      [opts] - Optional parameters.
-    *
-    * @param {HTMLElement} [opts.element] - HTMLElement container for main application element.
-    *
-    * @param {HTMLElement} [opts.elementContent] - HTMLElement container for content area of application shells.
-    *
-    * @param {HTMLElement} [opts.elementTarget] - HTMLElement container for main application target element.
+    * @param {import('@typhonjs-fvtt/svelte/application').MountedAppShell} [mountedAppShell] - The mounted app shell elements.
     */
-   onSvelteMount({ element, elementContent, elementTarget } = {}) {} // eslint-disable-line no-unused-vars
+   onSvelteMount(mountedAppShell) {} // eslint-disable-line no-unused-vars
+
+   /**
+    * Provides a callback after the main application shell is remounted. This may occur during HMR / hot module
+    * replacement or directly invoked from the `elementRootUpdate` callback passed to the application shell component
+    * context.
+    *
+    * @param {import('@typhonjs-fvtt/svelte/application').MountedAppShell} [mountedAppShell] - The mounted app shell elements.
+    */
+   onSvelteRemount(mountedAppShell) {} // eslint-disable-line no-unused-vars
 
    /**
     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
@@ -950,7 +953,8 @@ export class SvelteFormApplication extends FormApplication
     *
     * @param {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
     *
-    * @returns {TJSPosition} The updated position object for the application containing the new values
+    * @returns {TJSPosition} The updated position object for the application containing the new values.
+    * @ignore
     */
    setPosition(position)
    {
