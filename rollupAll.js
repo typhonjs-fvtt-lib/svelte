@@ -9,8 +9,6 @@ import { typhonjsRuntime } from './.rollup/local/index.js';
 
 import { externalPathsNPM } from './.rollup/local/externalPathsNPM.js';
 
-const s_SOURCEMAPS = true;
-
 // Defines the node-resolve config.
 const s_RESOLVE_CONFIG = {
    browser: true,
@@ -21,8 +19,10 @@ const s_RESOLVE_CONFIG = {
 // minified / mangled.
 const outputPlugins = [];
 
+const external = [/@typhonjs-svelte\/runtime-base\/*/, /@typhonjs-fvtt\/svelte\/*/];
+
 // Defines whether source maps are generated / loaded from the .env file.
-const sourcemap = s_SOURCEMAPS;
+const sourcemap = true;
 
 // GenerateDTS options -----------------------------------------------------------------------------------------------
 
@@ -74,6 +74,7 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/gsap/index.js',
+         external,
          plugins: [
             importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/gsap`] }),
@@ -92,6 +93,7 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/helper/index.js',
+         external,
          plugins: [
             importsExternal(),
             typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/helper`] }),
@@ -110,6 +112,7 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/store/fvtt/index.js',
+         external,
          plugins: [
             importsExternal(),
             resolve(s_RESOLVE_CONFIG),
@@ -128,6 +131,7 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/store/fvtt/document/index.js',
+         external,
          plugins: [
             importsExternal(),
             resolve(s_RESOLVE_CONFIG),
@@ -146,6 +150,7 @@ const rollupConfigs = [
    {
       input: {
          input: 'src/store/fvtt/settings/index.js',
+         external,
          plugins: [
             importsExternal(),
             resolve(s_RESOLVE_CONFIG),
@@ -242,15 +247,14 @@ for (const gsapFile of gsapFiles)
 }
 
 // Common application generateDTS options.
-// const applicationDTSOptions = { filterDiagnostic, onwarn, dtsReplace };
-const applicationDTSOptions = { filterDiagnostic, dtsReplace };
+const applicationDTSOptions = { filterDiagnostic, dtsReplace, rollupExternal: external };
 
 console.log('Generating TS Declaration: ./_dist/application/index.js');
 
 await generateDTS({
    input: './_dist/application/index.js',
    output: './_dist/application/index.d.ts',
-   ...applicationDTSOptions
+   ...applicationDTSOptions,
 });
 
 console.log('Generating TS Declaration: ./_dist/application/dialog/index.js');
