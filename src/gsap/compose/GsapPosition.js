@@ -388,7 +388,7 @@ class TimelinePositionImpl
     * @param {(
     *    import('#runtime/svelte/store/position').TJSPositionDataExtended |
     *    import('#runtime/svelte/store/position').TJSPositionDataExtended[]
-    * )}  positionData - PositionInfo data.
+    * )}  positionData - TJSPositionInfo data.
     *
     * @param {HTMLElement|HTMLElement[]}  elements - One or more HTMLElements.
     *
@@ -550,11 +550,11 @@ class TimelinePositionImpl
  *
  * @param {object[]|Function}             [gsapData] -
  *
- * @returns {import('../').PositionInfo} A PositionInfo instance.
+ * @returns {import('../').TJSPositionInfo} A TJSPositionInfo instance.
  */
 function s_GET_POSITIONINFO(tjsPositions, vars, filter, gsapData)
 {
-   /** @type {import('../').PositionInfo} */
+   /** @type {import('../').TJSPositionInfo} */
    const positionInfo = {
       position: [],
       positionData: [],

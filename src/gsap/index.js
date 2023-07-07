@@ -33,7 +33,8 @@ export * from './util/index.js';
 // Typedefs from GsapPosition ----------------------------------------------------------------------------------------
 
 /**
- * @typedef {object} PositionInfo
+ * @typedef {object} TJSPositionInfo Stores and tracks any associated `TJSPosition` instance utilized by
+ *          {@link GsapCompose}.
  *
  * @property {import('#runtime/svelte/store/position').TJSPosition[]}    position -
  *

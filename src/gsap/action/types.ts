@@ -5,7 +5,7 @@ import type {
 /**
  * Provides a store / object to make updating / setting draggableGsap options much easier.
  */
-export interface IDraggableGsapOptions
+export interface DraggableGsapOptions
 {
    ease: boolean;
 
@@ -116,10 +116,10 @@ export interface IDraggableGsapOptions
    /**
     * Store subscribe method.
     *
-    * @param {Subscriber<IDraggableGsapOptions>} handler - Callback function that is invoked on update / changes.
+    * @param {Subscriber<DraggableGsapOptions>} handler - Callback function that is invoked on update / changes.
     *        Receives the DraggableOptions object / instance.
     *
     * @returns {Unsubscriber} Unsubscribe function.
     */
-   subscribe(handler: Subscriber<IDraggableGsapOptions>): Unsubscriber;
+   subscribe(handler: Subscriber<DraggableGsapOptions>): Unsubscriber;
 }

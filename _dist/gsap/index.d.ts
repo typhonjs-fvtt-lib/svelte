@@ -1,16 +1,112 @@
+
+
 import * as _runtime_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
+import * as svelte_transition from 'svelte/transition';
 import * as svelte_store from 'svelte/store';
 import { Subscriber, Unsubscriber } from 'svelte/store';
 import * as svelte_action from 'svelte/action';
 
+/**
+ * The main GSAP object.
+ *
+ * @see https://greensock.com/docs/v3/GSAP
+ */
 declare let gsap: any;
-declare const easingFunc: {};
+/**
+ * Provides an object of Gsap and Svelte easing functions that are preconfigured and registered with `gsap`.
+ * {@link easingList} is an index of all the function names that are available in the `easingFunc` object. You may
+ * use these functions with Gsap or Svelte.
+ *
+ * @type {{ [key: string]: import('svelte/transition').EasingFunction }}
+ */
+declare const easingFunc: {
+    [key: string]: svelte_transition.EasingFunction;
+};
+/**
+ * Provides a list of Gsap easing functions that are preconfigured and registered with `gsap`. `easingList`
+ * is an index of all the function names that are available in the {@link easingFunc} object. Additionally, all Svelte
+ * easing functions are loaded and prepended with `svelte-<function name>`.
+ *
+ * The easing list include:
+ * - back.in(1)
+ * - back.inOut(1)
+ * - back.out(1)
+ * - back.in(10)
+ * - back.inOut(10)
+ * - back.out(10)
+ * - bounce.in
+ * - bounce.inOut
+ * - bounce.out
+ * - circ.in
+ * - circ.inOut
+ * - circ.out
+ * - elastic.in(1, 0.5)
+ * - elastic.inOut(1, 0.5)
+ * - elastic.out(1, 0.5)
+ * - elastic.in(10, 5)
+ * - elastic.inOut(10, 5)
+ * - elastic.out(10, 5)
+ * - expo.in
+ * - expo.inOut
+ * - expo.out
+ * - linear // same as 'none'
+ * - power1.in
+ * - power1.inOut
+ * - power1.out
+ * - power2.in
+ * - power2.inOut
+ * - power2.out
+ * - power3.in
+ * - power3.inOut
+ * - power3.out
+ * - power4.in
+ * - power4.inOut
+ * - power4.out
+ * - sine.in
+ * - sine.inOut
+ * - sine.out
+ * - steps(10)
+ * - steps(100)'
+ * - svelte-backIn
+ * - svelte-backInOut
+ * - svelte-backOut
+ * - svelte-bounceIn
+ * - svelte-bounceInOut
+ * - svelte-bounceOut
+ * - svelte-circIn
+ * - svelte-circInOut
+ * - svelte-circOut
+ * - svelte-cubicIn
+ * - svelte-cubicInOut
+ * - svelte-cubicOut
+ * - svelte-elasticIn
+ * - svelte-elasticInOut
+ * - svelte-elasticOut
+ * - svelte-expoIn
+ * - svelte-expoInOut
+ * - svelte-expoOut
+ * - svelte-linear
+ * - svelte-quadIn
+ * - svelte-quadInOut
+ * - svelte-quadOut
+ * - svelte-quartIn
+ * - svelte-quartInOut
+ * - svelte-quartOut
+ * - svelte-quintIn
+ * - svelte-quintInOut
+ * - svelte-quintOut
+ * - svelte-sineIn
+ * - svelte-sineInOut
+ * - svelte-sineOut
+ *
+ * @type {string[]}
+ */
 declare const easingList: string[];
 
 /**
  * Provides a store / object to make updating / setting draggableGsap options much easier.
  */
-interface IDraggableGsapOptions {
+interface DraggableGsapOptions {
     ease: boolean;
     easeOptions: {
         duration: number;
@@ -107,12 +203,12 @@ interface IDraggableGsapOptions {
     /**
      * Store subscribe method.
      *
-     * @param {Subscriber<IDraggableGsapOptions>} handler - Callback function that is invoked on update / changes.
+     * @param {Subscriber<DraggableGsapOptions>} handler - Callback function that is invoked on update / changes.
      *        Receives the DraggableOptions object / instance.
      *
      * @returns {Unsubscriber} Unsubscribe function.
      */
-    subscribe(handler: Subscriber<IDraggableGsapOptions>): Unsubscriber;
+    subscribe(handler: Subscriber<DraggableGsapOptions>): Unsubscriber;
 }
 
 /**
@@ -172,14 +268,14 @@ declare namespace draggableGsap {
      * @param {{ ease?: boolean, easeOptions?: object, inertia?: boolean, inertiaOptions?: object }} options -
      *        DraggableGsapOptions.
      *
-     * @returns {import('./types').IDraggableGsapOptions} A new options instance.
+     * @returns {import('./types').DraggableGsapOptions} A new options instance.
      */
     function options(options: {
         ease?: boolean;
         easeOptions?: any;
         inertia?: boolean;
         inertiaOptions?: any;
-    }): IDraggableGsapOptions;
+    }): DraggableGsapOptions;
 }
 
 /**
@@ -276,6 +372,7 @@ declare class GsapCompose {
  * @param {string}   name - Name of GSAP plugin to load.
  *
  * @returns {Promise<*>} The loaded plugin.
+ * @ignore
  */
 declare function gsapLoadPlugin(name: string): Promise<any>;
 
@@ -293,7 +390,11 @@ type GsapPositionOptions = {
     initialProps?: Iterable<string>;
 };
 type GSAPTarget = (string | object | _runtime_svelte_store_position.TJSPosition | Iterable<_runtime_svelte_store_position.TJSPosition> | Array<HTMLElement | object>);
-type PositionInfo = {
+/**
+ * Stores and tracks any associated `TJSPosition` instance utilized by
+ *          {@link GsapCompose }.
+ */
+type TJSPositionInfo = {
     /**
      * -
      */
@@ -316,4 +417,4 @@ type PositionInfo = {
     gsapData: Array<object[]>;
 };
 
-export { GSAPTarget, GsapCompose, GsapData, GsapPositionOptions, IDraggableGsapOptions, PositionInfo, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };
+export { DraggableGsapOptions, GSAPTarget, GsapCompose, GsapData, GsapPositionOptions, TJSPositionInfo, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };

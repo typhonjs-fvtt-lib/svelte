@@ -183,8 +183,8 @@ Hooks.on('PopOut:close', (app) =>
  * @property {boolean}  [notifyError=true] When true and an error is thrown in dialog callback functions post a UI
  *           error notification.
  *
- * @property {string|((application: import('./').TJSDialog) => any)} [onClose] Callback invoked when dialog
- *           is closed; no button option selected. When defined as a string any matching function by name exported from content
+ * @property {string|((application: import('./').TJSDialog) => any)} [onClose] Callback invoked when dialog is closed;
+ *           no button option selected. When defined as a string any matching function by name exported from content
  *           Svelte component is invoked.
  *
  * @property {boolean}  [rejectClose=false] When true and a Promise has been created by {@link TJSDialog.wait} and

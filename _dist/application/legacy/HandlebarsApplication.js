@@ -8,6 +8,11 @@ import {
    deepMerge,
    isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
 
+/**
+ * Provides legacy support for Handlebars rendering while still gaining aspects of reactivity with a Svelte powered
+ * application shell. You may use HandlebarsApplication in a similar manner as the core Foundry `Application` class.
+ * This should only be an interim or stepwise solution as you convert your package over to fully using TRL & Svelte.
+ */
 export class HandlebarsApplication extends SvelteApplication
 {
    /**
