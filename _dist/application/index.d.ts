@@ -301,11 +301,10 @@ declare class SvelteReactive {
     /**
      * Initializes reactive support. Package private for internal use.
      *
-     * @returns {import('@typhonjs-fvtt/svelte/application').SvelteStores | undefined} Internal methods to interact with Svelte
-     *          stores.
+     * @returns {SvelteReactiveStores | undefined} Internal methods to interact with Svelte stores.
      * @package
      */
-    initialize(): _typhonjs_fvtt_svelte_application.SvelteStores | undefined;
+    initialize(): SvelteReactiveStores | undefined;
     /**
      * @returns {import('@typhonjs-svelte/runtime-base/svelte/store/web-storage').TJSWebStorage} Returns TJSWebStorage (session) instance.
      */
@@ -557,6 +556,26 @@ declare class SvelteReactive {
     }): void;
     #private;
 }
+type SvelteReactiveStores = {
+    /**
+     * Update function
+     * for app options store.
+     */
+    appOptionsUpdate: (this: void, updater: svelte_store.Updater<object>) => void;
+    /**
+     * Subscribes to local stores.
+     */
+    subscribe: Function;
+    /**
+     * Update function
+     * for UI state stores.
+     */
+    uiStateUpdate: (this: void, updater: svelte_store.Updater<object>) => void;
+    /**
+     * Unsubscribes from local stores.
+     */
+    unsubscribe: Function;
+};
 /**
  * Provides a custom readable Svelte store for Application options state.
  */
@@ -1225,24 +1244,6 @@ type SvelteData = {
      */
     injectHTML: boolean;
 };
-type SvelteStores = {
-    /**
-     * Update function for app options store.
-     */
-    appOptionsUpdate: any;
-    /**
-     * Subscribes to local stores.
-     */
-    subscribe: Function;
-    /**
-     * Update function for UI options store.
-     */
-    uiOptionsUpdate: any;
-    /**
-     * Unsubscribes from local stores.
-     */
-    unsubscribe: Function;
-};
 /**
  * Defines the common dialog configuration data.
  */
@@ -1362,4 +1363,4 @@ type TJSDialogButtonData = {
     styles?: Record<string, string>;
 };
 
-export { MountedAppShell, SvelteApplication, SvelteApplicationOptions, SvelteData, SvelteStores, TJSDialog, TJSDialogButtonData, TJSDialogOptions };
+export { MountedAppShell, SvelteApplication, SvelteApplicationOptions, SvelteData, TJSDialog, TJSDialogButtonData, TJSDialogOptions };

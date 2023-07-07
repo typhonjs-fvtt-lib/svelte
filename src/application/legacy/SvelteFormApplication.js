@@ -101,7 +101,7 @@ export class SvelteFormApplication extends FormApplication
    /**
     * Contains methods to interact with the Svelte stores.
     *
-    * @type {import('#svelte-fvtt/application').SvelteStores}
+    * @type {import('../internal/SvelteReactive').SvelteReactiveStores}
     */
    #stores;
 
@@ -433,8 +433,8 @@ export class SvelteFormApplication extends FormApplication
 
       this.#onMount = false;
 
-      // Update the minimized UI store options.
-      this.#stores.uiOptionsUpdate((storeOptions) => deepMerge(storeOptions, { minimized: this._minimized }));
+      // Update the minimized UI store state.
+      this.#stores.uiStateUpdate((storeOptions) => deepMerge(storeOptions, { minimized: this._minimized }));
 
       // Apply any stored focus options and then remove them from options.
       A11yHelper.applyFocusSource(this.options.focusSource);
@@ -710,7 +710,7 @@ export class SvelteFormApplication extends FormApplication
          }
       }, 50);
 
-      this.#stores.uiOptionsUpdate((options) => deepMerge(options, { minimized: false }));
+      this.#stores.uiStateUpdate((options) => deepMerge(options, { minimized: false }));
    }
 
    /**
@@ -731,7 +731,7 @@ export class SvelteFormApplication extends FormApplication
    {
       if (!this.rendered || !this.popOut || [true, null].includes(this._minimized)) { return; }
 
-      this.#stores.uiOptionsUpdate((options) => deepMerge(options, { minimized: true }));
+      this.#stores.uiStateUpdate((options) => deepMerge(options, { minimized: true }));
 
       this._minimized = null;
 

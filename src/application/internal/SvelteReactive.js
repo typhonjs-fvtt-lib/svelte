@@ -93,7 +93,7 @@ export class SvelteReactive
    /**
     * Stores the update function for `#storeAppOptions`.
     *
-    * @type {import('svelte/store').Writable.update}
+    * @type {(this: void, updater: import('svelte/store').Updater<object>) => void}
     */
    #storeAppOptionsUpdate;
 
@@ -114,7 +114,7 @@ export class SvelteReactive
    /**
     * Stores the update function for `#storeUIState`.
     *
-    * @type {import('svelte/store').Writable.update}
+    * @type {(this: void, updater: import('svelte/store').Updater<object>) => void}
     */
    #storeUIStateUpdate;
 
@@ -145,8 +145,7 @@ export class SvelteReactive
    /**
     * Initializes reactive support. Package private for internal use.
     *
-    * @returns {import('#svelte-fvtt/application').SvelteStores | undefined} Internal methods to interact with Svelte
-    *          stores.
+    * @returns {SvelteReactiveStores | undefined} Internal methods to interact with Svelte stores.
     * @package
     */
    initialize()
@@ -159,7 +158,7 @@ export class SvelteReactive
 
       return {
          appOptionsUpdate: this.#storeAppOptionsUpdate,
-         uiOptionsUpdate: this.#storeUIStateUpdate,
+         uiStateUpdate: this.#storeUIStateUpdate,
          subscribe: this.#storesSubscribe.bind(this),
          unsubscribe: this.#storesUnsubscribe.bind(this)
       };
@@ -665,6 +664,21 @@ export class SvelteReactive
       });
    }
 }
+
+/**
+ * @typedef {object} SvelteReactiveStores
+ *
+ * @property {(this: void, updater: import('svelte/store').Updater<object>) => void} appOptionsUpdate Update function
+ * for app options store.
+ *
+ * @property {Function} subscribe Subscribes to local stores.
+ *
+ * @property {(this: void, updater: import('svelte/store').Updater<object>) => void} uiStateUpdate Update function
+ * for UI state stores.
+ *
+ * @property {Function} unsubscribe Unsubscribes from local stores.
+ */
+
 
 /**
  * @typedef {object} StoreAppOptions Provides a custom readable Svelte store for Application options state.

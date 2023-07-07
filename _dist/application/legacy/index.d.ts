@@ -437,11 +437,10 @@ declare class SvelteReactive {
     /**
      * Initializes reactive support. Package private for internal use.
      *
-     * @returns {import('@typhonjs-fvtt/svelte/application').SvelteStores | undefined} Internal methods to interact with Svelte
-     *          stores.
+     * @returns {SvelteReactiveStores | undefined} Internal methods to interact with Svelte stores.
      * @package
      */
-    initialize(): _typhonjs_fvtt_svelte_application.SvelteStores | undefined;
+    initialize(): SvelteReactiveStores | undefined;
     /**
      * @returns {import('@typhonjs-svelte/runtime-base/svelte/store/web-storage').TJSWebStorage} Returns TJSWebStorage (session) instance.
      */
@@ -693,6 +692,26 @@ declare class SvelteReactive {
     }): void;
     #private;
 }
+type SvelteReactiveStores = {
+    /**
+     * Update function
+     * for app options store.
+     */
+    appOptionsUpdate: (this: void, updater: svelte_store.Updater<object>) => void;
+    /**
+     * Subscribes to local stores.
+     */
+    subscribe: Function;
+    /**
+     * Update function
+     * for UI state stores.
+     */
+    uiStateUpdate: (this: void, updater: svelte_store.Updater<object>) => void;
+    /**
+     * Unsubscribes from local stores.
+     */
+    unsubscribe: Function;
+};
 /**
  * Provides a custom readable Svelte store for Application options state.
  */
