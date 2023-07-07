@@ -246,8 +246,31 @@ for (const gsapFile of gsapFiles)
    fs.writeFileSync(gsapFile, fileData);
 }
 
+/**
+ *  Adds a getter for position after `get elementTarget()`. This is necessary to perform as a DTS replacement as
+ *  Foundry defines a `position` property on Application.
+ *
+ * @type {string}
+ */
+const dtsReplacePositionGetter = `    get elementTarget(): HTMLElement;
+
+    /**
+     * Returns the TJSPosition instance.
+     *
+     * @returns {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPosition} The TJSPosition instance.
+     */
+    get position(): TJSPosition;
+`;
+
 // Common application generateDTS options.
-const applicationDTSOptions = { filterDiagnostic, dtsReplace, rollupExternal: external };
+const applicationDTSOptions = {
+   filterDiagnostic,
+   dtsReplace: {
+      ...dtsReplace,
+      'get elementTarget\\(\\): HTMLElement;': dtsReplacePositionGetter
+   },
+   rollupExternal: external
+};
 
 console.log('Generating TS Declaration: ./_dist/application/index.js');
 

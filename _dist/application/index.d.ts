@@ -668,7 +668,15 @@ declare class SvelteApplication {
      *
      * @returns {HTMLElement} Target element.
      */
-    get elementTarget(): HTMLElement;
+        get elementTarget(): HTMLElement;
+
+    /**
+     * Returns the TJSPosition instance.
+     *
+     * @returns {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPosition} The TJSPosition instance.
+     */
+    get position(): TJSPosition;
+
     /**
      * Returns the reactive accessors & Svelte stores for SvelteApplication.
      *
