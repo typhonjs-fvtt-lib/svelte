@@ -88,9 +88,13 @@ Hooks.on('PopOut:close', (app) =>
  * @property {import('@typhonjs-svelte/runtime-base/util/browser').A11yFocusSource}   [focusSource] - Defines A11yHelper focus source to
  *           apply when application closes.
  *
+ * @property {boolean}  [focusTrap=true] When true focus trapping / wrapping is enabled keeping focus inside app.
+ *
  * @property {boolean}  [headerButtonNoClose=false] If true then the close header button is removed.
  *
  * @property {boolean}  [headerButtonNoLabel=false] If true then header button labels are removed.
+ *
+ * @property {string}   [headerIcon] Sets a header icon given an image URL.
  *
  * @property {boolean}  [headerNoTitleMinimized=false] If true then header title is hidden when minimized.
  *

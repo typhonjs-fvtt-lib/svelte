@@ -1128,6 +1128,10 @@ type SvelteApplicationOptions = {
      */
     focusSource?: _typhonjs_svelte_runtime_base_util_browser.A11yFocusSource;
     /**
+     * When true focus trapping / wrapping is enabled keeping focus inside app.
+     */
+    focusTrap?: boolean;
+    /**
      * If true then the close header button is removed.
      */
     headerButtonNoClose?: boolean;
@@ -1135,6 +1139,10 @@ type SvelteApplicationOptions = {
      * If true then header button labels are removed.
      */
     headerButtonNoLabel?: boolean;
+    /**
+     * Sets a header icon given an image URL.
+     */
+    headerIcon?: string;
     /**
      * If true then header title is hidden when minimized.
      */
