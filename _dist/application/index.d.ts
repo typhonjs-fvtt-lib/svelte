@@ -1143,6 +1143,10 @@ type MountedAppShell = {
      */
     elementTarget?: HTMLElement;
 };
+/**
+ * Options for SvelteApplication. Note: that this extends the Foundry
+ * {@link ApplicationOptions }.
+ */
 type SvelteApplicationOptions = {
     /**
      * If false the default slide close animation is not run.

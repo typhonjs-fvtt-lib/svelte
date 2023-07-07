@@ -84,7 +84,8 @@ Hooks.on('PopOut:close', (app) =>
  */
 
 /**
- * @typedef {object} SvelteApplicationOptions
+ * @typedef {object} SvelteApplicationOptions Options for SvelteApplication. Note: that this extends the Foundry
+ * {@link ApplicationOptions}.
  *
  * @property {boolean}  [defaultCloseAnimation=true] If false the default slide close animation is not run.
  *
