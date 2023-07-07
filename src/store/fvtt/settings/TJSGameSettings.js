@@ -33,7 +33,7 @@ export class TJSGameSettings
     */
    #stores = new Map();
 
-   /** @type {import('./types').IUIControl} */
+   /** @type {import('./types').UIControl} */
    #uiControl;
 
    /**
@@ -84,7 +84,7 @@ export class TJSGameSettings
    }
 
    /**
-    * @returns {import('./types').IUIControl} The associated UIControl.
+    * @returns {import('./types').UIControl} The associated UIControl.
     */
    get uiControl()
    {

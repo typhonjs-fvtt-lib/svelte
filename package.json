@@ -50,6 +50,14 @@
       "types": "./_dist/store/fvtt/index.d.ts",
       "import": "./_dist/store/fvtt/index.js"
     },
+    "./store/fvtt/document": {
+      "types": "./_dist/store/fvtt/document/index.d.ts",
+      "import": "./_dist/store/fvtt/document/index.js"
+    },
+    "./store/fvtt/settings": {
+      "types": "./_dist/store/fvtt/settings/index.d.ts",
+      "import": "./_dist/store/fvtt/settings/index.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [

@@ -9,7 +9,7 @@ import type { TJSWebStorage } from '#runtime/svelte/store/web-storage'
  * for UI display by TJSSettingsEdit. The store `showSettings` is utilized in TJSSettingsSwap component to provide
  * an easy way to flip between settings component or any main slotted component.
  */
-export interface IUIControl
+export interface UIControl
 {
    /**
     * @returns {{showSettings: Readable<boolean>}} Returns the managed stores.

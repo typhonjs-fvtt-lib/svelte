@@ -113,11 +113,47 @@ const rollupConfigs = [
          plugins: [
             importsExternal(),
             resolve(s_RESOLVE_CONFIG),
-            generateDTS.plugin(dtsPluginOptions)
+            generateDTS.plugin({ ...dtsPluginOptions, tsFileWalk: false })
          ]
       },
       output: {
          file: '_dist/store/fvtt/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap
+      }
+   },
+   {
+      input: {
+         input: 'src/store/fvtt/document/index.js',
+         plugins: [
+            importsExternal(),
+            resolve(s_RESOLVE_CONFIG),
+            generateDTS.plugin(dtsPluginOptions)
+         ]
+      },
+      output: {
+         file: '_dist/store/fvtt/document/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap
+      }
+   },
+   {
+      input: {
+         input: 'src/store/fvtt/settings/index.js',
+         plugins: [
+            importsExternal(),
+            resolve(s_RESOLVE_CONFIG),
+            generateDTS.plugin(dtsPluginOptions)
+         ]
+      },
+      output: {
+         file: '_dist/store/fvtt/settings/index.js',
          format: 'es',
          generatedCode: { constBindings: true },
          paths: externalPathsNPM,
