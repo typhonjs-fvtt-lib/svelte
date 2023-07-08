@@ -9,6 +9,7 @@ import { A11yHelper }   from '@typhonjs-svelte/runtime-base/util/browser';
 import {
    deepMerge,
    hasGetter,
+   isIterable,
    isObject }           from '@typhonjs-svelte/runtime-base/util/object';
 
 import {
@@ -20,8 +21,10 @@ import {
    TJSAppIndex }        from './internal/index.js';
 
 /**
- * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
- * load one or more components from `defaultOptions`.
+ * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
+ * appropriately. You can declaratively load one or more components from `defaultOptions` using a
+ * {@link TJSSvelteConfig} object in the SvelteApplicationOptions `options` {@link SvelteApplicationOptions.svelte}
+ * property.
  */
 export class SvelteApplication extends Application
 {
@@ -434,7 +437,7 @@ export class SvelteApplication extends Application
     */
    _injectHTML(html)
    {
-      if (this.popOut && html.length === 0 && Array.isArray(this.options.svelte))
+      if (this.popOut && html.length === 0 && isIterable(this.options.svelte))
       {
          throw new Error(
           'SvelteApplication - _injectHTML - A popout app with no template can only support one Svelte component.');
@@ -462,7 +465,7 @@ export class SvelteApplication extends Application
          };
       };
 
-      if (Array.isArray(this.options.svelte))
+      if (isIterable(this.options.svelte))
       {
          for (const svelteConfig of this.options.svelte)
          {

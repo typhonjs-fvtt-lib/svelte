@@ -9,6 +9,7 @@ import { A11yHelper }   from '#runtime/util/browser';
 import {
    deepMerge,
    hasGetter,
+   isIterable,
    isObject }           from '#runtime/util/object';
 
 import {
@@ -19,11 +20,14 @@ import {
    SvelteReactive }     from '../internal/index.js';
 
 /**
- * Provides a Svelte aware extension to FormApplication to control the app lifecycle appropriately. You can
- * declaratively load one or more components from `defaultOptions`. It is not recommended that you use or depend on
- * this class as it only exists to support {@link HandlebarsFormApplication} due to the OOP nature of the Foundry VTT
- * platform. This should only be an interim or stepwise solution as you convert your package over to fully using TRL &
- * Svelte.
+ * Provides a Svelte aware extension to the Foundry {@link FormApplication} class to manage the app lifecycle
+ * appropriately. You can declaratively load one or more components from `defaultOptions`. You can declaratively load
+ * one or more components from `defaultOptions` using a {@link TJSSvelteConfig} object in the SvelteApplicationOptions
+ * `options` {@link SvelteApplicationOptions.svelte} property.
+ *
+ * Note: It is not recommended that you use or depend on this class as it only exists to support
+ * {@link HandlebarsFormApplication} due to the OOP nature of the Foundry VTT platform. This should only be an interim
+ * or stepwise solution as you convert your package over to fully using TRL & Svelte.
  */
 export class SvelteFormApplication extends FormApplication
 {
@@ -455,7 +459,7 @@ export class SvelteFormApplication extends FormApplication
     */
    _injectHTML(html)
    {
-      if (this.popOut && html.length === 0 && Array.isArray(this.options.svelte))
+      if (this.popOut && html.length === 0 && isIterable(this.options.svelte))
       {
          throw new Error(
           'SvelteFormApplication - _injectHTML - A popout app with no template can only support one Svelte component.');
@@ -483,7 +487,7 @@ export class SvelteFormApplication extends FormApplication
          };
       };
 
-      if (Array.isArray(this.options.svelte))
+      if (isIterable(this.options.svelte))
       {
          for (const svelteConfig of this.options.svelte)
          {

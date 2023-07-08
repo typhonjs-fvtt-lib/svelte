@@ -17,11 +17,14 @@ declare class HandlebarsApplication extends SvelteApplication {
 }
 
 /**
- * Provides a Svelte aware extension to FormApplication to control the app lifecycle appropriately. You can
- * declaratively load one or more components from `defaultOptions`. It is not recommended that you use or depend on
- * this class as it only exists to support {@link HandlebarsFormApplication} due to the OOP nature of the Foundry VTT
- * platform. This should only be an interim or stepwise solution as you convert your package over to fully using TRL &
- * Svelte.
+ * Provides a Svelte aware extension to the Foundry {@link FormApplication} class to manage the app lifecycle
+ * appropriately. You can declaratively load one or more components from `defaultOptions`. You can declaratively load
+ * one or more components from `defaultOptions` using a {@link TJSSvelteConfig} object in the SvelteApplicationOptions
+ * `options` {@link SvelteApplicationOptions.svelte} property.
+ *
+ * Note: It is not recommended that you use or depend on this class as it only exists to support
+ * {@link HandlebarsFormApplication} due to the OOP nature of the Foundry VTT platform. This should only be an interim
+ * or stepwise solution as you convert your package over to fully using TRL & Svelte.
  */
 declare class SvelteFormApplication {
     /**

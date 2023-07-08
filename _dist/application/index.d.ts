@@ -647,8 +647,10 @@ type StoreUIOptions = {
 };
 
 /**
- * Provides a Svelte aware extension to Application to control the app lifecycle appropriately. You can declaratively
- * load one or more components from `defaultOptions`.
+ * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
+ * appropriately. You can declaratively load one or more components from `defaultOptions` using a
+ * {@link TJSSvelteConfig} object in the SvelteApplicationOptions `options` {@link SvelteApplicationOptions.svelte}
+ * property.
  */
 declare class SvelteApplication {
     /**

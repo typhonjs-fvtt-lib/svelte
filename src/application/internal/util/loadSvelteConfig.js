@@ -13,7 +13,7 @@ import { isObject }              from '#runtime/util/object';
  *
  * @param {HTMLElement}       [opts.template] - Any HTML template.
  *
- * @param {object}            [opts.config] - Svelte component options
+ * @param {import('#runtime/svelte/util').TJSSvelteConfig}  [opts.config] - Svelte component options
  *
  * @param {Function}          [opts.elementRootUpdate] - A callback to assign to the external context.
  *
