@@ -1,15 +1,19 @@
 # Changelog
+## Release 0.1.0 (major)
+- Large overhaul of library structure.
+- Some import locations have changed; See release notes in Discord for updated change info.
+
 ## Release 0.0.22 (major)
 - Advanced focus management including focus trapping for application shells.
   - Check options `focusAuto`, `focusKeep`, `focusTrap` in SvelteApplication `options` / `reactive`
     - By default `focusAuto` / `focusTrap` is enabled for application shells.
     - `focusSource` for pass-through handling of returning focus to source of action on close.
-  - Note: To enable keyboard navigation by `tab` traversal you need to remove / reassign the Foundry key binding for 
+  - Note: To enable keyboard navigation by `tab` traversal you need to remove / reassign the Foundry key binding for
     `tab`.
-    
-- TJSDialog completely overhauled. 
+
+- TJSDialog completely overhauled.
   - Keeps the same configuration options / remove all JQuery support.
-  - New `wait` method w/ managed Promise handling. 
+  - New `wait` method w/ managed Promise handling.
     - Inside of dialog Svelte components access managed promise via `getContext('#managedPromise')`
 
 - New options for application header button options:
@@ -38,27 +42,27 @@
 - Moved TJSGameSettings to `svelte-standard`.
 
 ## Release 0.0.19 (medium)
-- Added new reactive embedded collections capability to TJSDocument. 
+- Added new reactive embedded collections capability to TJSDocument.
 - DynArrayReducer / DynMapReducer / DerivedArrayReducer / DerivedMapReducer stores added.
 - Fixed compatibility aspects w/ Foundry v10.
 
 ## Release 0.0.18 (minor)
-- Fixed teething issues w/ Vite. 
+- Fixed teething issues w/ Vite.
 
 ## Release 0.0.17 (major dependency update)
 - Vite is now the recommended bundler / dev setup
 - Full support for Svelte HMR in Vite developer mode.
 
-## Release 0.0.16 (small update) 
-- Updated `DynArrayReducer` from @typhonjs-svelte/lib to be able to dynamically reverse iteration. Useful for table 
+## Release 0.0.16 (small update)
+- Updated `DynArrayReducer` from @typhonjs-svelte/lib to be able to dynamically reverse iteration. Useful for table
   sorting.
- 
-- Fixed corner case issues in `SessionStorage` / `LocalStorage`. 
+
+- Fixed corner case issues in `SessionStorage` / `LocalStorage`.
 
 ## Release 0.0.15 (medium update / 1 deprecation)
 - `action`
   - Added 'applyScrolltop'; stores and applies scrollTop to associated element.
-  
+
 
 - `application`
   - SvelteApplication; fixed application minHeight / minWidth issues.
@@ -67,7 +71,7 @@
 - `animate`
   - Added 'animateEvents'; provides a wrapper around animate functions (IE flip) providing events for animation start / finish.
     This is useful when needing to alter characteristics / CSS values of the container during animation.
-   
+
 
 - `store`
   - TJSGameSettings
@@ -96,7 +100,7 @@
 
 - Position State API
   - New location (position.state.<xxx>)
-  
+
 - AnimationAPI / AnimationManager
   - Fully decoupled AnimationManager from UpdateElementManager.
   - `position.animate.<xxx>` & Position.Animate.<xxx> for grouping multiple position instances in one animation.
@@ -114,15 +118,15 @@
   - autoBlur; Applied to an element focus is blurred when another pointer down event occurs outside the element.
 
 ## Release 0.0.12 (massive update / animation stage #1)
-- Full integration of GSAP 
+- Full integration of GSAP
   - Proper module loading from remote source (requires top level await).
   - GsapCompose (data oriented GSAP bridge for Position)
   - draggableGsap; provides easing + inertia support.
 
 - Position system
   - immediate element update support; from external rAF callback.
-  - animateTo 
-    - returns an object w/ cancel method and `finished` for the animation 
+  - animateTo
+    - returns an object w/ cancel method and `finished` for the animation
       end Promise.
     - ease instead of easing. duration is now specified in seconds instead of milliseconds.
   - start of static public Animation API; support `cancelAll` -> `Position.Animation.cancelAll()`
@@ -130,15 +134,15 @@
 Demos
   - position-app: cleaned up UI; upgraded w/ GSAP timeline / tween examples + draggable selection.
   - position-box: upgraded w/ GSAP timeline example; draggableGsap
-  - position-carousel: upgraded for GSAP timeline / tween to control continuous updates.  
+  - position-carousel: upgraded for GSAP timeline / tween to control continuous updates.
 
 ## Skipped 0.0.11 (keep parity w/ TRL)
 
 ## Release 0.0.10 (large update)
 - Further refinement of position / Position system.
   - Orthographic mode
-    - top / left positional data is converted to translate X / Y in matrix3d transform.   
-    - SvelteApplication boolean option `positionOrtho` to turn off orthographic mode. 
+    - top / left positional data is converted to translate X / Y in matrix3d transform.
+    - SvelteApplication boolean option `positionOrtho` to turn off orthographic mode.
 - `resizeObserver` action performance improvements.
   - All resizeObserver actions share a single ResizeObserver instance.
   - resizeObserver now caches both content & offset width / height.
@@ -155,7 +159,7 @@ Demos
 - Continued refinement of position / Position in SvelteApplication.
   - Transforms are now handled by matrix3d.
 - New math package w/ glmatrix and other supporting functions.
-- Can now use a Svelte component as a header button. 
+- Can now use a Svelte component as a header button.
 - TJSDialog sets height as `auto` by default.
 - TJSDocument has `setFromUUID` and `setFromDataTransfer` methods
 
@@ -168,36 +172,36 @@ Demos
   are now possible.
 
 ## Release 0.0.6 (large update)
-- Breaking changes (rename of variables): 
-  - When creating a Svelte component the Foundry application accessible by 
-  `getContext('external').foundryApp` is renamed to `application` and accessible by `getContext('external').application`. 
+- Breaking changes (rename of variables):
+  - When creating a Svelte component the Foundry application accessible by
+  `getContext('external').foundryApp` is renamed to `application` and accessible by `getContext('external').application`.
   - SvelteApplication / SvelteReactive `IE this.reactive.storeUIOptions` renamed to `this.reactive.storeUIState`. Added
     two new stores for `dragging` and `resizing` that are true when the app is being dragged or resized.
 
-- TJSDocumentDialog and individual dialogs for working with documents added to 
+- TJSDocumentDialog and individual dialogs for working with documents added to
 new sub-module `@typhonjs-fvtt/svelte/application/dialog`.
 
-- TJSDocument and TJSDocumentCollection to make documents and document collections reactive / store / subscriber 
+- TJSDocument and TJSDocumentCollection to make documents and document collections reactive / store / subscriber
 protocol support available via `@typhonjs-fvtt/svelte/store`
 
-- Many refinements to TJSDialog smoothing out developer experience. 
+- Many refinements to TJSDialog smoothing out developer experience.
   - Added `autoClose` option to not automatically close on button press. You must manually close the app in button
-  callback. 
+  callback.
   - Normalized options for icon: you can now just pass a string for the FA icon class.
   - Normalized callback option / you can also use `onclick`
-  - If you are using a Svelte component for the dialog content the callback can be a text string for an exported 
+  - If you are using a Svelte component for the dialog content the callback can be a text string for an exported
   - function in the Svelte component to invoke on button press.
   - Added `styles` option / object to specify inline styles on the button.
   - Added `title` option to add a title / tooltip to buttons.
-  
-- The SvelteApplication `position` object is not a specific class `Position` that has the same API / shape as the 
-default core `position` object. 
+
+- The SvelteApplication `position` object is not a specific class `Position` that has the same API / shape as the
+default core `position` object.
   - The new position implementation is a Svelte store / reactive.
   - `this.position.validators` provides an API to add validation functions that are invoked on position changes allowing
   modification of position data or cancelling an update. This allows the easy creation of window / app management code.
-  
+
 - Really fine-tuned `setPosition` fixing outstanding issues / integrated position validation.
-  - `max-width` / `max-height` set in styles is now included in calculations, so when resizing an app the position data 
+  - `max-width` / `max-height` set in styles is now included in calculations, so when resizing an app the position data
   correctly stops at any max value set.
   - Validation via Position is engaged allowing much easier window management functionality.
 
@@ -213,17 +217,17 @@ default core `position` object.
 - A bunch more refinement; too much to list.
 
 ## Release 0.0.2
-- Updated SvelteApplication / SvelteFormApplication to properly handle z-index management including legacy Handlebars 
+- Updated SvelteApplication / SvelteFormApplication to properly handle z-index management including legacy Handlebars
 support.
 
 - Added `setPosition` option that by default is true. When set to false the `setPosition` method takes no effect.
 
 - Added `headerButtonNoClose` and `headerButtonNoLabel` options to remove close button and labels from header buttons.
 
-- Made storeAppOptions derived stores writable. 
+- Made storeAppOptions derived stores writable.
 
 ## Release 0.0.1
-- Updated SvelteApplication / SvelteFormApplication `setPosition` to automatically determine `noHeight` / `noWidth` from 
+- Updated SvelteApplication / SvelteFormApplication `setPosition` to automatically determine `noHeight` / `noWidth` from
 style `height` or `width`.
 
 ## Release 0.0.0
