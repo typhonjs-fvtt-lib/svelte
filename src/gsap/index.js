@@ -27,7 +27,7 @@ export * from './util/index.js';
  *    import('#runtime/svelte/store/position').TJSPosition |
  *    Iterable<import('#runtime/svelte/store/position').TJSPosition> |
  *    Array<HTMLElement | object>
- * )} GSAPTarget
+ * )} GsapTarget
  */
 
 // Typedefs from GsapPosition ----------------------------------------------------------------------------------------

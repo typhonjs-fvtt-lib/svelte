@@ -19,7 +19,7 @@ import { TimelineImpl } from './TimelineImpl.js';
 export class GsapCompose
 {
    /**
-    * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   vars - GSAP vars object for `from`.
     *
@@ -42,7 +42,7 @@ export class GsapCompose
    }
 
    /**
-    * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   fromVars - GSAP fromVars object for `fromTo`
     *
@@ -84,7 +84,7 @@ export class GsapCompose
    }
 
    /**
-    * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {string}   key - Property of position to manipulate.
     *
@@ -135,7 +135,7 @@ export class GsapCompose
    }
 
    /**
-    * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object | import('../').GsapData}   [arg1] - Either an object defining timeline options or GsapData.
     *
@@ -252,7 +252,7 @@ export class GsapCompose
    }
 
    /**
-    * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   vars - GSAP vars object for `to`.
     *

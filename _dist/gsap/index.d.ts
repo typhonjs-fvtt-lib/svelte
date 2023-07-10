@@ -1,5 +1,4 @@
 
-
 import * as _runtime_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import * as svelte_transition from 'svelte/transition';
 import * as svelte_store from 'svelte/store';
@@ -286,7 +285,7 @@ declare namespace draggableGsap {
  */
 declare class GsapCompose {
     /**
-     * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
+     * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
      *
      * @param {object}   vars - GSAP vars object for `from`.
      *
@@ -295,9 +294,9 @@ declare class GsapCompose {
      *
      * @returns {object} GSAP tween
      */
-    static from(target: GSAPTarget, vars: object, options?: GsapPositionOptions): object;
+    static from(target: GsapTarget, vars: object, options?: GsapPositionOptions): object;
     /**
-     * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
+     * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
      *
      * @param {object}   fromVars - GSAP fromVars object for `fromTo`
      *
@@ -307,7 +306,7 @@ declare class GsapCompose {
      *
      * @returns {object} GSAP tween
      */
-    static fromTo(target: GSAPTarget, fromVars: object, toVars: object, options?: GsapPositionOptions): object;
+    static fromTo(target: GsapTarget, fromVars: object, toVars: object, options?: GsapPositionOptions): object;
     /**
      * Checks the `gsap` module instance for existence of a method and GsapCompose for the same method name. This
      * is helpful to determine which new features are available. Ex. `quickTo` is not available until GSAP `3.10+`.
@@ -318,7 +317,7 @@ declare class GsapCompose {
      */
     static hasMethod(name: string): boolean;
     /**
-     * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
+     * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
      *
      * @param {string}   key - Property of position to manipulate.
      *
@@ -328,7 +327,7 @@ declare class GsapCompose {
      *
      * @returns {Function}  GSAP quickTo function.
      */
-    static quickTo(target: GSAPTarget, key: string, vars: object, options?: GsapPositionOptions): Function;
+    static quickTo(target: GsapTarget, key: string, vars: object, options?: GsapPositionOptions): Function;
     /**
      * Defers to `gsap` module to register an easing function.
      *
@@ -344,7 +343,7 @@ declare class GsapCompose {
      */
     static registerPlugin(...args: Function[]): void;
     /**
-     * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
+     * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
      *
      * @param {object | import('../').GsapData}   [arg1] - Either an object defining timeline options or GsapData.
      *
@@ -355,9 +354,9 @@ declare class GsapCompose {
      *
      * @returns {object} GSAP timeline
      */
-    static timeline(target: GSAPTarget, arg1?: object | GsapData, arg2?: GsapData | GsapPositionOptions, arg3?: GsapPositionOptions): object;
+    static timeline(target: GsapTarget, arg1?: object | GsapData, arg2?: GsapData | GsapPositionOptions, arg3?: GsapPositionOptions): object;
     /**
-     * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
+     * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
      *
      * @param {object}   vars - GSAP vars object for `to`.
      *
@@ -365,7 +364,7 @@ declare class GsapCompose {
      *
      * @returns {object} GSAP tween
      */
-    static to(target: GSAPTarget, vars: object, options?: GsapPositionOptions): object;
+    static to(target: GsapTarget, vars: object, options?: GsapPositionOptions): object;
 }
 
 /**
@@ -389,7 +388,7 @@ type GsapPositionOptions = {
      */
     initialProps?: Iterable<string>;
 };
-type GSAPTarget = (string | object | _runtime_svelte_store_position.TJSPosition | Iterable<_runtime_svelte_store_position.TJSPosition> | Array<HTMLElement | object>);
+type GsapTarget = (string | object | _runtime_svelte_store_position.TJSPosition | Iterable<_runtime_svelte_store_position.TJSPosition> | Array<HTMLElement | object>);
 /**
  * Stores and tracks any associated `TJSPosition` instance utilized by
  *          {@link GsapCompose }.
@@ -417,4 +416,4 @@ type TJSPositionInfo = {
     gsapData: Array<object[]>;
 };
 
-export { DraggableGsapOptions, GSAPTarget, GsapCompose, GsapData, GsapPositionOptions, TJSPositionInfo, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };
+export { DraggableGsapOptions, GsapCompose, GsapData, GsapPositionOptions, GsapTarget, TJSPositionInfo, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };

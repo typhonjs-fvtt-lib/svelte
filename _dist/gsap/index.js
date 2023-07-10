@@ -996,7 +996,7 @@ function s_VALIDATE_GSAPDATA_ENTRY(gsapData)
 class GsapCompose
 {
    /**
-    * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   vars - GSAP vars object for `from`.
     *
@@ -1019,7 +1019,7 @@ class GsapCompose
    }
 
    /**
-    * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   fromVars - GSAP fromVars object for `fromTo`
     *
@@ -1061,7 +1061,7 @@ class GsapCompose
    }
 
    /**
-    * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {string}   key - Property of position to manipulate.
     *
@@ -1112,7 +1112,7 @@ class GsapCompose
    }
 
    /**
-    * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object | import('../').GsapData}   [arg1] - Either an object defining timeline options or GsapData.
     *
@@ -1229,7 +1229,7 @@ class GsapCompose
    }
 
    /**
-    * @param {import('../').GSAPTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   vars - GSAP vars object for `to`.
     *
