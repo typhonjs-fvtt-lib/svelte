@@ -2,7 +2,8 @@ import { TJSDialog }                from '@typhonjs-fvtt/svelte/application';
 import { TJSFolderCreateUpdate
     as TJSFolderCreateUpdateImpl }  from '@typhonjs-fvtt/svelte/component/dialog';
 import { localize }                 from '@typhonjs-fvtt/svelte/helper';
-import { hasSetter }                from '@typhonjs-fvtt/svelte/util';
+
+import { hasSetter }                from '@typhonjs-svelte/runtime-base/util/object';
 
 /**
  * Provides a reactive dialog for modifying folders that by default is modal and not draggable. An additional set of
@@ -14,11 +15,11 @@ export class TJSFolderCreateUpdate extends TJSDialog
    /**
     * Updates an existing Folder by rendering a dialog window with basic details.
     *
-    * @param {Folder} document - The folder to edit.
+    * @param {globalThis.Folder} document - The folder to edit.
     *
     * @param {object} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('@typhonjs-fvtt/svelte/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     */
    constructor(document, options = {}, dialogData = {})
    {
@@ -46,8 +47,8 @@ export class TJSFolderCreateUpdate extends TJSDialog
       }, options);
 
       /**
-       * @member {Folder} document - Adds accessors to SvelteReactive to get / set the document associated with
-       *                           TJSFolderDialog.
+       * @member {globalThis.Folder} document - Adds accessors to SvelteReactive to get / set the document associated
+       *                             with TJSFolderDialog.
        *
        * @memberof SvelteReactive#
        */
@@ -70,7 +71,7 @@ export class TJSFolderCreateUpdate extends TJSDialog
     *
     * @param {object} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Folder|null>} The newly created Folder or null if the dialog is closed.
+    * @returns {Promise<globalThis.Folder|null>} The newly created Folder or null if the dialog is closed.
     */
    static async showCreate(folderData, options = {}, dialogData = {})
    {
@@ -96,13 +97,13 @@ export class TJSFolderCreateUpdate extends TJSDialog
    /**
     * Updates an existing Folder by rendering a dialog window with basic details.
     *
-    * @param {Folder} document - The folder to edit.
+    * @param {globalThis.Folder} document - The folder to edit.
     *
     * @param {object} [options] - Options to pass to TJSDialog / Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('@typhonjs-fvtt/svelte/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Folder|null>} The modified Folder or null if the dialog is closed.
+    * @returns {Promise<globalThis.Folder|null>} The modified Folder or null if the dialog is closed.
     */
    static async showUpdate(document, options = {}, dialogData = {})
    {

@@ -5,7 +5,7 @@
       localize,
       selectOptions }      from '@typhonjs-fvtt/svelte/helper';
 
-   import { TJSDocument }  from '@typhonjs-fvtt/svelte/store';
+   import { TJSDocument }  from '@typhonjs-fvtt/svelte/store/fvtt';
 
    export let document = void 0;
 

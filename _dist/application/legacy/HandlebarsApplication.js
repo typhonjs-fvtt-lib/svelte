@@ -6,14 +6,17 @@ import {
 
 import {
    deepMerge,
-   isObject }                 from '@typhonjs-fvtt/svelte/util';
+   isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
 
+/**
+ * Provides legacy support for Handlebars rendering while still gaining aspects of reactivity with a Svelte powered
+ * application shell. You may use HandlebarsApplication in a similar manner as the core Foundry `Application` class.
+ * This should only be an interim or stepwise solution as you convert your package over to fully using TRL & Svelte.
+ */
 export class HandlebarsApplication extends SvelteApplication
 {
    /**
-    * Temporarily holds the inner HTML.
-    *
-    * @type {JQuery}
+    * Temporarily holds the inner JQuery HTML.
     */
    #innerHTML;
 
@@ -33,12 +36,11 @@ export class HandlebarsApplication extends SvelteApplication
    }
 
    /**
-    * Append HTML to application shell content area.
+    * Append JQuery HTML to application shell content area.
     *
-    * @param {JQuery}   html - new content; is ignored
-    *
-    * @private
+    * @protected
     * @ignore
+    * @internal
     */
    _injectHTML(html) // eslint-disable-line no-unused-vars
    {
@@ -54,6 +56,13 @@ export class HandlebarsApplication extends SvelteApplication
       this.#innerHTML = void 0;
    }
 
+   /**
+    * Temporarily store the inner JQuery HTML.
+    *
+    * @protected
+    * @ignore
+    * @internal
+    */
    async _renderInner(data)
    {
       this.#innerHTML = await super._renderInner(data);
@@ -64,8 +73,9 @@ export class HandlebarsApplication extends SvelteApplication
     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
     * application frame / title for pop-out applications.
     *
-    * @inheritDoc
+    * @protected
     * @ignore
+    * @internal
     */
    _replaceHTML(element, html)  // eslint-disable-line no-unused-vars
    {

@@ -2,6 +2,7 @@
  * @param {string}   name - Name of GSAP plugin to load.
  *
  * @returns {Promise<*>} The loaded plugin.
+ * @ignore
  */
 export async function gsapLoadPlugin(name)
 {

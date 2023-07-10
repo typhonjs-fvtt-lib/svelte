@@ -1,7 +1,7 @@
 <script>
-   import { getContext }    from 'svelte';
+   import { getContext }    from '#svelte';
 
-   import { isObject }      from '@typhonjs-fvtt/svelte/util';
+   import { isObject }      from '#runtime/util/object';
 
    import TJSContainer      from './TJSContainer.svelte';
 

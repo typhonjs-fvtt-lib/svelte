@@ -1,17 +1,22 @@
 <script>
+   /**
+    * TODO: Documentation!
+    */
    import {
       getContext,
       onDestroy,
-      onMount }            from 'svelte';
+      onMount }               from 'svelte';
 
-   import { applyStyles }  from '@typhonjs-fvtt/svelte/action';
-   import { localize }     from '@typhonjs-fvtt/svelte/helper';
+   import { applyStyles }     from '@typhonjs-svelte/runtime-base/svelte/action/dom';
 
    import {
-      A11yHelper,
-      isObject,
       isSvelteComponent,
-      parseSvelteConfig }  from '@typhonjs-fvtt/svelte/util';
+      parseTJSSvelteConfig }  from '@typhonjs-svelte/runtime-base/svelte/util';
+
+   import { A11yHelper }      from '@typhonjs-svelte/runtime-base/util/browser';
+   import { isObject }        from '@typhonjs-svelte/runtime-base/util/object';
+
+   import { localize }        from '@typhonjs-fvtt/svelte/helper';
 
    export let data = void 0;
    export let preventDefault = false;
@@ -142,7 +147,7 @@
          }
          else if (isObject(content))
          {
-            const svelteConfig = parseSvelteConfig(content, application);
+            const svelteConfig = parseTJSSvelteConfig(content, application);
             dialogClass = svelteConfig.class;
             dialogProps = svelteConfig.props ?? {};
 
@@ -367,9 +372,9 @@
    </div>
 
    {#if buttons.length}
-   <div bind:this={buttonsEl} class=dialog-buttons>
+   <div bind:this={buttonsEl} class="dialog-buttons tjs-dialog-buttons">
       {#each buttons as button (button.id)}
-      <button class="dialog-button {button.id}"
+      <button class="dialog-button tjs-dialog-button {button.id}"
               on:click|preventDefault|stopPropagation={() => onClick(button)}
               on:focus={() => currentButtonId = button.id}
               disabled={button.disabled}
@@ -384,5 +389,19 @@
 <style>
    .dialog-buttons {
       padding-top: 8px;
+   }
+
+   .tjs-dialog-button:hover {
+      box-shadow: var(--tjs-dialog-button-box-shadow-focus-hover, var(--tjs-default-box-shadow-focus-hover));
+      outline: var(--tjs-dialog-button-outline-focus-hover, var(--tjs-default-outline-focus-hover, revert));
+      transition: var(--tjs-dialog-button-transition-focus-hover, var(--tjs-default-transition-focus-hover));
+      text-shadow: var(--tjs-dialog-button-text-shadow-focus-hover, var(--tjs-default-text-shadow-focus-hover, inherit));
+   }
+
+   .tjs-dialog-button:focus-visible {
+      box-shadow: var(--tjs-dialog-button-box-shadow-focus-visible, var(--tjs-default-box-shadow-focus-visible));
+      outline: var(--tjs-dialog-button-outline-focus-visible, var(--tjs-default-outline-focus-visible, revert));
+      transition: var(--tjs-dialog-button-transition-focus-visible, var(--tjs-default-transition-focus-visible));
+      text-shadow: var(--tjs-dialog-button-text-shadow-focus-visible, var(--tjs-default-text-shadow-focus-hover, inherit));
    }
 </style>

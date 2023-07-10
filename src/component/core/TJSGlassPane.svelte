@@ -1,11 +1,7 @@
 <script>
-   import { applyStyles }              from '@typhonjs-fvtt/svelte/action';
-
-   import {
-      s_DEFAULT_TRANSITION,
-      s_DEFAULT_TRANSITION_OPTIONS }   from '@typhonjs-fvtt/svelte/transition';
-
-   import { isObject }                 from '@typhonjs-fvtt/svelte/util';
+   import { applyStyles }              from '#runtime/svelte/action/dom';
+   import { TJSDefaultTransition }     from '#runtime/svelte/transition';
+   import { isObject }                 from '#runtime/util/object';
 
    /** @type {string} */
    export let background = '#50505080';
@@ -37,13 +33,13 @@
 
    // Exports properties to set a transition w/ in / out options.
    export let transition = void 0;
-   export let inTransition = s_DEFAULT_TRANSITION;
-   export let outTransition = s_DEFAULT_TRANSITION;
+   export let inTransition = void 0;
+   export let outTransition = void 0;
 
    // Exports properties to set options for any transitions.
    export let transitionOptions = void 0;
-   export let inTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS;
-   export let outTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS;
+   export let inTransitionOptions = TJSDefaultTransition.options;
+   export let outTransitionOptions = TJSDefaultTransition.options;
 
    // Tracks last transition state.
    let oldTransition = void 0;
@@ -54,8 +50,7 @@
    {
       // If transition is defined and not the default transition then set it to both in and out transition otherwise
       // set the default transition to both in & out transitions.
-      const newTransition = s_DEFAULT_TRANSITION !== transition && typeof transition === 'function' ? transition :
-       s_DEFAULT_TRANSITION;
+      const newTransition = typeof transition === 'function' ? transition : void 0;
 
       inTransition = newTransition;
       outTransition = newTransition;
@@ -66,8 +61,8 @@
    // Run this reactive block when the last transition options state is not equal to the current options state.
    $: if (oldTransitionOptions !== transitionOptions)
    {
-      const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && isObject(transitionOptions) ?
-       transitionOptions : s_DEFAULT_TRANSITION_OPTIONS;
+      const newOptions = transitionOptions !== TJSDefaultTransition.options && isObject(transitionOptions) ?
+       transitionOptions : TJSDefaultTransition.options;
 
       inTransitionOptions = newOptions;
       outTransitionOptions = newOptions;
@@ -76,16 +71,16 @@
    }
 
    // Handle cases if inTransition is unset; assign noop default transition function.
-   $: if (typeof inTransition !== 'function') { inTransition = s_DEFAULT_TRANSITION; }
+   $: if (typeof inTransition !== 'function') { inTransition = void 0; }
 
    // Handle cases if outTransition is unset; assign noop default transition function.
-   $: if (typeof outTransition !== 'function') { outTransition = s_DEFAULT_TRANSITION; }
+   $: if (typeof outTransition !== 'function') { outTransition = void 0; }
 
    // Handle cases if inTransitionOptions is unset; assign empty default transition options.
-   $: if (typeof inTransitionOptions !== 'object') { inTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS; }
+   $: if (!isObject(inTransitionOptions)) { inTransitionOptions = TJSDefaultTransition.options; }
 
    // Handle cases if outTransitionOptions is unset; assign empty default transition options.
-   $: if (typeof outTransitionOptions !== 'object') { outTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS; }
+   $: if (!isObject(outTransitionOptions)) { outTransitionOptions = TJSDefaultTransition.options; }
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -139,8 +134,8 @@
       <div class=tjs-glass-pane-background
            bind:this={backgroundEl}
            style:background={background}
-           in:inTransition={inTransitionOptions}
-           out:outTransition={outTransitionOptions}
+           in:inTransition|global={inTransitionOptions}
+           out:outTransition|global={outTransitionOptions}
            use:applyStyles={styles} />
 
       <div class=tjs-glass-pane-container bind:this={containerEl}>
@@ -150,8 +145,8 @@
       <div class=tjs-glass-pane-background
            bind:this={backgroundEl}
            style:background={background}
-           in:inTransition={inTransitionOptions}
-           out:outTransition={outTransitionOptions}
+           in:inTransition|global={inTransitionOptions}
+           out:outTransition|global={outTransitionOptions}
            use:applyStyles={styles} >
          <slot />
       </div>

@@ -2,7 +2,8 @@ import { TJSDialog }             from '@typhonjs-fvtt/svelte/application';
 import { TJSFolderRolltable
     as TJSFolderRolltableImpl }  from '@typhonjs-fvtt/svelte/component/dialog';
 import { localize }              from '@typhonjs-fvtt/svelte/helper';
-import { hasSetter }             from '@typhonjs-fvtt/svelte/util';
+
+import { hasSetter }             from '@typhonjs-svelte/runtime-base/util/object';
 
 /**
  * Provides a reactive dialog for creating a RollTable from a folder that by default is modal and not draggable. An
@@ -12,11 +13,12 @@ import { hasSetter }             from '@typhonjs-fvtt/svelte/util';
 export class TJSFolderRolltable extends TJSDialog
 {
    /**
-    * @param {Folder} document - Folder to create roll table from...
+    * @param {globalThis.Folder} document - Folder to create roll table from...
     *
-    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
+    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} [options] - Options to pass to TJSDialog /
+    *        Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('@typhonjs-fvtt/svelte/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     */
    constructor(document, options = {}, dialogData = {})
    {
@@ -65,14 +67,15 @@ export class TJSFolderRolltable extends TJSDialog
    /**
     * Create a RollTable from the contents of the Folder.
     *
-    * @param {Folder} document - Folder to create roll table from...
+    * @param {globalThis.Folder} document - Folder to create roll table from...
     *
-    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
+    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} [options] - Options to pass to TJSDialog /
+    *        Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('@typhonjs-fvtt/svelte/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<RollTable|boolean|null>} The newly created RollTable or a falsy value; either 'false' for
-    * cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    * @returns {Promise<globalThis.RollTable|boolean|null>} The newly created RollTable or a falsy value; either
+    *          'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async show(document, options = {}, dialogData = {})
    {

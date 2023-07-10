@@ -1,9 +1,9 @@
 <script>
-   import { getContext }    from 'svelte';
+   import { getContext }    from '#svelte';
 
    import {
       localize,
-      selectOptions }       from '@typhonjs-fvtt/svelte/helper';
+      selectOptions }       from '#svelte-fvtt/helper';
 
    export let documentCls = void 0;
    export let data = {};
@@ -26,17 +26,17 @@
    // Collect data
    const documentName = documentCls.metadata.name;
    const label = localize(documentCls.metadata.label);
+   const allTypes = game.documentTypes[documentName].filter((t) => t !== globalThis.CONST?.BASE_DOCUMENT_TYPE);
 
    folderSelect = data.folder || '';
    folders = parent ? [] : globalThis.game.folders.filter((f) => (f.type === documentName) && f.displayed);
-   types = globalThis.game.system.documentTypes[documentName];
 
-   hasTypes = types.length > 1;
+   hasTypes = allTypes.length > 1;
 
    name = data.name || localize('DOCUMENT.New', { type: label });
-   type = data.type || types[0];
+   type = data.type || allTypes[0];
 
-   types = types.reduce((obj, t) =>
+   types = allTypes.reduce((obj, t) =>
    {
       const typeLabel = globalThis.CONFIG[documentName]?.typeLabels?.[t] ?? t;
       obj[t] = globalThis.game.i18n.has(typeLabel) ? localize(typeLabel) : t;

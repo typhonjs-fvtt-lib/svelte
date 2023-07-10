@@ -1,8 +1,8 @@
-import { TJSVelocityTrack }   from '@typhonjs-fvtt/svelte/math';
+import { TJSVelocityTrack }   from '#runtime/math/physics';
 
 import {
    isIterable,
-   isObject }                 from '@typhonjs-fvtt/svelte/util';
+   isObject }                 from '#runtime/util/object';
 
 import { GsapCompose }        from '../compose/GsapCompose.js';
 
@@ -12,8 +12,9 @@ const s_HAS_QUICK_TO = false;
 
 /**
  * Provides an action to enable pointer dragging of an HTMLElement using GSAP `to` or `quickTo` to invoke `position.set`
- * on a given {@link Position} instance provided. You may provide a `easeOptions` object sent to the tween to modify the
- * duration / easing. When the attached boolean store state changes the draggable action is enabled or disabled.
+ * on a given {@link TJSPosition} instance provided. You may provide a
+ * `easeOptions` object sent to the tween to modify the duration / easing. When the attached boolean store state
+ * changes the draggable action is enabled or disabled.
  *
  * Note: Requires GSAP `3.10+` for `quickTo` support.
  *
@@ -21,14 +22,15 @@ const s_HAS_QUICK_TO = false;
  *
  * @param {object}            params - Required parameters.
  *
- * @param {Position}          params.position - A position instance.
+ * @param {import('#runtime/svelte/store/position').TJSPosition}   params.position - A position instance.
  *
  * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
  *
- * @param {number}            [params.button=0] - MouseEvent button; {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
+ * @param {number}            [params.button=0] - MouseEvent button;
+ *        {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
  *
  * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
- *                                                                            state.
+ *        state.
  *
  * @param {boolean}           [params.ease=true] - When true easing is enabled.
  *
@@ -44,7 +46,7 @@ const s_HAS_QUICK_TO = false;
  * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
  *                                                             list are ignored.
  *
- * @returns {{update: Function, destroy: Function}} The action lifecycle methods.
+ * @returns {import('svelte/action').ActionReturn<Record<string, any>>} Lifecycle functions.
  */
 function draggableGsap(node, { position, active = true, button = 0, storeDragging = void 0, ease = true,
  inertia = false, easeOptions = { duration: 0.1, ease: 'power3.out' },
@@ -101,9 +103,9 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
     * @type {object}
     */
    const handlers = {
-      dragDown: ['pointerdown', (e) => onDragPointerDown(e), false],
-      dragMove: ['pointermove', (e) => onDragPointerChange(e), false],
-      dragUp: ['pointerup', (e) => onDragPointerUp(e), false]
+      dragDown: ['pointerdown', onDragPointerDown, false],
+      dragMove: ['pointermove', onDragPointerChange, false],
+      dragUp: ['pointerup', onDragPointerUp, false]
    };
 
    /**
@@ -415,7 +417,7 @@ class DraggableGsapOptions
    /**
     * Stores the subscribers.
     *
-    * @type {(function(DraggableGsapOptions): void)[]}
+    * @type {import('svelte/store').Subscriber<DraggableGsapOptions>[]}
     */
    #subscriptions = [];
 
@@ -440,7 +442,7 @@ class DraggableGsapOptions
          get: () => { return this.#easeOptions; },
          set: (newEaseOptions) =>
          {
-            if (newEaseOptions === null || typeof newEaseOptions !== 'object')
+            if (!isObject(newEaseOptions))
             {
                throw new TypeError(`'easeOptions' is not an object.`);
             }
@@ -488,7 +490,7 @@ class DraggableGsapOptions
          get: () => { return this.#inertiaOptions; },
          set: (newInertiaOptions) =>
          {
-            if (newInertiaOptions === null || typeof newInertiaOptions !== 'object')
+            if (!isObject(newInertiaOptions))
             {
                throw new TypeError(`'inertiaOptions' is not an object.`);
             }
@@ -505,7 +507,7 @@ class DraggableGsapOptions
 
             if (newInertiaOptions.duration !== void 0)
             {
-               if (newInertiaOptions.duration === null || typeof newInertiaOptions.duration !== 'object')
+               if (!isObject(newInertiaOptions.duration))
                {
                   throw new TypeError(`'inertiaOptions.duration' is not an object.`);
                }
@@ -675,7 +677,7 @@ class DraggableGsapOptions
     */
    set inertiaDuration(duration)
    {
-      if (typeof duration !== 'object' && !Number.isFinite(duration.min) && !Number.isFinite(duration.max))
+      if (!isObject(duration) && !Number.isFinite(duration.min) && !Number.isFinite(duration.max))
       {
          throw new TypeError(`'duration' is not an object with 'min' & 'max' properties as finite numbers.`);
       }
@@ -777,10 +779,10 @@ class DraggableGsapOptions
    /**
     * Store subscribe method.
     *
-    * @param {function(DraggableGsapOptions): void} handler - Callback function that is invoked on update / changes.
-    *                                                         Receives the DraggableOptions object / instance.
+    * @param {import('svelte/store').Subscriber<DraggableGsapOptions>} handler - Callback function that is invoked on
+    * update / changes. Receives the DraggableOptions object / instance.
     *
-    * @returns {(function(): void)} Unsubscribe function.
+    * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
     */
    subscribe(handler)
    {
@@ -817,7 +819,7 @@ class DraggableGsapOptions
  * @param {{ ease?: boolean, easeOptions?: object, inertia?: boolean, inertiaOptions?: object }} options -
  *        DraggableGsapOptions.
  *
- * @returns {DraggableGsapOptions} A new options instance.
+ * @returns {import('./types').DraggableGsapOptions} A new options instance.
  */
 draggableGsap.options = (options) => new DraggableGsapOptions(options);
 

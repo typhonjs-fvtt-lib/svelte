@@ -2,7 +2,8 @@ import { TJSDialog }             from '@typhonjs-fvtt/svelte/application';
 import { TJSDocumentDelete
     as TJSDocumentDeleteImpl }   from '@typhonjs-fvtt/svelte/component/dialog';
 import { localize }              from '@typhonjs-fvtt/svelte/helper';
-import { hasSetter }             from '@typhonjs-fvtt/svelte/util';
+
+import { hasSetter }             from '#runtime/util/object';
 
 /**
  * Provides a reactive dialog for deleting documents that by default is modal and not draggable. An additional set of
@@ -18,9 +19,9 @@ export class TJSDocumentDelete extends TJSDialog
     *
     * @param {object} [opts.context] - DocumentModificationContext.
     *
-    * @param {...SvelteApplicationOptions} [opts.options] - Rest of options to pass to TJSDialog / Application.
+    * @param {import('#svelte-fvtt/application').SvelteApplicationOptions} [opts.options] - Rest of options to pass to TJSDialog / Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('#svelte-fvtt/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     */
    constructor(document, { context = {}, ...options } = {}, dialogData = {})
    {
@@ -91,12 +92,13 @@ export class TJSDocumentDelete extends TJSDialog
     *
     * @param {object} [opts.context] - DocumentModificationContext.
     *
-    * @param {...SvelteApplicationOptions} [opts.options] - Rest of options to pass to TJSDialog / Application.
+    * @param {import('#svelte-fvtt/application').SvelteApplicationOptions} [opts.options] - Rest of options to pass to
+    *        TJSDialog / Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('#svelte-fvtt/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Document|boolean|null>} The document if deleted or a falsy value; either 'false' for cancelling
-    *          or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    * @returns {Promise<foundry.abstract.Document|boolean|null>} The document if deleted or a falsy value; either
+    *          'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
     */
    static async show(document, { context = {}, ...options } = {}, dialogData = {})
    {

@@ -3,11 +3,11 @@
       getContext,
       onDestroy,
       onMount,
-      setContext }         from 'svelte';
+      setContext }         from '#svelte';
 
-   import { fade }         from 'svelte/transition';
+   import { fade }         from '#svelte/transition';
 
-   import { isObject }     from '@typhonjs-fvtt/svelte/util';
+   import { isObject }     from '#runtime/util/object';
 
    import ApplicationShell from '../application/ApplicationShell.svelte';
    import DialogContent    from './DialogContent.svelte';

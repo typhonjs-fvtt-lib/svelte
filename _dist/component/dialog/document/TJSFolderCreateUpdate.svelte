@@ -5,7 +5,7 @@
       localize,
       radioBoxes }         from '@typhonjs-fvtt/svelte/helper';
 
-   import { TJSDocument }  from '@typhonjs-fvtt/svelte/store';
+   import { TJSDocument }  from '@typhonjs-fvtt/svelte/store/fvtt';
 
    export let document = void 0;
 
@@ -79,7 +79,7 @@
    {
       const formData = new FormDataExtended(event.target).object;
 
-      if (!formData.name?.trim()) { formData.name = globalThis.Folder.implementation.defaultName(); }
+      if (!formData.name?.trim()) { formData.name = Folder.implementation.defaultName(); }
       if (!formData.parent) { formData.parent = null; }
 
       let modifiedDoc = document;

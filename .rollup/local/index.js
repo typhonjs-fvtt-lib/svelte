@@ -1,6 +1,7 @@
-import { externalPathsNPM }      from './externalPathsNPM.js';
+import { externalPathsNPM }   from './externalPathsNPM.js';
+import { externalRegexNPM }   from './externalRegexNPM.js';
 
-import { generatePlugin }        from '../generatePlugin.js';
+import { generatePlugin }     from '../generatePlugin.js';
 
 /**
  * Creates the TyphonJS runtime library substitution plugin.
@@ -11,5 +12,9 @@ import { generatePlugin }        from '../generatePlugin.js';
  */
 export function typhonjsRuntime({ exclude = [] } = {})
 {
-   return generatePlugin(externalPathsNPM, exclude);
+   return generatePlugin({
+      externalPaths: externalPathsNPM,
+      externalRegex: externalRegexNPM,
+      exclude
+   });
 }

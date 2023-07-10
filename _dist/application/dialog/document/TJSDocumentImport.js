@@ -1,8 +1,11 @@
+import { hasSetter }             from '@typhonjs-svelte/runtime-base/util/object';
+
 import { TJSDialog }             from '@typhonjs-fvtt/svelte/application';
+
 import { TJSDocumentImport
     as TJSDocumentImportImpl }   from '@typhonjs-fvtt/svelte/component/dialog';
+
 import { localize }              from '@typhonjs-fvtt/svelte/helper';
-import { hasSetter }             from '@typhonjs-fvtt/svelte/util';
 
 /**
  * Provides a reactive dialog for importing documents that by default is modal and not draggable. An additional set of
@@ -16,9 +19,10 @@ export class TJSDocumentImport extends TJSDialog
     *
     * @param {foundry.abstract.Document} document - The document to import JSON to...
     *
-    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
+    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} [options] - Options to pass to TJSDialog /
+    *        Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('@typhonjs-fvtt/svelte/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     */
    constructor(document, options, dialogData = {})
    {
@@ -53,7 +57,7 @@ export class TJSDocumentImport extends TJSDialog
        * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with
        *                             Document.
        *
-       * @memberof SvelteApplication.reactive
+       * @memberof import('@typhonjs-fvtt/svelte/application').SvelteApplication.reactive
        */
       Object.defineProperty(this.reactive, 'document', {
          get: () => this.svelte?.dialogComponent?.document,
@@ -70,12 +74,14 @@ export class TJSDocumentImport extends TJSDialog
     *
     * @param {foundry.abstract.Document} document - The document to import JSON to...
     *
-    * @param {SvelteApplicationOptions} [options] - Options to pass to TJSDialog / Application.
+    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} [options] - Options to pass to TJSDialog /
+    *        Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('@typhonjs-fvtt/svelte/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
-    * @returns {Promise<Document|boolean|null>} The document after import completes or a falsy value; either 'false' for
-    *          cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.
+    * @returns {Promise<foundry.abstract.Document|boolean|null>} The document after import completes or a falsy value;
+    *          either 'false' for cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header
+    *          button.
     */
    static async show(document, options = {}, dialogData = {})
    {

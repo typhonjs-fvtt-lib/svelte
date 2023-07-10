@@ -1,22 +1,20 @@
 {
   "name": "@typhonjs-fvtt/svelte",
-  "version": "0.0.22",
+  "version": "0.1.0",
   "description": "Provides resources to integrate Svelte w/ Foundry VTT.",
   "type": "module",
   "author": "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)",
   "contributors": [
     "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)"
   ],
-  "svelte": "src/index-svelte.js",
+  "imports": {
+    "#runtime/*": "@typhonjs-svelte/runtime-base/*",
+    "#svelte-fvtt/*": "@typhonjs-fvtt/svelte/*",
+    "#svelte-lib/*": "@typhonjs-fvtt/svelte/*",
+    "#svelte/*": "svelte/*",
+    "#svelte": "svelte"
+  },
   "exports": {
-    "./action": {
-      "types": "./_distaction/index.d.ts",
-      "import": "./_dist/action/index.js"
-    },
-    "./animate": {
-      "types": "./_dist/animate/index.d.ts",
-      "import": "./_dist/animate/index.js"
-    },
     "./application": {
       "import": "./_dist/application/index.js"
     },
@@ -44,58 +42,48 @@
     "./gsap/plugin/bonus/*": {
       "import": "./_dist/gsap/plugin/bonus/*.js"
     },
-    "./handler": {
-      "types": "./_dist/handler/index.d.ts",
-      "import": "./_dist/handler/index.js"
-    },
     "./helper": {
       "types": "./_dist/helper/index.d.ts",
       "import": "./_dist/helper/index.js"
     },
-    "./math": {
-      "types": "./_dist/math/index.d.ts",
-      "import": "./_dist/math/index.js"
+    "./store/fvtt": {
+      "types": "./_dist/store/fvtt/index.d.ts",
+      "import": "./_dist/store/fvtt/index.js"
     },
-    "./store": {
-      "types": "./_dist/store/index.d.ts",
-      "import": "./_dist/store/index.js"
+    "./store/fvtt/document": {
+      "types": "./_dist/store/fvtt/document/index.d.ts",
+      "import": "./_dist/store/fvtt/document/index.js"
     },
-    "./transition": {
-      "types": "./_dist/transition/index.d.ts",
-      "import": "./_dist/transition/index.js"
-    },
-    "./util": {
-      "types": "./_dist/util/index.d.ts",
-      "import": "./_dist/util/index.js"
-    },
-    "./plugin/data": {
-      "types": "./_dist/plugin/data/index.d.ts",
-      "import": "./_dist/plugin/data/index.js"
-    },
-    "./plugin/system": {
-      "types": "./_dist/plugin/system/index.d.ts",
-      "import": "./_dist/plugin/system/index.js"
+    "./store/fvtt/settings": {
+      "types": "./_dist/store/fvtt/settings/index.d.ts",
+      "import": "./_dist/store/fvtt/settings/index.js"
     },
     "./package.json": "./package.json"
   },
-  "dependencies": {
-  },
+  "sideEffects": [
+    "./_dist/component/core/index.js",
+    "./_dist/gsap/plugin/*.js",
+    "./_dist/gsap/plugin/bonus/*.js"
+  ],
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15",
-    "@typhonjs-build-test/esm-d-ts": "^0.0.8",
-    "@typhonjs-config/eslint-config": "^0.3.0",
+    "@typhonjs-build-test/esm-d-ts": "^0.1.0",
+    "@typhonjs-build-test/rollup-plugin-pkg-imports": "^0.0.2",
+    "@typhonjs-config/eslint-config": "^0.6.3",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "@typhonjs-svelte/lib": "github:typhonjs-svelte/lib",
-    "@typhonjs-utils/file-util": "^0.0.6",
-    "deepmerge": "^4.3.0",
+    "@typhonjs-svelte/runtime-base": "github:typhonjs-svelte/runtime-base#0.1.0",
     "eslint": "^8",
-    "fs-extra": "^11.1.0",
+    "fs-extra": "^11.1.1",
     "rollup": "^3",
-    "svelte": "^3.55.1",
+    "svelte": "^4.0.0",
     "upath": "^2"
   },
+  "peerDependencies": {
+    "svelte": ">=4.x.x"
+  },
   "engines": {
-    "node": ">=14.18"
+    "node": ">=16"
   },
   "homepage": "https://github.com/typhonjs-fvtt-lib/svelte#readme",
   "keywords": [

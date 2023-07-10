@@ -24,9 +24,10 @@ export class TJSDocumentCreate extends TJSDialog
     *
     * @param {boolean} [context.renderSheet] - Render the sheet for the new document.
     *
-    * @param {...SvelteApplicationOptions} [context.options] - Rest of options to pass to TJSDialog / Application.
+    * @param {Partial<import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions>} [context.options] - Rest of options
+    * to pass to TJSDialog / Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('@typhonjs-fvtt/svelte/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     */
    constructor(documentCls, data = {}, { parent = null, pack = null, renderSheet = true, ...options } = {},
     dialogData = {})
@@ -77,9 +78,10 @@ export class TJSDocumentCreate extends TJSDialog
     *
     * @param {boolean} [context.renderSheet] - Render the sheet for the new document.
     *
-    * @param {...SvelteApplicationOptions} [context.options] - Rest of options to pass to TJSDialog / Application.
+    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} [context.options] - Rest of options
+    *        to pass to TJSDialog / Application.
     *
-    * @param {TJSDialogOptions} [dialogData] - Optional data to modify dialog.
+    * @param {import('@typhonjs-fvtt/svelte/application').TJSDialogOptions} [dialogData] - Optional data to modify dialog.
     *
     * @returns {Promise<foundry.abstract.Document|null>} The newly created document or a falsy value; either 'false' for
     *          cancelling or 'null' if the user closed the dialog via `<Esc>` or the close header button.

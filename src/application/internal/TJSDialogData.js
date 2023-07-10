@@ -1,7 +1,7 @@
 import {
    deepMerge,
    safeAccess,
-   safeSet }   from '@typhonjs-fvtt/svelte/util';
+   safeSet }   from '#runtime/util/object';
 
 /**
  * Provides storage for all dialog options adding `get`, `merge` and `set` methods that safely access and update
@@ -10,14 +10,14 @@ import {
 export class TJSDialogData
 {
    /**
-    * @type {SvelteApplication}
+    * @type {import('../').SvelteApplication}
     */
    #application;
 
    /**
     * Provides configuration of the dialog button bar.
     *
-    * @type {Record<string, TJSDialogButtonData>}
+    * @type {Record<string, import('../').TJSDialogButtonData>}
     */
    buttons;
 
@@ -96,7 +96,7 @@ export class TJSDialogData
     * Callback invoked when dialog is closed; no button option selected. When defined as a string any matching function
     * by name exported from content Svelte component is invoked.
     *
-    * @type {string|((application: TJSDialog) => any)}
+    * @type {string|((application: import('../').TJSDialog) => any)}
     */
    onClose;
 
@@ -148,7 +148,7 @@ export class TJSDialogData
    zIndex;
 
    /**
-    * @param {SvelteApplication} application - The host Foundry application.
+    * @param {import('../').SvelteApplication} application - The host Foundry application.
     */
    constructor(application)
    {

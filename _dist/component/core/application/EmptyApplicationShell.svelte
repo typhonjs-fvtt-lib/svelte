@@ -6,17 +6,14 @@
 
    import {
       applyStyles,
-      resizeObserver }                 from '@typhonjs-fvtt/svelte/action';
+      resizeObserver }                 from '@typhonjs-svelte/runtime-base/svelte/action/dom';
 
-   import {
-      A11yHelper,
-      isObject }                       from '@typhonjs-fvtt/svelte/util';
+   import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
+   import { A11yHelper }               from '@typhonjs-svelte/runtime-base/util/browser';
+   import { isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
 
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
    import TJSFocusWrap                 from './TJSFocusWrap.svelte';
-
-   import {
-      s_DEFAULT_TRANSITION_OPTIONS }   from '@typhonjs-fvtt/svelte/transition';
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
    // use 'elementRoot' to set the element of the Application. You can also provide `elementContent` and
@@ -83,8 +80,8 @@
 
    // Exports properties to set options for any transitions.
    export let transitionOptions = void 0;
-   export let inTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS;
-   export let outTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS;
+   export let inTransitionOptions = TJSDefaultTransition.options;
+   export let outTransitionOptions = TJSDefaultTransition.options;
 
    // Tracks last transition state.
    let oldTransition = void 0;
@@ -106,8 +103,8 @@
    // Run this reactive block when the last transition options state is not equal to the current options state.
    $: if (oldTransitionOptions !== transitionOptions)
    {
-      const newOptions = transitionOptions !== s_DEFAULT_TRANSITION_OPTIONS && isObject(transitionOptions) ?
-       transitionOptions : s_DEFAULT_TRANSITION_OPTIONS;
+      const newOptions = transitionOptions !== TJSDefaultTransition.options && isObject(transitionOptions) ?
+       transitionOptions : TJSDefaultTransition.options;
 
       inTransitionOptions = newOptions;
       outTransitionOptions = newOptions;
@@ -131,10 +128,10 @@
    }
 
    // Handle cases if inTransitionOptions is unset; assign empty default transition options.
-   $: if (typeof inTransitionOptions !== 'object') { inTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS; }
+   $: if (!isObject(inTransitionOptions)) { inTransitionOptions = TJSDefaultTransition.options; }
 
    // Handle cases if outTransitionOptions is unset; assign empty default transition options.
-   $: if (typeof outTransitionOptions !== 'object') { outTransitionOptions = s_DEFAULT_TRANSITION_OPTIONS; }
+   $: if (!isObject(outTransitionOptions)) { outTransitionOptions = TJSDefaultTransition.options; }
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -195,6 +192,19 @@
     */
    function onKeydown(event)
    {
+      // TODO: Note this handling is specifically for Foundry v11+ as the platform KeyboardManager uses
+      // `document.querySelector(':focus')` to short circuit keyboard handling internally to KeyboardManager.
+      // ApplicationShell manages containing focus programmatically and this prevents the Foundry KeyboardManager from
+      // activating. We need to check if this key event target is currently the `elementRoot` or `elementContent` and
+      // the event matches any KeyboardManager actions and if so blur current focus.
+      if ((event.target === elementRoot || event.target === elementContent) &&
+       KeyboardManager && KeyboardManager?._getMatchingActions?.(
+        KeyboardManager?.getKeyboardEventContext?.(event))?.length)
+      {
+         event.target?.blur();
+         return;
+      }
+
       if (focusWrapEnabled && event.shiftKey && event.code === 'Tab')
       {
          // Collect all focusable elements from `elementRoot` and ignore TJSFocusWrap.
@@ -302,22 +312,25 @@
 <svelte:options accessors={true}/>
 
 {#if inTransition || outTransition}
+    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
          class={application.options.classes.join(' ')}
          data-appid={application.appId}
          bind:this={elementRoot}
-         in:inTransition={inTransitionOptions}
-         out:outTransition={outTransitionOptions}
+         in:inTransition|global={inTransitionOptions}
+         out:outTransition|global={outTransitionOptions}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
          on:keydown|capture={onKeydown}
          on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
          use:appResizeObserver={resizeObservedApp}
+         role=application
          tabindex=-1>
         <slot />
         <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
     </div>
 {:else}
+    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
          class={application.options.classes.join(' ')}
          data-appid={application.appId}
@@ -327,6 +340,7 @@
          on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
          use:appResizeObserver={resizeObservedApp}
+         role=application
          tabindex=-1>
         <slot />
         <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
