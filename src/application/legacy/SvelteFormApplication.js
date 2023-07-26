@@ -348,8 +348,10 @@ export class SvelteFormApplication extends FormApplication
       {
          /**
           * A hook event that fires whenever this Application is closed.
+          *
+          * Note: JQuery wrapping as Foundry event arguments uses JQuery.
           */
-         Hooks.call(`close${cls.name}`, this, el);
+         Hooks.call(`close${cls.name}`, this, $(el));
       }
 
       // If options `defaultCloseAnimation` is false then do not execute the standard slide up animation.
