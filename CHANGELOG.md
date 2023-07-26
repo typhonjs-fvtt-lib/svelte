@@ -1,4 +1,8 @@
 # Changelog
+## Release 0.1.1 (minor)
+- Fix for ResizableHandle component / elementRoot store access
+- Fix for SvelteApplication close hook invocation using JQuery element.
+
 ## Release 0.1.0 (major)
 - Large overhaul of library structure.
 - Some import locations have changed; See release notes in Discord for updated change info.
