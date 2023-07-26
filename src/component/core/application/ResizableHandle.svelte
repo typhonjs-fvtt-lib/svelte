@@ -6,7 +6,7 @@
    const application = getContext('#external').application;
 
    // Allows retrieval of the element root at runtime.
-   const storeElementRoot = getContext('storeElementRoot');
+   const storeElementRoot = getContext('#internal').stores.elementRoot;
 
    const storeResizable = application.reactive.storeAppOptions.resizable;
 
