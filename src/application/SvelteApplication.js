@@ -885,6 +885,14 @@ export class SvelteApplication extends Application
 
       await super._render(force, options);
 
+      // Handle the same render exclusion tests that reject a render in Application.
+
+      // Do not render under certain conditions.
+      if ([Application.RENDER_STATES.CLOSING, Application.RENDER_STATES.RENDERING].includes(this._state)) { return; }
+
+      // Applications which are not currently rendered must be forced.
+      if (!force && (this._state <= Application.RENDER_STATES.NONE)) { return; }
+
       // It is necessary to directly invoke `position.set` as TJSPosition uses accessors and is not a bare object, so
       // the merging that occurs is `Application._render` does not take effect.
       if (!this._minimized) { this.#position.set(options); }
