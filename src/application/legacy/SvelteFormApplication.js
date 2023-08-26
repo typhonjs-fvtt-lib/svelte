@@ -169,8 +169,8 @@ export class SvelteFormApplication extends FormApplication
          headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.
          headerIcon: void 0,              // Sets a header icon given an image URL.
          headerNoTitleMinimized: false,   // If true then header title is hidden when application is minimized.
-         minHeight: globalThis.MIN_WINDOW_HEIGHT,  // Assigned to position. Number specifying minimum window height.
-         minWidth: globalThis.MIN_WINDOW_WIDTH,    // Assigned to position. Number specifying minimum window width.
+         minHeight: MIN_WINDOW_HEIGHT,    // Assigned to position. Number specifying minimum window height.
+         minWidth: MIN_WINDOW_WIDTH,      // Assigned to position. Number specifying minimum window width.
          positionable: true,              // If false then `position.set` does not take effect.
          positionInitial: TJSPosition.Initial.browserCentered,      // A helper for initial position placement.
          positionOrtho: true,             // When true TJSPosition is optimized for orthographic use.

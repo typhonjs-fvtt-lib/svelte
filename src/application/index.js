@@ -98,10 +98,10 @@ Hooks.on('PopOut:close', (app) =>
  *
  * @property {boolean}  [headerNoTitleMinimized=false] If true then header title is hidden when minimized.
  *
- * @property {number}   [minHeight=globalThis.MIN_WINDOW_HEIGHT] Assigned to position. Number specifying minimum
+ * @property {number}   [minHeight=MIN_WINDOW_HEIGHT] Assigned to position. Number specifying minimum
  *           window height.
  *
- * @property {number}   [minWidth=globalThis.MIN_WINDOW_WIDTH] Assigned to position. Number specifying minimum
+ * @property {number}   [minWidth=MIN_WINDOW_WIDTH] Assigned to position. Number specifying minimum
  *           window width.
  *
  * @property {boolean}  [positionable=true] If false then `position.set` does not take effect.
