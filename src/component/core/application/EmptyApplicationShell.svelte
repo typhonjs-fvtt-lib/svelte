@@ -13,6 +13,7 @@
    import { isObject }                 from '#runtime/util/object';
 
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
+   import ResizableHandle              from './ResizableHandle.svelte';
    import TJSFocusWrap                 from './TJSFocusWrap.svelte';
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
@@ -327,6 +328,7 @@
          role=application
          tabindex=-1>
         <slot />
+        <ResizableHandle />
         <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
     </div>
 {:else}
@@ -343,6 +345,7 @@
          role=application
          tabindex=-1>
         <slot />
+        <ResizableHandle />
         <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
     </div>
 {/if}

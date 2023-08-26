@@ -190,3 +190,25 @@
      bind:this={elementResize}>
    <i class="fas fa-arrows-alt-h"></i>
 </div>
+
+<style>
+   .window-resizable-handle {
+      display: block;
+      position: absolute;
+      width: var(--tjs-app-resizable-handle-width, 20px);
+      height: var(--tjs-app-resizable-handle-height, 20px);
+      top: var(--tjs-app-resizable-handle-top, unset);
+      bottom: var(--tjs-app-resizable-handle-bottom, -1px);
+      right: var(--tjs-app-resizable-handle-right, 0);
+      left: var(--tjs-app-resizable-handle-left, unset);
+      background: var(--tjs-app-resizable-handle-background, #444);
+      border: var(--tjs-app-resizable-handle-border, 1px solid #111);
+      border-radius: var(--tjs-app-resizable-handle-border-radius, 4px 0 0 0);
+      padding: var(--tjs-app-resizable-handle-padding, 2px);
+   }
+
+   .fa-arrows-alt-h {
+      color: var(--tjs-app-resizable-handle-icon-color, #f0f0e0);
+      transform: var(--tjs-app-resizable-handle-icon-transform, rotate(45deg));
+   }
+</style>
