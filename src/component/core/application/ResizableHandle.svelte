@@ -169,7 +169,8 @@
          node.removeEventListener(...handlers.resizeMove);
          node.removeEventListener(...handlers.resizeUp);
 
-         application._onResize(event);
+         // TODO: Direct Foundry API access.
+         application?._onResize?.(event);
       }
 
       return {
