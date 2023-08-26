@@ -10,14 +10,14 @@ import {
 export class TJSDialogData
 {
    /**
-    * @type {import('../').SvelteApplication}
+    * @type {import('../../index.js').SvelteApplication}
     */
    #application;
 
    /**
     * Provides configuration of the dialog button bar.
     *
-    * @type {Record<string, import('../').TJSDialogButtonData>}
+    * @type {Record<string, import('../../index.js').TJSDialogButtonData>}
     */
    buttons;
 
@@ -96,7 +96,7 @@ export class TJSDialogData
     * Callback invoked when dialog is closed; no button option selected. When defined as a string any matching function
     * by name exported from content Svelte component is invoked.
     *
-    * @type {string|((application: import('../').TJSDialog) => any)}
+    * @type {string|((application: import('../../index.js').TJSDialog) => any)}
     */
    onClose;
 
@@ -148,7 +148,7 @@ export class TJSDialogData
    zIndex;
 
    /**
-    * @param {import('../').SvelteApplication} application - The host Foundry application.
+    * @param {import('../../index.js').SvelteApplication} application - The host Foundry application.
     */
    constructor(application)
    {

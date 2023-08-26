@@ -6,7 +6,7 @@ import {
    deepMerge,
    isObject }                 from '#runtime/util/object';
 
-import { TJSDialogData }      from './internal/TJSDialogData.js';
+import { TJSDialogData }      from './internal/state-dialog/TJSDialogData.js';
 import { SvelteApplication }  from './SvelteApplication.js';
 
 /**
