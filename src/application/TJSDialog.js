@@ -6,7 +6,7 @@ import {
    deepMerge,
    isObject }                 from '#runtime/util/object';
 
-import { TJSDialogData }      from './internal/state-dialog/TJSDialogData.js';
+import { TJSDialogData }      from './internal/state-dialog/index.js';
 import { SvelteApplication }  from './SvelteApplication.js';
 
 /**
@@ -107,7 +107,7 @@ export class TJSDialog extends SvelteApplication
    /**
     * Returns the dialog data.
     *
-    * @returns {TJSDialogData} Dialog data.
+    * @returns {import('./internal/state-dialog/types').TJSDialogData} Dialog data.
     */
    get data() { return this.#data; }
 
@@ -119,7 +119,7 @@ export class TJSDialog extends SvelteApplication
    /**
     * Sets the dialog data; this is reactive.
     *
-    * @param {object}   data - Dialog data.
+    * @param {import('./').TJSDialogOptions}   data - Dialog data.
     */
    set data(data)
    {

@@ -1,81 +1,79 @@
-import {
-   deepMerge,
-   safeAccess,
-   safeSet }   from '#runtime/util/object';
+import type { TJSSvelteConfig }  from '#runtime/svelte/util';
+
+import type {
+   TJSDialog,
+   TJSDialogButtonData,
+   TJSDialogOptions }            from '../../index.js';
 
 /**
- * Provides storage for all dialog options adding `get`, `merge` and `set` methods that safely access and update
- * data changed to the mounted DialogShell component reactively.
+ * Provides the ability the save / restore application state for positional and UI state such as minimized status.
+ *
+ * You can restore a saved state with animation; please see the options of {@link ApplicationState.restore}.
  */
-export class TJSDialogData
+declare interface TJSDialogData
 {
-   /**
-    * @type {import('../../index.js').SvelteApplication}
-    */
-   #application;
-
    /**
     * Provides configuration of the dialog button bar.
     *
-    * @type {Record<string, import('../../index.js').TJSDialogButtonData>}
+    * @type {Record<string, TJSDialogButtonData>}
     */
-   buttons;
+   buttons: Record<string, TJSDialogButtonData>;
 
    /**
     * A Svelte configuration object or HTML string content.
     *
-    * @type {import('#runtime/svelte/util').TJSSvelteConfig | string}
+    * @type {TJSSvelteConfig | string}
     */
-   content;
+   content: TJSSvelteConfig | string;
 
    /**
     * The default button ID to focus initially.
     *
     * @type {string}
     */
-   default;
+   default: string;
 
    /**
     * The dialog is draggable when true.
     *
     * @type {boolean}
     */
-   draggable;
+   draggable: boolean;
 
    /**
     * When true auto-management of app focus is enabled.
     *
     * @type {boolean}
     */
-   focusAuto;
+   focusAuto: boolean;
 
    /**
     * When true the first focusable element that isn't a button is focused.
     *
     * @type {boolean}
     */
-   focusFirst;
+   focusFirst: boolean;
 
    /**
     * When `focusAuto` and `focusKeep` is true; keeps internal focus.
     *
     * @type {boolean}
     */
-   focusKeep;
+   focusKeep: boolean;
 
    /**
     * When true the dialog is minimizable.
     *
     * @type {boolean}
     */
-   minimizable;
+   minimizable: boolean;
 
    /**
     * When true a modal dialog is displayed.
     *
     * @type {boolean}
     */
-   modal;
+   modal: boolean;
 
    /**
     * Additional options for modal dialog display.
@@ -83,22 +81,22 @@ export class TJSDialogData
     * @type {object}
     * TODO: Better specify type / options.
     */
-   modalOptions;
+   modalOptions: object;
 
    /**
     * When true and an error is raised in dialog callback functions post a UI error notification.
     *
     * @type {boolean}
     */
-   notifyError;
+   notifyError: boolean;
 
    /**
     * Callback invoked when dialog is closed; no button option selected. When defined as a string any matching function
     * by name exported from content Svelte component is invoked.
     *
-    * @type {string | ((application: import('../../index.js').TJSDialog) => any)}
+    * @type {string | ((application: TJSDialog) => any)}
     */
-   onClose;
+   onClose: string | ((application: TJSDialog) => any);
 
    /**
     * When true and a Promise has been created by {@link TJSDialog.wait} and the Promise is not in the process of being
@@ -107,14 +105,14 @@ export class TJSDialogData
     *
     * @type {boolean}
     */
-   rejectClose;
+   rejectClose: boolean;
 
    /**
     * When true the dialog is resizable.
     *
     * @type {boolean}
     */
-   resizable;
+   resizable: boolean;
 
    /**
     * When true and resolving any Promises and there are undefined results from any button callbacks the button ID is
@@ -122,14 +120,14 @@ export class TJSDialogData
     *
     * @type {boolean}
     */
-   resolveId;
+   resolveId: boolean;
 
    /**
     * The dialog window title.
     *
     * @type {string}
     */
-   title;
+   title: string;
 
    /**
     * Transition options for the dialog.
@@ -137,7 +135,7 @@ export class TJSDialogData
     * @type {object}
     * TODO: Better specify type / options.
     */
-   transition;
+   transition: object;
 
    /**
     * A specific z-index for the dialog. Pass null for the dialog to act like other applications in regard bringing to
@@ -145,15 +143,7 @@ export class TJSDialogData
     *
     * @type {number | null}
     */
-   zIndex;
-
-   /**
-    * @param {import('../../index.js').SvelteApplication} application - The host Foundry application.
-    */
-   constructor(application)
-   {
-      this.#application = application;
-   }
+   zIndex: number | null;
 
    /**
     * Provides a way to safely get this dialogs data given an accessor string which describes the
@@ -168,21 +158,12 @@ export class TJSDialogData
     *
     * @returns {any} Value at the accessor.
     */
-   get(accessor, defaultValue)
-   {
-      return safeAccess(this, accessor, defaultValue);
-   }
+   get(accessor: string, defaultValue: any): any;
 
    /**
-    * @param {import('../../index.js').TJSDialogOptions} data - Merge provided data object into Dialog data.
+    * @param {TJSDialogOptions} data - Merge provided data object into Dialog data.
     */
-   merge(data)
-   {
-      deepMerge(this, data);
-
-      const component = this.#application.svelte.component(0);
-      if (component?.data) { component.data = this; }
-   }
+   merge(data: TJSDialogOptions): void;
 
    /**
     * Provides a way to safely set this dialogs data given an accessor string which describes the
@@ -199,17 +180,7 @@ export class TJSDialogData
     *
     * @returns {boolean} True if successful.
     */
-   set(accessor, value)
-   {
-      const success = safeSet(this, accessor, value);
-
-      // If `this.options` modified then update the app options store.
-      if (success)
-      {
-         const component = this.#application.svelte.component(0);
-         if (component?.data) { component.data = this; }
-      }
-
-      return success;
-   }
+   set(accessor: string, value: any): boolean;
 }
+
+export { TJSDialogData }

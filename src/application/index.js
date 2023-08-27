@@ -131,7 +131,7 @@ Hooks.on('PopOut:close', (app) =>
  *
  * @property {Record<string, TJSDialogButtonData>}  [buttons={}] Provides configuration of the dialog button bar.
  *
- * @property {object|string}  [content] A Svelte configuration object or HTML string content.
+ * @property {import('#runtime/svelte/util').TJSSvelteConfig | string}  [content] A Svelte configuration object or HTML string content.
  *
  * @property {string}   [default] The default button ID to focus initially.
  *
@@ -154,7 +154,7 @@ Hooks.on('PopOut:close', (app) =>
  * @property {boolean}  [notifyError=true] When true and an error is thrown in dialog callback functions post a UI
  *           error notification.
  *
- * @property {string|((application: import('./').TJSDialog) => any)} [onClose] Callback invoked when dialog is closed;
+ * @property {string | ((application: import('./').TJSDialog) => any)} [onClose] Callback invoked when dialog is closed;
  *           no button option selected. When defined as a string any matching function by name exported from content
  *           Svelte component is invoked.
  *
@@ -171,7 +171,7 @@ Hooks.on('PopOut:close', (app) =>
  *
  * @property {object}   [transition] Transition options for the dialog.
  *
- * @property {number|null} [zIndex] A specific z-index for the dialog. Pass null for the dialog to act like other
+ * @property {number | null} [zIndex] A specific z-index for the dialog. Pass null for the dialog to act like other
  *           applications in regard bringing to top when activated.
  */
 
