@@ -5,9 +5,13 @@
       onMount,
       setContext }         from '#svelte';
 
+   import { writable }     from '#svelte/store';
+
    import { fade }         from '#svelte/transition';
 
-   import { isObject }     from '#runtime/util/object';
+   import {
+      isObject,
+      klona }              from '#runtime/util/object';
 
    import ApplicationShell from '../application/ApplicationShell.svelte';
    import DialogContent    from './DialogContent.svelte';
@@ -26,7 +30,10 @@
 
    const application = getContext('#external').application;
 
+   const dialogOptions = writable({});
+
    setContext('#managedPromise', managedPromise);
+   setContext('#dialogOptions', dialogOptions);
 
    const s_MODAL_TRANSITION = fade;
    const s_MODAL_TRANSITION_OPTIONS = { duration: 200 };
@@ -109,6 +116,9 @@
 
    $: if (isObject(data))
    {
+      // Update internal dialog options store / context with a clone of`data`.
+      dialogOptions.set(klona(data));
+
       const newZIndex = Number.isInteger(data.zIndex) || data.zIndex === null ? data.zIndex :
        modal ? Number.MAX_SAFE_INTEGER : Number.MAX_SAFE_INTEGER - 1
       if (zIndex !== newZIndex) { zIndex = newZIndex; }
