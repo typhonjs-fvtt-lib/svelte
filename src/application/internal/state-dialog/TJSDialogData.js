@@ -5,8 +5,8 @@ import {
    safeSet }   from '#runtime/util/object';
 
 /**
- * Provides storage for all dialog options adding `get`, `merge` and `set` methods that safely access and update
- * data changed to the mounted DialogShell component reactively.
+ * Provides storage for all dialog options through individual accessors and `get`, `merge`, `replace` and `set` methods
+ * that safely access and update data changed to the mounted DialogShell component reactively.
  */
 export class TJSDialogData
 {
@@ -16,137 +16,11 @@ export class TJSDialogData
    #application;
 
    /**
-    * Provides configuration of the dialog button bar.
+    * Stores the dialog options data.
     *
-    * @type {Record<string, import('./types').TJSDialogButtonData>}
+    * @type {import('./types').TJSDialogOptions}
     */
-   buttons;
-
-   /**
-    * A Svelte configuration object or HTML string content.
-    *
-    * @type {import('#runtime/svelte/util').TJSSvelteConfig | string}
-    */
-   content;
-
-   /**
-    * The default button ID to focus initially.
-    *
-    * @type {string}
-    */
-   default;
-
-   /**
-    * The dialog is draggable when true.
-    *
-    * @type {boolean}
-    */
-   draggable;
-
-   /**
-    * When true auto-management of app focus is enabled.
-    *
-    * @type {boolean}
-    */
-   focusAuto;
-
-   /**
-    * When true the first focusable element that isn't a button is focused.
-    *
-    * @type {boolean}
-    */
-   focusFirst;
-
-   /**
-    * When `focusAuto` and `focusKeep` is true; keeps internal focus.
-    *
-    * @type {boolean}
-    */
-   focusKeep;
-
-   /**
-    * When true the dialog is minimizable.
-    *
-    * @type {boolean}
-    */
-   minimizable;
-
-   /**
-    * When true a modal dialog is displayed.
-    *
-    * @type {boolean}
-    */
-   modal;
-
-   /**
-    * Additional options for modal dialog display.
-    *
-    * @type {object}
-    * TODO: Better specify type / options.
-    */
-   modalOptions;
-
-   /**
-    * When true and an error is raised in dialog callback functions post a UI error notification.
-    *
-    * @type {boolean}
-    */
-   notifyError;
-
-   /**
-    * Callback invoked when dialog is closed; no button option selected. When defined as a string any matching function
-    * by name exported from content Svelte component is invoked.
-    *
-    * @type {string | ((application: import('../../index.js').TJSDialog) => any)}
-    */
-   onClose;
-
-   /**
-    * When true and a Promise has been created by {@link TJSDialog.wait} and the Promise is not in the process of being
-    * resolved or rejected on close of the dialog any `onClose` function is invoked and any result that is undefined
-    * will cause the Promise to then be rejected.
-    *
-    * @type {boolean}
-    */
-   rejectClose;
-
-   /**
-    * When true the dialog is resizable.
-    *
-    * @type {boolean}
-    */
-   resizable;
-
-   /**
-    * When true and resolving any Promises and there are undefined results from any button callbacks the button ID is
-    * resolved.
-    *
-    * @type {boolean}
-    */
-   resolveId;
-
-   /**
-    * The dialog window title.
-    *
-    * @type {string}
-    */
-   title;
-
-   /**
-    * Transition options for the dialog.
-    *
-    * @type {object}
-    * TODO: Better specify type / options.
-    */
-   transition;
-
-   /**
-    * A specific z-index for the dialog. Pass null for the dialog to act like other applications in regard bringing to
-    * top when activated.
-    *
-    * @type {number | null}
-    */
-   zIndex;
+   #internal = {};
 
    /**
     * @param {import('../../index.js').SvelteApplication} application - The host Foundry application.
@@ -154,6 +28,361 @@ export class TJSDialogData
    constructor(application)
    {
       this.#application = application;
+   }
+
+   /**
+    * @returns {Record<string, import('./types').TJSDialogButtonData>} The dialog button configuration.
+    */
+   get buttons()
+   {
+      return this.#internal.buttons;
+   }
+
+   /**
+    * Set the dialog button configuration.
+    *
+    * @param {string} buttons - New dialog button configuration.
+    */
+   set buttons(buttons)
+   {
+      this.#internal.buttons = buttons;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {import('#runtime/svelte/util').TJSSvelteConfig | string} The Svelte configuration object or HTML string
+    *          content.
+    */
+   get content()
+   {
+      return this.#internal.content;
+   }
+
+   /**
+    * Set the Svelte configuration object or HTML string content.
+    *
+    * @param {import('#runtime/svelte/util').TJSSvelteConfig | string} content - New Svelte configuration object or
+    *        HTML string content.
+    */
+   set content(content)
+   {
+      this.#internal.content = content;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {string} The default button ID to focus initially.
+    */
+   get default()
+   {
+      return this.#internal.default;
+   }
+
+   /**
+    * Set the default button ID to focus initially.
+    *
+    * @param {string} newDefault - New default button ID to focus initially.
+    */
+   set default(newDefault)
+   {
+      this.#internal.default = newDefault;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {boolean} The dialog draggable state; draggable when true.
+    */
+   get draggable()
+   {
+      return this.#internal.draggable;
+   }
+
+   /**
+    * Set the dialog state; draggable when true.
+    *
+    * @param {boolean} draggable - New dialog draggable state; draggable when true.
+    */
+   set draggable(draggable)
+   {
+      this.#internal.draggable = draggable;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {boolean} When true auto-management of app focus is enabled.
+    */
+   get focusAuto()
+   {
+      return this.#internal.focusAuto;
+   }
+
+   /**
+    * Set the dialog auto-management of app focus.
+    *
+    * @param {boolean} focusAuto - New dialog auto-management of app focus.
+    */
+   set focusAuto(focusAuto)
+   {
+      this.#internal.focusAuto = focusAuto;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {boolean} When true the first focusable element that isn't a button is focused.
+    */
+   get focusFirst()
+   {
+      return this.#internal.focusFirst;
+   }
+
+   /**
+    * Set the dialog first focusable element state.
+    *
+    * @param {boolean} focusFirst - New dialog first focusable element state.
+    */
+   set focusFirst(focusFirst)
+   {
+      this.#internal.focusFirst = focusFirst;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {boolean} When `focusAuto` and `focusKeep` is true; keeps internal focus.
+    */
+   get focusKeep()
+   {
+      return this.#internal.focusKeep;
+   }
+
+   /**
+    * Set the dialog `focusKeep` state. When `focusAuto` and `focusKeep` is true; keeps internal focus.
+    *
+    * @param {boolean} focusKeep - New dialog `focusKeep` state.
+    */
+   set focusKeep(focusKeep)
+   {
+      this.#internal.focusKeep = focusKeep;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {boolean} When true the dialog is minimizable.
+    */
+   get minimizable()
+   {
+      return this.#internal.minimizable;
+   }
+
+   /**
+    * Set the dialog `minimizable` state. When true the dialog is minimizable.
+    *
+    * @param {boolean} minimizable - New dialog `minimizable` state.
+    */
+   set minimizable(minimizable)
+   {
+      this.#internal.minimizable = minimizable;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {boolean} When true a modal dialog is displayed.
+    */
+   get modal()
+   {
+      return this.#internal.modal;
+   }
+
+   /**
+    * Set the dialog `modal` state. When true a modal dialog is displayed.
+    *
+    * @param {boolean} modal - New dialog `modal` state.
+    */
+   set modal(modal)
+   {
+      this.#internal.modal = modal;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {object} Additional options for modal dialog display.
+    * TODO: Better specify type / options.
+    */
+   get modalOptions()
+   {
+      return this.#internal.modalOptions;
+   }
+
+   /**
+    * Set additional options for modal dialog display.
+    *
+    * @param {object} modalOptions - New additional options for modal dialog display.
+    */
+   set modalOptions(modalOptions)
+   {
+      this.#internal.modalOptions = modalOptions;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {boolean} When true and an error is raised in dialog callback functions post a UI error notification.
+    */
+   get notifyError()
+   {
+      return this.#internal.notifyError;
+   }
+
+   /**
+    * Set the dialog `notifyError` state. When true and an error is raised in dialog callback functions post a UI error
+    * notification.
+    *
+    * @param {boolean} notifyError - New dialog `notifyError` state.
+    */
+   set notifyError(notifyError)
+   {
+      this.#internal.notifyError = notifyError;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {string | ((application: import('../../index.js').TJSDialog) => any)} Callback invoked when dialog is
+    *          closed; no button option selected. When defined as a string any matching function by name exported from
+    *          content Svelte component is invoked.
+    */
+   get onClose()
+   {
+      return this.#internal.onClose;
+   }
+
+   /**
+    * Set callback invoked when dialog is closed; no button option selected. When defined as a string any matching
+    * function by name exported from content Svelte component is invoked..
+    *
+    * @param {string | ((application: import('../../index.js').TJSDialog) => any)} onClose - New dialog `onClose` state.
+    */
+   set onClose(onClose)
+   {
+      this.#internal.onClose = onClose;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {boolean} Dialog `rejectClose` state. When true and a Promise has been created by {@link TJSDialog.wait}
+    *          and the Promise is not in the process of being resolved or rejected on close of the dialog any `onClose`
+    *          function is invoked and any result that is undefined will cause the Promise to then be rejected..
+    */
+   get rejectClose()
+   {
+      return this.#internal.rejectClose;
+   }
+
+   /**
+    * Set the dialog `rejectClose` state.
+    *
+    * @param {boolean} rejectClose - New dialog `rejectClose` state.
+    */
+   set rejectClose(rejectClose)
+   {
+      this.#internal.rejectClose = rejectClose;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {boolean} When true the dialog is resizable.
+    */
+   get resizable()
+   {
+      return this.#internal.resizable;
+   }
+
+   /**
+    * Set the dialog `resizable` state. When true the dialog is resizable.
+    *
+    * @param {boolean} resizable - New dialog `resizable` state.
+    */
+   set resizable(resizable)
+   {
+      this.#internal.resizable = resizable;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {boolean} When true and resolving any Promises and there are undefined results from any button callbacks
+    *          the button ID is resolved.
+    */
+   get resolveId()
+   {
+      return this.#internal.resolveId;
+   }
+
+   /**
+    * Set the dialog `resolveId` state. When true and resolving any Promises and there are undefined results from any
+    * button callbacks the button ID is resolved.
+    *
+    * @param {boolean} resolveId - New dialog `resolveId` state.
+    */
+   set resolveId(resolveId)
+   {
+      this.#internal.resolveId = resolveId;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {string} The dialog window title.
+    */
+   get title()
+   {
+      return this.#internal.title;
+   }
+
+   /**
+    * Set the dialog window title.
+    *
+    * @param {string} title - New dialog window title.
+    */
+   set title(title)
+   {
+      this.#internal.title = title;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {object} Transition options for the dialog.
+    * TODO: Better specify type / options.
+    */
+   get transition()
+   {
+      return this.#internal.transition;
+   }
+
+   /**
+    * Set transition options for the dialog.
+    *
+    * @param {object} transition - New transition options for the dialog.
+    */
+   set transition(transition)
+   {
+      this.#internal.transition = transition;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {number | null} A specific z-index for the dialog. Pass null for the dialog to act like other
+    *          applications in regard bringing to top when activated.
+    */
+   get zIndex()
+   {
+      return this.#internal.zIndex;
+   }
+
+   /**
+    * Set specific z-index for the dialog.
+    *
+    * @param {number | null} zIndex - New z-index for the dialog.
+    */
+   set zIndex(zIndex)
+   {
+      this.#internal.zIndex = zIndex;
+      this.#updateComponent();
    }
 
    /**
@@ -171,7 +400,7 @@ export class TJSDialogData
     */
    get(accessor, defaultValue)
    {
-      return safeAccess(this, accessor, defaultValue);
+      return safeAccess(this.#internal, accessor, defaultValue);
    }
 
    /**
@@ -179,10 +408,8 @@ export class TJSDialogData
     */
    merge(data)
    {
-      deepMerge(this, data);
-
-      const component = this.#application.svelte.component(0);
-      if (component?.data) { component.data = this; }
+      deepMerge(this.#internal, data);
+      this.#updateComponent();
    }
 
    /**
@@ -194,13 +421,7 @@ export class TJSDialogData
    {
       if (!isObject(data)) { throw new TypeError(`TJSDialogData replace error: 'data' is not an object'.`); }
 
-      const descriptors = Object.getOwnPropertyDescriptors(this);
-
-      // Remove old data for all configurable descriptors.
-      for (const descriptor in descriptors)
-      {
-         if (descriptors[descriptor].configurable) { delete this[descriptor]; }
-      }
+      this.#internal = {};
 
       // Merge new data and perform a reactive update.
       this.merge(data);
@@ -223,15 +444,20 @@ export class TJSDialogData
     */
    set(accessor, value)
    {
-      const success = safeSet(this, accessor, value);
+      const success = safeSet(this.#internal, accessor, value);
 
-      // If `this.options` modified then update the app options store.
-      if (success)
-      {
-         const component = this.#application.svelte.component(0);
-         if (component?.data) { component.data = this; }
-      }
+      // If `this.#internal` modified then update the app options store.
+      if (success) { this.#updateComponent(); }
 
       return success;
+   }
+
+   /**
+    * Updates the data in the Svelte dialog component.
+    */
+   #updateComponent()
+   {
+      const component = this.#application.svelte.component(0);
+      if (component?.data) { component.data = this.#internal; }
    }
 }
