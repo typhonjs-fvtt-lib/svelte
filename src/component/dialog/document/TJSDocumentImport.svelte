@@ -2,7 +2,7 @@
    import { getContext }   from '#svelte';
 
    import { localize }     from '#svelte-fvtt/helper';
-   import { TJSDocument }  from '#svelte-fvtt/store/fvtt';
+   import { TJSDocument }  from '#svelte-fvtt/store/fvtt/document';
 
    /** @type {foundry.abstract.Document} */
    export let document = void 0;

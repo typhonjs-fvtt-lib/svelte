@@ -5,7 +5,7 @@
       localize,
       radioBoxes }         from '#svelte-fvtt/helper';
 
-   import { TJSDocument }  from '#svelte-fvtt/store/fvtt';
+   import { TJSDocument }  from '#svelte-fvtt/store/fvtt/document';
 
    export let document = void 0;
 
