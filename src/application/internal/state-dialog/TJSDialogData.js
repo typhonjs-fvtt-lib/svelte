@@ -1,5 +1,6 @@
 import {
    deepMerge,
+   isObject,
    safeAccess,
    safeSet }   from '#runtime/util/object';
 
@@ -17,7 +18,7 @@ export class TJSDialogData
    /**
     * Provides configuration of the dialog button bar.
     *
-    * @type {Record<string, import('../../index.js').TJSDialogButtonData>}
+    * @type {Record<string, import('./types').TJSDialogButtonData>}
     */
    buttons;
 
@@ -174,7 +175,7 @@ export class TJSDialogData
    }
 
    /**
-    * @param {import('../../index.js').TJSDialogOptions} data - Merge provided data object into Dialog data.
+    * @param {import('./types').TJSDialogOptions} data - Merge provided data object into Dialog data.
     */
    merge(data)
    {
@@ -182,6 +183,27 @@ export class TJSDialogData
 
       const component = this.#application.svelte.component(0);
       if (component?.data) { component.data = this; }
+   }
+
+   /**
+    * Sets the dialog data; this is reactive.
+    *
+    * @param {import('./types').TJSDialogOptions}   data - Dialog data.
+    */
+   replace(data)
+   {
+      if (!isObject(data)) { throw new TypeError(`TJSDialogData replace error: 'data' is not an object'.`); }
+
+      const descriptors = Object.getOwnPropertyDescriptors(this);
+
+      // Remove old data for all configurable descriptors.
+      for (const descriptor in descriptors)
+      {
+         if (descriptors[descriptor].configurable) { delete this[descriptor]; }
+      }
+
+      // Merge new data and perform a reactive update.
+      this.merge(data);
    }
 
    /**
