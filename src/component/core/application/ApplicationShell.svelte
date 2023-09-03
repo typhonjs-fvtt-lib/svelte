@@ -95,9 +95,9 @@
    // runtime execution.
 
    // Exports properties to set a transition w/ in / out options.
-   export let transition = void 0;
-   export let inTransition = void 0;
-   export let outTransition = void 0;
+   export let transition = TJSDefaultTransition.default;
+   export let inTransition = TJSDefaultTransition.default;
+   export let outTransition = TJSDefaultTransition.default;
 
    // Exports properties to set options for any transitions.
    export let transitionOptions = void 0;
@@ -105,7 +105,7 @@
    export let outTransitionOptions = TJSDefaultTransition.options;
 
    // Tracks last transition state.
-   let oldTransition = void 0;
+   let oldTransition = TJSDefaultTransition.default;
    let oldTransitionOptions = void 0
 
    // Run this reactive block when the last transition state is not equal to the current state.
@@ -113,7 +113,7 @@
    {
       // If transition is defined and not the default transition then set it to both in and out transition otherwise
       // set the default transition to both in & out transitions.
-      const newTransition = typeof transition === 'function' ? transition : void 0;
+      const newTransition = typeof transition === 'function' ? transition : TJSDefaultTransition.default;
 
       inTransition = newTransition;
       outTransition = newTransition;
@@ -134,17 +134,19 @@
    }
 
    // Handle cases if inTransition is unset; assign noop default transition function.
-   $: if (typeof inTransition !== 'function') { inTransition = void 0; }
+   $: if (typeof inTransition !== 'function') { inTransition = TJSDefaultTransition.default; }
 
    $:
    {
       // Handle cases if outTransition is unset; assign noop default transition function.
-      if (typeof outTransition !== 'function') { outTransition = void 0; }
+      if (typeof outTransition !== 'function') { outTransition = TJSDefaultTransition.default; }
 
-      // Set jquery close animation to either run or not when an out transition is changed.
-      if (application && typeof application?.options?.defaultCloseAnimation === 'boolean')
+      // Set close animation to `false` / not run when an out transition is defined.
+      const defaultCloseAnimation = application?.options?.defaultCloseAnimation;
+      if (typeof defaultCloseAnimation === 'boolean' && defaultCloseAnimation &&
+       outTransition !== TJSDefaultTransition.default)
       {
-         application.options.defaultCloseAnimation = outTransition === void 0;
+         application.options.defaultCloseAnimation = false;
       }
    }
 
@@ -355,7 +357,7 @@
 
 <svelte:options accessors={true}/>
 
-{#if inTransition || outTransition}
+{#if inTransition !== TJSDefaultTransition.default || outTransition !== TJSDefaultTransition.default}
    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
    <div id={application.id}
         class="app window-app {application.options.classes.join(' ')}"
