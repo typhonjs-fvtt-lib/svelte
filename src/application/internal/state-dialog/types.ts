@@ -1,5 +1,7 @@
 import type { TJSSvelteConfig }  from '#runtime/svelte/util';
 
+import type { TransitionFunction } from '#runtime/svelte/transition';
+
 import type { TJSDialog }        from '../../TJSDialog.js';
 
 /**
@@ -118,16 +120,15 @@ declare interface TJSDialogData
 
    /**
     * @returns {object} Additional options for modal dialog display.
-    * TODO: Better specify type / options.
     */
-   get modalOptions(): object;
+   get modalOptions(): TJSDialogModalOptions;
 
    /**
     * Set additional options for modal dialog display.
     *
-    * @param {object} modalOptions - New additional options for modal dialog display.
+    * @param {TJSDialogModalOptions} modalOptions - New additional options for modal dialog display.
     */
-   set modalOptions(modalOptions: object);
+   set modalOptions(modalOptions: TJSDialogModalOptions);
 
    /**
     * @returns {boolean} When true and an error is raised in dialog callback functions post a UI error notification.
@@ -210,17 +211,16 @@ declare interface TJSDialogData
    set title(title: string)
 
    /**
-    * @returns {object} Transition options for the dialog.
-    * TODO: Better specify type / options.
+    * @returns {TJSDialogTransitionOptions} Transition options for the dialog.
     */
-   get transition(): object;
+   get transition(): TJSDialogTransitionOptions;
 
    /**
     * Set transition options for the dialog.
     *
-    * @param {object} transition - New transition options for the dialog.
+    * @param {TJSDialogTransitionOptions} transition - New transition options for the dialog.
     */
-   set transition(transition: object)
+   set transition(transition: TJSDialogTransitionOptions)
 
    /**
     * @returns {number | null} A specific z-index for the dialog. Pass null for the dialog to act like other
@@ -239,8 +239,6 @@ declare interface TJSDialogData
     * Provides a way to safely get this dialogs data given an accessor string which describes the
     * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
     * to walk.
-    *
-    * // TODO DOCUMENT the accessor in more detail.
     *
     * @param {string}   accessor - The path / key to set. You can set multiple levels.
     *
@@ -268,8 +266,6 @@ declare interface TJSDialogData
     * to walk.
     *
     * Automatically the dialog data will be updated in the associated DialogShell Svelte component.
-    *
-    * // TODO DOCUMENT the accessor in more detail.
     *
     * @param {string}   accessor - The path / key to set. You can set multiple levels.
     *
@@ -373,7 +369,7 @@ type TJSDialogOptions = {
    /**
     * Additional options for modal dialog display.
     */
-   modalOptions?: object;
+   modalOptions?: TJSDialogModalOptions;
 
    /**
     * When true and an error is thrown in dialog callback functions post a UI error notification; default: false.
@@ -412,7 +408,7 @@ type TJSDialogOptions = {
    /**
     * Transition options for the dialog.
     */
-   transition?: object;
+   transition?: TJSDialogTransitionOptions;
 
    /**
     * A specific z-index for the dialog. Pass null for the dialog to act like other applications in regard bringing to
@@ -421,8 +417,76 @@ type TJSDialogOptions = {
    zIndex?: number | null;
 }
 
+/**
+ *
+ */
+type TJSDialogTransitionOptions = {
+   /**
+    * A Svelte transition function applied to both in / out transitions.
+    */
+   transition?: TransitionFunction;
+
+   /**
+    * A Svelte transition applied to the `in` transition.
+    */
+   inTransition?: TransitionFunction;
+
+   /**
+    * A Svelte transition applied to tbe `out` transition.
+    */
+   outTransition?: TransitionFunction;
+
+   /**
+    * Additional transition options applied to both in / out transitions.
+    */
+   transitionOptions?: Record<string, any>;
+
+   /**
+    * Additional transition options applied to the `in` transition.
+    */
+   inTransitionOptions?: Record<string, any>;
+
+   /**
+    * Additional transition options applied to the `out` transition.
+    */
+   outTransitionOptions?: Record<string, any>;
+}
+
+/**
+ * Defines additional modal options to control the display of the modal dialog and glasspane.
+ */
+type TJSDialogModalOptions = {
+   /**
+    * CSS background style for glasspane.
+    */
+   background?: string;
+
+   /**
+    * When true modal dialog is closed on any click / pointer down event on the glasspane.
+    */
+   closeOnInput?: boolean;
+
+   /**
+    * Creates a separate DIV element container for slot content.
+    */
+   slotSeparate?: boolean;
+
+   /**
+    * Custom styles applied to glasspane. Provide an object with CSS style properties with keys in kebab case.
+    * @see https://www.w3.org/Style/CSS/all-properties.en.html
+    */
+   styles?: Record<string, string>;
+
+   /**
+    * Custom transition options for modal background / glasspane.
+    */
+   transition: TJSDialogTransitionOptions;
+}
+
 export {
    TJSDialogButtonData,
    TJSDialogData,
-   TJSDialogOptions
+   TJSDialogModalOptions,
+   TJSDialogOptions,
+   TJSDialogTransitionOptions
 }

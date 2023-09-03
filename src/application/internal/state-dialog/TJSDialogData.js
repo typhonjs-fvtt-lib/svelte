@@ -204,8 +204,7 @@ export class TJSDialogData
    }
 
    /**
-    * @returns {object} Additional options for modal dialog display.
-    * TODO: Better specify type / options.
+    * @returns {import('./types').TJSDialogModalOptions} Additional options for modal dialog display.
     */
    get modalOptions()
    {
@@ -215,7 +214,7 @@ export class TJSDialogData
    /**
     * Set additional options for modal dialog display.
     *
-    * @param {object} modalOptions - New additional options for modal dialog display.
+    * @param {import('./types').TJSDialogModalOptions} modalOptions - New additional options for modal dialog display.
     */
    set modalOptions(modalOptions)
    {
@@ -346,8 +345,7 @@ export class TJSDialogData
    }
 
    /**
-    * @returns {object} Transition options for the dialog.
-    * TODO: Better specify type / options.
+    * @returns {import('./types').TJSDialogTransitionOptions} Transition options for the dialog.
     */
    get transition()
    {
@@ -357,7 +355,7 @@ export class TJSDialogData
    /**
     * Set transition options for the dialog.
     *
-    * @param {object} transition - New transition options for the dialog.
+    * @param {import('./types').TJSDialogTransitionOptions} transition - New transition options for the dialog.
     */
    set transition(transition)
    {
@@ -389,8 +387,6 @@ export class TJSDialogData
     * Provides a way to safely get this dialogs data given an accessor string which describes the
     * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
     * to walk.
-    *
-    * // TODO DOCUMENT the accessor in more detail.
     *
     * @param {string}   accessor - The path / key to set. You can set multiple levels.
     *
@@ -433,8 +429,6 @@ export class TJSDialogData
     * to walk.
     *
     * Automatically the dialog data will be updated in the associated DialogShell Svelte component.
-    *
-    * // TODO DOCUMENT the accessor in more detail.
     *
     * @param {string}   accessor - The path / key to set. You can set multiple levels.
     *
