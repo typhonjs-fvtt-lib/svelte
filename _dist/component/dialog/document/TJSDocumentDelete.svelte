@@ -4,7 +4,7 @@
    import { isObject }     from '@typhonjs-svelte/runtime-base/util/object';
 
    import { localize }     from '@typhonjs-fvtt/svelte/helper';
-   import { TJSDocument }  from '@typhonjs-fvtt/svelte/store/fvtt';
+   import { TJSDocument }  from '@typhonjs-fvtt/svelte/store/fvtt/document';
 
    /** @type {foundry.abstract.Document} */
    export let document = void 0;

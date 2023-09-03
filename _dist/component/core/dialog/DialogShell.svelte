@@ -5,9 +5,13 @@
       onMount,
       setContext }         from 'svelte';
 
+   import { writable }     from 'svelte/store';
+
    import { fade }         from 'svelte/transition';
 
-   import { isObject }     from '@typhonjs-svelte/runtime-base/util/object';
+   import {
+      isObject,
+      klona }              from '@typhonjs-svelte/runtime-base/util/object';
 
    import ApplicationShell from '../application/ApplicationShell.svelte';
    import DialogContent    from './DialogContent.svelte';
@@ -26,7 +30,10 @@
 
    const application = getContext('#external').application;
 
+   const dialogOptions = writable({});
+
    setContext('#managedPromise', managedPromise);
+   setContext('#dialogOptions', dialogOptions);
 
    const s_MODAL_TRANSITION = fade;
    const s_MODAL_TRANSITION_OPTIONS = { duration: 200 };
@@ -57,6 +64,9 @@
       slotSeparate: void 0,
       styles: void 0,
 
+      // Close modal on glasspane input.
+      closeOnInput: void 0,
+
       // Stores any transition functions.
       transition: void 0,
       inTransition: void 0,
@@ -69,8 +79,6 @@
    }
 
    let zIndex = void 0;
-
-   let minimizable = true;
 
    // Only set modal once on mount. You can't change between a modal an non-modal dialog during runtime.
    if (modal === void 0) { modal = typeof data?.modal === 'boolean' ? data.modal : false; }
@@ -108,6 +116,9 @@
 
    $: if (isObject(data))
    {
+      // Update internal dialog options store / context with a clone of`data`.
+      dialogOptions.set(klona(data));
+
       const newZIndex = Number.isInteger(data.zIndex) || data.zIndex === null ? data.zIndex :
        modal ? Number.MAX_SAFE_INTEGER : Number.MAX_SAFE_INTEGER - 1
       if (zIndex !== newZIndex) { zIndex = newZIndex; }
@@ -204,6 +215,14 @@
       if (newModalStyles !== modalProps.styles) { modalProps.styles = newModalStyles; }
    }
 
+   $:
+   {
+      const newModalCloseOnInput = typeof data?.modalOptions?.closeOnInput === 'boolean' ?
+       data.modalOptions.closeOnInput : void 0;
+
+      if (newModalCloseOnInput !== modalProps.closeOnInput) { modalProps.closeOnInput = newModalCloseOnInput; }
+   }
+
    $: if (isObject(data?.modalOptions?.transition))
    {
       // Store data.transitions to shorten statements below.
@@ -285,7 +304,7 @@
 <svelte:options accessors={true}/>
 
 {#if modal}
-   <TJSGlassPane id={`${application.id}-glasspane`} {...modalProps} {zIndex}>
+   <TJSGlassPane id={`${application.id}-glasspane`} {...modalProps} {zIndex} on:close:glasspane={() => application.close()}>
       <ApplicationShell bind:elementRoot bind:elementContent {...appProps} appOffsetHeight={true}>
          <DialogContent bind:dialogComponent {data} stopPropagation={true} />
       </ApplicationShell>

@@ -1,4 +1,6 @@
 <script>
+   import { createEventDispatcher }    from 'svelte';
+
    import { applyStyles }              from '@typhonjs-svelte/runtime-base/svelte/action/dom';
    import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
    import { isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
@@ -8,6 +10,13 @@
 
    /** @type {boolean} */
    export let captureInput = true;
+
+   /**
+    * When true any input fires an event `close:glasspane`.
+    *
+    * @type {boolean}
+    */
+   export let closeOnInput = void 0;
 
    /** @type {string} */
    export let id = void 0;
@@ -20,6 +29,8 @@
 
    /** @type {number} */
    export let zIndex = Number.MAX_SAFE_INTEGER;
+
+   const dispatch = createEventDispatcher();
 
    /** @type {HTMLDivElement} */
    let backgroundEl, containerEl, glassPaneEl;
@@ -103,6 +114,11 @@
       {
          event.preventDefault();
          event.stopImmediatePropagation();
+      }
+
+      if (event?.type === 'pointerdown' && closeOnInput)
+      {
+         dispatch('close:glasspane');
       }
    }
 </script>

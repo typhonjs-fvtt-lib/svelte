@@ -6,7 +6,7 @@ import {
    deepMerge,
    isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
 
-import { TJSDialogData }      from './internal/TJSDialogData.js';
+import { TJSDialogData }      from './internal/state-dialog/index.js';
 import { SvelteApplication }  from './SvelteApplication.js';
 
 /**
@@ -51,7 +51,7 @@ export class TJSDialog extends SvelteApplication
    #managedPromise;
 
    /**
-    * @param {import('./').TJSDialogOptions}           data - Dialog options.
+    * @param {import('./internal/state-dialog/types').TJSDialogOptions}           data - Dialog options.
     *
     * @param {import('./').SvelteApplicationOptions}   [options] - SvelteApplication options.
     */
@@ -62,7 +62,7 @@ export class TJSDialog extends SvelteApplication
       this.#managedPromise = new ManagedPromise();
 
       this.#data = new TJSDialogData(this);
-      this.data = data;
+      this.#data.replace(data);
 
       /**
        * @member {object} dialogComponent - A getter to SvelteData to retrieve any mounted Svelte component as the
@@ -107,7 +107,7 @@ export class TJSDialog extends SvelteApplication
    /**
     * Returns the dialog data.
     *
-    * @returns {TJSDialogData} Dialog data.
+    * @returns {import('./internal/state-dialog/types').TJSDialogData} Dialog data.
     */
    get data() { return this.#data; }
 
@@ -115,27 +115,6 @@ export class TJSDialog extends SvelteApplication
     * @returns {import('@typhonjs-svelte/runtime-base/util/async').ManagedPromise} Returns the managed promise.
     */
    get managedPromise() { return this.#managedPromise; }
-
-   /**
-    * Sets the dialog data; this is reactive.
-    *
-    * @param {object}   data - Dialog data.
-    */
-   set data(data)
-   {
-      if (!isObject(data)) { throw new TypeError(`TJSDialog set data error: 'data' is not an object'.`); }
-
-      const descriptors = Object.getOwnPropertyDescriptors(this.#data);
-
-      // Remove old data for all configurable descriptors.
-      for (const descriptor in descriptors)
-      {
-         if (descriptors[descriptor].configurable) { delete this.#data[descriptor]; }
-      }
-
-      // Merge new data and perform a reactive update.
-      this.#data.merge(data);
-   }
 
    /**
     * Close the dialog and un-register references to it within UI mappings.
@@ -231,7 +210,7 @@ export class TJSDialog extends SvelteApplication
     *
     * @template T
     *
-    * @param {import('./').TJSDialogOptions & {
+    * @param {import('./internal/state-dialog/types').TJSDialogOptions & {
     *    onYes?: string|((application: TJSDialog) => any),
     *    onNo?: string|((application: TJSDialog) => any)
     * }} [data] - Confirm dialog options.
@@ -350,7 +329,7 @@ export class TJSDialog extends SvelteApplication
     *
     * @template T
     *
-    * @param {import('./').TJSDialogOptions & {
+    * @param {import('./internal/state-dialog/types').TJSDialogOptions & {
     *    onOk?: string|((application: TJSDialog) => any),
     *    label?: string,
     *    icon?: string
@@ -404,7 +383,7 @@ export class TJSDialog extends SvelteApplication
     *
     * @template T
     *
-    * @param {import('./').TJSDialogOptions}  data - Dialog data passed to the TJSDialog constructor.
+    * @param {import('./internal/state-dialog/types').TJSDialogOptions}  data - Dialog data passed to the TJSDialog constructor.
     *
     * @param {import('./').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
     *        constructor.

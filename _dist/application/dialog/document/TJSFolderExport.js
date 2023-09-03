@@ -42,11 +42,7 @@ export class TJSFolderExport extends TJSDialog
          return globalThis.ui.notifications.warn(localize("FOLDER.ExportWarningNone", { type: document.type }));
       }
 
-      /**
-       * @type {object}
-       * @internal
-       */
-      this.data = {
+      this.data.replace({
          modal: typeof dialogData?.modal === 'boolean' ? dialogData.modal : true,
          draggable: typeof options?.draggable === 'boolean' ? options.draggable : false,
          focusKeep: true,
@@ -76,7 +72,7 @@ export class TJSFolderExport extends TJSDialog
             }
          },
          default: 'cancel'
-      };
+      });
    }
 
    /**
