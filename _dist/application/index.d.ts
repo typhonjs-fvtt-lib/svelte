@@ -1166,7 +1166,7 @@ type TJSDialogModalOptions = {
     /**
      * Custom transition options for modal background / glasspane.
      */
-    transition: TJSDialogTransitionOptions;
+    transition?: TJSDialogTransitionOptions;
 };
 
 /**
