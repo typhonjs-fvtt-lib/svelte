@@ -1,4 +1,15 @@
 # Changelog
+## Release 0.1.2 (medium)
+- Fixed min window height / width for app shells (global vs script space variable access)
+- Fixed SvelteApplication render gating / render: false will short circuit properly when app not rendered.
+- Added `closeOnInput` prop to TJSGlassPane which fires `close:glasspane` event on pointer down event.
+  - Added `modalOptions.closeOnInput` to TJSDialog data / close modal dialog on glasspane input.
+- Upgraded TJSDialogData adding reactive accessors for all standard data. New `replace` function instead of accessor setting of all data.
+- Update types for transition / modal options for TJSDialog.
+- Fixed application shell transition prop handling
+  - `defaultCloseAnimation` option not taking when set to `false` w/ no transition defined.
+  - separately defined in / out transitions works correctly.
+
 ## Release 0.1.1 (minor)
 - Fix for ResizableHandle component / elementRoot store access
 - Fix for SvelteApplication close hook invocation using JQuery element.
