@@ -2,6 +2,7 @@
 ## Release 0.1.2 (medium)
 - Fixed min window height / width for app shells (global vs script space variable access)
 - Fixed SvelteApplication render gating / render: false will short circuit properly when app not rendered.
+- EmptyApplicationShell component can now be made resizable via setting the `resizable` app option.
 - Added `closeOnInput` prop to TJSGlassPane which fires `close:glasspane` event on pointer down event.
   - Added `modalOptions.closeOnInput` to TJSDialog data / close modal dialog on glasspane input.
 - Upgraded TJSDialogData adding reactive accessors for all standard data. New `replace` function instead of accessor setting of all data.
@@ -9,6 +10,9 @@
 - Fixed application shell transition prop handling
   - `defaultCloseAnimation` option not taking when set to `false` w/ no transition defined.
   - separately defined in / out transitions works correctly.
+- `DynReducerHelper.filters.regexObjectQuery`
+  - Can now take "accessor" strings to lookup nested properties. Simply provide a string separated by `.` for each depth.
+  - An additional option is available `accessWarn` when set to true will log warnings when property lookups fail.
 
 ## Release 0.1.1 (minor)
 - Fix for ResizableHandle component / elementRoot store access
