@@ -39,8 +39,6 @@ import { SvelteApplication }  from './SvelteApplication.js';
  *
  * There are a couple of static helper methods to quickly create standard dialogs such as a 'yes' / 'no' confirmation
  * dialog with {@link TJSDialog.confirm} and an 'ok' single button dialog with {@link TJSDialog.prompt}.
- *
- * TODO: document all extended dialog data parameters such as transition options / modal transitions.
  */
 export class TJSDialog extends SvelteApplication
 {
