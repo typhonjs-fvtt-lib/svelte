@@ -192,6 +192,13 @@ export class SvelteReactive
 // Only reactive getters ---------------------------------------------------------------------------------------------
 
    /**
+    * Returns the current active Window / WindowProxy UI state.
+    *
+    * @returns {Window} Dragging UI state.
+    */
+   get activeWindow() { return this.#dataUIState.activeWindow ?? globalThis; }
+
+   /**
     * Returns the current dragging UI state.
     *
     * @returns {boolean} Dragging UI state.
@@ -211,6 +218,24 @@ export class SvelteReactive
     * @returns {boolean} Resizing UI state.
     */
    get resizing() { return this.#dataUIState.resizing; }
+
+   /**
+    * Sets the current active Window / WindowProxy UI state.
+    *
+    * Note: This is protected usage and used internally.
+    *
+    * @param {Window | undefined} activeWindow - Active Window / WindowProxy UI state.
+    */
+   set activeWindow(activeWindow)
+   {
+      // Note: when setting activeWindow to undefined `globalThis` is set. There isn't a great test for Window /
+      // WindowProxy, so check `toString`.
+      if (activeWindow === void 0 || activeWindow === null ||
+       (Object.prototype.toString.call(activeWindow) === '[object Window]'))
+      {
+         this.#storeUIStateUpdate((options) => deepMerge(options, { activeWindow: activeWindow ?? globalThis }));
+      }
+   }
 
 // Reactive getter / setters -----------------------------------------------------------------------------------------
 
@@ -549,6 +574,7 @@ export class SvelteReactive
       this.#storeAppOptions = storeAppOptions;
 
       this.#dataUIState = {
+         activeWindow: globalThis,
          dragging: false,
          headerButtons: [],
          minimized: this.#application._minimized,
@@ -567,6 +593,8 @@ export class SvelteReactive
       const storeUIState = {
          subscribe: writableUIOptions.subscribe,
 
+         // activeWindow: propertyStore(writableUIOptions, 'activeWindow'),
+         activeWindow: derived(writableUIOptions, ($options, set) => set($options.activeWindow)),
          dragging: propertyStore(writableUIOptions, 'dragging'),
          headerButtons: derived(writableUIOptions, ($options, set) => set($options.headerButtons)),
          minimized: derived(writableUIOptions, ($options, set) => set($options.minimized)),

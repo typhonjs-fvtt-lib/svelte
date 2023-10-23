@@ -1,5 +1,6 @@
-import { FoundryHMRSupport }  from './external/FoundryHMRSupport.js';
-import { PopoutSupport }      from './external/PopoutSupport.js';
+import {
+   FoundryHMRSupport,
+   PopoutSupport }   from './external/index.js';
 
 export * from './SvelteApplication.js';
 export * from './TJSDialog.js';
