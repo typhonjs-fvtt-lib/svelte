@@ -1,6 +1,7 @@
 import {
    deepMerge,
    isObject,
+   klona,
    safeAccess,
    safeSet }   from '#runtime/util/object';
 
@@ -384,6 +385,27 @@ export class TJSDialogData
    }
 
    /**
+    * Provides a cloned copy of the dialog data.
+    * Note: The content attribute is not cloned as complex / props may be present.
+    *
+    * @returns {import('./types').TJSDialogOptions} A clone of the dialog data.
+    */
+   clone()
+   {
+      // Make a shallow copy of internally stored data.
+      const shallowCopy = { ...this.#internal };
+
+      // Remove the content parameter as it may contain complex props sent to the hosted dialog component.
+      delete shallowCopy.content;
+
+      // Clone the internal data and then set the content directly.
+      const cData = klona(shallowCopy);
+      cData.content = this.#internal.content;
+
+      return cData;
+   }
+
+   /**
     * Provides a way to safely get this dialogs data given an accessor string which describes the
     * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
     * to walk.
@@ -452,6 +474,6 @@ export class TJSDialogData
    #updateComponent()
    {
       const component = this.#application.svelte.component(0);
-      if (component?.data) { component.data = this.#internal; }
+      if (component?.data) { component.data = this.clone(); }
    }
 }

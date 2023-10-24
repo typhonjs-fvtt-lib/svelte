@@ -1,8 +1,8 @@
-import type { TJSSvelteConfig }  from '#runtime/svelte/util';
+import type { TJSSvelteConfig }     from '#runtime/svelte/util';
 
-import type { TransitionFunction } from '#runtime/svelte/transition';
+import type { TransitionFunction }  from '#runtime/svelte/transition';
 
-import type { TJSDialog }        from '../../TJSDialog.js';
+import type { TJSDialog }           from '../../TJSDialog.js';
 
 /**
  * Provides storage for all dialog options through individual accessors and `get`, `merge`, `replace` and `set` methods
@@ -234,6 +234,14 @@ declare interface TJSDialogData
     * @param {number | null} zIndex - New z-index for the dialog.
     */
    set zIndex(zIndex: number | null);
+
+   /**
+    * Provides a cloned copy of the dialog data.
+    * Note: The content attribute is not cloned as complex / props may be present.
+    *
+    * @returns {import('./types').TJSDialogOptions} A clone of the dialog data.
+    */
+   clone(): TJSDialogOptions;
 
    /**
     * Provides a way to safely get this dialogs data given an accessor string which describes the
