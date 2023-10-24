@@ -15,6 +15,9 @@
    export let draggable = void 0;
    export let draggableOptions = void 0;
 
+   /**
+    * @type {SvelteApplication}
+    */
    const { application } = getContext('#external');
 
    // Focus related app options stores.
@@ -112,8 +115,10 @@
       {
          if ($focusKeep)
          {
-            const focusOutside = document.activeElement instanceof HTMLElement &&
-             !rootEl.contains(document.activeElement);
+            const activeWindow = application.reactive.activeWindow;
+
+            const focusOutside = activeWindow.document.activeElement instanceof HTMLElement &&
+             !rootEl.contains(activeWindow.document.activeElement);
 
             // Only focus the content element if the active element is outside the app; maintaining internal focused
             // element.
