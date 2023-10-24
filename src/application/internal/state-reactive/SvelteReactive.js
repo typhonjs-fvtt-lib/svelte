@@ -194,7 +194,7 @@ export class SvelteReactive
    /**
     * Returns the current active Window / WindowProxy UI state.
     *
-    * @returns {Window} Dragging UI state.
+    * @returns {Window} Active window UI state.
     */
    get activeWindow() { return this.#dataUIState.activeWindow ?? globalThis; }
 
@@ -224,7 +224,7 @@ export class SvelteReactive
     *
     * Note: This is protected usage and used internally.
     *
-    * @param {Window | undefined} activeWindow - Active Window / WindowProxy UI state.
+    * @param {Window} activeWindow - Active Window / WindowProxy UI state.
     */
    set activeWindow(activeWindow)
    {

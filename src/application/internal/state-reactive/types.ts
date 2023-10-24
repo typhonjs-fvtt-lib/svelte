@@ -272,6 +272,13 @@ declare interface SvelteReactive
    // Accessors for UI state -----------------------------------------------------------------------------------------
 
    /**
+    * Returns the current active Window / WindowProxy UI state.
+    *
+    * @returns {Window} Active window UI state.
+    */
+   get activeWindow(): Window;
+
+   /**
     * Returns the current dragging UI state.
     *
     * @returns {boolean} Dragging UI state.
@@ -291,6 +298,15 @@ declare interface SvelteReactive
     * @returns {boolean} Resizing UI state.
     */
    get resizing(): boolean;
+
+   /**
+    * Sets the current active Window / WindowProxy UI state.
+    *
+    * Note: This is protected usage and used internally.
+    *
+    * @param {Window} activeWindow - Active Window / WindowProxy UI state.
+    */
+   set activeWindow(activeWindow: Window);
 
    /**
     * Provides a way to safely get this applications options given an accessor string which describes the
