@@ -245,15 +245,18 @@ export class SvelteApplication extends Application
    {
       if (force || this.popOut) { super.bringToTop(); }
 
+      const activeWindow = this.reactive.activeWindow;
+
       // If the activeElement is not `document.body` and not contained in this app via elementTarget then blur the
       // current active element and make `document.body`focused. This allows <esc> key to close all open apps / windows.
-      if (document.activeElement !== document.body && !this.elementTarget.contains(document.activeElement))
+      if (activeWindow.document.activeElement !== activeWindow.document.body &&
+       !this.elementTarget.contains(activeWindow.document.activeElement))
       {
          // Blur current active element.
-         if (document.activeElement instanceof HTMLElement) { document.activeElement.blur(); }
+         if (activeWindow.document.activeElement instanceof HTMLElement) { activeWindow.document.activeElement.blur(); }
 
          // Make document body focused.
-         document.body.focus();
+         activeWindow.document.body.focus();
       }
 
       globalThis.ui.activeWindow = this;
@@ -874,8 +877,10 @@ export class SvelteApplication extends Application
       // Store any focusSource instance.
       if (isObject(options?.focusSource)) { this.options.focusSource = options.focusSource; }
 
+      const activeWindow = this.reactive.activeWindow;
+
       if (this._state === Application.RENDER_STATES.NONE &&
-       document.querySelector(`#${this.id}`) instanceof HTMLElement)
+       activeWindow.document.querySelector(`#${this.id}`) instanceof HTMLElement)
       {
          console.warn(`SvelteApplication - _render: A DOM element already exists for CSS ID '${this.id
          }'. Cancelling initial render for new application with appId '${this.appId}'.`);
@@ -919,8 +924,10 @@ export class SvelteApplication extends Application
     */
    async _renderInner(data)
    {
+      const activeWindow = this.reactive.activeWindow;
+
       const html = typeof this.template === 'string' ? await renderTemplate(this.template, data) :
-       document.createDocumentFragment();
+       activeWindow.document.createDocumentFragment();
 
       return $(html);
    }

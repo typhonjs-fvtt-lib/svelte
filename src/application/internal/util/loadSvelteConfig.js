@@ -37,7 +37,8 @@ export function loadSvelteConfig({ app, template, config, elementRootUpdate } = 
    }
    else                                            // No target defined, create a document fragment.
    {
-      target = document.createDocumentFragment();
+      const activeWindow = app?.reactive?.activeWindow ?? globalThis;
+      target = activeWindow.document.createDocumentFragment();
    }
 
    if (target === void 0)
