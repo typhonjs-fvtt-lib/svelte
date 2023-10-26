@@ -585,10 +585,11 @@ function s_GET_POSITIONINFO(tjsPositions, vars, filter, gsapData)
 
          const finalGsapData = gsapData(gsapDataOptions);
 
-         if (!isObject(finalGsapData))
+         if (!isIterable(finalGsapData))
          {
             throw new TypeError(
-             `GsapCompose error: gsapData callback function iteration(${index - 1}) failed to return an object.`);
+             `GsapCompose error: gsapData callback function iteration(${
+               index - 1}) failed to return an iterable list.`);
          }
 
          s_VALIDATE_GSAPDATA_ENTRY(finalGsapData);

@@ -155,6 +155,12 @@ export class GsapCompose
          return gsap.timeline(target);
       }
 
+      // If target is an empty array then return an empty timeline.
+      if (Array.isArray(target) && target.length === 0)
+      {
+         return gsap.timeline();
+      }
+
       // If target is TJSPosition related attempt to dispatch to GsapPosition.
       const positionTimeline = s_DISPATCH_POSITION('timeline', target, arg1, arg2, arg3);
       if (positionTimeline !== void 0) { return positionTimeline; }
@@ -314,8 +320,8 @@ function s_DISPATCH_POSITION(operation, target, options, arg1, arg2)
       {
          if (!allPosition)
          {
-            throw new TypeError(
-             `GsapCompose.${operation} error: 'target' is an array but all entries are not a Position instance.`);
+            throw new TypeError(`GsapCompose.${
+             operation} error: 'target' is an iterable list but all entries are not a Position instance.`);
          }
          else
          {
