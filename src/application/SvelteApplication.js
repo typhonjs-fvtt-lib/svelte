@@ -243,20 +243,20 @@ export class SvelteApplication extends Application
     */
    bringToTop({ force = false } = {})
    {
-      if (force || this.popOut) { super.bringToTop(); }
+      // Only perform bring to top when the active window is the main Foundry window instance.
+      if (this.reactive.activeWindow !== globalThis) { return; }
 
-      const activeWindow = this.reactive.activeWindow;
+      if (force || this.popOut) { super.bringToTop(); }
 
       // If the activeElement is not `document.body` and not contained in this app via elementTarget then blur the
       // current active element and make `document.body`focused. This allows <esc> key to close all open apps / windows.
-      if (activeWindow.document.activeElement !== activeWindow.document.body &&
-       !this.elementTarget.contains(activeWindow.document.activeElement))
+      if (document.activeElement !== document.body && !this.elementTarget.contains(document.activeElement))
       {
          // Blur current active element.
-         if (activeWindow.document.activeElement instanceof HTMLElement) { activeWindow.document.activeElement.blur(); }
+         if (document.activeElement instanceof HTMLElement) { document.activeElement.blur(); }
 
          // Make document body focused.
-         activeWindow.document.body.focus();
+         document.body.focus();
       }
 
       globalThis.ui.activeWindow = this;
