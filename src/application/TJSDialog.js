@@ -55,7 +55,8 @@ export class TJSDialog extends SvelteApplication
     */
    constructor(data, options = {})
    {
-      super(options);
+      // Note: explicit setting of `popOutModuleDisable` to prevent the PopOut! module from acting on modal dialogs.
+      super({ ...options, popOutModuleDisable: data?.modal ?? false });
 
       this.#managedPromise = new ManagedPromise();
 
