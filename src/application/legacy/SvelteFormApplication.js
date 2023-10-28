@@ -312,16 +312,8 @@ export class SvelteFormApplication extends FormApplication
    async close(options = {})
    {
       const states = Application.RENDER_STATES;
+
       if (!options.force && ![states.RENDERED, states.ERROR].includes(this._state)) { return; }
-
-      // Unsubscribe from any local stores.
-      this.#stores.unsubscribe();
-
-      /**
-       * @ignore
-       * @internal
-       */
-      this._state = states.CLOSING;
 
       /**
        * Get the element.
@@ -330,6 +322,19 @@ export class SvelteFormApplication extends FormApplication
        */
       const el = this.#elementTarget;
       if (!el) { return this._state = states.CLOSED; }
+
+      // Support for PopOut! module; `close` is double invoked; once before the element is rejoined to the main window.
+      // Reject close invocations when the element window is not the main originating window / globalThis.
+      if (el?.ownerDocument?.defaultView !== globalThis) { return; }
+
+      /**
+       * @ignore
+       * @internal
+       */
+      this._state = states.CLOSING;
+
+      // Unsubscribe from any local stores.
+      this.#stores.unsubscribe();
 
       // Make any window content overflow hidden to avoid any scrollbars appearing in default or Svelte outro
       // transitions.
