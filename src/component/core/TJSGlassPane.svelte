@@ -1,6 +1,4 @@
 <script>
-   import { createEventDispatcher }    from 'svelte';
-
    import { applyStyles }              from '#runtime/svelte/action/dom';
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
    import { isObject }                 from '#runtime/util/object';
@@ -29,8 +27,6 @@
 
    /** @type {number} */
    export let zIndex = Number.MAX_SAFE_INTEGER;
-
-   const dispatch = createEventDispatcher();
 
    /** @type {HTMLDivElement} */
    let backgroundEl, containerEl, glassPaneEl;
@@ -116,9 +112,14 @@
          event.stopImmediatePropagation();
       }
 
-      if (event?.type === 'pointerdown' && closeOnInput)
+      if (event?.type === 'pointerdown')
       {
-         dispatch('close:glasspane');
+         glassPaneEl.dispatchEvent(new CustomEvent('pointerdown:glasspane', { bubbles: true, cancelable: true }));
+
+         if (closeOnInput)
+         {
+            glassPaneEl.dispatchEvent(new CustomEvent('close:glasspane', { bubbles: true, cancelable: true }));
+         }
       }
    }
 </script>
@@ -144,7 +145,9 @@
 <div id={id}
      bind:this={glassPaneEl}
      class=tjs-glass-pane
-     style:z-index={zIndex}>
+     style:z-index={zIndex}
+     on:close:glasspane
+     on:pointerdown:glasspane>
 
    {#if slotSeparate}
       <div class=tjs-glass-pane-background
@@ -158,7 +161,7 @@
          <slot />
       </div>
    {:else}
-      <div class=tjs-glass-pane-background
+      <div class="tjs-glass-pane-background tjs-glass-pane-container"
            bind:this={backgroundEl}
            style:background={background}
            in:inTransition|global={inTransitionOptions}
