@@ -232,31 +232,39 @@ export class SvelteApplication extends Application
 
    /**
     * Provide an override to set this application as the active window regardless of z-index. Changes behaviour from
-    * Foundry core. This is important / used for instance in dialog key handling for left / right button selection.
+    * Foundry core.
     *
     * @param {object} [opts] - Optional parameters.
+    *
+    * @param {boolean} [opts.focus=true] - When true and the active element is not contained in the app `elementTarget`
+    *        is focused..
     *
     * @param {boolean} [opts.force=false] - Force bring to top; will increment z-index by popOut order.
     *
     * @ignore
     * @internal
     */
-   bringToTop({ force = false } = {})
+   bringToTop({ focus = true, force = false } = {})
    {
       // Only perform bring to top when the active window is the main Foundry window instance.
       if (this.reactive.activeWindow !== globalThis) { return; }
 
       if (force || this.popOut) { super.bringToTop(); }
 
-      // If the activeElement is not `document.body` and not contained in this app via elementTarget then blur the
-      // current active element and make `document.body`focused. This allows <esc> key to close all open apps / windows.
-      if (document.activeElement !== document.body && !this.elementTarget.contains(document.activeElement))
+      const elementTarget = this.elementTarget;
+      const activeElement = document.activeElement;
+
+      // If the activeElement is not contained in this app via elementTarget then blur the current active element
+      // and make elementTarget focused.
+      if (focus && elementTarget && activeElement !== elementTarget && !elementTarget?.contains(activeElement))
       {
          // Blur current active element.
-         if (document.activeElement instanceof HTMLElement) { document.activeElement.blur(); }
+         if (activeElement instanceof HTMLElement || document.activeElement instanceof SVGElement)
+         {
+            activeElement.blur();
+         }
 
-         // Make document body focused.
-         document.body.focus();
+         elementTarget?.focus();
       }
 
       globalThis.ui.activeWindow = this;
