@@ -239,28 +239,39 @@ export class SvelteFormApplication extends FormApplication
 
    /**
     * Provide an override to set this application as the active window regardless of z-index. Changes behaviour from
-    * Foundry core. This is important / used for instance in dialog key handling for left / right button selection.
+    * Foundry core.
     *
     * @param {object} [opts] - Optional parameters.
+    *
+    * @param {boolean} [opts.focus=true] - When true and the active element is not contained in the app `elementTarget`
+    *        is focused..
     *
     * @param {boolean} [opts.force=false] - Force bring to top; will increment z-index by popOut order.
     *
     * @ignore
     * @internal
     */
-   bringToTop({ force = false } = {})
+   bringToTop({ focus = true, force = false } = {})
    {
+      // Only perform bring to top when the active window is the main Foundry window instance.
+      if (this.reactive.activeWindow !== globalThis) { return; }
+
       if (force || this.popOut) { super.bringToTop(); }
 
-      // If the activeElement is not `document.body` and not contained in this app via elementTarget then blur the
-      // current active element and make `document.body`focused. This allows <esc> key to close all open apps / windows.
-      if (document.activeElement !== document.body && !this.elementTarget.contains(document.activeElement))
+      const elementTarget = this.elementTarget;
+      const activeElement = document.activeElement;
+
+      // If the activeElement is not contained in this app via elementTarget then blur the current active element
+      // and make elementTarget focused.
+      if (focus && elementTarget && activeElement !== elementTarget && !elementTarget?.contains(activeElement))
       {
          // Blur current active element.
-         if (document.activeElement instanceof HTMLElement) { document.activeElement.blur(); }
+         if (activeElement instanceof HTMLElement || document.activeElement instanceof SVGElement)
+         {
+            activeElement.blur();
+         }
 
-         // Make document body focused.
-         document.body.focus();
+         elementTarget?.focus();
       }
 
       globalThis.ui.activeWindow = this;
@@ -309,16 +320,8 @@ export class SvelteFormApplication extends FormApplication
    async close(options = {})
    {
       const states = Application.RENDER_STATES;
+
       if (!options.force && ![states.RENDERED, states.ERROR].includes(this._state)) { return; }
-
-      // Unsubscribe from any local stores.
-      this.#stores.unsubscribe();
-
-      /**
-       * @ignore
-       * @internal
-       */
-      this._state = states.CLOSING;
 
       /**
        * Get the element.
@@ -327,6 +330,19 @@ export class SvelteFormApplication extends FormApplication
        */
       const el = this.#elementTarget;
       if (!el) { return this._state = states.CLOSED; }
+
+      // Support for PopOut! module; `close` is double invoked; once before the element is rejoined to the main window.
+      // Reject close invocations when the element window is not the main originating window / globalThis.
+      if (el?.ownerDocument?.defaultView !== globalThis) { return; }
+
+      /**
+       * @ignore
+       * @internal
+       */
+      this._state = states.CLOSING;
+
+      // Unsubscribe from any local stores.
+      this.#stores.unsubscribe();
 
       // Make any window content overflow hidden to avoid any scrollbars appearing in default or Svelte outro
       // transitions.
@@ -895,8 +911,10 @@ export class SvelteFormApplication extends FormApplication
       // Store any focusSource instance.
       if (isObject(options?.focusSource)) { this.options.focusSource = options.focusSource; }
 
+      const activeWindow = this.reactive.activeWindow;
+
       if (this._state === Application.RENDER_STATES.NONE &&
-       document.querySelector(`#${this.id}`) instanceof HTMLElement)
+       activeWindow.document.querySelector(`#${this.id}`) instanceof HTMLElement)
       {
          console.warn(`SvelteFormApplication - _render: A DOM element already exists for CSS ID '${this.id
          }'. Cancelling initial render for new application with appId '${this.appId}'.`);
@@ -937,8 +955,10 @@ export class SvelteFormApplication extends FormApplication
     */
    async _renderInner(data)
    {
+      const activeWindow = this.reactive.activeWindow;
+
       const html = typeof this.template === 'string' ? await renderTemplate(this.template, data) :
-       document.createDocumentFragment();
+       activeWindow.document.createDocumentFragment();
 
       return $(html);
    }

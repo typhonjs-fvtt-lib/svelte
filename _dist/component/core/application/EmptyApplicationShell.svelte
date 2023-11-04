@@ -53,7 +53,11 @@
       getContext('#internal').stores.elementRoot.set(elementRoot);
    }
 
-   // Store application reference.
+   /**
+    * Store application reference.
+    *
+    * @type {SvelteApplication}
+    */
    const { application } = getContext('#external');
 
    // Focus related app options stores.
@@ -217,9 +221,12 @@
          const firstFocusEl = allFocusable.length > 0 ? allFocusable[0] : void 0;
          const lastFocusEl = allFocusable.length > 0 ? allFocusable[allFocusable.length - 1] : void 0;
 
+         const activeWindow = application.reactive.activeWindow;
+
          // Only cycle focus to the last keyboard focusable app element if `elementRoot` or first focusable element
          // is the active element.
-         if (elementRoot === document.activeElement || firstFocusEl === document.activeElement)
+         if (elementRoot === activeWindow.document.activeElement ||
+          firstFocusEl === activeWindow.document.activeElement)
          {
             if (lastFocusEl instanceof HTMLElement && firstFocusEl !== lastFocusEl) { lastFocusEl.focus(); }
 
@@ -251,8 +258,10 @@
       {
          if ($focusKeep)
          {
-            const focusOutside = document.activeElement instanceof HTMLElement &&
-             !elementRoot.contains(document.activeElement);
+            const activeWindow = application.reactive.activeWindow;
+
+            const focusOutside = activeWindow.document.activeElement instanceof HTMLElement &&
+             !elementRoot.contains(activeWindow.document.activeElement);
 
             // Only focus the content element if the active element is outside the app; maintaining internal focused
             // element.

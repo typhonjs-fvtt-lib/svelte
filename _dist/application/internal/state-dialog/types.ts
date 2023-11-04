@@ -1,8 +1,8 @@
-import type { TJSSvelteConfig }  from '@typhonjs-svelte/runtime-base/svelte/util';
+import type { TJSSvelteConfig }     from '@typhonjs-svelte/runtime-base/svelte/util';
 
-import type { TransitionFunction } from '@typhonjs-svelte/runtime-base/svelte/transition';
+import type { TransitionFunction }  from '@typhonjs-svelte/runtime-base/svelte/transition';
 
-import type { TJSDialog }        from '../../TJSDialog.js';
+import type { TJSDialog }           from '../../TJSDialog.js';
 
 /**
  * Provides storage for all dialog options through individual accessors and `get`, `merge`, `replace` and `set` methods
@@ -144,19 +144,19 @@ declare interface TJSDialogData
    set notifyError(notifyError: boolean);
 
    /**
-    * @returns {string | ((application: TJSDialog) => any)} Callback invoked when dialog is
+    * @returns {string | ((data?: { application?: TJSDialog }) => any)} Callback invoked when dialog is
     *          closed; no button option selected. When defined as a string any matching function by name exported from
     *          content Svelte component is invoked.
     */
-   get onClose(): string | ((application: TJSDialog) => any);
+   get onClose(): string | ((data?: { application?: TJSDialog }) => any);
 
    /**
     * Set callback invoked when dialog is closed; no button option selected. When defined as a string any matching
     * function by name exported from content Svelte component is invoked..
     *
-    * @param {string | ((application: TJSDialog) => any)} onClose - New dialog `onClose` state.
+    * @param {string | ((data?: { application: TJSDialog }) => any)} onClose - New dialog `onClose` state.
     */
-   set onClose(onClose: string | ((application: TJSDialog) => any));
+   set onClose(onClose: string | ((data?: { application?: TJSDialog }) => any));
 
    /**
     * @returns {boolean} Dialog `rejectClose` state. When true and a Promise has been created by {@link TJSDialog.wait}
@@ -236,6 +236,14 @@ declare interface TJSDialogData
    set zIndex(zIndex: number | null);
 
    /**
+    * Provides a cloned copy of the dialog data.
+    * Note: The content attribute is not cloned as complex / props may be present.
+    *
+    * @returns {import('./types').TJSDialogOptions} A clone of the dialog data.
+    */
+   clone(): TJSDialogOptions;
+
+   /**
     * Provides a way to safely get this dialogs data given an accessor string which describes the
     * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
     * to walk.
@@ -304,7 +312,7 @@ type TJSDialogButtonData = {
     * Callback for button press. When defined as a string any matching function by name exported from content Svelte
     * component is invoked.
     */
-   onPress?: string | ((application?: TJSDialog) => any);
+   onPress?: string | ((data?: { application?: TJSDialog }) => any);
 
    /**
     * Inline styles to apply to the button.
@@ -380,7 +388,7 @@ type TJSDialogOptions = {
     * Callback invoked when dialog is closed; no button option selected. When defined as a string any matching function
     * by name exported from content Svelte component is invoked.
     */
-   onClose?: string | ((application: TJSDialog) => any);
+   onClose?: string | ((data?: { application: TJSDialog }) => any);
 
    /**
     * When true and a Promise has been created by {@link TJSDialog.wait} and the Promise is not in the process of being

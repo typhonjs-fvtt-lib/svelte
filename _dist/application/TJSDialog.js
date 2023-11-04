@@ -39,8 +39,6 @@ import { SvelteApplication }  from './SvelteApplication.js';
  *
  * There are a couple of static helper methods to quickly create standard dialogs such as a 'yes' / 'no' confirmation
  * dialog with {@link TJSDialog.confirm} and an 'ok' single button dialog with {@link TJSDialog.prompt}.
- *
- * TODO: document all extended dialog data parameters such as transition options / modal transitions.
  */
 export class TJSDialog extends SvelteApplication
 {
@@ -57,7 +55,8 @@ export class TJSDialog extends SvelteApplication
     */
    constructor(data, options = {})
    {
-      super(options);
+      // Note: explicit setting of `popOutModuleDisable` to prevent the PopOut! module from acting on modal dialogs.
+      super({ popOutModuleDisable: data?.modal ?? false, ...options });
 
       this.#managedPromise = new ManagedPromise();
 
@@ -96,7 +95,7 @@ export class TJSDialog extends SvelteApplication
             props: function() // `this` is the TJSDialog instance when invoked.
             {
                return {
-                  data: this.#data,
+                  data: this.#data.clone(),
                   managedPromise: this.#managedPromise
                };
             }
@@ -211,17 +210,17 @@ export class TJSDialog extends SvelteApplication
     * @template T
     *
     * @param {import('./internal/state-dialog/types').TJSDialogOptions & {
-    *    onYes?: string|((application: TJSDialog) => any),
-    *    onNo?: string|((application: TJSDialog) => any)
+    *    onYes?: string | ((data?: { application?: TJSDialog }) => any),
+    *    onNo?: string | ((data?: { application?: TJSDialog }) => any)
     * }} [data] - Confirm dialog options.
     *
-    * @param {string|((application: TJSDialog) => any)} [data.onYes] - Callback function upon `yes`; may be an async
-    *        function. When defined as a string any matching function by name exported from content Svelte component is
-    *        invoked.
+    * @param {string|((data?: { application?: TJSDialog }) => any)} [data.onYes] - Callback function upon `yes`; may be
+    *        an async function. When defined as a string any matching function by name exported from content Svelte
+    *        component is invoked.
     *
-    * @param {string|((application: TJSDialog) => any)} [data.onNo] - Callback function upon `no`; may be an async
-    *        function. When defined as a string any matching function by name exported from content Svelte component is
-    *        invoked.
+    * @param {string|((data?: { application?: TJSDialog }) => any)} [data.onNo] - Callback function upon `no`; may be an
+    *        async function. When defined as a string any matching function by name exported from content Svelte
+    *        component is invoked.
     *
     * @param {import('./').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
     *        constructor.
@@ -232,7 +231,7 @@ export class TJSDialog extends SvelteApplication
     * const result = await TJSDialog.confirm({
     *  title: 'A Yes or No Question',
     *  content: '<p>Choose wisely.</p>',
-    *  onYes: () => 'YES Result'
+    *  onYes: () => 'YES Result',
     *  onNo: () => 'NO Result'
     * });
     *
@@ -257,10 +256,10 @@ export class TJSDialog extends SvelteApplication
          ...data,
          buttons: deepMerge(mergedButtons, {
             yes: {
-               onPress: (application) => this.#invokeFn(onYes, application, true)
+               onPress: ({ application }) => this.#invokeFn(onYes, application, true)
             },
             no: {
-               onPress: (application) => this.#invokeFn(onNo, application, false)
+               onPress: ({ application }) => this.#invokeFn(onNo, application, false)
             }
          }),
          default: data.default ?? 'yes'
@@ -271,7 +270,7 @@ export class TJSDialog extends SvelteApplication
     * A helper method to invoke a callback function directly or lookup an exported function with the same name from any
     * content Svelte component to invoke. This is used internally to apply default values for `confirm` and `prompt`.
     *
-    * @param {string|((application: TJSDialog) => any)} callback - Callback function to invoke; may be an async
+    * @param {string|((data?: { application?: TJSDialog }) => any)} callback - Callback function to invoke; may be an async
     *        function. When defined as a string any matching function by name exported from content Svelte component is
     *        invoked.
     *
@@ -291,7 +290,7 @@ export class TJSDialog extends SvelteApplication
       {
          case 'function':
             // Pass the dialog instance to the callback.
-            result = callback(application);
+            result = callback({ application });
             break;
 
          case 'string':
@@ -301,7 +300,7 @@ export class TJSDialog extends SvelteApplication
             // Attempt lookup by function name in dialog instance component.
             if (dialogComponent !== void 0 && typeof dialogComponent?.[callback] === 'function')
             {
-               result = dialogComponent?.[callback](application);
+               result = dialogComponent?.[callback]({ application });
             }
             else
             {
@@ -330,14 +329,14 @@ export class TJSDialog extends SvelteApplication
     * @template T
     *
     * @param {import('./internal/state-dialog/types').TJSDialogOptions & {
-    *    onOk?: string|((application: TJSDialog) => any),
+    *    onOk?: string | ((data?: { application?: TJSDialog }) => any),
     *    label?: string,
     *    icon?: string
     * }} [data] - Prompt dialog options that includes any TJSDialog options along with the following optional fields:
     *
-    * @param {string|((application: TJSDialog) => any)} [data.onOk] - Callback function upon `ok`; may be an async
-    *        function. When defined as a string any matching function by name exported from content Svelte component is
-    *        invoked.
+    * @param {string|((data?: { application?: TJSDialog }) => any)} [data.onOk] - Callback function upon `ok`; may be
+    *        an async function. When defined as a string any matching function by name exported from content Svelte
+    *        component is invoked.
     *
     * @param {string}   [data.label] - The OK prompt button text.
     *
@@ -353,7 +352,7 @@ export class TJSDialog extends SvelteApplication
     * const result = await TJSDialog.prompt({
     *  title: 'Are you OK?',
     *  content: '<p>Are you OK?.</p>',
-    *  label: 'Feeling Fine!'
+    *  label: 'Feeling Fine!',
     *  onOk: () => 'OK'
     * });
     *
@@ -368,7 +367,7 @@ export class TJSDialog extends SvelteApplication
             ok: {
                icon,
                label,
-               onPress: (application) => this.#invokeFn(onOk, application, true)
+               onPress: ({ application }) => this.#invokeFn(onOk, application, true)
             }
          },
          default: 'ok'

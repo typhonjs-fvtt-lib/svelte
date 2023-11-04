@@ -2,7 +2,8 @@
    import { getContext }            from 'svelte';
    import { cubicOut }              from 'svelte/easing';
 
-   import { isSvelteComponent }     from '@typhonjs-svelte/runtime-base/svelte/util';
+   import { isTJSSvelteConfig }     from '@typhonjs-svelte/runtime-base/svelte/util';
+
    import { isObject }              from '@typhonjs-svelte/runtime-base/util/object';
 
    import { localize }              from '@typhonjs-fvtt/svelte/helper';
@@ -15,6 +16,9 @@
    export let draggable = void 0;
    export let draggableOptions = void 0;
 
+   /**
+    * @type {SvelteApplication}
+    */
    const { application } = getContext('#external');
 
    // Focus related app options stores.
@@ -62,8 +66,9 @@
       {
          const buttonsList = typeof button?.alignLeft === 'boolean' && button?.alignLeft ? buttonsLeft : buttonsRight;
 
-         // If the button is a Svelte component set it as the class otherwise use `TJSHeaderButton` w/ button as props.
-         buttonsList.push(isSvelteComponent(button) ? { class: button, props: {} } :
+         // If the button contains a TJSSvelteConfig object in the `svelte` attribute then use it otherwise use
+         // `TJSHeaderButton` w/ button as props.
+         buttonsList.push(isTJSSvelteConfig(button?.svelte) ? { ...button.svelte } :
           { class: TJSHeaderButton, props: { button } });
       }
    }
@@ -112,8 +117,10 @@
       {
          if ($focusKeep)
          {
-            const focusOutside = document.activeElement instanceof HTMLElement &&
-             !rootEl.contains(document.activeElement);
+            const activeWindow = application.reactive.activeWindow;
+
+            const focusOutside = activeWindow.document.activeElement instanceof HTMLElement &&
+             !rootEl.contains(activeWindow.document.activeElement);
 
             // Only focus the content element if the active element is outside the app; maintaining internal focused
             // element.

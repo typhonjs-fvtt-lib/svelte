@@ -9,9 +9,7 @@
 
    import { fade }         from 'svelte/transition';
 
-   import {
-      isObject,
-      klona }              from '@typhonjs-svelte/runtime-base/util/object';
+   import { isObject }     from '@typhonjs-svelte/runtime-base/util/object';
 
    import ApplicationShell from '../application/ApplicationShell.svelte';
    import DialogContent    from './DialogContent.svelte';
@@ -28,7 +26,10 @@
 
    export let managedPromise = void 0;
 
-   const application = getContext('#external').application;
+   /**
+    * @type {TJSDialog}
+    */
+   const { application } = getContext('#external');
 
    const dialogOptions = writable({});
 
@@ -85,17 +86,19 @@
 
    // Special modal handling -----------------------------------------------------------------------------------------
 
+   const activeWindow = application.reactive.activeWindow;
+
    if (modal)
    {
       // Add a capture listener on window keydown to act before any other event listener.
-      onDestroy(() => window.removeEventListener('keydown', onKeydownModal, { capture: true }));
-      onMount(() => window.addEventListener('keydown', onKeydownModal, { capture: true }));
+      onDestroy(() => activeWindow.removeEventListener('keydown', onKeydownModal, { capture: true }));
+      onMount(() => activeWindow.addEventListener('keydown', onKeydownModal, { capture: true }));
    }
    else
    {
       // Add a listener on document keydown to act before or equal with other event listeners.
-      onDestroy(() => document.removeEventListener('keydown', onKeydown));
-      onMount(() => document.addEventListener('keydown', onKeydown));
+      onDestroy(() => activeWindow.document.removeEventListener('keydown', onKeydown));
+      onMount(() => activeWindow.document.addEventListener('keydown', onKeydown));
    }
 
    // Aria Attributes ------------------------------------------------------------------------------------------------
@@ -116,8 +119,8 @@
 
    $: if (isObject(data))
    {
-      // Update internal dialog options store / context with a clone of`data`.
-      dialogOptions.set(klona(data));
+      // Update internal dialog options store / context with `data`.
+      dialogOptions.set(data);
 
       const newZIndex = Number.isInteger(data.zIndex) || data.zIndex === null ? data.zIndex :
        modal ? Number.MAX_SAFE_INTEGER : Number.MAX_SAFE_INTEGER - 1

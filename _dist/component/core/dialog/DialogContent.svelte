@@ -26,6 +26,15 @@
 
    const s_REGEX_HTML = /^\s*<.*>$/;
 
+   const { elementRoot } = getContext('#internal').stores;
+
+   /**
+    * @type {TJSDialog}
+    */
+   const { application } = getContext('#external');
+
+   const managedPromise = getContext('#managedPromise');
+
    let buttons;
 
    /** @type {HTMLDivElement} */
@@ -37,12 +46,6 @@
    let content = void 0;
    let dialogClass;
    let dialogProps = {};
-
-   let { elementRoot } = getContext('#internal').stores;
-
-   let { application } = getContext('#external');
-
-   let managedPromise = getContext('#managedPromise');
 
    let currentButtonId = data.default;
 
@@ -176,7 +179,7 @@
    /**
     * Handle button click.
     *
-    * @param {object}   button - button data.
+    * @param {import('@typhonjs-svelte/runtime-base/svelte/application').TJSDialogButtonData}   button - button data.
     *
     * TODO: When app eventbus is available send event for UI notification instead of Foundry API usage.
     *
@@ -194,14 +197,14 @@
          {
             case 'function':
                // Pass back the TJSDialog instance.
-               result = callback(application);
+               result = callback({ application });
                break;
 
             case 'string':
                // Attempt lookup by function name in dialog instance component.
                if (dialogComponent !== void 0 && typeof dialogComponent[callback] === 'function')
                {
-                  result = dialogComponent[callback](application);
+                  result = dialogComponent[callback]({ application });
                }
                else
                {
@@ -271,7 +274,9 @@
             // navigation.
             setTimeout(() =>
             {
-               const activeElement = document.activeElement;
+               const activeWindow = application.reactive.activeWindow;
+
+               const activeElement = activeWindow.document.activeElement;
                if (activeElement instanceof HTMLElement && buttonsEl instanceof HTMLElement &&
                 buttonsEl.contains(activeElement))
                {
@@ -310,7 +315,8 @@
             event.preventDefault();
             event.stopPropagation();
 
-            const activeEl = document.activeElement;
+            const activeWindow = application.reactive.activeWindow;
+            const activeEl = activeWindow.document.activeElement;
 
             if (buttonsEl instanceof HTMLElement)
             {
@@ -332,7 +338,8 @@
             event.preventDefault();
             event.stopPropagation();
 
-            const activeEl = document.activeElement;
+            const activeWindow = application.reactive.activeWindow;
+            const activeEl = activeWindow.document.activeElement;
 
             if (buttonsEl instanceof HTMLElement)
             {
