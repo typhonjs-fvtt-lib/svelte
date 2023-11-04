@@ -144,19 +144,19 @@ declare interface TJSDialogData
    set notifyError(notifyError: boolean);
 
    /**
-    * @returns {string | ((application: TJSDialog) => any)} Callback invoked when dialog is
+    * @returns {string | ((data?: { application?: TJSDialog }) => any)} Callback invoked when dialog is
     *          closed; no button option selected. When defined as a string any matching function by name exported from
     *          content Svelte component is invoked.
     */
-   get onClose(): string | ((application: TJSDialog) => any);
+   get onClose(): string | ((data?: { application?: TJSDialog }) => any);
 
    /**
     * Set callback invoked when dialog is closed; no button option selected. When defined as a string any matching
     * function by name exported from content Svelte component is invoked..
     *
-    * @param {string | ((application: TJSDialog) => any)} onClose - New dialog `onClose` state.
+    * @param {string | ((data?: { application: TJSDialog }) => any)} onClose - New dialog `onClose` state.
     */
-   set onClose(onClose: string | ((application: TJSDialog) => any));
+   set onClose(onClose: string | ((data?: { application?: TJSDialog }) => any));
 
    /**
     * @returns {boolean} Dialog `rejectClose` state. When true and a Promise has been created by {@link TJSDialog.wait}
@@ -312,7 +312,7 @@ type TJSDialogButtonData = {
     * Callback for button press. When defined as a string any matching function by name exported from content Svelte
     * component is invoked.
     */
-   onPress?: string | ((application?: TJSDialog) => any);
+   onPress?: string | ((data?: { application?: TJSDialog }) => any);
 
    /**
     * Inline styles to apply to the button.
@@ -388,7 +388,7 @@ type TJSDialogOptions = {
     * Callback invoked when dialog is closed; no button option selected. When defined as a string any matching function
     * by name exported from content Svelte component is invoked.
     */
-   onClose?: string | ((application: TJSDialog) => any);
+   onClose?: string | ((data?: { application: TJSDialog }) => any);
 
    /**
     * When true and a Promise has been created by {@link TJSDialog.wait} and the Promise is not in the process of being

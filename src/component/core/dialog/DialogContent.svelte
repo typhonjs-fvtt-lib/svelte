@@ -179,7 +179,7 @@
    /**
     * Handle button click.
     *
-    * @param {object}   button - button data.
+    * @param {import('#runtime/svelte/application').TJSDialogButtonData}   button - button data.
     *
     * TODO: When app eventbus is available send event for UI notification instead of Foundry API usage.
     *
@@ -197,14 +197,14 @@
          {
             case 'function':
                // Pass back the TJSDialog instance.
-               result = callback(application);
+               result = callback({ application });
                break;
 
             case 'string':
                // Attempt lookup by function name in dialog instance component.
                if (dialogComponent !== void 0 && typeof dialogComponent[callback] === 'function')
                {
-                  result = dialogComponent[callback](application);
+                  result = dialogComponent[callback]({ application });
                }
                else
                {

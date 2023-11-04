@@ -244,9 +244,9 @@ export class TJSDialogData
    }
 
    /**
-    * @returns {string | ((application: import('../../index.js').TJSDialog) => any)} Callback invoked when dialog is
-    *          closed; no button option selected. When defined as a string any matching function by name exported from
-    *          content Svelte component is invoked.
+    * @returns {string | ((data?: { application?: import('../../index.js').TJSDialog }) => any)} Callback invoked when
+    *          dialog is closed; no button option selected. When defined as a string any matching function by name
+    *          exported from content Svelte component is invoked.
     */
    get onClose()
    {
@@ -257,7 +257,8 @@ export class TJSDialogData
     * Set callback invoked when dialog is closed; no button option selected. When defined as a string any matching
     * function by name exported from content Svelte component is invoked..
     *
-    * @param {string | ((application: import('../../index.js').TJSDialog) => any)} onClose - New dialog `onClose` state.
+    * @param {string | ((data?: { application?: import('../../index.js').TJSDialog }) => any)} onClose - New dialog
+    *        `onClose` state.
     */
    set onClose(onClose)
    {
