@@ -38,24 +38,21 @@
 
    function onClick(event)
    {
-      // Accept `onPress or `onclick` as the function / data to invoke.
+      // Accept `onPress or `onclick` as the function / data to invoke. `onclick` is from Foundry defined buttons.
       const invoke = button?.onPress ?? button?.onclick;
 
       if (typeof invoke === 'function')
       {
-         invoke.call(button, event);
+         invoke({ button, event });
          button = button; // This provides a reactive update if button data changes.
       }
    }
 
    function onContextMenu(event)
    {
-      // Accept `onContextMenu` as the function / data to invoke.
-      const invoke = button?.onContextMenu;
-
-      if (typeof invoke === 'function')
+      if (button?.onContextMenu === 'function')
       {
-         invoke.call(button, event);
+         button.onContextMenu({ button, event });
          button = button; // This provides a reactive update if button data changes.
       }
    }
@@ -83,11 +80,12 @@
    {
       if (event.code === keyCode)
       {
+         // Accept `onPress or `onclick` as the function / data to invoke. `onclick` is from Foundry defined buttons.
          const invoke = button.onPress ?? button.onclick;
 
          if (typeof invoke === 'function')
          {
-            invoke.call(button, event);
+            invoke({ button, event });
             button = button; // This provides a reactive update if button data changes.
          }
 

@@ -2,7 +2,8 @@
    import { getContext }            from '#svelte';
    import { cubicOut }              from '#svelte/easing';
 
-   import { isSvelteComponent }     from '#runtime/svelte/util';
+   import { isTJSSvelteConfig }     from '#runtime/svelte/util';
+
    import { isObject }              from '#runtime/util/object';
 
    import { localize }              from '@typhonjs-fvtt/svelte/helper';
@@ -65,8 +66,9 @@
       {
          const buttonsList = typeof button?.alignLeft === 'boolean' && button?.alignLeft ? buttonsLeft : buttonsRight;
 
-         // If the button is a Svelte component set it as the class otherwise use `TJSHeaderButton` w/ button as props.
-         buttonsList.push(isSvelteComponent(button) ? { class: button, props: {} } :
+         // If the button contains a TJSSvelteConfig object in the `svelte` attribute then use it otherwise use
+         // `TJSHeaderButton` w/ button as props.
+         buttonsList.push(isTJSSvelteConfig(button?.svelte) ? { ...button.svelte } :
           { class: TJSHeaderButton, props: { button } });
       }
    }
