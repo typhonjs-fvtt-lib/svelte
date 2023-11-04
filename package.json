@@ -18,19 +18,12 @@
     "./application": {
       "import": "./_dist/application/index.js"
     },
-    "./application/dialog": {
-      "import": "./_dist/application/dialog/index.js"
-    },
     "./application/legacy": {
       "import": "./_dist/application/legacy/index.js"
     },
     "./component/core": {
       "types": "./_dist/component/core/index.d.ts",
       "import": "./_dist/component/core/index.js"
-    },
-    "./component/dialog": {
-      "types": "./_dist/component/dialog/index.d.ts",
-      "import": "./_dist/component/dialog/index.js"
     },
     "./gsap": {
       "types": "./_dist/gsap/index.d.ts",
@@ -61,6 +54,7 @@
     "./package.json": "./package.json"
   },
   "sideEffects": [
+    "./_dist/application/index.js",
     "./_dist/component/core/index.js",
     "./_dist/gsap/plugin/*.js",
     "./_dist/gsap/plugin/bonus/*.js"

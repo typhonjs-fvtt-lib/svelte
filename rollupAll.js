@@ -280,14 +280,6 @@ await generateDTS({
    ...applicationDTSOptions,
 });
 
-console.log('Generating TS Declaration: ./_dist/application/dialog/index.js');
-
-await generateDTS({
-   input: './_dist/application/dialog/index.js',
-   output: './_dist/application/dialog/index.d.ts',
-   ...applicationDTSOptions
-});
-
 console.log('Generating TS Declaration: ./_dist/application/legacy/index.js');
 
 await generateDTS({
