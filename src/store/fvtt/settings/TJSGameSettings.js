@@ -296,12 +296,16 @@ export class TJSGameSettings
       // existing game setting.
       subscribeIgnoreFirst(targetStore, storeHandler);
 
-      this.#settings.push({
+      const gameSettingData = {
          namespace,
          key,
          folder,
          ...options
-      });
+      };
+
+      Object.freeze(gameSettingData);
+
+      this.#settings.push(gameSettingData);
 
       return storeHandler;
    }
@@ -390,7 +394,7 @@ export class TJSGameSettings
  *
  * @property {string} key The setting key to register.
  *
- * @property {string} folder The name of the TJSSvgFolder to put this setting in to group them.
+ * @property {string} [folder] The name of the TJSSvgFolder to put this setting in to group them.
  *
  * @property {import('svelte/store').Writable} [store] An existing store instance to use.
  *
@@ -404,5 +408,5 @@ export class TJSGameSettings
  *
  * @property {string} key The setting key to register.
  *
- * @property {string} folder The name of the TJSSvgFolder to put this setting in to group them.
+ * @property {string} [folder] The name of the TJSSvgFolder to put this setting in to group them.
  */

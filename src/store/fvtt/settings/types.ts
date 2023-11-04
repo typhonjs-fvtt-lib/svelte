@@ -97,12 +97,12 @@ export type TJSSettingsCustomSectionFolder = {
    /**
     * A Svelte component config object defining TJSSvgFolder summary end component.
     */
-   summaryEnd?: object;
+   summaryEnd?: import('#runtime/svelte/util').TJSSvelteConfig;
 
    /**
     * Inline styles for the `TJSSvgFolder`; useful for setting CSS variables.
     */
-   styles?: object;
+   styles?: Record<string, string>;
 };
 
 export type TJSSettingsUIData = {
