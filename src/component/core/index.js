@@ -1,7 +1,5 @@
 import { cssVariables } from './cssVariables.js';
 
-export { default as TJSComponentShell }   from './TJSComponentShell.svelte';
-export { default as TJSContainer }        from './TJSContainer.svelte';
 export { default as TJSGlassPane }        from './TJSGlassPane.svelte';
 export *                                  from './application/index.js';
 export *                                  from './dialog/index.js';
