@@ -88,13 +88,7 @@
 
    const activeWindow = application.reactive.activeWindow;
 
-   if (modal)
-   {
-      // Add a capture listener on window keydown to act before any other event listener.
-      onDestroy(() => activeWindow.removeEventListener('keydown', onKeydownModal, { capture: true }));
-      onMount(() => activeWindow.addEventListener('keydown', onKeydownModal, { capture: true }));
-   }
-   else
+   if (!modal)
    {
       // Add a listener on document keydown to act before or equal with other event listeners.
       onDestroy(() => activeWindow.document.removeEventListener('keydown', onKeydown));
@@ -286,28 +280,14 @@
          application.close();
       }
    }
-
-   /**
-    * Handles closing any modal window and is assigned to `window` with capture acting before any other browser wide
-    * event listeners stopping immediate propagation.
-    *
-    * @param {KeyboardEvent}  event - A KeyboardEvent.
-    */
-   function onKeydownModal(event)
-   {
-      if (event.code === 'Escape')
-      {
-         event.preventDefault();
-         event.stopImmediatePropagation();
-         application.close();
-      }
-   }
 </script>
 
 <svelte:options accessors={true}/>
 
 {#if modal}
-   <TJSGlassPane id={`${application.id}-glasspane`} {...modalProps} {zIndex} on:close:glasspane={() => application.close()}>
+   <TJSGlassPane id={`${application.id}-glasspane`} {...modalProps} {zIndex}
+                 on:glasspane:close={() => application.close()}
+                 on:glasspane:keydown:escape={() => application.close()}>
       <ApplicationShell bind:elementRoot bind:elementContent {...appProps} appOffsetHeight={true}>
          <DialogContent bind:dialogComponent {data} stopPropagation={true} />
       </ApplicationShell>

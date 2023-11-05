@@ -10,7 +10,7 @@
    export let captureInput = true;
 
    /**
-    * When true any input fires an event `close:glasspane`.
+    * When true any input fires an event `glasspane:close`.
     *
     * @type {boolean}
     */
@@ -100,6 +100,13 @@
    {
       const targetEl = event.target;
 
+      // Special handling of the Escape key pressed regardless of event target.
+      if (event?.type === 'keydown' && event?.code === 'Escape')
+      {
+         glassPaneEl.dispatchEvent(new CustomEvent('glasspane:keydown:escape', { bubbles: true, cancelable: true }));
+      }
+
+      // Ignore any events originating inside the glasspane. Return early if event target is not contained in glasspane.
       if (targetEl !== glassPaneEl && targetEl !== backgroundEl  && targetEl !== containerEl &&
         glassPaneEl.contains(targetEl))
       {
@@ -114,11 +121,11 @@
 
       if (event?.type === 'pointerdown')
       {
-         glassPaneEl.dispatchEvent(new CustomEvent('pointerdown:glasspane', { bubbles: true, cancelable: true }));
+         glassPaneEl.dispatchEvent(new CustomEvent('glasspane:pointerdown', { bubbles: true, cancelable: true }));
 
          if (closeOnInput)
          {
-            glassPaneEl.dispatchEvent(new CustomEvent('close:glasspane', { bubbles: true, cancelable: true }));
+            glassPaneEl.dispatchEvent(new CustomEvent('glasspane:close', { bubbles: true, cancelable: true }));
          }
       }
    }
@@ -146,8 +153,9 @@
      bind:this={glassPaneEl}
      class=tjs-glass-pane
      style:z-index={zIndex}
-     on:close:glasspane
-     on:pointerdown:glasspane>
+     on:glasspane:close
+     on:glasspane:keydown:escape
+     on:glasspane:pointerdown>
 
    {#if slotSeparate}
       <div class=tjs-glass-pane-background
