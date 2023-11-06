@@ -291,6 +291,7 @@
     */
    function onPointerdownContent(event)
    {
+      // Note: the event target may not always be the element that will eventually receive focus.
       const focusable = A11yHelper.isFocusable(event.target);
 
       if (!focusable && $focusAuto)
@@ -298,9 +299,7 @@
          if ($focusKeep)
          {
             const activeWindow = application.reactive.activeWindow;
-
-            const focusOutside = activeWindow.document.activeElement instanceof HTMLElement &&
-             !elementRoot.contains(activeWindow.document.activeElement);
+            const focusOutside = !elementRoot.contains(activeWindow.document.activeElement);
 
             // Only focus the content element if the active element is outside the app; maintaining internal focused
             // element.
