@@ -206,6 +206,7 @@
       border: var(--tjs-app-resizable-handle-border, 1px solid #111);
       border-radius: var(--tjs-app-resizable-handle-border-radius, 4px 0 0 0);
       padding: var(--tjs-app-resizable-handle-padding, 2px);
+      touch-action: none;
    }
 
    .fa-arrows-alt-h {

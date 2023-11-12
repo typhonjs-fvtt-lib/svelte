@@ -177,6 +177,7 @@
       flex: var(--tjs-app-header-flex, 0 0 30px);
       gap: var(--tjs-app-header-gap, 5px);
       padding: var(--tjs-app-header-padding, 0 4px);
+      touch-action: none;
    }
 
    .window-header .tjs-app-icon {
