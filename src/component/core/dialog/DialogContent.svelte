@@ -16,7 +16,7 @@
    import { A11yHelper }      from '#runtime/util/browser';
    import { isObject }        from '#runtime/util/object';
 
-   import { localize }        from '@typhonjs-fvtt/svelte/helper';
+   import { localize }        from '#svelte-fvtt/helper';
 
    export let data = void 0;
    export let preventDefault = false;
@@ -53,7 +53,7 @@
    onDestroy(() =>
    {
       const rootEl = $elementRoot;
-      if (rootEl instanceof HTMLElement)
+      if (A11yHelper.isFocusTarget(rootEl))
       {
          rootEl.removeEventListener('keydown', onKeydown)
          rootEl.removeEventListener('keyup', onKeyup)
@@ -67,7 +67,7 @@
       {
          const focusEl = A11yHelper.getFirstFocusableElement(contentEl);
 
-         if (focusEl instanceof HTMLElement)
+         if (A11yHelper.isFocusTarget(focusEl))
          {
             // Focus on next tick to allow application / dialog to mount to bypass ApplicationShell onMount focus
             // handling.
@@ -80,7 +80,7 @@
    $: if ($elementRoot)
    {
       const rootEl = $elementRoot;
-      if (rootEl instanceof HTMLElement)
+      if (A11yHelper.isFocusTarget(rootEl))
       {
          rootEl.addEventListener('keydown', onKeydown)
          rootEl.addEventListener('keyup', onKeyup)
@@ -94,10 +94,10 @@
    $: focusFirst = typeof data.focusFirst === 'boolean' ? data.focusFirst : false;
 
    // Focus current button when `buttonsEl` is bound.
-   $: if (!focusFirst && buttonsEl instanceof HTMLElement)
+   $: if (!focusFirst && A11yHelper.isFocusTarget(buttonsEl))
    {
       const buttonEl = buttonsEl.querySelector(`.${currentButtonId}`);
-      if (buttonEl instanceof HTMLElement) { buttonEl.focus(); }
+      if (A11yHelper.isFocusTarget(buttonEl)) { buttonEl.focus(); }
    }
 
    // When false the dialog does not automatically close when button selected.
@@ -277,7 +277,7 @@
                const activeWindow = application.reactive.activeWindow;
 
                const activeElement = activeWindow.document.activeElement;
-               if (activeElement instanceof HTMLElement && buttonsEl instanceof HTMLElement &&
+               if (A11yHelper.isFocusTarget(activeElement) && A11yHelper.isFocusTarget(buttonsEl) &&
                 buttonsEl.contains(activeElement))
                {
                   // Find class that isn't `dialog-button` or `default` and is a key in `data.buttons`.
@@ -318,17 +318,17 @@
             const activeWindow = application.reactive.activeWindow;
             const activeEl = activeWindow.document.activeElement;
 
-            if (buttonsEl instanceof HTMLElement)
+            if (A11yHelper.isFocusTarget(buttonsEl))
             {
                // Only advance button via arrow key if a button is already focused.
-               if (activeEl instanceof HTMLElement && buttonsEl.contains(activeEl))
+               if (A11yHelper.isFocusTarget(activeEl) && buttonsEl.contains(activeEl))
                {
                   const currentIndex = buttons.findIndex((button) => button.id === currentButtonId);
                   if (buttons.length && currentIndex > 0) { currentButtonId = buttons[currentIndex - 1].id; }
                }
 
                const buttonEl = buttonsEl.querySelector(`.${currentButtonId}`);
-               if (buttonEl instanceof HTMLElement) { buttonEl.focus(); }
+               if (A11yHelper.isFocusTarget(buttonEl)) { buttonEl.focus(); }
             }
             break;
          }
@@ -341,17 +341,17 @@
             const activeWindow = application.reactive.activeWindow;
             const activeEl = activeWindow.document.activeElement;
 
-            if (buttonsEl instanceof HTMLElement)
+            if (A11yHelper.isFocusTarget(buttonsEl))
             {
                // Only advance button via arrow key if a button is already focused  or there is no current button ID
-               if (activeEl instanceof HTMLElement && (buttonsEl.contains(activeEl) || currentButtonId === void 0))
+               if (A11yHelper.isFocusTarget(activeEl) && (buttonsEl.contains(activeEl) || currentButtonId === void 0))
                {
                   const currentIndex = buttons.findIndex((button) => button.id === currentButtonId);
                   if (buttons.length && currentIndex < buttons.length - 1) { currentButtonId = buttons[currentIndex + 1].id; }
                }
 
                const buttonEl = buttonsEl.querySelector(`.${currentButtonId}`);
-               if (buttonEl instanceof HTMLElement) { buttonEl.focus(); }
+               if (A11yHelper.isFocusTarget(buttonEl)) { buttonEl.focus(); }
             }
             break;
          }

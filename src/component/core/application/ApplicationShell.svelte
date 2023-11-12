@@ -182,7 +182,7 @@
       const targetEl = event?.detail?.target;
 
       // Early out if there is no target element.
-      if (!(targetEl instanceof HTMLElement)) { return; }
+      if (!A11yHelper.isFocusTarget(targetEl)) { return; }
 
       // Early out if the target element is focusable as it will gain focus naturally.
       if (A11yHelper.isFocusable(targetEl)) { return; }
@@ -251,7 +251,7 @@
          if (elementRoot === activeWindow.document.activeElement ||
           firstFocusEl === activeWindow.document.activeElement)
          {
-            if (lastFocusEl instanceof HTMLElement && firstFocusEl !== lastFocusEl) { lastFocusEl.focus(); }
+            if (A11yHelper.isFocusTarget(lastFocusEl) && firstFocusEl !== lastFocusEl) { lastFocusEl.focus(); }
 
             event.preventDefault();
             event.stopPropagation();

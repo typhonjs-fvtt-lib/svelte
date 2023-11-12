@@ -1,5 +1,7 @@
 import { TJSVelocityTrack }   from '#runtime/math/physics';
 
+import { A11yHelper }         from '#runtime/util/browser';
+
 import {
    isIterable,
    isObject }                 from '#runtime/util/object';
@@ -171,7 +173,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
 
       // Potentially ignore this event if `ignoreTargetClassList` is defined and the `event.target` has a matching
       // class.
-      if (ignoreTargetClassList !== void 0 && event.target instanceof HTMLElement)
+      if (ignoreTargetClassList !== void 0 && A11yHelper.isFocusTarget(event.target))
       {
          for (const targetClass of ignoreTargetClassList)
          {
@@ -181,7 +183,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
 
       // Potentially ignore this event if `hasTargetClassList` is defined and the `event.target` does not have any
       // matching class from the list.
-      if (hasTargetClassList !== void 0 && event.target instanceof HTMLElement)
+      if (hasTargetClassList !== void 0 && A11yHelper.isFocusTarget(event.target))
       {
          let foundTarget = false;
 

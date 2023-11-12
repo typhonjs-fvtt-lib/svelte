@@ -259,7 +259,7 @@ export class SvelteApplication extends Application
       if (focus && elementTarget && activeElement !== elementTarget && !elementTarget?.contains(activeElement))
       {
          // Blur current active element.
-         if (activeElement instanceof HTMLElement || document.activeElement instanceof SVGElement)
+         if (A11yHelper.isFocusTarget(activeElement))
          {
             activeElement.blur();
          }
@@ -579,7 +579,7 @@ export class SvelteApplication extends Application
       {
          for (const svelteData of this.#svelteData)
          {
-            if (svelteData.element instanceof HTMLElement)
+            if (A11yHelper.isFocusTarget(svelteData.element))
             {
                this._element = $(svelteData.element);
                break;
@@ -893,7 +893,7 @@ export class SvelteApplication extends Application
       const activeWindow = this.reactive.activeWindow;
 
       if (this._state === Application.RENDER_STATES.NONE &&
-       activeWindow.document.querySelector(`#${this.id}`) instanceof HTMLElement)
+       A11yHelper.isFocusTarget(activeWindow.document.querySelector(`#${this.id}`)))
       {
          console.warn(`SvelteApplication - _render: A DOM element already exists for CSS ID '${this.id
          }'. Cancelling initial render for new application with appId '${this.appId}'.`);

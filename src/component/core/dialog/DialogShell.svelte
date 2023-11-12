@@ -9,6 +9,7 @@
 
    import { fade }         from '#svelte/transition';
 
+   import { A11yHelper }   from '#runtime/util/browser';
    import { isObject }     from '#runtime/util/object';
 
    import ApplicationShell from '../application/ApplicationShell.svelte';
@@ -97,7 +98,7 @@
 
    // Aria Attributes ------------------------------------------------------------------------------------------------
 
-   $: if (elementRoot instanceof HTMLElement)
+   $: if (A11yHelper.isFocusTarget(elementRoot))
    {
       elementRoot.setAttribute('role', 'dialog');
 

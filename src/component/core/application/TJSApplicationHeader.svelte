@@ -3,10 +3,10 @@
    import { cubicOut }              from '#svelte/easing';
 
    import { isTJSSvelteConfig }     from '#runtime/svelte/util';
-
+   import { A11yHelper }            from '#runtime/util/browser';
    import { isObject }              from '#runtime/util/object';
 
-   import { localize }              from '@typhonjs-fvtt/svelte/helper';
+   import { localize }              from '#svelte-fvtt/helper';
 
    import {
       draggable as dragDefault }    from '#runtime/svelte/store/position';
@@ -113,13 +113,13 @@
    {
       const rootEl = $elementRoot;
 
-      if ($focusAuto && rootEl instanceof HTMLElement && rootEl?.isConnected)
+      if ($focusAuto && A11yHelper.isFocusTarget(rootEl) && rootEl?.isConnected)
       {
          if ($focusKeep)
          {
             const activeWindow = application.reactive.activeWindow;
 
-            const focusOutside = activeWindow.document.activeElement instanceof HTMLElement &&
+            const focusOutside = A11yHelper.isFocusTarget(activeWindow.document.activeElement) &&
              !rootEl.contains(activeWindow.document.activeElement);
 
             // Only focus the content element if the active element is outside the app; maintaining internal focused
