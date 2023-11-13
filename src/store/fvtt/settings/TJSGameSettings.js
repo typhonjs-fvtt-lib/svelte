@@ -372,7 +372,7 @@ export class TJSGameSettings
  *
  * @property {string} [hint] A description of the registered setting and its behavior.
  *
- * @property {string} name The displayed name of the setting.
+ * @property {string} [name] The displayed name of the setting.
  *
  * @property {Function|Iterable<Function>} [onChange] An onChange callback function or iterable list of callbacks to
  * directly receive callbacks from Foundry on setting change.
