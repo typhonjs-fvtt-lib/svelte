@@ -283,7 +283,7 @@ export class TJSGameSettings
 
       const storeHandler = async (value) =>
       {
-         if (!gateSet && globalThis.game.settings.get(namespace, key) !== value)
+         if (!gateSet)
          {
             gateSet = true;
             await globalThis.game.settings.set(namespace, key, value);
