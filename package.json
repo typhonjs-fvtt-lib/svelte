@@ -60,24 +60,24 @@
     "./_dist/gsap/plugin/bonus/*.js"
   ],
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^15",
-    "@typhonjs-build-test/esm-d-ts": "^0.1.0",
-    "@typhonjs-build-test/rollup-plugin-pkg-imports": "^0.0.2",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@typhonjs-build-test/esm-d-ts": "0.2.0-next.1",
+    "@typhonjs-build-test/rollup-plugin-pkg-imports": "^0.0.4",
     "@typhonjs-config/eslint-config": "^0.6.3",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "@typhonjs-svelte/lib": "github:typhonjs-svelte/lib",
     "@typhonjs-svelte/runtime-base": "github:typhonjs-svelte/runtime-base#0.1.1",
-    "eslint": "^8",
+    "eslint": "^8.53.0",
     "fs-extra": "^11.1.1",
-    "rollup": "^3",
-    "svelte": "^4.0.0",
-    "upath": "^2"
+    "rollup": "^4.4.1",
+    "svelte": "^4.2.4",
+    "upath": "^2.0.1"
   },
   "peerDependencies": {
     "svelte": ">=4.x.x"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "homepage": "https://github.com/typhonjs-fvtt-lib/svelte#readme",
   "keywords": [
