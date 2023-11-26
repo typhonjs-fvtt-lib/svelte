@@ -508,6 +508,10 @@
         padding: var(--tjs-app-content-padding, 8px);
         color: var(--tjs-app-content-color, #191813);
         overflow: var(--tjs-app-content-overflow, hidden auto);
+
+        /* For Firefox */
+        scrollbar-width: var(--tjs-app-content-scrollbar-width, thin);
+        scrollbar-color: var(--tjs-app-content-scrollbar-color, inherit);
     }
 
     .tjs-window-app :global(.window-resizable-handle) {

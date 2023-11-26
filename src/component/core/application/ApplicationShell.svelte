@@ -425,6 +425,12 @@
       overflow: var(--tjs-app-overflow, hidden);
    }
 
+   .window-content {
+      /* For Firefox */
+      scrollbar-width: var(--tjs-app-content-scrollbar-width, thin);
+      scrollbar-color: var(--tjs-app-content-scrollbar-color, inherit);
+   }
+
    .window-app:focus-visible {
       outline: var(--tjs-app-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
    }
