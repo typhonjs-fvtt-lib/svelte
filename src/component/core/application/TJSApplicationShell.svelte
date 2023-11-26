@@ -82,7 +82,7 @@
     *
     * @type {SvelteApplication}
     */
-   const { application } = getContext('#external');
+   const application = getContext('#external')?.application;
 
    // Focus related app options stores.
    const { focusAuto, focusKeep, focusTrap } = application.reactive.storeAppOptions;

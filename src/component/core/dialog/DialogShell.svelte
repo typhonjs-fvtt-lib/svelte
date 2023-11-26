@@ -30,7 +30,7 @@
    /**
     * @type {TJSDialog}
     */
-   const { application } = getContext('#external');
+   const application = getContext('#external')?.application;
 
    const dialogOptions = writable({});
 
