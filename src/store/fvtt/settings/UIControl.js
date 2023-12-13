@@ -228,7 +228,7 @@ export class UIControl
 
       const canConfigure = globalThis.game.user.can('SETTINGS_MODIFY');
 
-      for (const setting of this.#settings)
+      for (const setting of this.#settings.data())
       {
          if (!setting.config || (!canConfigure && (setting.scope !== 'client'))) { continue; }
 

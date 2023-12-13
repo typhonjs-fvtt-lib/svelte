@@ -70,7 +70,7 @@ export class TJSLiveGameSettings
       if (include !== void 0 && !(include instanceof Set)) { throw new TypeError(`'options.include' is not a Set.`); }
       if (exclude !== void 0 && !(exclude instanceof Set)) { throw new TypeError(`'options.exclude' is not a Set.`); }
 
-      for (const setting of gameSettings)
+      for (const setting of gameSettings.data())
       {
          const key = setting.key;
 
