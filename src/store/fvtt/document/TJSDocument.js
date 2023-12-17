@@ -1,3 +1,5 @@
+import { tick }                     from 'svelte';
+
 import { Hashing }                  from '#runtime/util';
 
 import {
@@ -7,7 +9,7 @@ import {
 import { EmbeddedStoreManager }     from './EmbeddedStoreManager.js';
 
 /**
- * @template [T=globalThis.foundry.abstract.Document]
+ * @template [T=import('./types').NamedDocumentConstructor]
  *
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.
  * This makes documents reactive in a Svelte component, but otherwise provides subscriber functionality external to
@@ -131,6 +133,9 @@ export class TJSDocument
             await this.#options.delete(doc);
          }
 
+         // Allow subscribers to be able to query `updateOptions` involving any reactive statements.
+         await tick();
+
          this.#updateOptions = void 0;
       }
    }
@@ -157,26 +162,9 @@ export class TJSDocument
       }
 
       this.#options.delete = void 0;
+      this.#options.preDelete = void 0;
+
       this.#subscriptions.length = 0;
-   }
-
-   /**
-    * @param {boolean}  [force] - unused - signature from Foundry render function.
-    *
-    * @param {object}   [options] - Options from render call; will have document update context.
-    */
-   #updateSubscribers(force = false, options = {}) // eslint-disable-line no-unused-vars
-   {
-      this.#updateOptions = options;
-
-      const doc = this.#document[0];
-
-      for (let cntr = 0; cntr < this.#subscriptions.length; cntr++) { this.#subscriptions[cntr](doc, options); }
-
-      if (this.#embeddedStoreManager)
-      {
-         this.#embeddedStoreManager.handleUpdate(options.renderContext);
-      }
    }
 
    /**
@@ -274,20 +262,29 @@ export class TJSDocument
          };
       }
 
-      this.#setDocument(document);
-      this.#updateOptions = options;
-      this.#updateSubscribers();
+      // Only post an update if the document has changed.
+      if (this.#setDocument(document))
+      {
+         this.#updateSubscribers(false, { action: `tjs-set-${document === void 0 ? 'undefined' : 'new'}`, ...options });
+      }
    }
 
    /**
+    * Internally sets the new document being tracked.
     *
     * @param {T | undefined} doc -
+    *
+    * @returns {boolean} Whether the document changed.
     */
    #setDocument(doc)
    {
+      const changed = doc !== this.#document[0];
+
       this.#document[0] = doc;
 
-      if (this.#embeddedStoreManager) { this.#embeddedStoreManager.handleDocChange(); }
+      if (changed && this.#embeddedStoreManager) { this.#embeddedStoreManager.handleDocChange(); }
+
+      return changed;
    }
 
    /**
@@ -310,7 +307,7 @@ export class TJSDocument
     *
     * @param {string}   uuid - A Foundry UUID to lookup.
     *
-    * @param {TJSDocumentOptions}   [options] - New document update options to set.
+    * @param {TJSDocumentUpdateOptions}   [options] - New document update options to set.
     *
     * @returns {Promise<boolean>} True if successfully set document from UUID.
     */
@@ -391,15 +388,34 @@ export class TJSDocument
          if (index >= 0) { this.#subscriptions.splice(index, 1); }
       };
    }
+
+   /**
+    * @param {boolean}  [force] - unused - signature from Foundry render function.
+    *
+    * @param {TJSDocumentUpdateOptions}   [options] - Options from render call; will have document update context.
+    */
+   #updateSubscribers(force = false, options = {}) // eslint-disable-line no-unused-vars
+   {
+      this.#updateOptions = options;
+
+      const doc = this.#document[0];
+
+      for (let cntr = 0; cntr < this.#subscriptions.length; cntr++) { this.#subscriptions[cntr](doc, options); }
+
+      if (this.#embeddedStoreManager)
+      {
+         this.#embeddedStoreManager.handleUpdate(options.renderContext);
+      }
+   }
 }
 
 /**
  * @typedef {object} TJSDocumentOptions
  *
- * @property {(doc: globalThis.foundry.abstract.Document) => void} [delete] Optional post delete function to invoke when
+ * @property {(doc?: object) => void} [delete] Optional post delete function to invoke when
  * document is deleted _after_ subscribers have been notified.
  *
- * @property {(doc: globalThis.foundry.abstract.Document) => void} [preDelete] Optional pre delete function to invoke
+ * @property {(doc?: object) => void} [preDelete] Optional pre delete function to invoke
  * when document is deleted _before_ subscribers are notified.
  */
 

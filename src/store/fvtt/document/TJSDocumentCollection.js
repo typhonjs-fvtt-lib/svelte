@@ -1,3 +1,5 @@
+import { tick }      from 'svelte';
+
 import { Hashing }   from '#runtime/util';
 
 import {
@@ -88,12 +90,16 @@ export class TJSDocumentCollection
          await this.#options.preDelete(collection);
       }
 
-      this.#notify(false, { action: 'delete', documentType: collection.documentName, documents: [], data: [] });
+      this.#updateSubscribers(false,
+       { action: 'delete', documentType: collection.documentName, documents: [], data: [] });
 
       if (typeof this.#options.delete === 'function')
       {
          await this.#options.delete(collection);
       }
+
+      // Allow subscribers to be able to query `updateOptions` involving any reactive statements.
+      await tick();
 
       this.#updateOptions = void 0;
    }
@@ -115,24 +121,9 @@ export class TJSDocumentCollection
       }
 
       this.#options.delete = void 0;
+      this.#options.preDelete = void 0;
+
       this.#subscriptions.length = 0;
-   }
-
-   /**
-    * @param {boolean}  [force] - unused - signature from Foundry render function.
-    *
-    * @param {object}   [options] - Options from render call; will have collection update context.
-    */
-   #notify(force = false, options = {}) // eslint-disable-line no-unused-vars
-   {
-      this.#updateOptions = options;
-
-      // Subscriptions are stored locally as on the browser Babel is still used for private class fields / Babel
-      // support until 2023. IE not doing this will require several extra method calls otherwise.
-      const subscriptions = this.#subscriptions;
-      const collection = this.#collection;
-
-      for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](collection, options); }
    }
 
    /**
@@ -143,7 +134,7 @@ export class TJSDocumentCollection
    /**
     * @param {T | undefined}  collection - New collection to set.
     *
-    * @param {object}         [options] - New collection update options to set.
+    * @param {TJSDocumentCollectionUpdateOptions}  [options] - New collection update options to set.
     */
    set(collection, options = {})
    {
@@ -170,15 +161,22 @@ export class TJSDocumentCollection
       {
          this.#collectionCallback = {
             close: this.#deleted.bind(this),
-            render: this.#notify.bind(this)
+            render: this.#updateSubscribers.bind(this)
          };
 
          collection?.apps?.push(this.#collectionCallback);
       }
 
+      const changed = this.#collection !== collection;
+
       this.#collection = collection;
       this.#updateOptions = options;
-      this.#notify();
+
+      if (changed)
+      {
+         this.#updateSubscribers(false,
+          { action: `tjs-set-${collection === void 0 ? 'undefined' : 'new'}`, ...options });
+      }
    }
 
    /**
@@ -242,6 +240,22 @@ export class TJSDocumentCollection
          const index = this.#subscriptions.findIndex((sub) => sub === handler);
          if (index >= 0) { this.#subscriptions.splice(index, 1); }
       };
+   }
+
+   /**
+    * @param {boolean}  [force] - unused - signature from Foundry render function.
+    *
+    * @param {TJSDocumentCollectionUpdateOptions}   [options] - Options from render call; will have collection
+    *        update context.
+    */
+   #updateSubscribers(force = false, options = {}) // eslint-disable-line no-unused-vars
+   {
+      this.#updateOptions = options;
+
+      const subscriptions = this.#subscriptions;
+      const collection = this.#collection;
+
+      for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](collection, options); }
    }
 }
 
