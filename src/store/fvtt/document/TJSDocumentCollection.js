@@ -15,12 +15,25 @@ import {
  */
 export class TJSDocumentCollection
 {
-   #collection;
-   #collectionCallback;
-   #uuid;
+   /**
+    * Fake Application API that DocumentCollection uses for document model callbacks.
+    *
+    * @type {{ uuid: string, close: Function, render: Function }}
+    */
+   #callbackAPI;
 
    /**
-    * @type {TJSDocumentCollectionOptions}
+    * @type {DocumentCollection}
+    */
+   #collection;
+
+   /**
+    * @type {string}
+    */
+   #uuidv4;
+
+   /**
+    * @type {{ delete?: Function, preDelete?: Function }}
     */
    #options = { delete: void 0, preDelete: void 0 };
 
@@ -41,7 +54,13 @@ export class TJSDocumentCollection
     */
    constructor(collection, options = {})
    {
-      this.#uuid = `tjs-collection-${Hashing.uuidv4()}`;
+      this.#uuidv4 = `tjs-collection-${Hashing.uuidv4()}`;
+
+      this.#callbackAPI = {
+         uuid: this.#uuidv4,
+         close: this.#deleted.bind(this),
+         render: this.#updateSubscribers.bind(this)
+      };
 
       if (isPlainObject(collection)) // Handle case when only options are passed into ctor.
       {
@@ -66,7 +85,34 @@ export class TJSDocumentCollection
     *
     * @returns {string} UUID
     */
-   get uuid() { return this.#uuid; }
+   get uuid() { return this.#uuidv4; }
+
+   /**
+    * Register the callback API with the underlying Foundry collection.
+    */
+   #callbackRegister()
+   {
+      const collection = this.#collection;
+
+      if (collection instanceof DocumentCollection && Array.isArray(collection?.apps))
+      {
+         const index = collection.apps.findIndex((sub) => sub === this.#callbackAPI);
+         if (index === -1) { collection.apps.push(this.#callbackAPI); }
+      }
+   }
+
+   /**
+    * Unregister the callback API with the underlying Foundry collection.
+    */
+   #callbackUnregister()
+   {
+      const collection = this.#collection;
+      if (collection instanceof DocumentCollection && Array.isArray(collection?.apps))
+      {
+         const index = collection.apps.findIndex((sub) => sub === this.#callbackAPI);
+         if (index >= 0) { collection.apps.splice(index, 1); }
+      }
+   }
 
    /**
     * Handles cleanup when the collection is deleted. Invoking any optional delete function set in the constructor.
@@ -77,26 +123,15 @@ export class TJSDocumentCollection
    {
       const collection = this.#collection;
 
-      if (collection instanceof DocumentCollection)
-      {
-         const index = collection?.apps?.findIndex((sub) => sub === this.#collectionCallback);
-         if (index >= 0) { collection?.apps?.splice(index, 1); }
+      this.#callbackUnregister();
+      this.#collection = void 0;
 
-         this.#collection = void 0;
-      }
-
-      if (typeof this.#options.preDelete === 'function')
-      {
-         await this.#options.preDelete(collection);
-      }
+      if (typeof this.#options.preDelete === 'function') { await this.#options.preDelete(collection); }
 
       this.#updateSubscribers(false,
        { action: 'delete', documentType: collection.documentName, documents: [], data: [] });
 
-      if (typeof this.#options.delete === 'function')
-      {
-         await this.#options.delete(collection);
-      }
+      if (typeof this.#options.delete === 'function') { await this.#options.delete(collection); }
 
       // Allow subscribers to be able to query `updateOptions` involving any reactive statements.
       await tick();
@@ -110,15 +145,8 @@ export class TJSDocumentCollection
     */
    destroy()
    {
-      const collection = this.#collection;
-
-      if (collection instanceof DocumentCollection)
-      {
-         const index = collection?.apps?.findIndex((sub) => sub === this.#collectionCallback);
-         if (index >= 0) { collection?.apps?.splice(index, 1); }
-
-         this.#collection = void 0;
-      }
+      this.#callbackUnregister();
+      this.#collection = void 0;
 
       this.#options.delete = void 0;
       this.#options.preDelete = void 0;
@@ -138,14 +166,6 @@ export class TJSDocumentCollection
     */
    set(collection, options = {})
    {
-      if (this.#collection)
-      {
-         const index = this.#collection.apps.findIndex((sub) => sub === this.#collectionCallback);
-         if (index >= 0) { this.#collection.apps.splice(index, 1); }
-
-         this.#collectionCallback = void 0;
-      }
-
       if (collection !== void 0 && !(collection instanceof DocumentCollection))
       {
          throw new TypeError(
@@ -157,23 +177,17 @@ export class TJSDocumentCollection
          throw new TypeError(`TJSDocument set error: 'options' is not an object.`);
       }
 
-      if (collection instanceof DocumentCollection)
-      {
-         this.#collectionCallback = {
-            close: this.#deleted.bind(this),
-            render: this.#updateSubscribers.bind(this)
-         };
-
-         collection?.apps?.push(this.#collectionCallback);
-      }
-
       const changed = this.#collection !== collection;
+
+      if (changed) { this.#callbackUnregister(); }
 
       this.#collection = collection;
       this.#updateOptions = options;
 
       if (changed)
       {
+         if (collection instanceof DocumentCollection && this.#subscriptions.length) { this.#callbackRegister(); }
+
          this.#updateSubscribers(false,
           { action: `tjs-set-${collection === void 0 ? 'undefined' : 'new'}`, ...options });
       }
@@ -193,26 +207,27 @@ export class TJSDocumentCollection
 
       // Verify valid values -------------
 
-      if (options.delete !== void 0 && typeof options.delete !== 'function')
+      if (options.delete !== void 0 && options.delete !== null && typeof options.delete !== 'function')
       {
-         throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function.`);
+         throw new TypeError(`TJSDocumentCollection error: 'delete' attribute in options is not a function or null.`);
       }
 
-      if (options.preDelete !== void 0 && typeof options.preDelete !== 'function')
+      if (options.preDelete !== void 0 && options.preDelete !== null && typeof options.preDelete !== 'function')
       {
-         throw new TypeError(`TJSDocumentCollection error: 'preDelete' attribute in options is not a function.`);
+         throw new TypeError(
+          `TJSDocumentCollection error: 'preDelete' attribute in options is not a function or null.`);
       }
 
       // Set any valid values -------------
 
-      if (options.delete === void 0 || typeof options.delete === 'function')
+      if (options.delete !== void 0)
       {
-         this.#options.delete = options.delete;
+         this.#options.delete = typeof options.delete === 'function' ? options.delete : void 0;
       }
 
-      if (options.preDelete === void 0 || typeof options.preDelete === 'function')
+      if (options.preDelete !== void 0)
       {
-         this.#options.preDelete = options.preDelete;
+         this.#options.preDelete = typeof options.preDelete === 'function' ? options.preDelete : void 0;
       }
    }
 
@@ -225,6 +240,9 @@ export class TJSDocumentCollection
    subscribe(handler)
    {
       this.#subscriptions.push(handler);              // Add handler to the array of subscribers.
+
+      // Register callback with first subscriber.
+      if (this.#subscriptions.length === 1) { this.#callbackRegister(); }
 
       const collection = this.#collection;
 
@@ -239,6 +257,9 @@ export class TJSDocumentCollection
       {
          const index = this.#subscriptions.findIndex((sub) => sub === handler);
          if (index >= 0) { this.#subscriptions.splice(index, 1); }
+
+         // Unsubscribe from collection if there are no subscribers.
+         if (this.#subscriptions.length === 0) { this.#callbackUnregister(); }
       };
    }
 
@@ -262,10 +283,10 @@ export class TJSDocumentCollection
 /**
  * @typedef TJSDocumentCollectionOptions
  *
- * @property {(collection: DocumentCollection) => void} [delete] Optional post delete function
+ * @property {((collection: DocumentCollection) => void) | null} [delete] Optional post delete function
  *           to invoke when document is deleted _after_ subscribers have been notified.
  *
- * @property {(collection: DocumentCollection) => void} [preDelete] Optional pre delete function to
+ * @property {((collection: DocumentCollection) => void) | null} [preDelete] Optional pre delete function to
  *           invoke when document is deleted _before_ subscribers are notified.
  */
 

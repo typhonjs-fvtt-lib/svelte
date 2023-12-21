@@ -18,6 +18,13 @@ import { EmbeddedStoreManager }     from './EmbeddedStoreManager.js';
 export class TJSDocument
 {
    /**
+    * Fake Application API that ClientDocumentMixin uses for document model callbacks.
+    *
+    * @type {{ close: Function, render: Function }}
+    */
+   #callbackAPI;
+
+   /**
     * @type {T[]}
     */
    #document = [void 0];
@@ -38,7 +45,7 @@ export class TJSDocument
    #uuidv4;
 
    /**
-    * @type {TJSDocumentOptions}
+    * @type {{ delete?: Function, preDelete?: Function }}
     */
    #options = { delete: void 0, preDelete: void 0 };
 
@@ -60,6 +67,11 @@ export class TJSDocument
    constructor(document, options = {})
    {
       this.#uuidv4 = `tjs-document-${Hashing.uuidv4()}`;
+
+      this.#callbackAPI = {
+         close: this.#deleted.bind(this),
+         render: this.#updateSubscribers.bind(this)
+      };
 
       if (isPlainObject(document)) // Handle case when only options are passed into ctor.
       {
@@ -107,6 +119,30 @@ export class TJSDocument
    get uuidv4() { return this.#uuidv4; }
 
    /**
+    * Register the callback API with the underlying Foundry document.
+    */
+   #callbackRegister()
+   {
+      const doc = this.#document[0];
+      if (doc instanceof globalThis.foundry.abstract.Document && isObject(doc?.apps) && !doc.apps[this.#uuidv4])
+      {
+         doc.apps[this.#uuidv4] = this.#callbackAPI;
+      }
+   }
+
+   /**
+    * Unregister the callback API with the underlying Foundry document.
+    */
+   #callbackUnregister()
+   {
+      const doc = this.#document[0];
+      if (doc instanceof globalThis.foundry.abstract.Document)
+      {
+         delete doc?.apps?.[this.#uuidv4];
+      }
+   }
+
+   /**
     * Handles cleanup when the document is deleted. Invoking any optional delete function set in the constructor.
     *
     * @returns {Promise<void>}
@@ -118,20 +154,13 @@ export class TJSDocument
       // Check to see if the document is still in the associated collection to determine if actually deleted.
       if (doc instanceof globalThis.foundry.abstract.Document && !doc?.collection?.has(doc.id))
       {
-         delete doc?.apps[this.#uuidv4];
          this.#setDocument(void 0);
 
-         if (typeof this.#options.preDelete === 'function')
-         {
-            await this.#options.preDelete(doc);
-         }
+         if (typeof this.#options.preDelete === 'function') { await this.#options.preDelete(doc); }
 
          this.#updateSubscribers(false, { action: 'delete', data: void 0 });
 
-         if (typeof this.#options.delete === 'function')
-         {
-            await this.#options.delete(doc);
-         }
+         if (typeof this.#options.delete === 'function') { await this.#options.delete(doc); }
 
          // Allow subscribers to be able to query `updateOptions` involving any reactive statements.
          await tick();
@@ -146,8 +175,6 @@ export class TJSDocument
     */
    destroy()
    {
-      const doc = this.#document[0];
-
       if (this.#embeddedStoreManager)
       {
          this.#embeddedStoreManager.destroy();
@@ -155,11 +182,7 @@ export class TJSDocument
          this.#embeddedAPI = void 0;
       }
 
-      if (doc instanceof globalThis.foundry.abstract.Document)
-      {
-         delete doc?.apps[this.#uuidv4];
-         this.#setDocument(void 0);
-      }
+      this.#setDocument(void 0);
 
       this.#options.delete = void 0;
       this.#options.preDelete = void 0;
@@ -179,17 +202,15 @@ export class TJSDocument
     *
     * @param {object}   [opts] - Optional parameters.
     *
-    * @param {boolean}  [opts.actor=true] - Accept actor owned documents.
-    *
     * @param {boolean}  [opts.compendium=true] - Accept compendium documents.
     *
     * @param {boolean}  [opts.world=true] - Accept world documents.
     *
-    * @param {string[]|undefined}   [opts.types] - Require the `data.type` to match entry in `types`.
+    * @param {string[]} [opts.types] - Require the `data.type` to match entry in `types`.
     *
     * @returns {string|undefined} Foundry UUID for drop data.
     */
-   static getUUIDFromDataTransfer(data, { actor = true, compendium = true, world = true, types = void 0 } = {})
+   static getUUIDFromDataTransfer(data, { compendium = true, world = true, types = void 0 } = {})
    {
       if (!isObject(data)) { return void 0; }
       if (Array.isArray(types) && !types.includes(data.type)) { return void 0; }
@@ -209,24 +230,6 @@ export class TJSDocument
             uuid = data.uuid;
          }
       }
-      else // v9 and below parsing.
-      {
-         if (actor && world && data.actorId && data.type)
-         {
-            uuid = `Actor.${data.actorId}.${data.type}.${data.data._id}`;
-         }
-         else if (typeof data.id === 'string') // v9 and below uses `id`
-         {
-            if (compendium && typeof data.pack === 'string')
-            {
-               uuid = `Compendium.${data.pack}.${data.id}`;
-            }
-            else if (world)
-            {
-               uuid = `${data.type}.${data.id}`;
-            }
-         }
-      }
 
       return uuid;
    }
@@ -239,11 +242,6 @@ export class TJSDocument
     */
    set(document, options = {})
    {
-      if (this.#document[0])
-      {
-         delete this.#document[0].apps[this.#uuidv4];
-      }
-
       if (document !== void 0 && !(document instanceof globalThis.foundry.abstract.Document))
       {
          throw new TypeError(`TJSDocument set error: 'document' is not a valid Document or undefined.`);
@@ -254,17 +252,15 @@ export class TJSDocument
          throw new TypeError(`TJSDocument set error: 'options' is not an object.`);
       }
 
-      if (document instanceof globalThis.foundry.abstract.Document)
-      {
-         document.apps[this.#uuidv4] = {
-            close: this.#deleted.bind(this),
-            render: this.#updateSubscribers.bind(this)
-         };
-      }
-
       // Only post an update if the document has changed.
       if (this.#setDocument(document))
       {
+         // Only add registration if there are current subscribers.
+         if (document instanceof globalThis.foundry.abstract.Document && this.#subscriptions.length)
+         {
+            this.#callbackRegister();
+         }
+
          this.#updateSubscribers(false, { action: `tjs-set-${document === void 0 ? 'undefined' : 'new'}`, ...options });
       }
    }
@@ -280,6 +276,9 @@ export class TJSDocument
    {
       const changed = doc !== this.#document[0];
 
+      // Unregister before setting new document state.
+      if (changed) { this.#callbackUnregister(); }
+
       this.#document[0] = doc;
 
       if (changed && this.#embeddedStoreManager) { this.#embeddedStoreManager.handleDocChange(); }
@@ -292,14 +291,14 @@ export class TJSDocument
     *
     * @param {object}   data - Document transfer data.
     *
-    * @param {{ actor?: boolean, compendium?: boolean, world?: boolean, types?: string[] } & TJSDocumentOptions}   [options] - Optional
-    *        parameters.
+    * @param {{ compendium?: boolean, world?: boolean, types?: string[] }}   [options] - Optional parameters for
+    *        {@link TJSDocument.getUUIDFromDataTransfer}.
     *
     * @returns {Promise<boolean>} Returns true if new document set from data transfer blob.
     */
    async setFromDataTransfer(data, options)
    {
-      return this.setFromUUID(TJSDocument.getUUIDFromDataTransfer(data, options), options);
+      return this.setFromUUID(TJSDocument.getUUIDFromDataTransfer(data, options));
    }
 
    /**
@@ -344,26 +343,26 @@ export class TJSDocument
 
       // Verify valid values -------------
 
-      if (options.delete !== void 0 && typeof options.delete !== 'function')
+      if (options.delete !== void 0 && options.delete !== null && typeof options.delete !== 'function')
       {
-         throw new TypeError(`TJSDocument error: 'delete' attribute in options is not a function.`);
+         throw new TypeError(`TJSDocument error: 'delete' attribute in options is not a function or null.`);
       }
 
-      if (options.preDelete !== void 0 && typeof options.preDelete !== 'function')
+      if (options.preDelete !== void 0 && options.preDelete !== null && typeof options.preDelete !== 'function')
       {
-         throw new TypeError(`TJSDocument error: 'preDelete' attribute in options is not a function.`);
+         throw new TypeError(`TJSDocument error: 'preDelete' attribute in options is not a function or null.`);
       }
 
       // Set any valid values -------------
 
-      if (options.delete === void 0 || typeof options.delete === 'function')
+      if (options.delete !== void 0)
       {
-         this.#options.delete = options.delete;
+         this.#options.delete = typeof options.delete === 'function' ? options.delete : void 0;
       }
 
-      if (options.preDelete === void 0 || typeof options.preDelete === 'function')
+      if (options.preDelete !== void 0)
       {
-         this.#options.preDelete = options.preDelete;
+         this.#options.preDelete = typeof options.preDelete === 'function' ? options.preDelete : void 0;
       }
    }
 
@@ -377,6 +376,9 @@ export class TJSDocument
    {
       this.#subscriptions.push(handler);           // Add handler to the array of subscribers.
 
+      // Register callback with first subscriber.
+      if (this.#subscriptions.length === 1) { this.#callbackRegister(); }
+
       const updateOptions = { action: 'subscribe', data: void 0 };
 
       handler(this.#document[0], updateOptions);      // Call handler with current value and update options.
@@ -386,6 +388,9 @@ export class TJSDocument
       {
          const index = this.#subscriptions.findIndex((sub) => sub === handler);
          if (index >= 0) { this.#subscriptions.splice(index, 1); }
+
+         // Unsubscribe from document callback if there are no subscribers.
+         if (this.#subscriptions.length === 0) { this.#callbackUnregister(); }
       };
    }
 
@@ -412,10 +417,10 @@ export class TJSDocument
 /**
  * @typedef {object} TJSDocumentOptions
  *
- * @property {(doc?: object) => void} [delete] Optional post delete function to invoke when
+ * @property {((doc?: object) => void) | null} [delete] Optional post delete function to invoke when
  * document is deleted _after_ subscribers have been notified.
  *
- * @property {(doc?: object) => void} [preDelete] Optional pre delete function to invoke
+ * @property {((doc?: object) => void) | null} [preDelete] Optional pre delete function to invoke
  * when document is deleted _before_ subscribers are notified.
  */
 
