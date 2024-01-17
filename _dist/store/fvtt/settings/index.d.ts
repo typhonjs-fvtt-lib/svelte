@@ -2,6 +2,7 @@
 
 import * as svelte_store from 'svelte/store';
 import { Readable, Writable } from 'svelte/store';
+import * as _runtime_svelte_util from '@typhonjs-svelte/runtime-base/svelte/util';
 import { TJSWebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 
 /**
@@ -83,11 +84,11 @@ type TJSSettingsCustomSectionFolder = {
     /**
      * A Svelte component config object defining TJSSvgFolder summary end component.
      */
-    summaryEnd?: object;
+    summaryEnd?: _runtime_svelte_util.TJSSvelteConfig;
     /**
      * Inline styles for the `TJSSvgFolder`; useful for setting CSS variables.
      */
-    styles?: object;
+    styles?: Record<string, string>;
 };
 type TJSSettingsUIData = {
     /**
@@ -203,12 +204,45 @@ declare class TJSGameSettings {
         [key: string]: Function;
     };
     /**
-     * Provides an iterator / generator to return stored settings data.
+     * Returns an iterable for the game setting data; {@link GameSettingData}.
      *
-     * @returns {IterableIterator<GameSettingData>} An iterator of all game setting data.
+     * @param {RegExp} [regex] - Optional regular expression to filter by game setting keys.
+     *
+     * @returns {IterableIterator<GameSettingData>} Iterable iterator of GameSettingData.
      * @yields {GameSettingData}
      */
-    [Symbol.iterator](): IterableIterator<GameSettingData>;
+    data(regex?: RegExp): IterableIterator<GameSettingData>;
+    /**
+     * @template T
+     *
+     * Returns an iterable for the game setting keys and stores.
+     *
+     * @param {RegExp} [regex] - Optional regular expression to filter by game setting keys.
+     *
+     * @returns {IterableIterator<[string, import('svelte/store').Writable<T>]>} Iterable iterator of keys and stores.
+     * @yields {import('svelte/store').Writable<T>}
+     */
+    entries<T>(regex?: RegExp): IterableIterator<[string, svelte_store.Writable<T>]>;
+    /**
+     * Returns an iterable for the game setting keys from existing stores.
+     *
+     * @param {RegExp} [regex] - Optional regular expression to filter by game setting keys.
+     *
+     * @returns {IterableIterator<string>} Iterable iterator of game setting keys.
+     * @yields {string}
+     */
+    keys(regex?: RegExp): IterableIterator<string>;
+    /**
+     * @template T
+     *
+     * Returns an iterable for the game setting stores.
+     *
+     * @param {RegExp} [regex] - Optional regular expression to filter by game setting keys.
+     *
+     * @returns {IterableIterator<import('svelte/store').Writable<T>>} Iterable iterator of stores.
+     * @yields {import('svelte/store').Writable<T>}
+     */
+    stores<T_1>(regex?: RegExp): IterableIterator<svelte_store.Writable<T_1>>;
     #private;
 }
 type GameSettingOptions = {
@@ -231,7 +265,7 @@ type GameSettingOptions = {
     /**
      * The displayed name of the setting.
      */
-    name: string;
+    name?: string;
     /**
      * An onChange callback function or iterable list of callbacks to
      * directly receive callbacks from Foundry on setting change.
@@ -274,7 +308,7 @@ type GameSetting = {
     /**
      * The name of the TJSSvgFolder to put this setting in to group them.
      */
-    folder: string;
+    folder?: string;
     /**
      * An existing store instance to use.
      */
@@ -374,4 +408,4 @@ declare class TJSLiveGameSettings {
     #private;
 }
 
-export { GameSetting, GameSettingData, GameSettingOptions, TJSGameSettings, TJSLiveGameSettings, TJSSettingsCreateOptions, TJSSettingsCustomSection, TJSSettingsCustomSectionFolder, TJSSettingsUIData, UIControl };
+export { type GameSetting, type GameSettingData, type GameSettingOptions, TJSGameSettings, TJSLiveGameSettings, type TJSSettingsCreateOptions, type TJSSettingsCustomSection, type TJSSettingsCustomSectionFolder, type TJSSettingsUIData, type UIControl };

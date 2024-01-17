@@ -3,7 +3,7 @@
    import { cubicOut }              from 'svelte/easing';
 
    import { isTJSSvelteConfig }     from '@typhonjs-svelte/runtime-base/svelte/util';
-
+   import { A11yHelper }            from '@typhonjs-svelte/runtime-base/util/browser';
    import { isObject }              from '@typhonjs-svelte/runtime-base/util/object';
 
    import { localize }              from '@typhonjs-fvtt/svelte/helper';
@@ -19,7 +19,7 @@
    /**
     * @type {SvelteApplication}
     */
-   const { application } = getContext('#external');
+   const application = getContext('#external')?.application;
 
    // Focus related app options stores.
    const { focusAuto, focusKeep } = application.reactive.storeAppOptions;
@@ -113,13 +113,13 @@
    {
       const rootEl = $elementRoot;
 
-      if ($focusAuto && rootEl instanceof HTMLElement && rootEl?.isConnected)
+      if ($focusAuto && A11yHelper.isFocusTarget(rootEl) && rootEl?.isConnected)
       {
          if ($focusKeep)
          {
             const activeWindow = application.reactive.activeWindow;
 
-            const focusOutside = activeWindow.document.activeElement instanceof HTMLElement &&
+            const focusOutside = A11yHelper.isFocusTarget(activeWindow.document.activeElement) &&
              !rootEl.contains(activeWindow.document.activeElement);
 
             // Only focus the content element if the active element is outside the app; maintaining internal focused
@@ -177,6 +177,7 @@
       flex: var(--tjs-app-header-flex, 0 0 30px);
       gap: var(--tjs-app-header-gap, 5px);
       padding: var(--tjs-app-header-padding, 0 4px);
+      touch-action: none;
    }
 
    .window-header .tjs-app-icon {

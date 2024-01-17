@@ -16,11 +16,11 @@
       // Early out if not enabled.
       if (!enabled) { return; }
 
-      if (elementRoot instanceof HTMLElement)
+      if (A11yHelper.isFocusTarget(elementRoot))
       {
          const firstFocusEl = A11yHelper.getFirstFocusableElement(elementRoot, ignoreElements);
 
-         if (firstFocusEl instanceof HTMLElement && firstFocusEl !== wrapEl)
+         if (A11yHelper.isFocusTarget(firstFocusEl) && firstFocusEl !== wrapEl)
          {
             firstFocusEl.focus();
          }

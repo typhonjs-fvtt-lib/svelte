@@ -114,6 +114,8 @@
 <style>
    a {
       padding: var(--tjs-app-header-button-padding, 0 3px);
+      user-select: none;
+      -webkit-tap-highlight-color: var(--tjs-default-webkit-tap-highlight-color, revert);
    }
 
    a :global(i) {

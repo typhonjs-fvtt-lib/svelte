@@ -58,7 +58,7 @@
     *
     * @type {SvelteApplication}
     */
-   const { application } = getContext('#external');
+   const application = getContext('#external')?.application;
 
    // Focus related app options stores.
    const { focusAuto, focusKeep, focusTrap } = application.reactive.storeAppOptions;
@@ -162,7 +162,7 @@
       const targetEl = event?.detail?.target;
 
       // Early out if there is no target element.
-      if (!(targetEl instanceof HTMLElement)) { return; }
+      if (!A11yHelper.isFocusTarget(targetEl)) { return; }
 
       // Early out if the target element is focusable as it will gain focus naturally.
       if (A11yHelper.isFocusable(targetEl)) { return; }
@@ -228,7 +228,7 @@
          if (elementRoot === activeWindow.document.activeElement ||
           firstFocusEl === activeWindow.document.activeElement)
          {
-            if (lastFocusEl instanceof HTMLElement && firstFocusEl !== lastFocusEl) { lastFocusEl.focus(); }
+            if (A11yHelper.isFocusTarget(lastFocusEl) && firstFocusEl !== lastFocusEl) { lastFocusEl.focus(); }
 
             event.preventDefault();
             event.stopPropagation();
@@ -252,16 +252,15 @@
     */
    function onPointerdownApp(event)
    {
+      // Note: the event target may not always be the element that will eventually receive focus.
       const focusable = A11yHelper.isFocusable(event.target);
 
-      if (!focusable && elementRoot instanceof HTMLElement && $focusAuto)
+      if (!focusable && $focusAuto)
       {
          if ($focusKeep)
          {
             const activeWindow = application.reactive.activeWindow;
-
-            const focusOutside = activeWindow.document.activeElement instanceof HTMLElement &&
-             !elementRoot.contains(activeWindow.document.activeElement);
+            const focusOutside = !elementRoot.contains(activeWindow.document.activeElement);
 
             // Only focus the content element if the active element is outside the app; maintaining internal focused
             // element.

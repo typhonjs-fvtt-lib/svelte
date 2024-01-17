@@ -1,3 +1,5 @@
+
+
 import * as _typhonjs_svelte_runtime_base_svelte_util from '@typhonjs-svelte/runtime-base/svelte/util';
 import { TJSSvelteConfig } from '@typhonjs-svelte/runtime-base/svelte/util';
 import * as _typhonjs_svelte_runtime_base_svelte_store_web_storage from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
@@ -1465,4 +1467,4 @@ type SvelteApplicationOptions = {
     transformOrigin?: _typhonjs_svelte_runtime_base_svelte_store_position.TJSTransformOrigin;
 };
 
-export { ApplicationState, ApplicationStateData, GetSvelteData, MountedAppShell, StoreAppOptions, StoreUIOptions, SvelteApplication, SvelteApplicationOptions, SvelteData, SvelteReactive, TJSDialog, TJSDialogButtonData, TJSDialogData, TJSDialogModalOptions, TJSDialogOptions, TJSDialogTransitionOptions };
+export { type ApplicationState, type ApplicationStateData, type GetSvelteData, type MountedAppShell, type StoreAppOptions, type StoreUIOptions, SvelteApplication, type SvelteApplicationOptions, type SvelteData, type SvelteReactive, TJSDialog, type TJSDialogButtonData, type TJSDialogData, type TJSDialogModalOptions, type TJSDialogOptions, type TJSDialogTransitionOptions };

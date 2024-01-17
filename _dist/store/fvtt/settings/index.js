@@ -224,7 +224,7 @@ class UIControl
 
       const canConfigure = globalThis.game.user.can('SETTINGS_MODIFY');
 
-      for (const setting of this.#settings)
+      for (const setting of this.#settings.data())
       {
          if (!setting.config || (!canConfigure && (setting.scope !== 'client'))) { continue; }
 
@@ -502,20 +502,6 @@ class TJSGameSettings
    }
 
    /**
-    * Provides an iterator / generator to return stored settings data.
-    *
-    * @returns {IterableIterator<GameSettingData>} An iterator of all game setting data.
-    * @yields {GameSettingData}
-    */
-   *[Symbol.iterator]()
-   {
-      for (const setting of this.#settings)
-      {
-         yield setting;
-      }
-   }
-
-   /**
     * @returns {string} Returns namespace set in constructor.
     */
    get namespace()
@@ -723,7 +709,7 @@ class TJSGameSettings
 
       const storeHandler = async (value) =>
       {
-         if (!gateSet && globalThis.game.settings.get(namespace, key) !== value)
+         if (!gateSet)
          {
             gateSet = true;
             await globalThis.game.settings.set(namespace, key, value);
@@ -736,12 +722,16 @@ class TJSGameSettings
       // existing game setting.
       subscribeIgnoreFirst(targetStore, storeHandler);
 
-      this.#settings.push({
+      const gameSettingData = {
          namespace,
          key,
          folder,
          ...options
-      });
+      };
+
+      Object.freeze(gameSettingData);
+
+      this.#settings.push(gameSettingData);
 
       return storeHandler;
    }
@@ -795,6 +785,120 @@ class TJSGameSettings
 
       return storeHandlers;
    }
+
+   // Iterators ------------------------------------------------------------------------------------------------------
+
+   /**
+    * Returns an iterable for the game setting data; {@link GameSettingData}.
+    *
+    * @param {RegExp} [regex] - Optional regular expression to filter by game setting keys.
+    *
+    * @returns {IterableIterator<GameSettingData>} Iterable iterator of GameSettingData.
+    * @yields {GameSettingData}
+    */
+   *data(regex = void 0)
+   {
+      if (regex !== void 0 && !(regex instanceof RegExp)) { throw new TypeError(`'regex' is not a RegExp`); }
+
+      if (!this.#settings.length) { return void 0; }
+
+      if (regex)
+      {
+         for (const setting of this.#settings)
+         {
+            if (regex.test(setting.key)) { yield setting; }
+         }
+      }
+      else
+      {
+         for (const setting of this.#settings) { yield setting; }
+      }
+   }
+
+   /**
+    * @template T
+    *
+    * Returns an iterable for the game setting keys and stores.
+    *
+    * @param {RegExp} [regex] - Optional regular expression to filter by game setting keys.
+    *
+    * @returns {IterableIterator<[string, import('svelte/store').Writable<T>]>} Iterable iterator of keys and stores.
+    * @yields {import('svelte/store').Writable<T>}
+    */
+   *entries(regex = void 0)
+   {
+      if (regex !== void 0 && !(regex instanceof RegExp)) { throw new TypeError(`'regex' is not a RegExp`); }
+
+      if (!this.#stores.size) { return void 0; }
+
+      if (regex)
+      {
+         for (const key of this.#stores.keys())
+         {
+            if (regex.test(key)) { yield [key, this.getStore(key)]; }
+         }
+      }
+      else
+      {
+         for (const key of this.#stores.keys()) { yield [key, this.getStore(key)]; }
+      }
+   }
+
+   /**
+    * Returns an iterable for the game setting keys from existing stores.
+    *
+    * @param {RegExp} [regex] - Optional regular expression to filter by game setting keys.
+    *
+    * @returns {IterableIterator<string>} Iterable iterator of game setting keys.
+    * @yields {string}
+    */
+   *keys(regex = void 0)
+   {
+      if (regex !== void 0 && !(regex instanceof RegExp)) { throw new TypeError(`'regex' is not a RegExp`); }
+
+      if (!this.#stores.size) { return void 0; }
+
+      if (regex)
+      {
+         for (const key of this.#stores.keys())
+         {
+            if (regex.test(key)) { yield key; }
+         }
+      }
+      else
+      {
+         for (const key of this.#stores.keys()) { yield key; }
+      }
+   }
+
+   /**
+    * @template T
+    *
+    * Returns an iterable for the game setting stores.
+    *
+    * @param {RegExp} [regex] - Optional regular expression to filter by game setting keys.
+    *
+    * @returns {IterableIterator<import('svelte/store').Writable<T>>} Iterable iterator of stores.
+    * @yields {import('svelte/store').Writable<T>}
+    */
+   *stores(regex = void 0)
+   {
+      if (regex !== void 0 && !(regex instanceof RegExp)) { throw new TypeError(`'regex' is not a RegExp`); }
+
+      if (!this.#stores.size) { return void 0; }
+
+      if (regex)
+      {
+         for (const key of this.#stores.keys())
+         {
+            if (regex.test(key)) { yield this.getStore(key); }
+         }
+      }
+      else
+      {
+         for (const key of this.#stores.keys()) { yield this.getStore(key); }
+      }
+   }
 }
 
 /**
@@ -808,7 +912,7 @@ class TJSGameSettings
  *
  * @property {string} [hint] A description of the registered setting and its behavior.
  *
- * @property {string} name The displayed name of the setting.
+ * @property {string} [name] The displayed name of the setting.
  *
  * @property {Function|Iterable<Function>} [onChange] An onChange callback function or iterable list of callbacks to
  * directly receive callbacks from Foundry on setting change.
@@ -830,7 +934,7 @@ class TJSGameSettings
  *
  * @property {string} key The setting key to register.
  *
- * @property {string} folder The name of the TJSSvgFolder to put this setting in to group them.
+ * @property {string} [folder] The name of the TJSSvgFolder to put this setting in to group them.
  *
  * @property {import('svelte/store').Writable} [store] An existing store instance to use.
  *
@@ -844,7 +948,7 @@ class TJSGameSettings
  *
  * @property {string} key The setting key to register.
  *
- * @property {string} folder The name of the TJSSvgFolder to put this setting in to group them.
+ * @property {string} [folder] The name of the TJSSvgFolder to put this setting in to group them.
  */
 
 /**
@@ -917,7 +1021,7 @@ class TJSLiveGameSettings
       if (include !== void 0 && !(include instanceof Set)) { throw new TypeError(`'options.include' is not a Set.`); }
       if (exclude !== void 0 && !(exclude instanceof Set)) { throw new TypeError(`'options.exclude' is not a Set.`); }
 
-      for (const setting of gameSettings)
+      for (const setting of gameSettings.data())
       {
          const key = setting.key;
 

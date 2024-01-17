@@ -3,7 +3,7 @@
 
    export let isResizable = false;
 
-   const application = getContext('#external').application;
+   const application = getContext('#external')?.application;
 
    // Allows retrieval of the element root at runtime.
    const storeElementRoot = getContext('#internal').stores.elementRoot;
@@ -206,6 +206,7 @@
       border: var(--tjs-app-resizable-handle-border, 1px solid #111);
       border-radius: var(--tjs-app-resizable-handle-border-radius, 4px 0 0 0);
       padding: var(--tjs-app-resizable-handle-padding, 2px);
+      touch-action: none;
    }
 
    .fa-arrows-alt-h {

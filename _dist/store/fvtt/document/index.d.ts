@@ -27,13 +27,13 @@ interface NamedDocumentConstructor {
 }
 
 /**
- * @template [T=globalThis.foundry.abstract.Document]
+ * @template [T=import('./types').NamedDocumentConstructor]
  *
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.
  * This makes documents reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
  */
-declare class TJSDocument<T = globalThis.foundry.abstract.Document> {
+declare class TJSDocument<T = NamedDocumentConstructor> {
     /**
      * Attempts to create a Foundry UUID from standard drop data. This may not work for all systems.
      *
@@ -41,21 +41,18 @@ declare class TJSDocument<T = globalThis.foundry.abstract.Document> {
      *
      * @param {object}   [opts] - Optional parameters.
      *
-     * @param {boolean}  [opts.actor=true] - Accept actor owned documents.
-     *
      * @param {boolean}  [opts.compendium=true] - Accept compendium documents.
      *
      * @param {boolean}  [opts.world=true] - Accept world documents.
      *
-     * @param {string[]|undefined}   [opts.types] - Require the `data.type` to match entry in `types`.
+     * @param {string[]} [opts.types] - Require the `data.type` to match entry in `types`.
      *
      * @returns {string|undefined} Foundry UUID for drop data.
      */
-    static getUUIDFromDataTransfer(data: object, { actor, compendium, world, types }?: {
-        actor?: boolean;
+    static getUUIDFromDataTransfer(data: object, { compendium, world, types }?: {
         compendium?: boolean;
         world?: boolean;
-        types?: string[] | undefined;
+        types?: string[];
     }): string | undefined;
     /**
      * @param {T | TJSDocumentOptions}  [document] - Document to wrap or TJSDocumentOptions.
@@ -99,27 +96,26 @@ declare class TJSDocument<T = globalThis.foundry.abstract.Document> {
      *
      * @param {object}   data - Document transfer data.
      *
-     * @param {{ actor?: boolean, compendium?: boolean, world?: boolean, types?: string[] } & TJSDocumentOptions}   [options] - Optional
-     *        parameters.
+     * @param {{ compendium?: boolean, world?: boolean, types?: string[] }}   [options] - Optional parameters for
+     *        {@link TJSDocument.getUUIDFromDataTransfer}.
      *
      * @returns {Promise<boolean>} Returns true if new document set from data transfer blob.
      */
     setFromDataTransfer(data: object, options?: {
-        actor?: boolean;
         compendium?: boolean;
         world?: boolean;
         types?: string[];
-    } & TJSDocumentOptions): Promise<boolean>;
+    }): Promise<boolean>;
     /**
      * Sets the document by Foundry UUID performing a lookup and setting the document if found.
      *
      * @param {string}   uuid - A Foundry UUID to lookup.
      *
-     * @param {TJSDocumentOptions}   [options] - New document update options to set.
+     * @param {TJSDocumentUpdateOptions}   [options] - New document update options to set.
      *
      * @returns {Promise<boolean>} True if successfully set document from UUID.
      */
-    setFromUUID(uuid: string, options?: TJSDocumentOptions): Promise<boolean>;
+    setFromUUID(uuid: string, options?: TJSDocumentUpdateOptions): Promise<boolean>;
     /**
      * Sets options for this document wrapper / store.
      *
@@ -140,12 +136,12 @@ type TJSDocumentOptions = {
      * Optional post delete function to invoke when
      * document is deleted _after_ subscribers have been notified.
      */
-    delete?: (doc: globalThis.foundry.abstract.Document) => void;
+    delete?: (doc?: object) => void;
     /**
      * Optional pre delete function to invoke
      * when document is deleted _before_ subscribers are notified.
      */
-    preDelete?: (doc: globalThis.foundry.abstract.Document) => void;
+    preDelete?: (doc?: object) => void;
 };
 /**
  * Provides data regarding the latest document change.
@@ -203,9 +199,9 @@ declare class TJSDocumentCollection<T = DocumentCollection> {
     /**
      * @param {T | undefined}  collection - New collection to set.
      *
-     * @param {object}         [options] - New collection update options to set.
+     * @param {TJSDocumentCollectionUpdateOptions}  [options] - New collection update options to set.
      */
-    set(collection: T | undefined, options?: object): void;
+    set(collection: T | undefined, options?: any): void;
     /**
      * Sets options for this collection wrapper / store.
      *
@@ -255,4 +251,4 @@ type TJSDocumentCollectionUpdateOptions<T> = {
     data: object[] | string[];
 };
 
-export { EmbeddedAPI, NamedDocumentConstructor, TJSDocument, TJSDocumentCollection, TJSDocumentCollectionOptions, TJSDocumentCollectionUpdateOptions, TJSDocumentOptions, TJSDocumentUpdateOptions };
+export { type EmbeddedAPI, type NamedDocumentConstructor, TJSDocument, TJSDocumentCollection, type TJSDocumentCollectionOptions, type TJSDocumentCollectionUpdateOptions, type TJSDocumentOptions, type TJSDocumentUpdateOptions };

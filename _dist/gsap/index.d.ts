@@ -417,4 +417,4 @@ type TJSPositionInfo = {
     gsapData: Array<object[]>;
 };
 
-export { DraggableGsapOptions, GsapCompose, GsapData, GsapPositionOptions, GsapTarget, TJSPositionInfo, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };
+export { type DraggableGsapOptions, GsapCompose, type GsapData, type GsapPositionOptions, type GsapTarget, type TJSPositionInfo, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };
