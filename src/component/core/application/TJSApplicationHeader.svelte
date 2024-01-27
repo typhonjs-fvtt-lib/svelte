@@ -1,4 +1,9 @@
 <script>
+   /**
+    * TODO: Add description
+    *
+    * @componentDescription
+    */
    import { getContext }            from '#svelte';
    import { cubicOut }              from '#svelte/easing';
 

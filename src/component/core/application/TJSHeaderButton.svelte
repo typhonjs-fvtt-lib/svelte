@@ -1,16 +1,22 @@
 <script>
    /**
-    * Provides an app header button conforming to the Foundry {@link ApplicationHeaderButton} type. Additionally, a
-    * `title` field is supported to give a tool tip for the button. For backward compatibility `onclick` is supported,
-    * but for uniformity across TRL defining an `onPress` function is recommended. If defined it is invoked when
-    * the button is clicked or `Enter` key pressed and state is updated accordingly.
+    * Provides an app header button conforming to the Foundry {@link globalThis.ApplicationHeaderButton} type.
+    * Additionally, a `title` field is supported to give a tool tip for the button. For backward compatibility
+    * `onclick` is supported, but for uniformity across TRL defining an `onPress` function is recommended. If defined
+    * it is invoked when the button is clicked or `Enter` key pressed and state is updated accordingly.
     *
     * TRL also supports the following extra button data:
+    *
     * - {keyCode='Enter'}           keyCode: A string conforming to `KeyboardEvent.code` to activate `onPress` callback.
+    *
     * - {keepMinimized=false}       keepMinimized: When true the button is not removed when app minimized.
+    *
     * - {Function}                  onContextMenu: Invoked when right mouse button or contextmenu key is pressed.
+    *
     * - {Function}                  onPress: Invoked when left mouse button or `keyCode` key is pressed.
+    *
     * - {Record<string, string>}    styles: Additional inline styles to apply to button.
+    *
     * - {string}                    title: Tooltip title.
     */
    import { applyStyles }   from '#runtime/svelte/action/dom';

@@ -1,4 +1,9 @@
 <script>
+   /**
+    * TODO: Add description
+    *
+    * @componentDescription
+    */
    import { applyStyles }              from '#runtime/svelte/action/dom';
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
    import { isObject }                 from '#runtime/util/object';

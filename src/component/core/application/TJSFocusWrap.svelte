@@ -1,4 +1,9 @@
 <script>
+   /**
+    * TODO: Add description
+    *
+    * @componentDescription
+    */
    import { A11yHelper }    from '#runtime/util/browser';
 
    /** @type {HTMLElement} */
