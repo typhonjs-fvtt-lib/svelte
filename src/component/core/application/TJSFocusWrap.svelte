@@ -2,7 +2,7 @@
    /**
     * TODO: Add description
     *
-    * @componentDescription
+    * @componentDocumentation
     */
    import { A11yHelper }    from '#runtime/util/browser';
 

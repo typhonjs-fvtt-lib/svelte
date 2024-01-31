@@ -9,7 +9,7 @@
     * ```
     * '--tjs-app-background': Controls the app background image; set in main `index.js`.
     * ```
-    * @componentDescription
+    * @componentDocumentation
     */
 
    import {

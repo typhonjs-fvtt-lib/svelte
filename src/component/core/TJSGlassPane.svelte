@@ -2,7 +2,7 @@
    /**
     * TODO: Add description
     *
-    * @componentDescription
+    * @componentDocumentation
     */
    import { applyStyles }              from '#runtime/svelte/action/dom';
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
