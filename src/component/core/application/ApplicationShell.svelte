@@ -1,5 +1,7 @@
 <script>
    /**
+    * @svelteComponent
+    *
     * Provides an application shell is a main top level slotted component that provides a reactive
     * outer wrapper and header bar for the main content component.
     *

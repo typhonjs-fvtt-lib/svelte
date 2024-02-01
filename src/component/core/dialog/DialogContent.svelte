@@ -1,5 +1,7 @@
 <script>
    /**
+    * @svelteComponent
+    *
     * TODO: Add description
     *
     * @componentDocumentation
