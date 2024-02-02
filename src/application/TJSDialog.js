@@ -1,4 +1,4 @@
-import { DialogShell }        from '#svelte-fvtt/component/core';
+import { DialogShell }        from '#svelte-fvtt/component/internal';
 
 import { ManagedPromise }     from '#runtime/util/async';
 

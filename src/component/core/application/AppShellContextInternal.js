@@ -2,6 +2,8 @@ import { writable } from '#svelte/store';
 
 /**
  * Provides the internal context to all application shells.
+ *
+ * @internal
  */
 export class AppShellContextInternal
 {

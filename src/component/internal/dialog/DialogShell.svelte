@@ -5,23 +5,25 @@
     * TODO: Add description
     *
     * @componentDocumentation
+    * @internal
     */
    import {
       getContext,
       onDestroy,
       onMount,
-      setContext }         from '#svelte';
+      setContext }               from '#svelte';
 
-   import { writable }     from '#svelte/store';
+   import { writable }           from '#svelte/store';
 
-   import { fade }         from '#svelte/transition';
+   import { fade }               from '#svelte/transition';
 
-   import { A11yHelper }   from '#runtime/util/browser';
-   import { isObject }     from '#runtime/util/object';
+   import { ApplicationShell }   from '#svelte-fvtt/component/core';
+   import { TJSGlassPane }       from '#svelte-fvtt/component/core';
 
-   import ApplicationShell from '../application/ApplicationShell.svelte';
-   import DialogContent    from './DialogContent.svelte';
-   import TJSGlassPane     from '../TJSGlassPane.svelte';
+   import { A11yHelper }         from '#runtime/util/browser';
+   import { isObject }           from '#runtime/util/object';
+
+   import DialogContent          from './DialogContent.svelte';
 
    // ApplicationShell contract.
    export let elementContent = void 0;

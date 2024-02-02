@@ -18,6 +18,9 @@
     * - {Record<string, string>}    styles: Additional inline styles to apply to button.
     *
     * - {string}                    title: Tooltip title.
+    *
+    * @componentDocumentation
+    * @internal
     */
    import { applyStyles }   from '#runtime/svelte/action/dom';
    import { isObject }      from '#runtime/util/object';
