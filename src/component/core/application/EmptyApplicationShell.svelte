@@ -1,7 +1,5 @@
 <script>
    /**
-    * @svelteComponent
-    *
     * Provides an empty application shell as a main top level slotted component.
     *
     * @componentDocumentation

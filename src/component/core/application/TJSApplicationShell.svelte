@@ -1,7 +1,5 @@
 <script>
    /**
-    * @svelteComponent
-    *
     * Provides an alternate application shell that is scoped by slightly different CSS classes than
     * {@link ApplicationShell}. An application shell is a main top level slotted component that provides a reactive
     * outer wrapper and header bar for the main content component.
