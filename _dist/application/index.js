@@ -51,7 +51,7 @@ PopoutSupport.initialize();
  *
  * @property {boolean}  [positionOrtho=true] When true TJSPosition is optimized for orthographic use.
  *
- * @property {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionValidatorOptions}   [positionValidator] A validator
+ * @property {import('@typhonjs-svelte/runtime-base/svelte/store/position').IValidatorAPI.Options}   [positionValidator] A validator
  *           function or data or list of validators.
  *
  * @property {import('@typhonjs-svelte/runtime-base/svelte/store/web-storage').TJSWebStorage}   [sessionStorage] An instance of

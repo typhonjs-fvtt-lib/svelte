@@ -27,10 +27,14 @@
  *   </div>
  * </div>
  */
-declare function radioBoxes(name: string, choices: object, options: {
+declare function radioBoxes(
+  name: string,
+  choices: object,
+  options: {
     checked: string;
     localize: boolean;
-}): string;
+  },
+): string;
 
 /**
  * Converts the `selectOptions` Handlebars helper to be Svelte compatible. This is useful when initially converting
@@ -104,7 +108,9 @@ declare function radioBoxes(name: string, choices: object, options: {
  *   {@html selectOptions(choices, { selected: value, nameAttr: 'key', labelAttr: 'label' })}
  * </select>
  */
-declare function selectOptions(choices: object, options: {
+declare function selectOptions(
+  choices: object,
+  options: {
     selected?: string | string[];
     localize?: boolean;
     blank?: string;
@@ -112,7 +118,8 @@ declare function selectOptions(choices: object, options: {
     labelAttr?: string;
     inverted?: boolean;
     sort?: boolean;
-}): string;
+  },
+): string;
 
 /**
  * Localize a string including variable formatting for input arguments. Provide a string ID which defines the localized

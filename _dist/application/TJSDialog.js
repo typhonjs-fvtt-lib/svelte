@@ -1,4 +1,4 @@
-import { DialogShell }        from '@typhonjs-fvtt/svelte/component/core';
+import { DialogShell }        from '@typhonjs-fvtt/svelte/component/internal';
 
 import { ManagedPromise }     from '@typhonjs-svelte/runtime-base/util/async';
 

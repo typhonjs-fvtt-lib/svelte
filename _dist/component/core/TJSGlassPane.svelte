@@ -1,4 +1,9 @@
 <script>
+   /**
+    * TODO: Add description
+    *
+    * @componentDocumentation
+    */
    import { applyStyles }              from '@typhonjs-svelte/runtime-base/svelte/action/dom';
    import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
    import { isObject }                 from '@typhonjs-svelte/runtime-base/util/object';

@@ -1,6 +1,9 @@
 <script>
    /**
-    * TODO: Documentation!
+    * TODO: Add description
+    *
+    * @componentDocumentation
+    * @internal
     */
    import {
       getContext,

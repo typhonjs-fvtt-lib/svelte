@@ -1,4 +1,10 @@
 <script>
+   /**
+    * TODO: Add description
+    *
+    * @componentDocumentation
+    * @internal
+    */
    import { getContext }            from 'svelte';
    import { cubicOut }              from 'svelte/easing';
 

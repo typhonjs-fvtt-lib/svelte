@@ -1,4 +1,9 @@
 <script>
+   /**
+    * TODO: Add description
+    *
+    * @componentDocumentation
+    */
    import { A11yHelper }    from '@typhonjs-svelte/runtime-base/util/browser';
 
    /** @type {HTMLElement} */

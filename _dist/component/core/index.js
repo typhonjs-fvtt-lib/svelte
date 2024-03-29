@@ -2,7 +2,6 @@ import { cssVariables } from './cssVariables.js';
 
 export { default as TJSGlassPane }        from './TJSGlassPane.svelte';
 export *                                  from './application/index.js';
-export *                                  from './dialog/index.js';
 
 /**
  * Provides default CSS variables for core components.

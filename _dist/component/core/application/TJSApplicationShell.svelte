@@ -4,8 +4,12 @@
     * {@link ApplicationShell}. An application shell is a main top level slotted component that provides a reactive
     * outer wrapper and header bar for the main content component.
     *
-    * CSS variables:
+    * ### CSS variables
+    *
+    * ```
     * '--tjs-app-background': Controls the app background image; set in main `index.js`.
+    * ```
+    * @componentDocumentation
     */
 
    import {

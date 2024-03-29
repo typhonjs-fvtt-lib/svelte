@@ -1,20 +1,27 @@
 <script>
+   /**
+    * TODO: Add description
+    *
+    * @componentDocumentation
+    * @internal
+    */
    import {
       getContext,
       onDestroy,
       onMount,
-      setContext }         from 'svelte';
+      setContext }               from 'svelte';
 
-   import { writable }     from 'svelte/store';
+   import { writable }           from 'svelte/store';
 
-   import { fade }         from 'svelte/transition';
+   import { fade }               from 'svelte/transition';
 
-   import { A11yHelper }   from '@typhonjs-svelte/runtime-base/util/browser';
-   import { isObject }     from '@typhonjs-svelte/runtime-base/util/object';
+   import { ApplicationShell }   from '@typhonjs-fvtt/svelte/component/core';
+   import { TJSGlassPane }       from '@typhonjs-fvtt/svelte/component/core';
 
-   import ApplicationShell from '../application/ApplicationShell.svelte';
-   import DialogContent    from './DialogContent.svelte';
-   import TJSGlassPane     from '../TJSGlassPane.svelte';
+   import { A11yHelper }         from '@typhonjs-svelte/runtime-base/util/browser';
+   import { isObject }           from '@typhonjs-svelte/runtime-base/util/object';
+
+   import DialogContent          from './DialogContent.svelte';
 
    // ApplicationShell contract.
    export let elementContent = void 0;

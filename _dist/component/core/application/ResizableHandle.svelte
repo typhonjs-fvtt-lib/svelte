@@ -1,4 +1,9 @@
 <script>
+   /**
+    * TODO: Add description
+    *
+    * @componentDocumentation
+    */
    import { getContext }         from 'svelte';
 
    export let isResizable = false;
