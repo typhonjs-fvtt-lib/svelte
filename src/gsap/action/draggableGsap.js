@@ -51,7 +51,7 @@ const s_HAS_QUICK_TO = false;
  * @returns {import('svelte/action').ActionReturn<Record<string, any>>} Lifecycle functions.
  */
 function draggableGsap(node, { position, active = true, button = 0, storeDragging = void 0, ease = true,
- inertia = false, easeOptions = { duration: 0.1, ease: 'power3.out' },
+ inertia = false, easeOptions = { duration: 0.06, ease: 'power3.out' },
   inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 },
    hasTargetClassList, ignoreTargetClassList })
 {
@@ -410,7 +410,7 @@ class DraggableGsapOptions
 {
    #ease = false;
 
-   #easeOptions = { duration: 0.1, ease: 'power3.out' };
+   #easeOptions = { duration: 0.06, ease: 'power3.out' };
 
    #inertia = false;
 
@@ -755,7 +755,7 @@ class DraggableGsapOptions
    {
       this.#ease = true;
       this.#inertia = false;
-      this.#easeOptions = { duration: 0.1, ease: 'power3.out' };
+      this.#easeOptions = { duration: 0.06, ease: 'power3.out' };
       this.#inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 };
       this.#updateSubscribers();
    }
@@ -765,7 +765,7 @@ class DraggableGsapOptions
     */
    resetEase()
    {
-      this.#easeOptions = { duration: 0.1, ease: 'power3.out' };
+      this.#easeOptions = { duration: 0.06, ease: 'power3.out' };
       this.#updateSubscribers();
    }
 
