@@ -33,6 +33,7 @@
         "document",
         "external",
         "event",
+        "focus",
         "length",
         "name",
         "parent",
