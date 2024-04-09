@@ -1444,7 +1444,7 @@ type SvelteApplicationOptions = {
    * A helper for
    * initial position placement.
    */
-  positionInitial?: _typhonjs_svelte_runtime_base_svelte_store_position.TJSPositionInitialHelper;
+  positionInitial?: _typhonjs_svelte_runtime_base_svelte_store_position.System.Initial.IInitialSystem;
   /**
    * When true TJSPosition is optimized for orthographic use.
    */
@@ -1465,10 +1465,10 @@ type SvelteApplicationOptions = {
    */
   svelte?: _typhonjs_svelte_runtime_base_svelte_util.TJSSvelteConfig;
   /**
-   * By default,
-   * 'top / left' respects rotation when minimizing.
+   * By
+   * default, 'top / left' respects rotation when minimizing.
    */
-  transformOrigin?: _typhonjs_svelte_runtime_base_svelte_store_position.TJSTransformOrigin;
+  transformOrigin?: _typhonjs_svelte_runtime_base_svelte_store_position.ITransformAPI.TransformOrigin;
 };
 
 export {

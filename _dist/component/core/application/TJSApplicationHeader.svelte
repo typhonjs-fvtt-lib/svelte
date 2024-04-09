@@ -50,9 +50,9 @@
    $: draggable = typeof draggable === 'function' ? draggable : dragDefault;
 
    // Combines external options with defaults for TJSApplicationHeader. By default, easing is turned on w/ duration of
-   // 0.08 seconds and cubicOut, but can be overridden by any provided `draggableOptions`. `position`, `active`, and
+   // 0.06 seconds and cubicOut, but can be overridden by any provided `draggableOptions`. `position`, `active`, and
    // `storeDragging` are always overridden by application position / stores.
-   $: dragOptions = Object.assign({}, { ease: true, easeOptions: { duration: 0.08, ease: cubicOut } },
+   $: dragOptions = Object.assign({}, { tween: true, tweenOptions: { duration: 0.06, ease: cubicOut } },
     isObject(draggableOptions) ? draggableOptions : {}, { position: application.position, active:
      $storeDraggable, storeDragging, hasTargetClassList: s_DRAG_TARGET_CLASSLIST });
 

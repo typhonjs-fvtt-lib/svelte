@@ -46,7 +46,7 @@ PopoutSupport.initialize();
  *
  * @property {boolean}  [positionable=true] If false then `position.set` does not take effect.
  *
- * @property {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionInitialHelper}   [positionInitial] A helper for
+ * @property {import('@typhonjs-svelte/runtime-base/svelte/store/position').System.Initial.IInitialSystem}   [positionInitial] A helper for
  *           initial position placement.
  *
  * @property {boolean}  [positionOrtho=true] When true TJSPosition is optimized for orthographic use.
@@ -60,6 +60,6 @@ PopoutSupport.initialize();
  * @property {import('@typhonjs-svelte/runtime-base/svelte/util').TJSSvelteConfig}   [svelte] A Svelte configuration object defining
  *           the main component.
  *
- * @property {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSTransformOrigin}   [transformOrigin='top left'] By default,
- *           'top / left' respects rotation when minimizing.
+ * @property {import('@typhonjs-svelte/runtime-base/svelte/store/position').ITransformAPI.TransformOrigin}   [transformOrigin='top left'] By
+ *           default, 'top / left' respects rotation when minimizing.
  */

@@ -1,8 +1,9 @@
 import * as _runtime_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import * as svelte_transition from 'svelte/transition';
-import * as svelte_store from 'svelte/store';
-import { Subscriber, Unsubscriber } from 'svelte/store';
+import { EasingFunction } from 'svelte/transition';
 import * as svelte_action from 'svelte/action';
+import * as svelte_store from 'svelte/store';
+import { Readable } from 'svelte/store';
 
 /**
  * The main GSAP object.
@@ -102,32 +103,62 @@ declare const easingFunc: {
 declare const easingList: string[];
 
 /**
- * Provides a store / object to make updating / setting draggableGsap options much easier.
+ * Defines Gsap tween options.
  */
-interface DraggableGsapOptions {
-  ease: boolean;
-  easeOptions: {
-    duration: number;
-    ease: string;
+type GsapTweenOptions = {
+  /**
+   * Duration in seconds; default: 1
+   */
+  duration?: number;
+  /**
+   * Easing function; default: 'power3.out'
+   */
+  ease?: string | EasingFunction;
+};
+/**
+ * Defines options for the inertia plugin / tween options.
+ *
+ * @see https://greensock.com/docs/v3/Plugins/InertiaPlugin
+ */
+type GsapInertiaOptions = {
+  end?: Number | [] | Function;
+  duration?: {
+    min: number;
+    max: number;
   };
+  resistance?: number;
+  velocityScale?: number;
+};
+/**
+ * Provides an interface of the {@link draggableGsap} action options support / Readable store to make updating / setting
+ * draggableGsap options much easier. When subscribing to the options instance returned by {@link draggableGsap.options}
+ * the Subscriber handler receives the entire instance.
+ */
+interface IDraggableGsapOptions extends Readable<IDraggableGsapOptions> {
+  /**
+   * Tweening enabled state.
+   */
+  tween: boolean;
+  /**
+   * GSAP tween options for easing function and duration.
+   */
+  tweenOptions: GsapTweenOptions;
+  /**
+   * Inertia enabled state.
+   */
   inertia: boolean;
-  inertiaOptions: {
-    end?: Number | [] | Function;
-    duration: {
-      min: number;
-      max: number;
-    };
-    resistance: number;
-    velocityScale: number;
-  };
+  /**
+   * Inertia options.
+   */
+  inertiaOptions: GsapInertiaOptions;
   /**
    * @returns {number} Get ease duration
    */
-  get easeDuration(): number;
+  get tweenDuration(): number;
   /**
-   * @returns {string | Function} Get easing function value.
+   * @returns {string | EasingFunction} Get easing function value.
    */
-  get easeValue(): string | Function;
+  get tweenEase(): string | Function;
   /**
    * @returns {number} Get inertia duration max time (seconds)
    */
@@ -152,11 +183,11 @@ interface DraggableGsapOptions {
   /**
    * @param {number}   duration - Set ease duration.
    */
-  set easeDuration(duration: number);
+  set tweenDuration(duration: number);
   /**
    * @param {string | Function} value - Get easing function value.
    */
-  set easeValue(value: string | Function);
+  set tweenEase(value: string | Function);
   /**
    * @param {{min: number, max: number}} duration - Set inertia duration min & max.
    */
@@ -184,26 +215,25 @@ interface DraggableGsapOptions {
    */
   set inertiaVelocityScale(velocityScale: number);
   /**
-   * Resets all options data to default values.
+   * Resets all options data to initial values.
    */
   reset(): void;
   /**
-   * Resets easing options to default values.
+   * Resets tween enabled state to initial value.
    */
-  resetEase(): void;
+  resetTween(): void;
   /**
-   * Resets inertia options to default values.
+   * Resets tween options to initial values.
+   */
+  resetTweenOptions(): void;
+  /**
+   * Resets inertia enabled state to initial value.
    */
   resetInertia(): void;
   /**
-   * Store subscribe method.
-   *
-   * @param {Subscriber<DraggableGsapOptions>} handler - Callback function that is invoked on update / changes.
-   *        Receives the DraggableOptions object / instance.
-   *
-   * @returns {Unsubscriber} Unsubscribe function.
+   * Resets inertia options to initial values.
    */
-  subscribe(handler: Subscriber<DraggableGsapOptions>): Unsubscriber;
+  resetInertiaOptions(): void;
 }
 
 /**
@@ -228,13 +258,13 @@ interface DraggableGsapOptions {
  * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
  *        state.
  *
- * @param {boolean}           [params.ease=true] - When true easing is enabled.
+ * @param {boolean}           [params.tween=false] - When true tweening is enabled.
  *
  * @param {boolean}           [params.inertia=false] - When true inertia easing is enabled.
  *
- * @param {object}            [params.easeOptions] - Gsap `to / `quickTo` vars object.
+ * @param {import('./types').GsapTweenOptions}  [params.tweenOptions] - Gsap `to / `quickTo` tween vars object.
  *
- * @param {object}            [params.inertiaOptions] - Inertia Options.
+ * @param {import('./types').GsapInertiaOptions}   [params.inertiaOptions] - Inertia Options.
  *
  * @param {Iterable<string>}  [params.hasTargetClassList] - When defined any event targets that has any class in this
  *                                                          list are allowed.
@@ -251,9 +281,9 @@ declare function draggableGsap(
     active,
     button,
     storeDragging,
-    ease,
+    tween,
     inertia,
-    easeOptions,
+    tweenOptions,
     inertiaOptions,
     hasTargetClassList,
     ignoreTargetClassList,
@@ -262,29 +292,33 @@ declare function draggableGsap(
     active?: boolean;
     button?: number;
     storeDragging?: svelte_store.Writable<boolean>;
-    ease?: boolean;
+    tween?: boolean;
     inertia?: boolean;
-    easeOptions?: object;
-    inertiaOptions?: object;
+    tweenOptions?: GsapTweenOptions;
+    inertiaOptions?: GsapInertiaOptions;
     hasTargetClassList?: Iterable<string>;
     ignoreTargetClassList?: Iterable<string>;
   },
 ): svelte_action.ActionReturn<Record<string, any>>;
 declare namespace draggableGsap {
   /**
-   * Define a function to get a DraggableGsapOptions instance.
+   * Define a function to get an IDraggableGsapOptions instance.
    *
-   * @param {{ ease?: boolean, easeOptions?: object, inertia?: boolean, inertiaOptions?: object }} options -
-   *        DraggableGsapOptions.
+   * @param {({
+   *    tween?: boolean,
+   *    tweenOptions?: import('./types').GsapTweenOptions,
+   *    inertia?: boolean,
+   *    inertiaOptions?: import('./types').GsapInertiaOptions
+   * })} options - Initial options for IDraggableGsapOptions.
    *
-   * @returns {import('./types').DraggableGsapOptions} A new options instance.
+   * @returns {import('./types').IDraggableGsapOptions} A new options instance.
    */
   function options(options: {
-    ease?: boolean;
-    easeOptions?: any;
+    tween?: boolean;
+    tweenOptions?: GsapTweenOptions;
     inertia?: boolean;
-    inertiaOptions?: any;
-  }): DraggableGsapOptions;
+    inertiaOptions?: GsapInertiaOptions;
+  }): IDraggableGsapOptions;
 }
 
 /**
@@ -437,11 +471,13 @@ type TJSPositionInfo = {
 };
 
 export {
-  type DraggableGsapOptions,
   GsapCompose,
   type GsapData,
+  type GsapInertiaOptions,
   type GsapPositionOptions,
   type GsapTarget,
+  type GsapTweenOptions,
+  type IDraggableGsapOptions,
   type TJSPositionInfo,
   draggableGsap,
   easingFunc,
