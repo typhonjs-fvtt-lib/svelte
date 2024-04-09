@@ -4,7 +4,8 @@ import { A11yHelper }         from '#runtime/util/browser';
 
 import {
    isIterable,
-   isObject }                 from '#runtime/util/object';
+   isObject,
+   klona }                    from '#runtime/util/object';
 
 import { GsapCompose }        from '../compose/GsapCompose.js';
 
@@ -34,13 +35,13 @@ const s_HAS_QUICK_TO = false;
  * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
  *        state.
  *
- * @param {boolean}           [params.ease=true] - When true easing is enabled.
+ * @param {boolean}           [params.tween=false] - When true tweening is enabled.
  *
  * @param {boolean}           [params.inertia=false] - When true inertia easing is enabled.
  *
- * @param {object}            [params.easeOptions] - Gsap `to / `quickTo` vars object.
+ * @param {import('./types').GsapTweenOptions}  [params.tweenOptions] - Gsap `to / `quickTo` tween vars object.
  *
- * @param {object}            [params.inertiaOptions] - Inertia Options.
+ * @param {import('./types').GsapInertiaOptions}   [params.inertiaOptions] - Inertia Options.
  *
  * @param {Iterable<string>}  [params.hasTargetClassList] - When defined any event targets that has any class in this
  *                                                          list are allowed.
@@ -50,8 +51,8 @@ const s_HAS_QUICK_TO = false;
  *
  * @returns {import('svelte/action').ActionReturn<Record<string, any>>} Lifecycle functions.
  */
-function draggableGsap(node, { position, active = true, button = 0, storeDragging = void 0, ease = true,
- inertia = false, easeOptions = { duration: 0.06, ease: 'power3.out' },
+function draggableGsap(node, { position, active = true, button = 0, storeDragging = void 0, tween = false,
+ inertia = false, tweenOptions = { duration: 1, ease: 'power3.out' },
   inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 },
    hasTargetClassList, ignoreTargetClassList })
 {
@@ -126,8 +127,8 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
 
    if (s_HAS_QUICK_TO)
    {
-      quickLeft = GsapCompose.quickTo(position, 'left', easeOptions);
-      quickTop = GsapCompose.quickTo(position, 'top', easeOptions);
+      quickLeft = GsapCompose.quickTo(position, 'left', tweenOptions);
+      quickTop = GsapCompose.quickTo(position, 'top', tweenOptions);
    }
 
    /**
@@ -262,7 +263,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
 
       if (inertia) { velocityTrack.update(event.clientX, event.clientY); }
 
-      if (ease)
+      if (tween)
       {
          // Update application position.
          if (s_HAS_QUICK_TO)
@@ -274,7 +275,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
          {
             if (tweenTo) { tweenTo.kill(); }
 
-            tweenTo = GsapCompose.to(position, { left: newLeft, top: newTop, ...easeOptions });
+            tweenTo = GsapCompose.to(position, { left: newLeft, top: newTop, ...tweenOptions });
          }
       }
       else
@@ -355,17 +356,17 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
             button = options.button;
          }
 
-         if (typeof options.ease === 'boolean') { ease = options.ease; }
+         if (typeof options.tween === 'boolean') { tween = options.tween; }
          if (typeof options.inertia === 'boolean') { inertia = options.inertia; }
 
-         if (isObject(options.easeOptions))
+         if (isObject(options.tweenOptions))
          {
-            easeOptions = options.easeOptions;
+            tweenOptions = options.tweenOptions;
 
             if (s_HAS_QUICK_TO)
             {
-               quickLeft = GsapCompose.quickTo(position, 'left', easeOptions);
-               quickTop = GsapCompose.quickTo(position, 'top', easeOptions);
+               quickLeft = GsapCompose.quickTo(position, 'left', tweenOptions);
+               quickTop = GsapCompose.quickTo(position, 'top', tweenOptions);
             }
          }
 
@@ -404,71 +405,93 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
 }
 
 /**
- * Provides a store / object to make updating / setting draggableGsap options much easier.
+ * Provides an instance of the {@link draggableGsap} action options support / Readable store to make updating / setting
+ * draggableGsap options much easier. When subscribing to the options instance returned by {@link draggableGsap.options}
+ * the Subscriber handler receives the entire instance.
+ *
+ * @implements {import('./types').IDraggableGsapOptions}
  */
 class DraggableGsapOptions
 {
-   #ease = false;
+   /** @type {boolean} */
+   #initialTween;
 
-   #easeOptions = { duration: 0.06, ease: 'power3.out' };
+   /**
+    * @type {import('./types').GsapTweenOptions}
+    */
+   #initialTweenOptions;
 
-   #inertia = false;
+   /** @type {boolean} */
+   #initialInertia;
+
+   /**
+    * @type {import('./types').GsapTweenInertiaOptions}
+    */
+   #initialInertiaOptions;
+
+   /** @type {boolean} */
+   #tween;
+
+   #tweenOptions = { duration: 1, ease: 'power3.out' };
+
+   /** @type {boolean} */
+   #inertia;
 
    #inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 };
 
    /**
     * Stores the subscribers.
     *
-    * @type {import('svelte/store').Subscriber<DraggableGsapOptions>[]}
+    * @type {import('svelte/store').Subscriber<import('./types').IDraggableGsapOptions>[]}
     */
    #subscriptions = [];
 
-   constructor({ ease, easeOptions, inertia, inertiaOptions } = {})
+   constructor({ tween = false, tweenOptions, inertia = false, inertiaOptions } = {})
    {
       // Define the following getters directly on this instance and make them enumerable. This allows them to be
       // picked up w/ `Object.assign`.
 
-      Object.defineProperty(this, 'ease', {
-         get: () => { return this.#ease; },
-         set: (newEase) =>
+      Object.defineProperty(this, 'tween', {
+         get: () => { return this.#tween; },
+         set: (newTween) =>
          {
-            if (typeof newEase !== 'boolean') { throw new TypeError(`'ease' is not a boolean.`); }
+            if (typeof newTween !== 'boolean') { throw new TypeError(`'tween' is not a boolean.`); }
 
-            this.#ease = newEase;
+            this.#tween = newTween;
             this.#updateSubscribers();
          },
          enumerable: true
       });
 
-      Object.defineProperty(this, 'easeOptions', {
-         get: () => { return this.#easeOptions; },
-         set: (newEaseOptions) =>
+      Object.defineProperty(this, 'tweenOptions', {
+         get: () => { return this.#tweenOptions; },
+         set: (newTweenOptions) =>
          {
-            if (!isObject(newEaseOptions))
+            if (!isObject(newTweenOptions))
             {
-               throw new TypeError(`'easeOptions' is not an object.`);
+               throw new TypeError(`'tweenOptions' is not an object.`);
             }
 
-            if (newEaseOptions.duration !== void 0)
+            if (newTweenOptions.duration !== void 0)
             {
-               if (!Number.isFinite(newEaseOptions.duration))
+               if (!Number.isFinite(newTweenOptions.duration))
                {
-                  throw new TypeError(`'easeOptions.duration' is not a finite number.`);
+                  throw new TypeError(`'tweenOptions.duration' is not a finite number.`);
                }
 
-               if (newEaseOptions.duration < 0) { throw new Error(`'easeOptions.duration' is less than 0.`); }
+               if (newTweenOptions.duration < 0) { throw new Error(`'tweenOptions.duration' is less than 0.`); }
 
-               this.#easeOptions.duration = newEaseOptions.duration;
+               this.#tweenOptions.duration = newTweenOptions.duration;
             }
 
-            if (newEaseOptions.ease !== void 0)
+            if (newTweenOptions.ease !== void 0)
             {
-               if (typeof newEaseOptions.ease !== 'function' && typeof newEaseOptions.ease !== 'string')
+               if (typeof newTweenOptions.ease !== 'function' && typeof newTweenOptions.ease !== 'string')
                {
-                  throw new TypeError(`'easeOptions.ease' is not a function or string.`);
+                  throw new TypeError(`'tweenOptions.ease' is not a function or string.`);
                }
 
-               this.#easeOptions.ease = newEaseOptions.ease;
+               this.#tweenOptions.ease = newTweenOptions.ease;
             }
 
             this.#updateSubscribers();
@@ -588,21 +611,26 @@ class DraggableGsapOptions
       });
 
       // Set default options.
-      if (ease !== void 0) { this.ease = ease; }
-      if (easeOptions !== void 0) { this.easeOptions = easeOptions; }
+      if (tween !== void 0) { this.tween = tween; }
+      if (tweenOptions !== void 0) { this.tweenOptions = tweenOptions; }
       if (inertia !== void 0) { this.inertia = inertia; }
       if (inertiaOptions !== void 0) { this.inertiaOptions = inertiaOptions; }
+
+      this.#initialTween = this.#tween;
+      this.#initialTweenOptions = klona(this.#tweenOptions);
+      this.#initialInertia = this.#inertia;
+      this.#initialInertiaOptions = klona(this.#inertiaOptions);
    }
 
    /**
     * @returns {number} Get ease duration
     */
-   get easeDuration() { return this.#easeOptions.duration; }
+   get tweenDuration() { return this.#tweenOptions.duration; }
 
    /**
     * @returns {string|Function} Get easing function value.
     */
-   get easeValue() { return this.#easeOptions.ease; }
+   get tweenEase() { return this.#tweenOptions.ease; }
 
    /**
     * @returns {number|Array|Function} Get inertia end.
@@ -631,9 +659,9 @@ class DraggableGsapOptions
    get inertiaVelocityScale() { return this.#inertiaOptions.velocityScale; }
 
    /**
-    * @param {number}   duration - Set ease duration.
+    * @param {number}   duration - Set tween duration.
     */
-   set easeDuration(duration)
+   set tweenDuration(duration)
    {
       if (!Number.isFinite(duration))
       {
@@ -642,24 +670,23 @@ class DraggableGsapOptions
 
       if (duration < 0) { throw new Error(`'duration' is less than 0.`); }
 
-      this.#easeOptions.duration = duration;
+      this.#tweenOptions.duration = duration;
       this.#updateSubscribers();
    }
 
    /**
-    * @param {string|Function} value - Get easing function value.
+    * @param {string|import('svelte/transition').EasingFunction} value - Set tween easing function value.
     */
-   set easeValue(value)
+   set tweenEase(value)
    {
       if (typeof value !== 'function' && typeof value !== 'string')
       {
          throw new TypeError(`'value' is not a function or string.`);
       }
 
-      this.#easeOptions.ease = value;
+      this.#tweenOptions.ease = value;
       this.#updateSubscribers();
    }
-
 
    /**
     * @param {number|Array|Function} end - Set inertia end.
@@ -749,40 +776,58 @@ class DraggableGsapOptions
    }
 
    /**
-    * Resets all options data to default values.
+    * Resets all options data to initial values.
     */
    reset()
    {
-      this.#ease = true;
-      this.#inertia = false;
-      this.#easeOptions = { duration: 0.06, ease: 'power3.out' };
-      this.#inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 };
+      this.#tween = this.#initialTween;
+      this.#inertia = this.#initialInertia;
+      this.#tweenOptions = klona(this.#initialTweenOptions);
+      this.#inertiaOptions = klona(this.#initialInertiaOptions);
       this.#updateSubscribers();
    }
 
    /**
-    * Resets easing options to default values.
+    * Resets tween enabled state to initial value.
     */
-   resetEase()
+   resetTween()
    {
-      this.#easeOptions = { duration: 0.06, ease: 'power3.out' };
+      this.#tween = this.#initialTween;
       this.#updateSubscribers();
    }
 
    /**
-    * Resets inertia options to default values.
+    * Resets tween options to initial values.
+    */
+   resetTweenOptions()
+   {
+      this.#tweenOptions = klona(this.#initialTweenOptions);
+      this.#updateSubscribers();
+   }
+
+   /**
+    * Resets inertia enabled state to initial value.
     */
    resetInertia()
    {
-      this.#inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 };
+      this.#inertia = this.#initialInertia;
+      this.#updateSubscribers();
+   }
+
+   /**
+    * Resets inertia options to initial values.
+    */
+   resetInertiaOptions()
+   {
+      this.#inertiaOptions = klona(this.#initialInertiaOptions);
       this.#updateSubscribers();
    }
 
    /**
     * Store subscribe method.
     *
-    * @param {import('svelte/store').Subscriber<DraggableGsapOptions>} handler - Callback function that is invoked on
-    * update / changes. Receives the DraggableOptions object / instance.
+    * @param {import('svelte/store').Subscriber<import('./types').IDraggableGsapOptions>} handler - Callback function
+    *        that is invoked on update / changes. Receives the IDraggableGsapOptions object / instance.
     *
     * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
     */
@@ -816,12 +861,16 @@ class DraggableGsapOptions
 }
 
 /**
- * Define a function to get a DraggableGsapOptions instance.
+ * Define a function to get an IDraggableGsapOptions instance.
  *
- * @param {{ ease?: boolean, easeOptions?: object, inertia?: boolean, inertiaOptions?: object }} options -
- *        DraggableGsapOptions.
+ * @param {({
+ *    tween?: boolean,
+ *    tweenOptions?: import('./types').GsapTweenOptions,
+ *    inertia?: boolean,
+ *    inertiaOptions?: import('./types').GsapInertiaOptions
+ * })} options - Initial options for IDraggableGsapOptions.
  *
- * @returns {import('./types').DraggableGsapOptions} A new options instance.
+ * @returns {import('./types').IDraggableGsapOptions} A new options instance.
  */
 draggableGsap.options = (options) => new DraggableGsapOptions(options);
 

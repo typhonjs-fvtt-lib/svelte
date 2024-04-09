@@ -1,34 +1,69 @@
-import type {
-   Subscriber,
-   Unsubscriber } from 'svelte/store';
+import type { Readable }         from 'svelte/store';
+import type { EasingFunction }   from 'svelte/transition';
 
 /**
- * Provides a store / object to make updating / setting draggableGsap options much easier.
+ * Defines Gsap tween options.
  */
-export interface DraggableGsapOptions
+type GsapTweenOptions = {
+   /**
+    * Duration in seconds; default: 1
+    */
+   duration?: number,
+
+   /**
+    * Easing function; default: 'power3.out'
+    */
+   ease?: string | EasingFunction
+}
+
+/**
+ * Defines options for the inertia plugin / tween options.
+ *
+ * @see https://greensock.com/docs/v3/Plugins/InertiaPlugin
+ */
+type GsapInertiaOptions = {
+   end?: Number | [] | Function,
+   duration?: { min: number, max: number },
+   resistance?: number,
+   velocityScale?: number
+}
+
+/**
+ * Provides an interface of the {@link draggableGsap} action options support / Readable store to make updating / setting
+ * draggableGsap options much easier. When subscribing to the options instance returned by {@link draggableGsap.options}
+ * the Subscriber handler receives the entire instance.
+ */
+interface IDraggableGsapOptions extends Readable<IDraggableGsapOptions>
 {
-   ease: boolean;
+   /**
+    * Tweening enabled state.
+    */
+   tween: boolean;
 
-   easeOptions: { duration: number, ease: string };
+   /**
+    * GSAP tween options for easing function and duration.
+    */
+   tweenOptions: GsapTweenOptions;
 
+   /**
+    * Inertia enabled state.
+    */
    inertia: boolean;
 
-   inertiaOptions: {
-      end?: Number | [] | Function,
-      duration: { min: number, max: number },
-      resistance: number,
-      velocityScale: number
-   };
+   /**
+    * Inertia options.
+    */
+   inertiaOptions: GsapInertiaOptions;
 
    /**
     * @returns {number} Get ease duration
     */
-   get easeDuration(): number;
+   get tweenDuration(): number;
 
    /**
-    * @returns {string | Function} Get easing function value.
+    * @returns {string | EasingFunction} Get easing function value.
     */
-   get easeValue(): string | Function;
+   get tweenEase(): string | Function;
 
    /**
     * @returns {number} Get inertia duration max time (seconds)
@@ -59,12 +94,12 @@ export interface DraggableGsapOptions
    /**
     * @param {number}   duration - Set ease duration.
     */
-   set easeDuration(duration: number);
+   set tweenDuration(duration: number);
 
    /**
     * @param {string | Function} value - Get easing function value.
     */
-   set easeValue(value: string | Function);
+   set tweenEase(value: string | Function);
 
    /**
     * @param {{min: number, max: number}} duration - Set inertia duration min & max.
@@ -99,27 +134,33 @@ export interface DraggableGsapOptions
    set inertiaVelocityScale(velocityScale: number);
 
    /**
-    * Resets all options data to default values.
+    * Resets all options data to initial values.
     */
    reset(): void;
 
    /**
-    * Resets easing options to default values.
+    * Resets tween enabled state to initial value.
     */
-   resetEase(): void;
+   resetTween(): void;
 
    /**
-    * Resets inertia options to default values.
+    * Resets tween options to initial values.
+    */
+   resetTweenOptions(): void;
+
+   /**
+    * Resets inertia enabled state to initial value.
     */
    resetInertia(): void;
 
    /**
-    * Store subscribe method.
-    *
-    * @param {Subscriber<DraggableGsapOptions>} handler - Callback function that is invoked on update / changes.
-    *        Receives the DraggableOptions object / instance.
-    *
-    * @returns {Unsubscriber} Unsubscribe function.
+    * Resets inertia options to initial values.
     */
-   subscribe(handler: Subscriber<DraggableGsapOptions>): Unsubscriber;
+   resetInertiaOptions(): void;
+}
+
+export {
+   GsapInertiaOptions,
+   GsapTweenOptions,
+   IDraggableGsapOptions
 }
