@@ -54,6 +54,13 @@ const s_POSITION_GET_OPTIONS = {
 export class GsapPosition
 {
    /**
+    * Defines the options used for {@link TJSPosition.set}.
+    *
+    * @type {Readonly<{immediateElementUpdate: boolean}>}
+    */
+   static #tjsPositionSetOptions = Object.freeze({ immediateElementUpdate: true });
+
+   /**
     * @param {TJSPosition} tjsPosition - TJSPosition instance.
     *
     * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
@@ -86,7 +93,7 @@ export class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionData = s_GET_POSITIONINFO(tjsPosition, vars, filter).positionData;
+      const positionData = GsapPosition.#getPositionInfo(tjsPosition, vars, filter).positionData;
 
       return gsap.from(positionData, vars);
    }
@@ -131,7 +138,7 @@ export class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionData = s_GET_POSITIONINFO(tjsPosition, toVars, filter).positionData;
+      const positionData = GsapPosition.#getPositionInfo(tjsPosition, toVars, filter).positionData;
 
       return gsap.fromTo(positionData, fromVars, toVars);
    }
@@ -169,7 +176,7 @@ export class GsapPosition
       // Add specific key specified to initial `positionData`.
       if (s_POSITION_KEYS.has(key)) { s_POSITION_PROPS.add(key); }
 
-      const positionData = s_GET_POSITIONINFO(tjsPosition, vars, filter).positionData;
+      const positionData = GsapPosition.#getPositionInfo(tjsPosition, vars, filter).positionData;
 
       return gsap.quickTo(positionData, key, vars);
    }
@@ -224,7 +231,7 @@ export class GsapPosition
          for (const prop of initialProps) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionInfo = s_GET_POSITIONINFO(tjsPosition, timelineOptions, filter, gsapData);
+      const positionInfo = GsapPosition.#getPositionInfo(tjsPosition, timelineOptions, filter, gsapData);
 
       const optionPosition = options?.position;
 
@@ -371,9 +378,171 @@ export class GsapPosition
          if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
       }
 
-      const positionData = s_GET_POSITIONINFO(tjsPosition, vars, filter).positionData;
+      const positionData = GsapPosition.#getPositionInfo(tjsPosition, vars, filter).positionData;
 
       return gsap.to(positionData, vars);
+   }
+
+   // Internal implementation ----------------------------------------------------------------------------------------
+
+   /**
+    * @param {TJSPosition|Iterable<TJSPosition>}   tjsPositions -
+    *
+    * @param {object}                        vars -
+    *
+    * @param {Function}                      filter -
+    *
+    * @param {object[]|Function}             [gsapData] -
+    *
+    * @returns {import('../').TJSPositionInfo} A TJSPositionInfo instance.
+    */
+   static #getPositionInfo(tjsPositions, vars, filter, gsapData)
+   {
+      /** @type {import('../').TJSPositionInfo} */
+      const positionInfo = {
+         position: [],
+         positionData: [],
+         data: [],
+         elements: [],
+         gsapData: [],
+      };
+
+      // If gsapData is a function invoke it w/ the current TJSPosition instance and position data to retrieve a unique
+      // gsapData object. If null / undefined is returned this entry is ignored.
+      if (typeof gsapData === 'function')
+      {
+         let index = 0;
+
+         const gsapDataOptions = {
+            index,
+            position: void 0,
+            data: void 0
+         };
+
+         const populateData = (entry) =>
+         {
+            const isPosition = entry instanceof TJSPosition;
+
+            gsapDataOptions.index = index++;
+            gsapDataOptions.position = isPosition ? entry : entry.position;
+            gsapDataOptions.data = isPosition ? void 0 : entry;
+
+            const finalGsapData = gsapData(gsapDataOptions);
+
+            if (!isIterable(finalGsapData))
+            {
+               throw new TypeError(
+                `GsapCompose error: gsapData callback function iteration(${
+                  index - 1}) failed to return an iterable list.`);
+            }
+
+            s_VALIDATE_GSAPDATA_ENTRY(finalGsapData);
+
+            positionInfo.gsapData.push(finalGsapData);
+         };
+
+         if (isIterable(tjsPositions))
+         {
+            for (const entry of tjsPositions) { populateData(entry); }
+         }
+         else
+         {
+            populateData(tjsPositions);
+         }
+      }
+      else if (isIterable(gsapData))
+      {
+         s_VALIDATE_GSAPDATA_ENTRY(gsapData);
+
+         positionInfo.gsapData.push(gsapData);
+      }
+
+      const existingOnUpdate = vars.onUpdate;
+
+      if (isIterable(tjsPositions))
+      {
+         for (const entry of tjsPositions)
+         {
+            const isPosition = entry instanceof TJSPosition;
+
+            const position = isPosition ? entry : entry.position;
+            const data = isPosition ? void 0 : entry;
+            const positionData = position.get({}, s_POSITION_GET_OPTIONS);
+
+            positionInfo.position.push(position);
+            positionInfo.positionData.push(positionData);
+            positionInfo.data.push(data);
+            positionInfo.elements.push(position.element);
+         }
+      }
+      else
+      {
+         const isPosition = tjsPositions instanceof TJSPosition;
+
+         const position = isPosition ? tjsPositions : tjsPositions.position;
+         const data = isPosition ? void 0 : tjsPositions;
+         const positionData = position.get({}, s_POSITION_GET_OPTIONS);
+
+         positionInfo.position.push(position);
+         positionInfo.positionData.push(positionData);
+         positionInfo.data.push(data);
+         positionInfo.elements.push(position.element);
+      }
+
+      if (typeof filter === 'function')
+      {
+         // Preserve invoking existing onUpdate function.
+         if (typeof existingOnUpdate === 'function')
+         {
+            vars.onUpdate = () =>
+            {
+               for (let cntr = 0; cntr < positionInfo.position.length; cntr++)
+               {
+                  positionInfo.position[cntr].set(filter(positionInfo.positionData[cntr]),
+                   GsapPosition.#tjsPositionSetOptions);
+               }
+               existingOnUpdate();
+            };
+         }
+         else
+         {
+            vars.onUpdate = () =>
+            {
+               for (let cntr = 0; cntr < positionInfo.position.length; cntr++)
+               {
+                  positionInfo.position[cntr].set(filter(positionInfo.positionData[cntr]),
+                   GsapPosition.#tjsPositionSetOptions);
+               }
+            };
+         }
+      }
+      else
+      {
+         // Preserve invoking existing onUpdate function.
+         if (typeof existingOnUpdate === 'function')
+         {
+            vars.onUpdate = () =>
+            {
+               for (let cntr = 0; cntr < positionInfo.position.length; cntr++)
+               {
+                  positionInfo.position[cntr].set(positionInfo.positionData[cntr], GsapPosition.#tjsPositionSetOptions);
+               }
+               existingOnUpdate();
+            };
+         }
+         else
+         {
+            vars.onUpdate = () =>
+            {
+               for (let cntr = 0; cntr < positionInfo.position.length; cntr++)
+               {
+                  positionInfo.position[cntr].set(positionInfo.positionData[cntr], GsapPosition.#tjsPositionSetOptions);
+               }
+            };
+         }
+      }
+
+      return positionInfo;
    }
 }
 
@@ -541,163 +710,6 @@ class TimelinePositionImpl
    }
 }
 
-/**
- * @param {TJSPosition|Iterable<TJSPosition>}   tjsPositions -
- *
- * @param {object}                        vars -
- *
- * @param {Function}                      filter -
- *
- * @param {object[]|Function}             [gsapData] -
- *
- * @returns {import('../').TJSPositionInfo} A TJSPositionInfo instance.
- */
-function s_GET_POSITIONINFO(tjsPositions, vars, filter, gsapData)
-{
-   /** @type {import('../').TJSPositionInfo} */
-   const positionInfo = {
-      position: [],
-      positionData: [],
-      data: [],
-      elements: [],
-      gsapData: [],
-   };
-
-   // If gsapData is a function invoke it w/ the current TJSPosition instance and position data to retrieve a unique
-   // gsapData object. If null / undefined is returned this entry is ignored.
-   if (typeof gsapData === 'function')
-   {
-      let index = 0;
-
-      const gsapDataOptions = {
-         index,
-         position: void 0,
-         data: void 0
-      };
-
-      const populateData = (entry) =>
-      {
-         const isPosition = entry instanceof TJSPosition;
-
-         gsapDataOptions.index = index++;
-         gsapDataOptions.position = isPosition ? entry : entry.position;
-         gsapDataOptions.data = isPosition ? void 0 : entry;
-
-         const finalGsapData = gsapData(gsapDataOptions);
-
-         if (!isIterable(finalGsapData))
-         {
-            throw new TypeError(
-             `GsapCompose error: gsapData callback function iteration(${
-               index - 1}) failed to return an iterable list.`);
-         }
-
-         s_VALIDATE_GSAPDATA_ENTRY(finalGsapData);
-
-         positionInfo.gsapData.push(finalGsapData);
-      };
-
-      if (isIterable(tjsPositions))
-      {
-         for (const entry of tjsPositions) { populateData(entry); }
-      }
-      else
-      {
-         populateData(tjsPositions);
-      }
-   }
-   else if (isIterable(gsapData))
-   {
-      s_VALIDATE_GSAPDATA_ENTRY(gsapData);
-
-      positionInfo.gsapData.push(gsapData);
-   }
-
-   const existingOnUpdate = vars.onUpdate;
-
-   if (isIterable(tjsPositions))
-   {
-      for (const entry of tjsPositions)
-      {
-         const isPosition = entry instanceof TJSPosition;
-
-         const position = isPosition ? entry : entry.position;
-         const data = isPosition ? void 0 : entry;
-         const positionData = position.get({ immediateElementUpdate: true }, s_POSITION_GET_OPTIONS);
-
-         positionInfo.position.push(position);
-         positionInfo.positionData.push(positionData);
-         positionInfo.data.push(data);
-         positionInfo.elements.push(position.element);
-      }
-   }
-   else
-   {
-      const isPosition = tjsPositions instanceof TJSPosition;
-
-      const position = isPosition ? tjsPositions : tjsPositions.position;
-      const data = isPosition ? void 0 : tjsPositions;
-      const positionData = position.get({ immediateElementUpdate: true }, s_POSITION_GET_OPTIONS);
-
-      positionInfo.position.push(position);
-      positionInfo.positionData.push(positionData);
-      positionInfo.data.push(data);
-      positionInfo.elements.push(position.element);
-   }
-
-   if (typeof filter === 'function')
-   {
-      // Preserve invoking existing onUpdate function.
-      if (typeof existingOnUpdate === 'function')
-      {
-         vars.onUpdate = () =>
-         {
-            for (let cntr = 0; cntr < positionInfo.position.length; cntr++)
-            {
-               positionInfo.position[cntr].set(filter(positionInfo.positionData[cntr]));
-            }
-            existingOnUpdate();
-         };
-      }
-      else
-      {
-         vars.onUpdate = () =>
-         {
-            for (let cntr = 0; cntr < positionInfo.position.length; cntr++)
-            {
-               positionInfo.position[cntr].set(filter(positionInfo.positionData[cntr]));
-            }
-         };
-      }
-   }
-   else
-   {
-      // Preserve invoking existing onUpdate function.
-      if (typeof existingOnUpdate === 'function')
-      {
-         vars.onUpdate = () =>
-         {
-            for (let cntr = 0; cntr < positionInfo.position.length; cntr++)
-            {
-               positionInfo.position[cntr].set(positionInfo.positionData[cntr]);
-            }
-            existingOnUpdate();
-         };
-      }
-      else
-      {
-         vars.onUpdate = () =>
-         {
-            for (let cntr = 0; cntr < positionInfo.position.length; cntr++)
-            {
-               positionInfo.position[cntr].set(positionInfo.positionData[cntr]);
-            }
-         };
-      }
-   }
-
-   return positionInfo;
-}
 
 /**
  * Validates `gsapData` entries.
