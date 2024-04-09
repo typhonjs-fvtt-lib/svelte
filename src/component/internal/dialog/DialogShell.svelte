@@ -296,12 +296,12 @@
    <TJSGlassPane id={`${application.id}-glasspane`} {...modalProps} {zIndex}
                  on:glasspane:close={() => application.close()}
                  on:glasspane:keydown:escape={() => application.close()}>
-      <ApplicationShell bind:elementRoot bind:elementContent {...appProps} appOffsetHeight={true}>
+      <ApplicationShell bind:elementRoot bind:elementContent {...appProps}>
          <DialogContent bind:dialogComponent {data} stopPropagation={true} />
       </ApplicationShell>
    </TJSGlassPane>
 {:else}
-   <ApplicationShell bind:elementRoot bind:elementContent {...appProps} appOffsetHeight={true}>
+   <ApplicationShell bind:elementRoot bind:elementContent {...appProps}>
       <DialogContent bind:dialogComponent {data} />
    </ApplicationShell>
 {/if}
