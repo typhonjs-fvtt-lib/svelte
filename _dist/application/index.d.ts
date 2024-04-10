@@ -3,7 +3,11 @@ import { TJSSvelteConfig } from '@typhonjs-svelte/runtime-base/svelte/util';
 import * as _typhonjs_svelte_runtime_base_svelte_store_web_storage from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import { TJSWebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import * as _typhonjs_svelte_runtime_base_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
-import { TJSPositionDataExtended, TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
+import {
+  TJSPositionDataExtended,
+  TJSPositionTypes,
+  TJSPosition,
+} from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import * as _typhonjs_svelte_runtime_base_util_browser from '@typhonjs-svelte/runtime-base/util/browser';
 import { SvelteComponent } from 'svelte';
 import { Readable, Writable } from 'svelte/store';
@@ -679,8 +683,10 @@ type StoreUIOptions = {
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
  * {@link TJSSvelteConfig} object in the SvelteApplicationOptions `options` {@link SvelteApplicationOptions.svelte}
  * property.
+ *
+ * @implements {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionTypes.IPositionable}
  */
-declare class SvelteApplication {
+declare class SvelteApplication implements TJSPositionTypes.IPositionable {
   /**
    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} options - The options for the application.
    *

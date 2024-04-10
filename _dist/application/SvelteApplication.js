@@ -25,6 +25,8 @@ import {
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
  * {@link TJSSvelteConfig} object in the SvelteApplicationOptions `options` {@link SvelteApplicationOptions.svelte}
  * property.
+ *
+ * @implements {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionTypes.IPositionable}
  */
 export class SvelteApplication extends Application
 {
