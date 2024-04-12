@@ -26,7 +26,7 @@ import {
  * {@link TJSSvelteConfig} object in the SvelteApplicationOptions `options` {@link SvelteApplicationOptions.svelte}
  * property.
  *
- * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.IPositionable}
+ * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
  */
 export class SvelteApplication extends Application
 {
