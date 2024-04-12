@@ -684,9 +684,9 @@ type StoreUIOptions = {
  * {@link TJSSvelteConfig} object in the SvelteApplicationOptions `options` {@link SvelteApplicationOptions.svelte}
  * property.
  *
- * @implements {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionTypes.IPositionable}
+ * @implements {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionTypes.Positionable}
  */
-declare class SvelteApplication implements TJSPositionTypes.IPositionable {
+declare class SvelteApplication implements TJSPositionTypes.Positionable {
   /**
    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} options - The options for the application.
    *
@@ -731,7 +731,6 @@ declare class SvelteApplication implements TJSPositionTypes.IPositionable {
    * @returns {import('./internal/state-svelte/types').GetSvelteData} GetSvelteData
    */
   get svelte(): GetSvelteData;
-  _state: any;
   /**
    * Provides a mechanism to update the UI options store for maximized.
    *
@@ -1450,7 +1449,7 @@ type SvelteApplicationOptions = {
    * A helper for
    * initial position placement.
    */
-  positionInitial?: _typhonjs_svelte_runtime_base_svelte_store_position.System.Initial.IInitialSystem;
+  positionInitial?: _typhonjs_svelte_runtime_base_svelte_store_position.System.Initial.InitialSystem;
   /**
    * When true TJSPosition is optimized for orthographic use.
    */
@@ -1459,7 +1458,7 @@ type SvelteApplicationOptions = {
    * A validator
    * function or data or list of validators.
    */
-  positionValidator?: _typhonjs_svelte_runtime_base_svelte_store_position.IValidatorAPI.Options;
+  positionValidator?: _typhonjs_svelte_runtime_base_svelte_store_position.ValidatorAPI.Options;
   /**
    * An instance of
    * TJSWebStorage (session) to share across SvelteApplications.
@@ -1474,7 +1473,7 @@ type SvelteApplicationOptions = {
    * By
    * default, 'top / left' respects rotation when minimizing.
    */
-  transformOrigin?: _typhonjs_svelte_runtime_base_svelte_store_position.ITransformAPI.TransformOrigin;
+  transformOrigin?: _typhonjs_svelte_runtime_base_svelte_store_position.TransformAPI.TransformOrigin;
 };
 
 export {

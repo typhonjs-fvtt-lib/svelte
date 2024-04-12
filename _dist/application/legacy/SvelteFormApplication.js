@@ -329,7 +329,16 @@ export class SvelteFormApplication extends FormApplication
        * @type {HTMLElement}
        */
       const el = this.#elementTarget;
-      if (!el) { return this._state = states.CLOSED; }
+      if (!el)
+      {
+         /**
+          * @ignore
+          * @internal
+          */
+         this._state = states.CLOSED;
+
+         return;
+      }
 
       // Support for PopOut! module; `close` is double invoked; once before the element is rejoined to the main window.
       // Reject close invocations when the element window is not the main originating window / globalThis.
@@ -409,7 +418,7 @@ export class SvelteFormApplication extends FormApplication
       }
 
       // Await all Svelte components to destroy.
-      await Promise.all(svelteDestroyPromises);
+      await Promise.allSettled(svelteDestroyPromises);
 
       // Reset SvelteData like this to maintain reference to GetSvelteData / `this.svelte`.
       this.#svelteData.length = 0;

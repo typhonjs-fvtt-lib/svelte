@@ -26,7 +26,7 @@ import {
  * {@link TJSSvelteConfig} object in the SvelteApplicationOptions `options` {@link SvelteApplicationOptions.svelte}
  * property.
  *
- * @implements {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionTypes.IPositionable}
+ * @implements {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionTypes.Positionable}
  */
 export class SvelteApplication extends Application
 {
@@ -305,7 +305,16 @@ export class SvelteApplication extends Application
        * @type {HTMLElement}
        */
       const el = this.#elementTarget;
-      if (!el) { return this._state = states.CLOSED; }
+      if (!el)
+      {
+         /**
+          * @ignore
+          * @internal
+          */
+         this._state = states.CLOSED;
+
+         return;
+      }
 
       // Support for PopOut! module; `close` is double invoked; once before the element is rejoined to the main window.
       // Reject close invocations when the element window is not the main originating window / globalThis.
@@ -385,7 +394,7 @@ export class SvelteApplication extends Application
       }
 
       // Await all Svelte components to destroy.
-      await Promise.all(svelteDestroyPromises);
+      await Promise.allSettled(svelteDestroyPromises);
 
       // Remove from all visible apps tracked.
       TJSAppIndex.delete(this);

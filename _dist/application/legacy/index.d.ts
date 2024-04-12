@@ -70,7 +70,6 @@ declare class SvelteFormApplication {
    * @returns {import('@typhonjs-fvtt/svelte/application').GetSvelteData} GetSvelteData
    */
   get svelte(): _typhonjs_fvtt_svelte_application.GetSvelteData;
-  _state: any;
   /**
    * Provides a mechanism to update the UI options store for maximized.
    *
