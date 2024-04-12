@@ -329,7 +329,16 @@ export class SvelteFormApplication extends FormApplication
        * @type {HTMLElement}
        */
       const el = this.#elementTarget;
-      if (!el) { return this._state = states.CLOSED; }
+      if (!el)
+      {
+         /**
+          * @ignore
+          * @internal
+          */
+         this._state = states.CLOSED;
+
+         return;
+      }
 
       // Support for PopOut! module; `close` is double invoked; once before the element is rejoined to the main window.
       // Reject close invocations when the element window is not the main originating window / globalThis.
