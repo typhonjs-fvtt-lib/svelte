@@ -409,7 +409,7 @@ export class SvelteFormApplication extends FormApplication
       }
 
       // Await all Svelte components to destroy.
-      await Promise.all(svelteDestroyPromises);
+      await Promise.allSettled(svelteDestroyPromises);
 
       // Reset SvelteData like this to maintain reference to GetSvelteData / `this.svelte`.
       this.#svelteData.length = 0;

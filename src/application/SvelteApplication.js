@@ -385,7 +385,7 @@ export class SvelteApplication extends Application
       }
 
       // Await all Svelte components to destroy.
-      await Promise.all(svelteDestroyPromises);
+      await Promise.allSettled(svelteDestroyPromises);
 
       // Remove from all visible apps tracked.
       TJSAppIndex.delete(this);
