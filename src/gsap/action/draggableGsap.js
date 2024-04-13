@@ -25,7 +25,8 @@ const s_HAS_QUICK_TO = false;
  *
  * @param {import('./types').Action.DraggableGsapOptions} options - Draggable Gsap options.
  *
- * @returns {import('svelte/action').ActionReturn<Record<string, any>>} Lifecycle functions.
+ * @returns {import('svelte/action').ActionReturn<Partial<import('./types').Action.DraggableGsapOptions>>} Action
+ *          lifecycle functions.
  */
 function draggableGsap(node, { position, enabled = true, button = 0, storeDragging = void 0, tween = false,
  inertia = false, tweenOptions = { duration: 1, ease: 'power3.out' },

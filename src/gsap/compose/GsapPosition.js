@@ -63,7 +63,8 @@ export class GsapPosition
    /**
     * @param {TJSPosition} tjsPosition - TJSPosition instance.
     *
-    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+    *        population.
     *
     * @param {object}   vars - GSAP vars object for `from`.
     *
@@ -101,7 +102,8 @@ export class GsapPosition
    /**
     * @param {TJSPosition} tjsPosition - TJSPosition instance.
     *
-    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+    *        population.
     *
     * @param {object}   fromVars - GSAP fromVars object for `fromTo`
     *
@@ -146,7 +148,8 @@ export class GsapPosition
    /**
     * @param {TJSPosition} tjsPosition - TJSPosition instance.
     *
-    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+    *        population.
     *
     * @param {string}   key - Property of position to manipulate.
     *
@@ -184,12 +187,14 @@ export class GsapPosition
    /**
     * @param {TJSPosition | Iterable<TJSPosition>}   tjsPosition - TJSPosition instance.
     *
-    * @param {object | import('../').GsapData}  arg1 - Either an object defining timelineOptions or GsapData.
+    * @param {object | import('./types').Compose.GsapData}  arg1 - Either an object defining timelineOptions or
+    *        GsapData.
     *
-    * @param {import('../').GsapData | import('../').GsapPositionOptions}  [arg2] - When arg1 is defined as an object;
-    *        arg2 defines GsapData.
+    * @param {import('./types').Compose.GsapData | import('./types').Compose.GsapPositionOptions}  [arg2] - When arg1
+    *        is defined as an object; arg2 defines GsapData.
     *
-    * @param {import('../').GsapPositionOptions}   [arg3] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions}   [arg3] - Options for filtering and initial data
+    *        population.
     *
     * @returns {object} GSAP timeline
     */
@@ -202,7 +207,7 @@ export class GsapPosition
       // If arg1 is an array then take it as `gsapData` otherwise select arg2.
       const gsapData = isIterable(arg1) || typeof arg1 === 'function' ? arg1 : arg2;
 
-      /** @type {import('../').GsapPositionOptions} */
+      /** @type {import('./types').Compose.GsapPositionOptions} */
       const options = gsapData === arg1 ? arg2 : arg3;
 
       if (!isObject(timelineOptions))
@@ -348,7 +353,8 @@ export class GsapPosition
    /**
     * @param {TJSPosition | TJSPosition[]} tjsPosition - TJSPosition instance.
     *
-    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+    *        population.
     *
     * @param {object}   vars - GSAP vars object for `to`.
     *
@@ -394,11 +400,11 @@ export class GsapPosition
     *
     * @param {object[]|Function}             [gsapData] -
     *
-    * @returns {import('../').TJSPositionInfo} A TJSPositionInfo instance.
+    * @returns {import('./types').Compose.TJSPositionInfo} A TJSPositionInfo instance.
     */
    static #getPositionInfo(tjsPositions, vars, filter, gsapData)
    {
-      /** @type {import('../').TJSPositionInfo} */
+      /** @type {import('./types').Compose.TJSPositionInfo} */
       const positionInfo = {
          position: [],
          positionData: [],

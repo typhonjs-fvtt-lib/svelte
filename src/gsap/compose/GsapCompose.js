@@ -19,12 +19,12 @@ import { TimelineImpl } from './TimelineImpl.js';
 export class GsapCompose
 {
    /**
-    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('./types').Compose.GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   vars - GSAP vars object for `from`.
     *
-    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population for
-    *        TJSPosition tweens.
+    * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+    *        population for TJSPosition tweens.
     *
     * @returns {object} GSAP tween
     */
@@ -42,13 +42,14 @@ export class GsapCompose
    }
 
    /**
-    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('./types').Compose.GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   fromVars - GSAP fromVars object for `fromTo`
     *
     * @param {object}   toVars - GSAP toVars object for `fromTo`.
     *
-    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+    *        population.
     *
     * @returns {object} GSAP tween
     */
@@ -84,13 +85,14 @@ export class GsapCompose
    }
 
    /**
-    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('./types').Compose.GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {string}   key - Property of position to manipulate.
     *
     * @param {object}   vars - GSAP vars object for `quickTo`.
     *
-    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+    *        population.
     *
     * @returns {Function}  GSAP quickTo function.
     */
@@ -135,14 +137,15 @@ export class GsapCompose
    }
 
    /**
-    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('./types').Compose.GsapTarget} target - A standard GSAP target or TJSPosition.
     *
-    * @param {object | import('../').GsapData}   [arg1] - Either an object defining timeline options or GsapData.
+    * @param {object | import('./types').Compose.GsapData}   [arg1] - Either an object defining timeline options or
+    *        GsapData.
     *
-    * @param {import('../').GsapData | import('../').GsapPositionOptions} [arg2] - When arg1 is defined as an object;
-    *        arg2 defines GsapData.
+    * @param {import('./types').Compose.GsapData | import('./types').Compose.GsapPositionOptions} [arg2] - When arg1 is
+    *        defined as an object; arg2 defines GsapData.
     *
-    * @param {import('../').GsapPositionOptions} [arg3] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions} [arg3] - Options for filtering and initial data population.
     *
     * @returns {object} GSAP timeline
     */
@@ -172,7 +175,7 @@ export class GsapCompose
       // If arg1 is an array then take it as `gsapData` otherwise select arg2.
       const gsapData = isIterable(arg1) ? arg1 : arg2;
 
-      /** @type {import('../').GsapPositionOptions} */
+      /** @type {import('./types').Compose.GsapPositionOptions} */
       const options = gsapData === arg1 ? arg2 : arg3;
 
       if (!isObject(timelineOptions))
@@ -258,11 +261,12 @@ export class GsapCompose
    }
 
    /**
-    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('./types').Compose.GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   vars - GSAP vars object for `to`.
     *
-    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+    *        population.
     *
     * @returns {object} GSAP tween
     */
