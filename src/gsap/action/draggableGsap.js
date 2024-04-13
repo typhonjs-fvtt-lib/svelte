@@ -27,7 +27,7 @@ const s_HAS_QUICK_TO = false;
  *
  * @returns {import('svelte/action').ActionReturn<Record<string, any>>} Lifecycle functions.
  */
-function draggableGsap(node, { position, active = true, button = 0, storeDragging = void 0, tween = false,
+function draggableGsap(node, { position, enabled = true, button = 0, storeDragging = void 0, tween = false,
  inertia = false, tweenOptions = { duration: 1, ease: 'power3.out' },
   inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 },
    hasTargetClassList, ignoreTargetClassList })
@@ -138,7 +138,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
       node.classList.remove('draggable');
    }
 
-   if (active)
+   if (enabled)
    {
       activateListeners();
    }
@@ -324,7 +324,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
    }
 
    return {
-      // The default of active being true won't automatically add listeners twice.
+      // The default of enabled being true won't automatically add listeners twice.
       update: (options) =>
       {
          if (options.position !== void 0)
@@ -347,10 +347,10 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
             }
          }
 
-         if (typeof options.active === 'boolean')
+         if (typeof options.enabled === 'boolean')
          {
-            active = options.active;
-            if (active) { activateListeners(); }
+            enabled = options.enabled;
+            if (enabled) { activateListeners(); }
             else { removeListeners(); }
          }
 

@@ -22,16 +22,16 @@ namespace Action {
       position: TJSPosition | TJSPositionTypes.Positionable;
 
       /**
-       * A boolean value; controlling the `enabled` state.
-       */
-      active?: boolean;
-
-      /**
        * MouseEvent button that activates dragging; default: 0
        *
        * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
        */
       button?: number;
+
+      /**
+       * A boolean value; controlling the `enabled` state.
+       */
+      enabled?: boolean;
 
       /**
        *  When defined any event targets that have a class in this list are allowed.
