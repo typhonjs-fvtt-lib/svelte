@@ -23,31 +23,7 @@ const s_HAS_QUICK_TO = false;
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
- * @param {object}            params - Required parameters.
- *
- * @param {import('#runtime/svelte/store/position').TJSPosition}   params.position - A position instance.
- *
- * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
- *
- * @param {number}            [params.button=0] - MouseEvent button;
- *        {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
- *
- * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
- *        state.
- *
- * @param {boolean}           [params.tween=false] - When true tweening is enabled.
- *
- * @param {boolean}           [params.inertia=false] - When true inertia easing is enabled.
- *
- * @param {import('./types').GsapTweenOptions}  [params.tweenOptions] - Gsap `to / `quickTo` tween vars object.
- *
- * @param {import('./types').GsapInertiaOptions}   [params.inertiaOptions] - Inertia Options.
- *
- * @param {Iterable<string>}  [params.hasTargetClassList] - When defined any event targets that has any class in this
- *                                                          list are allowed.
- *
- * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
- *                                                             list are ignored.
+ * @param {import('./types').Action.DraggableGsapOptions} options - Draggable Gsap options.
  *
  * @returns {import('svelte/action').ActionReturn<Record<string, any>>} Lifecycle functions.
  */
@@ -65,6 +41,13 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
    {
       throw new TypeError(`'ignoreTargetClassList' is not iterable.`);
    }
+
+   /**
+    * Find actual position instance checking for a Positionable instance.
+    *
+    * @type {import('#runtime/svelte/store/position').TJSPosition}
+    */
+   let actualPosition = position?.position ?? position;
 
    /**
     * Duplicate the app / Positionable starting position to track differences.
@@ -127,8 +110,8 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
 
    if (s_HAS_QUICK_TO)
    {
-      quickLeft = GsapCompose.quickTo(position, 'left', tweenOptions);
-      quickTop = GsapCompose.quickTo(position, 'top', tweenOptions);
+      quickLeft = GsapCompose.quickTo(actualPosition, 'left', tweenOptions);
+      quickTop = GsapCompose.quickTo(actualPosition, 'top', tweenOptions);
    }
 
    /**
@@ -170,7 +153,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
       if (event.button !== button || !event.isPrimary) { return; }
 
       // Do not process if the position system is not enabled.
-      if (!position.enabled) { return; }
+      if (!actualPosition.enabled) { return; }
 
       // Potentially ignore this event if `ignoreTargetClassList` is defined and the `event.target` has a matching
       // class.
@@ -205,7 +188,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
       dragging = false;
 
       // Record initial position.
-      initialPosition = position.get();
+      initialPosition = actualPosition.get();
       initialDragPoint.x = event.clientX;
       initialDragPoint.y = event.clientY;
 
@@ -265,7 +248,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
 
       if (tween)
       {
-         // Update application position.
+         // Update position.
          if (s_HAS_QUICK_TO)
          {
             quickLeft(newLeft);
@@ -275,7 +258,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
          {
             if (tweenTo) { tweenTo.kill(); }
 
-            tweenTo = GsapCompose.to(position, { left: newLeft, top: newTop, ...tweenOptions });
+            tweenTo = GsapCompose.to(actualPosition, { left: newLeft, top: newTop, ...tweenOptions });
          }
       }
       else
@@ -283,7 +266,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
          s_POSITION_DATA.left = newLeft;
          s_POSITION_DATA.top = newTop;
 
-         position.set(s_POSITION_DATA);
+         actualPosition.set(s_POSITION_DATA);
       }
    }
 
@@ -328,7 +311,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
 
          const velocity = velocityTrack.update(event.clientX, event.clientY);
 
-         inertiaTween = GsapCompose.to(position, {
+         inertiaTween = GsapCompose.to(actualPosition, {
             inertia: {
                left: Object.assign({ velocity: velocity.x * velScale }, tweenEnd ? { end: tweenEnd } : {}),
                top: Object.assign({ velocity: velocity.y * velScale }, tweenEnd ? { end: tweenEnd } : {}),
@@ -344,6 +327,26 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
       // The default of active being true won't automatically add listeners twice.
       update: (options) =>
       {
+         if (options.position !== void 0)
+         {
+            // Find actual position instance checking for a Positionable instance.
+            const newPosition = options.position?.position ?? options.position;
+            if (newPosition !== actualPosition)
+            {
+               actualPosition = newPosition;
+
+               // Kill any existing ease / tween.
+               if (s_HAS_QUICK_TO)
+               {
+                  quickLeft?.tween?.kill?.();
+                  quickTop?.tween?.kill?.();
+
+                  quickLeft = GsapCompose.quickTo(actualPosition, 'left', tweenOptions);
+                  quickTop = GsapCompose.quickTo(actualPosition, 'top', tweenOptions);
+               }
+            }
+         }
+
          if (typeof options.active === 'boolean')
          {
             active = options.active;
@@ -365,8 +368,8 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
 
             if (s_HAS_QUICK_TO)
             {
-               quickLeft = GsapCompose.quickTo(position, 'left', tweenOptions);
-               quickTop = GsapCompose.quickTo(position, 'top', tweenOptions);
+               quickLeft = GsapCompose.quickTo(actualPosition, 'left', tweenOptions);
+               quickTop = GsapCompose.quickTo(actualPosition, 'top', tweenOptions);
             }
          }
 
@@ -409,15 +412,15 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
  * draggableGsap options much easier. When subscribing to the options instance returned by {@link draggableGsap.options}
  * the Subscriber handler receives the entire instance.
  *
- * @implements {import('./types').IDraggableGsapOptions}
+ * @implements {import('./types').Action.DraggableGsapOptionsStore}
  */
-class DraggableGsapOptions
+class DraggableGsapOptionsStore
 {
    /** @type {boolean} */
    #initialTween;
 
    /**
-    * @type {import('./types').GsapTweenOptions}
+    * @type {import('./types').Action.GsapTweenOptions}
     */
    #initialTweenOptions;
 
@@ -442,7 +445,7 @@ class DraggableGsapOptions
    /**
     * Stores the subscribers.
     *
-    * @type {import('svelte/store').Subscriber<import('./types').IDraggableGsapOptions>[]}
+    * @type {import('svelte/store').Subscriber<import('./types').Action.DraggableGsapOptionsStore>[]}
     */
    #subscriptions = [];
 
@@ -826,8 +829,8 @@ class DraggableGsapOptions
    /**
     * Store subscribe method.
     *
-    * @param {import('svelte/store').Subscriber<import('./types').IDraggableGsapOptions>} handler - Callback function
-    *        that is invoked on update / changes. Receives the IDraggableGsapOptions object / instance.
+    * @param {import('svelte/store').Subscriber<import('./types').Action.DraggableGsapOptionsStore>} handler - Callback
+    *        function that is invoked on update / changes. Receives the DraggableGsapOptionsStore object / instance.
     *
     * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
     */
@@ -861,18 +864,18 @@ class DraggableGsapOptions
 }
 
 /**
- * Define a function to get an IDraggableGsapOptions instance.
+ * Define a function to get an DraggableGsapOptionsStore instance.
  *
  * @param {({
  *    tween?: boolean,
- *    tweenOptions?: import('./types').GsapTweenOptions,
+ *    tweenOptions?: import('./types').Action.GsapTweenOptions,
  *    inertia?: boolean,
- *    inertiaOptions?: import('./types').GsapInertiaOptions
- * })} options - Initial options for IDraggableGsapOptions.
+ *    inertiaOptions?: import('./types').Action.GsapInertiaOptions
+ * })} options - Initial options for DraggableGsapOptionsStore.
  *
- * @returns {import('./types').IDraggableGsapOptions} A new options instance.
+ * @returns {import('./types').Action.DraggableGsapOptionsStore} A new options instance.
  */
-draggableGsap.options = (options) => new DraggableGsapOptions(options);
+draggableGsap.options = (options) => new DraggableGsapOptionsStore(options);
 
 export { draggableGsap };
 
