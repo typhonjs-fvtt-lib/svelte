@@ -1,9 +1,12 @@
-import * as _runtime_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import * as svelte_transition from 'svelte/transition';
 import { EasingFunction } from 'svelte/transition';
 import * as svelte_action from 'svelte/action';
-import * as svelte_store from 'svelte/store';
-import { Readable } from 'svelte/store';
+import { Writable, Readable } from 'svelte/store';
+import {
+  TJSPosition,
+  TJSPositionTypes,
+  TJSPositionDataExtended,
+} from '@typhonjs-svelte/runtime-base/svelte/store/position';
 
 /**
  * The main GSAP object.
@@ -103,137 +106,201 @@ declare const easingFunc: {
 declare const easingList: string[];
 
 /**
- * Defines Gsap tween options.
+ * Defines the types for the {@link draggableGsap} action.
  */
-type GsapTweenOptions = {
+declare namespace Action {
   /**
-   * Duration in seconds; default: 1
+   * Defines the options for the {@link draggableGsap} action.
    */
-  duration?: number;
-  /**
-   * Easing function; default: 'power3.out'
-   */
-  ease?: string | EasingFunction;
-};
-/**
- * Defines options for the inertia plugin / tween options.
- *
- * @see https://greensock.com/docs/v3/Plugins/InertiaPlugin
- */
-type GsapInertiaOptions = {
-  end?: Number | [] | Function;
-  duration?: {
-    min: number;
-    max: number;
+  type DraggableGsapOptions = {
+    /**
+     * A position or positionable instance.
+     */
+    position: TJSPosition | TJSPositionTypes.Positionable;
+    /**
+     * MouseEvent button that activates dragging; default: 0
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
+     */
+    button?: number;
+    /**
+     * A boolean value; controlling the `enabled` state.
+     */
+    enabled?: boolean;
+    /**
+     *  When defined any event targets that have a class in this list are allowed.
+     */
+    hasTargetClassList?: Iterable<string>;
+    /**
+     * When defined any event targets that have a class in this list are ignored.
+     */
+    ignoreTargetClassList?: Iterable<string>;
+    /**
+     * When true inertia plugin options are enabled.
+     */
+    inertia: boolean;
+    /**
+     * Inertia plugin options.
+     */
+    inertiaOptions: GsapInertiaOptions;
+    /**
+     *  A writable store that tracks "dragging" state.
+     */
+    storeDragging?: Writable<boolean>;
+    /**
+     * When true tweening is enabled; default: false
+     */
+    tween?: boolean;
+    /**
+     * Quick tween options.
+     */
+    tweenOptions?: GsapTweenOptions;
   };
-  resistance?: number;
-  velocityScale?: number;
-};
-/**
- * Provides an interface of the {@link draggableGsap} action options support / Readable store to make updating / setting
- * draggableGsap options much easier. When subscribing to the options instance returned by {@link draggableGsap.options}
- * the Subscriber handler receives the entire instance.
- */
-interface IDraggableGsapOptions extends Readable<IDraggableGsapOptions> {
   /**
-   * Tweening enabled state.
+   * Provides an interface of the {@link draggableGsap} action options support / Readable store to make updating /
+   * setting `draggableGsap` options much easier. When subscribing to the options instance returned by
+   * {@link draggableGsap.options} the Subscriber handler receives the entire instance.
    */
-  tween: boolean;
+  interface DraggableGsapOptionsStore extends Readable<DraggableGsapOptionsStore> {
+    /**
+     * Tweening enabled state.
+     */
+    tween: boolean;
+    /**
+     * GSAP tween options for easing function and duration.
+     */
+    tweenOptions: GsapTweenOptions;
+    /**
+     * Inertia enabled state.
+     */
+    inertia: boolean;
+    /**
+     * Inertia options.
+     */
+    inertiaOptions: GsapInertiaOptions;
+    /**
+     * @returns {number} Get ease duration
+     */
+    get tweenDuration(): number;
+    /**
+     * @returns {string | EasingFunction} Get easing function value.
+     */
+    get tweenEase(): string | Function;
+    /**
+     * @returns {number} Get inertia duration max time (seconds)
+     */
+    get inertiaDurationMax(): number;
+    /**
+     * @returns {number} Get inertia duration min time (seconds)
+     */
+    get inertiaDurationMin(): number;
+    /**
+     * @returns {number |Array | Function} Get inertia end.
+     * @see `end` {@link https://greensock.com/docs/v3/Plugins/InertiaPlugin}
+     */
+    get inertiaEnd(): number | Function | any[];
+    /**
+     * @returns {number} Get inertia resistance (1000 is default).
+     */
+    get inertiaResistance(): number;
+    /**
+     * @returns {number} Get inertia velocity scale.
+     */
+    get inertiaVelocityScale(): number;
+    /**
+     * @param {number}   duration - Set ease duration.
+     */
+    set tweenDuration(duration: number);
+    /**
+     * @param {string | Function} value - Get easing function value.
+     */
+    set tweenEase(value: string | Function);
+    /**
+     * @param {{min: number, max: number}} duration - Set inertia duration min & max.
+     */
+    set inertiaDuration(duration: { min: number; max: number });
+    /**
+     * @param {number}   max - Set inertia duration max.
+     */
+    set inertiaDurationMax(max: number);
+    /**
+     * @param {number}   min - Set inertia duration min.
+     */
+    set inertiaDurationMin(min: number);
+    /**
+     * @param {number |Array | Function} end - Set inertia end.
+     *
+     * @see `end` {@link https://greensock.com/docs/v3/Plugins/InertiaPlugin}
+     */
+    set inertiaEnd(end: number | Function | any[]);
+    /**
+     * @param {number}   resistance - Set inertia resistance. Default: 1000
+     */
+    set inertiaResistance(resistance: number);
+    /**
+     * @param {number}   velocityScale - Set inertia velocity scale.
+     */
+    set inertiaVelocityScale(velocityScale: number);
+    /**
+     * Resets all options data to initial values.
+     */
+    reset(): void;
+    /**
+     * Resets tween enabled state to initial value.
+     */
+    resetTween(): void;
+    /**
+     * Resets tween options to initial values.
+     */
+    resetTweenOptions(): void;
+    /**
+     * Resets inertia enabled state to initial value.
+     */
+    resetInertia(): void;
+    /**
+     * Resets inertia options to initial values.
+     */
+    resetInertiaOptions(): void;
+  }
   /**
-   * GSAP tween options for easing function and duration.
+   * Defines Gsap tween options.
    */
-  tweenOptions: GsapTweenOptions;
+  type GsapTweenOptions = {
+    /**
+     * Duration in seconds; default: 1
+     */
+    duration?: number;
+    /**
+     * Easing function; default: 'power3.out'
+     */
+    ease?: string | EasingFunction;
+  };
   /**
-   * Inertia enabled state.
-   */
-  inertia: boolean;
-  /**
-   * Inertia options.
-   */
-  inertiaOptions: GsapInertiaOptions;
-  /**
-   * @returns {number} Get ease duration
-   */
-  get tweenDuration(): number;
-  /**
-   * @returns {string | EasingFunction} Get easing function value.
-   */
-  get tweenEase(): string | Function;
-  /**
-   * @returns {number} Get inertia duration max time (seconds)
-   */
-  get inertiaDurationMax(): number;
-  /**
-   * @returns {number} Get inertia duration min time (seconds)
-   */
-  get inertiaDurationMin(): number;
-  /**
-   * @returns {number |Array | Function} Get inertia end.
-   * @see `end` {@link https://greensock.com/docs/v3/Plugins/InertiaPlugin}
-   */
-  get inertiaEnd(): number | Function | any[];
-  /**
-   * @returns {number} Get inertia resistance (1000 is default).
-   */
-  get inertiaResistance(): number;
-  /**
-   * @returns {number} Get inertia velocity scale.
-   */
-  get inertiaVelocityScale(): number;
-  /**
-   * @param {number}   duration - Set ease duration.
-   */
-  set tweenDuration(duration: number);
-  /**
-   * @param {string | Function} value - Get easing function value.
-   */
-  set tweenEase(value: string | Function);
-  /**
-   * @param {{min: number, max: number}} duration - Set inertia duration min & max.
-   */
-  set inertiaDuration(duration: { min: number; max: number });
-  /**
-   * @param {number}   max - Set inertia duration max.
-   */
-  set inertiaDurationMax(max: number);
-  /**
-   * @param {number}   min - Set inertia duration min.
-   */
-  set inertiaDurationMin(min: number);
-  /**
-   * @param {number |Array | Function} end - Set inertia end.
+   * Defines options for the inertia plugin.
    *
-   * @see `end` {@link https://greensock.com/docs/v3/Plugins/InertiaPlugin}
+   * @see https://gsap.com/docs/v3/Plugins/InertiaPlugin/#config-object
    */
-  set inertiaEnd(end: number | Function | any[]);
-  /**
-   * @param {number}   resistance - Set inertia resistance. Default: 1000
-   */
-  set inertiaResistance(resistance: number);
-  /**
-   * @param {number}   velocityScale - Set inertia velocity scale.
-   */
-  set inertiaVelocityScale(velocityScale: number);
-  /**
-   * Resets all options data to initial values.
-   */
-  reset(): void;
-  /**
-   * Resets tween enabled state to initial value.
-   */
-  resetTween(): void;
-  /**
-   * Resets tween options to initial values.
-   */
-  resetTweenOptions(): void;
-  /**
-   * Resets inertia enabled state to initial value.
-   */
-  resetInertia(): void;
-  /**
-   * Resets inertia options to initial values.
-   */
-  resetInertiaOptions(): void;
+  type GsapInertiaOptions = {
+    /**
+     * Specifies hard ending points that are snapped to in pixels.
+     */
+    end?: number | number[] | ((naturalLandingValue: number) => number);
+    /**
+     * Min and max time in seconds for inertia duration. Default: `min`: 0; `max`: 3
+     */
+    duration?: {
+      min: number;
+      max: number;
+    };
+    /**
+     * The amount of resistance per second (think of it like how much friction is applied); Default: 1000
+     */
+    resistance?: number;
+    /**
+     * Scales velocity tracking values generated from dragging; Default: 1
+     */
+    velocityScale?: number;
+  };
 }
 
 /**
@@ -246,39 +313,16 @@ interface IDraggableGsapOptions extends Readable<IDraggableGsapOptions> {
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
- * @param {object}            params - Required parameters.
+ * @param {import('./types').Action.DraggableGsapOptions} options - Draggable Gsap options.
  *
- * @param {import('#runtime/svelte/store/position').TJSPosition}   params.position - A position instance.
- *
- * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
- *
- * @param {number}            [params.button=0] - MouseEvent button;
- *        {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
- *
- * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
- *        state.
- *
- * @param {boolean}           [params.tween=false] - When true tweening is enabled.
- *
- * @param {boolean}           [params.inertia=false] - When true inertia easing is enabled.
- *
- * @param {import('./types').GsapTweenOptions}  [params.tweenOptions] - Gsap `to / `quickTo` tween vars object.
- *
- * @param {import('./types').GsapInertiaOptions}   [params.inertiaOptions] - Inertia Options.
- *
- * @param {Iterable<string>}  [params.hasTargetClassList] - When defined any event targets that has any class in this
- *                                                          list are allowed.
- *
- * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
- *                                                             list are ignored.
- *
- * @returns {import('svelte/action').ActionReturn<Record<string, any>>} Lifecycle functions.
+ * @returns {import('svelte/action').ActionReturn<Partial<import('./types').Action.DraggableGsapOptions>>} Action
+ *          lifecycle functions.
  */
 declare function draggableGsap(
   node: HTMLElement,
   {
     position,
-    active,
+    enabled,
     button,
     storeDragging,
     tween,
@@ -287,38 +331,70 @@ declare function draggableGsap(
     inertiaOptions,
     hasTargetClassList,
     ignoreTargetClassList,
-  }: {
-    position: _runtime_svelte_store_position.TJSPosition;
-    active?: boolean;
-    button?: number;
-    storeDragging?: svelte_store.Writable<boolean>;
-    tween?: boolean;
-    inertia?: boolean;
-    tweenOptions?: GsapTweenOptions;
-    inertiaOptions?: GsapInertiaOptions;
-    hasTargetClassList?: Iterable<string>;
-    ignoreTargetClassList?: Iterable<string>;
-  },
-): svelte_action.ActionReturn<Record<string, any>>;
+  }: Action.DraggableGsapOptions,
+): svelte_action.ActionReturn<Partial<Action.DraggableGsapOptions>>;
 declare namespace draggableGsap {
   /**
-   * Define a function to get an IDraggableGsapOptions instance.
+   * Define a function to get an DraggableGsapOptionsStore instance.
    *
    * @param {({
    *    tween?: boolean,
-   *    tweenOptions?: import('./types').GsapTweenOptions,
+   *    tweenOptions?: import('./types').Action.GsapTweenOptions,
    *    inertia?: boolean,
-   *    inertiaOptions?: import('./types').GsapInertiaOptions
-   * })} options - Initial options for IDraggableGsapOptions.
+   *    inertiaOptions?: import('./types').Action.GsapInertiaOptions
+   * })} options - Initial options for DraggableGsapOptionsStore.
    *
-   * @returns {import('./types').IDraggableGsapOptions} A new options instance.
+   * @returns {import('./types').Action.DraggableGsapOptionsStore} A new options instance.
    */
   function options(options: {
     tween?: boolean;
-    tweenOptions?: GsapTweenOptions;
+    tweenOptions?: Action.GsapTweenOptions;
     inertia?: boolean;
-    inertiaOptions?: GsapInertiaOptions;
-  }): IDraggableGsapOptions;
+    inertiaOptions?: Action.GsapInertiaOptions;
+  }): Action.DraggableGsapOptionsStore;
+}
+
+/**
+ * Defines the types for {@link GsapCompose}.
+ */
+declare namespace Compose {
+  type GsapData = Iterable<object> | Function;
+  type GsapPositionOptions = {
+    /**
+     * An optional filter function to adjust position data in `onUpdate` callbacks. This is useful if you need to
+     * transform any data from GSAP / plugins into data TJSPosition can utilize.
+     */
+    filter?: Function;
+    /**
+     * Provides an iterable list of property keys to assign to initial position data. This is useful when you are
+     * using GSAP plugins that manipulate data automatically; Ex. MotionPathPlugin
+     */
+    initialProps?: Iterable<string>;
+  };
+  /**
+   * Allowable targets for {@link GsapCompose}.
+   */
+  type GsapTarget =
+    | string
+    | object
+    | TJSPosition
+    | Iterable<TJSPosition>
+    | TJSPositionTypes.Positionable
+    | Iterable<TJSPositionTypes.Positionable>
+    | Array<HTMLElement | object>;
+  /**
+   * Stores and tracks any associated `TJSPosition` instance utilized by {@link GsapCompose}.
+   */
+  type TJSPositionInfo = {
+    position: TJSPosition[];
+    positionData: TJSPositionDataExtended[];
+    /**
+     * Contains the full data object when a list of object w/ position is used.
+     */
+    data: object[];
+    elements: HTMLElement[];
+    gsapData: Array<object[]>;
+  };
 }
 
 /**
@@ -329,28 +405,34 @@ declare namespace draggableGsap {
  */
 declare class GsapCompose {
   /**
-   * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
+   * @param {import('./types').Compose.GsapTarget} target - A standard GSAP target or TJSPosition.
    *
    * @param {object}   vars - GSAP vars object for `from`.
    *
-   * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population for
-   *        TJSPosition tweens.
+   * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+   *        population for TJSPosition tweens.
    *
    * @returns {object} GSAP tween
    */
-  static from(target: GsapTarget, vars: object, options?: GsapPositionOptions): object;
+  static from(target: Compose.GsapTarget, vars: object, options?: Compose.GsapPositionOptions): object;
   /**
-   * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
+   * @param {import('./types').Compose.GsapTarget} target - A standard GSAP target or TJSPosition.
    *
    * @param {object}   fromVars - GSAP fromVars object for `fromTo`
    *
    * @param {object}   toVars - GSAP toVars object for `fromTo`.
    *
-   * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+   * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+   *        population.
    *
    * @returns {object} GSAP tween
    */
-  static fromTo(target: GsapTarget, fromVars: object, toVars: object, options?: GsapPositionOptions): object;
+  static fromTo(
+    target: Compose.GsapTarget,
+    fromVars: object,
+    toVars: object,
+    options?: Compose.GsapPositionOptions,
+  ): object;
   /**
    * Checks the `gsap` module instance for existence of a method and GsapCompose for the same method name. This
    * is helpful to determine which new features are available. Ex. `quickTo` is not available until GSAP `3.10+`.
@@ -361,17 +443,23 @@ declare class GsapCompose {
    */
   static hasMethod(name: string): boolean;
   /**
-   * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
+   * @param {import('./types').Compose.GsapTarget} target - A standard GSAP target or TJSPosition.
    *
    * @param {string}   key - Property of position to manipulate.
    *
    * @param {object}   vars - GSAP vars object for `quickTo`.
    *
-   * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+   * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+   *        population.
    *
    * @returns {Function}  GSAP quickTo function.
    */
-  static quickTo(target: GsapTarget, key: string, vars: object, options?: GsapPositionOptions): Function;
+  static quickTo(
+    target: Compose.GsapTarget,
+    key: string,
+    vars: object,
+    options?: Compose.GsapPositionOptions,
+  ): Function;
   /**
    * Defers to `gsap` module to register an easing function.
    *
@@ -387,33 +475,35 @@ declare class GsapCompose {
    */
   static registerPlugin(...args: Function[]): void;
   /**
-   * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
+   * @param {import('./types').Compose.GsapTarget} target - A standard GSAP target or TJSPosition.
    *
-   * @param {object | import('../').GsapData}   [arg1] - Either an object defining timeline options or GsapData.
+   * @param {object | import('./types').Compose.GsapData}   [arg1] - Either an object defining timeline options or
+   *        GsapData.
    *
-   * @param {import('../').GsapData | import('../').GsapPositionOptions} [arg2] - When arg1 is defined as an object;
-   *        arg2 defines GsapData.
+   * @param {import('./types').Compose.GsapData | import('./types').Compose.GsapPositionOptions} [arg2] - When arg1 is
+   *        defined as an object; arg2 defines GsapData.
    *
-   * @param {import('../').GsapPositionOptions} [arg3] - Options for filtering and initial data population.
+   * @param {import('./types').Compose.GsapPositionOptions} [arg3] - Options for filtering and initial data population.
    *
    * @returns {object} GSAP timeline
    */
   static timeline(
-    target: GsapTarget,
-    arg1?: object | GsapData,
-    arg2?: GsapData | GsapPositionOptions,
-    arg3?: GsapPositionOptions,
+    target: Compose.GsapTarget,
+    arg1?: object | Compose.GsapData,
+    arg2?: Compose.GsapData | Compose.GsapPositionOptions,
+    arg3?: Compose.GsapPositionOptions,
   ): object;
   /**
-   * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
+   * @param {import('./types').Compose.GsapTarget} target - A standard GSAP target or TJSPosition.
    *
    * @param {object}   vars - GSAP vars object for `to`.
    *
-   * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+   * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+   *        population.
    *
    * @returns {object} GSAP tween
    */
-  static to(target: GsapTarget, vars: object, options?: GsapPositionOptions): object;
+  static to(target: Compose.GsapTarget, vars: object, options?: Compose.GsapPositionOptions): object;
 }
 
 /**
@@ -424,64 +514,4 @@ declare class GsapCompose {
  */
 declare function gsapLoadPlugin(name: string): Promise<any>;
 
-type GsapData = Iterable<object> | Function;
-type GsapPositionOptions = {
-  /**
-   * An optional filter function to adjust position data in `onUpdate` callbacks. This is
-   * useful if you need to transform any data from GSAP / plugins into data TJSPosition can utilize.
-   */
-  filter?: Function;
-  /**
-   * Provides an iterable of property keys to assign to initial position
-   * data. This is useful when you are using GSAP plugins that manipulate data automatically; Ex. MotionPathPlugin
-   */
-  initialProps?: Iterable<string>;
-};
-type GsapTarget =
-  | string
-  | object
-  | _runtime_svelte_store_position.TJSPosition
-  | Iterable<_runtime_svelte_store_position.TJSPosition>
-  | Array<HTMLElement | object>;
-/**
- * Stores and tracks any associated `TJSPosition` instance utilized by
- *          {@link GsapCompose }.
- */
-type TJSPositionInfo = {
-  /**
-   * -
-   */
-  position: _runtime_svelte_store_position.TJSPosition[];
-  /**
-   * -
-   */
-  positionData: _runtime_svelte_store_position.TJSPositionDataExtended[];
-  /**
-   * Contains the full data object when a list of object w/ position is used.
-   */
-  data: object[];
-  /**
-   * -
-   */
-  elements: HTMLElement[];
-  /**
-   * -
-   */
-  gsapData: Array<object[]>;
-};
-
-export {
-  GsapCompose,
-  type GsapData,
-  type GsapInertiaOptions,
-  type GsapPositionOptions,
-  type GsapTarget,
-  type GsapTweenOptions,
-  type IDraggableGsapOptions,
-  type TJSPositionInfo,
-  draggableGsap,
-  easingFunc,
-  easingList,
-  gsap,
-  gsapLoadPlugin,
-};
+export { Action, Compose, GsapCompose, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };

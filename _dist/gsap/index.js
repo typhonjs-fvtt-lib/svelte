@@ -325,7 +325,8 @@ class GsapPosition
    /**
     * @param {TJSPosition} tjsPosition - TJSPosition instance.
     *
-    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+    *        population.
     *
     * @param {object}   vars - GSAP vars object for `from`.
     *
@@ -363,7 +364,8 @@ class GsapPosition
    /**
     * @param {TJSPosition} tjsPosition - TJSPosition instance.
     *
-    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+    *        population.
     *
     * @param {object}   fromVars - GSAP fromVars object for `fromTo`
     *
@@ -408,7 +410,8 @@ class GsapPosition
    /**
     * @param {TJSPosition} tjsPosition - TJSPosition instance.
     *
-    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+    *        population.
     *
     * @param {string}   key - Property of position to manipulate.
     *
@@ -446,12 +449,14 @@ class GsapPosition
    /**
     * @param {TJSPosition | Iterable<TJSPosition>}   tjsPosition - TJSPosition instance.
     *
-    * @param {object | import('../').GsapData}  arg1 - Either an object defining timelineOptions or GsapData.
+    * @param {object | import('./types').Compose.GsapData}  arg1 - Either an object defining timelineOptions or
+    *        GsapData.
     *
-    * @param {import('../').GsapData | import('../').GsapPositionOptions}  [arg2] - When arg1 is defined as an object;
-    *        arg2 defines GsapData.
+    * @param {import('./types').Compose.GsapData | import('./types').Compose.GsapPositionOptions}  [arg2] - When arg1
+    *        is defined as an object; arg2 defines GsapData.
     *
-    * @param {import('../').GsapPositionOptions}   [arg3] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions}   [arg3] - Options for filtering and initial data
+    *        population.
     *
     * @returns {object} GSAP timeline
     */
@@ -464,7 +469,7 @@ class GsapPosition
       // If arg1 is an array then take it as `gsapData` otherwise select arg2.
       const gsapData = isIterable(arg1) || typeof arg1 === 'function' ? arg1 : arg2;
 
-      /** @type {import('../').GsapPositionOptions} */
+      /** @type {import('./types').Compose.GsapPositionOptions} */
       const options = gsapData === arg1 ? arg2 : arg3;
 
       if (!isObject(timelineOptions))
@@ -610,7 +615,8 @@ class GsapPosition
    /**
     * @param {TJSPosition | TJSPosition[]} tjsPosition - TJSPosition instance.
     *
-    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+    *        population.
     *
     * @param {object}   vars - GSAP vars object for `to`.
     *
@@ -656,11 +662,11 @@ class GsapPosition
     *
     * @param {object[]|Function}             [gsapData] -
     *
-    * @returns {import('../').TJSPositionInfo} A TJSPositionInfo instance.
+    * @returns {import('./types').Compose.TJSPositionInfo} A TJSPositionInfo instance.
     */
    static #getPositionInfo(tjsPositions, vars, filter, gsapData)
    {
-      /** @type {import('../').TJSPositionInfo} */
+      /** @type {import('./types').Compose.TJSPositionInfo} */
       const positionInfo = {
          position: [],
          positionData: [],
@@ -1010,12 +1016,12 @@ function s_VALIDATE_GSAPDATA_ENTRY(gsapData)
 class GsapCompose
 {
    /**
-    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('./types').Compose.GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   vars - GSAP vars object for `from`.
     *
-    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population for
-    *        TJSPosition tweens.
+    * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+    *        population for TJSPosition tweens.
     *
     * @returns {object} GSAP tween
     */
@@ -1033,13 +1039,14 @@ class GsapCompose
    }
 
    /**
-    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('./types').Compose.GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   fromVars - GSAP fromVars object for `fromTo`
     *
     * @param {object}   toVars - GSAP toVars object for `fromTo`.
     *
-    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+    *        population.
     *
     * @returns {object} GSAP tween
     */
@@ -1075,13 +1082,14 @@ class GsapCompose
    }
 
    /**
-    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('./types').Compose.GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {string}   key - Property of position to manipulate.
     *
     * @param {object}   vars - GSAP vars object for `quickTo`.
     *
-    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+    *        population.
     *
     * @returns {Function}  GSAP quickTo function.
     */
@@ -1126,14 +1134,15 @@ class GsapCompose
    }
 
    /**
-    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('./types').Compose.GsapTarget} target - A standard GSAP target or TJSPosition.
     *
-    * @param {object | import('../').GsapData}   [arg1] - Either an object defining timeline options or GsapData.
+    * @param {object | import('./types').Compose.GsapData}   [arg1] - Either an object defining timeline options or
+    *        GsapData.
     *
-    * @param {import('../').GsapData | import('../').GsapPositionOptions} [arg2] - When arg1 is defined as an object;
-    *        arg2 defines GsapData.
+    * @param {import('./types').Compose.GsapData | import('./types').Compose.GsapPositionOptions} [arg2] - When arg1 is
+    *        defined as an object; arg2 defines GsapData.
     *
-    * @param {import('../').GsapPositionOptions} [arg3] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions} [arg3] - Options for filtering and initial data population.
     *
     * @returns {object} GSAP timeline
     */
@@ -1163,7 +1172,7 @@ class GsapCompose
       // If arg1 is an array then take it as `gsapData` otherwise select arg2.
       const gsapData = isIterable(arg1) ? arg1 : arg2;
 
-      /** @type {import('../').GsapPositionOptions} */
+      /** @type {import('./types').Compose.GsapPositionOptions} */
       const options = gsapData === arg1 ? arg2 : arg3;
 
       if (!isObject(timelineOptions))
@@ -1249,11 +1258,12 @@ class GsapCompose
    }
 
    /**
-    * @param {import('../').GsapTarget} target - A standard GSAP target or TJSPosition.
+    * @param {import('./types').Compose.GsapTarget} target - A standard GSAP target or TJSPosition.
     *
     * @param {object}   vars - GSAP vars object for `to`.
     *
-    * @param {import('../').GsapPositionOptions} [options] - Options for filtering and initial data population.
+    * @param {import('./types').Compose.GsapPositionOptions} [options] - Options for filtering and initial data
+    *        population.
     *
     * @returns {object} GSAP tween
     */
@@ -1391,35 +1401,12 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  *
  * @param {HTMLElement}       node - The node associated with the action.
  *
- * @param {object}            params - Required parameters.
+ * @param {import('./types').Action.DraggableGsapOptions} options - Draggable Gsap options.
  *
- * @param {import('#runtime/svelte/store/position').TJSPosition}   params.position - A position instance.
- *
- * @param {boolean}           [params.active=true] - A boolean value; attached to a readable store.
- *
- * @param {number}            [params.button=0] - MouseEvent button;
- *        {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button}.
- *
- * @param {import('svelte/store').Writable<boolean>} [params.storeDragging] - A writable store that tracks "dragging"
- *        state.
- *
- * @param {boolean}           [params.tween=false] - When true tweening is enabled.
- *
- * @param {boolean}           [params.inertia=false] - When true inertia easing is enabled.
- *
- * @param {import('./types').GsapTweenOptions}  [params.tweenOptions] - Gsap `to / `quickTo` tween vars object.
- *
- * @param {import('./types').GsapInertiaOptions}   [params.inertiaOptions] - Inertia Options.
- *
- * @param {Iterable<string>}  [params.hasTargetClassList] - When defined any event targets that has any class in this
- *                                                          list are allowed.
- *
- * @param {Iterable<string>}  [params.ignoreTargetClassList] - When defined any event targets that have a class in this
- *                                                             list are ignored.
- *
- * @returns {import('svelte/action').ActionReturn<Record<string, any>>} Lifecycle functions.
+ * @returns {import('svelte/action').ActionReturn<Partial<import('./types').Action.DraggableGsapOptions>>} Action
+ *          lifecycle functions.
  */
-function draggableGsap(node, { position, active = true, button = 0, storeDragging = void 0, tween = false,
+function draggableGsap(node, { position, enabled = true, button = 0, storeDragging = void 0, tween = false,
  inertia = false, tweenOptions = { duration: 1, ease: 'power3.out' },
   inertiaOptions = { end: void 0, duration: { min: 0, max: 3 }, resistance: 1000, velocityScale: 1 },
    hasTargetClassList, ignoreTargetClassList })
@@ -1433,6 +1420,13 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
    {
       throw new TypeError(`'ignoreTargetClassList' is not iterable.`);
    }
+
+   /**
+    * Find actual position instance checking for a Positionable instance.
+    *
+    * @type {import('#runtime/svelte/store/position').TJSPosition}
+    */
+   let actualPosition = position?.position ?? position;
 
    /**
     * Duplicate the app / Positionable starting position to track differences.
@@ -1510,7 +1504,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
       node.classList.remove('draggable');
    }
 
-   if (active)
+   if (enabled)
    {
       activateListeners();
    }
@@ -1525,7 +1519,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
       if (event.button !== button || !event.isPrimary) { return; }
 
       // Do not process if the position system is not enabled.
-      if (!position.enabled) { return; }
+      if (!actualPosition.enabled) { return; }
 
       // Potentially ignore this event if `ignoreTargetClassList` is defined and the `event.target` has a matching
       // class.
@@ -1560,7 +1554,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
       dragging = false;
 
       // Record initial position.
-      initialPosition = position.get();
+      initialPosition = actualPosition.get();
       initialDragPoint.x = event.clientX;
       initialDragPoint.y = event.clientY;
 
@@ -1620,11 +1614,11 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
 
       if (tween)
       {
-         // Update application position.
+         // Update position.
          {
             if (tweenTo) { tweenTo.kill(); }
 
-            tweenTo = GsapCompose.to(position, { left: newLeft, top: newTop, ...tweenOptions });
+            tweenTo = GsapCompose.to(actualPosition, { left: newLeft, top: newTop, ...tweenOptions });
          }
       }
       else
@@ -1632,7 +1626,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
          s_POSITION_DATA.left = newLeft;
          s_POSITION_DATA.top = newTop;
 
-         position.set(s_POSITION_DATA);
+         actualPosition.set(s_POSITION_DATA);
       }
    }
 
@@ -1671,7 +1665,7 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
 
          const velocity = velocityTrack.update(event.clientX, event.clientY);
 
-         inertiaTween = GsapCompose.to(position, {
+         inertiaTween = GsapCompose.to(actualPosition, {
             inertia: {
                left: Object.assign({ velocity: velocity.x * velScale }, tweenEnd ? { end: tweenEnd } : {}),
                top: Object.assign({ velocity: velocity.y * velScale }, tweenEnd ? { end: tweenEnd } : {}),
@@ -1684,13 +1678,23 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
    }
 
    return {
-      // The default of active being true won't automatically add listeners twice.
+      // The default of enabled being true won't automatically add listeners twice.
       update: (options) =>
       {
-         if (typeof options.active === 'boolean')
+         if (options.position !== void 0)
          {
-            active = options.active;
-            if (active) { activateListeners(); }
+            // Find actual position instance checking for a Positionable instance.
+            const newPosition = options.position?.position ?? options.position;
+            if (newPosition !== actualPosition)
+            {
+               actualPosition = newPosition;
+            }
+         }
+
+         if (typeof options.enabled === 'boolean')
+         {
+            enabled = options.enabled;
+            if (enabled) { activateListeners(); }
             else { removeListeners(); }
          }
 
@@ -1746,15 +1750,15 @@ function draggableGsap(node, { position, active = true, button = 0, storeDraggin
  * draggableGsap options much easier. When subscribing to the options instance returned by {@link draggableGsap.options}
  * the Subscriber handler receives the entire instance.
  *
- * @implements {import('./types').IDraggableGsapOptions}
+ * @implements {import('./types').Action.DraggableGsapOptionsStore}
  */
-class DraggableGsapOptions
+class DraggableGsapOptionsStore
 {
    /** @type {boolean} */
    #initialTween;
 
    /**
-    * @type {import('./types').GsapTweenOptions}
+    * @type {import('./types').Action.GsapTweenOptions}
     */
    #initialTweenOptions;
 
@@ -1779,7 +1783,7 @@ class DraggableGsapOptions
    /**
     * Stores the subscribers.
     *
-    * @type {import('svelte/store').Subscriber<import('./types').IDraggableGsapOptions>[]}
+    * @type {import('svelte/store').Subscriber<import('./types').Action.DraggableGsapOptionsStore>[]}
     */
    #subscriptions = [];
 
@@ -2163,8 +2167,8 @@ class DraggableGsapOptions
    /**
     * Store subscribe method.
     *
-    * @param {import('svelte/store').Subscriber<import('./types').IDraggableGsapOptions>} handler - Callback function
-    *        that is invoked on update / changes. Receives the IDraggableGsapOptions object / instance.
+    * @param {import('svelte/store').Subscriber<import('./types').Action.DraggableGsapOptionsStore>} handler - Callback
+    *        function that is invoked on update / changes. Receives the DraggableGsapOptionsStore object / instance.
     *
     * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
     */
@@ -2198,18 +2202,18 @@ class DraggableGsapOptions
 }
 
 /**
- * Define a function to get an IDraggableGsapOptions instance.
+ * Define a function to get an DraggableGsapOptionsStore instance.
  *
  * @param {({
  *    tween?: boolean,
- *    tweenOptions?: import('./types').GsapTweenOptions,
+ *    tweenOptions?: import('./types').Action.GsapTweenOptions,
  *    inertia?: boolean,
- *    inertiaOptions?: import('./types').GsapInertiaOptions
- * })} options - Initial options for IDraggableGsapOptions.
+ *    inertiaOptions?: import('./types').Action.GsapInertiaOptions
+ * })} options - Initial options for DraggableGsapOptionsStore.
  *
- * @returns {import('./types').IDraggableGsapOptions} A new options instance.
+ * @returns {import('./types').Action.DraggableGsapOptionsStore} A new options instance.
  */
-draggableGsap.options = (options) => new DraggableGsapOptions(options);
+draggableGsap.options = (options) => new DraggableGsapOptionsStore(options);
 
 /**
  * Extra options for GsapCompose.
