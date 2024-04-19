@@ -754,7 +754,7 @@ declare class SvelteApplication implements TJSPositionTypes.Positionable {
    * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
    * to animate the content area.
    *
-   * @param {object}   [opts] - Optional parameters
+   * @param {object}   [opts] - Optional parameters.
    *
    * @param {boolean}  [opts.animate=true] - When true perform default minimizing animation.
    *
@@ -778,11 +778,11 @@ declare class SvelteApplication implements TJSPositionTypes.Positionable {
    */
   onSvelteRemount(mountedAppShell?: MountedAppShell): void;
   /**
-   * All calculation and updates of position are implemented in {@link TJSPosition.set}. This allows position to be fully
-   * reactive and in control of updating inline styles for the application.
+   * All calculation and updates of position are implemented in {@link TJSPosition.set}. This allows position to be
+   * fully reactive and in control of updating inline styles for the application.
    *
    * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
-   * to update to using the {@link TJSPosition.validators} functionality.
+   * to update to using the {@link TJSPosition.validators} / ValidatorAPI functionality.
    *
    * @param {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
    *

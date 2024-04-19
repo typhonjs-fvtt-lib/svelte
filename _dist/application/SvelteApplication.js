@@ -33,7 +33,7 @@ export class SvelteApplication extends Application
    /**
     * Stores the first mounted component which follows the application shell contract.
     *
-    * @type {import('./internal/state-svelte/types').MountedAppShell[]|null[]} Application shell.
+    * @type {import('./internal/state-svelte/types').MountedAppShell[] | null[]} Application shell.
     */
    #applicationShellHolder = [null];
 
@@ -57,6 +57,14 @@ export class SvelteApplication extends Application
     * @type {HTMLElement}
     */
    #elementContent = null;
+
+   /**
+    * On initial render gating of `setPosition` invoked by `Application._render` occurs, so that percentage values
+    * can correctly be positioned with initial helper constraints (centered).
+    *
+    * @type {boolean}
+    */
+   #gateSetPosition = false;
 
    /**
     * Stores initial z-index from `_renderOuter` to set to target element / Svelte component.
@@ -281,8 +289,8 @@ export class SvelteApplication extends Application
     * from the DOM. The purpose of overriding ensures the slide up animation is always completed before
     * the Svelte components are destroyed and then the element is removed from the DOM.
     *
-    * Close the application and un-register references to it within UI mappings.
-    * This function returns a Promise which resolves once the window closing animation concludes
+    * Close the application and unregisters references to it within UI mappings.
+    * This function returns a Promise which resolves once the window closing animation concludes.
     *
     * @param {object}   [options] - Optional parameters.
     *
@@ -733,7 +741,7 @@ export class SvelteApplication extends Application
     * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
     * to animate the content area.
     *
-    * @param {object}   [opts] - Optional parameters
+    * @param {object}   [opts] - Optional parameters.
     *
     * @param {boolean}  [opts.animate=true] - When true perform default minimizing animation.
     *
@@ -912,7 +920,13 @@ export class SvelteApplication extends Application
          return;
       }
 
+      // On initial render gating of `setPosition` invoked by `Application._render` occurs, so that percentage values
+      // can correctly be positioned with initial helper constraints (centered).
+      this.#gateSetPosition = true;
+
       await super._render(force, options);
+
+      this.#gateSetPosition = false;
 
       // Handle the same render exclusion tests that reject a render in Application.
 
@@ -923,16 +937,39 @@ export class SvelteApplication extends Application
       if (!force && (this._state <= Application.RENDER_STATES.NONE)) { return; }
 
       // It is necessary to directly invoke `position.set` as TJSPosition uses accessors and is not a bare object, so
-      // the merging that occurs is `Application._render` does not take effect.
-      if (!this._minimized) { this.#position.set(options); }
+      // the merging that occurs in `Application._render` does not take effect. Additionally, any of the main
+      // positional properties that are defined as strings such as percentage values need to be set after the element
+      // is mounted.
+      if (!this._minimized)
+      {
+         this.#position.set({
+            left: typeof this.options?.left === 'string' ? this.options.left : void 0,
+            height: typeof this.options?.height === 'string' ? this.options.height : void 0,
+            maxHeight: typeof this.options?.maxHeight === 'string' ? this.options.maxHeight : void 0,
+            maxWidth: typeof this.options?.maxWidth === 'string' ? this.options.maxWidth : void 0,
+            minHeight: typeof this.options?.minHeight === 'string' ? this.options.minHeight : void 0,
+            minWidth: typeof this.options?.minWidth === 'string' ? this.options.minWidth : void 0,
+            rotateX: typeof this.options?.rotateX === 'string' ? this.options.rotateX : void 0,
+            rotateY: typeof this.options?.rotateY === 'string' ? this.options.rotateY : void 0,
+            rotateZ: typeof this.options?.rotateZ === 'string' ? this.options.rotateZ : void 0,
+            rotation: typeof this.options?.rotation === 'string' ? this.options.rotation : void 0,
+            top: typeof this.options?.top === 'string' ? this.options.top : void 0,
+            width: typeof this.options?.width === 'string' ? this.options.width : void 0,
+
+            ...options
+         });
+      }
 
       if (!this.#onMount)
       {
          // Add to visible apps tracked.
          TJSAppIndex.add(this);
 
-         this.onSvelteMount({ element: this._element[0], elementContent: this.#elementContent, elementTarget:
-          this.#elementTarget });
+         this.onSvelteMount({
+            elementRoot: /** @type {HTMLElement} */ this._element[0],
+            elementContent: this.#elementContent,
+            elementTarget: this.#elementTarget
+         });
 
          this.#onMount = true;
       }
@@ -972,11 +1009,11 @@ export class SvelteApplication extends Application
    }
 
    /**
-    * All calculation and updates of position are implemented in {@link TJSPosition.set}. This allows position to be fully
-    * reactive and in control of updating inline styles for the application.
+    * All calculation and updates of position are implemented in {@link TJSPosition.set}. This allows position to be
+    * fully reactive and in control of updating inline styles for the application.
     *
     * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
-    * to update to using the {@link TJSPosition.validators} functionality.
+    * to update to using the {@link TJSPosition.validators} / ValidatorAPI functionality.
     *
     * @param {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
     *
@@ -985,7 +1022,7 @@ export class SvelteApplication extends Application
     */
    setPosition(position)
    {
-      return this.position.set(position);
+      return !this.#gateSetPosition ? this.position.set(position) : this.position;
    }
 
    /**
@@ -1031,8 +1068,11 @@ export class SvelteApplication extends Application
 
          super._activateCoreListeners([this.popOut ? this.#elementTarget?.firstChild : this.#elementTarget]);
 
-         this.onSvelteRemount({ element: this._element[0], elementContent: this.#elementContent, elementTarget:
-          this.#elementTarget });
+         this.onSvelteRemount({
+            elementRoot: /** @type {HTMLElement} */ this._element[0],
+            elementContent: this.#elementContent,
+            elementTarget: this.#elementTarget
+         });
       }
    }
 }
