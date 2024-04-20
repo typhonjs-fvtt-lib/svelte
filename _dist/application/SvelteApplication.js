@@ -1015,7 +1015,7 @@ export class SvelteApplication extends Application
     * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
     * to update to using the {@link TJSPosition.validators} / ValidatorAPI functionality.
     *
-    * @param {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
+    * @param {Partial<import('@typhonjs-svelte/runtime-base/svelte/store/position').Data.TJSPositionData>}   [position] - TJSPosition data.
     *
     * @returns {TJSPosition} The updated position object for the application containing the new values.
     * @ignore

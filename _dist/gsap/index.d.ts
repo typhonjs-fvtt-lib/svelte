@@ -2,11 +2,7 @@ import * as svelte_transition from 'svelte/transition';
 import { EasingFunction } from 'svelte/transition';
 import * as svelte_action from 'svelte/action';
 import { Writable, Readable } from 'svelte/store';
-import {
-  TJSPosition,
-  TJSPositionTypes,
-  TJSPositionDataExtended,
-} from '@typhonjs-svelte/runtime-base/svelte/store/position';
+import { TJSPosition, TJSPositionTypes, Data } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 
 /**
  * The main GSAP object.
@@ -387,7 +383,7 @@ declare namespace Compose {
    */
   type TJSPositionInfo = {
     position: TJSPosition[];
-    positionData: TJSPositionDataExtended[];
+    positionData: Partial<Data.TJSPositionData>[];
     /**
      * Contains the full data object when a list of object w/ position is used.
      */

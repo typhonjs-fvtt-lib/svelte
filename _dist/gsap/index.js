@@ -823,8 +823,8 @@ class TimelinePositionImpl
     * Gets the target from GSAP data entry.
     *
     * @param {(
-    *    import('#runtime/svelte/store/position').TJSPositionDataExtended |
-    *    import('#runtime/svelte/store/position').TJSPositionDataExtended[]
+    *    Partial<import('#runtime/svelte/store/position').Data.TJSPositionData> |
+    *    Partial<import('#runtime/svelte/store/position').Data.TJSPositionData>[]
     * )}  positionData - TJSPositionInfo data.
     *
     * @param {HTMLElement|HTMLElement[]}  elements - One or more HTMLElements.
@@ -834,8 +834,8 @@ class TimelinePositionImpl
     * @param {number}         cntr - Current GSAP data entry index.
     *
     * @returns {(
-    *    import('#runtime/svelte/store/position').TJSPositionDataExtended |
-    *    import('#runtime/svelte/store/position').TJSPositionDataExtended[] |
+    *    Partial<import('#runtime/svelte/store/position').Data.TJSPositionData> |
+    *    Partial<import('#runtime/svelte/store/position').Data.TJSPositionData>[] |
     *    HTMLElement|HTMLElement[]
     * )} The target object or HTMLElement.
     */

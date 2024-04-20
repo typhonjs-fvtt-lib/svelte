@@ -1,7 +1,7 @@
 import * as _typhonjs_fvtt_svelte_application from '@typhonjs-fvtt/svelte/application';
 import { SvelteApplication } from '@typhonjs-fvtt/svelte/application';
 import * as _typhonjs_svelte_runtime_base_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
-import { TJSPositionDataExtended, TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
+import { Data, TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import { SvelteComponent } from 'svelte';
 import { TJSSvelteConfig } from '@typhonjs-svelte/runtime-base/svelte/util';
 import { Readable, Writable } from 'svelte/store';
@@ -261,7 +261,7 @@ type ApplicationStateData = {
   /**
    * Application position.
    */
-  position: TJSPositionDataExtended;
+  position: Data.TJSPositionDataExtra;
   /**
    * Any application saved position state for #beforeMinimized
    */
@@ -790,12 +790,14 @@ declare class SvelteFormApplication {
    * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
    * to update to using the {@link TJSPosition.validators} / ValidatorAPI functionality.
    *
-   * @param {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionDataExtended}   [position] - TJSPosition data.
+   * @param {Partial<import('@typhonjs-svelte/runtime-base/svelte/store/position').Data.TJSPositionData>}   [position] - TJSPosition data.
    *
    * @returns {TJSPosition} The updated position object for the application containing the new values.
    * @ignore
    */
-  setPosition(position?: _typhonjs_svelte_runtime_base_svelte_store_position.TJSPositionDataExtended): TJSPosition;
+  setPosition(
+    position?: Partial<_typhonjs_svelte_runtime_base_svelte_store_position.Data.TJSPositionData>,
+  ): TJSPosition;
   #private;
 }
 
