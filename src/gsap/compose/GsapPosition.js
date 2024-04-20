@@ -565,7 +565,7 @@ class TimelinePositionImpl
     *    Partial<import('#runtime/svelte/store/position').Data.TJSPositionData>[]
     * )}  positionData - TJSPositionInfo data.
     *
-    * @param {HTMLElement|HTMLElement[]}  elements - One or more HTMLElements.
+    * @param {HTMLElement | HTMLElement[]}  elements - One or more HTMLElements.
     *
     * @param {object}         entry - Gsap data entry.
     *
@@ -574,7 +574,7 @@ class TimelinePositionImpl
     * @returns {(
     *    Partial<import('#runtime/svelte/store/position').Data.TJSPositionData> |
     *    Partial<import('#runtime/svelte/store/position').Data.TJSPositionData>[] |
-    *    HTMLElement|HTMLElement[]
+    *    HTMLElement | HTMLElement[]
     * )} The target object or HTMLElement.
     */
    static getTarget(positionData, elements, entry, cntr)
