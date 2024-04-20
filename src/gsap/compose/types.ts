@@ -1,7 +1,7 @@
 import type {
+   Data,
    TJSPosition,
-   TJSPositionTypes,
-   TJSPositionDataExtended } from '#runtime/svelte/store/position';
+   TJSPositionTypes } from '#runtime/svelte/store/position';
 
 /**
  * Defines the types for {@link GsapCompose}.
@@ -42,7 +42,7 @@ namespace Compose {
    export type TJSPositionInfo = {
       position: TJSPosition[];
 
-      positionData: TJSPositionDataExtended[];
+      positionData: Partial<Data.TJSPositionData>[];
 
       /**
        * Contains the full data object when a list of object w/ position is used.

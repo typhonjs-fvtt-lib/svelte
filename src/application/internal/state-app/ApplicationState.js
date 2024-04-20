@@ -15,7 +15,7 @@ export class ApplicationState
    /** @type {T} */
    #application;
 
-   /** @type {Map<string, ApplicationStateData>} */
+   /** @type {Map<string, import('./types').ApplicationStateData>} */
    #dataSaved = new Map();
 
    /**
@@ -33,7 +33,7 @@ export class ApplicationState
     *
     * @param {object} [extra] - Extra data to add to application state.
     *
-    * @returns {ApplicationStateData} Passed in object with current application state.
+    * @returns {import('./types').ApplicationStateData} Passed in object with current application state.
     */
    get(extra = {})
    {
@@ -52,7 +52,7 @@ export class ApplicationState
     *
     * @param {string}   options.name - Saved data set name.
     *
-    * @returns {ApplicationStateData} The saved data set.
+    * @returns {import('./types').ApplicationStateData} The saved data set.
     */
    getSave({ name })
    {
@@ -71,7 +71,7 @@ export class ApplicationState
     *
     * @param {string}   options.name - Name to remove and retrieve.
     *
-    * @returns {ApplicationStateData} Saved application data.
+    * @returns {import('./types').ApplicationStateData} Saved application data.
     */
    remove({ name })
    {
@@ -106,7 +106,8 @@ export class ApplicationState
     *
     * @param {Function}          [params.interpolate=lerp] - Interpolation function.
     *
-    * @returns {ApplicationStateData|Promise<ApplicationStateData>} Saved application data.
+    * @returns {import('./types').ApplicationStateData | Promise<import('./types').ApplicationStateData>} Saved
+    *          application data.
     */
    restore({ name, remove = false, async = false, animateTo = false, duration = 0.1, ease = linear,
     interpolate = lerp })
@@ -144,7 +145,7 @@ export class ApplicationState
     *
     * @param {...*}     [options.extra] - Extra data to add to saved data.
     *
-    * @returns {ApplicationStateData} Current application data
+    * @returns {import('./types').ApplicationStateData} Current application data
     */
    save({ name, ...extra })
    {
@@ -169,7 +170,7 @@ export class ApplicationState
     *
     * TODO: THIS METHOD NEEDS TO BE REFACTORED WHEN TRL IS MADE INTO A STANDALONE FRAMEWORK.
     *
-    * @param {ApplicationStateData}   data - Saved data set name.
+    * @param {import('./types').ApplicationStateData}   data - Saved data set name.
     *
     * @param {object}            [opts] - Optional parameters
     *
@@ -324,15 +325,3 @@ export class ApplicationState
       return application;
    }
 }
-
-/**
- * @typedef {object} ApplicationStateData
- *
- * @property {import('#runtime/svelte/store/position').TJSPositionDataExtended}   position Application position.
- *
- * @property {object}         beforeMinimized Any application saved position state for #beforeMinimized
- *
- * @property {object}         options Application options.
- *
- * @property {object}         ui Application UI state.
- */

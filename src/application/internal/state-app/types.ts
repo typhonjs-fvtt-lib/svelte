@@ -1,4 +1,4 @@
-import type { TJSPositionDataExtended } from '#runtime/svelte/store/position';
+import type { Data } from '#runtime/svelte/store/position';
 
 /**
  * @template T
@@ -135,7 +135,7 @@ type ApplicationStateData = {
    /**
     * Application position.
     */
-   position: TJSPositionDataExtended;
+   position: Data.TJSPositionDataExtra;
    /**
     * Any application saved position state for #beforeMinimized
     */
