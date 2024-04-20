@@ -25,7 +25,7 @@ const s_HAS_QUICK_TO = false;
  *
  * @param {import('./types').Action.DraggableGsapOptions} options - Draggable Gsap options.
  *
- * @returns {import('svelte/action').ActionReturn<Partial<import('./types').Action.DraggableGsapOptions>>} Action
+ * @returns {import('svelte/action').Action<Partial<import('./types').Action.DraggableGsapOptions>>} Action
  *          lifecycle functions.
  */
 function draggableGsap(node, { position, enabled = true, button = 0, storeDragging = void 0, tween = false,
@@ -87,12 +87,12 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
    /**
     * Event handlers associated with this action for addition / removal.
     *
-    * @type {object}
+    * @type {{ [p: string]: [string, EventListener, boolean] }}
     */
    const handlers = {
-      dragDown: ['pointerdown', onDragPointerDown, false],
-      dragMove: ['pointermove', onDragPointerChange, false],
-      dragUp: ['pointerup', onDragPointerUp, false]
+      dragDown: ['pointerdown', /** @type {EventListener} */ onDragPointerDown, false],
+      dragMove: ['pointermove', /** @type {EventListener} */ onDragPointerChange, false],
+      dragUp: ['pointerup', /** @type {EventListener} */ onDragPointerUp, false]
    };
 
    /**
