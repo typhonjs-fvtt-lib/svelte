@@ -33,26 +33,6 @@ namespace Compose {
     TJSPositionTypes.Positionable |
     Iterable<TJSPositionTypes.Positionable> |
     Array<HTMLElement | object>;
-
-   // Typedefs from GsapPosition -------------------------------------------------------------------------------------
-
-   /**
-    * Stores and tracks any associated `TJSPosition` instance utilized by {@link GsapCompose}.
-    */
-   export type TJSPositionInfo = {
-      position: TJSPosition[];
-
-      positionData: Partial<Data.TJSPositionData>[];
-
-      /**
-       * Contains the full data object when a list of object w/ position is used.
-       */
-      data: object[];
-
-      elements: HTMLElement[];
-
-      gsapData: Array<object[]>;
-   };
 }
 
 export { Compose };

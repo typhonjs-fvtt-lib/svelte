@@ -142,8 +142,8 @@ export class GsapCompose
     * @param {object | import('./types').Compose.GsapData}   [arg1] - Either an object defining timeline options or
     *        GsapData.
     *
-    * @param {import('./types').Compose.GsapData | import('./types').Compose.GsapPositionOptions} [arg2] - When arg1 is
-    *        defined as an object; arg2 defines GsapData.
+    * @param {object | import('./types').Compose.GsapData | import('./types').Compose.GsapPositionOptions} [arg2] -
+    *        When arg1 is defined as an object / Function; arg2 defines GsapData or Gsap options.
     *
     * @param {import('./types').Compose.GsapPositionOptions} [arg3] - Options for filtering and initial data population.
     *

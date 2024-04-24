@@ -400,11 +400,11 @@ export class GsapPosition
     *
     * @param {object[]|Function}             [gsapData] -
     *
-    * @returns {import('./types').Compose.TJSPositionInfo} A TJSPositionInfo instance.
+    * @returns {import('./types-local').TJSPositionInfo} A TJSPositionInfo instance.
     */
    static #getPositionInfo(tjsPositions, vars, filter, gsapData)
    {
-      /** @type {import('./types').Compose.TJSPositionInfo} */
+      /** @type {import('./types-local').TJSPositionInfo} */
       const positionInfo = {
          position: [],
          positionData: [],
@@ -561,8 +561,8 @@ class TimelinePositionImpl
     * Gets the target from GSAP data entry.
     *
     * @param {(
-    *    Partial<import('#runtime/svelte/store/position').Data.TJSPositionData> |
-    *    Partial<import('#runtime/svelte/store/position').Data.TJSPositionData>[]
+    *    import('#runtime/svelte/store/position').Data.TJSPositionDataRelative |
+    *    import('#runtime/svelte/store/position').Data.TJSPositionDataRelative[]
     * )}  positionData - TJSPositionInfo data.
     *
     * @param {HTMLElement | HTMLElement[]}  elements - One or more HTMLElements.
@@ -572,8 +572,8 @@ class TimelinePositionImpl
     * @param {number}         cntr - Current GSAP data entry index.
     *
     * @returns {(
-    *    Partial<import('#runtime/svelte/store/position').Data.TJSPositionData> |
-    *    Partial<import('#runtime/svelte/store/position').Data.TJSPositionData>[] |
+    *    import('#runtime/svelte/store/position').Data.TJSPositionDataRelative |
+    *    import('#runtime/svelte/store/position').Data.TJSPositionDataRelative[] |
     *    HTMLElement | HTMLElement[]
     * )} The target object or HTMLElement.
     */
