@@ -662,11 +662,11 @@ class GsapPosition
     *
     * @param {object[]|Function}             [gsapData] -
     *
-    * @returns {import('./types').Compose.TJSPositionInfo} A TJSPositionInfo instance.
+    * @returns {import('./types-local').TJSPositionInfo} A TJSPositionInfo instance.
     */
    static #getPositionInfo(tjsPositions, vars, filter, gsapData)
    {
-      /** @type {import('./types').Compose.TJSPositionInfo} */
+      /** @type {import('./types-local').TJSPositionInfo} */
       const positionInfo = {
          position: [],
          positionData: [],
@@ -823,20 +823,20 @@ class TimelinePositionImpl
     * Gets the target from GSAP data entry.
     *
     * @param {(
-    *    Partial<import('#runtime/svelte/store/position').Data.TJSPositionData> |
-    *    Partial<import('#runtime/svelte/store/position').Data.TJSPositionData>[]
+    *    import('#runtime/svelte/store/position').Data.TJSPositionDataRelative |
+    *    import('#runtime/svelte/store/position').Data.TJSPositionDataRelative[]
     * )}  positionData - TJSPositionInfo data.
     *
-    * @param {HTMLElement|HTMLElement[]}  elements - One or more HTMLElements.
+    * @param {HTMLElement | HTMLElement[]}  elements - One or more HTMLElements.
     *
     * @param {object}         entry - Gsap data entry.
     *
     * @param {number}         cntr - Current GSAP data entry index.
     *
     * @returns {(
-    *    Partial<import('#runtime/svelte/store/position').Data.TJSPositionData> |
-    *    Partial<import('#runtime/svelte/store/position').Data.TJSPositionData>[] |
-    *    HTMLElement|HTMLElement[]
+    *    import('#runtime/svelte/store/position').Data.TJSPositionDataRelative |
+    *    import('#runtime/svelte/store/position').Data.TJSPositionDataRelative[] |
+    *    HTMLElement | HTMLElement[]
     * )} The target object or HTMLElement.
     */
    static getTarget(positionData, elements, entry, cntr)
@@ -1139,8 +1139,8 @@ class GsapCompose
     * @param {object | import('./types').Compose.GsapData}   [arg1] - Either an object defining timeline options or
     *        GsapData.
     *
-    * @param {import('./types').Compose.GsapData | import('./types').Compose.GsapPositionOptions} [arg2] - When arg1 is
-    *        defined as an object; arg2 defines GsapData.
+    * @param {object | import('./types').Compose.GsapData | import('./types').Compose.GsapPositionOptions} [arg2] -
+    *        When arg1 is defined as an object / Function; arg2 defines GsapData or Gsap options.
     *
     * @param {import('./types').Compose.GsapPositionOptions} [arg3] - Options for filtering and initial data population.
     *
@@ -1403,7 +1403,7 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  *
  * @param {import('./types').Action.DraggableGsapOptions} options - Draggable Gsap options.
  *
- * @returns {import('svelte/action').ActionReturn<Partial<import('./types').Action.DraggableGsapOptions>>} Action
+ * @returns {import('svelte/action').Action<Partial<import('./types').Action.DraggableGsapOptions>>} Action
  *          lifecycle functions.
  */
 function draggableGsap(node, { position, enabled = true, button = 0, storeDragging = void 0, tween = false,
@@ -1465,12 +1465,12 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
    /**
     * Event handlers associated with this action for addition / removal.
     *
-    * @type {object}
+    * @type {{ [p: string]: [string, EventListener, boolean] }}
     */
    const handlers = {
-      dragDown: ['pointerdown', onDragPointerDown, false],
-      dragMove: ['pointermove', onDragPointerChange, false],
-      dragUp: ['pointerup', onDragPointerUp, false]
+      dragDown: ['pointerdown', /** @type {EventListener} */ onDragPointerDown, false],
+      dragMove: ['pointermove', /** @type {EventListener} */ onDragPointerChange, false],
+      dragUp: ['pointerup', /** @type {EventListener} */ onDragPointerUp, false]
    };
 
    /**

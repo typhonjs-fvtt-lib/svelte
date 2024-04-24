@@ -2,7 +2,7 @@ import * as svelte_transition from 'svelte/transition';
 import { EasingFunction } from 'svelte/transition';
 import * as svelte_action from 'svelte/action';
 import { Writable, Readable } from 'svelte/store';
-import { TJSPosition, TJSPositionTypes, Data } from '@typhonjs-svelte/runtime-base/svelte/store/position';
+import { TJSPosition, TJSPositionTypes } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 
 /**
  * The main GSAP object.
@@ -311,7 +311,7 @@ declare namespace Action {
  *
  * @param {import('./types').Action.DraggableGsapOptions} options - Draggable Gsap options.
  *
- * @returns {import('svelte/action').ActionReturn<Partial<import('./types').Action.DraggableGsapOptions>>} Action
+ * @returns {import('svelte/action').Action<Partial<import('./types').Action.DraggableGsapOptions>>} Action
  *          lifecycle functions.
  */
 declare function draggableGsap(
@@ -328,7 +328,7 @@ declare function draggableGsap(
     hasTargetClassList,
     ignoreTargetClassList,
   }: Action.DraggableGsapOptions,
-): svelte_action.ActionReturn<Partial<Action.DraggableGsapOptions>>;
+): svelte_action.Action<Partial<Action.DraggableGsapOptions>>;
 declare namespace draggableGsap {
   /**
    * Define a function to get an DraggableGsapOptionsStore instance.
@@ -378,19 +378,6 @@ declare namespace Compose {
     | TJSPositionTypes.Positionable
     | Iterable<TJSPositionTypes.Positionable>
     | Array<HTMLElement | object>;
-  /**
-   * Stores and tracks any associated `TJSPosition` instance utilized by {@link GsapCompose}.
-   */
-  type TJSPositionInfo = {
-    position: TJSPosition[];
-    positionData: Partial<Data.TJSPositionData>[];
-    /**
-     * Contains the full data object when a list of object w/ position is used.
-     */
-    data: object[];
-    elements: HTMLElement[];
-    gsapData: Array<object[]>;
-  };
 }
 
 /**
@@ -476,8 +463,8 @@ declare class GsapCompose {
    * @param {object | import('./types').Compose.GsapData}   [arg1] - Either an object defining timeline options or
    *        GsapData.
    *
-   * @param {import('./types').Compose.GsapData | import('./types').Compose.GsapPositionOptions} [arg2] - When arg1 is
-   *        defined as an object; arg2 defines GsapData.
+   * @param {object | import('./types').Compose.GsapData | import('./types').Compose.GsapPositionOptions} [arg2] -
+   *        When arg1 is defined as an object / Function; arg2 defines GsapData or Gsap options.
    *
    * @param {import('./types').Compose.GsapPositionOptions} [arg3] - Options for filtering and initial data population.
    *
@@ -486,7 +473,7 @@ declare class GsapCompose {
   static timeline(
     target: Compose.GsapTarget,
     arg1?: object | Compose.GsapData,
-    arg2?: Compose.GsapData | Compose.GsapPositionOptions,
+    arg2?: object | Compose.GsapData | Compose.GsapPositionOptions,
     arg3?: Compose.GsapPositionOptions,
   ): object;
   /**
