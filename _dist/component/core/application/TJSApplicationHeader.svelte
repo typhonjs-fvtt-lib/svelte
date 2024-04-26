@@ -6,7 +6,6 @@
     * @internal
     */
    import { getContext }            from 'svelte';
-   import { cubicOut }              from 'svelte/easing';
 
    import { isTJSSvelteConfig }     from '@typhonjs-svelte/runtime-base/svelte/util';
    import { A11yHelper }            from '@typhonjs-svelte/runtime-base/util/browser';
@@ -52,7 +51,7 @@
    // Combines external options with defaults for TJSApplicationHeader. By default, easing is turned on w/ duration of
    // 0.06 seconds and cubicOut, but can be overridden by any provided `draggableOptions`. `position`, `active`, and
    // `storeDragging` are always overridden by application position / stores.
-   $: dragOptions = Object.assign({}, { tween: true, tweenOptions: { duration: 0.06, ease: cubicOut } },
+   $: dragOptions = Object.assign({}, { tween: true, tweenOptions: { duration: 0.06, ease: 'cubicOut' } },
     isObject(draggableOptions) ? draggableOptions : {}, { position: application.position, enabled:
      $storeDraggable, storeDragging, hasTargetClassList: s_DRAG_TARGET_CLASSLIST });
 

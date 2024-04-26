@@ -1,5 +1,5 @@
-import * as svelte_transition from 'svelte/transition';
-import { EasingFunction } from 'svelte/transition';
+import * as _runtime_svelte_easing from '@typhonjs-svelte/runtime-base/svelte/easing';
+import { EasingFunction } from '@typhonjs-svelte/runtime-base/svelte/easing';
 import * as svelte_action from 'svelte/action';
 import { Writable, Readable } from 'svelte/store';
 import { TJSPosition, TJSPositionTypes } from '@typhonjs-svelte/runtime-base/svelte/store/position';
@@ -83,7 +83,7 @@ type GsapEasingFunctionName =
  * Performs a lookup for standard Gsap easing functions by name. All Svelte easing functions are also available by
  * prepending `svelte-<EASE_NAME>`. For convenience if passing in a function it is returned verbatim.
  *
- * @param {import('./types').GsapEasingFunctionName | import('svelte/transition').EasingFunction} nameOrFunc - The name
+ * @param {import('./types').GsapEasingFunctionName | import('#runtime/svelte/easing').EasingFunction} nameOrFunc - The name
  *        of a standard Svelte easing function or an existing supplied easing function.
  *
  * @param {object}   [options] - Optional parameters.
@@ -91,14 +91,14 @@ type GsapEasingFunctionName =
  * @param {import('./types').GsapEasingFunctionName | false} [options.default='linear'] - The default easing function
  *        name to apply. When specified as `false` no default fallback easing function is selected.
  *
- * @returns {import('svelte/transition').EasingFunction} The requested easing function.
+ * @returns {import('#runtime/svelte/easing').EasingFunction} The requested easing function.
  */
 declare function getGsapEasingFunc(
-  nameOrFunc: GsapEasingFunctionName | svelte_transition.EasingFunction,
+  nameOrFunc: GsapEasingFunctionName | _runtime_svelte_easing.EasingFunction,
   options?: {
     default?: GsapEasingFunctionName | false;
   },
-): svelte_transition.EasingFunction;
+): _runtime_svelte_easing.EasingFunction;
 /**
  * The main GSAP object.
  *
@@ -110,9 +110,9 @@ declare let gsap: any;
  * {@link gsapEasingList} is an index of all the function names that are available in the `gsapEasingFunc` object. You may
  * use these functions with Gsap or Svelte.
  *
- * @type {Readonly<Record<import('types').GsapEasingFunctionName, import('svelte/transition').EasingFunction>>}
+ * @type {Readonly<Record<import('types').GsapEasingFunctionName, import('#runtime/svelte/easing').EasingFunction>>}
  */
-declare const gsapEasingFunc: Readonly<Record<any, svelte_transition.EasingFunction>>;
+declare const gsapEasingFunc: Readonly<Record<any, _runtime_svelte_easing.EasingFunction>>;
 /**
  * Provides a list of Gsap easing functions that are preconfigured and registered with `gsap`. `gsapEasingList`
  * is an index of all the function names that are available in the {@link gsapEasingFunc} object. Additionally, all
