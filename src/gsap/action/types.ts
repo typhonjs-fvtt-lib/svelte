@@ -2,7 +2,7 @@ import type {
    Readable,
    Writable }                    from 'svelte/store';
 
-import type { EasingFunction }   from 'svelte/transition';
+import type { EasingFunction }   from '#runtime/svelte/easing';
 
 import type {
    TJSPosition,

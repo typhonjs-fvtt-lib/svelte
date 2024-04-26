@@ -679,7 +679,7 @@ class DraggableGsapOptionsStore
    }
 
    /**
-    * @param {string|import('svelte/transition').EasingFunction} value - Set tween easing function value.
+    * @param {string|import('#runtime/svelte/easing').EasingFunction} value - Set tween easing function value.
     */
    set tweenEase(value)
    {
