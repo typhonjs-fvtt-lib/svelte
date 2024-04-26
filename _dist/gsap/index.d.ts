@@ -5,6 +5,101 @@ import { Writable, Readable } from 'svelte/store';
 import { TJSPosition, TJSPositionTypes } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 
 /**
+ * Defines all the standard 1-dimensional Gsap easing function names.
+ */
+type GsapEasingFunctionName =
+  | 'back.in(1)'
+  | 'back.inOut(1)'
+  | 'back.out(1)'
+  | 'back.in(10)'
+  | 'back.inOut(10)'
+  | 'back.out(10)'
+  | 'bounce.in'
+  | 'bounce.inOut'
+  | 'bounce.out'
+  | 'circ.in'
+  | 'circ.inOut'
+  | 'circ.out'
+  | 'elastic.in(1, 0.5)'
+  | 'elastic.inOut(1, 0.5)'
+  | 'elastic.out(1, 0.5)'
+  | 'elastic.in(10, 5)'
+  | 'elastic.inOut(10, 5)'
+  | 'elastic.out(10, 5)'
+  | 'expo.in'
+  | 'expo.inOut'
+  | 'expo.out'
+  | 'linear'
+  | 'power1.in'
+  | 'power1.inOut'
+  | 'power1.out'
+  | 'power2.in'
+  | 'power2.inOut'
+  | 'power2.out'
+  | 'power3.in'
+  | 'power3.inOut'
+  | 'power3.out'
+  | 'power4.in'
+  | 'power4.inOut'
+  | 'power4.out'
+  | 'sine.in'
+  | 'sine.inOut'
+  | 'sine.out'
+  | 'steps(10)'
+  | 'steps(100)'
+  | 'svelte-backIn'
+  | 'svelte-backInOut'
+  | 'svelte-backOut'
+  | 'svelte-bounceIn'
+  | 'svelte-bounceInOut'
+  | 'svelte-bounceOut'
+  | 'svelte-circIn'
+  | 'svelte-circInOut'
+  | 'svelte-circOut'
+  | 'svelte-cubicIn'
+  | 'svelte-cubicInOut'
+  | 'svelte-cubicOut'
+  | 'svelte-elasticIn'
+  | 'svelte-elasticInOut'
+  | 'svelte-elasticOut'
+  | 'svelte-expoIn'
+  | 'svelte-expoInOut'
+  | 'svelte-expoOut'
+  | 'svelte-linear'
+  | 'svelte-quadIn'
+  | 'svelte-quadInOut'
+  | 'svelte-quadOut'
+  | 'svelte-quartIn'
+  | 'svelte-quartInOut'
+  | 'svelte-quartOut'
+  | 'svelte-quintIn'
+  | 'svelte-quintInOut'
+  | 'svelte-quintOut'
+  | 'svelte-sineIn'
+  | 'svelte-sineInOut'
+  | 'svelte-sineOut';
+
+/**
+ * Performs a lookup for standard Gsap easing functions by name. All Svelte easing functions are also available by
+ * prepending `svelte-<EASE_NAME>`. For convenience if passing in a function it is returned verbatim.
+ *
+ * @param {import('./types').GsapEasingFunctionName | import('svelte/transition').EasingFunction} nameOrFunc - The name
+ *        of a standard Svelte easing function or an existing supplied easing function.
+ *
+ * @param {object}   [options] - Optional parameters.
+ *
+ * @param {import('./types').GsapEasingFunctionName | false} [options.default='linear'] - The default easing function
+ *        name to apply. When specified as `false` no default fallback easing function is selected.
+ *
+ * @returns {import('svelte/transition').EasingFunction} The requested easing function.
+ */
+declare function getGsapEasingFunc(
+  nameOrFunc: GsapEasingFunctionName | svelte_transition.EasingFunction,
+  options?: {
+    default?: GsapEasingFunctionName | false;
+  },
+): svelte_transition.EasingFunction;
+/**
  * The main GSAP object.
  *
  * @see https://greensock.com/docs/v3/GSAP
@@ -12,94 +107,20 @@ import { TJSPosition, TJSPositionTypes } from '@typhonjs-svelte/runtime-base/sve
 declare let gsap: any;
 /**
  * Provides an object of Gsap and Svelte easing functions that are preconfigured and registered with `gsap`.
- * {@link easingList} is an index of all the function names that are available in the `easingFunc` object. You may
+ * {@link gsapEasingList} is an index of all the function names that are available in the `gsapEasingFunc` object. You may
  * use these functions with Gsap or Svelte.
  *
- * @type {{ [key: string]: import('svelte/transition').EasingFunction }}
+ * @type {Readonly<Record<import('types').GsapEasingFunctionName, import('svelte/transition').EasingFunction>>}
  */
-declare const easingFunc: {
-  [key: string]: svelte_transition.EasingFunction;
-};
+declare const gsapEasingFunc: Readonly<Record<any, svelte_transition.EasingFunction>>;
 /**
- * Provides a list of Gsap easing functions that are preconfigured and registered with `gsap`. `easingList`
- * is an index of all the function names that are available in the {@link easingFunc} object. Additionally, all Svelte
- * easing functions are loaded and prepended with `svelte-<function name>`.
+ * Provides a list of Gsap easing functions that are preconfigured and registered with `gsap`. `gsapEasingList`
+ * is an index of all the function names that are available in the {@link gsapEasingFunc} object. Additionally, all
+ * Svelte easing functions are loaded and prepended with `svelte-<function name>`.
  *
- * The easing list include:
- * - back.in(1)
- * - back.inOut(1)
- * - back.out(1)
- * - back.in(10)
- * - back.inOut(10)
- * - back.out(10)
- * - bounce.in
- * - bounce.inOut
- * - bounce.out
- * - circ.in
- * - circ.inOut
- * - circ.out
- * - elastic.in(1, 0.5)
- * - elastic.inOut(1, 0.5)
- * - elastic.out(1, 0.5)
- * - elastic.in(10, 5)
- * - elastic.inOut(10, 5)
- * - elastic.out(10, 5)
- * - expo.in
- * - expo.inOut
- * - expo.out
- * - linear // same as 'none'
- * - power1.in
- * - power1.inOut
- * - power1.out
- * - power2.in
- * - power2.inOut
- * - power2.out
- * - power3.in
- * - power3.inOut
- * - power3.out
- * - power4.in
- * - power4.inOut
- * - power4.out
- * - sine.in
- * - sine.inOut
- * - sine.out
- * - steps(10)
- * - steps(100)'
- * - svelte-backIn
- * - svelte-backInOut
- * - svelte-backOut
- * - svelte-bounceIn
- * - svelte-bounceInOut
- * - svelte-bounceOut
- * - svelte-circIn
- * - svelte-circInOut
- * - svelte-circOut
- * - svelte-cubicIn
- * - svelte-cubicInOut
- * - svelte-cubicOut
- * - svelte-elasticIn
- * - svelte-elasticInOut
- * - svelte-elasticOut
- * - svelte-expoIn
- * - svelte-expoInOut
- * - svelte-expoOut
- * - svelte-linear
- * - svelte-quadIn
- * - svelte-quadInOut
- * - svelte-quadOut
- * - svelte-quartIn
- * - svelte-quartInOut
- * - svelte-quartOut
- * - svelte-quintIn
- * - svelte-quintInOut
- * - svelte-quintOut
- * - svelte-sineIn
- * - svelte-sineInOut
- * - svelte-sineOut
- *
- * @type {string[]}
+ * @type {ReadonlyArray<import('./types').GsapEasingFunctionName>}
  */
-declare const easingList: string[];
+declare const gsapEasingList: ReadonlyArray<GsapEasingFunctionName>;
 
 /**
  * Defines the types for the {@link draggableGsap} action.
@@ -497,4 +518,15 @@ declare class GsapCompose {
  */
 declare function gsapLoadPlugin(name: string): Promise<any>;
 
-export { Action, Compose, GsapCompose, draggableGsap, easingFunc, easingList, gsap, gsapLoadPlugin };
+export {
+  Action,
+  Compose,
+  GsapCompose,
+  type GsapEasingFunctionName,
+  draggableGsap,
+  getGsapEasingFunc,
+  gsap,
+  gsapEasingFunc,
+  gsapEasingList,
+  gsapLoadPlugin,
+};
