@@ -7,43 +7,19 @@ import {
    isObject }           from '#runtime/util/object';
 
 import { TimelineImpl } from './TimelineImpl.js';
-/**
- * Stores the entry types that potentially use the generated initial position data.
- *
- * @type {Set<string>}
- */
-const s_TYPES_POSITION = new Set(['from', 'fromTo', 'set', 'to']);
 
 /**
- * Stores the TJSPosition properties in order to create the minimum update data object when animating.
- *
- * @type {Set<string>}
+ * Stores shared internal data for {@link GsapPosition}.
  */
-const s_POSITION_KEYS = new Set([
- // Main keys
- 'left', 'top', 'maxWidth', 'maxHeight', 'minWidth', 'minHeight', 'width', 'height',
-  'rotateX', 'rotateY', 'rotateZ', 'scale', 'translateX', 'translateY', 'translateZ', 'zIndex',
-
- // Aliases
- 'rotation'
-]);
-
-/**
- * Stores the seen TJSPosition properties when building the minimum update data object when animating.
- *
- * @type {Set<string>}
- */
-const s_POSITION_PROPS = new Set();
-
-/**
- * Defines the options for {@link TJSPosition.get}.
- *
- * @type {{keys: Set<string>, numeric: boolean}}
- */
-const s_POSITION_GET_OPTIONS = {
-   keys: s_POSITION_PROPS,
-   numeric: true
-};
+class GsapPositionData
+{
+   /**
+    * Stores the seen TJSPosition properties when building the minimum update data object when animating.
+    *
+    * @type {Set<keyof import('#runtime/svelte/store/position').Data.TJSPositionData>}
+    */
+   static tjsPositionProps = new Set();
+}
 
 /**
  * Provides a data driven ways to connect a {@link TJSPosition} instance with a GSAP timeline and tweens.
@@ -53,6 +29,26 @@ const s_POSITION_GET_OPTIONS = {
  */
 export class GsapPosition
 {
+   /**
+    * Stores the entry types that potentially use the generated initial position data.
+    *
+    * @type {ReadonlySet<string>}
+    */
+   static #supportedEntryTypes = Object.freeze(new Set(['from', 'fromTo', 'set', 'to']));
+
+   /**
+    * Defines the options for {@link TJSPosition.get}.
+    *
+    * @type {(Readonly<{
+    *    keys: Set<keyof import('#runtime/svelte/store/position').Data.TJSPositionData>,
+    *    numeric: boolean
+    * }>)}
+    */
+   static #tjsPositionGetOptions = Object.freeze({
+      keys: GsapPositionData.tjsPositionProps,
+      numeric: true
+   });
+
    /**
     * Defines the options used for {@link TJSPosition.set}.
     *
@@ -81,17 +77,17 @@ export class GsapPosition
       const initialProps = options?.initialProps;
 
       // Only retrieve the TJSPosition keys that are in vars.
-      s_POSITION_PROPS.clear();
+      GsapPositionData.tjsPositionProps.clear();
 
       // Add any initial props if defined.
       if (isIterable(initialProps))
       {
-         for (const prop of initialProps) { s_POSITION_PROPS.add(prop); }
+         for (const prop of initialProps) { GsapPositionData.tjsPositionProps.add(prop); }
       }
 
       for (const prop in vars)
       {
-         if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
+         if (TJSPosition.Animate.isAnimationKey(prop)) { GsapPositionData.tjsPositionProps.add(prop); }
       }
 
       const positionData = GsapPosition.#getPositionInfo(tjsPosition, vars, filter).positionData;
@@ -122,22 +118,22 @@ export class GsapPosition
       const initialProps = options?.initialProps;
 
       // Only retrieve the TJSPosition keys that are in vars.
-      s_POSITION_PROPS.clear();
+      GsapPositionData.tjsPositionProps.clear();
 
       // Add any initial props if defined.
       if (isIterable(initialProps))
       {
-         for (const prop of initialProps) { s_POSITION_PROPS.add(prop); }
+         for (const prop of initialProps) { GsapPositionData.tjsPositionProps.add(prop); }
       }
 
       for (const prop in fromVars)
       {
-         if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
+         if (TJSPosition.Animate.isAnimationKey(prop)) { GsapPositionData.tjsPositionProps.add(prop); }
       }
 
       for (const prop in toVars)
       {
-         if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
+         if (TJSPosition.Animate.isAnimationKey(prop)) { GsapPositionData.tjsPositionProps.add(prop); }
       }
 
       const positionData = GsapPosition.#getPositionInfo(tjsPosition, toVars, filter).positionData;
@@ -168,16 +164,16 @@ export class GsapPosition
       const initialProps = options?.initialProps;
 
       // Only retrieve the TJSPosition keys that are in vars.
-      s_POSITION_PROPS.clear();
+      GsapPositionData.tjsPositionProps.clear();
 
       // Add any initial props if defined.
       if (isIterable(initialProps))
       {
-         for (const prop of initialProps) { s_POSITION_PROPS.add(prop); }
+         for (const prop of initialProps) { GsapPositionData.tjsPositionProps.add(prop); }
       }
 
       // Add specific key specified to initial `positionData`.
-      if (s_POSITION_KEYS.has(key)) { s_POSITION_PROPS.add(key); }
+      if (TJSPosition.Animate.isAnimationKey(key)) { GsapPositionData.tjsPositionProps.add(key); }
 
       const positionData = GsapPosition.#getPositionInfo(tjsPosition, vars, filter).positionData;
 
@@ -228,12 +224,12 @@ export class GsapPosition
       const filter = options?.filter;
       const initialProps = options?.initialProps;
 
-      s_POSITION_PROPS.clear();
+      GsapPositionData.tjsPositionProps.clear();
 
       // Add any initial props if defined.
       if (isIterable(initialProps))
       {
-         for (const prop of initialProps) { s_POSITION_PROPS.add(prop); }
+         for (const prop of initialProps) { GsapPositionData.tjsPositionProps.add(prop); }
       }
 
       const positionInfo = GsapPosition.#getPositionInfo(tjsPosition, timelineOptions, filter, gsapData);
@@ -371,17 +367,17 @@ export class GsapPosition
       const initialProps = options?.initialProps;
 
       // Only retrieve the TJSPosition keys that are in vars.
-      s_POSITION_PROPS.clear();
+      GsapPositionData.tjsPositionProps.clear();
 
       // Add any initial props if defined.
       if (isIterable(initialProps))
       {
-         for (const prop of initialProps) { s_POSITION_PROPS.add(prop); }
+         for (const prop of initialProps) { GsapPositionData.tjsPositionProps.add(prop); }
       }
 
       for (const prop in vars)
       {
-         if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
+         if (TJSPosition.Animate.isAnimationKey(prop)) { GsapPositionData.tjsPositionProps.add(prop); }
       }
 
       const positionData = GsapPosition.#getPositionInfo(tjsPosition, vars, filter).positionData;
@@ -442,7 +438,7 @@ export class GsapPosition
                   index - 1}) failed to return an iterable list.`);
             }
 
-            s_VALIDATE_GSAPDATA_ENTRY(finalGsapData);
+            this.#validateGsapDataEntry(finalGsapData);
 
             positionInfo.gsapData.push(finalGsapData);
          };
@@ -458,7 +454,7 @@ export class GsapPosition
       }
       else if (isIterable(gsapData))
       {
-         s_VALIDATE_GSAPDATA_ENTRY(gsapData);
+         this.#validateGsapDataEntry(gsapData);
 
          positionInfo.gsapData.push(gsapData);
       }
@@ -473,7 +469,7 @@ export class GsapPosition
 
             const position = isPosition ? entry : entry.position;
             const data = isPosition ? void 0 : entry;
-            const positionData = position.get({}, s_POSITION_GET_OPTIONS);
+            const positionData = position.get({}, this.#tjsPositionGetOptions);
 
             positionInfo.position.push(position);
             positionInfo.positionData.push(positionData);
@@ -487,7 +483,7 @@ export class GsapPosition
 
          const position = isPosition ? tjsPositions : tjsPositions.position;
          const data = isPosition ? void 0 : tjsPositions;
-         const positionData = position.get({}, s_POSITION_GET_OPTIONS);
+         const positionData = position.get({}, this.#tjsPositionGetOptions);
 
          positionInfo.position.push(position);
          positionInfo.positionData.push(positionData);
@@ -549,6 +545,34 @@ export class GsapPosition
       }
 
       return positionInfo;
+   }
+
+   /**
+    * Validates `gsapData` entries.
+    *
+    * @param {Iterable<object>} gsapData - GsapData array.
+    */
+   static #validateGsapDataEntry(gsapData)
+   {
+      let index = 0;
+
+      for (const entry of gsapData)
+      {
+         if (!isObject(entry))
+         {
+            throw new TypeError(`GsapCompose.timeline error: 'gsapData[${index}]' is not an object.`);
+         }
+
+         // Determine if any of the entries has a position related type and targets position by explicit value or by
+         // default. Build up only the position properties that are being modified by all entries. This allows maximum
+         // composability when animating multiple non-overlapping properties in a timeline.
+         if (this.#supportedEntryTypes.has(entry.type) && (entry.target === void 0 || entry.target === 'position'))
+         {
+            TimelinePositionImpl.validatePositionProp(entry, index);
+         }
+
+         index++;
+      }
    }
 }
 
@@ -645,8 +669,8 @@ class TimelinePositionImpl
 
    /**
     * Validates data for TJSPosition related properties: 'from', 'fromTo', 'set', 'to'. Also adds all properties found
-    * in Gsap entry data to s_POSITION_PROPS, so that just the properties being animated are added to animated
-    * `positionData`.
+    * in Gsap entry data to GsapPositionData.tjsPositionProps, so that just the properties being animated are added to
+    * animated `positionData`.
     *
     * @param {object}   entry - Gsap entry data.
     *
@@ -678,7 +702,7 @@ class TimelinePositionImpl
             // Only retrieve the TJSPosition keys that are in vars.
             for (const prop in vars)
             {
-               if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
+               if (TJSPosition.Animate.isAnimationKey(prop)) { GsapPositionData.tjsPositionProps.add(prop); }
             }
 
             break;
@@ -702,45 +726,16 @@ class TimelinePositionImpl
             // Only retrieve the TJSPosition keys that are in fromVars / toVars.
             for (const prop in fromVars)
             {
-               if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
+               if (TJSPosition.Animate.isAnimationKey(prop)) { GsapPositionData.tjsPositionProps.add(prop); }
             }
 
             for (const prop in toVars)
             {
-               if (s_POSITION_KEYS.has(prop)) { s_POSITION_PROPS.add(prop); }
+               if (TJSPosition.Animate.isAnimationKey(prop)) { GsapPositionData.tjsPositionProps.add(prop); }
             }
 
             break;
          }
       }
-   }
-}
-
-
-/**
- * Validates `gsapData` entries.
- *
- * @param {Iterable<object>} gsapData - GsapData array.
- */
-function s_VALIDATE_GSAPDATA_ENTRY(gsapData)
-{
-   let index = 0;
-
-   for (const entry of gsapData)
-   {
-      if (!isObject(entry))
-      {
-         throw new TypeError(`GsapCompose.timeline error: 'gsapData[${index}]' is not an object.`);
-      }
-
-      // Determine if any of the entries has a position related type and targets position by explicit value or by
-      // default. Build up only the position properties that are being modified by all entries. This allows maximum
-      // composability when animating multiple non-overlapping properties in a timeline.
-      if (s_TYPES_POSITION.has(entry.type) && (entry.target === void 0 || entry.target === 'position'))
-      {
-         TimelinePositionImpl.validatePositionProp(entry, index);
-      }
-
-      index++;
    }
 }
