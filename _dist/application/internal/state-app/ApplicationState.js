@@ -1,6 +1,3 @@
-import { linear }             from 'svelte/easing';
-
-import { lerp }               from '@typhonjs-svelte/runtime-base/math/interpolate';
 import { isObject }           from '@typhonjs-svelte/runtime-base/util/object';
 
 /**
@@ -87,8 +84,8 @@ export class ApplicationState
     * Restores a saved application state returning the data. Several optional parameters are available
     * to control whether the restore action occurs silently (no store / inline styles updates), animates
     * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
-    * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
-    * returned if awaiting the end of the animation.
+    * specification of the duration and easing along with configuring a Promise to be returned if awaiting the end of
+    * the animation.
     *
     * @param {object}            params - Parameters
     *
@@ -102,15 +99,15 @@ export class ApplicationState
     *
     * @param {number}            [params.duration=0.1] - Duration in seconds.
     *
-    * @param {Function}          [params.ease=linear] - Easing function.
-    *
-    * @param {Function}          [params.interpolate=lerp] - Interpolation function.
+    * @param {(
+    *    import('@typhonjs-svelte/runtime-base/svelte/easing').EasingFunctionName |
+    *    import('@typhonjs-svelte/runtime-base/svelte/easing').EasingFunction
+    * )} [params.ease='linear'] - Easing function or easing function name.
     *
     * @returns {import('./types').ApplicationStateData | Promise<import('./types').ApplicationStateData>} Saved
     *          application data.
     */
-   restore({ name, remove = false, async = false, animateTo = false, duration = 0.1, ease = linear,
-    interpolate = lerp })
+   restore({ name, remove = false, async = false, animateTo = false, duration = 0.1, ease = 'linear' })
    {
       if (typeof name !== 'string')
       {
@@ -125,11 +122,11 @@ export class ApplicationState
 
          if (async)
          {
-            return this.set(dataSaved, { async, animateTo, duration, ease, interpolate }).then(() => dataSaved);
+            return this.set(dataSaved, { async, animateTo, duration, ease }).then(() => dataSaved);
          }
          else
          {
-            this.set(dataSaved, { async, animateTo, duration, ease, interpolate });
+            this.set(dataSaved, { async, animateTo, duration, ease });
          }
       }
 
@@ -162,8 +159,8 @@ export class ApplicationState
     * Restores a saved application state returning the data. Several optional parameters are available
     * to control whether the restore action occurs silently (no store / inline styles updates), animates
     * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
-    * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
-    * returned if awaiting the end of the animation.
+    * specification of the duration and easing along with configuring a Promise to be returned if awaiting the end of
+    * the animation.
     *
     * Note: If serializing application state any minimized apps will use the before minimized state on initial render
     * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
@@ -180,13 +177,14 @@ export class ApplicationState
     *
     * @param {number}            [opts.duration=0.1] - Duration in seconds.
     *
-    * @param {Function}          [opts.ease=linear] - Easing function.
-    *
-    * @param {Function}          [opts.interpolate=lerp] - Interpolation function.
+    * @param {(
+    *    import('@typhonjs-svelte/runtime-base/svelte/easing').EasingFunctionName |
+    *    import('@typhonjs-svelte/runtime-base/svelte/easing').EasingFunction
+    * )} [opts.ease='linear'] - Easing function or easing function name.
     *
     * @returns {T | Promise<T>} When synchronous the application or Promise when animating resolving with application.
     */
-   set(data, { async = false, animateTo = false, duration = 0.1, ease = linear, interpolate = lerp } = {})
+   set(data, { async = false, animateTo = false, duration = 0.1, ease = 'linear' } = {})
    {
       if (!isObject(data))
       {
@@ -230,8 +228,7 @@ export class ApplicationState
             }
          }
 
-         const promise = application.position.animate.to(data.position,
-          { duration, ease, interpolate }).finished.then((cancelled) =>
+         const promise = application.position.animate.to(data.position, { duration, ease }).finished.then((cancelled) =>
          {
             if (cancelled) { return application; }
 

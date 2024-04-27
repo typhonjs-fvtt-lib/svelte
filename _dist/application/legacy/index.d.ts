@@ -4,6 +4,7 @@ import * as _typhonjs_svelte_runtime_base_svelte_store_position from '@typhonjs-
 import { Data, TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import { SvelteComponent } from 'svelte';
 import { TJSSvelteConfig } from '@typhonjs-svelte/runtime-base/svelte/util';
+import { EasingFunctionName, EasingFunction } from '@typhonjs-svelte/runtime-base/svelte/easing';
 import { Readable, Writable } from 'svelte/store';
 import { TJSWebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 
@@ -162,8 +163,8 @@ declare interface ApplicationState<T> {
    * Restores a saved application state returning the data. Several optional parameters are available
    * to control whether the restore action occurs silently (no store / inline styles updates), animates
    * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
-   * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
-   * returned if awaiting the end of the animation.
+   * specification of the duration and easing along with configuring a Promise to be returned if awaiting the end of
+   * the animation.
    *
    * @param {object}            params - Parameters
    *
@@ -177,9 +178,7 @@ declare interface ApplicationState<T> {
    *
    * @param {number}            [params.duration=0.1] - Duration in seconds.
    *
-   * @param {Function}          [params.ease=linear] - Easing function.
-   *
-   * @param {Function}          [params.interpolate=lerp] - Interpolation function.
+   * @param {EasingFunctionName | EasingFunction} [params.ease='linear'] - Easing function name or function.
    *
    * @returns {ApplicationStateData|Promise<ApplicationStateData>} Saved application data.
    */
@@ -190,15 +189,13 @@ declare interface ApplicationState<T> {
     animateTo,
     duration,
     ease,
-    interpolate,
   }: {
     name: string;
     remove?: boolean;
     async?: boolean;
     animateTo?: boolean;
     duration?: number;
-    ease?: Function;
-    interpolate?: Function;
+    ease?: EasingFunctionName | EasingFunction;
   }): ApplicationStateData | Promise<ApplicationStateData>;
   /**
    * Saves current application state with the opportunity to add extra data to the saved state.
@@ -216,8 +213,8 @@ declare interface ApplicationState<T> {
    * Restores a saved application state returning the data. Several optional parameters are available
    * to control whether the restore action occurs silently (no store / inline styles updates), animates
    * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
-   * specification of the duration, easing, and interpolate functions along with configuring a Promise to be
-   * returned if awaiting the end of the animation.
+   * specification of the duration and easing along with configuring a Promise to be returned if awaiting the end of
+   * the animation.
    *
    * Note: If serializing application state any minimized apps will use the before minimized state on initial render
    * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
@@ -234,11 +231,7 @@ declare interface ApplicationState<T> {
    *
    * @param {Function}          [opts.ease=linear] - Easing function.
    *
-   * @param {Function}          [opts.interpolate=lerp] - Interpolation function.
-   *
-   * @returns {(import('../SvelteApplication').SvelteApplication |
-   *    Promise<import('../SvelteApplication').SvelteApplication>)} When synchronous the application or Promise when
-   *    animating resolving with application.
+   * @returns {T | Promise<T>} When synchronous the application or Promise when animating resolving with application.
    */
   set(
     data: ApplicationStateData,
@@ -247,13 +240,11 @@ declare interface ApplicationState<T> {
       animateTo,
       duration,
       ease,
-      interpolate,
     }?: {
       async?: boolean;
       animateTo?: boolean;
       duration?: number;
       ease?: Function;
-      interpolate?: Function;
     },
   ): T | Promise<T>;
 }
