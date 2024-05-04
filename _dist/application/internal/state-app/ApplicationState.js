@@ -130,7 +130,8 @@ export class ApplicationState
          }
       }
 
-      return dataSaved;
+      // Saved data potentially not found, but must still return a Promise when async is true.
+      return async ? Promise.resolve(dataSaved) : dataSaved;
    }
 
    /**

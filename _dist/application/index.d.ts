@@ -1445,7 +1445,7 @@ type SvelteApplicationOptions = {
    * A validator
    * function or data or list of validators.
    */
-  positionValidator?: _typhonjs_svelte_runtime_base_svelte_store_position.ValidatorAPI.Options;
+  positionValidator?: any;
   /**
    * An instance of
    * TJSWebStorage (session) to share across SvelteApplications.
