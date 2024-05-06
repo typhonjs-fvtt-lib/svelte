@@ -459,7 +459,9 @@ export class GsapPosition
          positionInfo.gsapData.push(gsapData);
       }
 
-      const existingOnUpdate = vars.onUpdate;
+      // Ignore any existing `onUpdate` function if marked as coming from GsapPosition. This is set below.
+      const existingOnUpdate = typeof vars.onUpdate?.fromGsapPosition === 'boolean' && vars.onUpdate.fromGsapPosition ?
+       void 0 : vars.onUpdate;
 
       if (isIterable(tjsPositions))
       {
@@ -543,6 +545,9 @@ export class GsapPosition
             };
          }
       }
+
+      // Mark the update function as coming from GsapPosition.
+      vars.onUpdate.fromGsapPosition = true;
 
       return positionInfo;
    }

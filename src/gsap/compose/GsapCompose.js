@@ -36,7 +36,7 @@ export class GsapCompose
       }
 
       // If target is TJSPosition related attempt to dispatch to GsapPosition.
-      const positionTween = s_DISPATCH_POSITION('from', target, options, vars);
+      const positionTween = this.#dispatchPosition('from', target, options, vars);
 
       return positionTween !== void 0 ? positionTween : gsap.from(target, vars);
    }
@@ -66,7 +66,7 @@ export class GsapCompose
       }
 
       // If target is TJSPosition related attempt to dispatch to GsapPosition.
-      const positionTween = s_DISPATCH_POSITION('fromTo', target, options, fromVars, toVars);
+      const positionTween = this.#dispatchPosition('fromTo', target, options, fromVars, toVars);
 
       return positionTween !== void 0 ? positionTween : gsap.fromTo(target, fromVars, toVars);
    }
@@ -109,7 +109,7 @@ export class GsapCompose
       }
 
       // If target is TJSPosition related attempt to dispatch to GsapPosition.
-      const positionQuickTo = s_DISPATCH_POSITION('quickTo', target, options, key, vars);
+      const positionQuickTo = this.#dispatchPosition('quickTo', target, options, key, vars);
 
       return positionQuickTo !== void 0 ? positionQuickTo : gsap.quickTo(target, key, vars);
    }
@@ -165,7 +165,7 @@ export class GsapCompose
       }
 
       // If target is TJSPosition related attempt to dispatch to GsapPosition.
-      const positionTimeline = s_DISPATCH_POSITION('timeline', target, arg1, arg2, arg3);
+      const positionTimeline = this.#dispatchPosition('timeline', target, arg1, arg2, arg3);
       if (positionTimeline !== void 0) { return positionTimeline; }
 
       // Load the variable arguments from arg1 / arg2.
@@ -203,7 +203,7 @@ export class GsapCompose
             throw new TypeError(`GsapCompose.timeline error: 'gsapData[${index}]' is not an object.`);
          }
 
-         s_VALIDATE_OPTIONS(entry, index);
+         this.#validateOptions(entry, index);
 
          index++;
       }
@@ -278,116 +278,116 @@ export class GsapCompose
       }
 
       // If target is TJSPosition related attempt to dispatch to GsapPosition.
-      const positionTween = s_DISPATCH_POSITION('to', target, options, vars);
+      const positionTween = this.#dispatchPosition('to', target, options, vars);
 
       return positionTween !== void 0 ? positionTween : gsap.to(target, vars);
    }
-}
 
-/**
- * @param {string}            operation - GsapPosition function to invoke.
- *
- * @param {TJSPosition | object}   [target] -
- *
- * @param {object}            [options] -
- *
- * @param {*}                 [arg1] -
- *
- * @param {*}                 [arg2] -
- *
- * @returns {*} GsapPosition function result.
- */
-function s_DISPATCH_POSITION(operation, target, options, arg1, arg2)
-{
-   if (target instanceof TJSPosition)
-   {
-      return GsapPosition[operation](target, options, arg1, arg2);
-   }
-   else if (isObject(target) && target.position instanceof TJSPosition)
-   {
-      return GsapPosition[operation](target.position, options, arg1, arg2);
-   }
-   else if (isIterable(target))
-   {
-      let hasPosition = false;
-      let allPosition = true;
+   // Internal implementation ----------------------------------------------------------------------------------------
 
-      for (const entry of target)
+   /**
+    * @param {string}            operation - GsapPosition function to invoke.
+    *
+    * @param {TJSPosition | object}   [target] -
+    *
+    * @param {object}            [options] -
+    *
+    * @param {*}                 [arg1] -
+    *
+    * @param {*}                 [arg2] -
+    *
+    * @returns {*} GsapPosition function result.
+    */
+   static #dispatchPosition(operation, target, options, arg1, arg2)
+   {
+      if (target instanceof TJSPosition)
       {
-         const isPosition = entry instanceof TJSPosition || entry?.position instanceof TJSPosition;
+         return GsapPosition[operation](target, options, arg1, arg2);
+      }
+      else if (isObject(target) && target.position instanceof TJSPosition)
+      {
+         return GsapPosition[operation](target.position, options, arg1, arg2);
+      }
+      else if (isIterable(target))
+      {
+         let hasPosition = false;
+         let allPosition = true;
 
-         hasPosition |= isPosition;
-         if (!isPosition) { allPosition = false; }
+         for (const entry of target)
+         {
+            const isPosition = entry instanceof TJSPosition || entry?.position instanceof TJSPosition;
+
+            hasPosition |= isPosition;
+            if (!isPosition) { allPosition = false; }
+         }
+
+         if (hasPosition)
+         {
+            if (!allPosition)
+            {
+               throw new TypeError(`GsapCompose.${
+                operation} error: 'target' is an iterable list but all entries are not a Position instance.`);
+            }
+            else
+            {
+               return GsapPosition[operation](target, options, arg1, arg2);
+            }
+         }
       }
 
-      if (hasPosition)
-      {
-         if (!allPosition)
-         {
-            throw new TypeError(`GsapCompose.${
-             operation} error: 'target' is an iterable list but all entries are not a Position instance.`);
-         }
-         else
-         {
-            return GsapPosition[operation](target, options, arg1, arg2);
-         }
-      }
+      return void 0;
    }
 
-   return void 0;
-}
-
-/**
- * Validates data for TJSPosition related properties: 'from', 'fromTo', 'set', 'to'. Also adds all properties found
- * in Gsap entry data to s_POSITION_PROPS, so that just the properties being animated are added to animated
- * `positionData`.
- *
- * @param {object}   entry - Gsap entry data.
- *
- * @param {number}   cntr - Current index.
- */
-function s_VALIDATE_OPTIONS(entry, cntr)
-{
-   const position = entry.position;
-
-   if (position !== void 0 && !Number.isFinite(position) && typeof position !== 'string')
+   /**
+    * Validates data for TJSPosition related properties: 'from', 'fromTo', 'set', 'to'.
+    *
+    * @param {object}   entry - Gsap entry data.
+    *
+    * @param {number}   cntr - Current index.
+    */
+   static #validateOptions(entry, cntr)
    {
-      throw new TypeError(
-       `GsapCompose.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
-   }
+      const position = entry.position;
 
-   switch (entry.type)
-   {
-      case 'from':
-      case 'to':
-      case 'set':
+      if (position !== void 0 && !Number.isFinite(position) && typeof position !== 'string')
       {
-         const vars = entry.vars;
-
-         if (!isObject(vars))
-         {
-            throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'vars' object.`);
-         }
-
-         break;
+         throw new TypeError(
+          `GsapCompose.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
       }
 
-      case 'fromTo':
+      switch (entry.type)
       {
-         const fromVars = entry.fromVars;
-         const toVars = entry.toVars;
-
-         if (!isObject(fromVars))
+         case 'from':
+         case 'to':
+         case 'set':
          {
-            throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'fromVars' object.`);
+            const vars = entry.vars;
+
+            if (!isObject(vars))
+            {
+               throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'vars' object.`);
+            }
+
+            break;
          }
 
-         if (!isObject(toVars))
+         case 'fromTo':
          {
-            throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'toVars' object.`);
-         }
+            const fromVars = entry.fromVars;
+            const toVars = entry.toVars;
 
-         break;
+            if (!isObject(fromVars))
+            {
+               throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'fromVars' object.`);
+            }
+
+            if (!isObject(toVars))
+            {
+               throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'toVars' object.`);
+            }
+
+            break;
+         }
       }
    }
 }

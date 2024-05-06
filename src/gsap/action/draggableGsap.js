@@ -9,10 +9,6 @@ import {
 
 import { GsapCompose }        from '../compose/GsapCompose.js';
 
-// TODO: presently just use `to` instead of `quickTo`; more testing for `quickTo` required.
-const s_HAS_QUICK_TO = false;
-// const s_HAS_QUICK_TO = GsapCompose.hasMethod('quickTo');
-
 /**
  * Provides an action to enable pointer dragging of an HTMLElement using GSAP `to` or `quickTo` to invoke `position.set`
  * on a given {@link TJSPosition} instance provided. You may provide a
@@ -25,7 +21,7 @@ const s_HAS_QUICK_TO = false;
  *
  * @param {import('./types').Action.DraggableGsapOptions} options - Draggable Gsap options.
  *
- * @returns {import('svelte/action').Action<Partial<import('./types').Action.DraggableGsapOptions>>} Action
+ * @returns {import('svelte/action').ActionReturn<Partial<import('./types').Action.DraggableGsapOptions>>} Action
  *          lifecycle functions.
  */
 function draggableGsap(node, { position, enabled = true, button = 0, storeDragging = void 0, tween = false,
@@ -43,6 +39,27 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
       throw new TypeError(`'ignoreTargetClassList' is not iterable.`);
    }
 
+   const hasQuickTo = GsapCompose.hasMethod('quickTo');
+
+   /**
+    * Stores the initial X / Y on drag down.
+    *
+    * @type {object}
+    */
+   const initialDragPoint = { x: 0, y: 0 };
+
+   /**
+    * Used for direct call to `position.set`.
+    *
+    * @type {{top: number, left: number}}
+    */
+   const positionData = { left: 0, top: 0 };
+
+   /**
+    * Tracks velocity for inertia tween.
+    */
+   const velocityTrack = new TJSVelocityTrack();
+
    /**
     * Find actual position instance checking for a Positionable instance.
     *
@@ -58,13 +75,6 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
    let initialPosition = null;
 
    /**
-    * Stores the initial X / Y on drag down.
-    *
-    * @type {object}
-    */
-   const initialDragPoint = { x: 0, y: 0 };
-
-   /**
     * Stores the current dragging state and gates the move pointer as the dragging store is not
     * set until the first pointer move.
     *
@@ -78,11 +88,6 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
     * @type {object}
     */
    let inertiaTween;
-
-   /**
-    * Tracks velocity for inertia tween.
-    */
-   const velocityTrack = new TJSVelocityTrack();
 
    /**
     * Event handlers associated with this action for addition / removal.
@@ -109,10 +114,10 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
     */
    let tweenTo;
 
-   if (s_HAS_QUICK_TO)
+   if (hasQuickTo)
    {
-      quickLeft = GsapCompose.quickTo(actualPosition, 'left', tweenOptions);
-      quickTop = GsapCompose.quickTo(actualPosition, 'top', tweenOptions);
+      quickLeft = GsapCompose.quickTo(actualPosition, 'left', { ...tweenOptions });
+      quickTop = GsapCompose.quickTo(actualPosition, 'top', { ...tweenOptions });
    }
 
    /**
@@ -250,7 +255,7 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
       if (tween)
       {
          // Update position.
-         if (s_HAS_QUICK_TO)
+         if (hasQuickTo)
          {
             quickLeft(newLeft);
             quickTop(newTop);
@@ -264,10 +269,10 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
       }
       else
       {
-         s_POSITION_DATA.left = newLeft;
-         s_POSITION_DATA.top = newTop;
+         positionData.left = newLeft;
+         positionData.top = newTop;
 
-         actualPosition.set(s_POSITION_DATA);
+         actualPosition.set(positionData);
       }
    }
 
@@ -289,7 +294,7 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
       if (inertia)
       {
          // Kill any existing ease / tween before inertia tween.
-         if (s_HAS_QUICK_TO)
+         if (hasQuickTo)
          {
             quickLeft.tween.kill();
             quickTop.tween.kill();
@@ -320,30 +325,36 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
                resistance: tweenResistance,
                linkedProps: 'top,left'
             }
-         }, s_INTERTIA_GC_OPTIONS);
+         }, { initialProps: ['top', 'left'] });
       }
    }
 
    return {
-      // The default of enabled being true won't automatically add listeners twice.
+      /**
+       * The default of enabled being true won't automatically add listeners twice.
+       *
+       * @param {Partial<import('./types').Action.DraggableGsapOptions>} options - Action options.
+       */
       update: (options) =>
       {
          if (options.position !== void 0)
          {
             // Find actual position instance checking for a Positionable instance.
-            const newPosition = options.position?.position ?? options.position;
+            const newPosition = /** @type {import('#runtime/svelte/store/position').TJSPosition} */
+             options.position?.position ?? options.position;
+
             if (newPosition !== actualPosition)
             {
                actualPosition = newPosition;
 
                // Kill any existing ease / tween.
-               if (s_HAS_QUICK_TO)
+               if (hasQuickTo)
                {
                   quickLeft?.tween?.kill?.();
                   quickTop?.tween?.kill?.();
 
-                  quickLeft = GsapCompose.quickTo(actualPosition, 'left', tweenOptions);
-                  quickTop = GsapCompose.quickTo(actualPosition, 'top', tweenOptions);
+                  quickLeft = GsapCompose.quickTo(actualPosition, 'left', { ...tweenOptions });
+                  quickTop = GsapCompose.quickTo(actualPosition, 'top', { ...tweenOptions });
                }
             }
          }
@@ -367,10 +378,10 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
          {
             tweenOptions = options.tweenOptions;
 
-            if (s_HAS_QUICK_TO)
+            if (hasQuickTo)
             {
-               quickLeft = GsapCompose.quickTo(actualPosition, 'left', tweenOptions);
-               quickTop = GsapCompose.quickTo(actualPosition, 'top', tweenOptions);
+               quickLeft = GsapCompose.quickTo(actualPosition, 'left', { ...tweenOptions });
+               quickTop = GsapCompose.quickTo(actualPosition, 'top', { ...tweenOptions });
             }
          }
 
@@ -879,17 +890,3 @@ class DraggableGsapOptionsStore
 draggableGsap.options = (options) => new DraggableGsapOptionsStore(options);
 
 export { draggableGsap };
-
-/**
- * Extra options for GsapCompose.
- *
- * @type {{initialProps: string[]}}
- */
-const s_INTERTIA_GC_OPTIONS = { initialProps: ['top', 'left'] };
-
-/**
- * Used for direct call to `position.set`.
- *
- * @type {{top: number, left: number}}
- */
-const s_POSITION_DATA = { left: 0, top: 0 };
