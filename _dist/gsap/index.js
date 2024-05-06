@@ -671,7 +671,9 @@ class GsapPosition
          positionInfo.gsapData.push(gsapData);
       }
 
-      const existingOnUpdate = vars.onUpdate;
+      // Ignore any existing `onUpdate` function if marked as coming from GsapPosition. This is set below.
+      const existingOnUpdate = typeof vars.onUpdate?.fromGsapPosition === 'boolean' && vars.onUpdate.fromGsapPosition ?
+       void 0 : vars.onUpdate;
 
       if (isIterable(tjsPositions))
       {
@@ -755,6 +757,9 @@ class GsapPosition
             };
          }
       }
+
+      // Mark the update function as coming from GsapPosition.
+      vars.onUpdate.fromGsapPosition = true;
 
       return positionInfo;
    }
@@ -978,7 +983,7 @@ class GsapCompose
       }
 
       // If target is TJSPosition related attempt to dispatch to GsapPosition.
-      const positionTween = s_DISPATCH_POSITION('from', target, options, vars);
+      const positionTween = this.#dispatchPosition('from', target, options, vars);
 
       return positionTween !== void 0 ? positionTween : gsap.from(target, vars);
    }
@@ -1008,7 +1013,7 @@ class GsapCompose
       }
 
       // If target is TJSPosition related attempt to dispatch to GsapPosition.
-      const positionTween = s_DISPATCH_POSITION('fromTo', target, options, fromVars, toVars);
+      const positionTween = this.#dispatchPosition('fromTo', target, options, fromVars, toVars);
 
       return positionTween !== void 0 ? positionTween : gsap.fromTo(target, fromVars, toVars);
    }
@@ -1051,7 +1056,7 @@ class GsapCompose
       }
 
       // If target is TJSPosition related attempt to dispatch to GsapPosition.
-      const positionQuickTo = s_DISPATCH_POSITION('quickTo', target, options, key, vars);
+      const positionQuickTo = this.#dispatchPosition('quickTo', target, options, key, vars);
 
       return positionQuickTo !== void 0 ? positionQuickTo : gsap.quickTo(target, key, vars);
    }
@@ -1107,7 +1112,7 @@ class GsapCompose
       }
 
       // If target is TJSPosition related attempt to dispatch to GsapPosition.
-      const positionTimeline = s_DISPATCH_POSITION('timeline', target, arg1, arg2, arg3);
+      const positionTimeline = this.#dispatchPosition('timeline', target, arg1, arg2, arg3);
       if (positionTimeline !== void 0) { return positionTimeline; }
 
       // Load the variable arguments from arg1 / arg2.
@@ -1145,7 +1150,7 @@ class GsapCompose
             throw new TypeError(`GsapCompose.timeline error: 'gsapData[${index}]' is not an object.`);
          }
 
-         s_VALIDATE_OPTIONS(entry, index);
+         this.#validateOptions(entry, index);
 
          index++;
       }
@@ -1220,121 +1225,119 @@ class GsapCompose
       }
 
       // If target is TJSPosition related attempt to dispatch to GsapPosition.
-      const positionTween = s_DISPATCH_POSITION('to', target, options, vars);
+      const positionTween = this.#dispatchPosition('to', target, options, vars);
 
       return positionTween !== void 0 ? positionTween : gsap.to(target, vars);
    }
+
+   // Internal implementation ----------------------------------------------------------------------------------------
+
+   /**
+    * @param {string}            operation - GsapPosition function to invoke.
+    *
+    * @param {TJSPosition | object}   [target] -
+    *
+    * @param {object}            [options] -
+    *
+    * @param {*}                 [arg1] -
+    *
+    * @param {*}                 [arg2] -
+    *
+    * @returns {*} GsapPosition function result.
+    */
+   static #dispatchPosition(operation, target, options, arg1, arg2)
+   {
+      if (target instanceof TJSPosition)
+      {
+         return GsapPosition[operation](target, options, arg1, arg2);
+      }
+      else if (isObject(target) && target.position instanceof TJSPosition)
+      {
+         return GsapPosition[operation](target.position, options, arg1, arg2);
+      }
+      else if (isIterable(target))
+      {
+         let hasPosition = false;
+         let allPosition = true;
+
+         for (const entry of target)
+         {
+            const isPosition = entry instanceof TJSPosition || entry?.position instanceof TJSPosition;
+
+            hasPosition |= isPosition;
+            if (!isPosition) { allPosition = false; }
+         }
+
+         if (hasPosition)
+         {
+            if (!allPosition)
+            {
+               throw new TypeError(`GsapCompose.${
+                operation} error: 'target' is an iterable list but all entries are not a Position instance.`);
+            }
+            else
+            {
+               return GsapPosition[operation](target, options, arg1, arg2);
+            }
+         }
+      }
+
+      return void 0;
+   }
+
+   /**
+    * Validates data for TJSPosition related properties: 'from', 'fromTo', 'set', 'to'.
+    *
+    * @param {object}   entry - Gsap entry data.
+    *
+    * @param {number}   cntr - Current index.
+    */
+   static #validateOptions(entry, cntr)
+   {
+      const position = entry.position;
+
+      if (position !== void 0 && !Number.isFinite(position) && typeof position !== 'string')
+      {
+         throw new TypeError(
+          `GsapCompose.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
+      }
+
+      switch (entry.type)
+      {
+         case 'from':
+         case 'to':
+         case 'set':
+         {
+            const vars = entry.vars;
+
+            if (!isObject(vars))
+            {
+               throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'vars' object.`);
+            }
+
+            break;
+         }
+
+         case 'fromTo':
+         {
+            const fromVars = entry.fromVars;
+            const toVars = entry.toVars;
+
+            if (!isObject(fromVars))
+            {
+               throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'fromVars' object.`);
+            }
+
+            if (!isObject(toVars))
+            {
+               throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'toVars' object.`);
+            }
+
+            break;
+         }
+      }
+   }
 }
-
-/**
- * @param {string}            operation - GsapPosition function to invoke.
- *
- * @param {TJSPosition | object}   [target] -
- *
- * @param {object}            [options] -
- *
- * @param {*}                 [arg1] -
- *
- * @param {*}                 [arg2] -
- *
- * @returns {*} GsapPosition function result.
- */
-function s_DISPATCH_POSITION(operation, target, options, arg1, arg2)
-{
-   if (target instanceof TJSPosition)
-   {
-      return GsapPosition[operation](target, options, arg1, arg2);
-   }
-   else if (isObject(target) && target.position instanceof TJSPosition)
-   {
-      return GsapPosition[operation](target.position, options, arg1, arg2);
-   }
-   else if (isIterable(target))
-   {
-      let hasPosition = false;
-      let allPosition = true;
-
-      for (const entry of target)
-      {
-         const isPosition = entry instanceof TJSPosition || entry?.position instanceof TJSPosition;
-
-         hasPosition |= isPosition;
-         if (!isPosition) { allPosition = false; }
-      }
-
-      if (hasPosition)
-      {
-         if (!allPosition)
-         {
-            throw new TypeError(`GsapCompose.${
-             operation} error: 'target' is an iterable list but all entries are not a Position instance.`);
-         }
-         else
-         {
-            return GsapPosition[operation](target, options, arg1, arg2);
-         }
-      }
-   }
-
-   return void 0;
-}
-
-/**
- * Validates data for TJSPosition related properties: 'from', 'fromTo', 'set', 'to'. Also adds all properties found
- * in Gsap entry data to s_POSITION_PROPS, so that just the properties being animated are added to animated
- * `positionData`.
- *
- * @param {object}   entry - Gsap entry data.
- *
- * @param {number}   cntr - Current index.
- */
-function s_VALIDATE_OPTIONS(entry, cntr)
-{
-   const position = entry.position;
-
-   if (position !== void 0 && !Number.isFinite(position) && typeof position !== 'string')
-   {
-      throw new TypeError(
-       `GsapCompose.timeline error: gsapData[${cntr}] 'position' is not a number or string.`);
-   }
-
-   switch (entry.type)
-   {
-      case 'from':
-      case 'to':
-      case 'set':
-      {
-         const vars = entry.vars;
-
-         if (!isObject(vars))
-         {
-            throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'vars' object.`);
-         }
-
-         break;
-      }
-
-      case 'fromTo':
-      {
-         const fromVars = entry.fromVars;
-         const toVars = entry.toVars;
-
-         if (!isObject(fromVars))
-         {
-            throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'fromVars' object.`);
-         }
-
-         if (!isObject(toVars))
-         {
-            throw new TypeError(`GsapCompose.timeline error: gsapData[${cntr}] missing 'toVars' object.`);
-         }
-
-         break;
-      }
-   }
-}
-
-// const s_HAS_QUICK_TO = GsapCompose.hasMethod('quickTo');
 
 /**
  * Provides an action to enable pointer dragging of an HTMLElement using GSAP `to` or `quickTo` to invoke `position.set`
@@ -1348,7 +1351,7 @@ function s_VALIDATE_OPTIONS(entry, cntr)
  *
  * @param {import('./types').Action.DraggableGsapOptions} options - Draggable Gsap options.
  *
- * @returns {import('svelte/action').Action<Partial<import('./types').Action.DraggableGsapOptions>>} Action
+ * @returns {import('svelte/action').ActionReturn<Partial<import('./types').Action.DraggableGsapOptions>>} Action
  *          lifecycle functions.
  */
 function draggableGsap(node, { position, enabled = true, button = 0, storeDragging = void 0, tween = false,
@@ -1366,6 +1369,27 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
       throw new TypeError(`'ignoreTargetClassList' is not iterable.`);
    }
 
+   const hasQuickTo = GsapCompose.hasMethod('quickTo');
+
+   /**
+    * Stores the initial X / Y on drag down.
+    *
+    * @type {object}
+    */
+   const initialDragPoint = { x: 0, y: 0 };
+
+   /**
+    * Used for direct call to `position.set`.
+    *
+    * @type {{top: number, left: number}}
+    */
+   const positionData = { left: 0, top: 0 };
+
+   /**
+    * Tracks velocity for inertia tween.
+    */
+   const velocityTrack = new TJSVelocityTrack();
+
    /**
     * Find actual position instance checking for a Positionable instance.
     *
@@ -1379,13 +1403,6 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
     * @type {object}
     */
    let initialPosition = null;
-
-   /**
-    * Stores the initial X / Y on drag down.
-    *
-    * @type {object}
-    */
-   const initialDragPoint = { x: 0, y: 0 };
 
    /**
     * Stores the current dragging state and gates the move pointer as the dragging store is not
@@ -1403,11 +1420,6 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
    let inertiaTween;
 
    /**
-    * Tracks velocity for inertia tween.
-    */
-   const velocityTrack = new TJSVelocityTrack();
-
-   /**
     * Event handlers associated with this action for addition / removal.
     *
     * @type {{ [p: string]: [string, EventListener, boolean] }}
@@ -1419,11 +1431,24 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
    };
 
    /**
+    * Stores the `quickTo` functions.
+    *
+    * @type {Function}
+    */
+   let quickLeft, quickTop;
+
+   /**
     * Stores the ease tween.
     *
     * @type {object}
     */
    let tweenTo;
+
+   if (hasQuickTo)
+   {
+      quickLeft = GsapCompose.quickTo(actualPosition, 'left', { ...tweenOptions });
+      quickTop = GsapCompose.quickTo(actualPosition, 'top', { ...tweenOptions });
+   }
 
    /**
     * Activates listeners.
@@ -1560,6 +1585,12 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
       if (tween)
       {
          // Update position.
+         if (hasQuickTo)
+         {
+            quickLeft(newLeft);
+            quickTop(newTop);
+         }
+         else
          {
             if (tweenTo) { tweenTo.kill(); }
 
@@ -1568,10 +1599,10 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
       }
       else
       {
-         s_POSITION_DATA.left = newLeft;
-         s_POSITION_DATA.top = newTop;
+         positionData.left = newLeft;
+         positionData.top = newTop;
 
-         actualPosition.set(s_POSITION_DATA);
+         actualPosition.set(positionData);
       }
    }
 
@@ -1593,6 +1624,12 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
       if (inertia)
       {
          // Kill any existing ease / tween before inertia tween.
+         if (hasQuickTo)
+         {
+            quickLeft.tween.kill();
+            quickTop.tween.kill();
+         }
+         else
          {
             if (tweenTo)
             {
@@ -1618,21 +1655,37 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
                resistance: tweenResistance,
                linkedProps: 'top,left'
             }
-         }, s_INTERTIA_GC_OPTIONS);
+         }, { initialProps: ['top', 'left'] });
       }
    }
 
    return {
-      // The default of enabled being true won't automatically add listeners twice.
+      /**
+       * The default of enabled being true won't automatically add listeners twice.
+       *
+       * @param {Partial<import('./types').Action.DraggableGsapOptions>} options - Action options.
+       */
       update: (options) =>
       {
          if (options.position !== void 0)
          {
             // Find actual position instance checking for a Positionable instance.
-            const newPosition = options.position?.position ?? options.position;
+            const newPosition = /** @type {import('#runtime/svelte/store/position').TJSPosition} */
+             options.position?.position ?? options.position;
+
             if (newPosition !== actualPosition)
             {
                actualPosition = newPosition;
+
+               // Kill any existing ease / tween.
+               if (hasQuickTo)
+               {
+                  quickLeft?.tween?.kill?.();
+                  quickTop?.tween?.kill?.();
+
+                  quickLeft = GsapCompose.quickTo(actualPosition, 'left', { ...tweenOptions });
+                  quickTop = GsapCompose.quickTo(actualPosition, 'top', { ...tweenOptions });
+               }
             }
          }
 
@@ -1654,6 +1707,12 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
          if (isObject(options.tweenOptions))
          {
             tweenOptions = options.tweenOptions;
+
+            if (hasQuickTo)
+            {
+               quickLeft = GsapCompose.quickTo(actualPosition, 'left', { ...tweenOptions });
+               quickTop = GsapCompose.quickTo(actualPosition, 'top', { ...tweenOptions });
+            }
          }
 
          if (isObject(options.inertiaOptions))
@@ -2159,20 +2218,6 @@ class DraggableGsapOptionsStore
  * @returns {import('./types').Action.DraggableGsapOptionsStore} A new options instance.
  */
 draggableGsap.options = (options) => new DraggableGsapOptionsStore(options);
-
-/**
- * Extra options for GsapCompose.
- *
- * @type {{initialProps: string[]}}
- */
-const s_INTERTIA_GC_OPTIONS = { initialProps: ['top', 'left'] };
-
-/**
- * Used for direct call to `position.set`.
- *
- * @type {{top: number, left: number}}
- */
-const s_POSITION_DATA = { left: 0, top: 0 };
 
 /**
  * @param {string}   name - Name of GSAP plugin to load.

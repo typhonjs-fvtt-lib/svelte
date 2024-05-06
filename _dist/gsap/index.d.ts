@@ -332,7 +332,7 @@ declare namespace Action {
  *
  * @param {import('./types').Action.DraggableGsapOptions} options - Draggable Gsap options.
  *
- * @returns {import('svelte/action').Action<Partial<import('./types').Action.DraggableGsapOptions>>} Action
+ * @returns {import('svelte/action').ActionReturn<Partial<import('./types').Action.DraggableGsapOptions>>} Action
  *          lifecycle functions.
  */
 declare function draggableGsap(
@@ -349,7 +349,7 @@ declare function draggableGsap(
     hasTargetClassList,
     ignoreTargetClassList,
   }: Action.DraggableGsapOptions,
-): svelte_action.Action<Partial<Action.DraggableGsapOptions>>;
+): svelte_action.ActionReturn<Partial<Action.DraggableGsapOptions>>;
 declare namespace draggableGsap {
   /**
    * Define a function to get an DraggableGsapOptionsStore instance.
