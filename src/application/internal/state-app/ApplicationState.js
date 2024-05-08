@@ -229,7 +229,8 @@ export class ApplicationState
             }
          }
 
-         const promise = application.position.animate.to(data.position, { duration, ease }).finished.then((cancelled) =>
+         const promise = application.position.animate.to(data.position, { duration, ease }).finished.then(
+          ({ cancelled }) =>
          {
             if (cancelled) { return application; }
 
