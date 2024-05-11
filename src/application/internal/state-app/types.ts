@@ -5,13 +5,12 @@ import type {
 import type { Data }    from '#runtime/svelte/store/position';
 
 /**
- * @template T
- *
- * Provides the ability the save / restore application state for positional and UI state such as minimized status.
+ * Provides the ability the save / restore / serialize application state for positional and UI state such as minimized
+ * status.
  *
  * You can restore a saved state with animation; please see the options of {@link ApplicationState.restore}.
  */
-declare interface ApplicationState<T> {
+declare interface ApplicationState {
    /**
     * Returns current application state along with any extra data passed into method.
     *
@@ -22,37 +21,35 @@ declare interface ApplicationState<T> {
    get(extra?: object): ApplicationStateData;
 
    /**
-    * Returns any stored save state by name.
+    * Returns any saved application state by name.
     *
     * @param {object}   options - Options.
     *
     * @param {string}   options.name - Saved data set name.
     *
-    * @returns {ApplicationStateData} The saved data set.
+    * @returns {ApplicationStateData | undefined} The saved data set.
     */
    getSave({ name }: {
       name: string;
-   }): ApplicationStateData;
+   }): ApplicationStateData | undefined;
 
    /**
-    * Removes and returns any application state by name.
+    * Removes and returns any saved application state by name.
     *
     * @param {object}   options - Options.
     *
     * @param {string}   options.name - Name to remove and retrieve.
     *
-    * @returns {ApplicationStateData} Saved application data.
+    * @returns {ApplicationStateData | undefined} Saved application data.
     */
    remove({ name }: {
       name: string;
-   }): ApplicationStateData;
+   }): ApplicationStateData | undefined;
 
    /**
-    * Restores a saved application state returning the data. Several optional parameters are available
-    * to control whether the restore action occurs silently (no store / inline styles updates), animates
-    * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
-    * specification of the duration and easing along with configuring a Promise to be returned if awaiting the end of
-    * the animation.
+    * Restores a previously saved application state by `name` returning the data. Several optional parameters are
+    * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
+    * {@link AnimationAPI.to} and the duration and easing name or function may be specified.
     *
     * @param {object}            params - Parameters
     *
@@ -60,24 +57,21 @@ declare interface ApplicationState<T> {
     *
     * @param {boolean}           [params.remove=false] - Remove data set.
     *
-    * @param {boolean}           [params.async=false] - If animating return a Promise that resolves with any saved data.
-    *
     * @param {boolean}           [params.animateTo=false] - Animate to restore data.
     *
     * @param {number}            [params.duration=0.1] - Duration in seconds.
     *
     * @param {EasingFunctionName | EasingFunction} [params.ease='linear'] - Easing function name or function.
     *
-    * @returns {ApplicationStateData|Promise<ApplicationStateData>} Saved application data.
+    * @returns {ApplicationStateData | undefined} Any saved application data.
     */
-   restore({ name, remove, async, animateTo, duration, ease }: {
+   restore({ name, remove, animateTo, duration, ease }: {
       name: string;
       remove?: boolean;
-      async?: boolean;
       animateTo?: boolean;
       duration?: number;
       ease?: EasingFunctionName | EasingFunction;
-   }): ApplicationStateData | Promise<ApplicationStateData>;
+   }): ApplicationStateData | undefined;
 
    /**
     * Saves current application state with the opportunity to add extra data to the saved state.
@@ -96,35 +90,29 @@ declare interface ApplicationState<T> {
    }): ApplicationStateData;
 
    /**
-    * Restores a saved application state returning the data. Several optional parameters are available
-    * to control whether the restore action occurs silently (no store / inline styles updates), animates
-    * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
-    * specification of the duration and easing along with configuring a Promise to be returned if awaiting the end of
-    * the animation.
+    * Sets application state from the given {@link ApplicationStateData} instance. Several optional parameters are
+    * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
+    * {@link AnimationAPI.to} and the duration and easing name or function may be specified.
     *
     * Note: If serializing application state any minimized apps will use the before minimized state on initial render
     * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
     *
     * @param {ApplicationStateData}   data - Saved data set name.
     *
-    * @param {object}            [opts] - Optional parameters
+    * @param {object}         [options] - Optional parameters
     *
-    * @param {boolean}           [opts.async=false] - If animating return a Promise that resolves with any saved data.
+    * @param {boolean}        [options.animateTo=false] - Animate to restore data.
     *
-    * @param {boolean}           [opts.animateTo=false] - Animate to restore data.
+    * @param {number}         [options.duration=0.1] - Duration in seconds.
     *
-    * @param {number}            [opts.duration=0.1] - Duration in seconds.
-    *
-    * @param {Function}          [opts.ease=linear] - Easing function.
-    *
-    * @returns {T | Promise<T>} When synchronous the application or Promise when animating resolving with application.
+    * @param {EasingFunctionName | EasingFunction} [options.ease='linear'] - Easing function.
     */
-   set(data: ApplicationStateData, { async, animateTo, duration, ease }?: {
+   set(data: ApplicationStateData, { animateTo, duration, ease }?: {
       async?: boolean;
       animateTo?: boolean;
       duration?: number;
-      ease?: Function;
-   }): (T | Promise<T>);
+      ease?: EasingFunctionName | EasingFunction;
+   }): void;
 }
 
 type ApplicationStateData = {
