@@ -33,13 +33,21 @@ export class ApplicationState
    }
 
    /**
+    * Clears all saved application state.
+    */
+   clear()
+   {
+      this.#dataSaved.clear();
+   }
+
+   /**
     * Returns current application state along with any extra data passed into method.
     *
     * @param {object} [extra] - Extra data to add to application state.
     *
     * @returns {import('./types').ApplicationStateData} Passed in object with current application state.
     */
-   get(extra = {})
+   current(extra = {})
    {
       return Object.assign(extra, {
          position: this.#application?.position?.get(),
@@ -50,22 +58,30 @@ export class ApplicationState
    }
 
    /**
-    * Returns any saved application state by name.
+    * Gets any saved application state by name.
     *
     * @param {object}   options - Options.
     *
     * @param {string}   options.name - Saved data set name.
     *
-    * @returns {import('./types').ApplicationStateData | undefined} The saved data set.
+    * @returns {import('./types').ApplicationStateData | undefined} Any saved application state.
     */
-   getSave({ name })
+   get({ name })
    {
       if (typeof name !== 'string')
       {
-         throw new TypeError(`ApplicationState - getSave error: 'name' is not a string.`);
+         throw new TypeError(`ApplicationState - get error: 'name' is not a string.`);
       }
 
       return this.#dataSaved.get(name);
+   }
+
+   /**
+    * @returns {IterableIterator<string>} The saved application state names / keys.
+    */
+   keys()
+   {
+      return this.#dataSaved.keys();
    }
 
    /**
@@ -75,7 +91,7 @@ export class ApplicationState
     *
     * @param {string}   options.name - Name to remove and retrieve.
     *
-    * @returns {import('./types').ApplicationStateData | undefined} Saved application data.
+    * @returns {import('./types').ApplicationStateData | undefined} Any saved application state.
     */
    remove({ name })
    {
@@ -107,7 +123,7 @@ export class ApplicationState
     *    import('#runtime/svelte/easing').EasingFunction
     * )} [params.ease='linear'] - Easing function or easing function name.
     *
-    * @returns {import('./types').ApplicationStateData | undefined} Saved application data.
+    * @returns {import('./types').ApplicationStateData | undefined} Any saved application state.
     */
    restore({ name, remove = false, animateTo = false, duration = 0.1, ease = 'linear' })
    {
@@ -149,17 +165,15 @@ export class ApplicationState
     *
     * @param {object}   options - Options.
     *
-    * @param {string}   options.name - name to index this saved data.
+    * @param {string}   options.name - Name to index this saved state.
     *
-    * @param {...*}     [options.extra] - Extra data to add to saved data.
-    *
-    * @returns {import('./types').ApplicationStateData} Current application data
+    * @returns {import('./types').ApplicationStateData} Current saved application state.
     */
    save({ name, ...extra })
    {
       if (typeof name !== 'string') { throw new TypeError(`ApplicationState - save error: 'name' is not a string.`); }
 
-      const data = this.get(extra);
+      const data = this.current(extra);
 
       this.#dataSaved.set(name, data);
 

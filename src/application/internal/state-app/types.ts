@@ -12,26 +12,36 @@ import type { Data }    from '#runtime/svelte/store/position';
  */
 declare interface ApplicationState {
    /**
+    * Clears all saved application state.
+    */
+   clear(): void;
+
+   /**
     * Returns current application state along with any extra data passed into method.
     *
     * @param {object} [extra] - Extra data to add to application state.
     *
     * @returns {ApplicationStateData} Passed in object with current application state.
     */
-   get(extra?: object): ApplicationStateData;
+   current(extra?: object): ApplicationStateData;
 
    /**
-    * Returns any saved application state by name.
+    * Gets any saved application state by name.
     *
     * @param {object}   options - Options.
     *
     * @param {string}   options.name - Saved data set name.
     *
-    * @returns {ApplicationStateData | undefined} The saved data set.
+    * @returns {ApplicationStateData | undefined} Any saved application state.
     */
-   getSave({ name }: {
+   get({ name }: {
       name: string;
    }): ApplicationStateData | undefined;
+
+   /**
+    * @returns {IterableIterator<string>} The saved application state names / keys.
+    */
+   keys(): IterableIterator<string>;
 
    /**
     * Removes and returns any saved application state by name.
@@ -40,7 +50,7 @@ declare interface ApplicationState {
     *
     * @param {string}   options.name - Name to remove and retrieve.
     *
-    * @returns {ApplicationStateData | undefined} Saved application data.
+    * @returns {ApplicationStateData | undefined} Any saved application state.
     */
    remove({ name }: {
       name: string;
@@ -63,7 +73,7 @@ declare interface ApplicationState {
     *
     * @param {EasingFunctionName | EasingFunction} [params.ease='linear'] - Easing function name or function.
     *
-    * @returns {ApplicationStateData | undefined} Any saved application data.
+    * @returns {ApplicationStateData | undefined} Any saved application state.
     */
    restore({ name, remove, animateTo, duration, ease }: {
       name: string;
@@ -78,11 +88,11 @@ declare interface ApplicationState {
     *
     * @param {object}   options - Options.
     *
-    * @param {string}   options.name - name to index this saved data.
+    * @param {string}   options.name - Name to index this saved state.
     *
-    * @param {...*}     [options.extra] - Extra data to add to saved data.
+    * @param {...*}     [options.extra] - Extra data to add to saved state.
     *
-    * @returns {ApplicationStateData} Current application data
+    * @returns {ApplicationStateData} Current saved application state.
     */
    save({ name, ...extra }: {
       name: string;
