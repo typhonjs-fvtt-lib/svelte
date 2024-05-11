@@ -263,9 +263,6 @@ export class ApplicationState
             return;
          }
 
-         // Cancel any current animations.
-         application.position.animate.cancel();
-
          // Provide special handling to potentially change transform origin as this parameter is not animated.
          if (data.position.transformOrigin !== application.position.transformOrigin)
          {
@@ -282,8 +279,11 @@ export class ApplicationState
             }
          }
 
-         const promise = application.position.animate.to(data.position, { duration, ease }).finished.then(
-          ({ cancelled }) =>
+         const promise = application.position.animate.to(data.position, {
+            duration,
+            ease,
+            strategy: 'cancel'
+         }).finished.then(({ cancelled }) =>
          {
             if (cancelled) { return; }
 
