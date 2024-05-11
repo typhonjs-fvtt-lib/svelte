@@ -52,7 +52,7 @@ export class ApplicationState
       return Object.assign(extra, {
          position: this.#application?.position?.get(),
          beforeMinimized: this.#application?.position?.state.get({ name: '#beforeMinimized' }),
-         options: Object.assign({}, this.#application?.options),
+         options: this.#application?.reactive?.toJSON(),
          ui: { minimized: this.#application?.reactive?.minimized }
       });
    }

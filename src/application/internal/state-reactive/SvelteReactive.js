@@ -530,6 +530,27 @@ export class SvelteReactive
    }
 
    /**
+    * Serializes the main {@link SvelteApplicationOptions} for common application state.
+    *
+    * @returns {import('./types').SvelteReactiveData} Common application state.
+    */
+   toJSON()
+   {
+      return {
+         draggable: this.#application?.options?.draggable ?? true,
+         focusAuto: this.#application?.options?.focusAuto ?? true,
+         focusKeep: this.#application?.options?.focusKeep ?? false,
+         focusTrap: this.#application?.options?.focusTrap ?? true,
+         headerButtonNoClose: this.#application?.options?.headerButtonNoClose ?? false,
+         headerButtonNoLabel: this.#application?.options?.headerButtonNoLabel ?? false,
+         headerNoTitleMinimized: this.#application?.options?.headerNoTitleMinimized ?? false,
+         minimizable: this.#application?.options?.minimizable ?? true,
+         positionable: this.#application?.options?.positionable ?? true,
+         resizable: this.#application?.options?.resizable ?? true
+      };
+   }
+
+   /**
     * Updates the UI Options store with the current header buttons. You may dynamically add / remove header buttons
     * if using an application shell Svelte component. In either overriding `_getHeaderButtons` or responding to the
     * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
