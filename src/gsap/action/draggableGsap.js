@@ -254,8 +254,8 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
 
       if (tween)
       {
-         // Update position.
-         if (hasQuickTo)
+         // Update position; `quickTo` can't be used when inertia is enabled.
+         if (hasQuickTo && !inertia)
          {
             quickLeft(newLeft);
             quickTop(newTop);
@@ -294,18 +294,13 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
       if (inertia)
       {
          // Kill any existing ease / tween before inertia tween.
-         if (hasQuickTo)
+         quickLeft?.tween?.kill?.();
+         quickTop?.tween?.kill?.();
+
+         if (tweenTo)
          {
-            quickLeft.tween.kill();
-            quickTop.tween.kill();
-         }
-         else
-         {
-            if (tweenTo)
-            {
-               tweenTo.kill();
-               tweenTo = void 0;
-            }
+            tweenTo.kill();
+            tweenTo = void 0;
          }
 
          const opts = inertiaOptions;
