@@ -29,6 +29,8 @@ export class TJSDialogData
    constructor(application)
    {
       this.#application = application;
+
+      Object.seal(this);
    }
 
    /**
