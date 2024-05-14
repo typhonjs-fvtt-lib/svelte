@@ -282,7 +282,7 @@ export class ApplicationState
          const promise = application.position.animate.to(data.position, {
             duration,
             ease,
-            strategy: 'cancel'
+            strategy: 'cancelAll'
          }).finished.then(({ cancelled }) =>
          {
             if (cancelled) { return; }
