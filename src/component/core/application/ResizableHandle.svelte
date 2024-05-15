@@ -31,6 +31,14 @@
    }
 
    /**
+    * Cancel any app animation in progress when dragging starts.
+    */
+   function onPointerdown()
+   {
+      application.position.animate.cancel();
+   }
+
+   /**
     * Provides an action to handle resizing the application shell based on the resizable app option.
     *
     * @param {HTMLElement}       node - The node associated with the action.
@@ -192,7 +200,8 @@
 </script>
 
 <div class="window-resizable-handle"
-     use:resizable={{active: $storeResizable, storeResizing}}
+     on:pointerdown={onPointerdown}
+     use:resizable={{ active: $storeResizable, storeResizing }}
      bind:this={elementResize}>
    <i class="fas fa-arrows-alt-h"></i>
 </div>

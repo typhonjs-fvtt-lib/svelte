@@ -118,6 +118,9 @@
    {
       const rootEl = $elementRoot;
 
+      // Cancel any app animation in progress when dragging starts.
+      application.position.animate.cancel();
+
       if ($focusAuto && A11yHelper.isFocusTarget(rootEl) && rootEl?.isConnected)
       {
          if ($focusKeep)
@@ -148,9 +151,9 @@
 
 {#key draggable}
    <header class="window-header flexrow"
+           on:pointerdown={onPointerdown}
            use:draggable={dragOptions}
-           use:minimizable={$storeMinimizable}
-           on:pointerdown={onPointerdown}>
+           use:minimizable={$storeMinimizable}>
       {#if typeof $storeHeaderIcon === 'string'}
          <img class="tjs-app-icon keep-minimized" src={$storeHeaderIcon} alt=icon>
       {/if}
