@@ -13,8 +13,8 @@
    import { applyStyles }     from '#runtime/svelte/action/dom';
 
    import {
-      isSvelteComponent,
-      TJSSvelteConfigUtil }   from '#runtime/svelte/util';
+      TJSSvelteConfigUtil,
+      TJSSvelteUtil }         from '#runtime/svelte/util';
 
    import { A11yHelper }      from '#runtime/util/browser';
    import { isObject }        from '#runtime/util/object';
@@ -146,7 +146,7 @@
 
       try
       {
-         if (isSvelteComponent(content))
+         if (TJSSvelteUtil.isComponent(content))
          {
             dialogClass = content;
             dialogProps = {};

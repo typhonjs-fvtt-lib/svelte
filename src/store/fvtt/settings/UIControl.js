@@ -1,14 +1,14 @@
-import { writable }           from '#svelte/store';
+import { writable }        from '#svelte/store';
 
 import {
    ripple,
-   rippleFocus }              from '#runtime/svelte/action/animate';
+   rippleFocus }           from '#runtime/svelte/action/animate';
 
-import { isSvelteComponent }  from '#runtime/svelte/util';
-import { isObject }           from '#runtime/util/object';
+import { TJSSvelteUtil }   from '#runtime/svelte/util';
+import { isObject }        from '#runtime/util/object';
 
-import { TJSDialog }          from '#svelte-fvtt/application';
-import { localize }           from '#svelte-fvtt/helper';
+import { TJSDialog }       from '#svelte-fvtt/application';
+import { localize }        from '#svelte-fvtt/helper';
 
 /**
  * Controls preparation and processing of registered game settings w/ TJSGameSettings. Game settings are parsed
@@ -85,7 +85,10 @@ export class UIControl
    {
       if (!isObject(options)) { throw new TypeError(`'options' is not an object.`); }
 
-      if (!isSvelteComponent(options.class)) { throw new TypeError(`'options.class' is not a Svelte component.`); }
+      if (!TJSSvelteUtil.isComponent(options.class))
+      {
+         throw new TypeError(`'options.class' is not a Svelte component.`);
+      }
 
       if (options.props !== void 0 && !isObject(options.props))
       {
@@ -113,7 +116,7 @@ export class UIControl
                   throw new TypeError(`'options.folder.summaryEnd' is not an object.`);
                }
 
-               if (!isSvelteComponent(folder.summaryEnd.class))
+               if (!TJSSvelteUtil.isComponent(folder.summaryEnd.class))
                {
                   throw new TypeError(`'options.folder.summaryEnd.class' is not a Svelte component.`);
                }

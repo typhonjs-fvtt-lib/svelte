@@ -1,16 +1,14 @@
-import { TJSPosition }  from '#runtime/svelte/store/position';
+import { TJSPosition }     from '#runtime/svelte/store/position';
 
-import {
-   isHMRProxy,
-   outroAndDestroy }    from '#runtime/svelte/util';
+import { TJSSvelteUtil }   from '#runtime/svelte/util';
 
-import { A11yHelper }   from '#runtime/util/browser';
+import { A11yHelper }      from '#runtime/util/browser';
 
 import {
    deepMerge,
    hasGetter,
    isIterable,
-   isObject }           from '#runtime/util/object';
+   isObject }              from '#runtime/util/object';
 
 import {
    ApplicationState,
@@ -18,7 +16,7 @@ import {
    loadSvelteConfig,
    isApplicationShell,
    SvelteReactive,
-   TJSAppIndex }        from '../internal/index.js';
+   TJSAppIndex }           from '../internal/index.js';
 
 /**
  * Provides a Svelte aware extension to the Foundry {@link FormApplication} class to manage the app lifecycle
@@ -417,7 +415,7 @@ export class SvelteFormApplication extends FormApplication
       for (const entry of this.#svelteData)
       {
          // Use `outroAndDestroy` to run outro transitions before destroying.
-         svelteDestroyPromises.push(outroAndDestroy(entry.component));
+         svelteDestroyPromises.push(TJSSvelteUtil.outroAndDestroy(entry.component));
 
          // If any proxy eventbus has been added then remove all event registrations from the component.
          const eventbus = entry.config.eventbus;
@@ -555,7 +553,7 @@ export class SvelteFormApplication extends FormApplication
                // refreshes. Update the element root accordingly and force an update to TJSPosition.
                // See this issue for info about `on_hmr`:
                // https://github.com/sveltejs/svelte-hmr/issues/57
-               if (isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
+               if (TJSSvelteUtil.isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
                {
                   svelteData.component.$$.on_hmr.push(() => () => this.#updateApplicationShell());
                }
@@ -589,7 +587,7 @@ export class SvelteFormApplication extends FormApplication
             // refreshes. Update the element root accordingly and force an update to TJSPosition.
             // See this issue for info about `on_hmr`:
             // https://github.com/sveltejs/svelte-hmr/issues/57
-            if (isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
+            if (TJSSvelteUtil.isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
             {
                svelteData.component.$$.on_hmr.push(() => () => this.#updateApplicationShell());
             }
