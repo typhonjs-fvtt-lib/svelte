@@ -7,7 +7,7 @@
     */
    import { getContext }            from '#svelte';
 
-   import { isTJSSvelteConfig }     from '#runtime/svelte/util';
+   import { TJSSvelteConfigUtil }   from '#runtime/svelte/util';
    import { A11yHelper }            from '#runtime/util/browser';
    import { isObject }              from '#runtime/util/object';
 
@@ -73,7 +73,7 @@
 
          // If the button contains a TJSSvelteConfig object in the `svelte` attribute then use it otherwise use
          // `TJSHeaderButton` w/ button as props.
-         buttonsList.push(isTJSSvelteConfig(button?.svelte) ? { ...button.svelte } :
+         buttonsList.push(TJSSvelteConfigUtil.isConfig(button?.svelte) ? { ...button.svelte } :
           { class: TJSHeaderButton, props: { button } });
       }
    }

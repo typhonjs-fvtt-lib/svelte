@@ -14,7 +14,7 @@
 
    import {
       isSvelteComponent,
-      parseTJSSvelteConfig }  from '#runtime/svelte/util';
+      TJSSvelteConfigUtil }   from '#runtime/svelte/util';
 
    import { A11yHelper }      from '#runtime/util/browser';
    import { isObject }        from '#runtime/util/object';
@@ -151,17 +151,11 @@
             dialogClass = content;
             dialogProps = {};
          }
-         else if (isObject(content))
+         else if (TJSSvelteConfigUtil.isConfig(content))
          {
-            const svelteConfig = parseTJSSvelteConfig(content, application);
+            const svelteConfig = TJSSvelteConfigUtil.parseConfig(content, application);
             dialogClass = svelteConfig.class;
             dialogProps = svelteConfig.props ?? {};
-
-            // Check for any children parsed and added to the external context.
-            const children = svelteConfig?.context?.get('external')?.children;
-
-            // If so add to dialogProps.
-            if (Array.isArray(children)) { dialogProps.children = children; }
          }
          else
          {

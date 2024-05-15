@@ -1,4 +1,4 @@
-import { parseTJSSvelteConfig }  from '#runtime/svelte/util';
+import { TJSSvelteConfigUtil }   from '#runtime/svelte/util';
 
 import { isApplicationShell }    from './isApplicationShell.js';
 
@@ -52,7 +52,7 @@ export function loadSvelteConfig({ app, template, config, elementRootUpdate } = 
 
    const NewSvelteComponent = config.class;
 
-   const svelteConfig = parseTJSSvelteConfig({ ...config, target }, app);
+   const svelteConfig = TJSSvelteConfigUtil.parseConfig({ ...config, target }, app);
 
    const externalContext = svelteConfig.context.get('#external');
 
