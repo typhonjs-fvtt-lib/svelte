@@ -21,6 +21,8 @@
       applyStyles,
       resizeObserver }                 from '#runtime/svelte/action/dom';
 
+   import { dynamicAction }            from '#runtime/svelte/action/util';
+
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
    import { A11yHelper }               from '#runtime/util/browser';
    import { isObject }                 from '#runtime/util/object';
@@ -44,13 +46,44 @@
    export let stylesApp = void 0;
    export let stylesContent = void 0;
 
-   // If a parent component binds and sets `appOffsetHeight` to true then a resizeObserver action is enabled on the
-   // outer application `div`. Additionally, the SvelteApplication position resizeObserved store is updated.
+   /**
+    * Application reference.
+    *
+    * @type {SvelteApplication}
+    */
+   const application = getContext('#external')?.application;
+
+   // Focus related app options stores.
+   const { focusAuto, focusKeep, focusTrap } = application.reactive.storeAppOptions;
+
+   const { minimized } = application.reactive.storeUIState;
+
+   // Is the backing app TJSPosition instance a candidate for the `resizeObserver` action? IE `width` or `height is
+   // `auto` or `inherit`.
+   const { resizeObservable } = application.position.stores;
+
+   // ----------------------------------------------------------------------------------------------------------------
+
+   // If a parent component binds and sets `appOffsetHeight` or `appOffsetWidth` to a truthy value then the
+   // `resizeObserver` action is enabled on the outer application `div`. Additionally, the SvelteApplication position
+   // resizeObserved store is updated.
    export let appOffsetHeight = false;
    export let appOffsetWidth = false;
 
-   // Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
-   const appResizeObserver = !!appOffsetHeight || !!appOffsetWidth ? resizeObserver : () => null;
+   // Tracks initial state if either of the above props are truthy otherwise a null operation.
+   const initialAppResizeObserver = !!appOffsetHeight || !!appOffsetWidth;
+
+   /**
+    * Reactive statement to control any dynamic action to apply for the app resize observer. It is always enabled when
+    * `initialAppResizeObserver` is true or when the position store `resizeObservable` is true when app position `width`
+    * or `height` is `auto` or `inherit`.
+    *
+    * @type {undefined | import('#runtime/svelte/action/util').DynamicActionOptions}
+    */
+   $: appResizeObserver = initialAppResizeObserver || $resizeObservable ?
+    { action: resizeObserver, data: resizeObservedApp } : void 0;
+
+   // ----------------------------------------------------------------------------------------------------------------
 
    // If a parent component binds and sets `contentOffsetHeight` or `contentOffsetWidth` to true then a
    // resizeObserver action is enabled on the content `section`.
@@ -59,6 +92,8 @@
 
    // Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
    const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth ? resizeObserver : () => null;
+
+   // ----------------------------------------------------------------------------------------------------------------
 
    // Provides the internal context for data / stores of the application shell.
    const internal = new AppShellContextInternal();
@@ -80,18 +115,6 @@
    {
       getContext('#internal').stores.elementRoot.set(elementRoot);
    }
-
-   /**
-    * Store application reference.
-    *
-    * @type {SvelteApplication}
-    */
-   const application = getContext('#external')?.application;
-
-   // Focus related app options stores.
-   const { focusAuto, focusKeep, focusTrap } = application.reactive.storeAppOptions;
-
-   const { minimized } = application.reactive.storeUIState;
 
    let focusWrapEnabled;
 
@@ -385,7 +408,7 @@
          on:keydown|capture={onKeydown}
          on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
-         use:appResizeObserver={resizeObservedApp}
+         use:dynamicAction={appResizeObserver}
          role=application
          tabindex=-1>
         <TJSApplicationHeader {draggable} {draggableOptions} />
@@ -410,7 +433,7 @@
          on:keydown|capture={onKeydown}
          on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
-         use:appResizeObserver={resizeObservedApp}
+         use:dynamicAction={appResizeObserver}
          role=application
          tabindex=-1>
         <TJSApplicationHeader {draggable} {draggableOptions} />
