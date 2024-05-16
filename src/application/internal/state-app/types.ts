@@ -1,6 +1,4 @@
-import type {
-   EasingFunction,
-   EasingFunctionName }             from '#runtime/svelte/easing';
+import type { EasingReference }     from '#runtime/svelte/easing';
 
 import type { Data }                from '#runtime/svelte/store/position';
 
@@ -63,17 +61,17 @@ declare interface ApplicationState {
     * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
     * {@link AnimationAPI.to} and the duration and easing name or function may be specified.
     *
-    * @param {object}            params - Parameters
+    * @param {object}            options - Parameters
     *
-    * @param {string}            params.name - Saved data set name.
+    * @param {string}            options.name - Saved data set name.
     *
-    * @param {boolean}           [params.remove=false] - Remove data set.
+    * @param {boolean}           [options.remove=false] - Remove data set.
     *
-    * @param {boolean}           [params.animateTo=false] - Animate to restore data.
+    * @param {boolean}           [options.animateTo=false] - Animate to restore data.
     *
-    * @param {number}            [params.duration=0.1] - Duration in seconds.
+    * @param {number}            [options.duration=0.1] - Duration in seconds.
     *
-    * @param {EasingFunctionName | EasingFunction} [params.ease='linear'] - Easing function name or function.
+    * @param {EasingReference}   [options.ease='linear'] - Easing function name or function.
     *
     * @returns {ApplicationStateData | undefined} Any saved application state.
     */
@@ -82,7 +80,7 @@ declare interface ApplicationState {
       remove?: boolean;
       animateTo?: boolean;
       duration?: number;
-      ease?: EasingFunctionName | EasingFunction;
+      ease?: EasingReference;
    }): ApplicationStateData | undefined;
 
    /**
@@ -111,19 +109,19 @@ declare interface ApplicationState {
     *
     * @param {ApplicationStateData}   data - Saved data set name.
     *
-    * @param {object}         [options] - Optional parameters
+    * @param {object}            [options] - Optional parameters
     *
-    * @param {boolean}        [options.animateTo=false] - Animate to restore data.
+    * @param {boolean}           [options.animateTo=false] - Animate to restore data.
     *
-    * @param {number}         [options.duration=0.1] - Duration in seconds.
+    * @param {number}            [options.duration=0.1] - Duration in seconds.
     *
-    * @param {EasingFunctionName | EasingFunction} [options.ease='linear'] - Easing function.
+    * @param {EasingReference}   [options.ease='linear'] - Easing function.
     */
    set(data: ApplicationStateData, { animateTo, duration, ease }?: {
       async?: boolean;
       animateTo?: boolean;
       duration?: number;
-      ease?: EasingFunctionName | EasingFunction;
+      ease?: EasingReference;
    }): void;
 }
 

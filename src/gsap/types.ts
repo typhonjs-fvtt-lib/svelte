@@ -1,3 +1,5 @@
+import type { EasingFunction } from '#runtime/svelte/easing';
+
 /**
  * Defines all the standard 1-dimensional Gsap easing function names.
  */
@@ -14,5 +16,12 @@ type GsapEasingFunctionName = 'back.in(1)' | 'back.inOut(1)' | 'back.out(1)' | '
  'svelte-quartIn' | 'svelte-quartInOut' | 'svelte-quartOut' | 'svelte-quintIn' | 'svelte-quintInOut' |
  'svelte-quintOut' | 'svelte-sineIn' | 'svelte-sineInOut' | 'svelte-sineOut';
 
+/**
+ * Defines an easing input as either a predefined GSAP easing function name or a custom easing function.
+ */
+type GsapEasingReference = GsapEasingFunctionName | EasingFunction;
 
-export { GsapEasingFunctionName };
+export {
+   GsapEasingFunctionName,
+   GsapEasingReference
+};

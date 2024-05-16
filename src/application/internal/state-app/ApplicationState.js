@@ -108,20 +108,18 @@ export class ApplicationState
     * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
     * {@link AnimationAPI.to} and the duration and easing name or function may be specified.
     *
-    * @param {object}            params - Parameters
+    * @param {object}            options - Options.
     *
-    * @param {string}            params.name - Saved data set name.
+    * @param {string}            options.name - Saved data set name.
     *
-    * @param {boolean}           [params.remove=false] - Remove data set.
+    * @param {boolean}           [options.remove=false] - Remove data set.
     *
-    * @param {boolean}           [params.animateTo=false] - Animate to restore data.
+    * @param {boolean}           [options.animateTo=false] - Animate to restore data.
     *
-    * @param {number}            [params.duration=0.1] - Duration in seconds.
+    * @param {number}            [options.duration=0.1] - Duration in seconds.
     *
-    * @param {(
-    *    import('#runtime/svelte/easing').EasingFunctionName |
-    *    import('#runtime/svelte/easing').EasingFunction
-    * )} [params.ease='linear'] - Easing function or easing function name.
+    * @param {import('#runtime/svelte/easing').EasingReference} [options.ease='linear'] - Easing function or easing
+    *        function name.
     *
     * @returns {import('./types').ApplicationStateData | undefined} Any saved application state.
     */
@@ -196,10 +194,8 @@ export class ApplicationState
     *
     * @param {number}         [options.duration=0.1] - Duration in seconds.
     *
-    * @param {(
-    *    import('#runtime/svelte/easing').EasingFunctionName |
-    *    import('#runtime/svelte/easing').EasingFunction
-    * )} [options.ease='linear'] - Easing function or easing function name.
+    * @param {import('#runtime/svelte/easing').EasingReference} [options.ease='linear'] - Easing function or easing
+    *        function name.
     */
    set(data, options = {})
    {
@@ -228,10 +224,8 @@ export class ApplicationState
     *
     * @param {number}            [opts.duration=0.1] - Duration in seconds.
     *
-    * @param {(
-    *    import('#runtime/svelte/easing').EasingFunctionName |
-    *    import('#runtime/svelte/easing').EasingFunction
-    * )} [opts.ease='linear'] - Easing function or easing function name.
+    * @param {import('#runtime/svelte/easing').EasingReference} [opts.ease='linear'] - Easing function or easing
+    *        function name.
     *
     * @returns {undefined | Promise<void>} When asynchronous the animation Promise.
     */
