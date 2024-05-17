@@ -343,6 +343,11 @@ declare interface SvelteReactive
    setOptions(accessor: string, value: any): void;
 
    /**
+    * Serializes the main {@link SvelteApplicationOptions} for common application state.
+    */
+   toJSON(): SvelteReactiveData;
+
+   /**
     * Updates the UI Options store with the current header buttons. You may dynamically add / remove header buttons
     * if using an application shell Svelte component. In either overriding `_getHeaderButtons` or responding to the
     * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
@@ -469,4 +474,59 @@ type StoreUIOptions = {
    resizing: Writable<boolean>;
 };
 
-export { StoreAppOptions, StoreUIOptions, SvelteReactive }
+/**
+ * Defines the bulk serializable data from {@link SvelteReactive.toJSON} for common application state.
+ */
+type SvelteReactiveData = {
+   /**
+    * If true then application shells are draggable.
+    */
+   draggable: boolean;
+
+   /**
+    * When true auto-management of app focus is enabled.
+    */
+   focusAuto: boolean;
+
+   /**
+    * When `focusAuto` and `focusKeep` is true; keeps internal focus.
+    */
+   focusKeep: boolean;
+
+   /**
+    * When true focus trapping / wrapping is enabled keeping focus inside app.
+    */
+   focusTrap: boolean;
+
+   /**
+    * If true then the close header button is removed.
+    */
+   headerButtonNoClose: boolean;
+
+   /**
+    * If true then header button labels are removed.
+    */
+   headerButtonNoLabel: boolean;
+
+   /**
+    * If true then header title is hidden when minimized.
+    */
+   headerNoTitleMinimized: boolean;
+
+   /**
+    * If true then application shells are minimizable.
+    */
+   minimizable: boolean;
+
+   /**
+    * If false then `position.set` does not take effect.
+    */
+   positionable: boolean;
+
+   /**
+    * If true then application shells are resizable.
+    */
+   resizable: boolean;
+}
+
+export { StoreAppOptions, StoreUIOptions, SvelteReactive, SvelteReactiveData }

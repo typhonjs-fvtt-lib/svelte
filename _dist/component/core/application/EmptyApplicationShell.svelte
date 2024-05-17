@@ -13,6 +13,8 @@
       applyStyles,
       resizeObserver }                 from '@typhonjs-svelte/runtime-base/svelte/action/dom';
 
+   import { dynamicAction }            from '@typhonjs-svelte/runtime-base/svelte/action/util';
+
    import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
    import { A11yHelper }               from '@typhonjs-svelte/runtime-base/util/browser';
    import { isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
@@ -30,18 +32,50 @@
    // Explicit style overrides for the main app and content elements. Uses action `applyStyles`.
    export let stylesApp = void 0;
 
-   // If a parent component binds and sets `appOffsetHeight` to true then a resizeObserver action is enabled on the
-   // outer application `div`. Additionally, the SvelteApplication position resizeObserved store is updated.
+   /**
+    * Application reference.
+    *
+    * @type {SvelteApplication}
+    */
+   const application = getContext('#external')?.application;
+
+   // Focus related app options stores.
+   const { focusAuto, focusKeep, focusTrap } = application.reactive.storeAppOptions;
+
+   const { minimized } = application.reactive.storeUIState;
+
+   // Is the backing app TJSPosition instance a candidate for the `resizeObserver` action? IE `width` or `height is
+   // `auto` or `inherit`.
+   const { resizeObservable } = application.position.stores;
+
+   // ----------------------------------------------------------------------------------------------------------------
+
+   // If a parent component binds and sets `appOffsetHeight` or `appOffsetWidth` to a truthy value then the
+   // `resizeObserver` action is enabled on the outer application `div`. Additionally, the SvelteApplication position
+   // resizeObserved store is updated.
    export let appOffsetHeight = false;
    export let appOffsetWidth = false;
 
-   // Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
-   const appResizeObserver = !!appOffsetHeight || !!appOffsetWidth ? resizeObserver : () => null;
+   // Tracks initial state if either of the above props are truthy otherwise a null operation.
+   const initialAppResizeObserver = !!appOffsetHeight || !!appOffsetWidth;
+
+   /**
+    * Reactive statement to control any dynamic action to apply for the app resize observer. It is always enabled when
+    * `initialAppResizeObserver` is true or when the position store `resizeObservable` is true when app position `width`
+    * or `height` is `auto` or `inherit`.
+    *
+    * @type {undefined | import('@typhonjs-svelte/runtime-base/svelte/action/util').DynamicActionOptions}
+    */
+   $: appResizeObserver = initialAppResizeObserver || $resizeObservable ?
+    { action: resizeObserver, data: resizeObservedApp } : void 0;
+
+   // ----------------------------------------------------------------------------------------------------------------
+
+   // Provides the internal context for data / stores of the application shell.
+   const internal = new AppShellContextInternal();
 
    // Provides options to `A11yHelper.getFocusableElements` to ignore TJSFocusWrap by CSS class.
    const s_IGNORE_CLASSES = { ignoreClasses: ['tjs-focus-wrap'] };
-
-   const internal = new AppShellContextInternal();
 
    // Internal context for `elementContent` / `elementRoot` stores.
    setContext('#internal', internal);
@@ -58,25 +92,13 @@
       getContext('#internal').stores.elementRoot.set(elementRoot);
    }
 
-   /**
-    * Store application reference.
-    *
-    * @type {SvelteApplication}
-    */
-   const application = getContext('#external')?.application;
-
-   // Focus related app options stores.
-   const { focusAuto, focusKeep, focusTrap } = application.reactive.storeAppOptions;
-
-   const { minimized } = application.reactive.storeUIState;
+   // Assign elementRoot to elementContent.
+   $: if (elementRoot) { elementContent = elementRoot; }
 
    let focusWrapEnabled;
 
    // Enable TJSFocusWrap component when focus trapping app option is true and app is not minimized.
    $: focusWrapEnabled = $focusAuto && $focusTrap && !$minimized;
-
-   // Assign elementRoot to elementContent.
-   $: if (elementRoot) { elementContent = elementRoot; }
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -248,7 +270,6 @@
       }
    }
 
-
    /**
     * If the application is a popOut application then when clicked bring to top if not already the Foundry
     * `activeWindow`.
@@ -339,7 +360,7 @@
          on:keydown|capture={onKeydown}
          on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
-         use:appResizeObserver={resizeObservedApp}
+         use:dynamicAction={appResizeObserver}
          role=application
          tabindex=-1>
         <slot />
@@ -356,7 +377,7 @@
          on:keydown|capture={onKeydown}
          on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
-         use:appResizeObserver={resizeObservedApp}
+         use:dynamicAction={appResizeObserver}
          role=application
          tabindex=-1>
         <slot />

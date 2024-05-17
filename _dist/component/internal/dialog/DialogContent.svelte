@@ -13,8 +13,8 @@
    import { applyStyles }     from '@typhonjs-svelte/runtime-base/svelte/action/dom';
 
    import {
-      isSvelteComponent,
-      parseTJSSvelteConfig }  from '@typhonjs-svelte/runtime-base/svelte/util';
+      TJSSvelteConfigUtil,
+      TJSSvelteUtil }         from '@typhonjs-svelte/runtime-base/svelte/util';
 
    import { A11yHelper }      from '@typhonjs-svelte/runtime-base/util/browser';
    import { isObject }        from '@typhonjs-svelte/runtime-base/util/object';
@@ -146,22 +146,16 @@
 
       try
       {
-         if (isSvelteComponent(content))
+         if (TJSSvelteUtil.isComponent(content))
          {
             dialogClass = content;
             dialogProps = {};
          }
-         else if (isObject(content))
+         else if (TJSSvelteConfigUtil.isConfig(content))
          {
-            const svelteConfig = parseTJSSvelteConfig(content, application);
+            const svelteConfig = TJSSvelteConfigUtil.parseConfig(content, application);
             dialogClass = svelteConfig.class;
             dialogProps = svelteConfig.props ?? {};
-
-            // Check for any children parsed and added to the external context.
-            const children = svelteConfig?.context?.get('external')?.children;
-
-            // If so add to dialogProps.
-            if (Array.isArray(children)) { dialogProps.children = children; }
          }
          else
          {

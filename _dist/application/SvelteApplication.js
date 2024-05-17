@@ -1,16 +1,14 @@
-import { TJSPosition }  from '@typhonjs-svelte/runtime-base/svelte/store/position';
+import { TJSPosition }     from '@typhonjs-svelte/runtime-base/svelte/store/position';
 
-import {
-   isHMRProxy,
-   outroAndDestroy }    from '@typhonjs-svelte/runtime-base/svelte/util';
+import { TJSSvelteUtil }   from '@typhonjs-svelte/runtime-base/svelte/util';
 
-import { A11yHelper }   from '@typhonjs-svelte/runtime-base/util/browser';
+import { A11yHelper }      from '@typhonjs-svelte/runtime-base/util/browser';
 
 import {
    deepMerge,
    hasGetter,
    isIterable,
-   isObject }           from '@typhonjs-svelte/runtime-base/util/object';
+   isObject }              from '@typhonjs-svelte/runtime-base/util/object';
 
 import {
    ApplicationState,
@@ -18,7 +16,7 @@ import {
    loadSvelteConfig,
    isApplicationShell,
    SvelteReactive,
-   TJSAppIndex }        from './internal/index.js';
+   TJSAppIndex }           from './internal/index.js';
 
 /**
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
@@ -40,7 +38,7 @@ export class SvelteApplication extends Application
    /**
     * Stores and manages application state for saving / restoring / serializing.
     *
-    * @type {ApplicationState<SvelteApplication>}
+    * @type {ApplicationState}
     */
    #applicationState;
 
@@ -125,7 +123,7 @@ export class SvelteApplication extends Application
    {
       super(options);
 
-      /** @type {ApplicationState<SvelteApplication>} */
+      /** @type {ApplicationState} */
       this.#applicationState = new ApplicationState(this);
 
       // Initialize TJSPosition with the position object set by Application.
@@ -214,7 +212,7 @@ export class SvelteApplication extends Application
    /**
     * Returns the application state manager.
     *
-    * @returns {import('./internal/state-app/types').ApplicationState<SvelteApplication>} The application state manager.
+    * @returns {import('./internal/state-app/types').ApplicationState} The application state manager.
     */
    get state() { return this.#applicationState; }
 
@@ -390,7 +388,7 @@ export class SvelteApplication extends Application
       for (const entry of this.#svelteData)
       {
          // Use `outroAndDestroy` to run outro transitions before destroying.
-         svelteDestroyPromises.push(outroAndDestroy(entry.component));
+         svelteDestroyPromises.push(TJSSvelteUtil.outroAndDestroy(entry.component));
 
          // If any proxy eventbus has been added then remove all event registrations from the component.
          const eventbus = entry.config.eventbus;
@@ -528,7 +526,7 @@ export class SvelteApplication extends Application
                // refreshes. Update the element root accordingly and force an update to TJSPosition.
                // See this issue for info about `on_hmr`:
                // https://github.com/sveltejs/svelte-hmr/issues/57
-               if (isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
+               if (TJSSvelteUtil.isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
                {
                   svelteData.component.$$.on_hmr.push(() => () => this.#updateApplicationShell());
                }
@@ -562,7 +560,7 @@ export class SvelteApplication extends Application
             // refreshes. Update the element root accordingly and force an update to TJSPosition.
             // See this issue for info about `on_hmr`:
             // https://github.com/sveltejs/svelte-hmr/issues/57
-            if (isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
+            if (TJSSvelteUtil.isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
             {
                svelteData.component.$$.on_hmr.push(() => () => this.#updateApplicationShell());
             }

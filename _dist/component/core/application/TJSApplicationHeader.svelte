@@ -7,7 +7,7 @@
     */
    import { getContext }            from 'svelte';
 
-   import { isTJSSvelteConfig }     from '@typhonjs-svelte/runtime-base/svelte/util';
+   import { TJSSvelteConfigUtil }   from '@typhonjs-svelte/runtime-base/svelte/util';
    import { A11yHelper }            from '@typhonjs-svelte/runtime-base/util/browser';
    import { isObject }              from '@typhonjs-svelte/runtime-base/util/object';
 
@@ -73,7 +73,7 @@
 
          // If the button contains a TJSSvelteConfig object in the `svelte` attribute then use it otherwise use
          // `TJSHeaderButton` w/ button as props.
-         buttonsList.push(isTJSSvelteConfig(button?.svelte) ? { ...button.svelte } :
+         buttonsList.push(TJSSvelteConfigUtil.isConfig(button?.svelte) ? { ...button.svelte } :
           { class: TJSHeaderButton, props: { button } });
       }
    }
@@ -118,6 +118,9 @@
    {
       const rootEl = $elementRoot;
 
+      // Cancel any app animation in progress when dragging starts.
+      application.position.animate.cancel();
+
       if ($focusAuto && A11yHelper.isFocusTarget(rootEl) && rootEl?.isConnected)
       {
          if ($focusKeep)
@@ -148,9 +151,9 @@
 
 {#key draggable}
    <header class="window-header flexrow"
+           on:pointerdown={onPointerdown}
            use:draggable={dragOptions}
-           use:minimizable={$storeMinimizable}
-           on:pointerdown={onPointerdown}>
+           use:minimizable={$storeMinimizable}>
       {#if typeof $storeHeaderIcon === 'string'}
          <img class="tjs-app-icon keep-minimized" src={$storeHeaderIcon} alt=icon>
       {/if}

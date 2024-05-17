@@ -111,8 +111,8 @@ Object.freeze(gsapEasingList);
  * Performs a lookup for standard Gsap easing functions by name. All Svelte easing functions are also available by
  * prepending `svelte-<EASE_NAME>`. For convenience if passing in a function it is returned verbatim.
  *
- * @param {import('./types').GsapEasingFunctionName | import('#runtime/svelte/easing').EasingFunction} nameOrFunc - The name
- *        of a standard Svelte easing function or an existing supplied easing function.
+ * @param {import('./types').GsapEasingReference} easingRef - The name of a standard GSAP easing function or an
+ *        existing supplied easing function.
  *
  * @param {object}   [options] - Optional parameters.
  *
@@ -121,11 +121,11 @@ Object.freeze(gsapEasingList);
  *
  * @returns {import('#runtime/svelte/easing').EasingFunction} The requested easing function.
  */
-function getGsapEasingFunc(nameOrFunc, options)
+function getGsapEasingFunc(easingRef, options)
 {
-   if (typeof nameOrFunc === 'function') { return nameOrFunc; }
+   if (typeof easingRef === 'function') { return easingRef; }
 
-   const easingFn = gsapEasingFunc[nameOrFunc];
+   const easingFn = gsapEasingFunc[easingRef];
 
    return easingFn ? easingFn : gsapEasingFunc[options?.default ?? 'linear'];
 }
@@ -1584,8 +1584,8 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
 
       if (tween)
       {
-         // Update position.
-         if (hasQuickTo)
+         // Update position; `quickTo` can't be used when inertia is enabled.
+         if (hasQuickTo && !inertia)
          {
             quickLeft(newLeft);
             quickTop(newTop);
@@ -1624,18 +1624,13 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
       if (inertia)
       {
          // Kill any existing ease / tween before inertia tween.
-         if (hasQuickTo)
+         quickLeft?.tween?.kill?.();
+         quickTop?.tween?.kill?.();
+
+         if (tweenTo)
          {
-            quickLeft.tween.kill();
-            quickTop.tween.kill();
-         }
-         else
-         {
-            if (tweenTo)
-            {
-               tweenTo.kill();
-               tweenTo = void 0;
-            }
+            tweenTo.kill();
+            tweenTo = void 0;
          }
 
          const opts = inertiaOptions;

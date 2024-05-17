@@ -78,13 +78,17 @@ type GsapEasingFunctionName =
   | 'svelte-sineIn'
   | 'svelte-sineInOut'
   | 'svelte-sineOut';
+/**
+ * Defines an easing input as either a predefined GSAP easing function name or a custom easing function.
+ */
+type GsapEasingReference = GsapEasingFunctionName | EasingFunction;
 
 /**
  * Performs a lookup for standard Gsap easing functions by name. All Svelte easing functions are also available by
  * prepending `svelte-<EASE_NAME>`. For convenience if passing in a function it is returned verbatim.
  *
- * @param {import('./types').GsapEasingFunctionName | import('#runtime/svelte/easing').EasingFunction} nameOrFunc - The name
- *        of a standard Svelte easing function or an existing supplied easing function.
+ * @param {import('./types').GsapEasingReference} easingRef - The name of a standard GSAP easing function or an
+ *        existing supplied easing function.
  *
  * @param {object}   [options] - Optional parameters.
  *
@@ -94,7 +98,7 @@ type GsapEasingFunctionName =
  * @returns {import('#runtime/svelte/easing').EasingFunction} The requested easing function.
  */
 declare function getGsapEasingFunc(
-  nameOrFunc: GsapEasingFunctionName | _runtime_svelte_easing.EasingFunction,
+  easingRef: GsapEasingReference,
   options?: {
     default?: GsapEasingFunctionName | false;
   },
@@ -523,6 +527,7 @@ export {
   Compose,
   GsapCompose,
   type GsapEasingFunctionName,
+  type GsapEasingReference,
   draggableGsap,
   getGsapEasingFunc,
   gsap,

@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 import { isObject, isIterable } from '@typhonjs-svelte/runtime-base/util/object';
 import { isWritableStore, subscribeIgnoreFirst } from '@typhonjs-svelte/runtime-base/util/store';
 import { ripple, rippleFocus } from '@typhonjs-svelte/runtime-base/svelte/action/animate';
-import { isSvelteComponent } from '@typhonjs-svelte/runtime-base/svelte/util';
+import { TJSSvelteUtil } from '@typhonjs-svelte/runtime-base/svelte/util';
 import { TJSDialog } from '@typhonjs-fvtt/svelte/application';
 import { localize } from '@typhonjs-fvtt/svelte/helper';
 
@@ -81,7 +81,10 @@ class UIControl
    {
       if (!isObject(options)) { throw new TypeError(`'options' is not an object.`); }
 
-      if (!isSvelteComponent(options.class)) { throw new TypeError(`'options.class' is not a Svelte component.`); }
+      if (!TJSSvelteUtil.isComponent(options.class))
+      {
+         throw new TypeError(`'options.class' is not a Svelte component.`);
+      }
 
       if (options.props !== void 0 && !isObject(options.props))
       {
@@ -109,7 +112,7 @@ class UIControl
                   throw new TypeError(`'options.folder.summaryEnd' is not an object.`);
                }
 
-               if (!isSvelteComponent(folder.summaryEnd.class))
+               if (!TJSSvelteUtil.isComponent(folder.summaryEnd.class))
                {
                   throw new TypeError(`'options.folder.summaryEnd.class' is not a Svelte component.`);
                }

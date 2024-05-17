@@ -530,6 +530,69 @@ export class SvelteReactive
    }
 
    /**
+    * Serializes the main {@link SvelteApplicationOptions} for common application state.
+    *
+    * @returns {import('./types').SvelteReactiveData} Common application state.
+    */
+   toJSON()
+   {
+      return {
+         draggable: this.#application?.options?.draggable ?? true,
+         focusAuto: this.#application?.options?.focusAuto ?? true,
+         focusKeep: this.#application?.options?.focusKeep ?? false,
+         focusTrap: this.#application?.options?.focusTrap ?? true,
+         headerButtonNoClose: this.#application?.options?.headerButtonNoClose ?? false,
+         headerButtonNoLabel: this.#application?.options?.headerButtonNoLabel ?? false,
+         headerNoTitleMinimized: this.#application?.options?.headerNoTitleMinimized ?? false,
+         minimizable: this.#application?.options?.minimizable ?? true,
+         positionable: this.#application?.options?.positionable ?? true,
+         resizable: this.#application?.options?.resizable ?? true
+      };
+   }
+
+   /**
+    * Updates the UI Options store with the current header buttons. You may dynamically add / remove header buttons
+    * if using an application shell Svelte component. In either overriding `_getHeaderButtons` or responding to the
+    * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
+    * the new buttons.
+    *
+    * Optionally you can set in the SvelteApplication app options {@link SvelteApplicationOptions.headerButtonNoClose}
+    * to remove the close button and {@link SvelteApplicationOptions.headerButtonNoLabel} to true and labels will be
+    * removed from the header buttons.
+    *
+    * @param {object} [opts] - Optional parameters (for internal use)
+    *
+    * @param {boolean} [opts.headerButtonNoClose] - The value for `headerButtonNoClose`.
+    *
+    * @param {boolean} [opts.headerButtonNoLabel] - The value for `headerButtonNoLabel`.
+    */
+   updateHeaderButtons({ headerButtonNoClose = this.#application.options.headerButtonNoClose,
+    headerButtonNoLabel = this.#application.options.headerButtonNoLabel } = {})
+   {
+      let buttons = this.#application._getHeaderButtons();
+
+      // Remove close button if this.options.headerButtonNoClose is true;
+      if (typeof headerButtonNoClose === 'boolean' && headerButtonNoClose)
+      {
+         buttons = buttons.filter((button) => button.class !== 'close');
+      }
+
+      // Remove labels if this.options.headerButtonNoLabel is true;
+      if (typeof headerButtonNoLabel === 'boolean' && headerButtonNoLabel)
+      {
+         for (const button of buttons) { button.label = void 0; }
+      }
+
+      this.#storeUIStateUpdate((options) =>
+      {
+         options.headerButtons = buttons;
+         return options;
+      });
+   }
+
+   // Internal implementation ----------------------------------------------------------------------------------------
+
+   /**
     * Initializes the Svelte stores and derived stores for the application options and UI state.
     *
     * While writable stores are created the update method is stored in private variables locally and derived Readable
@@ -651,46 +714,6 @@ export class SvelteReactive
    {
       this.#storeUnsubscribe.forEach((unsubscribe) => unsubscribe());
       this.#storeUnsubscribe = [];
-   }
-
-   /**
-    * Updates the UI Options store with the current header buttons. You may dynamically add / remove header buttons
-    * if using an application shell Svelte component. In either overriding `_getHeaderButtons` or responding to the
-    * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
-    * the new buttons.
-    *
-    * Optionally you can set in the SvelteApplication app options {@link SvelteApplicationOptions.headerButtonNoClose}
-    * to remove the close button and {@link SvelteApplicationOptions.headerButtonNoLabel} to true and labels will be
-    * removed from the header buttons.
-    *
-    * @param {object} [opts] - Optional parameters (for internal use)
-    *
-    * @param {boolean} [opts.headerButtonNoClose] - The value for `headerButtonNoClose`.
-    *
-    * @param {boolean} [opts.headerButtonNoLabel] - The value for `headerButtonNoLabel`.
-    */
-   updateHeaderButtons({ headerButtonNoClose = this.#application.options.headerButtonNoClose,
-    headerButtonNoLabel = this.#application.options.headerButtonNoLabel } = {})
-   {
-      let buttons = this.#application._getHeaderButtons();
-
-      // Remove close button if this.options.headerButtonNoClose is true;
-      if (typeof headerButtonNoClose === 'boolean' && headerButtonNoClose)
-      {
-         buttons = buttons.filter((button) => button.class !== 'close');
-      }
-
-      // Remove labels if this.options.headerButtonNoLabel is true;
-      if (typeof headerButtonNoLabel === 'boolean' && headerButtonNoLabel)
-      {
-         for (const button of buttons) { button.label = void 0; }
-      }
-
-      this.#storeUIStateUpdate((options) =>
-      {
-         options.headerButtons = buttons;
-         return options;
-      });
    }
 }
 

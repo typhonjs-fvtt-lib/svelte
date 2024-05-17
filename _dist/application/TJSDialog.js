@@ -92,7 +92,14 @@ export class TJSDialog extends SvelteApplication
             class: DialogShell,
             intro: true,
             target: document.body,
-            props: function() // `this` is the TJSDialog instance when invoked.
+            /**
+             * `this` is the TJSDialog instance when invoked.
+             *
+             * @this TJSDialog
+             *
+             * @returns {{data: import('./types').TJSDialogOptions, managedPromise: ManagedPromise}} Props
+             */
+            props: function()
             {
                return {
                   data: this.#data.clone(),

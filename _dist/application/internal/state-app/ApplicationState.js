@@ -1,22 +1,29 @@
-import { isObject }           from '@typhonjs-svelte/runtime-base/util/object';
+import { isObject }  from '@typhonjs-svelte/runtime-base/util/object';
 
 /**
- * @template T
- *
- * Provides the ability the save / restore application state for positional and UI state such as minimized status.
+ * Provides the ability the save / restore / serialize application state for positional and UI state such as minimized
+ * status.
  *
  * You can restore a saved state with animation; please see the options of {@link ApplicationState.restore}.
  */
 export class ApplicationState
 {
-   /** @type {T} */
+   /** @type {object} */
    #application;
+
+   /**
+    * Stores the current save state key being restored by animating. When a restore is already being animated with the
+    * same name the subsequent restore animation is ignored.
+    *
+    * @type {string | undefined}
+    */
+   #currentRestoreKey;
 
    /** @type {Map<string, import('./types').ApplicationStateData>} */
    #dataSaved = new Map();
 
    /**
-    * @param {T}   application - The application.
+    * @param {object}   application - The application.
     */
    constructor(application)
    {
@@ -26,49 +33,65 @@ export class ApplicationState
    }
 
    /**
+    * Clears all saved application state.
+    */
+   clear()
+   {
+      this.#dataSaved.clear();
+   }
+
+   /**
     * Returns current application state along with any extra data passed into method.
     *
     * @param {object} [extra] - Extra data to add to application state.
     *
     * @returns {import('./types').ApplicationStateData} Passed in object with current application state.
     */
-   get(extra = {})
+   current(extra = {})
    {
       return Object.assign(extra, {
          position: this.#application?.position?.get(),
          beforeMinimized: this.#application?.position?.state.get({ name: '#beforeMinimized' }),
-         options: Object.assign({}, this.#application?.options),
+         options: this.#application?.reactive?.toJSON(),
          ui: { minimized: this.#application?.reactive?.minimized }
       });
    }
 
    /**
-    * Returns any stored save state by name.
+    * Gets any saved application state by name.
     *
     * @param {object}   options - Options.
     *
     * @param {string}   options.name - Saved data set name.
     *
-    * @returns {import('./types').ApplicationStateData} The saved data set.
+    * @returns {import('./types').ApplicationStateData | undefined} Any saved application state.
     */
-   getSave({ name })
+   get({ name })
    {
       if (typeof name !== 'string')
       {
-         throw new TypeError(`ApplicationState - getSave error: 'name' is not a string.`);
+         throw new TypeError(`ApplicationState - get error: 'name' is not a string.`);
       }
 
       return this.#dataSaved.get(name);
    }
 
    /**
-    * Removes and returns any application state by name.
+    * @returns {IterableIterator<string>} The saved application state names / keys.
+    */
+   keys()
+   {
+      return this.#dataSaved.keys();
+   }
+
+   /**
+    * Removes and returns any saved application state by name.
     *
     * @param {object}   options - Options.
     *
     * @param {string}   options.name - Name to remove and retrieve.
     *
-    * @returns {import('./types').ApplicationStateData} Saved application data.
+    * @returns {import('./types').ApplicationStateData | undefined} Any saved application state.
     */
    remove({ name })
    {
@@ -81,33 +104,26 @@ export class ApplicationState
    }
 
    /**
-    * Restores a saved application state returning the data. Several optional parameters are available
-    * to control whether the restore action occurs silently (no store / inline styles updates), animates
-    * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
-    * specification of the duration and easing along with configuring a Promise to be returned if awaiting the end of
-    * the animation.
+    * Restores a previously saved application state by `name` returning the data. Several optional parameters are
+    * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
+    * {@link AnimationAPI.to} and the duration and easing name or function may be specified.
     *
-    * @param {object}            params - Parameters
+    * @param {object}            options - Options.
     *
-    * @param {string}            params.name - Saved data set name.
+    * @param {string}            options.name - Saved data set name.
     *
-    * @param {boolean}           [params.remove=false] - Remove data set.
+    * @param {boolean}           [options.remove=false] - Remove data set.
     *
-    * @param {boolean}           [params.async=false] - If animating return a Promise that resolves with any saved data.
+    * @param {boolean}           [options.animateTo=false] - Animate to restore data.
     *
-    * @param {boolean}           [params.animateTo=false] - Animate to restore data.
+    * @param {number}            [options.duration=0.1] - Duration in seconds.
     *
-    * @param {number}            [params.duration=0.1] - Duration in seconds.
+    * @param {import('@typhonjs-svelte/runtime-base/svelte/easing').EasingReference} [options.ease='linear'] - Easing function or easing
+    *        function name.
     *
-    * @param {(
-    *    import('@typhonjs-svelte/runtime-base/svelte/easing').EasingFunctionName |
-    *    import('@typhonjs-svelte/runtime-base/svelte/easing').EasingFunction
-    * )} [params.ease='linear'] - Easing function or easing function name.
-    *
-    * @returns {import('./types').ApplicationStateData | Promise<import('./types').ApplicationStateData>} Saved
-    *          application data.
+    * @returns {import('./types').ApplicationStateData | undefined} Any saved application state.
     */
-   restore({ name, remove = false, async = false, animateTo = false, duration = 0.1, ease = 'linear' })
+   restore({ name, remove = false, animateTo = false, duration = 0.1, ease = 'linear' })
    {
       if (typeof name !== 'string')
       {
@@ -120,18 +136,26 @@ export class ApplicationState
       {
          if (remove) { this.#dataSaved.delete(name); }
 
-         if (async)
+         // Multiple invocations for animated restores are skipped when one is already in progress.
+         if (animateTo && name !== this.#currentRestoreKey)
          {
-            return this.set(dataSaved, { async, animateTo, duration, ease }).then(() => dataSaved);
-         }
-         else
-         {
-            this.set(dataSaved, { async, animateTo, duration, ease });
+            // Track current restore key name.
+            this.#currentRestoreKey = name;
+
+            this.#setImpl(dataSaved, {
+               animateTo,
+               async: true,
+               duration,
+               ease
+            }).then(() =>
+            {
+               // Reset current restore key name for animation if the same as initial animation initiation.
+               if (name === this.#currentRestoreKey) { this.#currentRestoreKey = void 0; }
+            });
          }
       }
 
-      // Saved data potentially not found, but must still return a Promise when async is true.
-      return async ? Promise.resolve(dataSaved) : dataSaved;
+      return dataSaved;
    }
 
    /**
@@ -139,17 +163,15 @@ export class ApplicationState
     *
     * @param {object}   options - Options.
     *
-    * @param {string}   options.name - name to index this saved data.
+    * @param {string}   options.name - Name to index this saved state.
     *
-    * @param {...*}     [options.extra] - Extra data to add to saved data.
-    *
-    * @returns {import('./types').ApplicationStateData} Current application data
+    * @returns {import('./types').ApplicationStateData} Current saved application state.
     */
    save({ name, ...extra })
    {
       if (typeof name !== 'string') { throw new TypeError(`ApplicationState - save error: 'name' is not a string.`); }
 
-      const data = this.get(extra);
+      const data = this.current(extra);
 
       this.#dataSaved.set(name, data);
 
@@ -157,11 +179,35 @@ export class ApplicationState
    }
 
    /**
-    * Restores a saved application state returning the data. Several optional parameters are available
-    * to control whether the restore action occurs silently (no store / inline styles updates), animates
-    * to the stored data, or simply sets the stored data. Restoring via {@link AnimationAPI.to} allows
-    * specification of the duration and easing along with configuring a Promise to be returned if awaiting the end of
-    * the animation.
+    * Sets application state from the given {@link ApplicationStateData} instance. Several optional parameters are
+    * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
+    * {@link AnimationAPI.to} and the duration and easing name or function may be specified.
+    *
+    * Note: If serializing application state any minimized apps will use the before minimized state on initial render
+    * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
+    *
+    * @param {import('./types').ApplicationStateData}   data - Saved data set name.
+    *
+    * @param {object}         [options] - Optional parameters
+    *
+    * @param {boolean}        [options.animateTo=false] - Animate to restore data.
+    *
+    * @param {number}         [options.duration=0.1] - Duration in seconds.
+    *
+    * @param {import('@typhonjs-svelte/runtime-base/svelte/easing').EasingReference} [options.ease='linear'] - Easing function or easing
+    *        function name.
+    */
+   set(data, options = {})
+   {
+      this.#setImpl(data, { ...options, async: false });
+   }
+
+   // Internal implementation ----------------------------------------------------------------------------------------
+
+   /**
+    * Sets application state from the given {@link ApplicationStateData} instance. Several optional parameters are
+    * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
+    * {@link AnimationAPI.to} and the duration and easing name or function may be specified.
     *
     * Note: If serializing application state any minimized apps will use the before minimized state on initial render
     * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
@@ -178,14 +224,12 @@ export class ApplicationState
     *
     * @param {number}            [opts.duration=0.1] - Duration in seconds.
     *
-    * @param {(
-    *    import('@typhonjs-svelte/runtime-base/svelte/easing').EasingFunctionName |
-    *    import('@typhonjs-svelte/runtime-base/svelte/easing').EasingFunction
-    * )} [opts.ease='linear'] - Easing function or easing function name.
+    * @param {import('@typhonjs-svelte/runtime-base/svelte/easing').EasingReference} [opts.ease='linear'] - Easing function or easing
+    *        function name.
     *
-    * @returns {T | Promise<T>} When synchronous the application or Promise when animating resolving with application.
+    * @returns {undefined | Promise<void>} When asynchronous the animation Promise.
     */
-   set(data, { async = false, animateTo = false, duration = 0.1, ease = 'linear' } = {})
+   #setImpl(data, { async = false, animateTo = false, duration = 0.1, ease = 'linear' } = {})
    {
       if (!isObject(data))
       {
@@ -197,22 +241,22 @@ export class ApplicationState
       if (!isObject(data?.position))
       {
          console.warn(`ApplicationState.set warning: 'data.position' is not an object.`);
-         return application;
+         return;
       }
 
       // TODO: TAKE NOTE THAT WE ARE ACCESSING A FOUNDRY APP v1 GETTER HERE TO DETERMINE IF APPLICATION IS RENDERED.
       // TODO: THIS NEEDS TO BE REFACTORED WHEN CONVERTING TRL TO A GENERIC FRAMEWORK.
       const rendered = application.rendered;
 
-      if (animateTo && !rendered)
-      {
-         console.warn(`ApplicationState.set warning: Application is not rendered and 'animateTo' is true.`);
-         return application;
-      }
-
       // Update data directly with no store or inline style updates.
       if (animateTo)  // Animate to saved data.
       {
+         if (!rendered)
+         {
+            console.warn(`ApplicationState.set warning: Application is not rendered and 'animateTo' is true.`);
+            return;
+         }
+
          // Provide special handling to potentially change transform origin as this parameter is not animated.
          if (data.position.transformOrigin !== application.position.transformOrigin)
          {
@@ -229,9 +273,13 @@ export class ApplicationState
             }
          }
 
-         const promise = application.position.animate.to(data.position, { duration, ease }).finished.then((cancelled) =>
+         const promise = application.position.animate.to(data.position, {
+            duration,
+            ease,
+            strategy: 'cancelAll'
+         }).finished.then(({ cancelled }) =>
          {
-            if (cancelled) { return application; }
+            if (cancelled) { return; }
 
             // Merge in saved options to application.
             if (isObject(data?.options))
@@ -255,8 +303,6 @@ export class ApplicationState
             {
                application.position.state.set({ name: '#beforeMinimized', ...data.beforeMinimized });
             }
-
-            return application;
          });
 
          // Return a Promise with the application that resolves after animation ends.
@@ -319,7 +365,5 @@ export class ApplicationState
             application.position.set(positionData);
          }
       }
-
-      return application;
    }
 }
