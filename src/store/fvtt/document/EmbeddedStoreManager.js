@@ -290,6 +290,11 @@ export class EmbeddedStoreManager
             this.#embeddedNames.add(`delete.${collectionName}`);
             this.#embeddedNames.add(`update.${collectionName}`);
 
+            // Update CRUD keys for v12.
+            this.#embeddedNames.add(`create${collectionName}`);
+            this.#embeddedNames.add(`delete${collectionName}`);
+            this.#embeddedNames.add(`update${collectionName}`);
+
             // v10 collection to doc name lookup.
             this.#collectionToDocName.set(docName, docName);
             this.#collectionToDocName.set(collectionName, docName);
