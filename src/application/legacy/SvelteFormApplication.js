@@ -935,11 +935,21 @@ export class SvelteFormApplication extends FormApplication
 
       const activeWindow = this.reactive.activeWindow;
 
-      if (this._state === Application.RENDER_STATES.NONE &&
-       A11yHelper.isFocusTarget(activeWindow.document.querySelector(`#${this.id}`)))
+      try
       {
-         console.warn(`SvelteFormApplication - _render: A DOM element already exists for CSS ID '${this.id
-         }'. Cancelling initial render for new application with appId '${this.appId}'.`);
+         if (this._state === Application.RENDER_STATES.NONE &&
+          A11yHelper.isFocusTarget(activeWindow.document.querySelector(`#${this.id}`)))
+         {
+            console.warn(`SvelteFormApplication - _render: A DOM element already exists for CSS ID '${this.id
+             }'. Cancelling initial render for new application with appId '${this.appId}'.`);
+
+            return;
+         }
+      }
+      catch (err)
+      {
+         console.warn(`SvelteFormApplication - _render: Potentially malformed application ID '${this.id
+          }'. Cancelling initial render for new application with appId '${this.appId}'.`);
 
          return;
       }
