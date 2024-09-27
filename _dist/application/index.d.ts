@@ -1312,7 +1312,7 @@ declare class TJSDialog extends SvelteApplication {
    * // Logs 'YES result', 'NO Result', or null if the user closed the dialog without making a selection.
    * console.log(result);
    */
-  static confirm<T_1>(
+  static confirm<T>(
     {
       onYes,
       onNo,
@@ -1322,7 +1322,7 @@ declare class TJSDialog extends SvelteApplication {
       onNo?: string | ((data?: { application?: TJSDialog }) => any);
     },
     options?: SvelteApplicationOptions,
-  ): Promise<T_1>;
+  ): Promise<T>;
   /**
    * A helper factory method to display a basic "prompt" style TJSDialog with a single button.
    *
@@ -1359,7 +1359,7 @@ declare class TJSDialog extends SvelteApplication {
    * // Logs 'OK' or null if the user closed the dialog without making a selection.
    * console.log(result);
    */
-  static prompt<T_2>(
+  static prompt<T>(
     {
       onOk,
       label,
@@ -1371,7 +1371,7 @@ declare class TJSDialog extends SvelteApplication {
       icon?: string;
     },
     options?: SvelteApplicationOptions,
-  ): Promise<T_2>;
+  ): Promise<T>;
   /**
    * Creates an anonymous data defined TJSDialog returning a Promise that can be awaited upon for the user to make a
    * choice.
@@ -1387,7 +1387,7 @@ declare class TJSDialog extends SvelteApplication {
    *
    * @returns {Promise<T>} A Promise that resolves to the chosen result.
    */
-  static wait<T_3>(data: TJSDialogOptions, options?: SvelteApplicationOptions): Promise<T_3>;
+  static wait<T>(data: TJSDialogOptions, options?: SvelteApplicationOptions): Promise<T>;
   /**
    * @param {import('./internal/state-dialog/types').TJSDialogOptions}           data - Dialog options.
    *
@@ -1428,7 +1428,7 @@ declare class TJSDialog extends SvelteApplication {
 
 /**
  * Options for SvelteApplication. Note: that this extends the Foundry
- * {@link ApplicationOptions }.
+ * {@link ApplicationOptions}.
  */
 type SvelteApplicationOptions = {
   /**
@@ -1499,7 +1499,7 @@ type SvelteApplicationOptions = {
    * A validator
    * function or data or list of validators.
    */
-  positionValidator?: any;
+  positionValidator?: _typhonjs_svelte_runtime_base_svelte_store_position.ValidatorAPI.Options;
   /**
    * An instance of
    * TJSWebStorage (session) to share across SvelteApplications.

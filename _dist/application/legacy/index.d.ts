@@ -740,11 +740,13 @@ type ApplicationStateData = {
  */
 declare class SvelteFormApplication {
   /**
+   * @param {object} object - Foundry document.
+   *
    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} options - The options for the application.
    *
    * @inheritDoc
    */
-  constructor(object: any, options?: _typhonjs_fvtt_svelte_application.SvelteApplicationOptions);
+  constructor(object: object, options?: _typhonjs_fvtt_svelte_application.SvelteApplicationOptions);
   /**
    * Returns the content element if an application shell is mounted.
    *

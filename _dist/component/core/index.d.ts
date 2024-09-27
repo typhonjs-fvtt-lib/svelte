@@ -2,6 +2,7 @@ import { SvelteComponent } from 'svelte';
 
 /**
  * TODO: Add description
+ *
  */
 declare class TjsGlassPane extends SvelteComponent<TjsGlassPane.Props, TjsGlassPane.Events, TjsGlassPane.Slots> {}
 
@@ -104,6 +105,7 @@ declare namespace TjsGlassPane {
 /**
  * Provides an application shell is a main top level slotted component that provides a reactive
  * outer wrapper and header bar for the main content component.
+ *
  */
 declare class ApplicationShell extends SvelteComponent<
   ApplicationShell.Props,
@@ -236,6 +238,7 @@ declare namespace ApplicationShell {
 
 /**
  * Provides an empty application shell as a main top level slotted component.
+ *
  */
 declare class EmptyApplicationShell extends SvelteComponent<
   EmptyApplicationShell.Props,
@@ -335,7 +338,9 @@ declare namespace EmptyApplicationShell {
  * Provides an alternate application shell that is scoped by slightly different CSS classes than
  * {@link ApplicationShell}. An application shell is a main top level slotted component that provides a reactive
  * outer wrapper and header bar for the main content component.
+ *
  * ### CSS variables
+ *
  * ```
  * '--tjs-app-background': Controls the app background image; set in main `index.js`.
  * ```
@@ -471,6 +476,7 @@ declare namespace TjsApplicationShell {
 
 /**
  * TODO: Add description
+ *
  */
 declare class TjsFocusWrap extends SvelteComponent<TjsFocusWrap.Props, TjsFocusWrap.Events, TjsFocusWrap.Slots> {}
 

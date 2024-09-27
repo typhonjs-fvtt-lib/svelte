@@ -243,7 +243,7 @@ declare class TJSGameSettings {
    * @returns {IterableIterator<import('svelte/store').Writable<T>>} Iterable iterator of stores.
    * @yields {import('svelte/store').Writable<T>}
    */
-  stores<T_1>(regex?: RegExp): IterableIterator<svelte_store.Writable<T_1>>;
+  stores<T>(regex?: RegExp): IterableIterator<svelte_store.Writable<T>>;
   #private;
 }
 type GameSettingOptions = {

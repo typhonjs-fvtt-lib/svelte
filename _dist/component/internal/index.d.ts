@@ -11,6 +11,7 @@ import { SvelteComponent } from 'svelte';
 
 /**
  * TODO: Add description
+ *
  * @internal
  */
 declare class DialogShell extends SvelteComponent<DialogShell.Props, DialogShell.Events, DialogShell.Slots> {

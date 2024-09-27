@@ -112,8 +112,10 @@
       }
 
       // Ignore any events originating inside the glasspane. Return early if event target is not contained in glasspane.
-      if (targetEl !== glassPaneEl && targetEl !== backgroundEl  && targetEl !== containerEl &&
-        glassPaneEl.contains(targetEl))
+      // An `instanceof` check ensures that the target is a Node. There may be cases where the target could be the
+      // `window`, etc.
+      if (targetEl !== glassPaneEl && targetEl !== backgroundEl && targetEl !== containerEl &&
+       glassPaneEl.contains(targetEl instanceof Node ? targetEl : null))
       {
          return;
       }

@@ -95,7 +95,7 @@ export class TJSDialog extends SvelteApplication
             /**
              * `this` is the TJSDialog instance when invoked.
              *
-             * @this TJSDialog
+             * @this {TJSDialog}
              *
              * @returns {{data: import('./types').TJSDialogOptions, managedPromise: ManagedPromise}} Props
              */

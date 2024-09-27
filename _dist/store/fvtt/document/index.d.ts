@@ -149,12 +149,12 @@ type TJSDocumentOptions = {
    * Optional post delete function to invoke when
    * document is deleted _after_ subscribers have been notified.
    */
-  delete?: (doc?: object) => void;
+  delete?: ((doc?: object) => void) | null;
   /**
    * Optional pre delete function to invoke
    * when document is deleted _before_ subscribers are notified.
    */
-  preDelete?: (doc?: object) => void;
+  preDelete?: ((doc?: object) => void) | null;
 };
 /**
  * Provides data regarding the latest document change.
@@ -214,7 +214,7 @@ declare class TJSDocumentCollection<T = DocumentCollection> {
    *
    * @param {TJSDocumentCollectionUpdateOptions}  [options] - New collection update options to set.
    */
-  set(collection: T | undefined, options?: any): void;
+  set(collection: T | undefined, options?: TJSDocumentCollectionUpdateOptions): void;
   /**
    * Sets options for this collection wrapper / store.
    *
@@ -237,12 +237,12 @@ type TJSDocumentCollectionOptions = {
    * Optional post delete function
    * to invoke when document is deleted _after_ subscribers have been notified.
    */
-  delete?: (collection: DocumentCollection) => void;
+  delete?: ((collection: DocumentCollection) => void) | null;
   /**
    * Optional pre delete function to
    * invoke when document is deleted _before_ subscribers are notified.
    */
-  preDelete?: (collection: DocumentCollection) => void;
+  preDelete?: ((collection: DocumentCollection) => void) | null;
 };
 /**
  * Provides data regarding the latest collection change.
