@@ -117,6 +117,8 @@ export class SvelteFormApplication extends FormApplication
    #stores;
 
    /**
+    * @param {object} object - Foundry document.
+    *
     * @param {import('#svelte-fvtt/application').SvelteApplicationOptions} options - The options for the application.
     *
     * @inheritDoc
