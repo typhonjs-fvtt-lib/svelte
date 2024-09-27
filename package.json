@@ -25,6 +25,10 @@
       "types": "./_dist/component/core/index.d.ts",
       "import": "./_dist/component/core/index.js"
     },
+    "./component/internal": {
+      "types": "./_dist/component/internal/index.d.ts",
+      "import": "./_dist/component/internal/index.js"
+    },
     "./gsap": {
       "types": "./_dist/gsap/index.d.ts",
       "import": "./_dist/gsap/index.js"
@@ -60,17 +64,17 @@
     "./_dist/gsap/plugin/bonus/*.js"
   ],
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "@typhonjs-build-test/esm-d-ts": "0.2.0",
-    "@typhonjs-build-test/rollup-plugin-pkg-imports": "^0.2.0",
+    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@typhonjs-build-test/esm-d-ts": "^0.3.0-next.8",
+    "@typhonjs-build-test/esm-d-ts-plugin-svelte": "^0.1.0-next.1",
+    "@typhonjs-build-test/rollup-plugin-pkg-imports": "^0.5.0",
     "@typhonjs-config/eslint-config": "^0.6.3",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
-    "@typhonjs-svelte/lib": "github:typhonjs-svelte/lib",
     "@typhonjs-svelte/runtime-base": "github:typhonjs-svelte/runtime-base",
-    "eslint": "^8.56.0",
+    "eslint": "^8.57.0",
     "fs-extra": "^11.2.0",
-    "rollup": "^4.9.5",
-    "svelte": "^4.2.9",
+    "rollup": "^4.22.4",
+    "svelte": "^4.2.19",
     "upath": "^2.0.1"
   },
   "peerDependencies": {
