@@ -162,7 +162,7 @@ export class TJSDocumentCollection
    /**
     * @param {T | undefined}  collection - New collection to set.
     *
-    * @param {TJSDocumentCollectionUpdateOptions}  [options] - New collection update options to set.
+    * @param {TJSDocumentCollectionUpdateOptions<T>}  [options] - New collection update options to set.
     */
    set(collection, options = {})
    {
@@ -266,7 +266,7 @@ export class TJSDocumentCollection
    /**
     * @param {boolean}  [force] - unused - signature from Foundry render function.
     *
-    * @param {TJSDocumentCollectionUpdateOptions}   [options] - Options from render call; will have collection
+    * @param {TJSDocumentCollectionUpdateOptions<T>}   [options] - Options from render call; will have collection
     *        update context.
     */
    #updateSubscribers(force = false, options = {}) // eslint-disable-line no-unused-vars
