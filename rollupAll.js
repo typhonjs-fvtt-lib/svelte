@@ -165,6 +165,25 @@ const rollupConfigs = [
          plugins: outputPlugins,
          sourcemap
       }
+   },
+   {
+      input: {
+         input: 'src/store/fvtt/settings/world/index.js',
+         external,
+         plugins: [
+            importsExternal(),
+            resolve(s_RESOLVE_CONFIG),
+            generateDTS.plugin(dtsPluginOptions)
+         ]
+      },
+      output: {
+         file: '_dist/store/fvtt/settings/world/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap
+      }
    }
 ];
 
