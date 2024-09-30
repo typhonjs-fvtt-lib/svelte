@@ -5,10 +5,10 @@ import {
    rippleFocus }           from '#runtime/svelte/action/animate';
 
 import { TJSSvelteUtil }   from '#runtime/svelte/util';
+import { localize }        from '#runtime/util/i18n';
 import { isObject }        from '#runtime/util/object';
 
 import { TJSDialog }       from '#svelte-fvtt/application';
-import { localize }        from '#svelte-fvtt/helper';
 
 /**
  * Controls preparation and processing of registered game settings w/ TJSGameSettings. Game settings are parsed

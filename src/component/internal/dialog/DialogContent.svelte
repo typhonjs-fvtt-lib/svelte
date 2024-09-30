@@ -17,9 +17,8 @@
       TJSSvelteUtil }         from '#runtime/svelte/util';
 
    import { A11yHelper }      from '#runtime/util/browser';
+   import { localize }        from '#runtime/util/i18n';
    import { isObject }        from '#runtime/util/object';
-
-   import { localize }        from '#svelte-fvtt/helper';
 
    export let data = void 0;
    export let preventDefault = false;

@@ -9,9 +9,8 @@
 
    import { TJSSvelteConfigUtil }   from '#runtime/svelte/util';
    import { A11yHelper }            from '#runtime/util/browser';
+   import { localize }              from '#runtime/util/i18n';
    import { isObject }              from '#runtime/util/object';
-
-   import { localize }              from '#svelte-fvtt/helper';
 
    import {
       draggable as dragDefault }    from '#runtime/svelte/store/position';

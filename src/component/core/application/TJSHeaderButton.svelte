@@ -23,9 +23,8 @@
     * @internal
     */
    import { applyStyles }   from '#runtime/svelte/action/dom';
+   import { localize }      from '#runtime/util/i18n';
    import { isObject }      from '#runtime/util/object';
-
-   import { localize }      from '@typhonjs-fvtt/svelte/helper';
 
    export let button = void 0;
 
