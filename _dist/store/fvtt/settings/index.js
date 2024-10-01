@@ -3,7 +3,7 @@ import { isObject, isIterable } from '@typhonjs-svelte/runtime-base/util/object'
 import { isWritableStore, subscribeIgnoreFirst } from '@typhonjs-svelte/runtime-base/util/store';
 import { ripple, rippleFocus } from '@typhonjs-svelte/runtime-base/svelte/action/animate';
 import { TJSSvelteUtil } from '@typhonjs-svelte/runtime-base/svelte/util';
-import { localize } from '@typhonjs-svelte/runtime-base/util/i18n';
+import { localize } from '@typhonjs-fvtt/runtime/util/i18n';
 import { TJSDialog } from '@typhonjs-fvtt/svelte/application';
 
 /**
