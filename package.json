@@ -8,6 +8,7 @@
     "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)"
   ],
   "imports": {
+    "#runtime/util/i18n": "@typhonjs-fvtt/runtime/util/i18n",
     "#runtime/*": "@typhonjs-svelte/runtime-base/*",
     "#svelte-fvtt/*": "@typhonjs-fvtt/svelte/*",
     "#svelte-lib/*": "@typhonjs-fvtt/svelte/*",
