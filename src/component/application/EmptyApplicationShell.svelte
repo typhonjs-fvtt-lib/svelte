@@ -7,22 +7,22 @@
    import {
       getContext,
       onMount,
-      setContext }                     from 'svelte';
+      setContext }                     from '#svelte';
 
    import {
       applyStyles,
-      resizeObserver }                 from '@typhonjs-svelte/runtime-base/svelte/action/dom';
+      resizeObserver }                 from '#runtime/svelte/action/dom';
 
-   import { dynamicAction }            from '@typhonjs-svelte/runtime-base/svelte/action/util';
+   import { dynamicAction }            from '#runtime/svelte/action/util';
 
-   import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
-   import { A11yHelper }               from '@typhonjs-svelte/runtime-base/util/a11y';
-   import { isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
+   import { TJSDefaultTransition }     from '#runtime/svelte/transition';
+   import { A11yHelper }               from '#runtime/util/a11y';
+   import { isObject }                 from '#runtime/util/object';
 
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
    import ResizableHandle              from './ResizableHandle.svelte';
 
-   import TJSFocusWrap                 from '../../internal/dom/TJSFocusWrap.svelte';
+   import TJSFocusWrap                 from '../internal/dom/TJSFocusWrap.svelte';
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
    // use 'elementRoot' to set the element of the Application. You can also provide `elementContent` and
@@ -65,7 +65,7 @@
     * `initialAppResizeObserver` is true or when the position store `resizeObservable` is true when app position `width`
     * or `height` is `auto` or `inherit`.
     *
-    * @type {undefined | import('@typhonjs-svelte/runtime-base/svelte/action/util').DynamicActionOptions}
+    * @type {undefined | import('#runtime/svelte/action/util').DynamicActionOptions}
     */
    $: appResizeObserver = initialAppResizeObserver || $resizeObservable ?
     { action: resizeObserver, data: resizeObservedApp } : void 0;

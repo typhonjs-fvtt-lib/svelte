@@ -307,9 +307,9 @@ await generateDTS({
    ...applicationDTSOptions
 });
 
-console.log('Generating TS Declaration: ./_dist/component/core/index.js');
+console.log('Generating TS Declaration: ./_dist/component/application/index.js');
 
-await generateDTS({ input: './_dist/component/core/index.js' });
+await generateDTS({ input: './_dist/component/application/index.js' });
 
 console.log('Generating TS Declaration: ./_dist/component/internal/index.js');
 

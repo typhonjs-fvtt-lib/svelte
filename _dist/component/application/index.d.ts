@@ -1,108 +1,6 @@
 import { SvelteComponent } from 'svelte';
 
 /**
- * TODO: Add description
- *
- */
-declare class TjsGlassPane extends SvelteComponent<TjsGlassPane.Props, TjsGlassPane.Events, TjsGlassPane.Slots> {}
-
-/** Event / Prop / Slot type aliases for {@link TjsGlassPane | associated component}. */
-declare namespace TjsGlassPane {
-  /** Props type alias for {@link TjsGlassPane | associated component}. */
-  export type Props = {
-    /** @type {string} */
-    id?: string;
-    /** @type {string} */
-    background?: string;
-    transition?: any;
-    /** @type {number} */
-    zIndex?: number;
-    /** @type {boolean} */
-    captureInput?: boolean;
-    /**
-     * When true any input fires an event `glasspane:close`.
-     *
-     * @type {boolean}
-     */
-    closeOnInput?: boolean;
-    /** @type {boolean} */
-    slotSeparate?: boolean;
-    /** @type {Record<string, string>} */
-    styles?: Record<string, string>;
-    inTransition?: any;
-    outTransition?: any;
-    transitionOptions?: any;
-    inTransitionOptions?: {};
-    outTransitionOptions?: {};
-  };
-  /** Events type alias for {@link TjsGlassPane | associated component}. */
-  export type Events = {
-    'glasspane:close':
-      | PointerEvent
-      | MouseEvent
-      | UIEvent
-      | Event
-      | ErrorEvent
-      | AnimationEvent
-      | ClipboardEvent
-      | CompositionEvent
-      | DragEvent
-      | FocusEvent
-      | FormDataEvent
-      | InputEvent
-      | KeyboardEvent
-      | ProgressEvent<EventTarget>
-      | SecurityPolicyViolationEvent
-      | SubmitEvent
-      | TouchEvent
-      | TransitionEvent
-      | WheelEvent;
-    'glasspane:keydown:escape':
-      | PointerEvent
-      | MouseEvent
-      | UIEvent
-      | Event
-      | ErrorEvent
-      | AnimationEvent
-      | ClipboardEvent
-      | CompositionEvent
-      | DragEvent
-      | FocusEvent
-      | FormDataEvent
-      | InputEvent
-      | KeyboardEvent
-      | ProgressEvent<EventTarget>
-      | SecurityPolicyViolationEvent
-      | SubmitEvent
-      | TouchEvent
-      | TransitionEvent
-      | WheelEvent;
-    'glasspane:pointerdown':
-      | PointerEvent
-      | MouseEvent
-      | UIEvent
-      | Event
-      | ErrorEvent
-      | AnimationEvent
-      | ClipboardEvent
-      | CompositionEvent
-      | DragEvent
-      | FocusEvent
-      | FormDataEvent
-      | InputEvent
-      | KeyboardEvent
-      | ProgressEvent<EventTarget>
-      | SecurityPolicyViolationEvent
-      | SubmitEvent
-      | TouchEvent
-      | TransitionEvent
-      | WheelEvent;
-  } & { [evt: string]: CustomEvent<any> };
-  /** Slots type alias for {@link TjsGlassPane | associated component}. */
-  export type Slots = { default: {} };
-}
-
-/**
  * Provides an application shell is a main top level slotted component that provides a reactive
  * outer wrapper and header bar for the main content component.
  *
@@ -215,11 +113,6 @@ declare namespace ApplicationShell {
   export type Props = {
     transition?: () => undefined;
     draggable?: any;
-    inTransition?: () => undefined;
-    outTransition?: () => undefined;
-    transitionOptions?: any;
-    inTransitionOptions?: {};
-    outTransitionOptions?: {};
     elementContent?: any;
     elementRoot?: any;
     draggableOptions?: any;
@@ -229,6 +122,11 @@ declare namespace ApplicationShell {
     appOffsetWidth?: boolean;
     contentOffsetHeight?: boolean;
     contentOffsetWidth?: boolean;
+    inTransition?: () => undefined;
+    outTransition?: () => undefined;
+    transitionOptions?: any;
+    inTransitionOptions?: {};
+    outTransitionOptions?: {};
   };
   /** Events type alias for {@link ApplicationShell | associated component}. */
   export type Events = { [evt: string]: CustomEvent<any> };
@@ -317,16 +215,16 @@ declare namespace EmptyApplicationShell {
   /** Props type alias for {@link EmptyApplicationShell | associated component}. */
   export type Props = {
     transition?: () => undefined;
-    inTransition?: () => undefined;
-    outTransition?: () => undefined;
-    transitionOptions?: any;
-    inTransitionOptions?: {};
-    outTransitionOptions?: {};
     elementContent?: any;
     elementRoot?: any;
     stylesApp?: any;
     appOffsetHeight?: boolean;
     appOffsetWidth?: boolean;
+    inTransition?: () => undefined;
+    outTransition?: () => undefined;
+    transitionOptions?: any;
+    inTransitionOptions?: {};
+    outTransitionOptions?: {};
   };
   /** Events type alias for {@link EmptyApplicationShell | associated component}. */
   export type Events = { [evt: string]: CustomEvent<any> };
@@ -453,11 +351,6 @@ declare namespace TjsApplicationShell {
   export type Props = {
     transition?: () => undefined;
     draggable?: any;
-    inTransition?: () => undefined;
-    outTransition?: () => undefined;
-    transitionOptions?: any;
-    inTransitionOptions?: {};
-    outTransitionOptions?: {};
     elementContent?: any;
     elementRoot?: any;
     draggableOptions?: any;
@@ -467,10 +360,117 @@ declare namespace TjsApplicationShell {
     appOffsetWidth?: boolean;
     contentOffsetHeight?: boolean;
     contentOffsetWidth?: boolean;
+    inTransition?: () => undefined;
+    outTransition?: () => undefined;
+    transitionOptions?: any;
+    inTransitionOptions?: {};
+    outTransitionOptions?: {};
   };
   /** Events type alias for {@link TjsApplicationShell | associated component}. */
   export type Events = { [evt: string]: CustomEvent<any> };
   /** Slots type alias for {@link TjsApplicationShell | associated component}. */
+  export type Slots = { default: {} };
+}
+
+/**
+ * TODO: Add description
+ *
+ */
+declare class TjsGlassPane extends SvelteComponent<TjsGlassPane.Props, TjsGlassPane.Events, TjsGlassPane.Slots> {}
+
+/** Event / Prop / Slot type aliases for {@link TjsGlassPane | associated component}. */
+declare namespace TjsGlassPane {
+  /** Props type alias for {@link TjsGlassPane | associated component}. */
+  export type Props = {
+    /** @type {string} */
+    id?: string;
+    /** @type {string} */
+    background?: string;
+    transition?: any;
+    /** @type {number} */
+    zIndex?: number;
+    inTransition?: any;
+    outTransition?: any;
+    transitionOptions?: any;
+    inTransitionOptions?: {};
+    outTransitionOptions?: {};
+    /** @type {boolean} */
+    captureInput?: boolean;
+    /**
+     * When true any input fires an event `glasspane:close`.
+     *
+     * @type {boolean}
+     */
+    closeOnInput?: boolean;
+    /** @type {boolean} */
+    slotSeparate?: boolean;
+    /** @type {Record<string, string>} */
+    styles?: Record<string, string>;
+  };
+  /** Events type alias for {@link TjsGlassPane | associated component}. */
+  export type Events = {
+    'glasspane:close':
+      | PointerEvent
+      | MouseEvent
+      | UIEvent
+      | Event
+      | ErrorEvent
+      | AnimationEvent
+      | ClipboardEvent
+      | CompositionEvent
+      | DragEvent
+      | FocusEvent
+      | FormDataEvent
+      | InputEvent
+      | KeyboardEvent
+      | ProgressEvent<EventTarget>
+      | SecurityPolicyViolationEvent
+      | SubmitEvent
+      | TouchEvent
+      | TransitionEvent
+      | WheelEvent;
+    'glasspane:keydown:escape':
+      | PointerEvent
+      | MouseEvent
+      | UIEvent
+      | Event
+      | ErrorEvent
+      | AnimationEvent
+      | ClipboardEvent
+      | CompositionEvent
+      | DragEvent
+      | FocusEvent
+      | FormDataEvent
+      | InputEvent
+      | KeyboardEvent
+      | ProgressEvent<EventTarget>
+      | SecurityPolicyViolationEvent
+      | SubmitEvent
+      | TouchEvent
+      | TransitionEvent
+      | WheelEvent;
+    'glasspane:pointerdown':
+      | PointerEvent
+      | MouseEvent
+      | UIEvent
+      | Event
+      | ErrorEvent
+      | AnimationEvent
+      | ClipboardEvent
+      | CompositionEvent
+      | DragEvent
+      | FocusEvent
+      | FormDataEvent
+      | InputEvent
+      | KeyboardEvent
+      | ProgressEvent<EventTarget>
+      | SecurityPolicyViolationEvent
+      | SubmitEvent
+      | TouchEvent
+      | TransitionEvent
+      | WheelEvent;
+  } & { [evt: string]: CustomEvent<any> };
+  /** Slots type alias for {@link TjsGlassPane | associated component}. */
   export type Slots = { default: {} };
 }
 

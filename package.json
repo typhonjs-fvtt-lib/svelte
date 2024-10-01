@@ -21,9 +21,9 @@
     "./application/legacy": {
       "import": "./_dist/application/legacy/index.js"
     },
-    "./component/core": {
-      "types": "./_dist/component/core/index.d.ts",
-      "import": "./_dist/component/core/index.js"
+    "./component/application": {
+      "types": "./_dist/component/application/index.d.ts",
+      "import": "./_dist/component/application/index.js"
     },
     "./component/internal": {
       "types": "./_dist/component/internal/index.d.ts",
@@ -63,7 +63,7 @@
   },
   "sideEffects": [
     "./_dist/application/index.js",
-    "./_dist/component/core/index.js",
+    "./_dist/component/application/index.js",
     "./_dist/gsap/plugin/*.js",
     "./_dist/gsap/plugin/bonus/*.js"
   ],

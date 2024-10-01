@@ -1,6 +1,6 @@
 import {
    ApplicationShell,
-   EmptyApplicationShell }       from '@typhonjs-fvtt/svelte/component/core';
+   EmptyApplicationShell }       from '@typhonjs-fvtt/svelte/component/application';
 
 import {
    deepMerge,

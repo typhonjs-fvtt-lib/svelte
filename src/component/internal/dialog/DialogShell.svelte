@@ -15,8 +15,9 @@
 
    import { fade }               from '#svelte/transition';
 
-   import { ApplicationShell }   from '#svelte-fvtt/component/core';
-   import { TJSGlassPane }       from '#svelte-fvtt/component/core';
+   import {
+      ApplicationShell,
+      TJSGlassPane }             from '#svelte-fvtt/component/application';
 
    import { A11yHelper }         from '#runtime/util/a11y';
    import { isObject }           from '#runtime/util/object';

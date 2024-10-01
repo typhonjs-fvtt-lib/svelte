@@ -1,37 +1,31 @@
 <script>
    /**
-    * Provides an alternate application shell that is scoped by slightly different CSS classes than
-    * {@link ApplicationShell}. An application shell is a main top level slotted component that provides a reactive
+    * Provides an application shell is a main top level slotted component that provides a reactive
     * outer wrapper and header bar for the main content component.
     *
-    * ### CSS variables
-    *
-    * ```
-    * '--tjs-app-background': Controls the app background image; set in main `index.js`.
-    * ```
     * @componentDocumentation
     */
 
    import {
       getContext,
       onMount,
-      setContext }                     from 'svelte';
+      setContext }                     from '#svelte';
 
    import {
       applyStyles,
-      resizeObserver }                 from '@typhonjs-svelte/runtime-base/svelte/action/dom';
+      resizeObserver }                 from '#runtime/svelte/action/dom';
 
-   import { dynamicAction }            from '@typhonjs-svelte/runtime-base/svelte/action/util';
+   import { dynamicAction }            from '#runtime/svelte/action/util';
 
-   import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
-   import { A11yHelper }               from '@typhonjs-svelte/runtime-base/util/a11y';
-   import { isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
+   import { TJSDefaultTransition }     from '#runtime/svelte/transition';
+   import { A11yHelper }               from '#runtime/util/a11y';
+   import { isObject }                 from '#runtime/util/object';
 
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
    import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
    import ResizableHandle              from './ResizableHandle.svelte';
 
-   import TJSFocusWrap                 from '../../internal/dom/TJSFocusWrap.svelte';
+   import TJSFocusWrap                 from '../internal/dom/TJSFocusWrap.svelte';
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
    // use 'elementRoot' to set the element of the Application. You can also provide `elementContent` and
@@ -42,6 +36,9 @@
    // Allows custom draggable implementations to be forwarded to TJSApplicationHeader.
    export let draggable = void 0;
    export let draggableOptions = void 0;
+
+   // The children array can be specified by a parent via prop or is read below from the external context.
+   // export let children = void 0;
 
    // Explicit style overrides for the main app and content elements. Uses action `applyStyles`.
    export let stylesApp = void 0;
@@ -79,7 +76,7 @@
     * `initialAppResizeObserver` is true or when the position store `resizeObservable` is true when app position `width`
     * or `height` is `auto` or `inherit`.
     *
-    * @type {undefined | import('@typhonjs-svelte/runtime-base/svelte/action/util').DynamicActionOptions}
+    * @type {undefined | import('#runtime/svelte/action/util').DynamicActionOptions}
     */
    $: appResizeObserver = initialAppResizeObserver || $resizeObservable ?
     { action: resizeObserver, data: resizeObservedApp } : void 0;
@@ -192,10 +189,7 @@
    // ---------------------------------------------------------------------------------------------------------------
 
    // Focus `elementRoot` on mount to allow keyboard tab navigation of header buttons.
-   onMount(() =>
-   {
-      if ($focusAuto) { elementRoot.focus(); }
-   });
+   onMount(() => elementRoot.focus());
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -245,7 +239,7 @@
 
    /**
     * Provides focus cycling inside the application capturing `<Shift-Tab>` and if `elementRoot` or `firstFocusEl` is
-    * the actively focused element then the second to last focusable element if applicable is focused.
+    * the actively focused element then last focusable element is focused skipping `TJSFocusWrap`.
     *
     * Also, if a popout app all key down events will bring this application to the top such that when focus is trapped
     * the app is top most.
@@ -398,163 +392,87 @@
 <svelte:options accessors={true}/>
 
 {#if inTransition !== TJSDefaultTransition.default || outTransition !== TJSDefaultTransition.default}
-    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-    <div id={application.id}
-         class="tjs-app tjs-window-app {application.options.classes.join(' ')}"
-         data-appid={application.appId}
-         bind:this={elementRoot}
-         in:inTransition|global={inTransitionOptions}
-         out:outTransition|global={outTransitionOptions}
-         on:close:popup|preventDefault|stopPropagation={onClosePopup}
-         on:keydown|capture={onKeydown}
-         on:pointerdown={onPointerdownApp}
-         use:applyStyles={stylesApp}
-         use:dynamicAction={appResizeObserver}
-         role=application
-         tabindex=-1>
-        <TJSApplicationHeader {draggable} {draggableOptions} />
-        <section class=window-content
-                 bind:this={elementContent}
-                 on:pointerdown={onPointerdownContent}
-                 use:applyStyles={stylesContent}
-                 use:contentResizeObserver={resizeObservedContent}
-                 tabindex=-1>
-            <slot />
-        </section>
-        <ResizableHandle />
-        <TJSFocusWrap {elementRoot} />
-    </div>
+   <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+   <div id={application.id}
+        class="app window-app {application.options.classes.join(' ')}"
+        data-appid={application.appId}
+        bind:this={elementRoot}
+        in:inTransition|global={inTransitionOptions}
+        out:outTransition|global={outTransitionOptions}
+        on:close:popup|preventDefault|stopPropagation={onClosePopup}
+        on:keydown|capture={onKeydown}
+        on:pointerdown={onPointerdownApp}
+        use:applyStyles={stylesApp}
+        use:dynamicAction={appResizeObserver}
+        role=application
+        tabindex=-1>
+      <TJSApplicationHeader {draggable} {draggableOptions} />
+      <section class=window-content
+               bind:this={elementContent}
+               on:pointerdown={onPointerdownContent}
+               use:applyStyles={stylesContent}
+               use:contentResizeObserver={resizeObservedContent}
+               tabindex=-1>
+         <slot />
+      </section>
+      <ResizableHandle />
+      <TJSFocusWrap {elementRoot} />
+   </div>
 {:else}
-    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-    <div id={application.id}
-         class="tjs-app tjs-window-app {application.options.classes.join(' ')}"
-         data-appid={application.appId}
-         bind:this={elementRoot}
-         on:close:popup|preventDefault|stopPropagation={onClosePopup}
-         on:keydown|capture={onKeydown}
-         on:pointerdown={onPointerdownApp}
-         use:applyStyles={stylesApp}
-         use:dynamicAction={appResizeObserver}
-         role=application
-         tabindex=-1>
-        <TJSApplicationHeader {draggable} {draggableOptions} />
-        <section class=window-content
-                 bind:this={elementContent}
-                 on:pointerdown={onPointerdownContent}
-                 use:applyStyles={stylesContent}
-                 use:contentResizeObserver={resizeObservedContent}
-                 tabindex=-1>
-            <slot />
-        </section>
-        <ResizableHandle />
-        <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
-    </div>
+   <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+   <div id={application.id}
+        class="app window-app {application.options.classes.join(' ')}"
+        data-appid={application.appId}
+        bind:this={elementRoot}
+        on:close:popup|preventDefault|stopPropagation={onClosePopup}
+        on:keydown|capture={onKeydown}
+        on:pointerdown={onPointerdownApp}
+        use:applyStyles={stylesApp}
+        use:dynamicAction={appResizeObserver}
+        role=application
+        tabindex=-1>
+      <TJSApplicationHeader {draggable} {draggableOptions} />
+      <section class=window-content
+               bind:this={elementContent}
+               on:pointerdown={onPointerdownContent}
+               use:applyStyles={stylesContent}
+               use:contentResizeObserver={resizeObservedContent}
+               tabindex=-1>
+         <slot />
+      </section>
+      <ResizableHandle />
+      <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
+   </div>
 {/if}
 
 <style>
-    /**
-     * Defines styles that mimic a Foundry popout Application. `:global` is used to preserve the unused CSS in the
-     * template above. A primary benefit of a separate application shell implementation is that the styles are not
-     * overridden by any given game system / modules that might alter the standard Foundry Application CSS. This allows
-     * separate and unique styles to be given to this application regardless of game system / module modifications.
-     */
+   /* Note: this is different than stock Foundry and allows rounded corners from .app core styles */
+   .window-app {
+      overflow: var(--tjs-app-overflow, hidden);
+   }
 
-    .tjs-app {
-        max-height: var(--tjs-app-max-height, 100%);
-        background: var(--tjs-app-background);
-        border-radius: var(--tjs-app-border-radius, 5px);
-        box-shadow: var(--tjs-app-box-shadow, 0 0 20px #000);
-        margin: var(--tjs-app-margin, 3px 0);
-        padding: var(--tjs-app-padding, 0.5em);
-        color: var(--tjs-app-color, #f0f0e0);
-    }
+   .window-content {
+      /* For Firefox */
+      scrollbar-width: var(--tjs-app-content-scrollbar-width, thin);
+      scrollbar-color: var(--tjs-app-content-scrollbar-color, inherit);
+   }
 
-    .tjs-window-app:focus-visible {
-        outline: var(--tjs-app-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
-    }
+   .window-app:focus-visible {
+      outline: var(--tjs-app-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
+   }
 
-    .tjs-window-app .window-content:focus-visible {
-        outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
-    }
+   .window-content:focus-visible {
+      outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
+   }
 
-    .tjs-window-app {
-        /* Note: this is different than stock Foundry and allows rounded corners from .app core styles */
-        overflow: var(--tjs-app-overflow, hidden);
+   /* Override Foundry default; adjust --tjs-app-header-gap to change gap size */
+   .window-app :global(.window-header a) {
+      flex: none;
+      margin: 0;
+   }
 
-        display: var(--tjs-app-display, flex);
-        flex-direction: var(--tjs-app-flex-direction, column);
-        flex-wrap: var(--tjs-app-flex-wrap, nowrap);
-        justify-content: var(--tjs-app-justify-content, flex-start);
-        position: var(--tjs-app-position, absolute);
-        box-shadow: var(--tjs-app-box-shadow, 0 0 20px #000);
-        padding: var(--tjs-app-padding, 0);
-    }
-
-    .tjs-window-app :global(> .flex0) {
-        display: block;
-        flex: 0;
-    }
-
-    .tjs-window-app :global(> .flex1) {
-        flex: 1;
-    }
-
-    .tjs-window-app :global(> .flex2) {
-        flex: 2;
-    }
-
-    .tjs-window-app :global(> .flex3) {
-        flex: 3;
-    }
-
-    .tjs-window-app :global(.window-header) {
-        overflow: var(--tjs-app-header-overflow, hidden);
-        line-height: var(--tjs-app-header-line-height, 30px);
-        border-bottom: var(--tjs-app-header-border-bottom, 1px solid #000);
-    }
-
-    .tjs-window-app :global(.window-header .window-title) {
-        margin: var(--tjs-app-header-title-margin, 0);
-        word-break: var(--tjs-app-header-title-word-break, break-all);
-    }
-
-    .tjs-window-app :global(.window-header a) {
-        flex: none;
-    }
-
-    .tjs-window-app.minimized :global(.window-header) {
-        border: var(--tjs-app-header-margin-minimized, none);
-    }
-
-    .tjs-window-app .window-content {
-        display: var(--tjs-app-content-display, flex);
-        flex-direction: var(--tjs-app-content-flex-direction, column);
-        flex-wrap: var(--tjs-app-content-flex-wrap, nowrap);
-        flex: var(--tjs-app-content-flex, 1);
-        justify-content: var(--tjs-app-content-justify-content, flex-start);
-        background: var(--tjs-app-content-background, none);
-        padding: var(--tjs-app-content-padding, 8px);
-        color: var(--tjs-app-content-color, #191813);
-        overflow: var(--tjs-app-content-overflow, hidden auto);
-
-        /* For Firefox */
-        scrollbar-width: var(--tjs-app-content-scrollbar-width, thin);
-        scrollbar-color: var(--tjs-app-content-scrollbar-color, inherit);
-    }
-
-    .tjs-window-app :global(.window-resizable-handle) {
-        width: 20px;
-        height: 20px;
-        position: absolute;
-        bottom: -1px;
-        right: 0;
-        background: #444;
-        padding: 2px;
-        border: 1px solid #111;
-        border-radius: 4px 0 0 0;
-    }
-
-    .tjs-window-app :global(.window-resizable-handle i.fas) {
-        transform: rotate(45deg);
-    }
+   /* Override Foundry default; See TJSHeaderButton for CSS variables */
+   .window-app :global(.window-header i[class^=fa]) {
+      margin: 0
+   }
 </style>
