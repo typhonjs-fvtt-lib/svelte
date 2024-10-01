@@ -212,9 +212,9 @@ declare class TJSDocumentCollection<T = DocumentCollection> {
   /**
    * @param {T | undefined}  collection - New collection to set.
    *
-   * @param {TJSDocumentCollectionUpdateOptions}  [options] - New collection update options to set.
+   * @param {TJSDocumentCollectionUpdateOptions<T>}  [options] - New collection update options to set.
    */
-  set(collection: T | undefined, options?: TJSDocumentCollectionUpdateOptions): void;
+  set(collection: T | undefined, options?: TJSDocumentCollectionUpdateOptions<T>): void;
   /**
    * Sets options for this collection wrapper / store.
    *

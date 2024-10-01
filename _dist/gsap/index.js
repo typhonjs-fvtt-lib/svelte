@@ -1,6 +1,6 @@
 import { easingFunc } from '@typhonjs-svelte/runtime-base/svelte/easing';
 import { TJSVelocityTrack } from '@typhonjs-svelte/runtime-base/math/physics';
-import { A11yHelper } from '@typhonjs-svelte/runtime-base/util/browser';
+import { A11yHelper } from '@typhonjs-svelte/runtime-base/util/a11y';
 import { isObject, isIterable, isPlainObject, klona } from '@typhonjs-svelte/runtime-base/util/object';
 import { TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 

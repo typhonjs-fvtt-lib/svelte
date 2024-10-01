@@ -18,7 +18,7 @@
    import { ApplicationShell }   from '#svelte-fvtt/component/core';
    import { TJSGlassPane }       from '#svelte-fvtt/component/core';
 
-   import { A11yHelper }         from '#runtime/util/browser';
+   import { A11yHelper }         from '#runtime/util/a11y';
    import { isObject }           from '#runtime/util/object';
 
    import DialogContent          from './DialogContent.svelte';

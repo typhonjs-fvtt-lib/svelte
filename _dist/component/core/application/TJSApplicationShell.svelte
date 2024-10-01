@@ -24,7 +24,7 @@
    import { dynamicAction }            from '@typhonjs-svelte/runtime-base/svelte/action/util';
 
    import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
-   import { A11yHelper }               from '@typhonjs-svelte/runtime-base/util/browser';
+   import { A11yHelper }               from '@typhonjs-svelte/runtime-base/util/a11y';
    import { isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
 
    import { AppShellContextInternal }  from './AppShellContextInternal.js';

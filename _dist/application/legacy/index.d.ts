@@ -1,3 +1,12 @@
+/**
+ * Provides legacy support for Handlebars rendering while still gaining aspects of reactivity with a Svelte powered
+ * application shell. You may use the resources in this package in a similar manner as the core Foundry
+ * {@link Application} / {@link FormApplication} classes. This should only be an interim or stepwise solution as you
+ * convert your package over to fully using TRL & Svelte.
+ *
+ * @module
+ */
+
 import * as _typhonjs_fvtt_svelte_application from '@typhonjs-fvtt/svelte/application';
 import { SvelteApplication } from '@typhonjs-fvtt/svelte/application';
 import * as _typhonjs_svelte_runtime_base_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';

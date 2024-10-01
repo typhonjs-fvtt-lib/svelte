@@ -2,7 +2,7 @@ import { TJSPosition }     from '#runtime/svelte/store/position';
 
 import { TJSSvelteUtil }   from '#runtime/svelte/util';
 
-import { A11yHelper }      from '#runtime/util/browser';
+import { A11yHelper }      from '#runtime/util/a11y';
 
 import {
    deepMerge,

@@ -24,7 +24,7 @@
    import { dynamicAction }            from '#runtime/svelte/action/util';
 
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
-   import { A11yHelper }               from '#runtime/util/browser';
+   import { A11yHelper }               from '#runtime/util/a11y';
    import { isObject }                 from '#runtime/util/object';
 
    import { AppShellContextInternal }  from './AppShellContextInternal.js';

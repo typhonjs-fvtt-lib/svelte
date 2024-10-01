@@ -4,7 +4,7 @@ import * as _typhonjs_svelte_runtime_base_svelte_store_web_storage from '@typhon
 import { TJSWebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import * as _typhonjs_svelte_runtime_base_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import { Data, TJSPositionTypes, TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
-import * as _typhonjs_svelte_runtime_base_util_browser from '@typhonjs-svelte/runtime-base/util/browser';
+import * as _typhonjs_svelte_runtime_base_util_a11y from '@typhonjs-svelte/runtime-base/util/a11y';
 import { SvelteComponent } from 'svelte';
 import { EasingReference } from '@typhonjs-svelte/runtime-base/svelte/easing';
 import { Readable, Writable } from 'svelte/store';
@@ -1451,7 +1451,7 @@ type SvelteApplicationOptions = {
    * - Defines A11yHelper focus source to
    * apply when application closes.
    */
-  focusSource?: _typhonjs_svelte_runtime_base_util_browser.A11yFocusSource;
+  focusSource?: _typhonjs_svelte_runtime_base_util_a11y.A11yFocusSource;
   /**
    * When true focus trapping / wrapping is enabled keeping focus inside app.
    */
@@ -1499,7 +1499,7 @@ type SvelteApplicationOptions = {
    * A validator
    * function or data or list of validators.
    */
-  positionValidator?: _typhonjs_svelte_runtime_base_svelte_store_position.ValidatorAPI.Options;
+  positionValidator?: _typhonjs_svelte_runtime_base_svelte_store_position.ValidatorAPI.ValidatorOption;
   /**
    * An instance of
    * TJSWebStorage (session) to share across SvelteApplications.

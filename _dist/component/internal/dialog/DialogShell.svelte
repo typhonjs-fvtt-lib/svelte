@@ -18,7 +18,7 @@
    import { ApplicationShell }   from '@typhonjs-fvtt/svelte/component/core';
    import { TJSGlassPane }       from '@typhonjs-fvtt/svelte/component/core';
 
-   import { A11yHelper }         from '@typhonjs-svelte/runtime-base/util/browser';
+   import { A11yHelper }         from '@typhonjs-svelte/runtime-base/util/a11y';
    import { isObject }           from '@typhonjs-svelte/runtime-base/util/object';
 
    import DialogContent          from './DialogContent.svelte';

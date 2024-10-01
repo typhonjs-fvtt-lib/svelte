@@ -4,7 +4,7 @@
     *
     * @componentDocumentation
     */
-   import { A11yHelper }    from '@typhonjs-svelte/runtime-base/util/browser';
+   import { A11yHelper }    from '@typhonjs-svelte/runtime-base/util/a11y';
 
    /** @type {HTMLElement} */
    export let elementRoot = void 0;

@@ -8,10 +8,9 @@
    import { getContext }            from 'svelte';
 
    import { TJSSvelteConfigUtil }   from '@typhonjs-svelte/runtime-base/svelte/util';
-   import { A11yHelper }            from '@typhonjs-svelte/runtime-base/util/browser';
+   import { A11yHelper }            from '@typhonjs-svelte/runtime-base/util/a11y';
+   import { localize }              from '@typhonjs-svelte/runtime-base/util/i18n';
    import { isObject }              from '@typhonjs-svelte/runtime-base/util/object';
-
-   import { localize }              from '@typhonjs-fvtt/svelte/helper';
 
    import {
       draggable as dragDefault }    from '@typhonjs-svelte/runtime-base/svelte/store/position';

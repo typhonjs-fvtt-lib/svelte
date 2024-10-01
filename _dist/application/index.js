@@ -25,7 +25,7 @@ PopoutSupport.initialize();
  *
  * @property {boolean}  [focusKeep=false] When `focusAuto` and `focusKeep` is true; keeps internal focus.
  *
- * @property {import('@typhonjs-svelte/runtime-base/util/browser').A11yFocusSource}   [focusSource] - Defines A11yHelper focus source to
+ * @property {import('@typhonjs-svelte/runtime-base/util/a11y').A11yFocusSource}   [focusSource] - Defines A11yHelper focus source to
  *           apply when application closes.
  *
  * @property {boolean}  [focusTrap=true] When true focus trapping / wrapping is enabled keeping focus inside app.
@@ -51,7 +51,7 @@ PopoutSupport.initialize();
  *
  * @property {boolean}  [positionOrtho=true] When true TJSPosition is optimized for orthographic use.
  *
- * @property {import('@typhonjs-svelte/runtime-base/svelte/store/position').ValidatorAPI.Options}   [positionValidator] A validator
+ * @property {import('@typhonjs-svelte/runtime-base/svelte/store/position').ValidatorAPI.ValidatorOption}   [positionValidator] A validator
  *           function or data or list of validators.
  *
  * @property {import('@typhonjs-svelte/runtime-base/svelte/store/web-storage').TJSWebStorage}   [sessionStorage] An instance of

@@ -1,6 +1,6 @@
 import { TJSVelocityTrack }   from '#runtime/math/physics';
 
-import { A11yHelper }         from '#runtime/util/browser';
+import { A11yHelper }         from '#runtime/util/a11y';
 
 import {
    isIterable,

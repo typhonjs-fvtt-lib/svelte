@@ -4,7 +4,7 @@
     *
     * @componentDocumentation
     */
-   import { A11yHelper }    from '#runtime/util/browser';
+   import { A11yHelper }    from '#runtime/util/a11y';
 
    /** @type {HTMLElement} */
    export let elementRoot = void 0;

@@ -2,7 +2,7 @@ import { TJSPosition }     from '@typhonjs-svelte/runtime-base/svelte/store/posi
 
 import { TJSSvelteUtil }   from '@typhonjs-svelte/runtime-base/svelte/util';
 
-import { A11yHelper }      from '@typhonjs-svelte/runtime-base/util/browser';
+import { A11yHelper }      from '@typhonjs-svelte/runtime-base/util/a11y';
 
 import {
    deepMerge,

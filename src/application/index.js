@@ -25,7 +25,7 @@ PopoutSupport.initialize();
  *
  * @property {boolean}  [focusKeep=false] When `focusAuto` and `focusKeep` is true; keeps internal focus.
  *
- * @property {import('#runtime/util/browser').A11yFocusSource}   [focusSource] - Defines A11yHelper focus source to
+ * @property {import('#runtime/util/a11y').A11yFocusSource}   [focusSource] - Defines A11yHelper focus source to
  *           apply when application closes.
  *
  * @property {boolean}  [focusTrap=true] When true focus trapping / wrapping is enabled keeping focus inside app.

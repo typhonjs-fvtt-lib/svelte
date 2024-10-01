@@ -16,7 +16,7 @@
       TJSSvelteConfigUtil,
       TJSSvelteUtil }         from '#runtime/svelte/util';
 
-   import { A11yHelper }      from '#runtime/util/browser';
+   import { A11yHelper }      from '#runtime/util/a11y';
    import { localize }        from '#runtime/util/i18n';
    import { isObject }        from '#runtime/util/object';
 
