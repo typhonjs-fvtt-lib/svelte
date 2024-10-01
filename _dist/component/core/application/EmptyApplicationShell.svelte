@@ -21,7 +21,8 @@
 
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
    import ResizableHandle              from './ResizableHandle.svelte';
-   import TJSFocusWrap                 from './TJSFocusWrap.svelte';
+
+   import TJSFocusWrap                 from '../../internal/dom/TJSFocusWrap.svelte';
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
    // use 'elementRoot' to set the element of the Application. You can also provide `elementContent` and

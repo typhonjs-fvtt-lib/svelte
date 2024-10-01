@@ -1,10 +1,11 @@
 <script>
    /**
-    * TODO: Add description
+    * Provides a component to wrap focus to the first focusable element in the given `elementRoot` prop. Place this
+    * component as the last child in `elementRoot`.
     *
     * @componentDocumentation
     */
-   import { A11yHelper }    from '#runtime/util/a11y';
+   import { A11yHelper }    from '@typhonjs-svelte/runtime-base/util/a11y';
 
    /** @type {HTMLElement} */
    export let elementRoot = void 0;
