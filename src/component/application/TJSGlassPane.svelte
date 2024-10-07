@@ -4,7 +4,7 @@
     *
     * @componentDocumentation
     */
-   import { applyStyles }              from '#runtime/svelte/action/dom';
+   import { applyStyles }              from '#runtime/svelte/action/dom/style';
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
    import { isObject }                 from '#runtime/util/object';
 

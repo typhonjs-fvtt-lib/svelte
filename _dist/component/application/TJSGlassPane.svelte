@@ -4,7 +4,7 @@
     *
     * @componentDocumentation
     */
-   import { applyStyles }              from '@typhonjs-svelte/runtime-base/svelte/action/dom';
+   import { applyStyles }              from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
    import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
    import { isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
 

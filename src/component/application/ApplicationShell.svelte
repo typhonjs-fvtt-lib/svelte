@@ -11,12 +11,9 @@
       onMount,
       setContext }                     from '#svelte';
 
-   import {
-      applyStyles,
-      resizeObserver }                 from '#runtime/svelte/action/dom';
-
+   import { resizeObserver }           from '#runtime/svelte/action/dom/observer';
+   import { applyStyles }              from '#runtime/svelte/action/dom/style';
    import { dynamicAction }            from '#runtime/svelte/action/util';
-
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
    import { A11yHelper }               from '#runtime/util/a11y';
    import { isObject }                 from '#runtime/util/object';

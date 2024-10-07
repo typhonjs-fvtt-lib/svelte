@@ -22,7 +22,7 @@
     * @componentDocumentation
     * @internal
     */
-   import { applyStyles }   from '@typhonjs-svelte/runtime-base/svelte/action/dom';
+   import { applyStyles }   from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
    import { localize }      from '@typhonjs-svelte/runtime-base/util/i18n';
    import { isObject }      from '@typhonjs-svelte/runtime-base/util/object';
 
