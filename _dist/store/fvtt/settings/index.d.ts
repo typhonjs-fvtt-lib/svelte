@@ -1,118 +1,4 @@
 import * as svelte_store from 'svelte/store';
-import { Readable, Writable } from 'svelte/store';
-import * as _runtime_svelte_util from '@typhonjs-svelte/runtime-base/svelte/util';
-import { TJSWebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
-
-/**
- * Controls preparation and processing of registered game settings w/ TJSGameSettings. Game settings are parsed
- * for UI display by TJSSettingsEdit. The store `showSettings` is utilized in TJSSettingsSwap component to provide
- * an easy way to flip between settings component or any main slotted component.
- */
-interface UIControl {
-  /**
-   * @returns {{showSettings: Readable<boolean>}} Returns the managed stores.
-   */
-  get stores(): {
-    showSettings: Readable<boolean>;
-  };
-  /**
-   * @returns {boolean} Current `showSettings` state.
-   */
-  get showSettings(): boolean;
-  /**
-   * Sets current `showSettings` state.
-   *
-   * @param {boolean}  showSettings - New `showSettings` state.
-   */
-  set showSettings(showSettings: boolean);
-  /**
-   * Adds a custom section / folder defined by the provided TJSSettingsCustomSection options object.
-   *
-   * @param {TJSSettingsCustomSection} options - The configuration object for the custom section.
-   */
-  addSection(options: TJSSettingsCustomSection): void;
-  /**
-   * Creates the UISettingsData object by parsing stored settings in
-   *
-   * @param {TJSSettingsCreateOptions} [options] - Optional parameters.
-   *
-   * @returns {TJSSettingsUIData} Parsed UI settings data.
-   */
-  create(options?: TJSSettingsCreateOptions): TJSSettingsUIData;
-  /**
-   * Convenience method to swap `showSettings`.
-   *
-   * @returns {boolean} New `showSettings` state.
-   */
-  swapShowSettings(): boolean;
-}
-type TJSSettingsCreateOptions = {
-  /**
-   * Defines the effects added to TJS components; ripple by default.
-   */
-  efx?: string;
-  /**
-   * TRL TJSWebStorage (session) instance to serialize folder state and scrollbar position.
-   */
-  storage?: TJSWebStorage;
-};
-type TJSSettingsCustomSection = {
-  /**
-   * Svelte component constructor function for custom section.
-   */
-  class: Function;
-  /**
-   * Svelte component constructor function for custom section.
-   */
-  props?: Function;
-  /**
-   * Inline styles for the section element.
-   */
-  styles?: object;
-  /**
-   * A folder label or TJSSettingsCustomSectionFolder object.
-   */
-  folder?: string | TJSSettingsCustomSectionFolder;
-};
-type TJSSettingsCustomSectionFolder = {
-  /**
-   * The folder label.
-   */
-  label: string;
-  /**
-   * A Svelte component config object defining TJSSvgFolder summary end component.
-   */
-  summaryEnd?: _runtime_svelte_util.TJSSvelteConfig;
-  /**
-   * Inline styles for the `TJSSvgFolder`; useful for setting CSS variables.
-   */
-  styles?: Record<string, string>;
-};
-type TJSSettingsUIData = {
-  /**
-   * Sorted folders with associated settings and label.
-   */
-  folders: {
-    label: string;
-    settings: object[];
-  }[];
-  /**
-   * Top level settings data.
-   */
-  topLevel: object[];
-  /**
-   * Custom sections.
-   */
-  sections: object[];
-  /**
-   * The store for `applyScrolltop`.
-   */
-  storeScrollbar: Writable<number>;
-  /**
-   * The bound destroy callback function for received of TJSSettingsUIData.
-   */
-  destroy?: Function;
-};
 
 /**
  * Registers game settings and creates a backing Svelte store for each setting. The Svelte store will update the
@@ -135,10 +21,6 @@ declare class TJSGameSettings {
    * @returns {string} Returns namespace set in constructor.
    */
   get namespace(): string;
-  /**
-   * @returns {import('./types').UIControl} The associated UIControl.
-   */
-  get uiControl(): UIControl;
   /**
    * Returns a readable Game Settings store for the associated key.
    *
@@ -415,15 +297,4 @@ declare class TJSLiveGameSettings {
   #private;
 }
 
-export {
-  type GameSetting,
-  type GameSettingData,
-  type GameSettingOptions,
-  TJSGameSettings,
-  TJSLiveGameSettings,
-  type TJSSettingsCreateOptions,
-  type TJSSettingsCustomSection,
-  type TJSSettingsCustomSectionFolder,
-  type TJSSettingsUIData,
-  type UIControl,
-};
+export { type GameSetting, type GameSettingData, type GameSettingOptions, TJSGameSettings, TJSLiveGameSettings };
