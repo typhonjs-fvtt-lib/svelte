@@ -8,8 +8,6 @@ import {
    isWritableStore,
    subscribeIgnoreFirst }  from '#runtime/util/store';
 
-import { UIControl }       from './UIControl.js';
-
 /**
  * Registers game settings and creates a backing Svelte store for each setting. The Svelte store will update the
  * Foundry game settings and vice versa when changes occur to the Foundry game settings the updated data is set to the
@@ -33,9 +31,6 @@ export class TJSGameSettings
     */
    #stores = new Map();
 
-   /** @type {import('./types').UIControl} */
-   #uiControl;
-
    /**
     * Creates the TJSGameSettings instance.
     *
@@ -46,7 +41,6 @@ export class TJSGameSettings
       if (typeof namespace !== 'string') { throw new TypeError(`'namespace' is not a string.`); }
 
       this.#namespace = namespace;
-      this.#uiControl = new UIControl(this);
    }
 
    /**
@@ -67,14 +61,6 @@ export class TJSGameSettings
    get namespace()
    {
       return this.#namespace;
-   }
-
-   /**
-    * @returns {import('./types').UIControl} The associated UIControl.
-    */
-   get uiControl()
-   {
-      return this.#uiControl;
    }
 
    /**
