@@ -19,9 +19,6 @@
     "./application": {
       "import": "./_dist/application/index.js"
     },
-    "./application/legacy": {
-      "import": "./_dist/application/legacy/index.js"
-    },
     "./component/application": {
       "types": "./_dist/component/application/index.d.ts",
       "import": "./_dist/component/application/index.js"
@@ -39,10 +36,6 @@
     },
     "./gsap/plugin/bonus/*": {
       "import": "./_dist/gsap/plugin/bonus/*.js"
-    },
-    "./helper": {
-      "types": "./_dist/helper/index.d.ts",
-      "import": "./_dist/helper/index.js"
     },
     "./store/fvtt": {
       "types": "./_dist/store/fvtt/index.d.ts",

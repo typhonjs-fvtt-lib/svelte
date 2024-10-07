@@ -29,12 +29,10 @@ const sourcemap = true;
 // Provides naive search / replace of bundled declaration file rewriting the re-bundled definitions from
 // @typhonjs-svelte/lib. This will alter the JSDoc comments and import symbols.
 const dtsReplace = {
-   _typhonjs_svelte_lib_: '_typhonjs_fvtt_svelte_',
    _svelte_lib_: '_typhonjs_fvtt_svelte_',
    _svelte_fvtt_: '_typhonjs_fvtt_svelte_',
    '#svelte-fvtt/': '@typhonjs-fvtt/svelte/',
    '#svelte-lib/': '@typhonjs-fvtt/svelte/',
-   '@typhonjs-svelte/lib/': '@typhonjs-fvtt/svelte/',
    '/\\/\\/ <reference.*\\/>': ''   // Svelte v4 types currently add triple slash references.
 };
 
@@ -83,25 +81,6 @@ const rollupConfigs = [
       },
       output: {
          file: '_dist/gsap/index.js',
-         format: 'es',
-         generatedCode: { constBindings: true },
-         paths: externalPathsNPM,
-         plugins: outputPlugins,
-         sourcemap
-      }
-   },
-   {
-      input: {
-         input: 'src/helper/index.js',
-         external,
-         plugins: [
-            importsExternal(),
-            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/helper`] }),
-            generateDTS.plugin(dtsPluginOptions)
-         ]
-      },
-      output: {
-         file: '_dist/helper/index.js',
          format: 'es',
          generatedCode: { constBindings: true },
          paths: externalPathsNPM,
@@ -205,8 +184,6 @@ for (const appFile of appFiles)
 {
    let fileData = fs.readFileSync(appFile, 'utf-8').toString();
 
-   fileData = fileData.replaceAll('@typhonjs-svelte/lib/', '@typhonjs-fvtt/svelte/');
-
    fileData = fileData.replaceAll('#runtime/', '@typhonjs-svelte/runtime-base/');
    fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
    fileData = fileData.replaceAll('#svelte-lib/', '@typhonjs-fvtt/svelte/');
@@ -297,14 +274,6 @@ await generateDTS({
    input: './_dist/application/index.js',
    output: './_dist/application/index.d.ts',
    ...applicationDTSOptions,
-});
-
-console.log('Generating TS Declaration: ./_dist/application/legacy/index.js');
-
-await generateDTS({
-   input: './_dist/application/legacy/index.js',
-   output: './_dist/application/legacy/index.d.ts',
-   ...applicationDTSOptions
 });
 
 console.log('Generating TS Declaration: ./_dist/component/application/index.js');
