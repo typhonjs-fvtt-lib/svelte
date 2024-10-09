@@ -1,12 +1,12 @@
 import { writable }        from '#svelte/store';
 
 import {
-   isIterable,
-   isObject }              from '#runtime/util/object';
+   isMinimalWritableStore,
+   subscribeIgnoreFirst }  from '#runtime/svelte/store/util';
 
 import {
-   isWritableStore,
-   subscribeIgnoreFirst }  from '#runtime/util/store';
+   isIterable,
+   isObject }              from '#runtime/util/object';
 
 /**
  * Registers game settings and creates a backing Svelte store for each setting. The Svelte store will update the
@@ -170,10 +170,10 @@ export class TJSGameSettings
          throw new TypeError(`TJSGameSettings - register: 'coreConfig' is not an boolean.`);
       }
 
-      if (setting.store !== void 0 && !isWritableStore(setting.store))
+      if (setting.store !== void 0 && !isMinimalWritableStore(setting.store))
       {
          throw new TypeError(
-          `TJSGameSettings - register: 'setting.store' attribute is not a writable store.`);
+          `TJSGameSettings - register: 'setting.store' attribute is not a minimal writable store.`);
       }
 
       const namespace = setting.namespace;
