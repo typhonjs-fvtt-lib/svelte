@@ -1,7 +1,7 @@
 import * as _typhonjs_svelte_runtime_base_svelte_util from '@typhonjs-svelte/runtime-base/svelte/util';
 import { TJSSvelteConfig } from '@typhonjs-svelte/runtime-base/svelte/util';
 import * as _typhonjs_svelte_runtime_base_svelte_store_web_storage from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
-import { TJSWebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
+import { WebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import * as _typhonjs_svelte_runtime_base_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import { Data, TJSPositionTypes, TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import * as _typhonjs_svelte_runtime_base_util_a11y from '@typhonjs-svelte/runtime-base/util/a11y';
@@ -173,9 +173,9 @@ type SvelteData = {
  */
 declare interface SvelteReactive {
   /**
-   * @returns {TJSWebStorage} Returns TJSWebStorage (session) instance.
+   * @returns {WebStorage} Returns WebStorage (session) instance.
    */
-  get sessionStorage(): TJSWebStorage;
+  get sessionStorage(): WebStorage;
   /**
    * Returns the store for app options.
    *
@@ -1502,9 +1502,11 @@ type SvelteApplicationOptions = {
   positionValidator?: _typhonjs_svelte_runtime_base_svelte_store_position.ValidatorAPI.ValidatorOption;
   /**
    * An instance of
-   * TJSWebStorage (session) to share across SvelteApplications.
+   * WebStorage (session) to share across SvelteApplications. This is only required to share a WebStorage
+   * instance across multiple SvelteApplications. By default, a unique {@link TJSSessionStorage} instance is
+   * created per SvelteApplication.
    */
-  sessionStorage?: _typhonjs_svelte_runtime_base_svelte_store_web_storage.TJSWebStorage;
+  sessionStorage?: _typhonjs_svelte_runtime_base_svelte_store_web_storage.WebStorage;
   /**
    * A Svelte configuration object defining
    * the main component.

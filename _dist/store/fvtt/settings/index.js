@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
+import { isMinimalWritableStore, subscribeIgnoreFirst } from '@typhonjs-svelte/runtime-base/svelte/store/util';
 import { isObject, isIterable } from '@typhonjs-svelte/runtime-base/util/object';
-import { isWritableStore, subscribeIgnoreFirst } from '@typhonjs-svelte/runtime-base/util/store';
 
 /**
  * Registers game settings and creates a backing Svelte store for each setting. The Svelte store will update the
@@ -164,10 +164,10 @@ class TJSGameSettings
          throw new TypeError(`TJSGameSettings - register: 'coreConfig' is not an boolean.`);
       }
 
-      if (setting.store !== void 0 && !isWritableStore(setting.store))
+      if (setting.store !== void 0 && !isMinimalWritableStore(setting.store))
       {
          throw new TypeError(
-          `TJSGameSettings - register: 'setting.store' attribute is not a writable store.`);
+          `TJSGameSettings - register: 'setting.store' attribute is not a minimal writable store.`);
       }
 
       const namespace = setting.namespace;
