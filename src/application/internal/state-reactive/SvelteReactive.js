@@ -1,5 +1,7 @@
 import { derived, writable }     from '#svelte/store';
 
+import { subscribeIgnoreFirst }  from '#runtime/svelte/store/util';
+
 import {
    TJSSessionStorage,
    TJSWebStorage }               from '#runtime/svelte/store/web-storage';
@@ -10,8 +12,6 @@ import {
    deepMerge,
    safeAccess,
    safeSet }                     from '#runtime/util/object';
-
-import { subscribeIgnoreFirst }  from '#runtime/util/store';
 
 /**
  * Contains the reactive functionality / Svelte stores associated with SvelteApplication and retrievable by
@@ -80,7 +80,7 @@ export class SvelteReactive
     */
    #initialized = false;
 
-   /** @type {import('#runtime/svelte/store/web-storage').TJSWebStorage} */
+   /** @type {import('#runtime/svelte/store/web-storage').WebStorage} */
    #sessionStorage;
 
    /**
@@ -168,7 +168,7 @@ export class SvelteReactive
 // Store getters -----------------------------------------------------------------------------------------------------
 
    /**
-    * @returns {import('#runtime/svelte/store/web-storage').TJSWebStorage} Returns TJSWebStorage (session) instance.
+    * @returns {import('#runtime/svelte/store/web-storage').WebStorage} Returns WebStorage (session) instance.
     */
    get sessionStorage()
    {

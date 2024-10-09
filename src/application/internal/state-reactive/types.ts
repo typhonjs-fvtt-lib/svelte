@@ -2,7 +2,7 @@ import type {
    Readable,
    Writable }                 from 'svelte/store';
 
-import type { TJSWebStorage } from '#runtime/svelte/store/web-storage';
+import type { WebStorage } from '#runtime/svelte/store/web-storage';
 
 /**
  * Contains the reactive functionality / Svelte stores associated with SvelteApplication and retrievable by
@@ -64,9 +64,9 @@ import type { TJSWebStorage } from '#runtime/svelte/store/web-storage';
 declare interface SvelteReactive
 {
    /**
-    * @returns {TJSWebStorage} Returns TJSWebStorage (session) instance.
+    * @returns {WebStorage} Returns WebStorage (session) instance.
     */
-   get sessionStorage(): TJSWebStorage;
+   get sessionStorage(): WebStorage;
 
    /**
     * Returns the store for app options.

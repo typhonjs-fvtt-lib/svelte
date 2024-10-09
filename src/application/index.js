@@ -54,8 +54,10 @@ PopoutSupport.initialize();
  * @property {import('#runtime/svelte/store/position').ValidatorAPI.ValidatorOption}   [positionValidator] A validator
  *           function or data or list of validators.
  *
- * @property {import('#runtime/svelte/store/web-storage').TJSWebStorage}   [sessionStorage] An instance of
- *           TJSWebStorage (session) to share across SvelteApplications.
+ * @property {import('#runtime/svelte/store/web-storage').WebStorage}   [sessionStorage] An instance of
+ *           WebStorage (session) to share across SvelteApplications. This is only required to share a WebStorage
+ *           instance across multiple SvelteApplications. By default, a unique {@link TJSSessionStorage} instance is
+ *           created per SvelteApplication.
  *
  * @property {import('#runtime/svelte/util').TJSSvelteConfig}   [svelte] A Svelte configuration object defining
  *           the main component.
