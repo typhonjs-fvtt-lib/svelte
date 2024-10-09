@@ -71,16 +71,16 @@ const dtsPluginOptions = { bundlePackageExports: true, filterDiagnostic, dtsRepl
 const rollupConfigs = [
    {
       input: {
-         input: 'src/gsap/index.js',
+         input: 'src/animate/gsap/index.js',
          external,
          plugins: [
             importsExternal(),
-            typhonjsRuntime({ exclude: [`@typhonjs-svelte/lib/gsap`] }),
+            typhonjsRuntime({ exclude: [`@typhonjs-fvtt/svelte/animate/gsap`] }),
             generateDTS.plugin(dtsPluginOptions)
          ]
       },
       output: {
-         file: '_dist/gsap/index.js',
+         file: '_dist/animate/gsap/index.js',
          format: 'es',
          generatedCode: { constBindings: true },
          paths: externalPathsNPM,
@@ -221,10 +221,10 @@ for (const compFile of compFiles)
 
 // GSAP plugin loading code is also bespoke and must be copied over.
 
-fs.emptyDirSync('./_dist/gsap/plugin');
-fs.copySync('./src/gsap/plugin', './_dist/gsap/plugin');
+fs.emptyDirSync('./_dist/animate/gsap/plugin');
+fs.copySync('./src/animate/gsap/plugin', './_dist/animate/gsap/plugin');
 
-const gsapFiles = await getFileList({ dir: './_dist/gsap/plugin', resolve: true, walk: true });
+const gsapFiles = await getFileList({ dir: './_dist/animate/gsap/plugin', resolve: true, walk: true });
 for (const gsapFile of gsapFiles)
 {
    let fileData = fs.readFileSync(gsapFile, 'utf-8').toString();

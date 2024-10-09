@@ -16,6 +16,16 @@
     "#svelte": "svelte"
   },
   "exports": {
+    "./animate/gsap": {
+      "types": "./_dist/animate/gsap/index.d.ts",
+      "import": "./_dist/animate/gsap/index.js"
+    },
+    "./animate/gsap/plugin/*": {
+      "import": "./_dist/animate/gsap/plugin/*.js"
+    },
+    "./animate/gsap/plugin/bonus/*": {
+      "import": "./_dist/animate/gsap/plugin/bonus/*.js"
+    },
     "./application": {
       "import": "./_dist/application/index.js"
     },
@@ -26,16 +36,6 @@
     "./component/internal": {
       "types": "./_dist/component/internal/index.d.ts",
       "import": "./_dist/component/internal/index.js"
-    },
-    "./gsap": {
-      "types": "./_dist/gsap/index.d.ts",
-      "import": "./_dist/gsap/index.js"
-    },
-    "./gsap/plugin/*": {
-      "import": "./_dist/gsap/plugin/*.js"
-    },
-    "./gsap/plugin/bonus/*": {
-      "import": "./_dist/gsap/plugin/bonus/*.js"
     },
     "./store/fvtt": {
       "types": "./_dist/store/fvtt/index.d.ts",
@@ -56,10 +56,10 @@
     "./package.json": "./package.json"
   },
   "sideEffects": [
+    "./_dist/animate/gsap/plugin/*.js",
+    "./_dist/animate/gsap/plugin/bonus/*.js",
     "./_dist/application/index.js",
-    "./_dist/component/application/index.js",
-    "./_dist/gsap/plugin/*.js",
-    "./_dist/gsap/plugin/bonus/*.js"
+    "./_dist/component/application/index.js"
   ],
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.3.0",
