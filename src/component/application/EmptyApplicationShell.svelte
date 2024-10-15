@@ -386,6 +386,7 @@
 
 <style>
     div {
+        contain: layout style paint;
         background: var(--tjs-empty-app-background, none);
 
         border-radius: var(--tjs-app-border-radius, 5px);

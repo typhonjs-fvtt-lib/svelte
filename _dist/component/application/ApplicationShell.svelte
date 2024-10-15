@@ -445,6 +445,7 @@
 <style>
    /* Note: this is different than stock Foundry and allows rounded corners from .app core styles */
    .window-app {
+      contain: layout style paint;
       overflow: var(--tjs-app-overflow, hidden);
    }
 

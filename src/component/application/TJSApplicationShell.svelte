@@ -457,6 +457,8 @@
      */
 
     .tjs-app {
+        contain: layout style paint;
+
         max-height: var(--tjs-app-max-height, 100%);
         background: var(--tjs-app-background);
         border-radius: var(--tjs-app-border-radius, 5px);
