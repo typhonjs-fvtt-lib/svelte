@@ -37,10 +37,6 @@
       "types": "./_dist/component/internal/index.d.ts",
       "import": "./_dist/component/internal/index.js"
     },
-    "./store/fvtt": {
-      "types": "./_dist/store/fvtt/index.d.ts",
-      "import": "./_dist/store/fvtt/index.js"
-    },
     "./store/fvtt/document": {
       "types": "./_dist/store/fvtt/document/index.d.ts",
       "import": "./_dist/store/fvtt/document/index.js"

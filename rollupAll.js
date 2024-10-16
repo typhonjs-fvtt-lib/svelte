@@ -90,25 +90,6 @@ const rollupConfigs = [
    },
    {
       input: {
-         input: 'src/store/fvtt/index.js',
-         external,
-         plugins: [
-            importsExternal(),
-            resolve(s_RESOLVE_CONFIG),
-            generateDTS.plugin({ ...dtsPluginOptions, tsFileWalk: false })
-         ]
-      },
-      output: {
-         file: '_dist/store/fvtt/index.js',
-         format: 'es',
-         generatedCode: { constBindings: true },
-         paths: externalPathsNPM,
-         plugins: outputPlugins,
-         sourcemap
-      }
-   },
-   {
-      input: {
          input: 'src/store/fvtt/document/index.js',
          external,
          plugins: [
