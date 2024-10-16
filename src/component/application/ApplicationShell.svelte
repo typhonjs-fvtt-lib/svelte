@@ -450,6 +450,8 @@
    }
 
    .window-content {
+      gap: var(--tjs-app-content-gap);
+
       /* For Firefox */
       scrollbar-width: var(--tjs-app-content-scrollbar-width, thin);
       scrollbar-color: var(--tjs-app-content-scrollbar-color, inherit);

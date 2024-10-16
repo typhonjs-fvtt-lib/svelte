@@ -531,10 +531,12 @@
         flex-wrap: var(--tjs-app-content-flex-wrap, nowrap);
         flex: var(--tjs-app-content-flex, 1);
         justify-content: var(--tjs-app-content-justify-content, flex-start);
+        gap: var(--tjs-app-content-gap);
+
         background: var(--tjs-app-content-background, none);
-        padding: var(--tjs-app-content-padding, 8px);
         color: var(--tjs-app-content-color, #191813);
         overflow: var(--tjs-app-content-overflow, hidden auto);
+        padding: var(--tjs-app-content-padding, 8px);
 
         /* For Firefox */
         scrollbar-width: var(--tjs-app-content-scrollbar-width, thin);

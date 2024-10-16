@@ -387,15 +387,18 @@
 <style>
     div {
         contain: layout style paint;
-        background: var(--tjs-empty-app-background, none);
 
-        border-radius: var(--tjs-app-border-radius, 5px);
-        box-shadow: var(--tjs-app-box-shadow, none);
-        color: var(--tjs-app-color, inherit);
         display: var(--tjs-app-display, flex);
         flex-direction: var(--tjs-app-flex-direction, column);
         flex-wrap: var(--tjs-app-flex-wrap, nowrap);
         justify-content: var(--tjs-app-justify-content, flex-start);
+        gap: var(--tjs-app-content-gap);
+
+        background: var(--tjs-empty-app-background, none);
+        border-radius: var(--tjs-app-border-radius, 5px);
+        box-shadow: var(--tjs-app-box-shadow, none);
+
+        color: var(--tjs-app-color, inherit);
         margin: var(--tjs-app-margin, 0);
         max-height: var(--tjs-app-max-height, 100%);
         overflow: var(--tjs-app-overflow, hidden);
