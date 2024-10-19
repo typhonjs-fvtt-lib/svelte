@@ -27,7 +27,7 @@
    /** @type {boolean} */
    export let slotSeparate = void 0;
 
-   /** @type {Record<string, string>} */
+   /** @type {{ [key: string]: string | null }} */
    export let styles = void 0;
 
    /** @type {number} */

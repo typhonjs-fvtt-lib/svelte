@@ -114,9 +114,9 @@ declare let gsap: any;
  * {@link gsapEasingList} is an index of all the function names that are available in the `gsapEasingFunc` object. You may
  * use these functions with Gsap or Svelte.
  *
- * @type {Readonly<Record<import('types').GsapEasingFunctionName, import('#runtime/svelte/easing').EasingFunction>>}
+ * @type {Readonly<{ [key in import('./types').GsapEasingFunctionName]: import('#runtime/svelte/easing').EasingFunction }>}
  */
-declare const gsapEasingFunc: Readonly<Record<any, _runtime_svelte_easing.EasingFunction>>;
+declare const gsapEasingFunc: Readonly<{ [key in GsapEasingFunctionName]: _runtime_svelte_easing.EasingFunction }>;
 /**
  * Provides a list of Gsap easing functions that are preconfigured and registered with `gsap`. `gsapEasingList`
  * is an index of all the function names that are available in the {@link gsapEasingFunc} object. Additionally, all

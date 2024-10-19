@@ -404,8 +404,8 @@ declare namespace TjsGlassPane {
     closeOnInput?: boolean;
     /** @type {boolean} */
     slotSeparate?: boolean;
-    /** @type {Record<string, string>} */
-    styles?: Record<string, string>;
+    /** @type {{ [key: string]: string | null }} */
+    styles?: { [key: string]: string | null };
   };
   /** Events type alias for {@link TjsGlassPane | associated component}. */
   export type Events = {

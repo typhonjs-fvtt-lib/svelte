@@ -11,16 +11,16 @@ import type { TJSDialog }           from '../../TJSDialog.js';
 declare interface TJSDialogData
 {
    /**
-    * @returns {Record<string, TJSDialogButtonData>} The dialog button configuration.
+    * @returns {{ [key: string]: TJSDialogButtonData }} The dialog button configuration.
     */
-   get buttons(): Record<string, TJSDialogButtonData>;
+   get buttons(): { [key: string]: TJSDialogButtonData };
 
    /**
     * Set the dialog button configuration.
     *
-    * @param {Record<string, TJSDialogButtonData>} buttons - New dialog button configuration.
+    * @param {{ [key: string]: TJSDialogButtonData }} buttons - New dialog button configuration.
     */
-   set buttons(buttons: Record<string, TJSDialogButtonData>)
+   set buttons(buttons: { [key: string]: TJSDialogButtonData })
 
    /**
     * @returns {TJSSvelteConfig | string} The Svelte configuration object or HTML string content.
@@ -317,7 +317,7 @@ type TJSDialogButtonData = {
    /**
     * Inline styles to apply to the button.
     */
-   styles?: Record<string, string>;
+   styles?: { [key: string]: string | null };
 };
 
 /**
@@ -327,7 +327,7 @@ type TJSDialogOptions = {
    /**
     * Provides configuration of the dialog button bar.
     */
-   buttons?: Record<string, TJSDialogButtonData>;
+   buttons?: { [key: string]: TJSDialogButtonData };
 
    /**
     * A Svelte configuration object or HTML string content.
@@ -447,17 +447,17 @@ type TJSDialogTransitionOptions = {
    /**
     * Additional transition options applied to both in / out transitions.
     */
-   transitionOptions?: Record<string, any>;
+   transitionOptions?: { [key: string]: any };
 
    /**
     * Additional transition options applied to the `in` transition.
     */
-   inTransitionOptions?: Record<string, any>;
+   inTransitionOptions?: { [key: string]: any };
 
    /**
     * Additional transition options applied to the `out` transition.
     */
-   outTransitionOptions?: Record<string, any>;
+   outTransitionOptions?: { [key: string]: any };
 }
 
 /**
@@ -483,7 +483,7 @@ type TJSDialogModalOptions = {
     * Custom styles applied to glasspane. Provide an object with CSS style properties with keys in kebab case.
     * @see https://www.w3.org/Style/CSS/all-properties.en.html
     */
-   styles?: Record<string, string>;
+   styles?: { [key: string]: string | null };
 
    /**
     * Custom transition options for modal background / glasspane.

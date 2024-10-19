@@ -15,7 +15,7 @@
     *
     * - {Function}                  onPress: Invoked when left mouse button or `keyCode` key is pressed.
     *
-    * - {Record<string, string>}    styles: Additional inline styles to apply to button.
+    * - {{ [key: string]: string | null }}   styles: Additional inline styles to apply to button.
     *
     * - {string}                    title: Tooltip title.
     *

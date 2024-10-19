@@ -34,7 +34,7 @@ export class TJSDialogData
    }
 
    /**
-    * @returns {Record<string, import('./types').TJSDialogButtonData>} The dialog button configuration.
+    * @returns {{ [key: string]: import('./types').TJSDialogButtonData }} The dialog button configuration.
     */
    get buttons()
    {
