@@ -40,7 +40,7 @@
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-<div bind:this={wrapEl} class=tjs-focus-wrap tabindex=0 on:focus={onFocus} />
+<div bind:this={wrapEl} class=tjs-focus-wrap tabindex=0 on:focus={onFocus}></div>
 
 <style>
     div {

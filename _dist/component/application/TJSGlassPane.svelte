@@ -170,7 +170,7 @@
            style:background={background}
            in:inTransition|global={inTransitionOptions}
            out:outTransition|global={outTransitionOptions}
-           use:applyStyles={styles} />
+           use:applyStyles={styles}></div>
 
       <div class=tjs-glass-pane-container bind:this={containerEl}>
          <slot />
