@@ -72,7 +72,7 @@
     "upath": "^2.0.1"
   },
   "peerDependencies": {
-    "svelte": ">=4.x.x"
+    "svelte": ">=4.x.x <5"
   },
   "engines": {
     "node": ">=18"
