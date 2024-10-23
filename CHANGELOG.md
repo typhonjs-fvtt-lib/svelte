@@ -1,4 +1,8 @@
 # Changelog
+## Release 0.2.0 (major)
+- Various sub-path refactoring / removals.
+- Overall refinement / streamlining.
+
 ## Release 0.1.2 (medium)
 - Fixed min window height / width for app shells (global vs script space variable access)
 - Fixed SvelteApplication render gating / render: false will short circuit properly when app not rendered.
