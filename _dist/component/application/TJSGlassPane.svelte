@@ -122,7 +122,10 @@
 
       if (captureInput)
       {
-         event.preventDefault();
+         // `wheel` event types can't use `preventDefault` in capture / passive mode.
+         // see: https://chromestatus.com/feature/6662647093133312
+         if (event?.type !== 'wheel') { event.preventDefault(); }
+
          event.stopImmediatePropagation();
       }
 
