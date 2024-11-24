@@ -1,8 +1,7 @@
 import { TJSPosition }     from '#runtime/svelte/store/position';
-
 import { TJSSvelteUtil }   from '#runtime/svelte/util';
-
 import { A11yHelper }      from '#runtime/util/a11y';
+import { CrossWindow }     from '#runtime/util/browser';
 
 import {
    deepMerge,
@@ -324,7 +323,7 @@ export class SvelteApplication extends Application
 
       // Support for PopOut! module; `close` is double invoked; once before the element is rejoined to the main window.
       // Reject close invocations when the element window is not the main originating window / globalThis.
-      if (el?.ownerDocument?.defaultView !== globalThis) { return; }
+      if (CrossWindow.getWindow(el) !== globalThis) { return; }
 
       /**
        * @ignore
