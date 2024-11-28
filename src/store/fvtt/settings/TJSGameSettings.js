@@ -4,6 +4,8 @@ import {
    isMinimalWritableStore,
    subscribeIgnoreFirst }  from '#runtime/svelte/store/util';
 
+import { CrossWindow }     from '#runtime/util/browser';
+
 import {
    isIterable,
    isObject }              from '#runtime/util/object';
@@ -344,7 +346,7 @@ export class TJSGameSettings
     */
    *data(regex = void 0)
    {
-      if (regex !== void 0 && !(regex instanceof RegExp)) { throw new TypeError(`'regex' is not a RegExp`); }
+      if (regex !== void 0 && !CrossWindow.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
       if (!this.#settings.length) { return void 0; }
 
@@ -373,7 +375,7 @@ export class TJSGameSettings
     */
    *entries(regex = void 0)
    {
-      if (regex !== void 0 && !(regex instanceof RegExp)) { throw new TypeError(`'regex' is not a RegExp`); }
+      if (regex !== void 0 && !CrossWindow.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
       if (!this.#stores.size) { return void 0; }
 
@@ -400,7 +402,7 @@ export class TJSGameSettings
     */
    *keys(regex = void 0)
    {
-      if (regex !== void 0 && !(regex instanceof RegExp)) { throw new TypeError(`'regex' is not a RegExp`); }
+      if (regex !== void 0 && !CrossWindow.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
       if (!this.#stores.size) { return void 0; }
 
@@ -429,7 +431,7 @@ export class TJSGameSettings
     */
    *stores(regex = void 0)
    {
-      if (regex !== void 0 && !(regex instanceof RegExp)) { throw new TypeError(`'regex' is not a RegExp`); }
+      if (regex !== void 0 && !CrossWindow.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
       if (!this.#stores.size) { return void 0; }
 
