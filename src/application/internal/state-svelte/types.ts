@@ -113,12 +113,6 @@ type SvelteData = {
     * The main bound element.
     */
    element: HTMLElement;
-
-   /**
-    * Whether HTML is injected.
-    * @internal
-    */
-   injectHTML: boolean;
 };
 
 export { GetSvelteData, MountedAppShell, SvelteData }
