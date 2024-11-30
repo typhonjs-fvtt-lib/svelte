@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import { isMinimalWritableStore, subscribeIgnoreFirst } from '@typhonjs-svelte/runtime-base/svelte/store/util';
+import { CrossWindow } from '@typhonjs-svelte/runtime-base/util/browser';
 import { isObject, isIterable } from '@typhonjs-svelte/runtime-base/util/object';
 
 /**
@@ -338,7 +339,7 @@ class TJSGameSettings
     */
    *data(regex = void 0)
    {
-      if (regex !== void 0 && !(regex instanceof RegExp)) { throw new TypeError(`'regex' is not a RegExp`); }
+      if (regex !== void 0 && !CrossWindow.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
       if (!this.#settings.length) { return void 0; }
 
@@ -367,7 +368,7 @@ class TJSGameSettings
     */
    *entries(regex = void 0)
    {
-      if (regex !== void 0 && !(regex instanceof RegExp)) { throw new TypeError(`'regex' is not a RegExp`); }
+      if (regex !== void 0 && !CrossWindow.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
       if (!this.#stores.size) { return void 0; }
 
@@ -394,7 +395,7 @@ class TJSGameSettings
     */
    *keys(regex = void 0)
    {
-      if (regex !== void 0 && !(regex instanceof RegExp)) { throw new TypeError(`'regex' is not a RegExp`); }
+      if (regex !== void 0 && !CrossWindow.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
       if (!this.#stores.size) { return void 0; }
 
@@ -423,7 +424,7 @@ class TJSGameSettings
     */
    *stores(regex = void 0)
    {
-      if (regex !== void 0 && !(regex instanceof RegExp)) { throw new TypeError(`'regex' is not a RegExp`); }
+      if (regex !== void 0 && !CrossWindow.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
       if (!this.#stores.size) { return void 0; }
 
@@ -558,8 +559,8 @@ class TJSLiveGameSettings
          throw new TypeError(`'gameSettings' is not a TJSGameSettings instance.`);
       }
 
-      if (include !== void 0 && !(include instanceof Set)) { throw new TypeError(`'options.include' is not a Set.`); }
-      if (exclude !== void 0 && !(exclude instanceof Set)) { throw new TypeError(`'options.exclude' is not a Set.`); }
+      if (include !== void 0 && !CrossWindow.isSet(include)) { throw new TypeError(`'options.include' is not a Set.`); }
+      if (exclude !== void 0 && !CrossWindow.isSet(exclude)) { throw new TypeError(`'options.exclude' is not a Set.`); }
 
       for (const setting of gameSettings.data())
       {

@@ -1,20 +1,17 @@
 import { TJSPosition }     from '@typhonjs-svelte/runtime-base/svelte/store/position';
-
 import { TJSSvelteUtil }   from '@typhonjs-svelte/runtime-base/svelte/util';
-
 import { A11yHelper }      from '@typhonjs-svelte/runtime-base/util/a11y';
+import { CrossWindow }     from '@typhonjs-svelte/runtime-base/util/browser';
 
 import {
    deepMerge,
    hasGetter,
-   isIterable,
    isObject }              from '@typhonjs-svelte/runtime-base/util/object';
 
 import {
    ApplicationState,
    GetSvelteData,
    loadSvelteConfig,
-   isApplicationShell,
    SvelteReactive,
    TJSAppIndex }           from './internal/index.js';
 
@@ -122,6 +119,11 @@ export class SvelteApplication extends Application
    constructor(options = {})
    {
       super(options);
+
+      if (!isObject(this.options.svelte))
+      {
+         throw new Error(`SvelteApplication - constructor - No Svelte configuration object found in 'options'.`);
+      }
 
       /** @type {ApplicationState} */
       this.#applicationState = new ApplicationState(this);
@@ -324,7 +326,7 @@ export class SvelteApplication extends Application
 
       // Support for PopOut! module; `close` is double invoked; once before the element is rejoined to the main window.
       // Reject close invocations when the element window is not the main originating window / globalThis.
-      if (el?.ownerDocument?.defaultView !== globalThis) { return; }
+      if (CrossWindow.getWindow(el, { throws: false }) !== globalThis) { return; }
 
       /**
        * @ignore
@@ -470,14 +472,8 @@ export class SvelteApplication extends Application
     * @ignore
     * @internal
     */
-   _injectHTML(html)
+   _injectHTML()
    {
-      if (this.popOut && html.length === 0 && isIterable(this.options.svelte))
-      {
-         throw new Error(
-          'SvelteApplication - _injectHTML - A popout app with no template can only support one Svelte component.');
-      }
-
       // Make sure the store is updated with the latest header buttons. Also allows filtering buttons before display.
       this.reactive.updateHeaderButtons();
 
@@ -500,122 +496,50 @@ export class SvelteApplication extends Application
          };
       };
 
-      if (isIterable(this.options.svelte))
+      // A sanity check; absence should be detected in constructor.
+      if (!isObject(this.options.svelte))
       {
-         for (const svelteConfig of this.options.svelte)
-         {
-            const svelteData = loadSvelteConfig({
-               app: this,
-               template: html[0],
-               config: svelteConfig,
-               elementRootUpdate
-            });
-
-            if (isApplicationShell(svelteData.component))
-            {
-               if (this.svelte.applicationShell !== null)
-               {
-                  throw new Error(
-                   `SvelteApplication - _injectHTML - An application shell is already mounted; offending config:
-                    ${JSON.stringify(svelteConfig)}`);
-               }
-
-               this.#applicationShellHolder[0] = svelteData.component;
-
-               // If Vite / HMR / svelte_hmr is enabled then add a hook to receive callbacks when the ProxyComponent
-               // refreshes. Update the element root accordingly and force an update to TJSPosition.
-               // See this issue for info about `on_hmr`:
-               // https://github.com/sveltejs/svelte-hmr/issues/57
-               if (TJSSvelteUtil.isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
-               {
-                  svelteData.component.$$.on_hmr.push(() => () => this.#updateApplicationShell());
-               }
-            }
-
-            this.#svelteData.push(svelteData);
-         }
-      }
-      else if (isObject(this.options.svelte))
-      {
-         const svelteData = loadSvelteConfig({
-            app: this,
-            template: html[0],
-            config: this.options.svelte,
-            elementRootUpdate
-         });
-
-         if (isApplicationShell(svelteData.component))
-         {
-            // A sanity check as shouldn't hit this case as only one component is being mounted.
-            if (this.svelte.applicationShell !== null)
-            {
-               throw new Error(
-                `SvelteApplication - _injectHTML - An application shell is already mounted; offending config:
-                 ${JSON.stringify(this.options.svelte)}`);
-            }
-
-            this.#applicationShellHolder[0] = svelteData.component;
-
-            // If Vite / HMR / svelte_hmr is enabled then add a hook to receive callbacks when the ProxyComponent
-            // refreshes. Update the element root accordingly and force an update to TJSPosition.
-            // See this issue for info about `on_hmr`:
-            // https://github.com/sveltejs/svelte-hmr/issues/57
-            if (TJSSvelteUtil.isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
-            {
-               svelteData.component.$$.on_hmr.push(() => () => this.#updateApplicationShell());
-            }
-         }
-
-         this.#svelteData.push(svelteData);
+         throw new Error(`SvelteApplication - _injectHTML - No Svelte configuration object found in 'options'.`);
       }
 
-      // Detect if this is a synthesized DocumentFragment.
-      const isDocumentFragment = html.length && html[0] instanceof DocumentFragment;
+      const svelteData = loadSvelteConfig({
+         app: this,
+         config: this.options.svelte,
+         elementRootUpdate
+      });
 
-      // If any of the Svelte components mounted directly targets an HTMLElement then do not inject HTML.
-      let injectHTML = true;
-      for (const svelteData of this.#svelteData)
-      {
-         if (!svelteData.injectHTML) { injectHTML = false; break; }
-      }
-      if (injectHTML) { super._injectHTML(html); }
-
+      // A sanity check as shouldn't hit this case as only one component is being mounted.
       if (this.svelte.applicationShell !== null)
       {
-         this._element = $(this.svelte.applicationShell.elementRoot);
-
-         // Detect if the application shell exports an `elementContent` accessor.
-         this.#elementContent = hasGetter(this.svelte.applicationShell, 'elementContent') ?
-          this.svelte.applicationShell.elementContent : null;
-
-         // Detect if the application shell exports an `elementTarget` accessor.
-         this.#elementTarget = hasGetter(this.svelte.applicationShell, 'elementTarget') ?
-          this.svelte.applicationShell.elementTarget : null;
+         throw new Error(
+          `SvelteApplication - _injectHTML - An application shell is already mounted; offending config:\n` +
+           `${JSON.stringify(this.options.svelte)}`);
       }
-      else if (isDocumentFragment) // Set the element of the app to the first child element in order of Svelte components mounted.
+
+      this.#applicationShellHolder[0] = svelteData.component;
+
+      // If Vite / HMR / svelte_hmr is enabled then add a hook to receive callbacks when the ProxyComponent
+      // refreshes. Update the element root accordingly and force an update to TJSPosition.
+      // See this issue for info about `on_hmr`:
+      // https://github.com/sveltejs/svelte-hmr/issues/57
+      if (TJSSvelteUtil.isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
       {
-         for (const svelteData of this.#svelteData)
-         {
-            if (A11yHelper.isFocusTarget(svelteData.element))
-            {
-               this._element = $(svelteData.element);
-               break;
-            }
-         }
+         svelteData.component.$$.on_hmr.push(() => () => this.#updateApplicationShell());
       }
 
-      // Potentially retrieve a specific target element if `selectorTarget` is defined otherwise make the target the
-      // main element.
-      if (this.#elementTarget === null)
-      {
-         this.#elementTarget = typeof this.options.selectorTarget === 'string' ?
-          this._element[0].querySelector(this.options.selectorTarget) : this._element[0];
-      }
+      this.#svelteData.push(svelteData);
 
-      if (this.#elementTarget === null || this.#elementTarget === void 0)
-      {
-         throw new Error(`SvelteApplication - _injectHTML: Target element '${this.options.selectorTarget}' not found.`);
-      }
+      // Wrap `elementRoot` as a JQuery object and set to AppV1 / Application element.
+      this._element = $(this.svelte.applicationShell.elementRoot);
+
+      // Detect if the application shell exports an `elementContent` accessor.
+      this.#elementContent = hasGetter(this.svelte.applicationShell, 'elementContent') ?
+       this.svelte.applicationShell.elementContent : null;
+
+      // Detect if the application shell exports an `elementTarget` accessor if not set `elementTarget` to
+      // `elementRoot`.
+      this.#elementTarget = hasGetter(this.svelte.applicationShell, 'elementTarget') ?
+       this.svelte.applicationShell.elementTarget : this.svelte.applicationShell.elementRoot;
 
       // The initial zIndex may be set in application options or for popOut applications is stored by `_renderOuter`
       // in `this.#initialZIndex`.
@@ -984,19 +908,17 @@ export class SvelteApplication extends Application
    }
 
    /**
-    * Render the inner application content. Only render a template if one is defined otherwise provide an empty
-    * JQuery element per the core Foundry API.
+    * Render the inner application content. Provide an empty JQuery element per the core Foundry API.
     *
     * @protected
     * @ignore
     * @internal
     */
-   async _renderInner(data)
+   async _renderInner()
    {
       const activeWindow = this.reactive.activeWindow;
 
-      const html = typeof this.template === 'string' ? await renderTemplate(this.template, data) :
-       activeWindow.document.createDocumentFragment();
+      const html = activeWindow.document.createDocumentFragment();
 
       return $(html);
    }
