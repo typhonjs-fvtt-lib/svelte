@@ -403,7 +403,7 @@
          in:inTransition|global={inTransitionOptions}
          out:outTransition|global={outTransitionOptions}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
-         on:keydown|capture={onKeydown}
+         on:keydown={onKeydown}
          on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
          use:dynamicAction={appResizeObserver}
@@ -428,7 +428,7 @@
          data-appid={application.appId}
          bind:this={elementRoot}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
-         on:keydown|capture={onKeydown}
+         on:keydown={onKeydown}
          on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
          use:dynamicAction={appResizeObserver}
