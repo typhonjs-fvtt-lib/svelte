@@ -9,8 +9,8 @@ import { SvelteComponent } from 'svelte';
 import { EasingReference } from '@typhonjs-svelte/runtime-base/svelte/easing';
 import { Readable, Writable } from 'svelte/store';
 import * as _typhonjs_fvtt_svelte_application from '@typhonjs-fvtt/svelte/application';
+import * as _typhonjs_svelte_runtime_base_util_async from '@typhonjs-svelte/runtime-base/util/async';
 import { TransitionFunction } from '@typhonjs-svelte/runtime-base/svelte/transition';
-import { ManagedPromise } from '@typhonjs-svelte/runtime-base/util/async';
 
 /**
  * Provides a mechanism to retrieve and query all mounted Svelte components including the main application shell.
@@ -1417,7 +1417,7 @@ declare class TJSDialog extends SvelteApplication {
   /**
    * @returns {import('@typhonjs-svelte/runtime-base/util/async').ManagedPromise} Returns the managed promise.
    */
-  get managedPromise(): ManagedPromise;
+  get managedPromise(): _typhonjs_svelte_runtime_base_util_async.ManagedPromise;
   /**
    * Brings to top or renders this dialog returning a Promise that is resolved any button pressed or when the dialog
    * is closed.
