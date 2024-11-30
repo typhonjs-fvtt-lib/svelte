@@ -12,7 +12,7 @@ import { externalPathsNPM } from './.rollup/local/externalPathsNPM.js';
 // Defines the node-resolve config.
 const s_RESOLVE_CONFIG = {
    browser: true,
-   dedupe: ['svelte', '@typhonjs-svelte/lib']
+   dedupe: ['svelte', '@typhonjs-svelte/runtime-base']
 };
 
 // Defines potential output plugins to use conditionally if the .env file indicates the bundles should be
@@ -26,13 +26,11 @@ const sourcemap = true;
 
 // GenerateDTS options -----------------------------------------------------------------------------------------------
 
-// Provides naive search / replace of bundled declaration file rewriting the re-bundled definitions from
-// @typhonjs-svelte/lib. This will alter the JSDoc comments and import symbols.
+// Provides naive search / replace of bundled declaration file rewriting the re-bundled definitions. This will alter
+// the JSDoc comments and import symbols.
 const dtsReplace = {
-   _svelte_lib_: '_typhonjs_fvtt_svelte_',
    _svelte_fvtt_: '_typhonjs_fvtt_svelte_',
    '#svelte-fvtt/': '@typhonjs-fvtt/svelte/',
-   '#svelte-lib/': '@typhonjs-fvtt/svelte/',
    '/\\/\\/ <reference.*\\/>': ''   // Svelte v4 types currently add triple slash references.
 };
 
@@ -53,17 +51,7 @@ const filterDiagnostic = (diagnostic, message) =>
  (diagnostic.code === 2300 && message === `Duplicate identifier 'DOMRect'.`) ||
   (diagnostic.code === 1014 && message === `A rest parameter must be last in a parameter list.`);
 
-// // We don't care about external warning messages for `@typhonjs-svelte/lib` imports.
-// const ignorePattern = /^@typhonjs-svelte\/lib/;
-//
-// const onwarn = (warning, warn) =>
-// {
-//    if (warning.code === 'UNRESOLVED_IMPORT' && ignorePattern.test(warning.exporter)) { return; }
-//    warn(warning);
-// };
-
 // Rollup plugin options for generateDTS.
-// const dtsPluginOptions = { bundlePackageExports: true, filterDiagnostic, onwarn, dtsReplace };
 const dtsPluginOptions = { bundlePackageExports: true, filterDiagnostic, dtsReplace };
 
 // -------------------------------------------------------------------------------------------------------------------
@@ -167,7 +155,6 @@ for (const appFile of appFiles)
 
    fileData = fileData.replaceAll('#runtime/', '@typhonjs-svelte/runtime-base/');
    fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
-   fileData = fileData.replaceAll('#svelte-lib/', '@typhonjs-fvtt/svelte/');
    fileData = fileData.replaceAll('\'#svelte', '\'svelte');
 
    // For types
@@ -187,11 +174,8 @@ for (const compFile of compFiles)
 {
    let fileData = fs.readFileSync(compFile, 'utf-8').toString();
 
-   fileData = fileData.replaceAll('@typhonjs-svelte/lib/', '@typhonjs-fvtt/svelte/');
-
    fileData = fileData.replaceAll('#runtime/', '@typhonjs-svelte/runtime-base/');
    fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
-   fileData = fileData.replaceAll('#svelte-lib/', '@typhonjs-fvtt/svelte/');
    fileData = fileData.replaceAll('\'#svelte', '\'svelte');
 
    // For types
@@ -210,11 +194,8 @@ for (const gsapFile of gsapFiles)
 {
    let fileData = fs.readFileSync(gsapFile, 'utf-8').toString();
 
-   fileData = fileData.replaceAll('@typhonjs-svelte/lib/', '@typhonjs-fvtt/svelte/');
-
    fileData = fileData.replaceAll('#runtime/', '@typhonjs-svelte/runtime-base/');
    fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
-   fileData = fileData.replaceAll('#svelte-lib/', '@typhonjs-fvtt/svelte/');
    fileData = fileData.replaceAll('\'#svelte', '\'svelte');
 
    // For types
