@@ -269,8 +269,7 @@
    }
 
    /**
-    * If the application is a popOut application then when clicked bring to top if not already the Foundry
-    * `activeWindow`.
+    * Handle focus management on any pointer events, `non-capture`.
     *
     * @param {PointerEvent} event - A PointerEvent.
     */
@@ -302,7 +301,17 @@
             elementRoot.focus();
          }
       }
+   }
 
+   /**
+    * If the application is a popOut application then when clicked bring to top if not already the Foundry
+    * `activeWindow`.
+    *
+    * Note: `capture` is used so pointer down is always received. Be mindful as `onPointerdownAppTopMost` should only
+    * invoke `bringToTop`.
+    */
+   function onPointerdownAppTopMost()
+   {
       if (typeof application?.options?.popOut === 'boolean' && application.options.popOut &&
        application !== globalThis.ui?.activeWindow)
       {
@@ -356,6 +365,7 @@
          out:outTransition|global={outTransitionOptions}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
          on:keydown={onKeydown}
+         on:pointerdown|capture={onPointerdownAppTopMost}
          on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
          use:dynamicAction={appResizeObserver}
@@ -373,6 +383,7 @@
          bind:this={elementRoot}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
          on:keydown={onKeydown}
+         on:pointerdown|capture={onPointerdownAppTopMost}
          on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
          use:dynamicAction={appResizeObserver}

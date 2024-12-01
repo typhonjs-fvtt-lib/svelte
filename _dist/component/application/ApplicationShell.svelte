@@ -292,6 +292,9 @@
    /**
     * If the application is a popOut application then when clicked bring to top if not already the Foundry
     * `activeWindow`.
+    *
+    * Note: `capture` is used so pointer down is always received. Be mindful as `onPointerdownApp` should only
+    * invoke `bringToTop`.
     */
    function onPointerdownApp()
    {
@@ -398,7 +401,7 @@
         out:outTransition|global={outTransitionOptions}
         on:close:popup|preventDefault|stopPropagation={onClosePopup}
         on:keydown={onKeydown}
-        on:pointerdown={onPointerdownApp}
+        on:pointerdown|capture={onPointerdownApp}
         use:applyStyles={stylesApp}
         use:dynamicAction={appResizeObserver}
         role=application
@@ -423,7 +426,7 @@
         bind:this={elementRoot}
         on:close:popup|preventDefault|stopPropagation={onClosePopup}
         on:keydown={onKeydown}
-        on:pointerdown={onPointerdownApp}
+        on:pointerdown|capture={onPointerdownApp}
         use:applyStyles={stylesApp}
         use:dynamicAction={appResizeObserver}
         role=application
