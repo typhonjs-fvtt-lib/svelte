@@ -17,6 +17,7 @@ import {
  *
  * Note: It is possible to add multiple `onChange` callbacks on registration.
  *
+ * @privateRemarks
  * TODO: A possible future extension is to offer type checking against the setting type by creating a customized
  * writable store that has an overloaded `set` method to provide type checking.
  */

@@ -7,6 +7,7 @@ import {
 /**
  * Provides management of reactive embedded collections.
  *
+ * @privateRemarks
  * TODO: Consider subscribing to TJSDocument rather than exposing {@link EmbeddedStoreManager.handleDocChange} and
  * {@link EmbeddedStoreManager.handleUpdate}
  */

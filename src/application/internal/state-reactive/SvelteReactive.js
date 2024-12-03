@@ -325,7 +325,9 @@ export class SvelteReactive
 
    /**
     * Returns the title accessor from the parent Application class; {@link Application.title}
-    * TODO: Application v2; note that super.title localizes `this.options.title`; IMHO it shouldn't.
+    *
+    * @privateRemarks
+    * TODO: Application v2; note that super.title localizes `this.options.title`; IMHO it shouldn't.    *
     *
     * @returns {string} Title.
     */

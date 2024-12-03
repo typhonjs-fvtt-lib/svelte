@@ -1,5 +1,6 @@
 <script>
    /**
+    * @privateRemarks
     * TODO: Add description
     *
     * @componentDocumentation
@@ -175,9 +176,10 @@
    /**
     * Handle button click.
     *
-    * @param {import('#runtime/svelte/application').TJSDialogButtonData}   button - button data.
-    *
+    * @privateRemarks
     * TODO: When app eventbus is available send event for UI notification instead of Foundry API usage.
+    *
+    * @param {import('#runtime/svelte/application').TJSDialogButtonData}   button - button data.
     *
     * @returns {*}
     */
