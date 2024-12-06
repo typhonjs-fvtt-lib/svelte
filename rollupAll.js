@@ -236,14 +236,6 @@ const applicationDTSOptions = {
    rollupExternal: external
 };
 
-console.log('Generating TS Declaration: ./_dist/application/index.js');
-
-await generateDTS({
-   input: './_dist/application/index.js',
-   output: './_dist/application/index.d.ts',
-   ...applicationDTSOptions,
-});
-
 console.log('Generating TS Declaration: ./_dist/component/application/index.js');
 
 await generateDTS({ input: './_dist/component/application/index.js' });
@@ -251,3 +243,12 @@ await generateDTS({ input: './_dist/component/application/index.js' });
 console.log('Generating TS Declaration: ./_dist/component/internal/index.js');
 
 await generateDTS({ input: './_dist/component/internal/index.js' });
+
+
+console.log('Generating TS Declaration: ./_dist/application/index.js');
+
+await generateDTS({
+   input: './_dist/application/index.js',
+   output: './_dist/application/index.d.ts',
+   ...applicationDTSOptions,
+});

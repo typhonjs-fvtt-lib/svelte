@@ -10,7 +10,10 @@
   "imports": {
     "#runtime/util/i18n": "@typhonjs-fvtt/runtime/util/i18n",
     "#runtime/*": "@typhonjs-svelte/runtime-base/*",
-    "#svelte-fvtt/*": "@typhonjs-fvtt/svelte/*",
+    "#svelte-fvtt/*": {
+      "types": "./_dist/*/index.d.ts",
+      "default": "@typhonjs-fvtt/svelte/*"
+    },
     "#svelte/*": "svelte/*",
     "#svelte": "svelte"
   },
