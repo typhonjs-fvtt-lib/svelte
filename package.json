@@ -29,7 +29,12 @@
       "import": "./_dist/animate/gsap/plugin/bonus/*.js"
     },
     "./application": {
+      "types": "./_dist/application/index.d.ts",
       "import": "./_dist/application/index.js"
+    },
+    "./application/ambient-ts": {
+      "types": "./_dist/application/ambient-ts/index.d.ts",
+      "import": "./_dist/application/ambient-ts/index.js"
     },
     "./component/application": {
       "types": "./_dist/component/application/index.d.ts",
@@ -67,6 +72,7 @@
     "@typhonjs-config/eslint-config": "^0.6.3",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "@typhonjs-svelte/runtime-base": "github:typhonjs-svelte/runtime-base#0.2.0-next.2",
+    "@typhonjs-utils/file-util": "^0.1.0",
     "eslint": "^8.57.0",
     "fs-extra": "^11.2.0",
     "rollup": "^4.22.4",

@@ -5,9 +5,8 @@ import { getFileList }           from '@typhonjs-utils/file-util';
 import fs                        from 'fs-extra';
 import { rollup }                from 'rollup';
 
-import { typhonjsRuntime } from './.rollup/local/index.js';
-
-import { externalPathsNPM } from './.rollup/local/externalPathsNPM.js';
+import { externalPathsNPM }      from './.rollup/local/externalPathsNPM.js';
+import { typhonjsRuntime }       from './.rollup/local/index.js';
 
 // Defines the node-resolve config.
 const s_RESOLVE_CONFIG = {
@@ -19,7 +18,7 @@ const s_RESOLVE_CONFIG = {
 // minified / mangled.
 const outputPlugins = [];
 
-const external = [/@typhonjs-svelte\/runtime-base\/*/, /@typhonjs-fvtt\/svelte\/*/];
+const external = [/^svelte/, /@typhonjs-svelte\/runtime-base\/*/, /@typhonjs-fvtt\/svelte\/*/];
 
 // Defines whether source maps are generated / loaded from the .env file.
 const sourcemap = true;
@@ -34,25 +33,35 @@ const dtsReplace = {
    '/\\/\\/ <reference.*\\/>': ''   // Svelte v4 types currently add triple slash references.
 };
 
-/**
- * Filter out "Duplicate identifier 'DOMRect'" messages.
- *
- * TODO: NOTE - The filtering of 2300 is unwanted churn, but 1014 can be a valid error though currently there is no
- * great way to describe destructuring rest parameters as a function argument with JSDoc that Typescript agrees with.
- * See this issue:
- *
- * @param {import('typescript').Diagnostic} diagnostic -
- *
- * @param {string} message -
- *
- * @returns {boolean} Return true to filter message.
- */
-const filterDiagnostic = (diagnostic, message) =>
- (diagnostic.code === 2300 && message === `Duplicate identifier 'DOMRect'.`) ||
-  (diagnostic.code === 1014 && message === `A rest parameter must be last in a parameter list.`);
-
 // Rollup plugin options for generateDTS.
-const dtsPluginOptions = { bundlePackageExports: true, filterDiagnostic, dtsReplace };
+const dtsPluginOptions = { bundlePackageExports: true, dtsReplace };
+
+// -------------------------------------------------------------------------------------------------------------------
+
+/**
+ *  Adds a getter for position after `get elementTarget()`. This is necessary to perform as a DTS replacement as
+ *  Foundry defines a `position` property on Application.
+ *
+ * @type {string}
+ */
+const dtsReplacePositionGetter = `    get elementTarget(): HTMLElement;
+
+    /**
+     * Returns the TJSPosition instance.
+     *
+     * @returns {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPosition} The TJSPosition instance.
+     */
+    get position(): TJSPosition;
+`;
+
+// Common application generateDTS options.
+const applicationDTSOptions = {
+   dtsReplace: {
+      ...dtsReplace,
+      'get elementTarget\\(\\): HTMLElement;': dtsReplacePositionGetter
+   },
+   rollupExternal: external
+};
 
 // -------------------------------------------------------------------------------------------------------------------
 
@@ -69,6 +78,25 @@ const rollupConfigs = [
       },
       output: {
          file: '_dist/animate/gsap/index.js',
+         format: 'es',
+         generatedCode: { constBindings: true },
+         paths: externalPathsNPM,
+         plugins: outputPlugins,
+         sourcemap
+      }
+   },
+   {
+      input: {
+         input: 'src/application/index.js',
+         external,
+         plugins: [
+            importsExternal(),
+            typhonjsRuntime({ exclude: [`@typhonjs-fvtt/svelte/application`] }),
+            generateDTS.plugin(applicationDTSOptions)
+         ]
+      },
+      output: {
+         file: '_dist/application/index.js',
          format: 'es',
          generatedCode: { constBindings: true },
          paths: externalPathsNPM,
@@ -144,28 +172,6 @@ for (const config of rollupConfigs)
    await bundle.close();
 }
 
-// Handle application & application/legacy by copying the source.
-fs.emptyDirSync('./_dist/application');
-fs.copySync('./src/application', './_dist/application');
-
-const appFiles = await getFileList({ dir: './_dist/application', resolve: true, walk: true });
-for (const appFile of appFiles)
-{
-   let fileData = fs.readFileSync(appFile, 'utf-8').toString();
-
-   // Ignore any `{@link #runtime...}` enclosed references.
-   fileData = fileData.replaceAll(/(?<!\{@link\s*)#runtime\//g, '@typhonjs-svelte/runtime-base/');
-
-   fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
-   fileData = fileData.replaceAll('\'#svelte', '\'svelte');
-
-   // For types
-   // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');
-
-   fs.writeFileSync(appFile, fileData);
-}
-
-
 // Copy component core / dialog
 
 fs.emptyDirSync('./_dist/component');
@@ -210,45 +216,9 @@ for (const gsapFile of gsapFiles)
    fs.writeFileSync(gsapFile, fileData);
 }
 
-/**
- *  Adds a getter for position after `get elementTarget()`. This is necessary to perform as a DTS replacement as
- *  Foundry defines a `position` property on Application.
- *
- * @type {string}
- */
-const dtsReplacePositionGetter = `    get elementTarget(): HTMLElement;
+// Application Ambient TS declarations
+await generateDTS({ input: './src/application/ambient-ts/index.js', output: './_dist/application/ambient-ts/index.d.ts', importsExternal: true });
 
-    /**
-     * Returns the TJSPosition instance.
-     *
-     * @returns {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPosition} The TJSPosition instance.
-     */
-    get position(): TJSPosition;
-`;
-
-// Common application generateDTS options.
-const applicationDTSOptions = {
-   filterDiagnostic,
-   dtsReplace: {
-      ...dtsReplace,
-      'get elementTarget\\(\\): HTMLElement;': dtsReplacePositionGetter
-   },
-   rollupExternal: external
-};
-
-console.log('Generating TS Declaration: ./_dist/component/application/index.js');
-
+// Svelte components
 await generateDTS({ input: './_dist/component/application/index.js' });
-
-console.log('Generating TS Declaration: ./_dist/component/internal/index.js');
-
 await generateDTS({ input: './_dist/component/internal/index.js' });
-
-
-console.log('Generating TS Declaration: ./_dist/application/index.js');
-
-await generateDTS({
-   input: './_dist/application/index.js',
-   output: './_dist/application/index.d.ts',
-   ...applicationDTSOptions,
-});
