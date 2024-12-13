@@ -24,8 +24,8 @@ import {
  * - {@link SvelteReactive.resizing}
  *
  * There are also reactive getters / setters for {@link SvelteApplicationOptions} and Foundry
- * {@link ApplicationOptions}. You can use the following as one way bindings and update the associated stores. For
- * two-way bindings / stores see {@link SvelteReactive.storeAppOptions}.
+ * `ApplicationOptions`. You can use the following as one way bindings and update the
+ * associated stores. For two-way bindings / stores see {@link SvelteReactive.storeAppOptions}.
  *
  * - {@link SvelteReactive.draggable}
  * - {@link SvelteReactive.focusAuto}
@@ -145,7 +145,9 @@ export class SvelteReactive
    /**
     * Initializes reactive support. Package private for internal use.
     *
-    * @returns {SvelteReactiveStores | undefined} Internal methods to interact with Svelte stores.
+    * @returns {import('./types-local').SvelteReactiveStores | undefined} Internal methods to interact with Svelte
+    * stores.
+    *
     * @package
     * @internal
     */
@@ -718,17 +720,3 @@ export class SvelteReactive
       this.#storeUnsubscribe = [];
    }
 }
-
-/**
- * @typedef {object} SvelteReactiveStores
- *
- * @property {(this: void, updater: import('svelte/store').Updater<object>) => void} appOptionsUpdate Update function
- * for app options store.
- *
- * @property {Function} subscribe Subscribes to local stores.
- *
- * @property {(this: void, updater: import('svelte/store').Updater<object>) => void} uiStateUpdate Update function
- * for UI state stores.
- *
- * @property {Function} unsubscribe Unsubscribes from local stores.
- */

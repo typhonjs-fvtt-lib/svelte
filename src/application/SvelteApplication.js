@@ -18,8 +18,11 @@ import {
 /**
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
- * {@link TJSSvelteConfig} object in the SvelteApplicationOptions `options` {@link SvelteApplicationOptions.svelte}
- * property.
+ * {@link #runtime/svelte/util|TJSSvelteConfig} object in the SvelteApplicationOptions `options`
+ * {@link SvelteApplicationOptions.svelte} property.
+ *
+ * @template [Options = import('./types').SvelteApplicationOptions]
+ * @augments {Application<Options>}
  *
  * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
  */
@@ -107,14 +110,12 @@ export class SvelteApplication extends Application
    /**
     * Contains methods to interact with the Svelte stores.
     *
-    * @type {import('./internal/state-reactive/SvelteReactive').SvelteReactiveStores}
+    * @type {import('./internal/state-reactive/types-local').SvelteReactiveStores}
     */
    #stores;
 
    /**
-    * @param {import('#svelte-fvtt/application').SvelteApplicationOptions} options - The options for the application.
-    *
-    * @inheritDoc
+    * @param {Options} options - The options for the application.
     */
    constructor(options = {})
    {
@@ -160,14 +161,12 @@ export class SvelteApplication extends Application
    /**
     * Specifies the default options that SvelteApplication supports.
     *
-    * @returns {import('#svelte-fvtt/application').SvelteApplicationOptions} options - Application options.
+    * @returns {import('./types').SvelteApplicationOptions} options - Application options.
     * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
-    *
-    * @internal
     */
    static get defaultOptions()
    {
-      return deepMerge(super.defaultOptions, {
+      return /** @type {import('./types').SvelteApplicationOptions} */ deepMerge(super.defaultOptions, {
          defaultCloseAnimation: true,     // If false the default slide close animation is not run.
          draggable: true,                 // If true then application shells are draggable.
          focusAuto: true,                 // When true auto-management of app focus is enabled.

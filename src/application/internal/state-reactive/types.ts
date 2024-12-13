@@ -1,6 +1,7 @@
 import type {
    Readable,
-   Writable }                 from 'svelte/store';
+   Writable,
+   Updater }               from 'svelte/store';
 
 import type { WebStorage } from '#runtime/svelte/store/web-storage';
 
