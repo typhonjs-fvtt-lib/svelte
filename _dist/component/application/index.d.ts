@@ -11,16 +11,16 @@ declare class ApplicationShell extends SvelteComponent<
   ApplicationShell.Slots
 > {
   /** Setter for {@link ApplicationShell.Props.elementContent | elementContent} prop. */
-  set elementContent(_: any);
+  set elementContent(_: HTMLElement);
 
   /** Getter for {@link ApplicationShell.Props.elementContent | elementContent} prop. */
-  get elementContent(): any;
+  get elementContent(): HTMLElement;
 
   /** Setter for {@link ApplicationShell.Props.elementRoot | elementRoot} prop. */
-  set elementRoot(_: any);
+  set elementRoot(_: HTMLElement);
 
   /** Getter for {@link ApplicationShell.Props.elementRoot | elementRoot} prop. */
-  get elementRoot(): any;
+  get elementRoot(): HTMLElement;
 
   /** Setter for {@link ApplicationShell.Props.draggable | draggable} prop. */
   set draggable(_: any);
@@ -113,8 +113,10 @@ declare namespace ApplicationShell {
   export type Props = {
     transition?: () => undefined;
     draggable?: any;
-    elementContent?: any;
-    elementRoot?: any;
+    /** @type {HTMLElement} */
+    elementContent?: HTMLElement;
+    /** @type {HTMLElement} */
+    elementRoot?: HTMLElement;
     draggableOptions?: any;
     stylesApp?: any;
     stylesContent?: any;
@@ -144,16 +146,16 @@ declare class EmptyApplicationShell extends SvelteComponent<
   EmptyApplicationShell.Slots
 > {
   /** Setter for {@link EmptyApplicationShell.Props.elementContent | elementContent} prop. */
-  set elementContent(_: any);
+  set elementContent(_: HTMLElement);
 
   /** Getter for {@link EmptyApplicationShell.Props.elementContent | elementContent} prop. */
-  get elementContent(): any;
+  get elementContent(): HTMLElement;
 
   /** Setter for {@link EmptyApplicationShell.Props.elementRoot | elementRoot} prop. */
-  set elementRoot(_: any);
+  set elementRoot(_: HTMLElement);
 
   /** Getter for {@link EmptyApplicationShell.Props.elementRoot | elementRoot} prop. */
-  get elementRoot(): any;
+  get elementRoot(): HTMLElement;
 
   /** Setter for {@link EmptyApplicationShell.Props.stylesApp | stylesApp} prop. */
   set stylesApp(_: any);
@@ -215,8 +217,10 @@ declare namespace EmptyApplicationShell {
   /** Props type alias for {@link EmptyApplicationShell | associated component}. */
   export type Props = {
     transition?: () => undefined;
-    elementContent?: any;
-    elementRoot?: any;
+    /** @type {HTMLElement} */
+    elementContent?: HTMLElement;
+    /** @type {HTMLElement} */
+    elementRoot?: HTMLElement;
     stylesApp?: any;
     appOffsetHeight?: boolean;
     appOffsetWidth?: boolean;
@@ -249,16 +253,16 @@ declare class TjsApplicationShell extends SvelteComponent<
   TjsApplicationShell.Slots
 > {
   /** Setter for {@link TjsApplicationShell.Props.elementContent | elementContent} prop. */
-  set elementContent(_: any);
+  set elementContent(_: HTMLElement);
 
   /** Getter for {@link TjsApplicationShell.Props.elementContent | elementContent} prop. */
-  get elementContent(): any;
+  get elementContent(): HTMLElement;
 
   /** Setter for {@link TjsApplicationShell.Props.elementRoot | elementRoot} prop. */
-  set elementRoot(_: any);
+  set elementRoot(_: HTMLElement);
 
   /** Getter for {@link TjsApplicationShell.Props.elementRoot | elementRoot} prop. */
-  get elementRoot(): any;
+  get elementRoot(): HTMLElement;
 
   /** Setter for {@link TjsApplicationShell.Props.draggable | draggable} prop. */
   set draggable(_: any);
@@ -351,8 +355,10 @@ declare namespace TjsApplicationShell {
   export type Props = {
     transition?: () => undefined;
     draggable?: any;
-    elementContent?: any;
-    elementRoot?: any;
+    /** @type {HTMLElement} */
+    elementContent?: HTMLElement;
+    /** @type {HTMLElement} */
+    elementRoot?: HTMLElement;
     draggableOptions?: any;
     stylesApp?: any;
     stylesContent?: any;
@@ -373,6 +379,7 @@ declare namespace TjsApplicationShell {
 }
 
 /**
+ * @privateRemarks
  * TODO: Add description
  *
  */

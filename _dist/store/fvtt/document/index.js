@@ -6,6 +6,7 @@ import { DynMapReducer } from '@typhonjs-svelte/runtime-base/svelte/store/reduce
 /**
  * Provides management of reactive embedded collections.
  *
+ * @privateRemarks
  * TODO: Consider subscribing to TJSDocument rather than exposing {@link EmbeddedStoreManager.handleDocChange} and
  * {@link EmbeddedStoreManager.handleUpdate}
  */

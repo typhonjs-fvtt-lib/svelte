@@ -1,5 +1,6 @@
 <script>
    /**
+    * @privateRemarks
     * TODO: Add description
     *
     * @componentDocumentation

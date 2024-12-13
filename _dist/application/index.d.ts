@@ -1,16 +1,21 @@
-import * as _typhonjs_svelte_runtime_base_svelte_util from '@typhonjs-svelte/runtime-base/svelte/util';
-import { TJSSvelteConfig } from '@typhonjs-svelte/runtime-base/svelte/util';
-import * as _typhonjs_svelte_runtime_base_svelte_store_web_storage from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
-import { WebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
-import * as _typhonjs_svelte_runtime_base_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
-import { Data, TJSPositionTypes, TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
-import * as _typhonjs_svelte_runtime_base_util_a11y from '@typhonjs-svelte/runtime-base/util/a11y';
+import * as _runtime_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
+import {
+  Data,
+  System,
+  ValidatorAPI,
+  TransformAPI,
+  TJSPositionTypes,
+  TJSPosition,
+} from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import { SvelteComponent } from 'svelte';
+import { TJSSvelteConfig } from '@typhonjs-svelte/runtime-base/svelte/util';
 import { EasingReference } from '@typhonjs-svelte/runtime-base/svelte/easing';
 import { Readable, Writable } from 'svelte/store';
-import * as _typhonjs_fvtt_svelte_application from '@typhonjs-fvtt/svelte/application';
-import * as _typhonjs_svelte_runtime_base_util_async from '@typhonjs-svelte/runtime-base/util/async';
+import { WebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
+import { A11yFocusSource } from '@typhonjs-svelte/runtime-base/util/a11y';
+import * as _runtime_util_async from '@typhonjs-svelte/runtime-base/util/async';
 import { TransitionFunction } from '@typhonjs-svelte/runtime-base/svelte/transition';
+import { SvelteApplicationOptions as SvelteApplicationOptions$1 } from '@typhonjs-fvtt/svelte/application';
 
 /**
  * Provides a mechanism to retrieve and query all mounted Svelte components including the main application shell.
@@ -153,7 +158,7 @@ type SvelteData = {
  *
  * @example
  * ```js
- * import { hasSetter } from '@typhonjs-svelte/runtime-base/util/object';
+ * import { hasSetter } from '#runtime/util/object';
  *
  * // Note: make a normal comment.
  * //  * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with
@@ -719,21 +724,228 @@ type ApplicationStateData = {
   };
 };
 
+declare global {
+  interface ApplicationOptions {
+    /**
+     * A named "base application" which generates an additional hook.
+     *
+     * @defaultValue `null`
+     */
+    baseApplication?: string | null;
+    /**
+     * The default pixel width for the rendered HTML.
+     *
+     * @defaultValue `null`
+     */
+    width?: number | string | null;
+    /**
+     * The default pixel height for the rendered HTML.
+     *
+     * @defaultValue `null`
+     */
+    height?: number | 'auto' | null;
+    /**
+     * The default offset-top position for the rendered HTML.
+     *
+     * @defaultValue `null`
+     */
+    top?: number | null;
+    /**
+     * The default offset-left position for the rendered HTML.
+     *
+     * @defaultValue `null`
+     */
+    left?: number | null;
+    /**
+     * A transformation scale for the rendered HTML.
+     *
+     * @defaultValue `null`
+     */
+    scale?: number | null;
+    /**
+     * Whether to display the application as a pop-out container.
+     *
+     * @defaultValue `true`
+     */
+    popOut?: boolean;
+    /**
+     * Whether the rendered application can be minimized (popOut only).
+     *
+     * @defaultValue `true`
+     */
+    minimizable?: boolean;
+    /**
+     * Whether the rendered application can be drag-resized (popOut only).
+     *
+     * @defaultValue `false`
+     */
+    resizable?: boolean;
+    /**
+     * The default CSS id to assign to the rendered HTML.
+     *
+     * @defaultValue `""`
+     */
+    id?: string;
+    /**
+     * An array of CSS string classes to apply to the rendered HTML.
+     *
+     * @defaultValue `[]`
+     */
+    classes?: string[];
+    /**
+     * A default window title string (popOut only).
+     *
+     * @defaultValue `""`
+     */
+    title?: string;
+  }
+}
+/**
+ * Options for SvelteApplication. Note: that this extends the Foundry `ApplicationOptions`.
+ */
+interface SvelteApplicationOptions extends ApplicationOptions {
+  /**
+   * If false the default slide close animation is not run.
+   *
+   * @defaultValue true
+   */
+  defaultCloseAnimation?: boolean;
+  /**
+   * If true then application shells are draggable.
+   *
+   * @defaultValue true
+   */
+  draggable?: boolean;
+  /**
+   * When true auto-management of app focus is enabled.
+   *
+   * @defaultValue true
+   */
+  focusAuto?: boolean;
+  /**
+   * When `focusAuto` and `focusKeep` is true; keeps internal focus.
+   *
+   * @defaultValue false
+   */
+  focusKeep?: boolean;
+  /**
+   * Defines A11yHelper focus source to apply when application closes.
+   *
+   * @defaultValue: undefined
+   */
+  focusSource?: A11yFocusSource;
+  /**
+   * When true focus trapping / wrapping is enabled keeping focus inside app.
+   *
+   * @defaultValue true
+   */
+  focusTrap?: boolean;
+  /**
+   * If true then the close header button is removed.
+   *
+   * @defaultValue false
+   */
+  headerButtonNoClose?: boolean;
+  /**
+   * If true then header button labels are removed.
+   *
+   * @defaultValue false
+   */
+  headerButtonNoLabel?: boolean;
+  /**
+   * Sets a header icon given an image URL.
+   *
+   * @defaultValue undefined
+   */
+  headerIcon?: string;
+  /**
+   * If true then header title is hidden when minimized.
+   *
+   * @defaultValue false
+   */
+  headerNoTitleMinimized?: boolean;
+  /**
+   * Assigned to position. Number specifying minimum window height.
+   *
+   * @defaultValue 50
+   */
+  minHeight?: number;
+  /**
+   * Assigned to position. Number specifying minimum window width.
+   *
+   * @defaultValue 200
+   */
+  minWidth?: number;
+  /**
+   * If false then `position.set` does not take effect.
+   *
+   * @defaultValue true
+   */
+  positionable?: boolean;
+  /**
+   * A helper for initial position placement.
+   *
+   * @defaultValue TJSPosition.Initial.browserCentered
+   */
+  positionInitial?: System.Initial.InitialSystem;
+  /**
+   * When true TJSPosition is optimized for orthographic use.
+   *
+   * @defaultValue true
+   */
+  positionOrtho?: boolean;
+  /**
+   * A validator function or data or list of validators.
+   *
+   * @defaultValue TJSPosition.Validators.transformWindow
+   */
+  positionValidator?: ValidatorAPI.ValidatorOption;
+  /**
+   * An instance of WebStorage (session) to share across SvelteApplications. This is only required to share a
+   * WebStorage instance across multiple SvelteApplications. By default, a unique
+   * {@link #runtime/svelte/store/web-storage|TJSSessionStorage} instance is created per SvelteApplication.
+   *
+   * @defaultValue TJSSessionStorage
+   */
+  sessionStorage?: WebStorage;
+  /**
+   * A Svelte configuration object defining the main component.
+   *
+   */
+  svelte?: TJSSvelteConfig;
+  /**
+   * By default, 'top / left' respects rotation when minimizing.
+   *
+   * @defaultValue 'top left'
+   */
+  transformOrigin?: TransformAPI.TransformOrigin;
+}
+
 /**
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
- * {@link TJSSvelteConfig} object in the SvelteApplicationOptions `options` {@link SvelteApplicationOptions.svelte}
- * property.
+ * {@link #runtime/svelte/util|TJSSvelteConfig} object in the SvelteApplicationOptions `options`
+ * {@link SvelteApplicationOptions.svelte} property.
  *
- * @implements {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPositionTypes.Positionable}
+ * @template [Options = import('./types').SvelteApplicationOptions]
+ * @augments {Application<Options>}
+ *
+ * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
  */
-declare class SvelteApplication implements TJSPositionTypes.Positionable {
+declare class SvelteApplication<Options = SvelteApplicationOptions> implements TJSPositionTypes.Positionable {
   /**
-   * @param {import('@typhonjs-fvtt/svelte/application').SvelteApplicationOptions} options - The options for the application.
+   * Specifies the default options that SvelteApplication supports.
+   *
+   * @returns {import('./types').SvelteApplicationOptions} options - Application options.
+   * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
+   */
+  static get defaultOptions(): SvelteApplicationOptions;
+  /**
+   * @param {Options} options - The options for the application.
    *
    * @inheritDoc
    */
-  constructor(options?: _typhonjs_fvtt_svelte_application.SvelteApplicationOptions);
+  constructor(options?: Options);
   /**
    * Returns the content element if an application shell is mounted.
    *
@@ -825,12 +1037,12 @@ declare class SvelteApplication implements TJSPositionTypes.Positionable {
    * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
    * to update to using the {@link TJSPosition.validators} / ValidatorAPI functionality.
    *
-   * @param {import('@typhonjs-svelte/runtime-base/svelte/store/position').Data.TJSPositionDataRelative}   [position] - TJSPosition data.
+   * @param {import('#runtime/svelte/store/position').Data.TJSPositionDataRelative}   [position] - TJSPosition data.
    *
    * @returns {TJSPosition} The updated position object for the application containing the new values.
    * @ignore
    */
-  setPosition(position?: _typhonjs_svelte_runtime_base_svelte_store_position.Data.TJSPositionDataRelative): TJSPosition;
+  setPosition(position?: _runtime_svelte_store_position.Data.TJSPositionDataRelative): TJSPosition;
   #private;
 }
 
@@ -1288,8 +1500,11 @@ type TJSDialogModalOptions = {
  *
  * There are a couple of static helper methods to quickly create standard dialogs such as a 'yes' / 'no' confirmation
  * dialog with {@link TJSDialog.confirm} and an 'ok' single button dialog with {@link TJSDialog.prompt}.
+ *
+ * @template [Options = import('./types').SvelteApplicationOptions]
+ * @augments {SvelteApplication<Options>}
  */
-declare class TJSDialog extends SvelteApplication {
+declare class TJSDialog<Options = SvelteApplicationOptions> extends SvelteApplication<Options> {
   /**
    * A helper factory method to create simple confirmation dialog windows which consist of simple yes / no prompts.
    * If you require more flexibility, a custom TJSDialog instance is preferred. The default focused button is 'yes'.
@@ -1310,7 +1525,7 @@ declare class TJSDialog extends SvelteApplication {
    *        async function. When defined as a string any matching function by name exported from content Svelte
    *        component is invoked.
    *
-   * @param {import('./').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
+   * @param {import('./types').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
    *        constructor.
    *
    * @returns {Promise<T>} A promise which resolves with result of yes / no callbacks or true / false.
@@ -1356,7 +1571,7 @@ declare class TJSDialog extends SvelteApplication {
    *
    * @param {string}   [data.icon="fas fa-check"] - Set another icon besides `fas fa-check` for button.
    *
-   * @param {import('./').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
+   * @param {import('./types').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
    *        constructor.
    *
    * @returns {Promise<T>} The returned value from the provided callback function or `true` if the button
@@ -1394,20 +1609,21 @@ declare class TJSDialog extends SvelteApplication {
    *
    * @template T
    *
-   * @param {import('./internal/state-dialog/types').TJSDialogOptions}  data - Dialog data passed to the TJSDialog constructor.
+   * @param {import('./internal/state-dialog/types').TJSDialogOptions}  data - Dialog data passed to the TJSDialog
+   *        constructor.
    *
-   * @param {import('./').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
+   * @param {import('./types').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
    *        constructor.
    *
    * @returns {Promise<T>} A Promise that resolves to the chosen result.
    */
   static wait<T>(data: TJSDialogOptions, options?: SvelteApplicationOptions): Promise<T>;
   /**
-   * @param {import('./internal/state-dialog/types').TJSDialogOptions}           data - Dialog options.
+   * @param {import('./internal/state-dialog/types').TJSDialogOptions} data - Dialog options.
    *
-   * @param {import('./').SvelteApplicationOptions}   [options] - SvelteApplication options.
+   * @param {Options}   [options] - SvelteApplication options.
    */
-  constructor(data: TJSDialogOptions, options?: SvelteApplicationOptions);
+  constructor(data: TJSDialogOptions, options?: Options);
   /**
    * Returns the dialog data.
    *
@@ -1415,9 +1631,9 @@ declare class TJSDialog extends SvelteApplication {
    */
   get data(): TJSDialogData;
   /**
-   * @returns {import('@typhonjs-svelte/runtime-base/util/async').ManagedPromise} Returns the managed promise.
+   * @returns {import('#runtime/util/async').ManagedPromise} Returns the managed promise.
    */
-  get managedPromise(): _typhonjs_svelte_runtime_base_util_async.ManagedPromise;
+  get managedPromise(): _runtime_util_async.ManagedPromise;
   /**
    * Brings to top or renders this dialog returning a Promise that is resolved any button pressed or when the dialog
    * is closed.
@@ -1440,98 +1656,14 @@ declare class TJSDialog extends SvelteApplication {
   #private;
 }
 
-/**
- * Options for SvelteApplication. Note: that this extends the Foundry
- * {@link ApplicationOptions}.
- */
-type SvelteApplicationOptions = {
-  /**
-   * If false the default slide close animation is not run.
-   */
-  defaultCloseAnimation?: boolean;
-  /**
-   * If true then application shells are draggable.
-   */
-  draggable?: boolean;
-  /**
-   * When true auto-management of app focus is enabled.
-   */
-  focusAuto?: boolean;
-  /**
-   * When `focusAuto` and `focusKeep` is true; keeps internal focus.
-   */
-  focusKeep?: boolean;
-  /**
-   * - Defines A11yHelper focus source to
-   * apply when application closes.
-   */
-  focusSource?: _typhonjs_svelte_runtime_base_util_a11y.A11yFocusSource;
-  /**
-   * When true focus trapping / wrapping is enabled keeping focus inside app.
-   */
-  focusTrap?: boolean;
-  /**
-   * If true then the close header button is removed.
-   */
-  headerButtonNoClose?: boolean;
-  /**
-   * If true then header button labels are removed.
-   */
-  headerButtonNoLabel?: boolean;
-  /**
-   * Sets a header icon given an image URL.
-   */
-  headerIcon?: string;
-  /**
-   * If true then header title is hidden when minimized.
-   */
-  headerNoTitleMinimized?: boolean;
-  /**
-   * Assigned to position. Number specifying minimum
-   * window height.
-   */
-  minHeight?: number;
-  /**
-   * Assigned to position. Number specifying minimum
-   * window width.
-   */
-  minWidth?: number;
-  /**
-   * If false then `position.set` does not take effect.
-   */
-  positionable?: boolean;
-  /**
-   * A helper for
-   * initial position placement.
-   */
-  positionInitial?: _typhonjs_svelte_runtime_base_svelte_store_position.System.Initial.InitialSystem;
-  /**
-   * When true TJSPosition is optimized for orthographic use.
-   */
-  positionOrtho?: boolean;
-  /**
-   * A validator
-   * function or data or list of validators.
-   */
-  positionValidator?: _typhonjs_svelte_runtime_base_svelte_store_position.ValidatorAPI.ValidatorOption;
-  /**
-   * An instance of
-   * WebStorage (session) to share across SvelteApplications. This is only required to share a WebStorage
-   * instance across multiple SvelteApplications. By default, a unique {@link TJSSessionStorage} instance is
-   * created per SvelteApplication.
-   */
-  sessionStorage?: _typhonjs_svelte_runtime_base_svelte_store_web_storage.WebStorage;
-  /**
-   * A Svelte configuration object defining
-   * the main component.
-   */
-  svelte?: _typhonjs_svelte_runtime_base_svelte_util.TJSSvelteConfig;
-  /**
-   * By
-   * default, 'top / left' respects rotation when minimizing.
-   */
-  transformOrigin?: _typhonjs_svelte_runtime_base_svelte_store_position.TransformAPI.TransformOrigin;
-};
+declare global {
+  interface Application<Options> {}
+}
+declare module '@typhonjs-fvtt/svelte/application' {
+  interface SvelteApplication<Options extends SvelteApplicationOptions$1> extends Application<Options> {
+    options: Options;
+  }
+}
 
 export {
   type ApplicationState,
