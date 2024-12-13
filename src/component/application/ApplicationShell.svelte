@@ -27,7 +27,9 @@
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
    // use 'elementRoot' to set the element of the Application. You can also provide `elementContent` and
    // `elementTarget`. Please see SvelteApplication lifecycle documentation.
+   /** @type {HTMLElement} */
    export let elementContent = void 0;
+   /** @type {HTMLElement} */
    export let elementRoot = void 0;
 
    // Allows custom draggable implementations to be forwarded to TJSApplicationHeader.
