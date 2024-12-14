@@ -13,88 +13,96 @@ declare global {
    interface ApplicationOptions
    {
       /**
-       * A named "base application" which generates an additional hook.
+       * A named `base application` which generates an additional hook.
        *
        * @defaultValue `null`
        */
-      baseApplication?: string | null;
+      baseApplication: string | null;
 
       /**
-       * The default pixel width for the rendered HTML.
+       * The default pixel height for app. You may also use relative units including percentages.
+       *
+       * {@link #runtime/svelte/store/position|Data.TJSPositionDataRelative}.
        *
        * @defaultValue `null`
        */
-      width?: number | string | null;
+      width: number | string | null;
 
       /**
-       * The default pixel height for the rendered HTML.
+       * The default pixel height for app. You may also use relative units including percentages.
+       *
+       * {@link #runtime/svelte/store/position|Data.TJSPositionDataRelative}.
        *
        * @defaultValue `null`
        */
-      height?: number | "auto" | null;
+      height: number | string | null;
 
       /**
-       * The default offset-top position for the rendered HTML.
+       * The default top offset position for app. You may also use relative units including percentages.
+       *
+       * {@link #runtime/svelte/store/position|Data.TJSPositionDataRelative}.
        *
        * @defaultValue `null`
        */
-      top?: number | null;
+      top: number | string | null;
 
       /**
-       * The default offset-left position for the rendered HTML.
+       * The default left offset position for app. You may also use relative units including percentages.
+       *
+       * {@link #runtime/svelte/store/position|Data.TJSPositionDataRelative}.
        *
        * @defaultValue `null`
        */
-      left?: number | null;
+      left: number | string |  null;
 
       /**
-       * A transformation scale for the rendered HTML.
+       * A transformation scale for the app.
        *
        * @defaultValue `null`
        */
-      scale?: number | null;
+      scale: number | null;
 
       /**
        * Whether to display the application as a pop-out container.
        *
        * @defaultValue `true`
        */
-      popOut?: boolean;
+      popOut: boolean;
 
       /**
        * Whether the rendered application can be minimized (popOut only).
        *
        * @defaultValue `true`
        */
-      minimizable?: boolean;
+      minimizable: boolean;
 
       /**
        * Whether the rendered application can be drag-resized (popOut only).
        *
        * @defaultValue `false`
        */
-      resizable?: boolean;
+      resizable: boolean;
 
       /**
        * The default CSS id to assign to the rendered HTML.
        *
        * @defaultValue `""`
        */
-      id?: string;
+      id: string;
 
       /**
        * An array of CSS string classes to apply to the rendered HTML.
        *
        * @defaultValue `[]`
        */
-      classes?: string[];
+      classes: string[];
 
       /**
-       * A default window title string (popOut only).
+       * A default window title string (popOut only); may be a language key.
        *
        * @defaultValue `""`
        */
-      title?: string;
+      title: string;
    }
 }
 
@@ -108,112 +116,112 @@ interface SvelteApplicationOptions extends ApplicationOptions
     *
     * @defaultValue true
     */
-   defaultCloseAnimation?: boolean;
+   defaultCloseAnimation: boolean;
 
    /**
     * If true then application shells are draggable.
     *
     * @defaultValue true
     */
-   draggable?: boolean;
+   draggable: boolean;
 
    /**
     * When true auto-management of app focus is enabled.
     *
     * @defaultValue true
     */
-   focusAuto?: boolean;
+   focusAuto: boolean;
 
    /**
     * When `focusAuto` and `focusKeep` is true; keeps internal focus.
     *
     * @defaultValue false
     */
-   focusKeep?: boolean;
+   focusKeep: boolean;
 
    /**
     * Defines A11yHelper focus source to apply when application closes.
     *
     * @defaultValue: undefined
     */
-   focusSource?: A11yFocusSource;
+   focusSource: A11yFocusSource;
 
    /**
     * When true focus trapping / wrapping is enabled keeping focus inside app.
     *
     * @defaultValue true
     */
-   focusTrap?: boolean;
+   focusTrap: boolean;
 
    /**
     * If true then the close header button is removed.
     *
     * @defaultValue false
     */
-   headerButtonNoClose?: boolean;
+   headerButtonNoClose: boolean;
 
    /**
     * If true then header button labels are removed.
     *
     * @defaultValue false
     */
-   headerButtonNoLabel?: boolean;
+   headerButtonNoLabel: boolean;
 
    /**
     * Sets a header icon given an image URL.
     *
     * @defaultValue undefined
     */
-   headerIcon?: string;
+   headerIcon: string;
 
    /**
     * If true then header title is hidden when minimized.
     *
     * @defaultValue false
     */
-   headerNoTitleMinimized?: boolean;
+   headerNoTitleMinimized: boolean;
 
    /**
     * Assigned to position. Number specifying minimum window height.
     *
     * @defaultValue 50
     */
-   minHeight?: number;
+   minHeight: number;
 
    /**
     * Assigned to position. Number specifying minimum window width.
     *
     * @defaultValue 200
     */
-   minWidth?: number;
+   minWidth: number;
 
    /**
     * If false then `position.set` does not take effect.
     *
     * @defaultValue true
     */
-   positionable?: boolean;
+   positionable: boolean;
 
    /**
     * A helper for initial position placement.
     *
     * @defaultValue TJSPosition.Initial.browserCentered
     */
-   positionInitial?: System.Initial.InitialSystem;
+   positionInitial: System.Initial.InitialSystem;
 
    /**
     * When true TJSPosition is optimized for orthographic use.
     *
     * @defaultValue true
     */
-   positionOrtho?: boolean;
+   positionOrtho: boolean;
 
    /**
     * A validator function or data or list of validators.
     *
     * @defaultValue TJSPosition.Validators.transformWindow
     */
-   positionValidator?: ValidatorAPI.ValidatorOption;
+   positionValidator: ValidatorAPI.ValidatorOption;
 
    /**
     * An instance of WebStorage (session) to share across SvelteApplications. This is only required to share a
@@ -222,20 +230,20 @@ interface SvelteApplicationOptions extends ApplicationOptions
     *
     * @defaultValue TJSSessionStorage
     */
-   sessionStorage?: WebStorage;
+   sessionStorage: WebStorage;
 
    /**
     * A Svelte configuration object defining the main component.
     *
     */
-   svelte?: TJSSvelteConfig;
+   svelte: TJSSvelteConfig;
 
    /**
     * By default, 'top / left' respects rotation when minimizing.
     *
     * @defaultValue 'top left'
     */
-   transformOrigin?: TransformAPI.TransformOrigin;
+   transformOrigin: TransformAPI.TransformOrigin;
 }
 
 export { SvelteApplicationOptions };

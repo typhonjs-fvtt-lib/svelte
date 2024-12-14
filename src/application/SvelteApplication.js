@@ -115,7 +115,7 @@ export class SvelteApplication extends Application
    #stores;
 
    /**
-    * @param {Options} options - The options for the application.
+    * @param {Partial<Options>} [options] - The options for the application.
     */
    constructor(options = {})
    {
