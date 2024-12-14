@@ -18,10 +18,9 @@ import {
 /**
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
- * {@link #runtime/svelte/util|TJSSvelteConfig} object in the SvelteApplicationOptions `options`
- * {@link SvelteApplicationOptions.svelte} property.
+ * {@link #runtime/svelte/util|TJSSvelteConfig} object in the {@link SvelteApp.Options.svelte} property.
  *
- * @template [Options = import('./types').SvelteApplicationOptions]
+ * @template [Options = import('./types').SvelteApp.Options]
  * @augments {Application<Options>}
  *
  * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
@@ -161,12 +160,12 @@ export class SvelteApplication extends Application
    /**
     * Specifies the default options that SvelteApplication supports.
     *
-    * @returns {import('./types').SvelteApplicationOptions} options - Application options.
+    * @returns {import('./types').SvelteApp.Options} options - Application options.
     * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
     */
    static get defaultOptions()
    {
-      return /** @type {import('./types').SvelteApplicationOptions} */ deepMerge(super.defaultOptions, {
+      return /** @type {import('./types').SvelteApp.Options} */ deepMerge(super.defaultOptions, {
          defaultCloseAnimation: true,     // If false the default slide close animation is not run.
          draggable: true,                 // If true then application shells are draggable.
          focusAuto: true,                 // When true auto-management of app focus is enabled.
@@ -477,7 +476,7 @@ export class SvelteApplication extends Application
       this.reactive.updateHeaderButtons();
 
       // Create a function to generate a callback for Svelte components to invoke to update the tracked elements for
-      // application shells in the rare cases that the main element root changes. The update is only trigged on
+      // application shells in the rare cases that the main element root changes. The update is only triggered on
       // successive changes of `elementRoot`. Returns a boolean to indicate the element roots are updated.
       const elementRootUpdate = () =>
       {

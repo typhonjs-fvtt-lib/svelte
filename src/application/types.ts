@@ -105,145 +105,179 @@ declare global {
       title: string;
    }
 }
-
-/**
- * Options for SvelteApplication. Note: that this extends the Foundry `ApplicationOptions`.
+/*
+   externalContext.application = app;
+   externalContext.elementRootUpdate = elementRootUpdate;
+   externalContext.sessionStorage = app.reactive.sessionStorage;
  */
-interface SvelteApplicationOptions extends ApplicationOptions
-{
+declare namespace SvelteApp {
    /**
-    * If false the default slide close animation is not run.
-    *
-    * @defaultValue true
+    * Svelte context interfaces for {@link SvelteApplication}.
     */
-   defaultCloseAnimation: boolean;
+   export namespace Context {
+      /**
+       * The `#external` context.
+       */
+      export interface External<App extends import('./SvelteApplication').SvelteApplication = import('./SvelteApplication').SvelteApplication> {
+         /**
+          * The external application instance.
+          */
+         application: App;
+
+         /**
+          * Create a function to generate a callback for Svelte components to invoke to update the tracked elements for
+          * application shells in the external application instance. There are rare cases that the main element root
+          * changes in a mounted application component. The update is only triggered on successive changes of
+          * `elementRoot`. Returns a boolean to indicate the element roots are updated.
+          */
+         elementRootUpdate: () => (elementRoot: HTMLElement) => boolean;
+
+         /**
+          * The session storage store manager associated with the external application.
+          */
+         sessionStorage: WebStorage;
+      }
+   }
 
    /**
-    * If true then application shells are draggable.
-    *
-    * @defaultValue true
+    * Options for SvelteApplication. Note: that this extends the Foundry `ApplicationOptions`.
     */
-   draggable: boolean;
+   interface Options extends ApplicationOptions
+   {
+      /**
+       * If false the default slide close animation is not run.
+       *
+       * @defaultValue true
+       */
+      defaultCloseAnimation: boolean;
 
-   /**
-    * When true auto-management of app focus is enabled.
-    *
-    * @defaultValue true
-    */
-   focusAuto: boolean;
+      /**
+       * If true then application shells are draggable.
+       *
+       * @defaultValue true
+       */
+      draggable: boolean;
 
-   /**
-    * When `focusAuto` and `focusKeep` is true; keeps internal focus.
-    *
-    * @defaultValue false
-    */
-   focusKeep: boolean;
+      /**
+       * When true auto-management of app focus is enabled.
+       *
+       * @defaultValue true
+       */
+      focusAuto: boolean;
 
-   /**
-    * Defines A11yHelper focus source to apply when application closes.
-    *
-    * @defaultValue: undefined
-    */
-   focusSource: A11yFocusSource;
+      /**
+       * When `focusAuto` and `focusKeep` is true; keeps internal focus.
+       *
+       * @defaultValue false
+       */
+      focusKeep: boolean;
 
-   /**
-    * When true focus trapping / wrapping is enabled keeping focus inside app.
-    *
-    * @defaultValue true
-    */
-   focusTrap: boolean;
+      /**
+       * Defines A11yHelper focus source to apply when application closes.
+       *
+       * @defaultValue: undefined
+       */
+      focusSource: A11yFocusSource;
 
-   /**
-    * If true then the close header button is removed.
-    *
-    * @defaultValue false
-    */
-   headerButtonNoClose: boolean;
+      /**
+       * When true focus trapping / wrapping is enabled keeping focus inside app.
+       *
+       * @defaultValue true
+       */
+      focusTrap: boolean;
 
-   /**
-    * If true then header button labels are removed.
-    *
-    * @defaultValue false
-    */
-   headerButtonNoLabel: boolean;
+      /**
+       * If true then the close header button is removed.
+       *
+       * @defaultValue false
+       */
+      headerButtonNoClose: boolean;
 
-   /**
-    * Sets a header icon given an image URL.
-    *
-    * @defaultValue undefined
-    */
-   headerIcon: string;
+      /**
+       * If true then header button labels are removed.
+       *
+       * @defaultValue false
+       */
+      headerButtonNoLabel: boolean;
 
-   /**
-    * If true then header title is hidden when minimized.
-    *
-    * @defaultValue false
-    */
-   headerNoTitleMinimized: boolean;
+      /**
+       * Sets a header icon given an image URL.
+       *
+       * @defaultValue undefined
+       */
+      headerIcon: string;
 
-   /**
-    * Assigned to position. Number specifying minimum window height.
-    *
-    * @defaultValue 50
-    */
-   minHeight: number;
+      /**
+       * If true then header title is hidden when minimized.
+       *
+       * @defaultValue false
+       */
+      headerNoTitleMinimized: boolean;
 
-   /**
-    * Assigned to position. Number specifying minimum window width.
-    *
-    * @defaultValue 200
-    */
-   minWidth: number;
+      /**
+       * Assigned to position. Number specifying minimum window height.
+       *
+       * @defaultValue 50
+       */
+      minHeight: number;
 
-   /**
-    * If false then `position.set` does not take effect.
-    *
-    * @defaultValue true
-    */
-   positionable: boolean;
+      /**
+       * Assigned to position. Number specifying minimum window width.
+       *
+       * @defaultValue 200
+       */
+      minWidth: number;
 
-   /**
-    * A helper for initial position placement.
-    *
-    * @defaultValue TJSPosition.Initial.browserCentered
-    */
-   positionInitial: System.Initial.InitialSystem;
+      /**
+       * If false then `position.set` does not take effect.
+       *
+       * @defaultValue true
+       */
+      positionable: boolean;
 
-   /**
-    * When true TJSPosition is optimized for orthographic use.
-    *
-    * @defaultValue true
-    */
-   positionOrtho: boolean;
+      /**
+       * A helper for initial position placement.
+       *
+       * @defaultValue TJSPosition.Initial.browserCentered
+       */
+      positionInitial: System.Initial.InitialSystem;
 
-   /**
-    * A validator function or data or list of validators.
-    *
-    * @defaultValue TJSPosition.Validators.transformWindow
-    */
-   positionValidator: ValidatorAPI.ValidatorOption;
+      /**
+       * When true TJSPosition is optimized for orthographic use.
+       *
+       * @defaultValue true
+       */
+      positionOrtho: boolean;
 
-   /**
-    * An instance of WebStorage (session) to share across SvelteApplications. This is only required to share a
-    * WebStorage instance across multiple SvelteApplications. By default, a unique
-    * {@link #runtime/svelte/store/web-storage|TJSSessionStorage} instance is created per SvelteApplication.
-    *
-    * @defaultValue TJSSessionStorage
-    */
-   sessionStorage: WebStorage;
+      /**
+       * A validator function or data or list of validators.
+       *
+       * @defaultValue TJSPosition.Validators.transformWindow
+       */
+      positionValidator: ValidatorAPI.ValidatorOption;
 
-   /**
-    * A Svelte configuration object defining the main component.
-    *
-    */
-   svelte: TJSSvelteConfig;
+      /**
+       * An instance of WebStorage (session) to share across SvelteApplications. This is only required to share a
+       * WebStorage instance across multiple SvelteApplications. By default, a unique
+       * {@link #runtime/svelte/store/web-storage|TJSSessionStorage} instance is created per SvelteApplication.
+       *
+       * @defaultValue TJSSessionStorage
+       */
+      sessionStorage: WebStorage;
 
-   /**
-    * By default, 'top / left' respects rotation when minimizing.
-    *
-    * @defaultValue 'top left'
-    */
-   transformOrigin: TransformAPI.TransformOrigin;
+      /**
+       * A Svelte configuration object defining the main component.
+       *
+       */
+      svelte: TJSSvelteConfig;
+
+      /**
+       * By default, 'top / left' respects rotation when minimizing.
+       *
+       * @defaultValue 'top left'
+       */
+      transformOrigin: TransformAPI.TransformOrigin;
+   }
 }
 
-export { SvelteApplicationOptions };
+export { SvelteApp };

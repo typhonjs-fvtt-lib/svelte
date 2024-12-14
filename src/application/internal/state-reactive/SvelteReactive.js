@@ -23,7 +23,7 @@ import {
  * - {@link SvelteReactive.minimized}
  * - {@link SvelteReactive.resizing}
  *
- * There are also reactive getters / setters for {@link SvelteApplicationOptions} and Foundry
+ * There are also reactive getters / setters for {@link SvelteApp.Options} and Foundry
  * `ApplicationOptions`. You can use the following as one way bindings and update the
  * associated stores. For two-way bindings / stores see {@link SvelteReactive.storeAppOptions}.
  *
@@ -43,7 +43,7 @@ import {
  *
  * An instance of TJSWebStorage (session) / TJSSessionStorage is accessible via {@link SvelteReactive.sessionStorage}.
  * Optionally you can pass in an existing TJSWebStorage instance that can be shared across multiple SvelteApplications
- * by setting {@link SvelteApplicationOptions.sessionStorage}.
+ * by setting {@link SvelteApp.Options.sessionStorage}.
  *
  * -------------------------------------------------------------------------------------------------------------------
  *
@@ -312,7 +312,7 @@ export class SvelteReactive
    get popOut() { return this.#application.popOut; }
 
    /**
-    * Returns the positionable app option; {@link SvelteApplicationOptions.positionable}
+    * Returns the positionable app option; {@link SvelteApp.Options.positionable}
     *
     * @returns {boolean} Positionable app option.
     */
@@ -534,7 +534,7 @@ export class SvelteReactive
    }
 
    /**
-    * Serializes the main {@link SvelteApplicationOptions} for common application state.
+    * Serializes the main {@link SvelteApp.Options} for common application state.
     *
     * @returns {import('./types').SvelteReactiveData} Common application state.
     */
@@ -560,8 +560,8 @@ export class SvelteReactive
     * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
     * the new buttons.
     *
-    * Optionally you can set in the SvelteApplication app options {@link SvelteApplicationOptions.headerButtonNoClose}
-    * to remove the close button and {@link SvelteApplicationOptions.headerButtonNoLabel} to true and labels will be
+    * Optionally you can set in the SvelteApplication app options {@link SvelteApp.Options.headerButtonNoClose}
+    * to remove the close button and {@link SvelteApp.Options.headerButtonNoLabel} to true and labels will be
     * removed from the header buttons.
     *
     * @param {object} [opts] - Optional parameters (for internal use)

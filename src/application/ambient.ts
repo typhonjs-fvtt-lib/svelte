@@ -1,4 +1,4 @@
-import { SvelteApplicationOptions } from './types';
+import { SvelteApp } from './types';
 
 declare global {
    interface Application<Options> {}
@@ -6,7 +6,7 @@ declare global {
 
 // @ts-ignore This is bundled and is not an error.
 declare module '@typhonjs-fvtt/svelte/application' {
-   export interface SvelteApplication<Options extends SvelteApplicationOptions> extends Application<Options>
+   export interface SvelteApplication<Options extends SvelteApp.Options> extends Application<Options>
    {
       options: Options;
    }
