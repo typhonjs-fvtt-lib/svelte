@@ -216,9 +216,6 @@ for (const gsapFile of gsapFiles)
    fs.writeFileSync(gsapFile, fileData);
 }
 
-// Application Ambient TS declarations
-await generateDTS({ input: './src/application/ambient-ts/index.js', output: './_dist/application/ambient-ts/index.d.ts', importsExternal: true });
-
 // Svelte components
 await generateDTS({ input: './_dist/component/application/index.js' });
 await generateDTS({ input: './_dist/component/internal/index.js' });
