@@ -522,7 +522,7 @@ class GetSvelteData
  * - {@link SvelteReactive.minimized}
  * - {@link SvelteReactive.resizing}
  *
- * There are also reactive getters / setters for {@link SvelteApplicationOptions} and Foundry
+ * There are also reactive getters / setters for {@link SvelteApp.Options} and Foundry
  * `ApplicationOptions`. You can use the following as one way bindings and update the
  * associated stores. For two-way bindings / stores see {@link SvelteReactive.storeAppOptions}.
  *
@@ -542,7 +542,7 @@ class GetSvelteData
  *
  * An instance of TJSWebStorage (session) / TJSSessionStorage is accessible via {@link SvelteReactive.sessionStorage}.
  * Optionally you can pass in an existing TJSWebStorage instance that can be shared across multiple SvelteApplications
- * by setting {@link SvelteApplicationOptions.sessionStorage}.
+ * by setting {@link SvelteApp.Options.sessionStorage}.
  *
  * -------------------------------------------------------------------------------------------------------------------
  *
@@ -811,7 +811,7 @@ class SvelteReactive
    get popOut() { return this.#application.popOut; }
 
    /**
-    * Returns the positionable app option; {@link SvelteApplicationOptions.positionable}
+    * Returns the positionable app option; {@link SvelteApp.Options.positionable}
     *
     * @returns {boolean} Positionable app option.
     */
@@ -1033,7 +1033,7 @@ class SvelteReactive
    }
 
    /**
-    * Serializes the main {@link SvelteApplicationOptions} for common application state.
+    * Serializes the main {@link SvelteApp.Options} for common application state.
     *
     * @returns {import('./types').SvelteReactiveData} Common application state.
     */
@@ -1059,8 +1059,8 @@ class SvelteReactive
     * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
     * the new buttons.
     *
-    * Optionally you can set in the SvelteApplication app options {@link SvelteApplicationOptions.headerButtonNoClose}
-    * to remove the close button and {@link SvelteApplicationOptions.headerButtonNoLabel} to true and labels will be
+    * Optionally you can set in the SvelteApplication app options {@link SvelteApp.Options.headerButtonNoClose}
+    * to remove the close button and {@link SvelteApp.Options.headerButtonNoLabel} to true and labels will be
     * removed from the header buttons.
     *
     * @param {object} [opts] - Optional parameters (for internal use)
@@ -1499,10 +1499,9 @@ class FoundryHMRSupport
 /**
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
- * {@link #runtime/svelte/util|TJSSvelteConfig} object in the SvelteApplicationOptions `options`
- * {@link SvelteApplicationOptions.svelte} property.
+ * {@link #runtime/svelte/util|TJSSvelteConfig} object in the {@link SvelteApp.Options.svelte} property.
  *
- * @template [Options = import('./types').SvelteApplicationOptions]
+ * @template [Options = import('./types').SvelteApp.Options]
  * @augments {Application<Options>}
  *
  * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
@@ -1596,9 +1595,7 @@ class SvelteApplication extends Application
    #stores;
 
    /**
-    * @param {Options} options - The options for the application.
-    *
-    * @inheritDoc
+    * @param {Partial<Options>} [options] - The options for the application.
     */
    constructor(options = {})
    {
@@ -1644,12 +1641,12 @@ class SvelteApplication extends Application
    /**
     * Specifies the default options that SvelteApplication supports.
     *
-    * @returns {import('./types').SvelteApplicationOptions} options - Application options.
+    * @returns {import('./types').SvelteApp.Options} options - Application options.
     * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
     */
    static get defaultOptions()
    {
-      return /** @type {import('./types').SvelteApplicationOptions} */ deepMerge(super.defaultOptions, {
+      return /** @type {import('./types').SvelteApp.Options} */ deepMerge(super.defaultOptions, {
          defaultCloseAnimation: true,     // If false the default slide close animation is not run.
          draggable: true,                 // If true then application shells are draggable.
          focusAuto: true,                 // When true auto-management of app focus is enabled.
@@ -1960,7 +1957,7 @@ class SvelteApplication extends Application
       this.reactive.updateHeaderButtons();
 
       // Create a function to generate a callback for Svelte components to invoke to update the tracked elements for
-      // application shells in the rare cases that the main element root changes. The update is only trigged on
+      // application shells in the rare cases that the main element root changes. The update is only triggered on
       // successive changes of `elementRoot`. Returns a boolean to indicate the element roots are updated.
       const elementRootUpdate = () =>
       {
@@ -3050,7 +3047,7 @@ class TJSDialogData
  * There are a couple of static helper methods to quickly create standard dialogs such as a 'yes' / 'no' confirmation
  * dialog with {@link TJSDialog.confirm} and an 'ok' single button dialog with {@link TJSDialog.prompt}.
  *
- * @template [Options = import('./types').SvelteApplicationOptions]
+ * @template [Options = import('./types').SvelteApp.Options]
  * @augments {SvelteApplication<Options>}
  */
 class TJSDialog extends SvelteApplication
@@ -3069,6 +3066,7 @@ class TJSDialog extends SvelteApplication
    constructor(data, options = {})
    {
       // Note: explicit setting of `popOutModuleDisable` to prevent the PopOut! module from acting on modal dialogs.
+      // @ts-expect-error
       super({ popOutModuleDisable: data?.modal ?? false, ...options });
 
       this.#managedPromise = new ManagedPromise();
@@ -3093,7 +3091,7 @@ class TJSDialog extends SvelteApplication
     * content even if it changes. The default `DialogShell` / `svelte` options should not be changed and instead mount
     * the dialog content component by supplying a Svelte configuration object to dialog data `content` field.
     *
-    * @returns {import('./types').SvelteApplicationOptions} Default options
+    * @returns {import('./types').SvelteApp.Options} Default options
     */
    static get defaultOptions()
    {
@@ -3242,7 +3240,7 @@ class TJSDialog extends SvelteApplication
     *        async function. When defined as a string any matching function by name exported from content Svelte
     *        component is invoked.
     *
-    * @param {import('./types').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
+    * @param {import('./types').SvelteApp.Options}  [options]  SvelteApplication options passed to the TJSDialog
     *        constructor.
     *
     * @returns {Promise<T>} A promise which resolves with result of yes / no callbacks or true / false.
@@ -3362,7 +3360,7 @@ class TJSDialog extends SvelteApplication
     *
     * @param {string}   [data.icon="fas fa-check"] - Set another icon besides `fas fa-check` for button.
     *
-    * @param {import('./types').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
+    * @param {import('./types').SvelteApp.Options}  [options]  SvelteApplication options passed to the TJSDialog
     *        constructor.
     *
     * @returns {Promise<T>} The returned value from the provided callback function or `true` if the button
@@ -3405,7 +3403,7 @@ class TJSDialog extends SvelteApplication
     * @param {import('./internal/state-dialog/types').TJSDialogOptions}  data - Dialog data passed to the TJSDialog
     *        constructor.
     *
-    * @param {import('./types').SvelteApplicationOptions}  [options]  SvelteApplication options passed to the TJSDialog
+    * @param {import('./types').SvelteApp.Options}  [options]  SvelteApplication options passed to the TJSDialog
     *        constructor.
     *
     * @returns {Promise<T>} A Promise that resolves to the chosen result.

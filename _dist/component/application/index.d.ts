@@ -1,4 +1,5 @@
 import { SvelteComponent } from 'svelte';
+import { Writable } from 'svelte/store';
 
 /**
  * Provides an application shell is a main top level slotted component that provides a reactive
@@ -481,7 +482,31 @@ declare namespace TjsGlassPane {
   export type Slots = { default: {} };
 }
 
+/**
+ * Provides the data and types for application shells.
+ */
+declare namespace AppShell {
+  /**
+   * All context data.
+   */
+  namespace Context {
+    /**
+     * The `#internal` context data.
+     */
+    interface Internal {
+      /**
+       * Returns stores holding the current `elementRoot` / `elementContent` instances.
+       */
+      get stores(): {
+        ['elementContent']: Writable<HTMLElement>;
+        ['elementRoot']: Writable<HTMLElement>;
+      };
+    }
+  }
+}
+
 export {
+  AppShell,
   ApplicationShell,
   EmptyApplicationShell,
   TjsApplicationShell as TJSApplicationShell,
