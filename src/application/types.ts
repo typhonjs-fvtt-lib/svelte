@@ -105,11 +105,7 @@ declare global {
       title: string;
    }
 }
-/*
-   externalContext.application = app;
-   externalContext.elementRootUpdate = elementRootUpdate;
-   externalContext.sessionStorage = app.reactive.sessionStorage;
- */
+
 declare namespace SvelteApp {
    /**
     * Svelte context interfaces for {@link SvelteApplication}.
