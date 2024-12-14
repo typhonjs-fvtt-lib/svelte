@@ -1691,7 +1691,7 @@ declare global {
   interface Application<Options> {}
 }
 declare module '@typhonjs-fvtt/svelte/application' {
-  interface SvelteApplication<Options extends SvelteApp.Options> extends Application<Options> {
+  interface SvelteApplication<Options extends SvelteApp.Options = SvelteApp.Options> extends Application<Options> {
     options: Options;
   }
 }
