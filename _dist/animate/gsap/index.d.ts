@@ -326,7 +326,7 @@ declare namespace Action {
 
 /**
  * Provides an action to enable pointer dragging of an HTMLElement using GSAP `to` or `quickTo` to invoke `position.set`
- * on a given {@link TJSPosition} instance provided. You may provide a
+ * on a given {@link #runtime/svelte/store/position!TJSPosition} instance provided. You may provide a
  * `easeOptions` object sent to the tween to modify the duration / easing. When the attached boolean store state
  * changes the draggable action is enabled or disabled.
  *
@@ -406,7 +406,8 @@ declare namespace Compose {
 }
 
 /**
- * Provides a data driven ways to connect a {@link TJSPosition} instance with a GSAP timeline and tweens.
+ * Provides a data driven ways to connect a {@link #runtime/svelte/store/position!TJSPosition} instance with a GSAP
+ * timeline and tweens.
  *
  * {@link GsapPosition.timeline} supports the following types: 'add', 'addLabel', 'addPause', 'call', 'from',
  * 'fromTo', 'set', 'to'.

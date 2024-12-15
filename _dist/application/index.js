@@ -116,7 +116,8 @@ class ApplicationState
    /**
     * Restores a previously saved application state by `name` returning the data. Several optional parameters are
     * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
-    * {@link AnimationAPI.to} and the duration and easing name or function may be specified.
+    * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
+    * specified.
     *
     * @param {object}            options - Options.
     *
@@ -191,7 +192,8 @@ class ApplicationState
    /**
     * Sets application state from the given {@link ApplicationStateData} instance. Several optional parameters are
     * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
-    * {@link AnimationAPI.to} and the duration and easing name or function may be specified.
+    * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
+    * specified.
     *
     * Note: If serializing application state any minimized apps will use the before minimized state on initial render
     * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
@@ -217,7 +219,8 @@ class ApplicationState
    /**
     * Sets application state from the given {@link ApplicationStateData} instance. Several optional parameters are
     * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
-    * {@link AnimationAPI.to} and the duration and easing name or function may be specified.
+    * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
+    * specified.
     *
     * Note: If serializing application state any minimized apps will use the before minimized state on initial render
     * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
@@ -1499,7 +1502,7 @@ class FoundryHMRSupport
 /**
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
- * {@link #runtime/svelte/util|TJSSvelteConfig} object in the {@link SvelteApp.Options.svelte} property.
+ * {@link #runtime/svelte/util!TJSSvelteConfig} object in the {@link SvelteApp.Options.svelte} property.
  *
  * @template [Options = import('./types').SvelteApp.Options]
  * @augments {Application<Options>}
@@ -2418,8 +2421,8 @@ class SvelteApplication extends Application
    }
 
    /**
-    * All calculation and updates of position are implemented in {@link TJSPosition.set}. This allows position to be
-    * fully reactive and in control of updating inline styles for the application.
+    * All calculation and updates of position are implemented in {@link #runtime/svelte/store/position!TJSPosition.set}.
+    * This allows position to be fully reactive and in control of updating inline styles for the application.
     *
     * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
     * to update to using the {@link TJSPosition.validators} / ValidatorAPI functionality.

@@ -620,7 +620,7 @@ declare interface ApplicationState {
   /**
    * Restores a previously saved application state by `name` returning the data. Several optional parameters are
    * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
-   * {@link AnimationAPI.to} and the duration and easing name or function may be specified.
+   * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be specified.
    *
    * @param {object}            options - Parameters
    *
@@ -664,7 +664,8 @@ declare interface ApplicationState {
   /**
    * Sets application state from the given {@link ApplicationStateData} instance. Several optional parameters are
    * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
-   * {@link AnimationAPI.to} and the duration and easing name or function may be specified.
+   * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
+   * specified.
    *
    * Note: If serializing application state any minimized apps will use the before minimized state on initial render
    * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
@@ -723,90 +724,6 @@ type ApplicationStateData = {
   };
 };
 
-declare global {
-  interface ApplicationOptions {
-    /**
-     * A named `base application` which generates an additional hook.
-     *
-     * @defaultValue `null`
-     */
-    baseApplication: string | null;
-    /**
-     * The default pixel height for app. You may also use relative units including percentages.
-     *
-     * {@link #runtime/svelte/store/position|Data.TJSPositionDataRelative}.
-     *
-     * @defaultValue `null`
-     */
-    width: number | string | null;
-    /**
-     * The default pixel height for app. You may also use relative units including percentages.
-     *
-     * {@link #runtime/svelte/store/position|Data.TJSPositionDataRelative}.
-     *
-     * @defaultValue `null`
-     */
-    height: number | string | null;
-    /**
-     * The default top offset position for app. You may also use relative units including percentages.
-     *
-     * {@link #runtime/svelte/store/position|Data.TJSPositionDataRelative}.
-     *
-     * @defaultValue `null`
-     */
-    top: number | string | null;
-    /**
-     * The default left offset position for app. You may also use relative units including percentages.
-     *
-     * {@link #runtime/svelte/store/position|Data.TJSPositionDataRelative}.
-     *
-     * @defaultValue `null`
-     */
-    left: number | string | null;
-    /**
-     * A transformation scale for the app.
-     *
-     * @defaultValue `null`
-     */
-    scale: number | null;
-    /**
-     * Whether to display the application as a pop-out container.
-     *
-     * @defaultValue `true`
-     */
-    popOut: boolean;
-    /**
-     * Whether the rendered application can be minimized (popOut only).
-     *
-     * @defaultValue `true`
-     */
-    minimizable: boolean;
-    /**
-     * Whether the rendered application can be drag-resized (popOut only).
-     *
-     * @defaultValue `false`
-     */
-    resizable: boolean;
-    /**
-     * The default CSS id to assign to the rendered HTML.
-     *
-     * @defaultValue `""`
-     */
-    id: string;
-    /**
-     * An array of CSS string classes to apply to the rendered HTML.
-     *
-     * @defaultValue `[]`
-     */
-    classes: string[];
-    /**
-     * A default window title string (popOut only); may be a language key.
-     *
-     * @defaultValue `""`
-     */
-    title: string;
-  }
-}
 declare namespace SvelteApp {
   /**
    * Svelte context interfaces for {@link SvelteApplication}.
@@ -936,7 +853,7 @@ declare namespace SvelteApp {
     /**
      * An instance of WebStorage (session) to share across SvelteApplications. This is only required to share a
      * WebStorage instance across multiple SvelteApplications. By default, a unique
-     * {@link #runtime/svelte/store/web-storage|TJSSessionStorage} instance is created per SvelteApplication.
+     * {@link #runtime/svelte/store/web-storage!TJSSessionStorage} instance is created per SvelteApplication.
      *
      * @defaultValue TJSSessionStorage
      */
@@ -952,20 +869,55 @@ declare namespace SvelteApp {
      * @defaultValue 'top left'
      */
     transformOrigin: TransformAPI.TransformOrigin;
+    /**
+     * The default pixel height for app. You may also use relative units including percentages.
+     *
+     * {@link #runtime/svelte/store/position!Data.TJSPositionDataRelative}.
+     *
+     * @defaultValue `null`
+     */
+    width: number | string | null;
+    /**
+     * The default pixel height for app. You may also use relative units including percentages.
+     *
+     * {@link #runtime/svelte/store/position!Data.TJSPositionDataRelative}.
+     *
+     * @defaultValue `null`
+     */
+    height: number | string | null;
+    /**
+     * The default top offset position for app. You may also use relative units including percentages.
+     *
+     * {@link #runtime/svelte/store/position!Data.TJSPositionDataRelative}.
+     *
+     * @defaultValue `null`
+     */
+    top: number | string | null;
+    /**
+     * The default left offset position for app. You may also use relative units including percentages.
+     *
+     * {@link #runtime/svelte/store/position!Data.TJSPositionDataRelative}.
+     *
+     * @defaultValue `null`
+     */
+    left: number | string | null;
   }
 }
 
 /**
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
- * {@link #runtime/svelte/util|TJSSvelteConfig} object in the {@link SvelteApp.Options.svelte} property.
+ * {@link #runtime/svelte/util!TJSSvelteConfig} object in the {@link SvelteApp.Options.svelte} property.
  *
  * @template [Options = import('./types').SvelteApp.Options]
  * @augments {Application<Options>}
  *
  * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
  */
-declare class SvelteApplication<Options = SvelteApp.Options> implements TJSPositionTypes.Positionable {
+declare class SvelteApplication<Options extends SvelteApp.Options = SvelteApp.Options>
+  extends Application<Options>
+  implements TJSPositionTypes.Positionable
+{
   /**
    * Specifies the default options that SvelteApplication supports.
    *
@@ -1062,8 +1014,8 @@ declare class SvelteApplication<Options = SvelteApp.Options> implements TJSPosit
    */
   onSvelteRemount(mountedAppShell?: MountedAppShell): void;
   /**
-   * All calculation and updates of position are implemented in {@link TJSPosition.set}. This allows position to be
-   * fully reactive and in control of updating inline styles for the application.
+   * All calculation and updates of position are implemented in {@link #runtime/svelte/store/position!TJSPosition.set}.
+   * This allows position to be fully reactive and in control of updating inline styles for the application.
    *
    * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
    * to update to using the {@link TJSPosition.validators} / ValidatorAPI functionality.
@@ -1535,7 +1487,7 @@ type TJSDialogModalOptions = {
  * @template [Options = import('./types').SvelteApp.Options]
  * @augments {SvelteApplication<Options>}
  */
-declare class TJSDialog<Options = SvelteApp.Options> extends SvelteApplication<Options> {
+declare class TJSDialog<Options extends SvelteApp.Options = SvelteApp.Options> extends SvelteApplication<Options> {
   /**
    * A helper factory method to create simple confirmation dialog windows which consist of simple yes / no prompts.
    * If you require more flexibility, a custom TJSDialog instance is preferred. The default focused button is 'yes'.
@@ -1685,15 +1637,6 @@ declare class TJSDialog<Options = SvelteApp.Options> extends SvelteApplication<O
    */
   wait<T>(options?: { reuse?: boolean }): Promise<T>;
   #private;
-}
-
-declare global {
-  interface Application<Options> {}
-}
-declare module '@typhonjs-fvtt/svelte/application' {
-  interface SvelteApplication<Options extends SvelteApp.Options = SvelteApp.Options> extends Application<Options> {
-    options: Options;
-  }
 }
 
 export {
