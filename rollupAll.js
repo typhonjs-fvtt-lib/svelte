@@ -58,9 +58,17 @@ const dtsReplacePositionGetter = `    get elementTarget(): HTMLElement;
 const applicationDTSOptions = {
    dtsReplace: {
       ...dtsReplace,
-      'get elementTarget\\(\\): HTMLElement;': dtsReplacePositionGetter
+      'get elementTarget\\(\\): HTMLElement;': dtsReplacePositionGetter,
+
+      // The following replacements handle cases where JSDoc can't properly define generic extends clauses.
+      'SvelteApplication<Options = SvelteApp.Options>': 'SvelteApplication<Options extends SvelteApp.Options = SvelteApp.Options> extends Application<Options> ',
+      '<Options = SvelteApp.Options>': '<Options extends SvelteApp.Options = SvelteApp.Options>',
+
+      // The following replacement is to handle `SvelteApp.Options` extension of Foundry core `ApplicationOptions`.
+      'interface Options': 'interface Options extends ApplicationOptions'
    },
-   rollupExternal: external
+   rollupExternal: external,
+   logLevel: 'debug',
 };
 
 // -------------------------------------------------------------------------------------------------------------------
