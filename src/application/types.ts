@@ -9,103 +9,6 @@ import type { WebStorage }          from '#runtime/svelte/store/web-storage';
 
 import { TJSSvelteConfig }          from '#runtime/svelte/util';
 
-declare global {
-   interface ApplicationOptions
-   {
-      /**
-       * A named `base application` which generates an additional hook.
-       *
-       * @defaultValue `null`
-       */
-      baseApplication: string | null;
-
-      /**
-       * The default pixel height for app. You may also use relative units including percentages.
-       *
-       * {@link #runtime/svelte/store/position|Data.TJSPositionDataRelative}.
-       *
-       * @defaultValue `null`
-       */
-      width: number | string | null;
-
-      /**
-       * The default pixel height for app. You may also use relative units including percentages.
-       *
-       * {@link #runtime/svelte/store/position|Data.TJSPositionDataRelative}.
-       *
-       * @defaultValue `null`
-       */
-      height: number | string | null;
-
-      /**
-       * The default top offset position for app. You may also use relative units including percentages.
-       *
-       * {@link #runtime/svelte/store/position|Data.TJSPositionDataRelative}.
-       *
-       * @defaultValue `null`
-       */
-      top: number | string | null;
-
-      /**
-       * The default left offset position for app. You may also use relative units including percentages.
-       *
-       * {@link #runtime/svelte/store/position|Data.TJSPositionDataRelative}.
-       *
-       * @defaultValue `null`
-       */
-      left: number | string |  null;
-
-      /**
-       * A transformation scale for the app.
-       *
-       * @defaultValue `null`
-       */
-      scale: number | null;
-
-      /**
-       * Whether to display the application as a pop-out container.
-       *
-       * @defaultValue `true`
-       */
-      popOut: boolean;
-
-      /**
-       * Whether the rendered application can be minimized (popOut only).
-       *
-       * @defaultValue `true`
-       */
-      minimizable: boolean;
-
-      /**
-       * Whether the rendered application can be drag-resized (popOut only).
-       *
-       * @defaultValue `false`
-       */
-      resizable: boolean;
-
-      /**
-       * The default CSS id to assign to the rendered HTML.
-       *
-       * @defaultValue `""`
-       */
-      id: string;
-
-      /**
-       * An array of CSS string classes to apply to the rendered HTML.
-       *
-       * @defaultValue `[]`
-       */
-      classes: string[];
-
-      /**
-       * A default window title string (popOut only); may be a language key.
-       *
-       * @defaultValue `""`
-       */
-      title: string;
-   }
-}
-
 declare namespace SvelteApp {
    /**
     * Svelte context interfaces for {@link SvelteApplication}.
@@ -138,7 +41,7 @@ declare namespace SvelteApp {
    /**
     * Options for SvelteApplication. Note: that this extends the Foundry `ApplicationOptions`.
     */
-   interface Options extends ApplicationOptions
+   interface Options
    {
       /**
        * If false the default slide close animation is not run.
@@ -255,7 +158,7 @@ declare namespace SvelteApp {
       /**
        * An instance of WebStorage (session) to share across SvelteApplications. This is only required to share a
        * WebStorage instance across multiple SvelteApplications. By default, a unique
-       * {@link #runtime/svelte/store/web-storage|TJSSessionStorage} instance is created per SvelteApplication.
+       * {@link #runtime/svelte/store/web-storage!TJSSessionStorage} instance is created per SvelteApplication.
        *
        * @defaultValue TJSSessionStorage
        */
@@ -273,6 +176,44 @@ declare namespace SvelteApp {
        * @defaultValue 'top left'
        */
       transformOrigin: TransformAPI.TransformOrigin;
+
+      // The following are overrides of core Foundry `ApplicationOptions` providing type expansion and comments.
+
+      /**
+       * The default pixel height for app. You may also use relative units including percentages.
+       *
+       * {@link #runtime/svelte/store/position!Data.TJSPositionDataRelative}.
+       *
+       * @defaultValue `null`
+       */
+      width: number | string | null;
+
+      /**
+       * The default pixel height for app. You may also use relative units including percentages.
+       *
+       * {@link #runtime/svelte/store/position!Data.TJSPositionDataRelative}.
+       *
+       * @defaultValue `null`
+       */
+      height: number | string | null;
+
+      /**
+       * The default top offset position for app. You may also use relative units including percentages.
+       *
+       * {@link #runtime/svelte/store/position!Data.TJSPositionDataRelative}.
+       *
+       * @defaultValue `null`
+       */
+      top: number | string | null;
+
+      /**
+       * The default left offset position for app. You may also use relative units including percentages.
+       *
+       * {@link #runtime/svelte/store/position!Data.TJSPositionDataRelative}.
+       *
+       * @defaultValue `null`
+       */
+      left: number | string |  null;
    }
 }
 

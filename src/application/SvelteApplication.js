@@ -18,7 +18,7 @@ import {
 /**
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
- * {@link #runtime/svelte/util|TJSSvelteConfig} object in the {@link SvelteApp.Options.svelte} property.
+ * {@link #runtime/svelte/util!TJSSvelteConfig} object in the {@link SvelteApp.Options.svelte} property.
  *
  * @template [Options = import('./types').SvelteApp.Options]
  * @augments {Application<Options>}
@@ -937,8 +937,8 @@ export class SvelteApplication extends Application
    }
 
    /**
-    * All calculation and updates of position are implemented in {@link TJSPosition.set}. This allows position to be
-    * fully reactive and in control of updating inline styles for the application.
+    * All calculation and updates of position are implemented in {@link #runtime/svelte/store/position!TJSPosition.set}.
+    * This allows position to be fully reactive and in control of updating inline styles for the application.
     *
     * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
     * to update to using the {@link TJSPosition.validators} / ValidatorAPI functionality.
