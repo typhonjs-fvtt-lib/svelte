@@ -59,7 +59,7 @@ declare interface ApplicationState {
    /**
     * Restores a previously saved application state by `name` returning the data. Several optional parameters are
     * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
-    * {@link AnimationAPI.to} and the duration and easing name or function may be specified.
+    * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be specified.
     *
     * @param {object}            options - Parameters
     *
@@ -102,7 +102,8 @@ declare interface ApplicationState {
    /**
     * Sets application state from the given {@link ApplicationStateData} instance. Several optional parameters are
     * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
-    * {@link AnimationAPI.to} and the duration and easing name or function may be specified.
+    * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
+    * specified.
     *
     * Note: If serializing application state any minimized apps will use the before minimized state on initial render
     * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
