@@ -165,10 +165,13 @@ declare namespace SvelteApp {
       sessionStorage: WebStorage;
 
       /**
-       * A Svelte configuration object defining the main component.
+       * A Svelte configuration object defining the main component loaded.
        *
+       * Note: that `svelte.class` and `svelte.target` is required and will cause an error if missing.
+       * `Partial<TJSSvelteConfig>` is used for the types to allow any sort of late binding to the options defining the
+       * required SvelteComponent `class` and `target` properties.
        */
-      svelte: TJSSvelteConfig;
+      svelte: Partial<TJSSvelteConfig>;
 
       /**
        * By default, 'top / left' respects rotation when minimizing.
