@@ -66,17 +66,6 @@ export class TJSDialog extends SvelteApplication
 
       this.#data = new TJSDialogData(this);
       this.#data.replace(data);
-
-      /**
-       * @member {object} dialogComponent - A getter to SvelteData to retrieve any mounted Svelte component as the
-       *                                    dialog content.
-       *
-       * @memberof GetSvelteData#
-       * @readonly
-       */
-      Object.defineProperty(this.svelte, 'dialogComponent', {
-         get: () => this.svelte?.appShell?.dialogComponent,
-      });
    }
 
    /**
@@ -88,7 +77,7 @@ export class TJSDialog extends SvelteApplication
     */
    static get defaultOptions()
    {
-      return deepMerge(super.defaultOptions, {
+      return /** @type {import('./types').SvelteApp.Options} */ deepMerge(super.defaultOptions, {
          classes: ['dialog', 'tjs-dialog'],
          width: 400,
          height: 'auto',
@@ -233,8 +222,8 @@ export class TJSDialog extends SvelteApplication
     *        async function. When defined as a string any matching function by name exported from content Svelte
     *        component is invoked.
     *
-    * @param {import('./types').SvelteApp.Options}  [options]  SvelteApplication options passed to the TJSDialog
-    *        constructor.
+    * @param {Partial<import('./types').SvelteApp.Options>}  [options]  SvelteApplication options passed to the
+    *        TJSDialog constructor.
     *
     * @returns {Promise<T>} A promise which resolves with result of yes / no callbacks or true / false.
     *
@@ -306,7 +295,7 @@ export class TJSDialog extends SvelteApplication
 
          case 'string':
          {
-            const dialogComponent = application?.svelte?.dialogComponent;
+            const dialogComponent = application?.svelte?.appShell?.dialogComponent;
 
             // Attempt lookup by function name in dialog instance component.
             if (dialogComponent !== void 0 && typeof dialogComponent?.[callback] === 'function')
@@ -353,8 +342,8 @@ export class TJSDialog extends SvelteApplication
     *
     * @param {string}   [data.icon="fas fa-check"] - Set another icon besides `fas fa-check` for button.
     *
-    * @param {import('./types').SvelteApp.Options}  [options]  SvelteApplication options passed to the TJSDialog
-    *        constructor.
+    * @param {Partial<import('./types').SvelteApp.Options>}  [options]  SvelteApplication options passed to the
+    *        TJSDialog constructor.
     *
     * @returns {Promise<T>} The returned value from the provided callback function or `true` if the button
     *          is pressed.
@@ -396,8 +385,8 @@ export class TJSDialog extends SvelteApplication
     * @param {import('./internal/state-dialog/types').TJSDialogOptions}  data - Dialog data passed to the TJSDialog
     *        constructor.
     *
-    * @param {import('./types').SvelteApp.Options}  [options]  SvelteApplication options passed to the TJSDialog
-    *        constructor.
+    * @param {Partial<import('./types').SvelteApp.Options>}  [options]  SvelteApplication options passed to the
+    *        TJSDialog constructor.
     *
     * @returns {Promise<T>} A Promise that resolves to the chosen result.
     */
