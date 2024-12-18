@@ -214,6 +214,50 @@ for (const config of rollupConfigs)
    fs.writeFileSync('./_dist/application/index.d.ts', applicationIndexDTS);
 }
 
+// Copy components to dist -------------------------------------------------------------------------------------------
+
+fs.emptyDirSync('./_dist/component');
+fs.copySync('./src/component', './_dist/component');
+
+const compFiles = await getFileList({ dir: './_dist/component', resolve: true, walk: true });
+for (const compFile of compFiles)
+{
+   let fileData = fs.readFileSync(compFile, 'utf-8').toString();
+
+   // Ignore any `{@link #runtime...}` enclosed references.
+   fileData = fileData.replaceAll(/(?<!\{@link\s*)#runtime\//g, '@typhonjs-svelte/runtime-base/');
+
+   fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
+   fileData = fileData.replaceAll('\'#svelte', '\'svelte');
+
+   // For types
+   // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');
+
+   fs.writeFileSync(compFile, fileData);
+}
+
+// GSAP plugin loading code is also bespoke and must be copied over.
+
+fs.emptyDirSync('./_dist/animate/gsap/plugin');
+fs.copySync('./src/animate/gsap/plugin', './_dist/animate/gsap/plugin');
+
+const gsapFiles = await getFileList({ dir: './_dist/animate/gsap/plugin', resolve: true, walk: true });
+for (const gsapFile of gsapFiles)
+{
+   let fileData = fs.readFileSync(gsapFile, 'utf-8').toString();
+
+   // Ignore any `{@link #runtime...}` enclosed references.
+   fileData = fileData.replaceAll(/(?<!\{@link\s*)#runtime\//g, '@typhonjs-svelte/runtime-base/');
+
+   fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
+   fileData = fileData.replaceAll('\'#svelte', '\'svelte');
+
+   // For types
+   // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');
+
+   fs.writeFileSync(gsapFile, fileData);
+}
+
 // Svelte components
 await generateDTS({ input: './_dist/component/application/index.js' });
 await generateDTS({ input: './_dist/component/internal/index.js' });
