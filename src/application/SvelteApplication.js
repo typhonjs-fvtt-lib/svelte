@@ -37,7 +37,7 @@ export class SvelteApplication extends Application
    /**
     * Stores and manages application state for saving / restoring / serializing.
     *
-    * @type {ApplicationState}
+    * @type {import('./types').SvelteApp.API.State}
     */
    #applicationState;
 
@@ -125,7 +125,6 @@ export class SvelteApplication extends Application
          throw new Error(`SvelteApplication - constructor - No Svelte configuration object found in 'options'.`);
       }
 
-      /** @type {ApplicationState} */
       this.#applicationState = new ApplicationState(this);
 
       // Initialize TJSPosition with the position object set by Application.
@@ -212,7 +211,7 @@ export class SvelteApplication extends Application
    /**
     * Returns the application state manager.
     *
-    * @returns {import('./internal/state-app/types').ApplicationState} The application state manager.
+    * @returns {import('./types').SvelteApp.API.State} The application state manager.
     */
    get state() { return this.#applicationState; }
 

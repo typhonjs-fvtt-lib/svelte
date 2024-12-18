@@ -4,7 +4,10 @@ import type {
 
 import type { A11yFocusSource }     from '#runtime/util/a11y';
 
+import type { EasingReference }     from '#runtime/svelte/easing';
+
 import type {
+   Data as PositionData, // TODO REFACTOR
    System,
    ValidatorAPI,
    TransformAPI }                   from '#runtime/svelte/store/position';
@@ -15,6 +18,8 @@ import { TJSSvelteConfig }          from '#runtime/svelte/util';
 
 declare namespace SvelteApp {
    export namespace API {
+      // Reactive API ------------------------------------------------------------------------------------------------
+
       /**
        * Contains the reactive functionality / Svelte stores associated with SvelteApplication and retrievable by
        * {@link SvelteApplication.reactive}.
@@ -539,6 +544,158 @@ declare namespace SvelteApp {
              * Derived store for `resizing` updates.
              */
             resizing: Writable<boolean>;
+         };
+      }
+
+      // State API ---------------------------------------------------------------------------------------------------
+      /**
+       * Provides the ability the save / restore / serialize application state for positional and UI state such as minimized
+       * status.
+       *
+       * You can restore a saved state with animation; please see the options of {@link State.restore}.
+       */
+      export interface State {
+         /**
+          * Clears all saved application state.
+          */
+         clear(): void;
+
+         /**
+          * Returns current application state along with any extra data passed into method.
+          *
+          * @param [extra] - Extra data to add to application state.
+          *
+          * @returns Passed in object with current application state.
+          */
+         current(extra?: object): State.Data;
+
+         /**
+          * Gets any saved application state by name.
+          *
+          * @param options - Options.
+          *
+          * @param options.name - Saved data set name.
+          *
+          * @returns Any saved application state.
+          */
+         get({ name }: {
+            name: string;
+         }): State.Data | undefined;
+
+         /**
+          * @returns The saved application state names / keys.
+          */
+         keys(): IterableIterator<string>;
+
+         /**
+          * Removes and returns any saved application state by name.
+          *
+          * @param options - Options.
+          *
+          * @param options.name - Name to remove and retrieve.
+          *
+          * @returns Any saved application state.
+          */
+         remove({ name }: {
+            name: string;
+         }): State.Data | undefined;
+
+         /**
+          * Restores a previously saved application state by `name` returning the data. Several optional parameters are
+          * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
+          * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be specified.
+          *
+          * @param options - Parameters
+          *
+          * @param options.name - Saved data set name.
+          *
+          * @param [options.remove=false] - Remove data set.
+          *
+          * @param [options.animateTo=false] - Animate to restore data.
+          *
+          * @param [options.duration=0.1] - Duration in seconds.
+          *
+          * @param [options.ease='linear'] - Easing function name or function.
+          *
+          * @returns Any saved application state.
+          */
+         restore({ name, remove, animateTo, duration, ease }: {
+            name: string;
+            remove?: boolean;
+            animateTo?: boolean;
+            duration?: number;
+            ease?: EasingReference;
+         }): State.Data | undefined;
+
+         /**
+          * Saves current application state with the opportunity to add extra data to the saved state.
+          *
+          * @param options - Options.
+          *
+          * @param options.name - Name to index this saved state.
+          *
+          * @param [options.extra] - Extra data to add to saved state.
+          *
+          * @returns {State.Data} Current saved application state.
+          */
+         save({ name, ...extra }: {
+            name: string;
+            extra?: any[];
+         }): State.Data;
+
+         /**
+          * Sets application state from the given {@link State.Data} instance. Several optional parameters are
+          * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
+          * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
+          * specified.
+          *
+          * Note: If serializing application state any minimized apps will use the before minimized state on initial render
+          * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
+          *
+          * @param data - Saved data set name.
+          *
+          * @param [options] - Optional parameters
+          *
+          * @param [options.animateTo=false] - Animate to restore data.
+          *
+          * @param [options.duration=0.1] - Duration in seconds.
+          *
+          * @param [options.ease='linear'] - Easing function.
+          */
+         set(data: State.Data, { animateTo, duration, ease }?: {
+            async?: boolean;
+            animateTo?: boolean;
+            duration?: number;
+            ease?: EasingReference;
+         }): void;
+      }
+
+      export namespace State {
+         /**
+          * Defines common application state including positional data and options generated by the {@link State} API.
+          */
+         type Data = {
+            /**
+             * Application position.
+             */
+            position: PositionData.TJSPositionData;
+
+            /**
+             * Any application saved position state for #beforeMinimized including maximized constraints.
+             */
+            beforeMinimized?: PositionData.TJSPositionData & {
+               constraints: { maxHeight: string, paddingTop: string, paddingBottom: string }
+            };
+
+            /**
+             * Common SvelteApplication reactive app options.
+             */
+            options: SvelteApp.API.Reactive.Data;
+
+            /**
+             * Application UI state.
+             */
+            ui: { minimized: boolean };
          };
       }
    }

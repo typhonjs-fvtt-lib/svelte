@@ -3,12 +3,10 @@ import { isObject }  from '#runtime/util/object';
 /**
  * Provides the ability the save / restore / serialize application state for positional and UI state such as minimized
  * status.
- *
- * You can restore a saved state with animation; please see the options of {@link ApplicationState.restore}.
  */
 export class ApplicationState
 {
-   /** @type {object} */
+   /** @type {import('../../SvelteApplication').SvelteApplication} */
    #application;
 
    /**
@@ -19,11 +17,11 @@ export class ApplicationState
     */
    #currentRestoreKey;
 
-   /** @type {Map<string, import('./types').ApplicationStateData>} */
+   /** @type {Map<string, import('../../types').SvelteApp.API.State.Data>} */
    #dataSaved = new Map();
 
    /**
-    * @param {object}   application - The application.
+    * @param {import('../../SvelteApplication').SvelteApplication}   application - The application.
     */
    constructor(application)
    {
@@ -45,7 +43,7 @@ export class ApplicationState
     *
     * @param {object} [extra] - Extra data to add to application state.
     *
-    * @returns {import('./types').ApplicationStateData} Passed in object with current application state.
+    * @returns {import('../../types').SvelteApp.API.State.Data} Passed in object with current application state.
     */
    current(extra = {})
    {
@@ -64,13 +62,13 @@ export class ApplicationState
     *
     * @param {string}   options.name - Saved data set name.
     *
-    * @returns {import('./types').ApplicationStateData | undefined} Any saved application state.
+    * @returns {import('../../types').SvelteApp.API.State.Data | undefined} Any saved application state.
     */
    get({ name })
    {
       if (typeof name !== 'string')
       {
-         throw new TypeError(`ApplicationState - get error: 'name' is not a string.`);
+         throw new TypeError(`[SvelteApp.svelte.get] error: 'name' is not a string.`);
       }
 
       return this.#dataSaved.get(name);
@@ -91,11 +89,11 @@ export class ApplicationState
     *
     * @param {string}   options.name - Name to remove and retrieve.
     *
-    * @returns {import('./types').ApplicationStateData | undefined} Any saved application state.
+    * @returns {import('../../types').SvelteApp.API.State.Data | undefined} Any saved application state.
     */
    remove({ name })
    {
-      if (typeof name !== 'string') { throw new TypeError(`ApplicationState - remove: 'name' is not a string.`); }
+      if (typeof name !== 'string') { throw new TypeError(`[SvelteApp.svelte.remove] error: 'name' is not a string.`); }
 
       const data = this.#dataSaved.get(name);
       this.#dataSaved.delete(name);
@@ -122,13 +120,13 @@ export class ApplicationState
     * @param {import('#runtime/svelte/easing').EasingReference} [options.ease='linear'] - Easing function or easing
     *        function name.
     *
-    * @returns {import('./types').ApplicationStateData | undefined} Any saved application state.
+    * @returns {import('../../types').SvelteApp.API.State.Data | undefined} Any saved application state.
     */
    restore({ name, remove = false, animateTo = false, duration = 0.1, ease = 'linear' })
    {
       if (typeof name !== 'string')
       {
-         throw new TypeError(`ApplicationState - restore error: 'name' is not a string.`);
+         throw new TypeError(`[SvelteApp.svelte.restore] error: 'name' is not a string.`);
       }
 
       const dataSaved = this.#dataSaved.get(name);
@@ -166,11 +164,11 @@ export class ApplicationState
     *
     * @param {string}   options.name - Name to index this saved state.
     *
-    * @returns {import('./types').ApplicationStateData} Current saved application state.
+    * @returns {import('../../types').SvelteApp.API.State.Data} Current saved application state.
     */
    save({ name, ...extra })
    {
-      if (typeof name !== 'string') { throw new TypeError(`ApplicationState - save error: 'name' is not a string.`); }
+      if (typeof name !== 'string') { throw new TypeError(`[SvelteApp.svelte.save] error: 'name' is not a string.`); }
 
       const data = this.current(extra);
 
@@ -180,7 +178,7 @@ export class ApplicationState
    }
 
    /**
-    * Sets application state from the given {@link ApplicationStateData} instance. Several optional parameters are
+    * Sets application state from the given `SvelteApp.API.State.Data` instance. Several optional parameters are
     * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
     * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
     * specified.
@@ -188,7 +186,7 @@ export class ApplicationState
     * Note: If serializing application state any minimized apps will use the before minimized state on initial render
     * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
     *
-    * @param {import('./types').ApplicationStateData}   data - Saved data set name.
+    * @param {import('../../types').SvelteApp.API.State.Data}   data - Saved data set name.
     *
     * @param {object}         [options] - Optional parameters
     *
@@ -207,7 +205,7 @@ export class ApplicationState
    // Internal implementation ----------------------------------------------------------------------------------------
 
    /**
-    * Sets application state from the given {@link ApplicationStateData} instance. Several optional parameters are
+    * Sets application state from the given `SvelteApp.API.State.Data` instance. Several optional parameters are
     * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
     * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
     * specified.
@@ -218,7 +216,7 @@ export class ApplicationState
     * @privateRemarks
     * TODO: THIS METHOD NEEDS TO BE REFACTORED WHEN TRL IS MADE INTO A STANDALONE FRAMEWORK.
     *
-    * @param {import('./types').ApplicationStateData}   data - Saved data set name.
+    * @param {import('../../types').SvelteApp.API.State.Data}   data - Saved data set name.
     *
     * @param {object}            [opts] - Optional parameters
     *
@@ -237,14 +235,14 @@ export class ApplicationState
    {
       if (!isObject(data))
       {
-         throw new TypeError(`ApplicationState - restore error: 'data' is not an object.`);
+         throw new TypeError(`[SvelteApp.svelte.set] error: 'data' is not an object.`);
       }
 
       const application = this.#application;
 
       if (!isObject(data?.position))
       {
-         console.warn(`ApplicationState.set warning: 'data.position' is not an object.`);
+         console.warn(`[SvelteApp.svelte.set] warning: 'data.position' is not an object.`);
          return;
       }
 
@@ -257,7 +255,7 @@ export class ApplicationState
       {
          if (!rendered)
          {
-            console.warn(`ApplicationState.set warning: Application is not rendered and 'animateTo' is true.`);
+            console.warn(`[SvelteApp.svelte.set] warning: application is not rendered and 'animateTo' is true.`);
             return;
          }
 
