@@ -5,78 +5,14 @@ import type { TJSSvelteConfig } from '#runtime/svelte/util';
 /**
  * Provides a mechanism to retrieve and query all mounted Svelte components including the main application shell.
  */
-declare interface GetSvelteData
+declare interface GetSvelteData<ComponentInstance extends SvelteComponent>
 {
    /**
-    * Returns any mounted {@link MountedAppShell}.
+    * Returns mounted application shell Svelte component.
     *
-    * @returns {MountedAppShell | null} Any mounted application shell.
+    * @returns Any mounted application shell.
     */
-   get applicationShell(): MountedAppShell;
-
-   /**
-    * Returns the indexed Svelte component.
-    *
-    * @param {number}   index - The index of Svelte component to retrieve.
-    *
-    * @returns {SvelteComponent} The loaded Svelte component.
-    */
-   component(index: number): object;
-
-   /**
-    * Returns the Svelte component entries iterator.
-    *
-    * @returns {IterableIterator<[number, SvelteComponent]>} Svelte component entries iterator.
-    * @yields
-    */
-   componentEntries(): IterableIterator<[number, SvelteComponent]>;
-
-   /**
-    * Returns the Svelte component values iterator.
-    *
-    * @returns {IterableIterator<SvelteComponent>} Svelte component values iterator.
-    * @yields
-    */
-   componentValues(): IterableIterator<SvelteComponent>;
-
-   /**
-    * Returns the indexed SvelteData entry.
-    *
-    * @param {number}   index - The index of SvelteData instance to retrieve.
-    *
-    * @returns {SvelteData} The loaded Svelte config + component.
-    */
-   data(index: number): SvelteData;
-
-   /**
-    * Returns the {@link SvelteData} instance for a given component.
-    *
-    * @param {SvelteComponent} component - Svelte component.
-    *
-    * @returns {SvelteData} -  The loaded Svelte config + component.
-    */
-   dataByComponent(component: SvelteComponent): SvelteData;
-
-   /**
-    * Returns the SvelteData entries iterator.
-    *
-    * @returns {IterableIterator<[number, SvelteData]>} SvelteData entries iterator.
-    */
-   dataEntries(): IterableIterator<[number, SvelteData]>;
-
-   /**
-    * Returns the SvelteData values iterator.
-    *
-    * @returns {IterableIterator<SvelteData>} SvelteData values iterator.
-    */
-   dataValues(): IterableIterator<SvelteData>;
-
-   /**
-    * Returns the length of the mounted Svelte component list.
-    *
-    * @returns {number} Length of mounted Svelte component list.
-    */
-   get length(): number;
+   get applicationShell(): ComponentInstance;
 }
 
 /**

@@ -1,3 +1,5 @@
+import type { SvelteComponent }     from 'svelte';
+
 import type {
    Readable,
    Writable }                       from 'svelte/store';
@@ -731,7 +733,7 @@ declare namespace SvelteApp {
    /**
     * Options for SvelteApplication. Note: that this extends the Foundry `ApplicationOptions`.
     */
-   interface Options
+   interface Options<Component extends SvelteComponent = SvelteComponent>
    {
       /**
        * If false the default slide close animation is not run.
@@ -861,7 +863,7 @@ declare namespace SvelteApp {
        * `Partial<TJSSvelteConfig>` is used for the types to allow any sort of late binding to the options defining the
        * required SvelteComponent `class` and `target` properties.
        */
-      svelte: Partial<TJSSvelteConfig>;
+      svelte: TJSSvelteConfig<Component>;
 
       /**
        * By default, 'top / left' respects rotation when minimizing.
