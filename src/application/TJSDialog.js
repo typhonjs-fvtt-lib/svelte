@@ -54,13 +54,12 @@ export class TJSDialog extends SvelteApplication
    /**
     * @param {import('./internal/state-dialog/types').TJSDialogOptions} data - Dialog options.
     *
-    * @param {Options}   [options] - SvelteApplication options.
+    * @param {Partial<Options>}   [options] - SvelteApplication options.
     */
    constructor(data, options = {})
    {
       // Note: explicit setting of `popOutModuleDisable` to prevent the PopOut! module from acting on modal dialogs.
-      // @ts-expect-error
-      super({ popOutModuleDisable: data?.modal ?? false, ...options });
+      super({ popOutModuleDisable: typeof data?.modal === 'boolean' ? data.modal : false, ...options });
 
       this.#managedPromise = new ManagedPromise();
 
