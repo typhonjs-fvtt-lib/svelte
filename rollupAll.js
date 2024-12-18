@@ -61,11 +61,11 @@ const applicationDTSOptions = {
       'get elementTarget\\(\\): HTMLElement;': dtsReplacePositionGetter,
 
       // The following replacements handle cases where JSDoc can't properly define generic extends clauses.
-      'SvelteApplication<Options = SvelteApp.Options>': 'SvelteApplication<Options extends SvelteApp.Options = SvelteApp.Options> extends Application<Options> ',
-      '<Options = SvelteApp.Options>': '<Options extends SvelteApp.Options = SvelteApp.Options>',
+      'SvelteApplication<Options = SvelteApp.Options<svelte.SvelteComponent<any, any, any>>>': 'SvelteApplication<Options extends SvelteApp.Options = SvelteApp.Options> extends Application<Options> ',
+      '<Options = SvelteApp.Options<svelte.SvelteComponent<any, any, any>>>': '<Options extends SvelteApp.Options = SvelteApp.Options>',
 
       // The following replacement is to handle `SvelteApp.Options` extension of Foundry core `ApplicationOptions`.
-      'interface Options': 'interface Options extends ApplicationOptions'
+      'interface Options<Component extends SvelteComponent = SvelteComponent>': 'interface Options<Component extends SvelteComponent = SvelteComponent> extends ApplicationOptions'
    },
    rollupExternal: external,
    logLevel: 'debug',
@@ -180,48 +180,38 @@ for (const config of rollupConfigs)
    await bundle.close();
 }
 
-// Copy component core / dialog
+// Application rewriting types / exports -----------------------------------------------------------------------------
 
-fs.emptyDirSync('./_dist/component');
-fs.copySync('./src/component', './_dist/component');
-
-const compFiles = await getFileList({ dir: './_dist/component', resolve: true, walk: true });
-for (const compFile of compFiles)
+// The manipulation below is to rewrite `SvelteApplication` as `SvelteApp` to be able to merge with the namespace
+// `SvelteApp`. `SvelteApp` is then reexported as `SvelteApplication` in both the sub-path JS bundle and declarations.
 {
-   let fileData = fs.readFileSync(compFile, 'utf-8').toString();
+   // JS Bundle mods --------------
+   let applicationIndexJS = fs.readFileSync('./_dist/application/index.js', 'utf-8');
 
-   // Ignore any `{@link #runtime...}` enclosed references.
-   fileData = fileData.replaceAll(/(?<!\{@link\s*)#runtime\//g, '@typhonjs-svelte/runtime-base/');
+   applicationIndexJS = applicationIndexJS.replaceAll('SvelteApplication', 'SvelteApp');
+   applicationIndexJS = applicationIndexJS.replaceAll('export { SvelteApp, TJSDialog };',
+    'export { SvelteApp, SvelteApp as SvelteApplication, TJSDialog };');
 
-   fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
-   fileData = fileData.replaceAll('\'#svelte', '\'svelte');
+   fs.writeFileSync('./_dist/application/index.js', applicationIndexJS);
 
-   // For types
-   // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');
+   // DTS Bundle mods -------------
+   let applicationIndexDTS = fs.readFileSync('./_dist/application/index.d.ts', 'utf-8');
 
-   fs.writeFileSync(compFile, fileData);
-}
+   applicationIndexDTS = applicationIndexDTS.replaceAll('SvelteApplication', 'SvelteApp');
 
-// GSAP plugin loading code is also bespoke and must be copied over.
+   // Only replace the second instance of `SvelteApp,` with `SvelteApp as SvelteApplication,` in export statement.
+   applicationIndexDTS = applicationIndexDTS.replace(/export\s*{([^}]*)}/s, (match, exportContent) =>
+   {
+      let counter = 0;
+      const updatedContent = exportContent.replace(/SvelteApp,/g, (m) =>
+      {
+         counter++;
+         return counter === 2 ? 'SvelteApp as SvelteApplication,' : m;
+      });
+      return `export {${updatedContent}}`;
+   });
 
-fs.emptyDirSync('./_dist/animate/gsap/plugin');
-fs.copySync('./src/animate/gsap/plugin', './_dist/animate/gsap/plugin');
-
-const gsapFiles = await getFileList({ dir: './_dist/animate/gsap/plugin', resolve: true, walk: true });
-for (const gsapFile of gsapFiles)
-{
-   let fileData = fs.readFileSync(gsapFile, 'utf-8').toString();
-
-   // Ignore any `{@link #runtime...}` enclosed references.
-   fileData = fileData.replaceAll(/(?<!\{@link\s*)#runtime\//g, '@typhonjs-svelte/runtime-base/');
-
-   fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
-   fileData = fileData.replaceAll('\'#svelte', '\'svelte');
-
-   // For types
-   // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');
-
-   fs.writeFileSync(gsapFile, fileData);
+   fs.writeFileSync('./_dist/application/index.d.ts', applicationIndexDTS);
 }
 
 // Svelte components
