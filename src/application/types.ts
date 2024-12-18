@@ -550,9 +550,10 @@ declare namespace SvelteApp {
       }
 
       // State API ---------------------------------------------------------------------------------------------------
+
       /**
-       * Provides the ability the save / restore / serialize application state for positional and UI state such as minimized
-       * status.
+       * Provides the ability the save / restore / serialize application state for positional and UI state such as
+       * minimized status.
        *
        * You can restore a saved state with animation; please see the options of {@link State.restore}.
        */
@@ -698,6 +699,57 @@ declare namespace SvelteApp {
              * Application UI state.
              */
             ui: { minimized: boolean };
+         };
+      }
+
+      // Svelte API --------------------------------------------------------------------------------------------------
+
+      /**
+       * Provides a mechanism to retrieve and query mounted Svelte application shell.
+       */
+      export interface Svelte<ComponentInstance extends SvelteComponent>
+      {
+         /**
+          * Returns mounted application shell Svelte component.
+          *
+          * @deprecated Use {@link Svelte.appShell}; since `0.2.0` removal in `0.5.0`.
+          *
+          * @returns Any mounted application shell.
+          */
+         get applicationShell(): ComponentInstance | null;
+
+         /**
+          * Returns mounted application shell Svelte component.
+          *
+          * @returns Any mounted application shell.
+          */
+         get appShell(): ComponentInstance | null;
+
+         /**
+          * Returns mounted application shell data / config.
+          *
+          * @hidden
+          */
+         get appShellData(): Svelte.Data | null;
+      }
+
+      export namespace Svelte {
+         /**
+          * Provides access to a mounted Svelte component.
+          */
+         type Data = {
+            /**
+             * The TJSSvelteConfig for this component.
+             */
+            config: TJSSvelteConfig;
+            /**
+             * The svelte component instance.
+             */
+            component: SvelteComponent;
+            /**
+             * The main bound element.
+             */
+            element: HTMLElement;
          };
       }
    }

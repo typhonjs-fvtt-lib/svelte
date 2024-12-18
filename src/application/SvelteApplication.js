@@ -102,7 +102,7 @@ export class SvelteApplication extends Application
     * Provides a helper class that combines multiple methods for interacting with the mounted components tracked in
     * #svelteData.
     *
-    * @type {import('./internal/state-svelte/types').GetSvelteData<InstanceType<Options['svelte']['class']>>}
+    * @type {import('./types').SvelteApp.API.Svelte<InstanceType<Options['svelte']['class']>>}
     */
    #getSvelteData = new GetSvelteData(this.#applicationShellHolder, this.#svelteData);
 
@@ -218,7 +218,7 @@ export class SvelteApplication extends Application
    /**
     * Returns the Svelte helper class w/ various methods to access mounted Svelte components.
     *
-    * @returns {import('./internal/state-svelte/types').GetSvelteData<InstanceType<Options['svelte']['class']>>} GetSvelteData
+    * @returns {import('./types').SvelteApp.API.Svelte<InstanceType<Options['svelte']['class']>>} GetSvelteData
     */
    get svelte() { return this.#getSvelteData; }
 
