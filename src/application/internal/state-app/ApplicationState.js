@@ -68,7 +68,7 @@ export class ApplicationState
    {
       if (typeof name !== 'string')
       {
-         throw new TypeError(`[SvelteApp.svelte.get] error: 'name' is not a string.`);
+         throw new TypeError(`[SvelteApp.state.get] error: 'name' is not a string.`);
       }
 
       return this.#dataSaved.get(name);
@@ -93,7 +93,7 @@ export class ApplicationState
     */
    remove({ name })
    {
-      if (typeof name !== 'string') { throw new TypeError(`[SvelteApp.svelte.remove] error: 'name' is not a string.`); }
+      if (typeof name !== 'string') { throw new TypeError(`[SvelteApp.state.remove] error: 'name' is not a string.`); }
 
       const data = this.#dataSaved.get(name);
       this.#dataSaved.delete(name);
@@ -126,7 +126,7 @@ export class ApplicationState
    {
       if (typeof name !== 'string')
       {
-         throw new TypeError(`[SvelteApp.svelte.restore] error: 'name' is not a string.`);
+         throw new TypeError(`[SvelteApp.state.restore] error: 'name' is not a string.`);
       }
 
       const dataSaved = this.#dataSaved.get(name);
@@ -168,7 +168,7 @@ export class ApplicationState
     */
    save({ name, ...extra })
    {
-      if (typeof name !== 'string') { throw new TypeError(`[SvelteApp.svelte.save] error: 'name' is not a string.`); }
+      if (typeof name !== 'string') { throw new TypeError(`[SvelteApp.state.save] error: 'name' is not a string.`); }
 
       const data = this.current(extra);
 
@@ -235,14 +235,14 @@ export class ApplicationState
    {
       if (!isObject(data))
       {
-         throw new TypeError(`[SvelteApp.svelte.set] error: 'data' is not an object.`);
+         throw new TypeError(`[SvelteApp.state.set] error: 'data' is not an object.`);
       }
 
       const application = this.#application;
 
       if (!isObject(data?.position))
       {
-         console.warn(`[SvelteApp.svelte.set] warning: 'data.position' is not an object.`);
+         console.warn(`[SvelteApp.state.set] warning: 'data.position' is not an object.`);
          return;
       }
 
@@ -255,7 +255,7 @@ export class ApplicationState
       {
          if (!rendered)
          {
-            console.warn(`[SvelteApp.svelte.set] warning: application is not rendered and 'animateTo' is true.`);
+            console.warn(`[SvelteApp.state.set] warning: application is not rendered and 'animateTo' is true.`);
             return;
          }
 
