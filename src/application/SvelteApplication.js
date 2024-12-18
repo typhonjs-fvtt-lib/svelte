@@ -407,7 +407,7 @@ export class SvelteApplication extends Application
       TJSAppIndex.delete(this);
 
       // Reset SvelteData like this to maintain reference to GetSvelteData / `this.svelte`.
-      this.#svelteData.length = 0;
+      this.#svelteData[0] = null;
 
       // Remove element from the DOM. Most SvelteComponents have already removed it.
       el.remove();
@@ -533,7 +533,7 @@ export class SvelteApplication extends Application
 
       // Detect if the application shell exports an `elementContent` accessor.
       this.#elementContent = hasGetter(this.svelte.appShell, 'elementContent') ?
-       this.svelte.applicationShell.elementContent : null;
+       this.svelte.appShell.elementContent : null;
 
       // Detect if the application shell exports an `elementTarget` accessor if not set `elementTarget` to
       // `elementRoot`.

@@ -14,19 +14,19 @@ declare interface GetSvelteData<ComponentInstance extends SvelteComponent>
     *
     * @returns Any mounted application shell.
     */
-   get applicationShell(): ComponentInstance;
+   get applicationShell(): ComponentInstance | null;
 
    /**
     * Returns mounted application shell Svelte component.
     *
     * @returns Any mounted application shell.
     */
-   get appShell(): ComponentInstance;
+   get appShell(): ComponentInstance | null;
 
    /**
     * Returns mounted application shell data / config.
     */
-   get appShellData(): SvelteData;
+   get appShellData(): SvelteData | null;
 }
 
 /**

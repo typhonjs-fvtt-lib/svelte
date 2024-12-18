@@ -476,7 +476,7 @@ export class TJSDialogData
     */
    #updateComponent()
    {
-      const component = this.#application.svelte.component(0);
+      const component = this.#application.svelte.appShell;
       if (component?.data) { component.data = this.clone(); }
    }
 }
