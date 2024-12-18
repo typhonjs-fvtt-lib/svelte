@@ -10,28 +10,24 @@ declare interface GetSvelteData<ComponentInstance extends SvelteComponent>
    /**
     * Returns mounted application shell Svelte component.
     *
+    * @deprecated Use {@link GetSvelteData.appShell}; since `0.2.0` removal in `0.5.0`.
+    *
     * @returns Any mounted application shell.
     */
    get applicationShell(): ComponentInstance;
-}
 
-/**
- * Application shell contract for Svelte components.
- */
-type MountedAppShell = {
    /**
-    * The root element / exported prop.
+    * Returns mounted application shell Svelte component.
+    *
+    * @returns Any mounted application shell.
     */
-   elementRoot: HTMLElement;
+   get appShell(): ComponentInstance;
+
    /**
-    * The content element / exported prop.
+    * Returns mounted application shell data / config.
     */
-   elementContent?: HTMLElement;
-   /**
-    * The target element / exported prop.
-    */
-   elementTarget?: HTMLElement;
-};
+   get appShellData(): SvelteData;
+}
 
 /**
  * Provides access to a mounted Svelte component.
@@ -51,4 +47,4 @@ type SvelteData = {
    element: HTMLElement;
 };
 
-export { GetSvelteData, MountedAppShell, SvelteData }
+export { GetSvelteData, SvelteData }

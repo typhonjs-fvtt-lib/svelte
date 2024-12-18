@@ -75,7 +75,7 @@ export class TJSDialog extends SvelteApplication
        * @readonly
        */
       Object.defineProperty(this.svelte, 'dialogComponent', {
-         get: () => this.svelte?.applicationShell?.dialogComponent,
+         get: () => this.svelte?.appShell?.dialogComponent,
       });
    }
 

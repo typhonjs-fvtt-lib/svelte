@@ -16,14 +16,14 @@ export class FoundryHMRSupport
                {
                   for (const app of TJSAppIndex.values())
                   {
-                     const appShell = app.svelte.applicationShell;
+                     const appShell = app.svelte.appShell;
 
                      // Retrieve the original `svelte-hmr` instrumented HMR component / not the proxy.
                      const hmrComponent = appShell?.$$?.hmr_cmp;
 
                      if (appShell && typeof hmrComponent?.$replace === 'function')
                      {
-                        const svelteData = app.svelte.dataByComponent(appShell);
+                        const svelteData = app.svelte.appShellData;
                         if (svelteData)
                         {
                            try

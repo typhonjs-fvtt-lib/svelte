@@ -70,10 +70,10 @@ declare namespace SvelteApp {
        * //  * @memberof SvelteReactive#
        * //  *
        * Object.defineProperty(this.reactive, 'document', {
-       *    get: () => this.svelte?.applicationShell?.document,
+       *    get: () => this.svelte?.appShell?.document,
        *    set: (document) =>
        *    {
-       *       const component = this.svelte?.applicationShell;
+       *       const component = this.svelte?.appShell;
        *       if (hasSetter(component, 'document')) { component.document = document; }
        *    }
        * });

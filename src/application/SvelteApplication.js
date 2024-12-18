@@ -94,15 +94,15 @@ export class SvelteApplication extends Application
    /**
     * Stores SvelteData entries with instantiated Svelte components.
     *
-    * @type {import('./internal/state-svelte/types').SvelteData[]}
+    * @type {import('./internal/state-svelte/types').SvelteData[] | null[]}
     */
-   #svelteData = [];
+   #svelteData = [null];
 
    /**
     * Provides a helper class that combines multiple methods for interacting with the mounted components tracked in
     * #svelteData.
     *
-    * @type {GetSvelteData<InstanceType<Options['svelte']['class']>>}
+    * @type {import('./internal/state-svelte/types').GetSvelteData<InstanceType<Options['svelte']['class']>>}
     */
    #getSvelteData = new GetSvelteData(this.#applicationShellHolder, this.#svelteData);
 
@@ -386,6 +386,8 @@ export class SvelteApplication extends Application
       // Manually invoke the destroy callbacks for all Svelte components.
       for (const entry of this.#svelteData)
       {
+         if (!isObject(entry)) { continue; }
+
          // Use `outroAndDestroy` to run outro transitions before destroying.
          svelteDestroyPromises.push(TJSSvelteUtil.outroAndDestroy(entry.component));
 
@@ -506,7 +508,7 @@ export class SvelteApplication extends Application
       });
 
       // A sanity check as shouldn't hit this case as only one component is being mounted.
-      if (this.svelte.applicationShell !== null)
+      if (this.svelte.appShell !== null)
       {
          throw new Error(
           `SvelteApplication - _injectHTML - An application shell is already mounted; offending config:\n` +
@@ -524,19 +526,19 @@ export class SvelteApplication extends Application
          svelteData.component.$$.on_hmr.push(() => () => this.#updateApplicationShell());
       }
 
-      this.#svelteData.push(svelteData);
+      this.#svelteData[0] = svelteData;
 
       // Wrap `elementRoot` as a JQuery object and set to AppV1 / Application element.
-      this._element = $(this.svelte.applicationShell.elementRoot);
+      this._element = $(this.svelte.appShell.elementRoot);
 
       // Detect if the application shell exports an `elementContent` accessor.
-      this.#elementContent = hasGetter(this.svelte.applicationShell, 'elementContent') ?
+      this.#elementContent = hasGetter(this.svelte.appShell, 'elementContent') ?
        this.svelte.applicationShell.elementContent : null;
 
       // Detect if the application shell exports an `elementTarget` accessor if not set `elementTarget` to
       // `elementRoot`.
-      this.#elementTarget = hasGetter(this.svelte.applicationShell, 'elementTarget') ?
-       this.svelte.applicationShell.elementTarget : this.svelte.applicationShell.elementRoot;
+      this.#elementTarget = hasGetter(this.svelte.appShell, 'elementTarget') ? this.svelte.appShell.elementTarget :
+       this.svelte.appShell.elementRoot;
 
       // The initial zIndex may be set in application options or for popOut applications is stored by `_renderOuter`
       // in `this.#initialZIndex`.
@@ -779,21 +781,15 @@ export class SvelteApplication extends Application
 
    /**
     * Provides a callback after all Svelte components are initialized.
-    *
-    * @param {import('./internal/state-svelte/types').MountedAppShell} [mountedAppShell] - The mounted app shell
-    *        elements.
     */
-   onSvelteMount(mountedAppShell) {} // eslint-disable-line no-unused-vars
+   onSvelteMount() {} // eslint-disable-line no-unused-vars
 
    /**
     * Provides a callback after the main application shell is remounted. This may occur during HMR / hot module
     * replacement or directly invoked from the `elementRootUpdate` callback passed to the application shell component
     * context.
-    *
-    * @param {import('./internal/state-svelte/types').MountedAppShell} [mountedAppShell] - The mounted app shell
-    *        elements.
     */
-   onSvelteRemount(mountedAppShell) {} // eslint-disable-line no-unused-vars
+   onSvelteRemount() {} // eslint-disable-line no-unused-vars
 
    /**
     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
@@ -894,11 +890,7 @@ export class SvelteApplication extends Application
          // Add to visible apps tracked.
          TJSAppIndex.add(this);
 
-         this.onSvelteMount({
-            elementRoot: /** @type {HTMLElement} */ this._element[0],
-            elementContent: this.#elementContent,
-            elementTarget: this.#elementTarget
-         });
+         this.onSvelteMount();
 
          this.#onMount = true;
       }
@@ -960,7 +952,7 @@ export class SvelteApplication extends Application
     */
    #updateApplicationShell()
    {
-      const applicationShell = this.svelte.applicationShell;
+      const applicationShell = this.svelte.appShell;
 
       if (applicationShell !== null)
       {
@@ -995,11 +987,7 @@ export class SvelteApplication extends Application
 
          super._activateCoreListeners([this.popOut ? this.#elementTarget?.firstChild : this.#elementTarget]);
 
-         this.onSvelteRemount({
-            elementRoot: /** @type {HTMLElement} */ this._element[0],
-            elementContent: this.#elementContent,
-            elementTarget: this.#elementTarget
-         });
+         this.onSvelteRemount();
       }
    }
 }
