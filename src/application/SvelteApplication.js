@@ -30,7 +30,7 @@ export class SvelteApplication extends Application
    /**
     * Stores the first mounted component which follows the application shell contract.
     *
-    * @type {InstanceType<Options['svelte']['class']>[] | null[]} Application shell.
+    * @type {import('svelte').SvelteComponent[] | null[]} Application shell.
     */
    #applicationShellHolder = [null];
 
@@ -102,7 +102,7 @@ export class SvelteApplication extends Application
     * Provides a helper class that combines multiple methods for interacting with the mounted components tracked in
     * #svelteData.
     *
-    * @type {import('./types').SvelteApp.API.Svelte<InstanceType<Options['svelte']['class']>>}
+    * @type {import('./types').SvelteApp.API.Svelte<Options>}
     */
    #getSvelteData = new GetSvelteData(this.#applicationShellHolder, this.#svelteData);
 
@@ -216,9 +216,9 @@ export class SvelteApplication extends Application
    get state() { return this.#applicationState; }
 
    /**
-    * Returns the Svelte helper class w/ various methods to access mounted Svelte components.
+    * Returns the `Svelte` helper class w/ various methods to access the mounted application shell component.
     *
-    * @returns {import('./types').SvelteApp.API.Svelte<InstanceType<Options['svelte']['class']>>} GetSvelteData
+    * @returns {import('./types').SvelteApp.API.Svelte<Options>} `Svelte` / mounted application shell API.
     */
    get svelte() { return this.#getSvelteData; }
 

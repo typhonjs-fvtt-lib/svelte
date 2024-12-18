@@ -1,22 +1,25 @@
-import type { SvelteComponent }     from 'svelte';
+import type {
+   ComponentEvents,
+   ComponentProps,
+   SvelteComponent }             from 'svelte';
 
 import type {
    Readable,
-   Writable }                       from 'svelte/store';
+   Writable }                    from 'svelte/store';
 
-import type { A11yFocusSource }     from '#runtime/util/a11y';
+import type { A11yFocusSource }  from '#runtime/util/a11y';
 
-import type { EasingReference }     from '#runtime/svelte/easing';
+import type { EasingReference }  from '#runtime/svelte/easing';
 
 import type {
    Data as PositionData, // TODO REFACTOR
    System,
    ValidatorAPI,
-   TransformAPI }                   from '#runtime/svelte/store/position';
+   TransformAPI }                from '#runtime/svelte/store/position';
 
-import type { WebStorage }          from '#runtime/svelte/store/web-storage';
+import type { WebStorage }       from '#runtime/svelte/store/web-storage';
 
-import { TJSSvelteConfig }          from '#runtime/svelte/util';
+import { TJSSvelteConfig }       from '#runtime/svelte/util';
 
 declare namespace SvelteApp {
    export namespace API {
@@ -707,7 +710,7 @@ declare namespace SvelteApp {
       /**
        * Provides a mechanism to retrieve and query mounted Svelte application shell.
        */
-      export interface Svelte<ComponentInstance extends SvelteComponent>
+      export interface Svelte<Options extends SvelteApp.Options>
       {
          /**
           * Returns mounted application shell Svelte component.
@@ -716,41 +719,21 @@ declare namespace SvelteApp {
           *
           * @returns Any mounted application shell.
           */
-         get applicationShell(): ComponentInstance | null;
+         get applicationShell(): AppShell<Options> | null;
 
          /**
           * Returns mounted application shell Svelte component.
           *
           * @returns Any mounted application shell.
           */
-         get appShell(): ComponentInstance | null;
+         get appShell(): AppShell<Options> | null;
 
          /**
           * Returns mounted application shell data / config.
           *
-          * @hidden
+          * @internal
           */
-         get appShellData(): Svelte.Data | null;
-      }
-
-      export namespace Svelte {
-         /**
-          * Provides access to a mounted Svelte component.
-          */
-         type Data = {
-            /**
-             * The TJSSvelteConfig for this component.
-             */
-            config: TJSSvelteConfig;
-            /**
-             * The svelte component instance.
-             */
-            component: SvelteComponent;
-            /**
-             * The main bound element.
-             */
-            element: HTMLElement;
-         };
+         get appShellData(): SvelteData | null;
       }
    }
 
@@ -965,3 +948,57 @@ declare namespace SvelteApp {
 }
 
 export { SvelteApp };
+
+// Internal types ----------------------------------------------------------------------------------------------------
+
+/**
+ * Omits the protected application shell contract properties.
+ */
+type OmitPropsTRL<Options extends SvelteApp.Options> = Omit<
+   ComponentProps<InstanceType<Options['svelte']['class']>>,
+   'elementRoot' | 'elementContent' | 'elementTarget'
+>;
+
+/**
+ * Based on the `SvelteApp.Options` -> `svelte.class` property limit the props exposed and add the safe methods that
+ * can be accessed
+ */
+type AppShell<Options extends SvelteApp.Options> = OmitPropsTRL<Options> & {
+   /**
+    * Register an event callback.
+    *
+    * @param type - Event type.
+    *
+    * @param callback - Callback function
+    *
+    * @returns Unsubscriber function.
+    */
+   $on<K extends Extract<keyof ComponentEvents<InstanceType<Options['svelte']['class']>>, string>>(type: K, callback:
+    ((e: ComponentEvents<InstanceType<Options['svelte']['class']>>[K]) => void) | null | undefined): () => void;
+
+   /**
+    * Set props of component.
+    *
+    * @param props - Props to set.
+    */
+   $set(props: Partial<OmitPropsTRL<Options>>): void;
+};
+
+/**
+ * Provides access to a mounted Svelte component for internal use. The access point is marked with `@internal` via
+ * `SvelteApp.svelte.appShellData`.
+ */
+type SvelteData = {
+   /**
+    * The TJSSvelteConfig for this component.
+    */
+   config: TJSSvelteConfig;
+   /**
+    * The svelte component instance.
+    */
+   component: SvelteComponent;
+   /**
+    * The main bound element.
+    */
+   element: HTMLElement;
+};
