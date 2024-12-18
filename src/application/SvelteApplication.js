@@ -114,7 +114,7 @@ export class SvelteApplication extends Application
    #stores;
 
    /**
-    * @param {Partial<Options>} [options] - The options for the application.
+    * @param {Partial<import('./types').SvelteApp.Options>} [options] - The options for the application.
     */
    constructor(options = {})
    {
@@ -205,7 +205,7 @@ export class SvelteApplication extends Application
    /**
     * Returns the reactive accessors & Svelte stores for SvelteApplication.
     *
-    * @returns {import('./internal/state-reactive/types').SvelteReactive} The reactive accessors & Svelte stores.
+    * @returns {import('./types').SvelteApp.API.Reactive} The reactive accessors & Svelte stores.
     */
    get reactive() { return this.#reactive; }
 

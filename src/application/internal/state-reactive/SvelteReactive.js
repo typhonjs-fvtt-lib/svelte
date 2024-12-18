@@ -187,7 +187,7 @@ export class SvelteReactive
    /**
     * Returns the store for UI options.
     *
-    * @returns {import('./types').StoreUIOptions} UI options store.
+    * @returns {import('../../types').SvelteApp.API.Reactive.StoreUIOptions} UI options store.
     */
    get storeUIState() { return this.#storeUIState; }
 
@@ -536,7 +536,7 @@ export class SvelteReactive
    /**
     * Serializes the main {@link SvelteApp.Options} for common application state.
     *
-    * @returns {import('./types').SvelteReactiveData} Common application state.
+    * @returns {import('../../types').SvelteApp.API.Reactive.Data} Common application state.
     */
    toJSON()
    {

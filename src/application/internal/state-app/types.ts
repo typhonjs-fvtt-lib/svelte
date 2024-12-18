@@ -2,7 +2,7 @@ import type { EasingReference }     from '#runtime/svelte/easing';
 
 import type { Data }                from '#runtime/svelte/store/position';
 
-import type { SvelteReactiveData }  from '../state-reactive/types';
+import type { SvelteApp }           from '../../types';
 
 /**
  * Provides the ability the save / restore / serialize application state for positional and UI state such as minimized
@@ -143,9 +143,9 @@ type ApplicationStateData = {
    };
 
    /**
-    * Common SvelteApplication options.
+    * Common SvelteApplication reactive app options.
     */
-   options: SvelteReactiveData;
+   options: SvelteApp.API.Reactive.Data;
 
    /**
     * Application UI state.
