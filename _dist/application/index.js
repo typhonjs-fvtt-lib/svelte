@@ -13,12 +13,10 @@ import { ManagedPromise } from '@typhonjs-svelte/runtime-base/util/async';
 /**
  * Provides the ability the save / restore / serialize application state for positional and UI state such as minimized
  * status.
- *
- * You can restore a saved state with animation; please see the options of {@link ApplicationState.restore}.
  */
 class ApplicationState
 {
-   /** @type {object} */
+   /** @type {import('../../SvelteApp').SvelteApp} */
    #application;
 
    /**
@@ -29,11 +27,11 @@ class ApplicationState
     */
    #currentRestoreKey;
 
-   /** @type {Map<string, import('./types').ApplicationStateData>} */
+   /** @type {Map<string, import('../../types').SvelteApp.API.State.Data>} */
    #dataSaved = new Map();
 
    /**
-    * @param {object}   application - The application.
+    * @param {import('../../SvelteApp').SvelteApp}   application - The application.
     */
    constructor(application)
    {
@@ -55,7 +53,7 @@ class ApplicationState
     *
     * @param {object} [extra] - Extra data to add to application state.
     *
-    * @returns {import('./types').ApplicationStateData} Passed in object with current application state.
+    * @returns {import('../../types').SvelteApp.API.State.Data} Passed in object with current application state.
     */
    current(extra = {})
    {
@@ -74,13 +72,13 @@ class ApplicationState
     *
     * @param {string}   options.name - Saved data set name.
     *
-    * @returns {import('./types').ApplicationStateData | undefined} Any saved application state.
+    * @returns {import('../../types').SvelteApp.API.State.Data | undefined} Any saved application state.
     */
    get({ name })
    {
       if (typeof name !== 'string')
       {
-         throw new TypeError(`ApplicationState - get error: 'name' is not a string.`);
+         throw new TypeError(`[SvelteApp.state.get] error: 'name' is not a string.`);
       }
 
       return this.#dataSaved.get(name);
@@ -101,11 +99,11 @@ class ApplicationState
     *
     * @param {string}   options.name - Name to remove and retrieve.
     *
-    * @returns {import('./types').ApplicationStateData | undefined} Any saved application state.
+    * @returns {import('../../types').SvelteApp.API.State.Data | undefined} Any saved application state.
     */
    remove({ name })
    {
-      if (typeof name !== 'string') { throw new TypeError(`ApplicationState - remove: 'name' is not a string.`); }
+      if (typeof name !== 'string') { throw new TypeError(`[SvelteApp.state.remove] error: 'name' is not a string.`); }
 
       const data = this.#dataSaved.get(name);
       this.#dataSaved.delete(name);
@@ -132,13 +130,13 @@ class ApplicationState
     * @param {import('#runtime/svelte/easing').EasingReference} [options.ease='linear'] - Easing function or easing
     *        function name.
     *
-    * @returns {import('./types').ApplicationStateData | undefined} Any saved application state.
+    * @returns {import('../../types').SvelteApp.API.State.Data | undefined} Any saved application state.
     */
    restore({ name, remove = false, animateTo = false, duration = 0.1, ease = 'linear' })
    {
       if (typeof name !== 'string')
       {
-         throw new TypeError(`ApplicationState - restore error: 'name' is not a string.`);
+         throw new TypeError(`[SvelteApp.state.restore] error: 'name' is not a string.`);
       }
 
       const dataSaved = this.#dataSaved.get(name);
@@ -176,11 +174,11 @@ class ApplicationState
     *
     * @param {string}   options.name - Name to index this saved state.
     *
-    * @returns {import('./types').ApplicationStateData} Current saved application state.
+    * @returns {import('../../types').SvelteApp.API.State.Data} Current saved application state.
     */
    save({ name, ...extra })
    {
-      if (typeof name !== 'string') { throw new TypeError(`ApplicationState - save error: 'name' is not a string.`); }
+      if (typeof name !== 'string') { throw new TypeError(`[SvelteApp.state.save] error: 'name' is not a string.`); }
 
       const data = this.current(extra);
 
@@ -190,7 +188,7 @@ class ApplicationState
    }
 
    /**
-    * Sets application state from the given {@link ApplicationStateData} instance. Several optional parameters are
+    * Sets application state from the given `SvelteApp.API.State.Data` instance. Several optional parameters are
     * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
     * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
     * specified.
@@ -198,7 +196,7 @@ class ApplicationState
     * Note: If serializing application state any minimized apps will use the before minimized state on initial render
     * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
     *
-    * @param {import('./types').ApplicationStateData}   data - Saved data set name.
+    * @param {import('../../types').SvelteApp.API.State.Data}   data - Saved data set name.
     *
     * @param {object}         [options] - Optional parameters
     *
@@ -217,7 +215,7 @@ class ApplicationState
    // Internal implementation ----------------------------------------------------------------------------------------
 
    /**
-    * Sets application state from the given {@link ApplicationStateData} instance. Several optional parameters are
+    * Sets application state from the given `SvelteApp.API.State.Data` instance. Several optional parameters are
     * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
     * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
     * specified.
@@ -228,7 +226,7 @@ class ApplicationState
     * @privateRemarks
     * TODO: THIS METHOD NEEDS TO BE REFACTORED WHEN TRL IS MADE INTO A STANDALONE FRAMEWORK.
     *
-    * @param {import('./types').ApplicationStateData}   data - Saved data set name.
+    * @param {import('../../types').SvelteApp.API.State.Data}   data - Saved data set name.
     *
     * @param {object}            [opts] - Optional parameters
     *
@@ -247,14 +245,14 @@ class ApplicationState
    {
       if (!isObject(data))
       {
-         throw new TypeError(`ApplicationState - restore error: 'data' is not an object.`);
+         throw new TypeError(`[SvelteApp.state.set] error: 'data' is not an object.`);
       }
 
       const application = this.#application;
 
       if (!isObject(data?.position))
       {
-         console.warn(`ApplicationState.set warning: 'data.position' is not an object.`);
+         console.warn(`[SvelteApp.state.set] warning: 'data.position' is not an object.`);
          return;
       }
 
@@ -267,7 +265,7 @@ class ApplicationState
       {
          if (!rendered)
          {
-            console.warn(`ApplicationState.set warning: Application is not rendered and 'animateTo' is true.`);
+            console.warn(`[SvelteApp.state.set] warning: application is not rendered and 'animateTo' is true.`);
             return;
          }
 
@@ -384,20 +382,21 @@ class ApplicationState
 
 /**
  * Provides a mechanism to retrieve and query all mounted Svelte components including the main application shell.
+ *
+ * @implements {import('../../types').SvelteApp.API.Svelte}
  */
 class GetSvelteData
 {
-   /** @type {import('./types').MountedAppShell[] | null[]} */
+   /** @type {import('svelte').SvelteComponent[] | null[]} */
    #applicationShellHolder;
 
    /** @type {import('./types').SvelteData[]} */
    #svelteData;
 
    /**
-    * Keep a direct reference to the SvelteData array in an associated {@link SvelteApplication}.
+    * Keep a direct reference to the SvelteData array in an associated {@link SvelteApp}.
     *
-    * @param {import('./types').MountedAppShell[] | null[]}  applicationShellHolder - A reference to the
-    *        MountedAppShell array.
+    * @param {import('svelte').SvelteComponent[] | null[]}  applicationShellHolder - A reference to the mounted app shell.
     *
     * @param {import('./types').SvelteData[]}  svelteData - A reference to the SvelteData array of mounted components.
     */
@@ -408,116 +407,34 @@ class GetSvelteData
    }
 
    /**
-    * Returns any mounted {@link MountedAppShell}.
+    * Returns any mounted application shell.
     *
-    * @returns {import('./types').MountedAppShell | null} Any mounted application shell.
+    * @returns {import('svelte').SvelteComponent} Any mounted application shell.
+    */
+   get appShell() { return this.#applicationShellHolder[0]; }
+
+   /**
+    * Returns any mounted application shell.
+    *
+    * @deprecated Use {@link GetSvelteData.appShell}; since `0.2.0` removal in `0.5.0`.
+    *
+    * @returns {import('svelte').SvelteComponent} Any mounted application shell.
     */
    get applicationShell() { return this.#applicationShellHolder[0]; }
 
    /**
-    * Returns the indexed Svelte component.
+    * Returns mounted application shell data / config.
     *
-    * @param {number}   index -
+    * @internal
     *
-    * @returns {object} The loaded Svelte component.
+    * @returns {import('./types').SvelteData} Any mounted application shell data.
     */
-   component(index)
-   {
-      const data = this.#svelteData[index];
-      return data?.component ?? void 0;
-   }
-
-   /**
-    * Returns the Svelte component entries iterator.
-    *
-    * @returns {IterableIterator<[number, import('svelte').SvelteComponent]>} Svelte component entries iterator.
-    * @yields
-    */
-   *componentEntries()
-   {
-      for (let cntr = 0; cntr < this.#svelteData.length; cntr++)
-      {
-         yield [cntr, this.#svelteData[cntr].component];
-      }
-   }
-
-   /**
-    * Returns the Svelte component values iterator.
-    *
-    * @returns {IterableIterator<import('svelte').SvelteComponent>} Svelte component values iterator.
-    * @yields
-    */
-   *componentValues()
-   {
-      for (let cntr = 0; cntr < this.#svelteData.length; cntr++)
-      {
-         yield this.#svelteData[cntr].component;
-      }
-   }
-
-   /**
-    * Returns the indexed SvelteData entry.
-    *
-    * @param {number}   index - The index of SvelteData instance to retrieve.
-    *
-    * @returns {import('./types').SvelteData} The loaded Svelte config + component.
-    */
-   data(index)
-   {
-      return this.#svelteData[index];
-   }
-
-   /**
-    * Returns the {@link SvelteData} instance for a given component.
-    *
-    * @param {import('svelte').SvelteComponent} component - Svelte component.
-    *
-    * @returns {import('./types').SvelteData} -  The loaded Svelte config + component.
-    */
-   dataByComponent(component)
-   {
-      for (const data of this.#svelteData)
-      {
-         if (data.component === component) { return data; }
-      }
-
-      return void 0;
-   }
-
-   /**
-    * Returns the SvelteData entries iterator.
-    *
-    * @returns {IterableIterator<[number, import('./types').SvelteData]>} SvelteData entries iterator.
-    */
-   dataEntries()
-   {
-      return this.#svelteData.entries();
-   }
-
-   /**
-    * Returns the SvelteData values iterator.
-    *
-    * @returns {IterableIterator<import('./types').SvelteData>} SvelteData values iterator.
-    */
-   dataValues()
-   {
-      return this.#svelteData.values();
-   }
-
-   /**
-    * Returns the length of the mounted Svelte component list.
-    *
-    * @returns {number} Length of mounted Svelte component list.
-    */
-   get length()
-   {
-      return this.#svelteData.length;
-   }
+   get appShellData() { return this.#svelteData[0]; }
 }
 
 /**
- * Contains the reactive functionality / Svelte stores associated with SvelteApplication and retrievable by
- * {@link SvelteApplication.reactive}.
+ * Contains the reactive functionality / Svelte stores associated with SvelteApp and retrievable by
+ * {@link SvelteApp.reactive}.
  *
  * There are several reactive getters for UI state such and for two-way bindings / stores see
  * {@link SvelteReactive.storeUIState}:
@@ -544,7 +461,7 @@ class GetSvelteData
  * - {@link SvelteReactive.title}
  *
  * An instance of TJSWebStorage (session) / TJSSessionStorage is accessible via {@link SvelteReactive.sessionStorage}.
- * Optionally you can pass in an existing TJSWebStorage instance that can be shared across multiple SvelteApplications
+ * Optionally you can pass in an existing TJSWebStorage instance that can be shared across multiple SvelteApps
  * by setting {@link SvelteApp.Options.sessionStorage}.
  *
  * -------------------------------------------------------------------------------------------------------------------
@@ -562,10 +479,10 @@ class GetSvelteData
  * //  * @memberof SvelteReactive#
  * //  *
  * Object.defineProperty(this.reactive, 'document', {
- *    get: () => this.svelte?.applicationShell?.document,
+ *    get: () => this.svelte?.appShell?.document,
  *    set: (document) =>
  *    {
- *       const component = this.svelte?.applicationShell;
+ *       const component = this.svelte?.appShell;
  *       if (hasSetter(component, 'document')) { component.document = document; }
  *    }
  * });
@@ -573,7 +490,7 @@ class GetSvelteData
 class SvelteReactive
 {
    /**
-    * @type {import('../SvelteApplication').SvelteApplication}
+    * @type {import('../SvelteApp').SvelteApp}
     */
    #application;
 
@@ -628,7 +545,7 @@ class SvelteReactive
    #storeUnsubscribe = [];
 
    /**
-    * @param {import('../SvelteApplication').SvelteApplication} application - The host Foundry application.
+    * @param {import('../SvelteApp').SvelteApp} application - The host Foundry application.
     */
    constructor(application)
    {
@@ -689,7 +606,7 @@ class SvelteReactive
    /**
     * Returns the store for UI options.
     *
-    * @returns {import('./types').StoreUIOptions} UI options store.
+    * @returns {import('../../types').SvelteApp.API.Reactive.StoreUIOptions} UI options store.
     */
    get storeUIState() { return this.#storeUIState; }
 
@@ -942,7 +859,7 @@ class SvelteReactive
    }
 
    /**
-    * Sets `this.options.positionable` enabling / disabling {@link SvelteApplication.position}.
+    * Sets `this.options.positionable` enabling / disabling {@link SvelteApp.position}.
     *
     * @param {boolean}  positionable - Sets the positionable option.
     */
@@ -1038,7 +955,7 @@ class SvelteReactive
    /**
     * Serializes the main {@link SvelteApp.Options} for common application state.
     *
-    * @returns {import('./types').SvelteReactiveData} Common application state.
+    * @returns {import('../../types').SvelteApp.API.Reactive.Data} Common application state.
     */
    toJSON()
    {
@@ -1062,7 +979,7 @@ class SvelteReactive
     * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
     * the new buttons.
     *
-    * Optionally you can set in the SvelteApplication app options {@link SvelteApp.Options.headerButtonNoClose}
+    * Optionally you can set in the SvelteApp app options {@link SvelteApp.Options.headerButtonNoClose}
     * to remove the close button and {@link SvelteApp.Options.headerButtonNoLabel} to true and labels will be
     * removed from the header buttons.
     *
@@ -1179,7 +1096,7 @@ class SvelteReactive
    /**
     * Registers local store subscriptions for app options. `popOut` controls registering this app with `ui.windows`.
     *
-    * @see SvelteApplication._injectHTML
+    * @see SvelteApp._injectHTML
     */
    #storesSubscribe()
    {
@@ -1214,7 +1131,7 @@ class SvelteReactive
    /**
     * Unsubscribes from any locally monitored stores.
     *
-    * @see SvelteApplication.close
+    * @see SvelteApp.close
     */
    #storesUnsubscribe()
    {
@@ -1368,7 +1285,7 @@ function loadSvelteConfig({ app, config, elementRootUpdate } = {})
 }
 
 /**
- * Provides an index of all visible rendered {@link SvelteApplication} instances in a given Svelte runtime. This allows
+ * Provides an index of all visible rendered {@link SvelteApp} instances in a given Svelte runtime. This allows
  * bulk operations to be performed across all apps.
  */
 class TJSAppIndex
@@ -1376,14 +1293,14 @@ class TJSAppIndex
    /**
     * Stores all visible / rendered apps.
     *
-    * @type {Map<string, import('#svelte-fvtt/application').SvelteApplication>}
+    * @type {Map<string, import('#svelte-fvtt/application').SvelteApp>}
     */
    static #visibleApps = new Map();
 
    /**
-    * Adds a SvelteApplication to all visible apps tracked.
+    * Adds a SvelteApp to all visible apps tracked.
     *
-    * @param {import('#svelte-fvtt/application').SvelteApplication} app - A SvelteApplication
+    * @param {import('#svelte-fvtt/application').SvelteApp} app - A SvelteApp
     *
     * @package
     */
@@ -1393,9 +1310,9 @@ class TJSAppIndex
    }
 
    /**
-    * Removes a SvelteApplication from all visible apps tracked.
+    * Removes a SvelteApp from all visible apps tracked.
     *
-    * @param {import('#svelte-fvtt/application').SvelteApplication} app - A SvelteApplication
+    * @param {import('#svelte-fvtt/application').SvelteApp} app - A SvelteApp
     *
     * @package
     */
@@ -1409,7 +1326,7 @@ class TJSAppIndex
     *
     * @param {string}   key - App ID.
     *
-    * @returns {import('#svelte-fvtt/application').SvelteApplication} Associated app.
+    * @returns {import('#svelte-fvtt/application').SvelteApp} Associated app.
     */
    static get(key)
    {
@@ -1437,7 +1354,7 @@ class TJSAppIndex
    }
 
    /**
-    * @returns {IterableIterator<import('#svelte-fvtt/application').SvelteApplication>} All visible apps.
+    * @returns {IterableIterator<import('#svelte-fvtt/application').SvelteApp>} All visible apps.
     */
    static values()
    {
@@ -1461,19 +1378,19 @@ class FoundryHMRSupport
                {
                   for (const app of TJSAppIndex.values())
                   {
-                     const appShell = app.svelte.applicationShell;
+                     const appShell = app.svelte.appShell;
 
                      // Retrieve the original `svelte-hmr` instrumented HMR component / not the proxy.
                      const hmrComponent = appShell?.$$?.hmr_cmp;
 
                      if (appShell && typeof hmrComponent?.$replace === 'function')
                      {
-                        const svelteData = app.svelte.dataByComponent(appShell);
+                        const svelteData = app.svelte.appShellData;
                         if (svelteData)
                         {
                            try
                            {
-                              // Replace with self; this will invoke `on_hmr` callback in associated SvelteApplication.
+                              // Replace with self; this will invoke `on_hmr` callback in associated SvelteApp.
                               hmrComponent.$replace(hmrComponent.constructor, {
                                  target: svelteData.config.target,
                                  anchor: svelteData.config.anchor,
@@ -1509,19 +1426,19 @@ class FoundryHMRSupport
  *
  * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
  */
-class SvelteApplication extends Application
+class SvelteApp extends Application
 {
    /**
     * Stores the first mounted component which follows the application shell contract.
     *
-    * @type {import('./internal/state-svelte/types').MountedAppShell[] | null[]} Application shell.
+    * @type {import('svelte').SvelteComponent[] | null[]} Application shell.
     */
    #applicationShellHolder = [null];
 
    /**
     * Stores and manages application state for saving / restoring / serializing.
     *
-    * @type {ApplicationState}
+    * @type {import('./types').SvelteApp.API.State}
     */
    #applicationState;
 
@@ -1578,15 +1495,15 @@ class SvelteApplication extends Application
    /**
     * Stores SvelteData entries with instantiated Svelte components.
     *
-    * @type {import('./internal/state-svelte/types').SvelteData[]}
+    * @type {import('./internal/state-svelte/types').SvelteData[] | null[]}
     */
-   #svelteData = [];
+   #svelteData = [null];
 
    /**
     * Provides a helper class that combines multiple methods for interacting with the mounted components tracked in
     * #svelteData.
     *
-    * @type {GetSvelteData}
+    * @type {import('./types').SvelteApp.API.Svelte<Options>}
     */
    #getSvelteData = new GetSvelteData(this.#applicationShellHolder, this.#svelteData);
 
@@ -1598,7 +1515,7 @@ class SvelteApplication extends Application
    #stores;
 
    /**
-    * @param {Partial<Options>} [options] - The options for the application.
+    * @param {Partial<import('./types').SvelteApp.Options>} [options] - The options for the application.
     */
    constructor(options = {})
    {
@@ -1606,10 +1523,9 @@ class SvelteApplication extends Application
 
       if (!isObject(this.options.svelte))
       {
-         throw new Error(`SvelteApplication - constructor - No Svelte configuration object found in 'options'.`);
+         throw new Error(`SvelteApp - constructor - No Svelte configuration object found in 'options'.`);
       }
 
-      /** @type {ApplicationState} */
       this.#applicationState = new ApplicationState(this);
 
       // Initialize TJSPosition with the position object set by Application.
@@ -1627,9 +1543,9 @@ class SvelteApplication extends Application
       /**
        * Define accessors to retrieve TJSPosition by `this.position`.
        *
-       * @member {TJSPosition} position - Adds accessors to SvelteApplication to get / set the position data.
+       * @member {TJSPosition} position - Adds accessors to SvelteApp to get / set the position data.
        *
-       * @memberof SvelteApplication#
+       * @memberof SvelteApp#
        */
       Object.defineProperty(this, 'position', {
          get: () => this.#position,
@@ -1642,7 +1558,7 @@ class SvelteApplication extends Application
    }
 
    /**
-    * Specifies the default options that SvelteApplication supports.
+    * Specifies the default options that SvelteApp supports.
     *
     * @returns {import('./types').SvelteApp.Options} options - Application options.
     * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
@@ -1666,7 +1582,7 @@ class SvelteApplication extends Application
          positionInitial: TJSPosition.Initial.browserCentered,      // A helper for initial position placement.
          positionOrtho: true,             // When true TJSPosition is optimized for orthographic use.
          positionValidator: TJSPosition.Validators.transformWindow, // A function providing the default validator.
-         sessionStorage: void 0,          // An instance of WebStorage (session) to share across SvelteApplications.
+         sessionStorage: void 0,          // An instance of WebStorage (session) to share across SvelteApps.
          svelte: void 0,                  // A Svelte configuration object.
          transformOrigin: 'top left'      // By default, 'top / left' respects rotation when minimizing.
       });
@@ -1687,23 +1603,23 @@ class SvelteApplication extends Application
    get elementTarget() { return this.#elementTarget; }
 
    /**
-    * Returns the reactive accessors & Svelte stores for SvelteApplication.
+    * Returns the reactive accessors & Svelte stores for SvelteApp.
     *
-    * @returns {import('./internal/state-reactive/types').SvelteReactive} The reactive accessors & Svelte stores.
+    * @returns {import('./types').SvelteApp.API.Reactive} The reactive accessors & Svelte stores.
     */
    get reactive() { return this.#reactive; }
 
    /**
     * Returns the application state manager.
     *
-    * @returns {import('./internal/state-app/types').ApplicationState} The application state manager.
+    * @returns {import('./types').SvelteApp.API.State} The application state manager.
     */
    get state() { return this.#applicationState; }
 
    /**
-    * Returns the Svelte helper class w/ various methods to access mounted Svelte components.
+    * Returns the `Svelte` helper class w/ various methods to access the mounted application shell component.
     *
-    * @returns {import('./internal/state-svelte/types').GetSvelteData} GetSvelteData
+    * @returns {import('./types').SvelteApp.API.Svelte<Options>} `Svelte` / mounted application shell API.
     */
    get svelte() { return this.#getSvelteData; }
 
@@ -1871,6 +1787,8 @@ class SvelteApplication extends Application
       // Manually invoke the destroy callbacks for all Svelte components.
       for (const entry of this.#svelteData)
       {
+         if (!isObject(entry)) { continue; }
+
          // Use `outroAndDestroy` to run outro transitions before destroying.
          svelteDestroyPromises.push(TJSSvelteUtil.outroAndDestroy(entry.component));
 
@@ -1890,7 +1808,7 @@ class SvelteApplication extends Application
       TJSAppIndex.delete(this);
 
       // Reset SvelteData like this to maintain reference to GetSvelteData / `this.svelte`.
-      this.#svelteData.length = 0;
+      this.#svelteData[0] = null;
 
       // Remove element from the DOM. Most SvelteComponents have already removed it.
       el.remove();
@@ -1981,7 +1899,7 @@ class SvelteApplication extends Application
       // A sanity check; absence should be detected in constructor.
       if (!isObject(this.options.svelte))
       {
-         throw new Error(`SvelteApplication - _injectHTML - No Svelte configuration object found in 'options'.`);
+         throw new Error(`SvelteApp - _injectHTML - No Svelte configuration object found in 'options'.`);
       }
 
       const svelteData = loadSvelteConfig({
@@ -1991,10 +1909,10 @@ class SvelteApplication extends Application
       });
 
       // A sanity check as shouldn't hit this case as only one component is being mounted.
-      if (this.svelte.applicationShell !== null)
+      if (this.svelte.appShell !== null)
       {
          throw new Error(
-          `SvelteApplication - _injectHTML - An application shell is already mounted; offending config:\n` +
+          `SvelteApp - _injectHTML - An application shell is already mounted; offending config:\n` +
            `${JSON.stringify(this.options.svelte)}`);
       }
 
@@ -2009,19 +1927,19 @@ class SvelteApplication extends Application
          svelteData.component.$$.on_hmr.push(() => () => this.#updateApplicationShell());
       }
 
-      this.#svelteData.push(svelteData);
+      this.#svelteData[0] = svelteData;
 
       // Wrap `elementRoot` as a JQuery object and set to AppV1 / Application element.
-      this._element = $(this.svelte.applicationShell.elementRoot);
+      this._element = $(this.svelte.appShell.elementRoot);
 
       // Detect if the application shell exports an `elementContent` accessor.
-      this.#elementContent = hasGetter(this.svelte.applicationShell, 'elementContent') ?
-       this.svelte.applicationShell.elementContent : null;
+      this.#elementContent = hasGetter(this.svelte.appShell, 'elementContent') ?
+       this.svelte.appShell.elementContent : null;
 
       // Detect if the application shell exports an `elementTarget` accessor if not set `elementTarget` to
       // `elementRoot`.
-      this.#elementTarget = hasGetter(this.svelte.applicationShell, 'elementTarget') ?
-       this.svelte.applicationShell.elementTarget : this.svelte.applicationShell.elementRoot;
+      this.#elementTarget = hasGetter(this.svelte.appShell, 'elementTarget') ? this.svelte.appShell.elementTarget :
+       this.svelte.appShell.elementRoot;
 
       // The initial zIndex may be set in application options or for popOut applications is stored by `_renderOuter`
       // in `this.#initialZIndex`.
@@ -2040,7 +1958,7 @@ class SvelteApplication extends Application
     *
     * Note: the sanity check is duplicated from {@link Application.maximize} the store is updated _before_
     * performing the rest of animations. This allows application shells to remove / show any resize handlers
-    * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
+    * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApp.minimize}
     * to animate the content area.
     *
     * @param {object}   [opts] - Optional parameters.
@@ -2142,7 +2060,7 @@ class SvelteApplication extends Application
     *
     * Note: the sanity check is duplicated from {@link Application.minimize} the store is updated _before_
     * performing the rest of animations. This allows application shells to remove / show any resize handlers
-    * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
+    * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApp.minimize}
     * to animate the content area.
     *
     * @param {object}   [opts] - Optional parameters.
@@ -2264,21 +2182,15 @@ class SvelteApplication extends Application
 
    /**
     * Provides a callback after all Svelte components are initialized.
-    *
-    * @param {import('./internal/state-svelte/types').MountedAppShell} [mountedAppShell] - The mounted app shell
-    *        elements.
     */
-   onSvelteMount(mountedAppShell) {} // eslint-disable-line no-unused-vars
+   onSvelteMount() {} // eslint-disable-line no-unused-vars
 
    /**
     * Provides a callback after the main application shell is remounted. This may occur during HMR / hot module
     * replacement or directly invoked from the `elementRootUpdate` callback passed to the application shell component
     * context.
-    *
-    * @param {import('./internal/state-svelte/types').MountedAppShell} [mountedAppShell] - The mounted app shell
-    *        elements.
     */
-   onSvelteRemount(mountedAppShell) {} // eslint-disable-line no-unused-vars
+   onSvelteRemount() {} // eslint-disable-line no-unused-vars
 
    /**
     * Override replacing HTML as Svelte components control the rendering process. Only potentially change the outer
@@ -2298,7 +2210,7 @@ class SvelteApplication extends Application
    /**
     * Provides an override verifying that a new Application being rendered for the first time doesn't have a
     * corresponding DOM element already loaded. This is a check that only occurs when `this._state` is
-    * `Application.RENDER_STATES.NONE`. It is useful in particular when SvelteApplication has a static ID
+    * `Application.RENDER_STATES.NONE`. It is useful in particular when SvelteApp has a static ID
     * explicitly set in `this.options.id` and long intro / outro transitions are assigned. If a new application
     * sharing this static ID attempts to open / render for the first time while an existing DOM element sharing
     * this static ID exists then the initial render is cancelled below rather than crashing later in the render
@@ -2320,7 +2232,7 @@ class SvelteApplication extends Application
          if (this._state === Application.RENDER_STATES.NONE &&
           A11yHelper.isFocusTarget(activeWindow.document.querySelector(`#${this.id}`)))
          {
-            console.warn(`SvelteApplication - _render: A DOM element already exists for CSS ID '${this.id
+            console.warn(`SvelteApp - _render: A DOM element already exists for CSS ID '${this.id
              }'. Cancelling initial render for new application with appId '${this.appId}'.`);
 
             return;
@@ -2328,7 +2240,7 @@ class SvelteApplication extends Application
       }
       catch (err)
       {
-         console.warn(`SvelteApplication - _render: Potentially malformed application ID '${this.id
+         console.warn(`SvelteApp - _render: Potentially malformed application ID '${this.id
           }'. Cancelling initial render for new application with appId '${this.appId}'.`);
 
          return;
@@ -2379,11 +2291,7 @@ class SvelteApplication extends Application
          // Add to visible apps tracked.
          TJSAppIndex.add(this);
 
-         this.onSvelteMount({
-            elementRoot: /** @type {HTMLElement} */ this._element[0],
-            elementContent: this.#elementContent,
-            elementTarget: this.#elementTarget
-         });
+         this.onSvelteMount();
 
          this.#onMount = true;
       }
@@ -2439,13 +2347,13 @@ class SvelteApplication extends Application
 
    /**
     * This method is invoked by the `elementRootUpdate` callback that is added to the external context passed to
-    * Svelte components. When invoked it updates the local element roots tracked by SvelteApplication.
+    * Svelte components. When invoked it updates the local element roots tracked by SvelteApp.
     *
     * This method may also be invoked by HMR / hot module replacement via `svelte-hmr`.
     */
    #updateApplicationShell()
    {
-      const applicationShell = this.svelte.applicationShell;
+      const applicationShell = this.svelte.appShell;
 
       if (applicationShell !== null)
       {
@@ -2480,11 +2388,7 @@ class SvelteApplication extends Application
 
          super._activateCoreListeners([this.popOut ? this.#elementTarget?.firstChild : this.#elementTarget]);
 
-         this.onSvelteRemount({
-            elementRoot: /** @type {HTMLElement} */ this._element[0],
-            elementContent: this.#elementContent,
-            elementTarget: this.#elementTarget
-         });
+         this.onSvelteRemount();
       }
    }
 }
@@ -2498,7 +2402,7 @@ class PopoutSupport
    {
       Hooks.on('PopOut:loading', (app, popout) =>
       {
-         if (app instanceof SvelteApplication)
+         if (app instanceof SvelteApp)
          {
             // Disable app position system.
             app.position.enabled = false;
@@ -2528,7 +2432,7 @@ class PopoutSupport
     */
    static #handleRejoin(app)
    {
-      if (app instanceof SvelteApplication)
+      if (app instanceof SvelteApp)
       {
          // Enable the app position system.
          app.position.enabled = true;
@@ -2550,7 +2454,7 @@ class PopoutSupport
 class TJSDialogData
 {
    /**
-    * @type {import('../../index.js').SvelteApplication}
+    * @type {import('../../index.js').SvelteApp}
     */
    #application;
 
@@ -2562,7 +2466,7 @@ class TJSDialogData
    #internal = {};
 
    /**
-    * @param {import('../../index.js').SvelteApplication} application - The host Foundry application.
+    * @param {import('../../index.js').SvelteApp} application - The host Foundry application.
     */
    constructor(application)
    {
@@ -3014,7 +2918,7 @@ class TJSDialogData
     */
    #updateComponent()
    {
-      const component = this.#application.svelte.component(0);
+      const component = this.#application.svelte.appShell;
       if (component?.data) { component.data = this.clone(); }
    }
 }
@@ -3051,9 +2955,9 @@ class TJSDialogData
  * dialog with {@link TJSDialog.confirm} and an 'ok' single button dialog with {@link TJSDialog.prompt}.
  *
  * @template [Options = import('./types').SvelteApp.Options]
- * @augments {SvelteApplication<Options>}
+ * @augments {SvelteApp<Options>}
  */
-class TJSDialog extends SvelteApplication
+class TJSDialog extends SvelteApp
 {
    /** @type {TJSDialogData} */
    #data;
@@ -3064,29 +2968,17 @@ class TJSDialog extends SvelteApplication
    /**
     * @param {import('./internal/state-dialog/types').TJSDialogOptions} data - Dialog options.
     *
-    * @param {Options}   [options] - SvelteApplication options.
+    * @param {Partial<Options>}   [options] - SvelteApp options.
     */
    constructor(data, options = {})
    {
       // Note: explicit setting of `popOutModuleDisable` to prevent the PopOut! module from acting on modal dialogs.
-      // @ts-expect-error
-      super({ popOutModuleDisable: data?.modal ?? false, ...options });
+      super({ popOutModuleDisable: typeof data?.modal === 'boolean' ? data.modal : false, ...options });
 
       this.#managedPromise = new ManagedPromise();
 
       this.#data = new TJSDialogData(this);
       this.#data.replace(data);
-
-      /**
-       * @member {object} dialogComponent - A getter to SvelteData to retrieve any mounted Svelte component as the
-       *                                    dialog content.
-       *
-       * @memberof GetSvelteData#
-       * @readonly
-       */
-      Object.defineProperty(this.svelte, 'dialogComponent', {
-         get: () => this.svelte?.applicationShell?.dialogComponent,
-      });
    }
 
    /**
@@ -3098,7 +2990,7 @@ class TJSDialog extends SvelteApplication
     */
    static get defaultOptions()
    {
-      return deepMerge(super.defaultOptions, {
+      return /** @type {import('./types').SvelteApp.Options} */ deepMerge(super.defaultOptions, {
          classes: ['dialog', 'tjs-dialog'],
          width: 400,
          height: 'auto',
@@ -3243,8 +3135,8 @@ class TJSDialog extends SvelteApplication
     *        async function. When defined as a string any matching function by name exported from content Svelte
     *        component is invoked.
     *
-    * @param {import('./types').SvelteApp.Options}  [options]  SvelteApplication options passed to the TJSDialog
-    *        constructor.
+    * @param {Partial<import('./types').SvelteApp.Options>}  [options]  SvelteApp options passed to the
+    *        TJSDialog constructor.
     *
     * @returns {Promise<T>} A promise which resolves with result of yes / no callbacks or true / false.
     *
@@ -3316,7 +3208,7 @@ class TJSDialog extends SvelteApplication
 
          case 'string':
          {
-            const dialogComponent = application?.svelte?.dialogComponent;
+            const dialogComponent = application?.svelte?.appShell?.dialogComponent;
 
             // Attempt lookup by function name in dialog instance component.
             if (dialogComponent !== void 0 && typeof dialogComponent?.[callback] === 'function')
@@ -3363,8 +3255,8 @@ class TJSDialog extends SvelteApplication
     *
     * @param {string}   [data.icon="fas fa-check"] - Set another icon besides `fas fa-check` for button.
     *
-    * @param {import('./types').SvelteApp.Options}  [options]  SvelteApplication options passed to the TJSDialog
-    *        constructor.
+    * @param {Partial<import('./types').SvelteApp.Options>}  [options]  SvelteApp options passed to the
+    *        TJSDialog constructor.
     *
     * @returns {Promise<T>} The returned value from the provided callback function or `true` if the button
     *          is pressed.
@@ -3406,8 +3298,8 @@ class TJSDialog extends SvelteApplication
     * @param {import('./internal/state-dialog/types').TJSDialogOptions}  data - Dialog data passed to the TJSDialog
     *        constructor.
     *
-    * @param {import('./types').SvelteApp.Options}  [options]  SvelteApplication options passed to the TJSDialog
-    *        constructor.
+    * @param {Partial<import('./types').SvelteApp.Options>}  [options]  SvelteApp options passed to the
+    *        TJSDialog constructor.
     *
     * @returns {Promise<T>} A Promise that resolves to the chosen result.
     */
@@ -3426,5 +3318,5 @@ if (import.meta.hot) { FoundryHMRSupport.initialize(); }
 // Handle `PopOut!` module hooks to allow applications to popout to their own browser window.
 PopoutSupport.initialize();
 
-export { SvelteApplication, TJSDialog };
+export { SvelteApp, SvelteApp as SvelteApplication, TJSDialog };
 //# sourceMappingURL=index.js.map

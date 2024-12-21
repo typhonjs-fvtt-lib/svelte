@@ -7,739 +7,661 @@ import {
   TJSPositionTypes,
   TJSPosition,
 } from '@typhonjs-svelte/runtime-base/svelte/store/position';
-import { SvelteComponent } from 'svelte';
-import { TJSSvelteConfig } from '@typhonjs-svelte/runtime-base/svelte/util';
-import { EasingReference } from '@typhonjs-svelte/runtime-base/svelte/easing';
+
+import { SvelteComponent, ComponentEvents, ComponentProps } from 'svelte';
 import { Readable, Writable } from 'svelte/store';
-import { WebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import { A11yFocusSource } from '@typhonjs-svelte/runtime-base/util/a11y';
+import { EasingReference } from '@typhonjs-svelte/runtime-base/svelte/easing';
+import { WebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
+import { TJSSvelteConfig } from '@typhonjs-svelte/runtime-base/svelte/util';
 import * as _runtime_util_async from '@typhonjs-svelte/runtime-base/util/async';
 import { TransitionFunction } from '@typhonjs-svelte/runtime-base/svelte/transition';
 
-/**
- * Provides a mechanism to retrieve and query all mounted Svelte components including the main application shell.
- */
-declare interface GetSvelteData {
-  /**
-   * Returns any mounted {@link MountedAppShell}.
-   *
-   * @returns {MountedAppShell | null} Any mounted application shell.
-   */
-  get applicationShell(): MountedAppShell;
-  /**
-   * Returns the indexed Svelte component.
-   *
-   * @param {number}   index - The index of Svelte component to retrieve.
-   *
-   * @returns {SvelteComponent} The loaded Svelte component.
-   */
-  component(index: number): object;
-  /**
-   * Returns the Svelte component entries iterator.
-   *
-   * @returns {IterableIterator<[number, SvelteComponent]>} Svelte component entries iterator.
-   * @yields
-   */
-  componentEntries(): IterableIterator<[number, SvelteComponent]>;
-  /**
-   * Returns the Svelte component values iterator.
-   *
-   * @returns {IterableIterator<SvelteComponent>} Svelte component values iterator.
-   * @yields
-   */
-  componentValues(): IterableIterator<SvelteComponent>;
-  /**
-   * Returns the indexed SvelteData entry.
-   *
-   * @param {number}   index - The index of SvelteData instance to retrieve.
-   *
-   * @returns {SvelteData} The loaded Svelte config + component.
-   */
-  data(index: number): SvelteData;
-  /**
-   * Returns the {@link SvelteData} instance for a given component.
-   *
-   * @param {SvelteComponent} component - Svelte component.
-   *
-   * @returns {SvelteData} -  The loaded Svelte config + component.
-   */
-  dataByComponent(component: SvelteComponent): SvelteData;
-  /**
-   * Returns the SvelteData entries iterator.
-   *
-   * @returns {IterableIterator<[number, SvelteData]>} SvelteData entries iterator.
-   */
-  dataEntries(): IterableIterator<[number, SvelteData]>;
-  /**
-   * Returns the SvelteData values iterator.
-   *
-   * @returns {IterableIterator<SvelteData>} SvelteData values iterator.
-   */
-  dataValues(): IterableIterator<SvelteData>;
-  /**
-   * Returns the length of the mounted Svelte component list.
-   *
-   * @returns {number} Length of mounted Svelte component list.
-   */
-  get length(): number;
-}
-/**
- * Application shell contract for Svelte components.
- */
-type MountedAppShell = {
-  /**
-   * The root element / exported prop.
-   */
-  elementRoot: HTMLElement;
-  /**
-   * The content element / exported prop.
-   */
-  elementContent?: HTMLElement;
-  /**
-   * The target element / exported prop.
-   */
-  elementTarget?: HTMLElement;
-};
-/**
- * Provides access to a mounted Svelte component.
- */
-type SvelteData = {
-  /**
-   * The TJSSvelteConfig for this component.
-   */
-  config: TJSSvelteConfig;
-  /**
-   * The svelte component instance.
-   */
-  component: SvelteComponent;
-  /**
-   * The main bound element.
-   */
-  element: HTMLElement;
-};
-
-/**
- * Contains the reactive functionality / Svelte stores associated with SvelteApplication and retrievable by
- * {@link SvelteApplication.reactive}.
- *
- * There are several reactive getters for UI state such and for two-way bindings / stores see
- * {@link SvelteReactive.storeUIState}:
- * - {@link SvelteReactive.dragging}
- * - {@link SvelteReactive.minimized}
- * - {@link SvelteReactive.resizing}
- *
- * There are also reactive getters / setters for {@link SvelteApp.Options} and Foundry
- * {@link ApplicationOptions}. You can use the following as one way bindings and update the associated stores. For
- * two-way bindings / stores see {@link SvelteReactive.storeAppOptions}.
- *
- * - {@link SvelteReactive.draggable}
- * - {@link SvelteReactive.focusAuto}
- * - {@link SvelteReactive.focusKeep}
- * - {@link SvelteReactive.focusTrap}
- * - {@link SvelteReactive.headerButtonNoClose}
- * - {@link SvelteReactive.headerButtonNoLabel}
- * - {@link SvelteReactive.headerIcon}
- * - {@link SvelteReactive.headerNoTitleMinimized}
- * - {@link SvelteReactive.minimizable}
- * - {@link SvelteReactive.popOut}
- * - {@link SvelteReactive.positionable}
- * - {@link SvelteReactive.resizable}
- * - {@link SvelteReactive.title}
- *
- * An instance of TJSWebStorage (session) / TJSSessionStorage is accessible via {@link SvelteReactive.sessionStorage}.
- * Optionally you can pass in an existing TJSWebStorage instance that can be shared across multiple SvelteApplications
- * by setting {@link SvelteApp.Options.sessionStorage}.
- *
- * -------------------------------------------------------------------------------------------------------------------
- *
- * This API is not sealed, and it is recommended that you extend it with accessors to get / set data that is reactive
- * in your application. An example of setting an exported prop `document` from the main mounted application shell.
- *
- * @example
- * ```js
- * import { hasSetter } from '#runtime/util/object';
- *
- * // Note: make a normal comment.
- * //  * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with
- * //  *                             Document with the mounted application shell Svelte component.
- * //  *
- * //  * @memberof SvelteReactive#
- * //  *
- * Object.defineProperty(this.reactive, 'document', {
- *    get: () => this.svelte?.applicationShell?.document,
- *    set: (document) =>
- *    {
- *       const component = this.svelte?.applicationShell;
- *       if (hasSetter(component, 'document')) { component.document = document; }
- *    }
- * });
- * ```
- */
-declare interface SvelteReactive {
-  /**
-   * @returns {WebStorage} Returns WebStorage (session) instance.
-   */
-  get sessionStorage(): WebStorage;
-  /**
-   * Returns the store for app options.
-   *
-   * @returns {StoreAppOptions} App options store.
-   */
-  get storeAppOptions(): StoreAppOptions;
-  /**
-   * Returns the store for UI options.
-   *
-   * @returns {StoreUIOptions} UI options store.
-   */
-  get storeUIState(): StoreUIOptions;
-  /**
-   * Returns the draggable app option.
-   *
-   * @returns {boolean} Draggable app option.
-   */
-  get draggable(): boolean;
-  /**
-   * Sets `this.options.draggable` which is reactive for application shells.
-   *
-   * @param {boolean}  draggable - Sets the draggable option.
-   */
-  set draggable(draggable: boolean);
-  /**
-   * Returns the focusAuto app option.
-   *
-   * @returns {boolean} When true auto-management of app focus is enabled.
-   */
-  get focusAuto(): boolean;
-  /**
-   * Sets `this.options.focusAuto` which is reactive for application shells.
-   *
-   * @param {boolean}  focusAuto - Sets the focusAuto option.
-   */
-  set focusAuto(focusAuto: boolean);
-  /**
-   * Returns the focusKeep app option.
-   *
-   * @returns {boolean} When `focusAuto` and `focusKeep` is true; keeps internal focus.
-   */
-  get focusKeep(): boolean;
-  /**
-   * Sets `this.options.focusKeep` which is reactive for application shells.
-   *
-   * @param {boolean}  focusKeep - Sets the focusKeep option.
-   */
-  set focusKeep(focusKeep: boolean);
-  /**
-   * Returns the focusTrap app option.
-   *
-   * @returns {boolean} When true focus trapping / wrapping is enabled keeping focus inside app.
-   */
-  get focusTrap(): boolean;
-  /**
-   * Sets `this.options.focusTrap` which is reactive for application shells.
-   *
-   * @param {boolean}  focusTrap - Sets the focusTrap option.
-   */
-  set focusTrap(focusTrap: boolean);
-  /**
-   * Returns the headerButtonNoClose app option.
-   *
-   * @returns {boolean} Remove the close the button in header app option.
-   */
-  get headerButtonNoClose(): boolean;
-  /**
-   * Sets `this.options.headerButtonNoClose` which is reactive for application shells.
-   *
-   * @param {boolean}  headerButtonNoClose - Sets the headerButtonNoClose option.
-   */
-  set headerButtonNoClose(headerButtonNoClose: boolean);
-  /**
-   * Returns the headerButtonNoLabel app option.
-   *
-   * @returns {boolean} Remove the labels from buttons in header app option.
-   */
-  get headerButtonNoLabel(): boolean;
-  /**
-   * Sets `this.options.headerButtonNoLabel` which is reactive for application shells.
-   *
-   * @param {boolean}  headerButtonNoLabel - Sets the headerButtonNoLabel option.
-   */
-  set headerButtonNoLabel(headerButtonNoLabel: boolean);
-  /**
-   * Returns the headerIcon app option.
-   *
-   * @returns {string | undefined} URL for header app icon.
-   */
-  get headerIcon(): string | undefined;
-  /**
-   * Sets `this.options.headerIcon` which is reactive for application shells.
-   *
-   * @param {string | undefined}  headerIcon - Sets the headerButtonNoLabel option.
-   */
-  set headerIcon(headerIcon: string | undefined);
-  /**
-   * Returns the headerNoTitleMinimized app option.
-   *
-   * @returns {boolean} When true removes the header title when minimized.
-   */
-  get headerNoTitleMinimized(): boolean;
-  /**
-   * Sets `this.options.headerNoTitleMinimized` which is reactive for application shells.
-   *
-   * @param {boolean}  headerNoTitleMinimized - Sets the headerNoTitleMinimized option.
-   */
-  set headerNoTitleMinimized(headerNoTitleMinimized: boolean);
-  /**
-   * Returns the minimizable app option.
-   *
-   * @returns {boolean} Minimizable app option.
-   */
-  get minimizable(): boolean;
-  /**
-   * Sets `this.options.minimizable` which is reactive for application shells that are also pop out.
-   *
-   * @param {boolean}  minimizable - Sets the minimizable option.
-   */
-  set minimizable(minimizable: boolean);
-  /**
-   * Returns the Foundry popOut state; {@link ApplicationOptions.popOut}
-   *
-   * @returns {boolean} Positionable app option.
-   */
-  get popOut(): boolean;
-  /**
-   * Sets `this.options.popOut` which is reactive for application shells. This will add / remove this application
-   * from `ui.windows`.
-   *
-   * @param {boolean}  popOut - Sets the popOut option.
-   */
-  set popOut(popOut: boolean);
-  /**
-   * Returns the positionable app option; {@link SvelteApp.Options.positionable}
-   *
-   * @returns {boolean} Positionable app option.
-   */
-  get positionable(): boolean;
-  /**
-   * Sets `this.options.positionable` enabling / disabling {@link SvelteApplication.position}.
-   *
-   * @param {boolean}  positionable - Sets the positionable option.
-   */
-  set positionable(positionable: boolean);
-  /**
-   * Returns the resizable option.
-   *
-   * @returns {boolean} Resizable app option.
-   */
-  get resizable(): boolean;
-  /**
-   * Sets `this.options.resizable` which is reactive for application shells.
-   *
-   * @param {boolean}  resizable - Sets the resizable option.
-   */
-  set resizable(resizable: boolean);
-  /**
-   * Returns the title accessor from the parent Application class; {@link ApplicationOptions.title}
-   *
-   * @returns {string} Title.
-   */
-  get title(): string;
-  /**
-   * Sets `this.options.title` which is reactive for application shells.
-   *
-   * Note: Will set empty string if title is undefined or null.
-   *
-   * @param {string | undefined | null}   title - Application title; will be localized, so a translation key is fine.
-   */
-  set title(title: string);
-  /**
-   * Returns the current active Window / WindowProxy UI state.
-   *
-   * @returns {Window} Active window UI state.
-   */
-  get activeWindow(): Window;
-  /**
-   * Returns the current dragging UI state.
-   *
-   * @returns {boolean} Dragging UI state.
-   */
-  get dragging(): boolean;
-  /**
-   * Returns the current minimized UI state.
-   *
-   * @returns {boolean} Minimized UI state.
-   */
-  get minimized(): boolean;
-  /**
-   * Returns the current resizing UI state.
-   *
-   * @returns {boolean} Resizing UI state.
-   */
-  get resizing(): boolean;
-  /**
-   * Sets the current active Window / WindowProxy UI state.
-   *
-   * Note: This is protected usage and used internally.
-   *
-   * @param {Window} activeWindow - Active Window / WindowProxy UI state.
-   */
-  set activeWindow(activeWindow: Window);
-  /**
-   * Provides a way to safely get this applications options given an accessor string which describes the
-   * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
-   * to walk.
-   *
-   * @param {string}   accessor - The path / key to set. You can set multiple levels.
-   *
-   * @param {*}        [defaultValue] - A default value returned if the accessor is not found.
-   *
-   * @returns {*} Value at the accessor.
-   */
-  getOptions(accessor: string, defaultValue?: any): any;
-  /**
-   * Provides a way to merge `options` into this applications options and update the appOptions store.
-   *
-   * @param {object}   options - The options object to merge with `this.options`.
-   */
-  mergeOptions(options: object): void;
-  /**
-   * Provides a way to safely set this applications options given an accessor string which describes the
-   * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
-   * to walk.
-   *
-   * Additionally, if an application shell Svelte component is mounted and exports the `appOptions` property then
-   * the application options is set to `appOptions` potentially updating the application shell / Svelte component.
-   *
-   * @param {string}   accessor - The path / key to set. You can set multiple levels.
-   *
-   * @param {any}        value - Value to set.
-   */
-  setOptions(accessor: string, value: any): void;
-  /**
-   * Serializes the main {@link SvelteApp.Options} for common application state.
-   */
-  toJSON(): SvelteReactiveData;
-  /**
-   * Updates the UI Options store with the current header buttons. You may dynamically add / remove header buttons
-   * if using an application shell Svelte component. In either overriding `_getHeaderButtons` or responding to the
-   * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
-   * the new buttons.
-   *
-   * Optionally you can set in the SvelteApplication app options {@link SvelteApp.Options.headerButtonNoClose}
-   * to remove the close button and {@link SvelteApp.Options.headerButtonNoLabel} to true and labels will be
-   * removed from the header buttons.
-   *
-   * @param {object} [opts] - Optional parameters (for internal use)
-   *
-   * @param {boolean} [opts.headerButtonNoClose] - The value for `headerButtonNoClose`.
-   *
-   * @param {boolean} [opts.headerButtonNoLabel] - The value for `headerButtonNoLabel`.
-   */
-  updateHeaderButtons({
-    headerButtonNoClose,
-    headerButtonNoLabel,
-  }?: {
-    headerButtonNoClose?: boolean;
-    headerButtonNoLabel?: boolean;
-  }): void;
-}
-/**
- * Provides a custom readable Svelte store for Application options state.
- */
-type StoreAppOptions = {
-  /**
-   * Subscribe to all app options updates.
-   */
-  subscribe: Readable<object>;
-  /**
-   * Derived store for `draggable` updates.
-   */
-  draggable: Writable<boolean>;
-  /**
-   * Derived store for `focusAuto` updates.
-   */
-  focusAuto: Writable<boolean>;
-  /**
-   * Derived store for `focusKeep` updates.
-   */
-  focusKeep: Writable<boolean>;
-  /**
-   * Derived store for `focusTrap` updates.
-   */
-  focusTrap: Writable<boolean>;
-  /**
-   * Derived store for `headerButtonNoClose` updates.
-   */
-  headerButtonNoClose: Writable<boolean>;
-  /**
-   * Derived store for `headerButtonNoLabel` updates.
-   */
-  headerButtonNoLabel: Writable<boolean>;
-  /**
-   * Derived store for `headerIcon` updates.
-   */
-  headerIcon: Writable<string>;
-  /**
-   * Derived store for `headerNoTitleMinimized` updates.
-   */
-  headerNoTitleMinimized: Writable<boolean>;
-  /**
-   * Derived store for `minimizable` updates.
-   */
-  minimizable: Writable<boolean>;
-  /**
-   * Derived store for `popOut` updates.
-   */
-  popOut: Writable<boolean>;
-  /**
-   * Derived store for `positionable` updates.
-   */
-  positionable: Writable<boolean>;
-  /**
-   * Derived store for `resizable` updates.
-   */
-  resizable: Writable<boolean>;
-  /**
-   * Derived store for `title` updates.
-   */
-  title: Writable<string>;
-};
-/**
- * Provides a custom readable Svelte store for UI options state.
- */
-type StoreUIOptions = {
-  /**
-   * Subscribe to all UI options updates.
-   */
-  subscribe: Readable<object>;
-  /**
-   * Derived store for `dragging` updates.
-   */
-  dragging: Writable<boolean>;
-  /**
-   * Derived store for `headerButtons` updates.
-   */
-  headerButtons: Readable<globalThis.ApplicationHeaderButton[]>;
-  /**
-   * Derived store for `minimized` updates.
-   */
-  minimized: Readable<boolean>;
-  /**
-   * Derived store for `resizing` updates.
-   */
-  resizing: Writable<boolean>;
-};
-/**
- * Defines the bulk serializable data from {@link SvelteReactive.toJSON} for common application state.
- */
-type SvelteReactiveData = {
-  /**
-   * If true then application shells are draggable.
-   */
-  draggable: boolean;
-  /**
-   * When true auto-management of app focus is enabled.
-   */
-  focusAuto: boolean;
-  /**
-   * When `focusAuto` and `focusKeep` is true; keeps internal focus.
-   */
-  focusKeep: boolean;
-  /**
-   * When true focus trapping / wrapping is enabled keeping focus inside app.
-   */
-  focusTrap: boolean;
-  /**
-   * If true then the close header button is removed.
-   */
-  headerButtonNoClose: boolean;
-  /**
-   * If true then header button labels are removed.
-   */
-  headerButtonNoLabel: boolean;
-  /**
-   * If true then header title is hidden when minimized.
-   */
-  headerNoTitleMinimized: boolean;
-  /**
-   * If true then application shells are minimizable.
-   */
-  minimizable: boolean;
-  /**
-   * If false then `position.set` does not take effect.
-   */
-  positionable: boolean;
-  /**
-   * If true then application shells are resizable.
-   */
-  resizable: boolean;
-};
-
-/**
- * Provides the ability the save / restore / serialize application state for positional and UI state such as minimized
- * status.
- *
- * You can restore a saved state with animation; please see the options of {@link ApplicationState.restore}.
- */
-declare interface ApplicationState {
-  /**
-   * Clears all saved application state.
-   */
-  clear(): void;
-  /**
-   * Returns current application state along with any extra data passed into method.
-   *
-   * @param {object} [extra] - Extra data to add to application state.
-   *
-   * @returns {ApplicationStateData} Passed in object with current application state.
-   */
-  current(extra?: object): ApplicationStateData;
-  /**
-   * Gets any saved application state by name.
-   *
-   * @param {object}   options - Options.
-   *
-   * @param {string}   options.name - Saved data set name.
-   *
-   * @returns {ApplicationStateData | undefined} Any saved application state.
-   */
-  get({ name }: { name: string }): ApplicationStateData | undefined;
-  /**
-   * @returns {IterableIterator<string>} The saved application state names / keys.
-   */
-  keys(): IterableIterator<string>;
-  /**
-   * Removes and returns any saved application state by name.
-   *
-   * @param {object}   options - Options.
-   *
-   * @param {string}   options.name - Name to remove and retrieve.
-   *
-   * @returns {ApplicationStateData | undefined} Any saved application state.
-   */
-  remove({ name }: { name: string }): ApplicationStateData | undefined;
-  /**
-   * Restores a previously saved application state by `name` returning the data. Several optional parameters are
-   * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
-   * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be specified.
-   *
-   * @param {object}            options - Parameters
-   *
-   * @param {string}            options.name - Saved data set name.
-   *
-   * @param {boolean}           [options.remove=false] - Remove data set.
-   *
-   * @param {boolean}           [options.animateTo=false] - Animate to restore data.
-   *
-   * @param {number}            [options.duration=0.1] - Duration in seconds.
-   *
-   * @param {EasingReference}   [options.ease='linear'] - Easing function name or function.
-   *
-   * @returns {ApplicationStateData | undefined} Any saved application state.
-   */
-  restore({
-    name,
-    remove,
-    animateTo,
-    duration,
-    ease,
-  }: {
-    name: string;
-    remove?: boolean;
-    animateTo?: boolean;
-    duration?: number;
-    ease?: EasingReference;
-  }): ApplicationStateData | undefined;
-  /**
-   * Saves current application state with the opportunity to add extra data to the saved state.
-   *
-   * @param {object}   options - Options.
-   *
-   * @param {string}   options.name - Name to index this saved state.
-   *
-   * @param {...*}     [options.extra] - Extra data to add to saved state.
-   *
-   * @returns {ApplicationStateData} Current saved application state.
-   */
-  save({ name, ...extra }: { name: string; extra?: any[] }): ApplicationStateData;
-  /**
-   * Sets application state from the given {@link ApplicationStateData} instance. Several optional parameters are
-   * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
-   * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
-   * specified.
-   *
-   * Note: If serializing application state any minimized apps will use the before minimized state on initial render
-   * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
-   *
-   * @param {ApplicationStateData}   data - Saved data set name.
-   *
-   * @param {object}            [options] - Optional parameters
-   *
-   * @param {boolean}           [options.animateTo=false] - Animate to restore data.
-   *
-   * @param {number}            [options.duration=0.1] - Duration in seconds.
-   *
-   * @param {EasingReference}   [options.ease='linear'] - Easing function.
-   */
-  set(
-    data: ApplicationStateData,
-    {
-      animateTo,
-      duration,
-      ease,
-    }?: {
-      async?: boolean;
-      animateTo?: boolean;
-      duration?: number;
-      ease?: EasingReference;
-    },
-  ): void;
-}
-/**
- * Defines common application state including positional data and options generated by the {@link ApplicationState} API.
- */
-type ApplicationStateData = {
-  /**
-   * Application position.
-   */
-  position: Data.TJSPositionData;
-  /**
-   * Any application saved position state for #beforeMinimized including maximized constraints.
-   */
-  beforeMinimized?: Data.TJSPositionData & {
-    constraints: {
-      maxHeight: string;
-      paddingTop: string;
-      paddingBottom: string;
-    };
-  };
-  /**
-   * Common SvelteApplication options.
-   */
-  options: SvelteReactiveData;
-  /**
-   * Application UI state.
-   */
-  ui: {
-    minimized: boolean;
-  };
-};
-
 declare namespace SvelteApp {
+  namespace API {
+    /**
+     * Contains the reactive functionality / Svelte stores associated with SvelteApp and retrievable by
+     * {@link SvelteApp.reactive}.
+     *
+     * There are several reactive getters for UI state such and for two-way bindings / stores see
+     * {@link SvelteReactive.storeUIState}:
+     * - {@link SvelteReactive.dragging}
+     * - {@link SvelteReactive.minimized}
+     * - {@link SvelteReactive.resizing}
+     *
+     * There are also reactive getters / setters for {@link SvelteApp.Options} and Foundry
+     * {@link ApplicationOptions}. You can use the following as one way bindings and update the associated stores. For
+     * two-way bindings / stores see {@link SvelteReactive.storeAppOptions}.
+     *
+     * - {@link SvelteReactive.draggable}
+     * - {@link SvelteReactive.focusAuto}
+     * - {@link SvelteReactive.focusKeep}
+     * - {@link SvelteReactive.focusTrap}
+     * - {@link SvelteReactive.headerButtonNoClose}
+     * - {@link SvelteReactive.headerButtonNoLabel}
+     * - {@link SvelteReactive.headerIcon}
+     * - {@link SvelteReactive.headerNoTitleMinimized}
+     * - {@link SvelteReactive.minimizable}
+     * - {@link SvelteReactive.popOut}
+     * - {@link SvelteReactive.positionable}
+     * - {@link SvelteReactive.resizable}
+     * - {@link SvelteReactive.title}
+     *
+     * An instance of TJSWebStorage (session) / TJSSessionStorage is accessible via {@link SvelteReactive.sessionStorage}.
+     * Optionally you can pass in an existing TJSWebStorage instance that can be shared across multiple SvelteApps
+     * by setting {@link SvelteApp.Options.sessionStorage}.
+     *
+     * -------------------------------------------------------------------------------------------------------------------
+     *
+     * This API is not sealed, and it is recommended that you extend it with accessors to get / set data that is reactive
+     * in your application. An example of setting an exported prop `document` from the main mounted application shell.
+     *
+     * @example
+     * ```js
+     * import { hasSetter } from '#runtime/util/object';
+     *
+     * // Note: make a normal comment.
+     * //  * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with
+     * //  *                             Document with the mounted application shell Svelte component.
+     * //  *
+     * //  * @memberof SvelteReactive#
+     * //  *
+     * Object.defineProperty(this.reactive, 'document', {
+     *    get: () => this.svelte?.appShell?.document,
+     *    set: (document) =>
+     *    {
+     *       const component = this.svelte?.appShell;
+     *       if (hasSetter(component, 'document')) { component.document = document; }
+     *    }
+     * });
+     * ```
+     */
+    interface Reactive {
+      /**
+       * @returns {WebStorage} Returns WebStorage (session) instance.
+       */
+      get sessionStorage(): WebStorage;
+      /**
+       * Provides a custom readable Svelte store for {@link SvelteApp.Options} state.
+       *
+       * @returns App options store.
+       */
+      get storeAppOptions(): Reactive.AppOptions;
+      /**
+       * Returns the store for UI options.
+       *
+       * @returns UI state store.
+       */
+      get storeUIState(): Reactive.UIState;
+      /**
+       * Returns the draggable app option.
+       *
+       * @returns {boolean} Draggable app option.
+       */
+      get draggable(): boolean;
+      /**
+       * Sets `this.options.draggable` which is reactive for application shells.
+       *
+       * @param {boolean}  draggable - Sets the draggable option.
+       */
+      set draggable(draggable: boolean);
+      /**
+       * Returns the focusAuto app option.
+       *
+       * @returns {boolean} When true auto-management of app focus is enabled.
+       */
+      get focusAuto(): boolean;
+      /**
+       * Sets `this.options.focusAuto` which is reactive for application shells.
+       *
+       * @param {boolean}  focusAuto - Sets the focusAuto option.
+       */
+      set focusAuto(focusAuto: boolean);
+      /**
+       * Returns the focusKeep app option.
+       *
+       * @returns {boolean} When `focusAuto` and `focusKeep` is true; keeps internal focus.
+       */
+      get focusKeep(): boolean;
+      /**
+       * Sets `this.options.focusKeep` which is reactive for application shells.
+       *
+       * @param {boolean}  focusKeep - Sets the focusKeep option.
+       */
+      set focusKeep(focusKeep: boolean);
+      /**
+       * Returns the focusTrap app option.
+       *
+       * @returns {boolean} When true focus trapping / wrapping is enabled keeping focus inside app.
+       */
+      get focusTrap(): boolean;
+      /**
+       * Sets `this.options.focusTrap` which is reactive for application shells.
+       *
+       * @param {boolean}  focusTrap - Sets the focusTrap option.
+       */
+      set focusTrap(focusTrap: boolean);
+      /**
+       * Returns the headerButtonNoClose app option.
+       *
+       * @returns {boolean} Remove the close the button in header app option.
+       */
+      get headerButtonNoClose(): boolean;
+      /**
+       * Sets `this.options.headerButtonNoClose` which is reactive for application shells.
+       *
+       * @param {boolean}  headerButtonNoClose - Sets the headerButtonNoClose option.
+       */
+      set headerButtonNoClose(headerButtonNoClose: boolean);
+      /**
+       * Returns the headerButtonNoLabel app option.
+       *
+       * @returns {boolean} Remove the labels from buttons in header app option.
+       */
+      get headerButtonNoLabel(): boolean;
+      /**
+       * Sets `this.options.headerButtonNoLabel` which is reactive for application shells.
+       *
+       * @param {boolean}  headerButtonNoLabel - Sets the headerButtonNoLabel option.
+       */
+      set headerButtonNoLabel(headerButtonNoLabel: boolean);
+      /**
+       * Returns the headerIcon app option.
+       *
+       * @returns {string | undefined} URL for header app icon.
+       */
+      get headerIcon(): string | undefined;
+      /**
+       * Sets `this.options.headerIcon` which is reactive for application shells.
+       *
+       * @param {string | undefined}  headerIcon - Sets the headerButtonNoLabel option.
+       */
+      set headerIcon(headerIcon: string | undefined);
+      /**
+       * Returns the headerNoTitleMinimized app option.
+       *
+       * @returns {boolean} When true removes the header title when minimized.
+       */
+      get headerNoTitleMinimized(): boolean;
+      /**
+       * Sets `this.options.headerNoTitleMinimized` which is reactive for application shells.
+       *
+       * @param {boolean}  headerNoTitleMinimized - Sets the headerNoTitleMinimized option.
+       */
+      set headerNoTitleMinimized(headerNoTitleMinimized: boolean);
+      /**
+       * Returns the minimizable app option.
+       *
+       * @returns {boolean} Minimizable app option.
+       */
+      get minimizable(): boolean;
+      /**
+       * Sets `this.options.minimizable` which is reactive for application shells that are also pop out.
+       *
+       * @param {boolean}  minimizable - Sets the minimizable option.
+       */
+      set minimizable(minimizable: boolean);
+      /**
+       * Returns the Foundry popOut state; {@link ApplicationOptions.popOut}
+       *
+       * @returns {boolean} Positionable app option.
+       */
+      get popOut(): boolean;
+      /**
+       * Sets `this.options.popOut` which is reactive for application shells. This will add / remove this application
+       * from `ui.windows`.
+       *
+       * @param {boolean}  popOut - Sets the popOut option.
+       */
+      set popOut(popOut: boolean);
+      /**
+       * Returns the positionable app option; {@link SvelteApp.Options.positionable}
+       *
+       * @returns {boolean} Positionable app option.
+       */
+      get positionable(): boolean;
+      /**
+       * Sets `this.options.positionable` enabling / disabling {@link SvelteApp.position}.
+       *
+       * @param {boolean}  positionable - Sets the positionable option.
+       */
+      set positionable(positionable: boolean);
+      /**
+       * Returns the resizable option.
+       *
+       * @returns {boolean} Resizable app option.
+       */
+      get resizable(): boolean;
+      /**
+       * Sets `this.options.resizable` which is reactive for application shells.
+       *
+       * @param {boolean}  resizable - Sets the resizable option.
+       */
+      set resizable(resizable: boolean);
+      /**
+       * Returns the title accessor from the parent Application class; {@link ApplicationOptions.title}
+       *
+       * @returns {string} Title.
+       */
+      get title(): string;
+      /**
+       * Sets `this.options.title` which is reactive for application shells.
+       *
+       * Note: Will set empty string if title is undefined or null.
+       *
+       * @param {string | undefined | null}   title - Application title; will be localized, so a translation key is fine.
+       */
+      set title(title: string);
+      /**
+       * Returns the current active Window / WindowProxy UI state.
+       *
+       * @returns {Window} Active window UI state.
+       */
+      get activeWindow(): Window;
+      /**
+       * Returns the current dragging UI state.
+       *
+       * @returns {boolean} Dragging UI state.
+       */
+      get dragging(): boolean;
+      /**
+       * Returns the current minimized UI state.
+       *
+       * @returns {boolean} Minimized UI state.
+       */
+      get minimized(): boolean;
+      /**
+       * Returns the current resizing UI state.
+       *
+       * @returns {boolean} Resizing UI state.
+       */
+      get resizing(): boolean;
+      /**
+       * Sets the current active Window / WindowProxy UI state.
+       *
+       * Note: This is protected usage and used internally.
+       *
+       * @param {Window} activeWindow - Active Window / WindowProxy UI state.
+       */
+      set activeWindow(activeWindow: Window);
+      /**
+       * Provides a way to safely get this applications options given an accessor string which describes the
+       * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
+       * to walk.
+       *
+       * @param {string}   accessor - The path / key to set. You can set multiple levels.
+       *
+       * @param {*}        [defaultValue] - A default value returned if the accessor is not found.
+       *
+       * @returns {*} Value at the accessor.
+       */
+      getOptions(accessor: string, defaultValue?: any): any;
+      /**
+       * Provides a way to merge `options` into this applications options and update the appOptions store.
+       *
+       * @param {object}   options - The options object to merge with `this.options`.
+       */
+      mergeOptions(options: object): void;
+      /**
+       * Provides a way to safely set this applications options given an accessor string which describes the
+       * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
+       * to walk.
+       *
+       * Additionally, if an application shell Svelte component is mounted and exports the `appOptions` property then
+       * the application options is set to `appOptions` potentially updating the application shell / Svelte component.
+       *
+       * @param {string}   accessor - The path / key to set. You can set multiple levels.
+       *
+       * @param {any}        value - Value to set.
+       */
+      setOptions(accessor: string, value: any): void;
+      /**
+       * Serializes the main {@link SvelteApp.Options} for common application state.
+       */
+      toJSON(): Reactive.Data;
+      /**
+       * Updates the UI Options store with the current header buttons. You may dynamically add / remove header buttons
+       * if using an application shell Svelte component. In either overriding `_getHeaderButtons` or responding to the
+       * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
+       * the new buttons.
+       *
+       * Optionally you can set in the SvelteApp app options {@link SvelteApp.Options.headerButtonNoClose}
+       * to remove the close button and {@link SvelteApp.Options.headerButtonNoLabel} to true and labels will be
+       * removed from the header buttons.
+       *
+       * @param {object} [opts] - Optional parameters (for internal use)
+       *
+       * @param {boolean} [opts.headerButtonNoClose] - The value for `headerButtonNoClose`.
+       *
+       * @param {boolean} [opts.headerButtonNoLabel] - The value for `headerButtonNoLabel`.
+       */
+      updateHeaderButtons({
+        headerButtonNoClose,
+        headerButtonNoLabel,
+      }?: {
+        headerButtonNoClose?: boolean;
+        headerButtonNoLabel?: boolean;
+      }): void;
+    }
+    namespace Reactive {
+      /**
+       * Defines the bulk serializable data from {@link SvelteReactive.toJSON} for common application state.
+       */
+      type Data = {
+        /**
+         * If true then application shells are draggable.
+         */
+        draggable: boolean;
+        /**
+         * When true auto-management of app focus is enabled.
+         */
+        focusAuto: boolean;
+        /**
+         * When `focusAuto` and `focusKeep` is true; keeps internal focus.
+         */
+        focusKeep: boolean;
+        /**
+         * When true focus trapping / wrapping is enabled keeping focus inside app.
+         */
+        focusTrap: boolean;
+        /**
+         * If true then the close header button is removed.
+         */
+        headerButtonNoClose: boolean;
+        /**
+         * If true then header button labels are removed.
+         */
+        headerButtonNoLabel: boolean;
+        /**
+         * If true then header title is hidden when minimized.
+         */
+        headerNoTitleMinimized: boolean;
+        /**
+         * If true then application shells are minimizable.
+         */
+        minimizable: boolean;
+        /**
+         * If false then `position.set` does not take effect.
+         */
+        positionable: boolean;
+        /**
+         * If true then application shells are resizable.
+         */
+        resizable: boolean;
+      };
+      /**
+       * Provides a custom readable Svelte store for {@link SvelteApp.Options} state.
+       */
+      type AppOptions = {
+        /**
+         * Subscribe to all app options updates.
+         */
+        subscribe: Readable<object>;
+        /**
+         * Derived store for `draggable` updates.
+         */
+        draggable: Writable<boolean>;
+        /**
+         * Derived store for `focusAuto` updates.
+         */
+        focusAuto: Writable<boolean>;
+        /**
+         * Derived store for `focusKeep` updates.
+         */
+        focusKeep: Writable<boolean>;
+        /**
+         * Derived store for `focusTrap` updates.
+         */
+        focusTrap: Writable<boolean>;
+        /**
+         * Derived store for `headerButtonNoClose` updates.
+         */
+        headerButtonNoClose: Writable<boolean>;
+        /**
+         * Derived store for `headerButtonNoLabel` updates.
+         */
+        headerButtonNoLabel: Writable<boolean>;
+        /**
+         * Derived store for `headerIcon` updates.
+         */
+        headerIcon: Writable<string>;
+        /**
+         * Derived store for `headerNoTitleMinimized` updates.
+         */
+        headerNoTitleMinimized: Writable<boolean>;
+        /**
+         * Derived store for `minimizable` updates.
+         */
+        minimizable: Writable<boolean>;
+        /**
+         * Derived store for `popOut` updates.
+         */
+        popOut: Writable<boolean>;
+        /**
+         * Derived store for `positionable` updates.
+         */
+        positionable: Writable<boolean>;
+        /**
+         * Derived store for `resizable` updates.
+         */
+        resizable: Writable<boolean>;
+        /**
+         * Derived store for `title` updates.
+         */
+        title: Writable<string>;
+      };
+      /**
+       * Provides a custom readable Svelte store for UI state.
+       */
+      type UIState = {
+        /**
+         * Subscribe to all UI options updates.
+         */
+        subscribe: Readable<object>;
+        /**
+         * Derived store for `dragging` updates.
+         */
+        dragging: Writable<boolean>;
+        /**
+         * Derived store for `headerButtons` updates.
+         */
+        headerButtons: Readable<globalThis.ApplicationHeaderButton[]>;
+        /**
+         * Derived store for `minimized` updates.
+         */
+        minimized: Readable<boolean>;
+        /**
+         * Derived store for `resizing` updates.
+         */
+        resizing: Writable<boolean>;
+      };
+    }
+    /**
+     * Provides the ability the save / restore / serialize application state for positional and UI state such as
+     * minimized status.
+     *
+     * You can restore a saved state with animation; please see the options of {@link State.restore}.
+     */
+    interface State {
+      /**
+       * Clears all saved application state.
+       */
+      clear(): void;
+      /**
+       * Returns current application state along with any extra data passed into method.
+       *
+       * @param [extra] - Extra data to add to application state.
+       *
+       * @returns Passed in object with current application state.
+       */
+      current(extra?: object): State.Data;
+      /**
+       * Gets any saved application state by name.
+       *
+       * @param options - Options.
+       *
+       * @param options.name - Saved data set name.
+       *
+       * @returns Any saved application state.
+       */
+      get({ name }: { name: string }): State.Data | undefined;
+      /**
+       * @returns The saved application state names / keys.
+       */
+      keys(): IterableIterator<string>;
+      /**
+       * Removes and returns any saved application state by name.
+       *
+       * @param options - Options.
+       *
+       * @param options.name - Name to remove and retrieve.
+       *
+       * @returns Any saved application state.
+       */
+      remove({ name }: { name: string }): State.Data | undefined;
+      /**
+       * Restores a previously saved application state by `name` returning the data. Several optional parameters are
+       * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
+       * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be specified.
+       *
+       * @param options - Parameters
+       *
+       * @param options.name - Saved data set name.
+       *
+       * @param [options.remove=false] - Remove data set.
+       *
+       * @param [options.animateTo=false] - Animate to restore data.
+       *
+       * @param [options.duration=0.1] - Duration in seconds.
+       *
+       * @param [options.ease='linear'] - Easing function name or function.
+       *
+       * @returns Any saved application state.
+       */
+      restore({
+        name,
+        remove,
+        animateTo,
+        duration,
+        ease,
+      }: {
+        name: string;
+        remove?: boolean;
+        animateTo?: boolean;
+        duration?: number;
+        ease?: EasingReference;
+      }): State.Data | undefined;
+      /**
+       * Saves current application state with the opportunity to add extra data to the saved state.
+       *
+       * @param options - Options.
+       *
+       * @param options.name - Name to index this saved state.
+       *
+       * @param [options.extra] - Extra data to add to saved state.
+       *
+       * @returns {State.Data} Current saved application state.
+       */
+      save({ name, ...extra }: { name: string; extra?: any[] }): State.Data;
+      /**
+       * Sets application state from the given {@link State.Data} instance. Several optional parameters are
+       * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
+       * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
+       * specified.
+       *
+       * Note: If serializing application state any minimized apps will use the before minimized state on initial render
+       * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
+       *
+       * @param data - Saved data set name.
+       *
+       * @param [options] - Optional parameters
+       *
+       * @param [options.animateTo=false] - Animate to restore data.
+       *
+       * @param [options.duration=0.1] - Duration in seconds.
+       *
+       * @param [options.ease='linear'] - Easing function.
+       */
+      set(
+        data: State.Data,
+        {
+          animateTo,
+          duration,
+          ease,
+        }?: {
+          async?: boolean;
+          animateTo?: boolean;
+          duration?: number;
+          ease?: EasingReference;
+        },
+      ): void;
+    }
+    namespace State {
+      /**
+       * Defines common application state including positional data and options generated by the {@link State} API.
+       */
+      type Data = {
+        /**
+         * Application position.
+         */
+        position: Data.TJSPositionData;
+        /**
+         * Any application saved position state for #beforeMinimized including maximized constraints.
+         */
+        beforeMinimized?: Data.TJSPositionData & {
+          constraints: {
+            maxHeight: string;
+            paddingTop: string;
+            paddingBottom: string;
+          };
+        };
+        /**
+         * Common SvelteApp reactive app options.
+         */
+        options: SvelteApp.API.Reactive.Data;
+        /**
+         * Application UI state.
+         */
+        ui: {
+          minimized: boolean;
+        };
+      };
+    }
+    /**
+     * Provides a mechanism to retrieve and query mounted Svelte application shell.
+     */
+    interface Svelte<Options extends SvelteApp.Options> {
+      /**
+       * Returns mounted application shell Svelte component.
+       *
+       * @deprecated Use {@link Svelte.appShell}; since `0.2.0` removal in `0.5.0`.
+       *
+       * @returns Any mounted application shell.
+       */
+      get applicationShell(): AppShell<Options> | null;
+      /**
+       * Returns mounted application shell Svelte component.
+       *
+       * @returns Any mounted application shell.
+       */
+      get appShell(): AppShell<Options> | null;
+    }
+  }
   /**
-   * Svelte context interfaces for {@link SvelteApplication}.
+   * Svelte context interfaces for {@link SvelteApp}.
    */
   namespace Context {
     /**
      * The `#external` context.
      */
-    interface External<App extends SvelteApplication = SvelteApplication> {
+    interface External<App extends SvelteApp = SvelteApp> {
       /**
        * The external application instance.
        */
       application: App;
       /**
-       * Create a function to generate a callback for Svelte components to invoke to update the tracked elements for
-       * application shells in the external application instance. There are rare cases that the main element root
+       * Create a function to generate a callback for Svelte components to invoke to update the tracked `elementRoot`
+       * for application shells in the external application instance. There are rare cases that the main element root
        * changes in a mounted application component. The update is only triggered on successive changes of
        * `elementRoot`. Returns a boolean to indicate the element roots are updated.
        */
@@ -751,9 +673,16 @@ declare namespace SvelteApp {
     }
   }
   /**
-   * Options for SvelteApplication. Note: that this extends the Foundry `ApplicationOptions`.
+   * Options for SvelteApp. Note: that this extends the Foundry `ApplicationOptions`.
    */
-  interface Options extends ApplicationOptions {
+  interface Options<
+    Component extends SvelteComponent = SvelteComponent,
+    ContextExternal extends { application: unknown; elementRootUpdate: unknown; sessionStorage: unknown } = {
+      application: unknown;
+      elementRootUpdate: unknown;
+      sessionStorage: unknown;
+    },
+  > extends ApplicationOptions {
     /**
      * If false the default slide close animation is not run.
      *
@@ -851,18 +780,26 @@ declare namespace SvelteApp {
      */
     positionValidator: ValidatorAPI.ValidatorOption;
     /**
-     * An instance of WebStorage (session) to share across SvelteApplications. This is only required to share a
-     * WebStorage instance across multiple SvelteApplications. By default, a unique
-     * {@link #runtime/svelte/store/web-storage!TJSSessionStorage} instance is created per SvelteApplication.
+     * An instance of WebStorage (session) to share across SvelteApps. This is only required to share a
+     * WebStorage instance across multiple SvelteApps. By default, a unique
+     * {@link #runtime/svelte/store/web-storage!TJSSessionStorage} instance is created per SvelteApp.
      *
      * @defaultValue TJSSessionStorage
      */
     sessionStorage: WebStorage;
     /**
-     * A Svelte configuration object defining the main component.
+     * A Svelte configuration object defining the main component loaded.
      *
+     * Note: that `svelte.class` is required; this is due to type inference requirements by TypeScript.
      */
-    svelte: TJSSvelteConfig;
+    svelte: TJSSvelteConfig<
+      Component,
+      {
+        PropsOmit: 'elementContent' | 'elementRoot' | 'elementTarget';
+        ContextOmit: 'application' | 'elementRootUpdate' | 'sessionStorage';
+        ContextShape: ContextExternal;
+      }
+    >;
     /**
      * By default, 'top / left' respects rotation when minimizing.
      *
@@ -876,7 +813,7 @@ declare namespace SvelteApp {
      *
      * @defaultValue `null`
      */
-    width: number | string | null;
+    width?: number | string | null;
     /**
      * The default pixel height for app. You may also use relative units including percentages.
      *
@@ -884,7 +821,7 @@ declare namespace SvelteApp {
      *
      * @defaultValue `null`
      */
-    height: number | string | null;
+    height?: number | string | null;
     /**
      * The default top offset position for app. You may also use relative units including percentages.
      *
@@ -892,7 +829,7 @@ declare namespace SvelteApp {
      *
      * @defaultValue `null`
      */
-    top: number | string | null;
+    top?: number | string | null;
     /**
      * The default left offset position for app. You may also use relative units including percentages.
      *
@@ -900,9 +837,42 @@ declare namespace SvelteApp {
      *
      * @defaultValue `null`
      */
-    left: number | string | null;
+    left?: number | string | null;
   }
 }
+
+/**
+ * Omits the protected application shell contract properties.
+ */
+type OmitPropsTRL<Options extends SvelteApp.Options> = Omit<
+  ComponentProps<InstanceType<Options['svelte']['class']>>,
+  'elementRoot' | 'elementContent' | 'elementTarget'
+>;
+/**
+ * Based on the `SvelteApp.Options` -> `svelte.class` property limit the props exposed and add the safe methods that
+ * can be accessed
+ */
+type AppShell<Options extends SvelteApp.Options> = OmitPropsTRL<Options> & {
+  /**
+   * Register an event callback.
+   *
+   * @param type - Event type.
+   *
+   * @param callback - Callback function
+   *
+   * @returns Unsubscriber function.
+   */
+  $on<K extends Extract<keyof ComponentEvents<InstanceType<Options['svelte']['class']>>, string>>(
+    type: K,
+    callback: ((e: ComponentEvents<InstanceType<Options['svelte']['class']>>[K]) => void) | null | undefined,
+  ): () => void;
+  /**
+   * Set props of component.
+   *
+   * @param props - Props to set.
+   */
+  $set(props: Partial<OmitPropsTRL<Options>>): void;
+};
 
 /**
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
@@ -914,21 +884,21 @@ declare namespace SvelteApp {
  *
  * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
  */
-declare class SvelteApplication<Options extends SvelteApp.Options = SvelteApp.Options>
+declare class SvelteApp<Options extends SvelteApp.Options = SvelteApp.Options>
   extends Application<Options>
   implements TJSPositionTypes.Positionable
 {
   /**
-   * Specifies the default options that SvelteApplication supports.
+   * Specifies the default options that SvelteApp supports.
    *
    * @returns {import('./types').SvelteApp.Options} options - Application options.
    * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
    */
   static get defaultOptions(): SvelteApp.Options;
   /**
-   * @param {Partial<Options>} [options] - The options for the application.
+   * @param {Partial<import('./types').SvelteApp.Options>} [options] - The options for the application.
    */
-  constructor(options?: Partial<Options>);
+  constructor(options?: Partial<SvelteApp.Options>);
   /**
    * Returns the content element if an application shell is mounted.
    *
@@ -950,29 +920,29 @@ declare class SvelteApplication<Options extends SvelteApp.Options = SvelteApp.Op
   get position(): TJSPosition;
 
   /**
-   * Returns the reactive accessors & Svelte stores for SvelteApplication.
+   * Returns the reactive accessors & Svelte stores for SvelteApp.
    *
-   * @returns {import('./internal/state-reactive/types').SvelteReactive} The reactive accessors & Svelte stores.
+   * @returns {import('./types').SvelteApp.API.Reactive} The reactive accessors & Svelte stores.
    */
-  get reactive(): SvelteReactive;
+  get reactive(): SvelteApp.API.Reactive;
   /**
    * Returns the application state manager.
    *
-   * @returns {import('./internal/state-app/types').ApplicationState} The application state manager.
+   * @returns {import('./types').SvelteApp.API.State} The application state manager.
    */
-  get state(): ApplicationState;
+  get state(): SvelteApp.API.State;
   /**
-   * Returns the Svelte helper class w/ various methods to access mounted Svelte components.
+   * Returns the `Svelte` helper class w/ various methods to access the mounted application shell component.
    *
-   * @returns {import('./internal/state-svelte/types').GetSvelteData} GetSvelteData
+   * @returns {import('./types').SvelteApp.API.Svelte<Options>} `Svelte` / mounted application shell API.
    */
-  get svelte(): GetSvelteData;
+  get svelte(): SvelteApp.API.Svelte<Options>;
   /**
    * Provides a mechanism to update the UI options store for maximized.
    *
    * Note: the sanity check is duplicated from {@link Application.maximize} the store is updated _before_
    * performing the rest of animations. This allows application shells to remove / show any resize handlers
-   * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
+   * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApp.minimize}
    * to animate the content area.
    *
    * @param {object}   [opts] - Optional parameters.
@@ -987,7 +957,7 @@ declare class SvelteApplication<Options extends SvelteApp.Options = SvelteApp.Op
    *
    * Note: the sanity check is duplicated from {@link Application.minimize} the store is updated _before_
    * performing the rest of animations. This allows application shells to remove / show any resize handlers
-   * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
+   * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApp.minimize}
    * to animate the content area.
    *
    * @param {object}   [opts] - Optional parameters.
@@ -999,20 +969,14 @@ declare class SvelteApplication<Options extends SvelteApp.Options = SvelteApp.Op
   minimize({ animate, duration }?: { animate?: boolean; duration?: number }): Promise<void>;
   /**
    * Provides a callback after all Svelte components are initialized.
-   *
-   * @param {import('./internal/state-svelte/types').MountedAppShell} [mountedAppShell] - The mounted app shell
-   *        elements.
    */
-  onSvelteMount(mountedAppShell?: MountedAppShell): void;
+  onSvelteMount(): void;
   /**
    * Provides a callback after the main application shell is remounted. This may occur during HMR / hot module
    * replacement or directly invoked from the `elementRootUpdate` callback passed to the application shell component
    * context.
-   *
-   * @param {import('./internal/state-svelte/types').MountedAppShell} [mountedAppShell] - The mounted app shell
-   *        elements.
    */
-  onSvelteRemount(mountedAppShell?: MountedAppShell): void;
+  onSvelteRemount(): void;
   /**
    * All calculation and updates of position are implemented in {@link #runtime/svelte/store/position!TJSPosition.set}.
    * This allows position to be fully reactive and in control of updating inline styles for the application.
@@ -1485,9 +1449,9 @@ type TJSDialogModalOptions = {
  * dialog with {@link TJSDialog.confirm} and an 'ok' single button dialog with {@link TJSDialog.prompt}.
  *
  * @template [Options = import('./types').SvelteApp.Options]
- * @augments {SvelteApplication<Options>}
+ * @augments {SvelteApp<Options>}
  */
-declare class TJSDialog<Options extends SvelteApp.Options = SvelteApp.Options> extends SvelteApplication<Options> {
+declare class TJSDialog<Options extends SvelteApp.Options = SvelteApp.Options> extends SvelteApp<Options> {
   /**
    * A helper factory method to create simple confirmation dialog windows which consist of simple yes / no prompts.
    * If you require more flexibility, a custom TJSDialog instance is preferred. The default focused button is 'yes'.
@@ -1508,8 +1472,8 @@ declare class TJSDialog<Options extends SvelteApp.Options = SvelteApp.Options> e
    *        async function. When defined as a string any matching function by name exported from content Svelte
    *        component is invoked.
    *
-   * @param {import('./types').SvelteApp.Options}  [options]  SvelteApplication options passed to the TJSDialog
-   *        constructor.
+   * @param {Partial<import('./types').SvelteApp.Options>}  [options]  SvelteApp options passed to the
+   *        TJSDialog constructor.
    *
    * @returns {Promise<T>} A promise which resolves with result of yes / no callbacks or true / false.
    *
@@ -1533,7 +1497,7 @@ declare class TJSDialog<Options extends SvelteApp.Options = SvelteApp.Options> e
       onYes?: string | ((data?: { application?: TJSDialog }) => any);
       onNo?: string | ((data?: { application?: TJSDialog }) => any);
     },
-    options?: SvelteApp.Options,
+    options?: Partial<SvelteApp.Options>,
   ): Promise<T>;
   /**
    * A helper factory method to display a basic "prompt" style TJSDialog with a single button.
@@ -1554,8 +1518,8 @@ declare class TJSDialog<Options extends SvelteApp.Options = SvelteApp.Options> e
    *
    * @param {string}   [data.icon="fas fa-check"] - Set another icon besides `fas fa-check` for button.
    *
-   * @param {import('./types').SvelteApp.Options}  [options]  SvelteApplication options passed to the TJSDialog
-   *        constructor.
+   * @param {Partial<import('./types').SvelteApp.Options>}  [options]  SvelteApp options passed to the
+   *        TJSDialog constructor.
    *
    * @returns {Promise<T>} The returned value from the provided callback function or `true` if the button
    *          is pressed.
@@ -1582,7 +1546,7 @@ declare class TJSDialog<Options extends SvelteApp.Options = SvelteApp.Options> e
       label?: string;
       icon?: string;
     },
-    options?: SvelteApp.Options,
+    options?: Partial<SvelteApp.Options>,
   ): Promise<T>;
   /**
    * Creates an anonymous data defined TJSDialog returning a Promise that can be awaited upon for the user to make a
@@ -1595,18 +1559,18 @@ declare class TJSDialog<Options extends SvelteApp.Options = SvelteApp.Options> e
    * @param {import('./internal/state-dialog/types').TJSDialogOptions}  data - Dialog data passed to the TJSDialog
    *        constructor.
    *
-   * @param {import('./types').SvelteApp.Options}  [options]  SvelteApplication options passed to the TJSDialog
-   *        constructor.
+   * @param {Partial<import('./types').SvelteApp.Options>}  [options]  SvelteApp options passed to the
+   *        TJSDialog constructor.
    *
    * @returns {Promise<T>} A Promise that resolves to the chosen result.
    */
-  static wait<T>(data: TJSDialogOptions, options?: SvelteApp.Options): Promise<T>;
+  static wait<T>(data: TJSDialogOptions, options?: Partial<SvelteApp.Options>): Promise<T>;
   /**
    * @param {import('./internal/state-dialog/types').TJSDialogOptions} data - Dialog options.
    *
-   * @param {Options}   [options] - SvelteApplication options.
+   * @param {Partial<Options>}   [options] - SvelteApp options.
    */
-  constructor(data: TJSDialogOptions, options?: Options);
+  constructor(data: TJSDialogOptions, options?: Partial<Options>);
   /**
    * Returns the dialog data.
    *
@@ -1640,17 +1604,8 @@ declare class TJSDialog<Options extends SvelteApp.Options = SvelteApp.Options> e
 }
 
 export {
-  type ApplicationState,
-  type ApplicationStateData,
-  type GetSvelteData,
-  type MountedAppShell,
-  type StoreAppOptions,
-  type StoreUIOptions,
   SvelteApp,
-  SvelteApplication,
-  type SvelteData,
-  type SvelteReactive,
-  type SvelteReactiveData,
+  SvelteApp as SvelteApplication,
   TJSDialog,
   type TJSDialogButtonData,
   type TJSDialogData,
