@@ -751,8 +751,8 @@ declare namespace SvelteApp {
          application: App;
 
          /**
-          * Create a function to generate a callback for Svelte components to invoke to update the tracked elements for
-          * application shells in the external application instance. There are rare cases that the main element root
+          * Create a function to generate a callback for Svelte components to invoke to update the tracked `elementRoot`
+          * for application shells in the external application instance. There are rare cases that the main element root
           * changes in a mounted application component. The update is only triggered on successive changes of
           * `elementRoot`. Returns a boolean to indicate the element roots are updated.
           */
@@ -768,7 +768,8 @@ declare namespace SvelteApp {
    /**
     * Options for SvelteApplication. Note: that this extends the Foundry `ApplicationOptions`.
     */
-   interface Options<Component extends SvelteComponent = SvelteComponent>
+   // ContextExternal has a replacement in `rollupAll.js`.
+   interface Options<Component extends SvelteComponent = SvelteComponent, ContextExternal = any>
    {
       /**
        * If false the default slide close animation is not run.
@@ -890,15 +891,17 @@ declare namespace SvelteApp {
        * @defaultValue TJSSessionStorage
        */
       sessionStorage: WebStorage;
-
       /**
        * A Svelte configuration object defining the main component loaded.
        *
-       * Note: that `svelte.class` and `svelte.target` is required and will cause an error if missing.
-       * `Partial<TJSSvelteConfig>` is used for the types to allow any sort of late binding to the options defining the
-       * required SvelteComponent `class` and `target` properties.
+       * Note: that `svelte.class` is required; this is due to type inference requirements by TypeScript.
        */
-      svelte: TJSSvelteConfig<Component>;
+      // @ts-expect-error
+      svelte: TJSSvelteConfig<Component, {
+         PropsOmit: 'elementContent' | 'elementRoot' | 'elementTarget',
+         ContextOmit: 'application' | 'elementRootUpdate'| 'sessionStorage',
+         ContextShape: ContextExternal,
+      }>;
 
       /**
        * By default, 'top / left' respects rotation when minimizing.
@@ -916,7 +919,7 @@ declare namespace SvelteApp {
        *
        * @defaultValue `null`
        */
-      width: number | string | null;
+      width?: number | string | null;
 
       /**
        * The default pixel height for app. You may also use relative units including percentages.
@@ -925,7 +928,7 @@ declare namespace SvelteApp {
        *
        * @defaultValue `null`
        */
-      height: number | string | null;
+      height?: number | string | null;
 
       /**
        * The default top offset position for app. You may also use relative units including percentages.
@@ -934,7 +937,7 @@ declare namespace SvelteApp {
        *
        * @defaultValue `null`
        */
-      top: number | string | null;
+      top?: number | string | null;
 
       /**
        * The default left offset position for app. You may also use relative units including percentages.
@@ -943,7 +946,7 @@ declare namespace SvelteApp {
        *
        * @defaultValue `null`
        */
-      left: number | string |  null;
+      left?: number | string |  null;
    }
 }
 
