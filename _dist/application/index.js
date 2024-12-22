@@ -1230,7 +1230,7 @@ function loadSvelteConfig({ app, config, elementRootUpdate } = {})
 
    const NewSvelteComponent = config.class;
 
-   const svelteConfig = TJSSvelteConfigUtil.parseConfig({ ...config, target }, app);
+   const svelteConfig = TJSSvelteConfigUtil.parseConfig({ ...config, target }, { thisArg: app });
 
    const externalContext = svelteConfig.context.get('#external');
 
@@ -1523,6 +1523,8 @@ class SvelteApp extends Application
 
       if (!isObject(this.options.svelte))
       {
+console.log(`!!! SvelteApp - ctor - this.options: `, this.options);
+
          throw new Error(`SvelteApp - constructor - No Svelte configuration object found in 'options'.`);
       }
 
@@ -2971,7 +2973,7 @@ class TJSDialog extends SvelteApp
    {
       // Note: explicit setting of `popOutModuleDisable` to prevent the PopOut! module from acting on modal dialogs.
       // @ts-expect-error
-      super({ popOutModuleDisable: typeof data?.modal === 'boolean' ? data.modal : false, ...options, svelte: null });
+      super({ popOutModuleDisable: typeof data?.modal === 'boolean' ? data.modal : false, ...options });
 
       this.#managedPromise = new ManagedPromise();
 
