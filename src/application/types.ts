@@ -26,7 +26,7 @@ declare namespace SvelteApp {
       // Reactive API ------------------------------------------------------------------------------------------------
 
       /**
-       * Contains the reactive functionality / Svelte stores associated with SvelteApplication and retrievable by
+       * Contains the reactive functionality / Svelte stores associated with SvelteApp and retrievable by
        * {@link SvelteApplication.reactive}.
        *
        * There are several reactive getters for UI state such and for two-way bindings / stores see
@@ -53,14 +53,15 @@ declare namespace SvelteApp {
        * - {@link SvelteReactive.resizable}
        * - {@link SvelteReactive.title}
        *
-       * An instance of TJSWebStorage (session) / TJSSessionStorage is accessible via {@link SvelteReactive.sessionStorage}.
-       * Optionally you can pass in an existing TJSWebStorage instance that can be shared across multiple SvelteApplications
-       * by setting {@link SvelteApp.Options.sessionStorage}.
+       * An instance of TJSWebStorage (session) / TJSSessionStorage is accessible via
+       * {@link SvelteReactive.sessionStorage}. Optionally you can pass in an existing TJSWebStorage instance that can
+       * be shared across multiple SvelteApps by setting {@link SvelteApp.Options.sessionStorage}.
        *
-       * -------------------------------------------------------------------------------------------------------------------
+       * -------------------------------------------------------------------------------------------------------------
        *
-       * This API is not sealed, and it is recommended that you extend it with accessors to get / set data that is reactive
-       * in your application. An example of setting an exported prop `document` from the main mounted application shell.
+       * This API is not sealed, and it is recommended that you extend it with accessors to get / set data that is
+       * reactive in your application. An example of setting an exported prop `document` from the main mounted
+       * application shell.
        *
        * @example
        * ```js
@@ -103,7 +104,7 @@ declare namespace SvelteApp {
           */
          get storeUIState(): Reactive.UIState;
 
-         // Accessors for App state ----------------------------------------------------------------------------------------
+         // Accessors for App state ----------------------------------------------------------------------------------
 
          /**
           * Returns the draggable app option.
@@ -286,11 +287,12 @@ declare namespace SvelteApp {
           *
           * Note: Will set empty string if title is undefined or null.
           *
-          * @param {string | undefined | null}   title - Application title; will be localized, so a translation key is fine.
+          * @param {string | undefined | null}   title - Application title; will be localized, so a translation key is
+          *        fine.
           */
          set title(title: string);
 
-         // Accessors for UI state -----------------------------------------------------------------------------------------
+         // Accessors for UI state -----------------------------------------------------------------------------------
 
          /**
           * Returns the current active Window / WindowProxy UI state.
@@ -331,8 +333,8 @@ declare namespace SvelteApp {
 
          /**
           * Provides a way to safely get this applications options given an accessor string which describes the
-          * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
-          * to walk.
+          * entries to walk. To access deeper entries into the object format the accessor string with `.` between
+          * entries to walk.
           *
           * @param {string}   accessor - The path / key to set. You can set multiple levels.
           *
@@ -351,11 +353,12 @@ declare namespace SvelteApp {
 
          /**
           * Provides a way to safely set this applications options given an accessor string which describes the
-          * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
-          * to walk.
+          * entries to walk. To access deeper entries into the object format the accessor string with `.` between
+          * entries to walk.
           *
           * Additionally, if an application shell Svelte component is mounted and exports the `appOptions` property then
-          * the application options is set to `appOptions` potentially updating the application shell / Svelte component.
+          * the application options is set to `appOptions` potentially updating the application shell / Svelte
+          * component.
           *
           * @param {string}   accessor - The path / key to set. You can set multiple levels.
           *
@@ -369,12 +372,12 @@ declare namespace SvelteApp {
          toJSON(): Reactive.Data;
 
          /**
-          * Updates the UI Options store with the current header buttons. You may dynamically add / remove header buttons
-          * if using an application shell Svelte component. In either overriding `_getHeaderButtons` or responding to the
-          * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
-          * the new buttons.
+          * Updates the UI Options store with the current header buttons. You may dynamically add / remove header
+          * buttons if using an application shell Svelte component. In either overriding `_getHeaderButtons` or
+          * responding to the Hooks fired return a new button array and the uiOptions store is updated and the
+          * application shell will render the new buttons.
           *
-          * Optionally you can set in the SvelteApplication app options {@link SvelteApp.Options.headerButtonNoClose}
+          * Optionally you can set in the SvelteApp app options {@link SvelteApp.Options.headerButtonNoClose}
           * to remove the close button and {@link SvelteApp.Options.headerButtonNoLabel} to true and labels will be
           * removed from the header buttons.
           *
@@ -609,7 +612,8 @@ declare namespace SvelteApp {
          /**
           * Restores a previously saved application state by `name` returning the data. Several optional parameters are
           * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
-          * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be specified.
+          * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
+          * specified.
           *
           * @param options - Parameters
           *
@@ -655,8 +659,9 @@ declare namespace SvelteApp {
           * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
           * specified.
           *
-          * Note: If serializing application state any minimized apps will use the before minimized state on initial render
-          * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
+          * Note: If serializing application state any minimized apps will use the before minimized state on initial
+          * render of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized
+          * state.
           *
           * @param data - Saved data set name.
           *
@@ -694,7 +699,7 @@ declare namespace SvelteApp {
             };
 
             /**
-             * Common SvelteApplication reactive app options.
+             * Common SvelteApp reactive app options.
              */
             options: SvelteApp.API.Reactive.Data;
 
@@ -779,7 +784,7 @@ declare namespace SvelteApp {
    }
 
    /**
-    * Base options for SvelteApplication. Defines all core options not related to defining a Svelte component to load.
+    * Base options for SvelteApp. Defines all core options not related to defining a Svelte component to load.
     * It is useful to use `OptionsCore` when defining APIs of extended classes that internally handle loading a Svelte
     * component where the intention is to only allow modification of other core options.
     *
@@ -900,9 +905,9 @@ declare namespace SvelteApp {
       positionValidator?: ValidatorAPI.ValidatorOption;
 
       /**
-       * An instance of WebStorage (session) to share across SvelteApplications. This is only required to share a
-       * WebStorage instance across multiple SvelteApplications. By default, a unique
-       * {@link #runtime/svelte/store/web-storage!TJSSessionStorage} instance is created per SvelteApplication.
+       * An instance of WebStorage (session) to share across SvelteApps. This is only required to share a
+       * WebStorage instance across multiple SvelteApps. By default, a unique
+       * {@link #runtime/svelte/store/web-storage!TJSSessionStorage} instance is created per SvelteApp.
        *
        * @defaultValue TJSSessionStorage
        */
@@ -955,11 +960,25 @@ declare namespace SvelteApp {
    }
 
    /**
-    * Options for SvelteApplication.
+    * Options for SvelteApp including the `svelte` property which defines the Svelte component to load as the
+    * "application shell".
+    *
+    * Note: Unlike standard Svelte component loading the `context` is loaded as additional data into the `#external`
+    * context along with data such as the outer application instance reference. This allows one to extend the
+    * {@link SvelteApp.Context.External} interface with additional data that you are loading and use one type to
+    * retrieve all external context data inside the Svelte component.
+    *
+    * Note that the `svelte` configuration includes dynamic options to define `context` and `props` as a `function` as
+    * well as an `object`. There are times when the `context` and `prop` data to load needs to come from data associated
+    * with the instance of the application. When defining the configuration from the overloaded static accessor
+    * {@link SvelteApplication.defaultOptions}` you may use a normal `function` IE `function() {}` for `context` or
+    * `props` When `SvelteApp` loads the component these functions will be invoked with the `this` reference of the
+    * actual instance allowing one to associate instance data from a static context.
     *
     * Note: that this extends the Foundry `ApplicationOptions`.
     */
-   interface Options<Component extends SvelteComponent = SvelteComponent, ContextExternal extends SvelteApp.Context.AbstractExternal = SvelteApp.Context.AbstractExternal> extends OptionsCore
+   interface Options<Component extends SvelteComponent = SvelteComponent,
+    ContextExternal extends SvelteApp.Context.AbstractExternal = SvelteApp.Context.AbstractExternal> extends OptionsCore
    {
       /**
        * A Svelte configuration object defining the main component loaded.
