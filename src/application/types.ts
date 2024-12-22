@@ -742,9 +742,22 @@ declare namespace SvelteApp {
     */
    export namespace Context {
       /**
+       * For clean generics / templating / substitution purposes avoiding circular dependencies.
+       * Please use {@link External}.
+       *
+       * @hidden
+       */
+      interface AbstractExternal {
+         application: unknown;
+         elementRootUpdate: unknown;
+         sessionStorage: unknown;
+      }
+
+      /**
        * The `#external` context.
        */
-      export interface External<App extends import('./SvelteApplication').SvelteApplication = import('./SvelteApplication').SvelteApplication> {
+      export interface External<App extends import('./SvelteApplication').SvelteApplication =
+       import('./SvelteApplication').SvelteApplication> extends AbstractExternal {
          /**
           * The external application instance.
           */
@@ -766,122 +779,125 @@ declare namespace SvelteApp {
    }
 
    /**
-    * Options for SvelteApplication. Note: that this extends the Foundry `ApplicationOptions`.
+    * Base options for SvelteApplication. Defines all core options not related to defining a Svelte component to load.
+    * It is useful to use `OptionsCore` when defining APIs of extended classes that internally handle loading a Svelte
+    * component where the intention is to only allow modification of other core options.
+    *
+    * Note: that this extends the Foundry `ApplicationOptions`.
     */
-   // ContextExternal has a replacement in `rollupAll.js`.
-   interface Options<Component extends SvelteComponent = SvelteComponent, ContextExternal = any>
+   interface OptionsCore
    {
       /**
        * If false the default slide close animation is not run.
        *
        * @defaultValue true
        */
-      defaultCloseAnimation: boolean;
+      defaultCloseAnimation?: boolean;
 
       /**
        * If true then application shells are draggable.
        *
        * @defaultValue true
        */
-      draggable: boolean;
+      draggable?: boolean;
 
       /**
        * When true auto-management of app focus is enabled.
        *
        * @defaultValue true
        */
-      focusAuto: boolean;
+      focusAuto?: boolean;
 
       /**
        * When `focusAuto` and `focusKeep` is true; keeps internal focus.
        *
        * @defaultValue false
        */
-      focusKeep: boolean;
+      focusKeep?: boolean;
 
       /**
        * Defines A11yHelper focus source to apply when application closes.
        *
        * @defaultValue: undefined
        */
-      focusSource: A11yFocusSource;
+      focusSource?: A11yFocusSource;
 
       /**
        * When true focus trapping / wrapping is enabled keeping focus inside app.
        *
        * @defaultValue true
        */
-      focusTrap: boolean;
+      focusTrap?: boolean;
 
       /**
        * If true then the close header button is removed.
        *
        * @defaultValue false
        */
-      headerButtonNoClose: boolean;
+      headerButtonNoClose?: boolean;
 
       /**
        * If true then header button labels are removed.
        *
        * @defaultValue false
        */
-      headerButtonNoLabel: boolean;
+      headerButtonNoLabel?: boolean;
 
       /**
        * Sets a header icon given an image URL.
        *
        * @defaultValue undefined
        */
-      headerIcon: string;
+      headerIcon?: string;
 
       /**
        * If true then header title is hidden when minimized.
        *
        * @defaultValue false
        */
-      headerNoTitleMinimized: boolean;
+      headerNoTitleMinimized?: boolean;
 
       /**
        * Assigned to position. Number specifying minimum window height.
        *
        * @defaultValue 50
        */
-      minHeight: number;
+      minHeight?: number;
 
       /**
        * Assigned to position. Number specifying minimum window width.
        *
        * @defaultValue 200
        */
-      minWidth: number;
+      minWidth?: number;
 
       /**
        * If false then `position.set` does not take effect.
        *
        * @defaultValue true
        */
-      positionable: boolean;
+      positionable?: boolean;
 
       /**
        * A helper for initial position placement.
        *
        * @defaultValue TJSPosition.Initial.browserCentered
        */
-      positionInitial: System.Initial.InitialSystem;
+      positionInitial?: System.Initial.InitialSystem;
 
       /**
        * When true TJSPosition is optimized for orthographic use.
        *
        * @defaultValue true
        */
-      positionOrtho: boolean;
+      positionOrtho?: boolean;
 
       /**
        * A validator function or data or list of validators.
        *
        * @defaultValue TJSPosition.Validators.transformWindow
        */
-      positionValidator: ValidatorAPI.ValidatorOption;
+      positionValidator?: ValidatorAPI.ValidatorOption;
 
       /**
        * An instance of WebStorage (session) to share across SvelteApplications. This is only required to share a
@@ -890,25 +906,14 @@ declare namespace SvelteApp {
        *
        * @defaultValue TJSSessionStorage
        */
-      sessionStorage: WebStorage;
-      /**
-       * A Svelte configuration object defining the main component loaded.
-       *
-       * Note: that `svelte.class` is required; this is due to type inference requirements by TypeScript.
-       */
-      // @ts-expect-error
-      svelte: TJSSvelteConfig<Component, {
-         PropsOmit: 'elementContent' | 'elementRoot' | 'elementTarget',
-         ContextOmit: 'application' | 'elementRootUpdate'| 'sessionStorage',
-         ContextShape: ContextExternal,
-      }>;
+      sessionStorage?: WebStorage;
 
       /**
        * By default, 'top / left' respects rotation when minimizing.
        *
        * @defaultValue 'top left'
        */
-      transformOrigin: TransformAPI.TransformOrigin;
+      transformOrigin?: TransformAPI.TransformOrigin;
 
       // The following are overrides of core Foundry `ApplicationOptions` providing type expansion and comments.
 
@@ -947,6 +952,23 @@ declare namespace SvelteApp {
        * @defaultValue `null`
        */
       left?: number | string |  null;
+   }
+
+   /**
+    * Options for SvelteApplication. Note: that this extends the Foundry `ApplicationOptions`.
+    */
+   interface Options<Component extends SvelteComponent = SvelteComponent, ContextExternal extends SvelteApp.Context.AbstractExternal = SvelteApp.Context.AbstractExternal> extends OptionsCore
+   {
+      /**
+       * A Svelte configuration object defining the main component loaded.
+       *
+       * Note: that `svelte.class` is required; this is due to type inference requirements by TypeScript.
+       */
+      svelte: TJSSvelteConfig<Component, {
+         PropsOmit: 'elementContent' | 'elementRoot' | 'elementTarget',
+         ContextOmit: 'application' | 'elementRootUpdate'| 'sessionStorage',
+         ContextShape: ContextExternal,
+      }>;
    }
 }
 

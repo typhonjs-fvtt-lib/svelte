@@ -39,9 +39,6 @@ import { SvelteApplication }  from './SvelteApplication.js';
  *
  * There are a couple of static helper methods to quickly create standard dialogs such as a 'yes' / 'no' confirmation
  * dialog with {@link TJSDialog.confirm} and an 'ok' single button dialog with {@link TJSDialog.prompt}.
- *
- * @template [Options = import('./types').SvelteApp.Options]
- * @augments {SvelteApplication<Options>}
  */
 export class TJSDialog extends SvelteApplication
 {
@@ -54,12 +51,13 @@ export class TJSDialog extends SvelteApplication
    /**
     * @param {import('./internal/state-dialog/types').TJSDialogOptions} data - Dialog options.
     *
-    * @param {Partial<Options>}   [options] - SvelteApplication options.
+    * @param {import('./types').SvelteApp.OptionsCore}   [options] - SvelteApplication options.
     */
    constructor(data, options = {})
    {
       // Note: explicit setting of `popOutModuleDisable` to prevent the PopOut! module from acting on modal dialogs.
-      super({ popOutModuleDisable: typeof data?.modal === 'boolean' ? data.modal : false, ...options });
+      // @ts-expect-error
+      super({ popOutModuleDisable: typeof data?.modal === 'boolean' ? data.modal : false, ...options, svelte: null });
 
       this.#managedPromise = new ManagedPromise();
 
@@ -221,7 +219,7 @@ export class TJSDialog extends SvelteApplication
     *        async function. When defined as a string any matching function by name exported from content Svelte
     *        component is invoked.
     *
-    * @param {Partial<import('./types').SvelteApp.Options>}  [options]  SvelteApplication options passed to the
+    * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApplication options passed to the
     *        TJSDialog constructor.
     *
     * @returns {Promise<T>} A promise which resolves with result of yes / no callbacks or true / false.
@@ -341,7 +339,7 @@ export class TJSDialog extends SvelteApplication
     *
     * @param {string}   [data.icon="fas fa-check"] - Set another icon besides `fas fa-check` for button.
     *
-    * @param {Partial<import('./types').SvelteApp.Options>}  [options]  SvelteApplication options passed to the
+    * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApplication options passed to the
     *        TJSDialog constructor.
     *
     * @returns {Promise<T>} The returned value from the provided callback function or `true` if the button
@@ -384,7 +382,7 @@ export class TJSDialog extends SvelteApplication
     * @param {import('./internal/state-dialog/types').TJSDialogOptions}  data - Dialog data passed to the TJSDialog
     *        constructor.
     *
-    * @param {Partial<import('./types').SvelteApp.Options>}  [options]  SvelteApplication options passed to the
+    * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApplication options passed to the
     *        TJSDialog constructor.
     *
     * @returns {Promise<T>} A Promise that resolves to the chosen result.
