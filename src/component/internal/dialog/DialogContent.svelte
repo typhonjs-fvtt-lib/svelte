@@ -153,9 +153,9 @@
          }
          else if (TJSSvelteConfigUtil.isConfig(content))
          {
-            const svelteConfig = TJSSvelteConfigUtil.parseConfig(content, application);
+            const svelteConfig = TJSSvelteConfigUtil.parseConfig(content, { thisArg: application });
             dialogClass = svelteConfig.class;
-            dialogProps = svelteConfig.props ?? {};
+            dialogProps = svelteConfig.props;
          }
          else
          {

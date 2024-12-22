@@ -122,6 +122,8 @@ export class SvelteApplication extends Application
 
       if (!isObject(this.options.svelte))
       {
+console.log(`!!! SvelteApp - ctor - this.options: `, this.options);
+
          throw new Error(`SvelteApplication - constructor - No Svelte configuration object found in 'options'.`);
       }
 

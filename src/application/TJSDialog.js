@@ -57,7 +57,7 @@ export class TJSDialog extends SvelteApplication
    {
       // Note: explicit setting of `popOutModuleDisable` to prevent the PopOut! module from acting on modal dialogs.
       // @ts-expect-error
-      super({ popOutModuleDisable: typeof data?.modal === 'boolean' ? data.modal : false, ...options, svelte: null });
+      super({ popOutModuleDisable: typeof data?.modal === 'boolean' ? data.modal : false, ...options });
 
       this.#managedPromise = new ManagedPromise();
 
