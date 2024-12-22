@@ -652,9 +652,20 @@ declare namespace SvelteApp {
    */
   namespace Context {
     /**
+     * For clean generics / templating / substitution purposes avoiding circular dependencies.
+     * Please use {@link External}.
+     *
+     * @hidden
+     */
+    interface AbstractExternal {
+      application: unknown;
+      elementRootUpdate: unknown;
+      sessionStorage: unknown;
+    }
+    /**
      * The `#external` context.
      */
-    interface External<App extends SvelteApp = SvelteApp> {
+    interface External<App extends SvelteApp = SvelteApp> extends AbstractExternal {
       /**
        * The external application instance.
        */
@@ -673,112 +684,109 @@ declare namespace SvelteApp {
     }
   }
   /**
-   * Options for SvelteApp. Note: that this extends the Foundry `ApplicationOptions`.
+   * Base options for SvelteApp. Defines all core options not related to defining a Svelte component to load.
+   * It is useful to use `OptionsCore` when defining APIs of extended classes that internally handle loading a Svelte
+   * component where the intention is to only allow modification of other core options.
+   *
+   * Note: that this extends the Foundry `ApplicationOptions`.
    */
-  interface Options<
-    Component extends SvelteComponent = SvelteComponent,
-    ContextExternal extends { application: unknown; elementRootUpdate: unknown; sessionStorage: unknown } = {
-      application: unknown;
-      elementRootUpdate: unknown;
-      sessionStorage: unknown;
-    },
-  > extends ApplicationOptions {
+  interface OptionsCore extends ApplicationOptions {
     /**
      * If false the default slide close animation is not run.
      *
      * @defaultValue true
      */
-    defaultCloseAnimation: boolean;
+    defaultCloseAnimation?: boolean;
     /**
      * If true then application shells are draggable.
      *
      * @defaultValue true
      */
-    draggable: boolean;
+    draggable?: boolean;
     /**
      * When true auto-management of app focus is enabled.
      *
      * @defaultValue true
      */
-    focusAuto: boolean;
+    focusAuto?: boolean;
     /**
      * When `focusAuto` and `focusKeep` is true; keeps internal focus.
      *
      * @defaultValue false
      */
-    focusKeep: boolean;
+    focusKeep?: boolean;
     /**
      * Defines A11yHelper focus source to apply when application closes.
      *
      * @defaultValue: undefined
      */
-    focusSource: A11yFocusSource;
+    focusSource?: A11yFocusSource;
     /**
      * When true focus trapping / wrapping is enabled keeping focus inside app.
      *
      * @defaultValue true
      */
-    focusTrap: boolean;
+    focusTrap?: boolean;
     /**
      * If true then the close header button is removed.
      *
      * @defaultValue false
      */
-    headerButtonNoClose: boolean;
+    headerButtonNoClose?: boolean;
     /**
      * If true then header button labels are removed.
      *
      * @defaultValue false
      */
-    headerButtonNoLabel: boolean;
+    headerButtonNoLabel?: boolean;
     /**
      * Sets a header icon given an image URL.
      *
      * @defaultValue undefined
      */
-    headerIcon: string;
+    headerIcon?: string;
     /**
      * If true then header title is hidden when minimized.
      *
      * @defaultValue false
      */
-    headerNoTitleMinimized: boolean;
+    headerNoTitleMinimized?: boolean;
     /**
      * Assigned to position. Number specifying minimum window height.
      *
      * @defaultValue 50
      */
-    minHeight: number;
+    minHeight?: number;
     /**
      * Assigned to position. Number specifying minimum window width.
      *
      * @defaultValue 200
      */
-    minWidth: number;
+    minWidth?: number;
     /**
      * If false then `position.set` does not take effect.
      *
      * @defaultValue true
      */
-    positionable: boolean;
+    positionable?: boolean;
     /**
      * A helper for initial position placement.
      *
      * @defaultValue TJSPosition.Initial.browserCentered
      */
-    positionInitial: System.Initial.InitialSystem;
+    positionInitial?: System.Initial.InitialSystem;
     /**
      * When true TJSPosition is optimized for orthographic use.
      *
      * @defaultValue true
      */
-    positionOrtho: boolean;
+    positionOrtho?: boolean;
     /**
      * A validator function or data or list of validators.
      *
      * @defaultValue TJSPosition.Validators.transformWindow
      */
-    positionValidator: ValidatorAPI.ValidatorOption;
+    positionValidator?: ValidatorAPI.ValidatorOption;
     /**
      * An instance of WebStorage (session) to share across SvelteApps. This is only required to share a
      * WebStorage instance across multiple SvelteApps. By default, a unique
@@ -786,26 +794,13 @@ declare namespace SvelteApp {
      *
      * @defaultValue TJSSessionStorage
      */
-    sessionStorage: WebStorage;
-    /**
-     * A Svelte configuration object defining the main component loaded.
-     *
-     * Note: that `svelte.class` is required; this is due to type inference requirements by TypeScript.
-     */
-    svelte: TJSSvelteConfig<
-      Component,
-      {
-        PropsOmit: 'elementContent' | 'elementRoot' | 'elementTarget';
-        ContextOmit: 'application' | 'elementRootUpdate' | 'sessionStorage';
-        ContextShape: ContextExternal;
-      }
-    >;
+    sessionStorage?: WebStorage;
     /**
      * By default, 'top / left' respects rotation when minimizing.
      *
      * @defaultValue 'top left'
      */
-    transformOrigin: TransformAPI.TransformOrigin;
+    transformOrigin?: TransformAPI.TransformOrigin;
     /**
      * The default pixel height for app. You may also use relative units including percentages.
      *
@@ -838,6 +833,27 @@ declare namespace SvelteApp {
      * @defaultValue `null`
      */
     left?: number | string | null;
+  }
+  /**
+   * Options for SvelteApp. Note: that this extends the Foundry `ApplicationOptions`.
+   */
+  interface Options<
+    Component extends SvelteComponent = SvelteComponent,
+    ContextExternal extends SvelteApp.Context.AbstractExternal = SvelteApp.Context.AbstractExternal,
+  > extends OptionsCore {
+    /**
+     * A Svelte configuration object defining the main component loaded.
+     *
+     * Note: that `svelte.class` is required; this is due to type inference requirements by TypeScript.
+     */
+    svelte: TJSSvelteConfig<
+      Component,
+      {
+        PropsOmit: 'elementContent' | 'elementRoot' | 'elementTarget';
+        ContextOmit: 'application' | 'elementRootUpdate' | 'sessionStorage';
+        ContextShape: ContextExternal;
+      }
+    >;
   }
 }
 
@@ -1447,11 +1463,8 @@ type TJSDialogModalOptions = {
  *
  * There are a couple of static helper methods to quickly create standard dialogs such as a 'yes' / 'no' confirmation
  * dialog with {@link TJSDialog.confirm} and an 'ok' single button dialog with {@link TJSDialog.prompt}.
- *
- * @template [Options = import('./types').SvelteApp.Options]
- * @augments {SvelteApp<Options>}
  */
-declare class TJSDialog<Options extends SvelteApp.Options = SvelteApp.Options> extends SvelteApp<Options> {
+declare class TJSDialog extends SvelteApp {
   /**
    * A helper factory method to create simple confirmation dialog windows which consist of simple yes / no prompts.
    * If you require more flexibility, a custom TJSDialog instance is preferred. The default focused button is 'yes'.
@@ -1472,7 +1485,7 @@ declare class TJSDialog<Options extends SvelteApp.Options = SvelteApp.Options> e
    *        async function. When defined as a string any matching function by name exported from content Svelte
    *        component is invoked.
    *
-   * @param {Partial<import('./types').SvelteApp.Options>}  [options]  SvelteApp options passed to the
+   * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApp options passed to the
    *        TJSDialog constructor.
    *
    * @returns {Promise<T>} A promise which resolves with result of yes / no callbacks or true / false.
@@ -1497,7 +1510,7 @@ declare class TJSDialog<Options extends SvelteApp.Options = SvelteApp.Options> e
       onYes?: string | ((data?: { application?: TJSDialog }) => any);
       onNo?: string | ((data?: { application?: TJSDialog }) => any);
     },
-    options?: Partial<SvelteApp.Options>,
+    options?: SvelteApp.OptionsCore,
   ): Promise<T>;
   /**
    * A helper factory method to display a basic "prompt" style TJSDialog with a single button.
@@ -1518,7 +1531,7 @@ declare class TJSDialog<Options extends SvelteApp.Options = SvelteApp.Options> e
    *
    * @param {string}   [data.icon="fas fa-check"] - Set another icon besides `fas fa-check` for button.
    *
-   * @param {Partial<import('./types').SvelteApp.Options>}  [options]  SvelteApp options passed to the
+   * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApp options passed to the
    *        TJSDialog constructor.
    *
    * @returns {Promise<T>} The returned value from the provided callback function or `true` if the button
@@ -1546,7 +1559,7 @@ declare class TJSDialog<Options extends SvelteApp.Options = SvelteApp.Options> e
       label?: string;
       icon?: string;
     },
-    options?: Partial<SvelteApp.Options>,
+    options?: SvelteApp.OptionsCore,
   ): Promise<T>;
   /**
    * Creates an anonymous data defined TJSDialog returning a Promise that can be awaited upon for the user to make a
@@ -1559,18 +1572,18 @@ declare class TJSDialog<Options extends SvelteApp.Options = SvelteApp.Options> e
    * @param {import('./internal/state-dialog/types').TJSDialogOptions}  data - Dialog data passed to the TJSDialog
    *        constructor.
    *
-   * @param {Partial<import('./types').SvelteApp.Options>}  [options]  SvelteApp options passed to the
+   * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApp options passed to the
    *        TJSDialog constructor.
    *
    * @returns {Promise<T>} A Promise that resolves to the chosen result.
    */
-  static wait<T>(data: TJSDialogOptions, options?: Partial<SvelteApp.Options>): Promise<T>;
+  static wait<T>(data: TJSDialogOptions, options?: SvelteApp.OptionsCore): Promise<T>;
   /**
    * @param {import('./internal/state-dialog/types').TJSDialogOptions} data - Dialog options.
    *
-   * @param {Partial<Options>}   [options] - SvelteApp options.
+   * @param {import('./types').SvelteApp.OptionsCore}   [options] - SvelteApp options.
    */
-  constructor(data: TJSDialogOptions, options?: Partial<Options>);
+  constructor(data: TJSDialogOptions, options?: SvelteApp.OptionsCore);
   /**
    * Returns the dialog data.
    *
