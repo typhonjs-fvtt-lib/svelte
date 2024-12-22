@@ -60,17 +60,20 @@ const applicationDTSOptions = {
       ...dtsReplace,
       'get elementTarget\\(\\): HTMLElement;': dtsReplacePositionGetter,
 
+      // Handle the case of removing all generics from the extension of SvelteApp by TJSDialog as it internally defines the loaded component.
+      'TJSDialog extends SvelteApplication<SvelteApp.Options<svelte.SvelteComponent<any, any, any>, SvelteApp.Context.AbstractExternal>>': 'TJSDialog extends SvelteApplication',
+
       // The following replacements handle cases where JSDoc can't properly define generic extends clauses.
-      'SvelteApplication<Options = SvelteApp.Options<svelte.SvelteComponent<any, any, any>, any>>': 'SvelteApplication<Options extends SvelteApp.Options = SvelteApp.Options> extends Application<Options>',
+      'SvelteApplication<Options = SvelteApp.Options<svelte.SvelteComponent<any, any, any>, SvelteApp.Context.AbstractExternal>>': 'SvelteApplication<Options extends SvelteApp.Options = SvelteApp.Options> extends Application<Options>',
 
-      '<Options = SvelteApp.Options<svelte.SvelteComponent<any, any, any>, any>>': '<Options extends SvelteApp.Options = SvelteApp.Options>',
-
-      'interface Options<Component extends SvelteComponent = SvelteComponent, ContextExternal = any>': 'interface Options<Component extends SvelteComponent = SvelteComponent, ContextExternal extends { application: unknown; elementRootUpdate: unknown; sessionStorage: unknown } = { application: unknown; elementRootUpdate: unknown; sessionStorage: unknown }> extends ApplicationOptions',
+      // Make the base SvelteApp.OptionsCore extend the global Foundry ApplicationOptions.
+      'interface OptionsCore': 'interface OptionsCore extends ApplicationOptions',
 
       // Remove unused barrel import of `svelte`.
       [`import \\* as svelte from 'svelte';`]: ''
    },
-   rollupExternal: external
+   rollupExternal: external,
+   logLevel: 'debug'
 };
 
 // -------------------------------------------------------------------------------------------------------------------
