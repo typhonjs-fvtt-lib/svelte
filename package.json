@@ -98,6 +98,6 @@
   ],
   "directories": {},
   "license": "MPL-2.0",
-  "repository": "github:typhonjs-fvtt/svelte",
+  "repository": "github:typhonjs-fvtt-lib/svelte",
   "bugs": "https://github.com/typhonjs-fvtt-lib/svelte/issues"
 }
