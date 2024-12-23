@@ -92,9 +92,7 @@
     "eslint": "eslint ."
   },
   "files": [
-    "/_dist",
-    "/_types",
-    "/src"
+    "/_dist"
   ],
   "directories": {},
   "license": "MPL-2.0",
