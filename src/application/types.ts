@@ -70,6 +70,7 @@ declare namespace SvelteApp {
       /**
        * Same as {@link HeaderButton.onPress}; supported for Foundry core backward compatibility. Use `onPress`.
        *
+       * @hidden
        * @deprecated
        */
       onclick?: HeaderButtonCallback;
@@ -133,8 +134,8 @@ declare namespace SvelteApp {
        * - {@link SvelteReactive.resizing}
        *
        * There are also reactive getters / setters for {@link SvelteApp.Options} and Foundry
-       * {@link ApplicationOptions}. You can use the following as one way bindings and update the associated stores. For
-       * two-way bindings / stores see {@link SvelteReactive.storeAppOptions}.
+       * {@link fvtt!ApplicationOptions}. You can use the following as one way bindings and update the associated
+       * stores. For two-way bindings / stores see {@link SvelteReactive.storeAppOptions}.
        *
        * - {@link SvelteReactive.draggable}
        * - {@link SvelteReactive.focusAuto}
@@ -330,7 +331,7 @@ declare namespace SvelteApp {
          set minimizable(minimizable: boolean);
 
          /**
-          * Returns the Foundry popOut state; {@link ApplicationOptions.popOut}
+          * Returns the Foundry popOut state; {@link fvtt!ApplicationOptions.popOut}
           *
           * @returns {boolean} Positionable app option.
           */
@@ -425,6 +426,8 @@ declare namespace SvelteApp {
           * Note: This is protected usage and used internally.
           *
           * @param {Window} activeWindow - Active Window / WindowProxy UI state.
+          *
+          * @hidden
           */
          set activeWindow(activeWindow: Window);
 
@@ -492,7 +495,7 @@ declare namespace SvelteApp {
 
       export namespace Reactive {
          /**
-          * Defines the bulk serializable data from {@link SvelteReactive.toJSON} for common application state.
+          * Defines the bulk serializable data from {@link Reactive.toJSON} for common application state.
           */
          type Data = {
             /**
@@ -885,7 +888,7 @@ declare namespace SvelteApp {
     * It is useful to use `OptionsCore` when defining APIs of extended classes that internally handle loading a Svelte
     * component where the intention is to only allow modification of other core options.
     *
-    * Note: that this extends the Foundry `ApplicationOptions`.
+    * @privateRemarks Note: that this extends the Foundry `ApplicationOptions` in the build process.
     */
    interface OptionsCore
    {
@@ -1060,19 +1063,17 @@ declare namespace SvelteApp {
     * Options for SvelteApp including the `svelte` property which defines the Svelte component to load as the
     * "application shell".
     *
-    * Note: Unlike standard Svelte component loading the `context` is loaded as additional data into the `#external`
-    * context along with data such as the outer application instance reference. This allows one to extend the
-    * {@link SvelteApp.Context.External} interface with additional data that you are loading and use one type to
-    * retrieve all external context data inside the Svelte component.
+    * Note: Unlike standard Svelte component loading any `context` provided is loaded as additional data into the
+    * `#external` context key along with data such as the outer application instance reference. This allows one to
+    * extend the {@link SvelteApp.Context.External} interface with additional data that you are loading and use one
+    * type to conveniently retrieve all external context data inside a Svelte component.
     *
     * Note that the `svelte` configuration includes dynamic options to define `context` and `props` as a `function` as
     * well as an `object`. There are times when the `context` and `prop` data to load needs to come from data associated
     * with the instance of the application. When defining the configuration from the overloaded static accessor
-    * {@link SvelteApplication.defaultOptions}` you may use a normal `function` IE `function() {}` for `context` or
-    * `props` When `SvelteApp` loads the component these functions will be invoked with the `this` reference of the
-    * actual instance allowing one to associate instance data from a static context.
-    *
-    * Note: that this extends the Foundry `ApplicationOptions`.
+    * {@link SvelteApplication.defaultOptions} you may use a standard function IE `function() {}` for `context` or
+    * `props`. When `SvelteApp` loads the component these functions will be invoked with the `this` reference of the
+    * actual instance allowing association of instance data from within a static context.
     */
    interface Options<Component extends SvelteComponent = SvelteComponent,
     ContextExternal extends SvelteApp.Context.AbstractExternal = SvelteApp.Context.AbstractExternal> extends OptionsCore
