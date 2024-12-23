@@ -122,8 +122,6 @@ export class SvelteApplication extends Application
 
       if (!isObject(this.options.svelte))
       {
-console.log(`!!! SvelteApp - ctor - this.options: `, this.options);
-
          throw new Error(`SvelteApplication - constructor - No Svelte configuration object found in 'options'.`);
       }
 
@@ -462,6 +460,24 @@ console.log(`!!! SvelteApp - ctor - this.options: `, this.options);
       A11yHelper.applyFocusSource(this.options.focusSource);
 
       delete this.options.focusSource;
+   }
+
+   /**
+    * Specify the set of config buttons which should appear in the SvelteApp header. Buttons should be returned as
+    * an Array of objects. The header buttons which are added to the application can be modified by the
+    * `getApplicationHeaderButtons` hook.
+    *
+    * SvelteApp extends the button functionality with full reactivity for state changes during callbacks. Callbacks
+    * receive the button data and can modify it to update the button state.
+    *
+    * @privateRemarks Provide a basic override implementation to extend types with additional SvelteApp functionality.
+    *
+    * @returns {import('./types').SvelteApp.HeaderButton[]} All header buttons.
+    * @protected
+    */
+   _getHeaderButtons()
+   {
+      return super._getHeaderButtons();
    }
 
    /**

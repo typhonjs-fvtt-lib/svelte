@@ -19,9 +19,106 @@ import type {
 
 import type { WebStorage }          from '#runtime/svelte/store/web-storage';
 
-import { TJSSvelteConfigDynamic }   from '#runtime/svelte/util';
+import type {
+   TJSSvelteConfig,
+   TJSSvelteConfigDynamic }         from '#runtime/svelte/util';
 
+/**
+ * Provides all types associated with {@link SvelteApplication}.
+ */
 declare namespace SvelteApp {
+   /**
+    * Defines the application header button data handled in {@link SvelteApplication._getHeaderButtons} and associated
+    * `getApplicationHeaderButtons` hooks. SvelteApp extends the header button data from
+    * {@link ApplicationHeaderButton}.
+    */
+   export type HeaderButton = {
+      /**
+       * When true the button is left aligned after the window title.
+       *
+       * @defaultValue `false`
+       */
+      alignLeft?: boolean;
+
+      /**
+       * Additional CSS class to add to the header button.
+       */
+      class?: string;
+
+      /**
+       * Icon class identifier.
+       */
+      icon?: string;
+
+      /**
+       * Keep the header button visible when the app is minimized.
+       */
+      keepMinimized?: boolean;
+
+      /**
+       * Defines the KeyboardEvent 'code' that activates the button.
+       *
+       * @defaultValue `Enter`
+       */
+      keyCode?: string;
+
+      /**
+       * Text label or language key to associate with button.
+       */
+      label?: string;
+
+      /**
+       * Same as {@link HeaderButton.onPress}; supported for Foundry core backward compatibility. Use `onPress`.
+       *
+       * @deprecated
+       */
+      onclick?: HeaderButtonCallback;
+
+      /**
+       * Callback when context menu activated. You may modify and return the button data to update it.
+       */
+      onContextMenu?: HeaderButtonCallback;
+
+      /**
+       * Callback when pressed. You may modify and return the button data to update it.
+       */
+      onPress?: HeaderButtonCallback;
+
+      /**
+       * Hyphen case CSS property key / value object of properties to add as additional inline CSS styles to the button.
+       */
+      styles?: { [key: string]: string | null };
+
+      /**
+       * You may load a custom Svelte component into the header to replace a button.
+       *
+       * Note: supports just `class` and `props` definition.
+       */
+      svelte?: TJSSvelteConfig;
+
+      /**
+       * A tooltip to display when hovered.
+       */
+      title?: string;
+   };
+
+   /**
+    * Defines a callback function in {@link HeaderButton} for `onContextMenu` / `onPress` handlers.
+    * You may modify the button data received to update it.
+    *
+    * @param args - The data object containing the button data and source invoking event.
+    *
+    * @param args.button - The header button data associated with the interaction.
+    *
+    * @param args.event - The event triggering the callback (pointer or keyboard).
+    */
+   export type HeaderButtonCallback = (args: {
+      button: SvelteApp.HeaderButton;
+      event: PointerEvent | KeyboardEvent
+   }) => void;
+
+   // Main composition API additions to `SvelteApp` ------------------------------------------------------------------
+
    export namespace API {
       // Reactive API ------------------------------------------------------------------------------------------------
 
@@ -542,7 +639,7 @@ declare namespace SvelteApp {
             /**
              * Derived store for `headerButtons` updates.
              */
-            headerButtons: Readable<globalThis.ApplicationHeaderButton[]>;
+            headerButtons: Readable<SvelteApp.HeaderButton>;
 
             /**
              * Derived store for `minimized` updates.
@@ -761,7 +858,9 @@ declare namespace SvelteApp {
       /**
        * The `#external` context.
        */
+      // @ts-ignore
       export interface External<App extends import('./SvelteApplication').SvelteApplication =
+       // @ts-ignore
        import('./SvelteApplication').SvelteApplication> extends AbstractExternal {
          /**
           * The external application instance.
