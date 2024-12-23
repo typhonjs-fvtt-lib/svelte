@@ -4,7 +4,10 @@
     "module": "ES2022",
     "moduleResolution" : "bundler",
     "target": "ES2022",
-    "strict": true
+    "strict": true,
+    "types": ["@typhonjs-fvtt/types-fvtt-shim"],
+
+    "allowJs": true // For VSCode
   },
   "exclude": ["node_modules", "_dist"]
 }
