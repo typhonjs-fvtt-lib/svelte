@@ -30,7 +30,7 @@ declare namespace SvelteApp {
    /**
     * Defines the application header button data handled in {@link SvelteApplication._getHeaderButtons} and associated
     * `getApplicationHeaderButtons` hooks. SvelteApp extends the header button data from
-    * {@link ApplicationHeaderButton}.
+    * {@link fvtt!ApplicationHeaderButton} bringing an expanded feature set.
     */
    export type HeaderButton = {
       /**
@@ -846,10 +846,8 @@ declare namespace SvelteApp {
       /**
        * For clean generics / templating / substitution purposes avoiding circular dependencies.
        * Please use {@link External}.
-       *
-       * @hidden
        */
-      interface AbstractExternal {
+      export interface AbstractExternal {
          application: unknown;
          elementRootUpdate: unknown;
          sessionStorage: unknown;
