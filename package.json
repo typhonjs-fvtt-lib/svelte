@@ -67,6 +67,7 @@
     "@typhonjs-build-test/rollup-plugin-pkg-imports": "^0.5.0",
     "@typhonjs-config/eslint-config": "^0.6.3",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
+    "@typhonjs-fvtt/types-fvtt-shim": "github:typhonjs-fvtt-lib/types-fvtt-shim",
     "@typhonjs-svelte/runtime-base": "github:typhonjs-svelte/runtime-base#0.2.0-next.2",
     "@typhonjs-utils/file-util": "^0.1.0",
     "eslint": "^8.57.0",
