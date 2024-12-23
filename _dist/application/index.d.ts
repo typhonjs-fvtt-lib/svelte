@@ -13,11 +13,91 @@ import { Readable, Writable } from 'svelte/store';
 import { A11yFocusSource } from '@typhonjs-svelte/runtime-base/util/a11y';
 import { EasingReference } from '@typhonjs-svelte/runtime-base/svelte/easing';
 import { WebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
-import { TJSSvelteConfigDynamic, TJSSvelteConfig } from '@typhonjs-svelte/runtime-base/svelte/util';
+import { TJSSvelteConfig, TJSSvelteConfigDynamic } from '@typhonjs-svelte/runtime-base/svelte/util';
 import * as _runtime_util_async from '@typhonjs-svelte/runtime-base/util/async';
 import { TransitionFunction } from '@typhonjs-svelte/runtime-base/svelte/transition';
 
+/**
+ * Provides all types associated with {@link SvelteApp}.
+ */
 declare namespace SvelteApp {
+  /**
+   * Defines the application header button data handled in {@link SvelteApp._getHeaderButtons} and associated
+   * `getApplicationHeaderButtons` hooks. SvelteApp extends the header button data from
+   * {@link fvtt!ApplicationHeaderButton} bringing an expanded feature set.
+   */
+  type HeaderButton = {
+    /**
+     * When true the button is left aligned after the window title.
+     *
+     * @defaultValue `false`
+     */
+    alignLeft?: boolean;
+    /**
+     * Additional CSS class to add to the header button.
+     */
+    class?: string;
+    /**
+     * Icon class identifier.
+     */
+    icon?: string;
+    /**
+     * Keep the header button visible when the app is minimized.
+     */
+    keepMinimized?: boolean;
+    /**
+     * Defines the KeyboardEvent 'code' that activates the button.
+     *
+     * @defaultValue `Enter`
+     */
+    keyCode?: string;
+    /**
+     * Text label or language key to associate with button.
+     */
+    label?: string;
+    /**
+     * Same as {@link HeaderButton.onPress}; supported for Foundry core backward compatibility. Use `onPress`.
+     *
+     * @hidden
+     * @deprecated
+     */
+    onclick?: HeaderButtonCallback;
+    /**
+     * Callback when context menu activated. You may modify and return the button data to update it.
+     */
+    onContextMenu?: HeaderButtonCallback;
+    /**
+     * Callback when pressed. You may modify and return the button data to update it.
+     */
+    onPress?: HeaderButtonCallback;
+    /**
+     * Hyphen case CSS property key / value object of properties to add as additional inline CSS styles to the button.
+     */
+    styles?: {
+      [key: string]: string | null;
+    };
+    /**
+     * You may load a custom Svelte component into the header to replace a button.
+     *
+     * Note: supports just `class` and `props` definition.
+     */
+    svelte?: TJSSvelteConfig;
+    /**
+     * A tooltip to display when hovered.
+     */
+    title?: string;
+  };
+  /**
+   * Defines a callback function in {@link HeaderButton} for `onContextMenu` / `onPress` handlers.
+   * You may modify the button data received to update it.
+   *
+   * @param args - The data object containing the button data and source invoking event.
+   *
+   * @param args.button - The header button data associated with the interaction.
+   *
+   * @param args.event - The event triggering the callback (pointer or keyboard).
+   */
+  type HeaderButtonCallback = (args: { button: SvelteApp.HeaderButton; event: PointerEvent | KeyboardEvent }) => void;
   namespace API {
     /**
      * Contains the reactive functionality / Svelte stores associated with SvelteApp and retrievable by
@@ -30,8 +110,8 @@ declare namespace SvelteApp {
      * - {@link SvelteReactive.resizing}
      *
      * There are also reactive getters / setters for {@link SvelteApp.Options} and Foundry
-     * {@link ApplicationOptions}. You can use the following as one way bindings and update the associated stores. For
-     * two-way bindings / stores see {@link SvelteReactive.storeAppOptions}.
+     * {@link fvtt!ApplicationOptions}. You can use the following as one way bindings and update the associated
+     * stores. For two-way bindings / stores see {@link SvelteReactive.storeAppOptions}.
      *
      * - {@link SvelteReactive.draggable}
      * - {@link SvelteReactive.focusAuto}
@@ -203,7 +283,7 @@ declare namespace SvelteApp {
        */
       set minimizable(minimizable: boolean);
       /**
-       * Returns the Foundry popOut state; {@link ApplicationOptions.popOut}
+       * Returns the Foundry popOut state; {@link fvtt!ApplicationOptions.popOut}
        *
        * @returns {boolean} Positionable app option.
        */
@@ -284,6 +364,8 @@ declare namespace SvelteApp {
        * Note: This is protected usage and used internally.
        *
        * @param {Window} activeWindow - Active Window / WindowProxy UI state.
+       *
+       * @hidden
        */
       set activeWindow(activeWindow: Window);
       /**
@@ -348,7 +430,7 @@ declare namespace SvelteApp {
     }
     namespace Reactive {
       /**
-       * Defines the bulk serializable data from {@link SvelteReactive.toJSON} for common application state.
+       * Defines the bulk serializable data from {@link Reactive.toJSON} for common application state.
        */
       type Data = {
         /**
@@ -468,7 +550,7 @@ declare namespace SvelteApp {
         /**
          * Derived store for `headerButtons` updates.
          */
-        headerButtons: Readable<globalThis.ApplicationHeaderButton[]>;
+        headerButtons: Readable<SvelteApp.HeaderButton>;
         /**
          * Derived store for `minimized` updates.
          */
@@ -659,8 +741,6 @@ declare namespace SvelteApp {
     /**
      * For clean generics / templating / substitution purposes avoiding circular dependencies.
      * Please use {@link External}.
-     *
-     * @hidden
      */
     interface AbstractExternal {
       application: unknown;
@@ -693,9 +773,9 @@ declare namespace SvelteApp {
    * It is useful to use `OptionsCore` when defining APIs of extended classes that internally handle loading a Svelte
    * component where the intention is to only allow modification of other core options.
    *
-   * Note: that this extends the Foundry `ApplicationOptions`.
+   * @privateRemarks Note: that this extends the Foundry `ApplicationOptions` in the build process.
    */
-  interface OptionsCore extends ApplicationOptions {
+  interface OptionsCore extends fvtt.ApplicationOptions {
     /**
      * If false the default slide close animation is not run.
      *
@@ -843,19 +923,17 @@ declare namespace SvelteApp {
    * Options for SvelteApp including the `svelte` property which defines the Svelte component to load as the
    * "application shell".
    *
-   * Note: Unlike standard Svelte component loading the `context` is loaded as additional data into the `#external`
-   * context along with data such as the outer application instance reference. This allows one to extend the
-   * {@link SvelteApp.Context.External} interface with additional data that you are loading and use one type to
-   * retrieve all external context data inside the Svelte component.
+   * Note: Unlike standard Svelte component loading any `context` provided is loaded as additional data into the
+   * `#external` context key along with data such as the outer application instance reference. This allows one to
+   * extend the {@link SvelteApp.Context.External} interface with additional data that you are loading and use one
+   * type to conveniently retrieve all external context data inside a Svelte component.
    *
    * Note that the `svelte` configuration includes dynamic options to define `context` and `props` as a `function` as
    * well as an `object`. There are times when the `context` and `prop` data to load needs to come from data associated
    * with the instance of the application. When defining the configuration from the overloaded static accessor
-   * {@link SvelteApp.defaultOptions}` you may use a normal `function` IE `function() {}` for `context` or
-   * `props` When `SvelteApp` loads the component these functions will be invoked with the `this` reference of the
-   * actual instance allowing one to associate instance data from a static context.
-   *
-   * Note: that this extends the Foundry `ApplicationOptions`.
+   * {@link SvelteApp.defaultOptions} you may use a standard function IE `function() {}` for `context` or
+   * `props`. When `SvelteApp` loads the component these functions will be invoked with the `this` reference of the
+   * actual instance allowing association of instance data from within a static context.
    */
   interface Options<
     Component extends SvelteComponent = SvelteComponent,
@@ -921,7 +999,7 @@ type AppShell<Options extends SvelteApp.Options> = OmitPropsTRL<Options> & {
  * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
  */
 declare class SvelteApp<Options extends SvelteApp.Options = SvelteApp.Options>
-  extends Application<Options>
+  extends fvtt.Application<Options>
   implements TJSPositionTypes.Positionable
 {
   /**
@@ -973,6 +1051,20 @@ declare class SvelteApp<Options extends SvelteApp.Options = SvelteApp.Options>
    * @returns {import('./types').SvelteApp.API.Svelte<Options>} `Svelte` / mounted application shell API.
    */
   get svelte(): SvelteApp.API.Svelte<Options>;
+  /**
+   * Specify the set of config buttons which should appear in the SvelteApp header. Buttons should be returned as
+   * an Array of objects. The header buttons which are added to the application can be modified by the
+   * `getApplicationHeaderButtons` hook.
+   *
+   * SvelteApp extends the button functionality with full reactivity for state changes during callbacks. Callbacks
+   * receive the button data and can modify it to update the button state.
+   *
+   * @privateRemarks Provide a basic override implementation to extend types with additional SvelteApp functionality.
+   *
+   * @returns {import('./types').SvelteApp.HeaderButton[]} All header buttons.
+   * @protected
+   */
+  protected _getHeaderButtons(): SvelteApp.HeaderButton[];
   /**
    * Provides a mechanism to update the UI options store for maximized.
    *
