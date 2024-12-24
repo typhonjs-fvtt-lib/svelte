@@ -128,58 +128,32 @@ declare namespace SvelteApp {
        * {@link SvelteApplication.reactive}.
        *
        * There are several reactive getters for UI state such and for two-way bindings / stores see
-       * {@link SvelteReactive.storeUIState}:
-       * - {@link SvelteReactive.dragging}
-       * - {@link SvelteReactive.minimized}
-       * - {@link SvelteReactive.resizing}
+       * {@link Reactive.storeUIState}:
+       * - {@link Reactive.dragging}
+       * - {@link Reactive.minimized}
+       * - {@link Reactive.resizing}
        *
        * There are also reactive getters / setters for {@link SvelteApp.Options} and Foundry
        * {@link fvtt!ApplicationOptions}. You can use the following as one way bindings and update the associated
-       * stores. For two-way bindings / stores see {@link SvelteReactive.storeAppOptions}.
+       * stores. For two-way bindings / stores see {@link Reactive.storeAppOptions}.
        *
-       * - {@link SvelteReactive.draggable}
-       * - {@link SvelteReactive.focusAuto}
-       * - {@link SvelteReactive.focusKeep}
-       * - {@link SvelteReactive.focusTrap}
-       * - {@link SvelteReactive.headerButtonNoClose}
-       * - {@link SvelteReactive.headerButtonNoLabel}
-       * - {@link SvelteReactive.headerIcon}
-       * - {@link SvelteReactive.headerNoTitleMinimized}
-       * - {@link SvelteReactive.minimizable}
-       * - {@link SvelteReactive.popOut}
-       * - {@link SvelteReactive.positionable}
-       * - {@link SvelteReactive.resizable}
-       * - {@link SvelteReactive.title}
+       * - {@link Reactive.draggable}
+       * - {@link Reactive.focusAuto}
+       * - {@link Reactive.focusKeep}
+       * - {@link Reactive.focusTrap}
+       * - {@link Reactive.headerButtonNoClose}
+       * - {@link Reactive.headerButtonNoLabel}
+       * - {@link Reactive.headerIcon}
+       * - {@link Reactive.headerNoTitleMinimized}
+       * - {@link Reactive.minimizable}
+       * - {@link Reactive.popOut}
+       * - {@link Reactive.positionable}
+       * - {@link Reactive.resizable}
+       * - {@link Reactive.title}
        *
        * An instance of TJSWebStorage (session) / TJSSessionStorage is accessible via
-       * {@link SvelteReactive.sessionStorage}. Optionally you can pass in an existing TJSWebStorage instance that can
+       * {@link Reactive.sessionStorage}. Optionally you can pass in an existing TJSWebStorage instance that can
        * be shared across multiple SvelteApps by setting {@link SvelteApp.Options.sessionStorage}.
-       *
-       * -------------------------------------------------------------------------------------------------------------
-       *
-       * This API is not sealed, and it is recommended that you extend it with accessors to get / set data that is
-       * reactive in your application. An example of setting an exported prop `document` from the main mounted
-       * application shell.
-       *
-       * @example
-       * ```js
-       * import { hasSetter } from '#runtime/util/object';
-       *
-       * // Note: make a normal comment.
-       * //  * @member {object} document - Adds accessors to SvelteReactive to get / set the document associated with
-       * //  *                             Document with the mounted application shell Svelte component.
-       * //  *
-       * //  * @memberof SvelteReactive#
-       * //  *
-       * Object.defineProperty(this.reactive, 'document', {
-       *    get: () => this.svelte?.appShell?.document,
-       *    set: (document) =>
-       *    {
-       *       const component = this.svelte?.appShell;
-       *       if (hasSetter(component, 'document')) { component.document = document; }
-       *    }
-       * });
-       * ```
        */
       export interface Reactive
       {
