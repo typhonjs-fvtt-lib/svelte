@@ -194,31 +194,21 @@ for (const config of rollupConfigs)
    let applicationIndexJS = fs.readFileSync('./_dist/application/index.js', 'utf-8');
 
    applicationIndexJS = applicationIndexJS.replaceAll('TJSDialogNS', 'TJSDialog');
-
-   applicationIndexJS = applicationIndexJS.replaceAll('SvelteApplication', 'SvelteApp');
-   applicationIndexJS = applicationIndexJS.replaceAll('export { SvelteApp, TJSDialog };',
-    'export { SvelteApp, SvelteApp as SvelteApplication, TJSDialog };');
+   applicationIndexJS = applicationIndexJS.replaceAll('SvelteAppNS', 'SvelteApp');
 
    fs.writeFileSync('./_dist/application/index.js', applicationIndexJS);
 
    // DTS Bundle mods -------------
    let applicationIndexDTS = fs.readFileSync('./_dist/application/index.d.ts', 'utf-8');
 
+   // Remove merged class / namespace exports.
+   applicationIndexDTS = applicationIndexDTS.replace(
+      'export { SvelteApp, SvelteAppNS, SvelteApp as SvelteApplication, TJSDialog, TJSDialogNS };',
+      'export { SvelteApp, SvelteApp as SvelteApplication, TJSDialog };'
+   );
+
    applicationIndexDTS = applicationIndexDTS.replaceAll('TJSDialogNS', 'TJSDialog');
-
-   applicationIndexDTS = applicationIndexDTS.replaceAll('SvelteApplication', 'SvelteApp');
-
-   // Only replace the second instance of `SvelteApp,` with `SvelteApp as SvelteApplication,` in export statement.
-   applicationIndexDTS = applicationIndexDTS.replace(/export\s*{([^}]*)}/s, (match, exportContent) =>
-   {
-      let counter = 0;
-      const updatedContent = exportContent.replace(/SvelteApp,/g, (m) =>
-      {
-         counter++;
-         return counter === 2 ? 'SvelteApp as SvelteApplication,' : m;
-      });
-      return `export {${updatedContent}}`;
-   });
+   applicationIndexDTS = applicationIndexDTS.replaceAll('SvelteAppNS', 'SvelteApp');
 
    fs.writeFileSync('./_dist/application/index.d.ts', applicationIndexDTS);
 }
