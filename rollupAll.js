@@ -193,6 +193,8 @@ for (const config of rollupConfigs)
    // JS Bundle mods --------------
    let applicationIndexJS = fs.readFileSync('./_dist/application/index.js', 'utf-8');
 
+   applicationIndexJS = applicationIndexJS.replaceAll('TJSDialogNS', 'TJSDialog');
+
    applicationIndexJS = applicationIndexJS.replaceAll('SvelteApplication', 'SvelteApp');
    applicationIndexJS = applicationIndexJS.replaceAll('export { SvelteApp, TJSDialog };',
     'export { SvelteApp, SvelteApp as SvelteApplication, TJSDialog };');
@@ -201,6 +203,8 @@ for (const config of rollupConfigs)
 
    // DTS Bundle mods -------------
    let applicationIndexDTS = fs.readFileSync('./_dist/application/index.d.ts', 'utf-8');
+
+   applicationIndexDTS = applicationIndexDTS.replaceAll('TJSDialogNS', 'TJSDialog');
 
    applicationIndexDTS = applicationIndexDTS.replaceAll('SvelteApplication', 'SvelteApp');
 
