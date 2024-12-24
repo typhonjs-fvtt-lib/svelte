@@ -49,7 +49,7 @@ export class TJSDialog extends SvelteApplication
    #managedPromise;
 
    /**
-    * @param {import('./internal/state-dialog/types').TJSDialogOptions} data - Dialog options.
+    * @param {import('./internal/state-dialog/types').TJSDialogNS.Options} data - Dialog options.
     *
     * @param {import('./types').SvelteApp.OptionsCore}   [options] - SvelteApplication options.
     */
@@ -103,7 +103,7 @@ export class TJSDialog extends SvelteApplication
    /**
     * Returns the dialog data.
     *
-    * @returns {import('./internal/state-dialog/types').TJSDialogData} Dialog data.
+    * @returns {import('./internal/state-dialog/types').TJSDialogNS.Data} Dialog data.
     */
    get data() { return this.#data; }
 
@@ -206,7 +206,7 @@ export class TJSDialog extends SvelteApplication
     *
     * @template T
     *
-    * @param {import('./internal/state-dialog/types').TJSDialogOptions & {
+    * @param {import('./internal/state-dialog/types').TJSDialogNS.Options & {
     *    onYes?: string | ((data?: { application?: TJSDialog }) => any),
     *    onNo?: string | ((data?: { application?: TJSDialog }) => any)
     * }} [data] - Confirm dialog options.
@@ -325,7 +325,7 @@ export class TJSDialog extends SvelteApplication
     *
     * @template T
     *
-    * @param {import('./internal/state-dialog/types').TJSDialogOptions & {
+    * @param {import('./internal/state-dialog/types').TJSDialogNS.Options & {
     *    onOk?: string | ((data?: { application?: TJSDialog }) => any),
     *    label?: string,
     *    icon?: string
@@ -379,7 +379,7 @@ export class TJSDialog extends SvelteApplication
     *
     * @template T
     *
-    * @param {import('./internal/state-dialog/types').TJSDialogOptions}  data - Dialog data passed to the TJSDialog
+    * @param {import('./internal/state-dialog/types').TJSDialogNS.Options}  data - Dialog data passed to the TJSDialog
     *        constructor.
     *
     * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApplication options passed to the
