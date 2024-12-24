@@ -64,10 +64,10 @@ const applicationDTSOptions = {
       'TJSDialog extends SvelteApplication<SvelteApp.Options<svelte.SvelteComponent<any, any, any>, SvelteApp.Context.AbstractExternal>>': 'TJSDialog extends SvelteApplication',
 
       // The following replacements handle cases where JSDoc can't properly define generic extends clauses.
-      'SvelteApplication<Options = SvelteApp.Options<svelte.SvelteComponent<any, any, any>, SvelteApp.Context.AbstractExternal>>': 'SvelteApplication<Options extends SvelteApp.Options = SvelteApp.Options> extends fvtt.Application<Options>',
+      'SvelteApplication<Options = SvelteApp.Options<svelte.SvelteComponent<any, any, any>, SvelteApp.Context.AbstractExternal>>': 'SvelteApplication<Options extends SvelteApp.Options = SvelteApp.Options> extends Application<Options>',
 
       // Make the base SvelteApp.OptionsCore extend the global Foundry ApplicationOptions.
-      'interface OptionsCore': 'interface OptionsCore extends fvtt.ApplicationOptions',
+      'interface OptionsCore': 'interface OptionsCore extends ApplicationOptions',
 
       // Remove unused barrel import of `svelte`.
       [`import \\* as svelte from 'svelte';`]: ''
