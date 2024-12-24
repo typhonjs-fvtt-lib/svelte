@@ -22,7 +22,7 @@
    export let draggableOptions = void 0;
 
    /**
-    * @type {SvelteApplication}
+    * @type {SvelteApp}
     */
    const application = getContext('#external')?.application;
 

@@ -1,6 +1,6 @@
 <script>
    /**
-    * Provides an app header button conforming to the {@link SvelteApp.HeaderButton} type.
+    * Provides an app header button conforming to the {@link SvelteAppNS.HeaderButton} type.
     * Additionally, a `title` field is supported to give a tool tip for the button. For backward compatibility
     * `onclick` is supported, but for uniformity across TRL defining an `onPress` function is recommended. If defined
     * it is invoked when the button is clicked or `Enter` key pressed and state is updated accordingly.

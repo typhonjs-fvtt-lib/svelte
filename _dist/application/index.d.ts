@@ -1,21 +1,150 @@
+import * as _runtime_util_async from '@typhonjs-svelte/runtime-base/util/async';
 import * as _runtime_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import {
+  TJSPositionTypes,
+  TJSPosition,
   Data,
   System,
   ValidatorAPI,
   TransformAPI,
-  TJSPositionTypes,
-  TJSPosition,
 } from '@typhonjs-svelte/runtime-base/svelte/store/position';
-
 import { SvelteComponent, ComponentEvents, ComponentProps } from 'svelte';
 import { Readable, Writable } from 'svelte/store';
 import { A11yFocusSource } from '@typhonjs-svelte/runtime-base/util/a11y';
 import { EasingReference } from '@typhonjs-svelte/runtime-base/svelte/easing';
 import { WebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import { TJSSvelteConfig, TJSSvelteConfigDynamic } from '@typhonjs-svelte/runtime-base/svelte/util';
-import * as _runtime_util_async from '@typhonjs-svelte/runtime-base/util/async';
 import { TransitionFunction } from '@typhonjs-svelte/runtime-base/svelte/transition';
+
+/**
+ * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
+ * appropriately. You can declaratively load one or more components from `defaultOptions` using a
+ * {@link #runtime/svelte/util!TJSSvelteConfig} object in the {@link SvelteApp.Options.svelte} property.
+ *
+ * @template [Options = import('./types').SvelteApp.Options]
+ * @augments {Application<Options>}
+ *
+ * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
+ */
+declare class SvelteApp<Options = any> implements TJSPositionTypes.Positionable {
+  /**
+   * Specifies the default options that SvelteApp supports.
+   *
+   * @returns {import('./types').SvelteApp.Options} options - Application options.
+   * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
+   */
+  static get defaultOptions(): SvelteApp.Options;
+  /**
+   * @param {Partial<import('./types').SvelteApp.Options>} [options] - The options for the application.
+   */
+  constructor(options?: Partial<SvelteApp.Options>);
+  /**
+   * Returns the content element if an application shell is mounted.
+   *
+   * @returns {HTMLElement} Content element.
+   */
+  get elementContent(): HTMLElement;
+  /**
+   * Returns the target element or main element if no target defined.
+   *
+   * @returns {HTMLElement} Target element.
+   */
+  get elementTarget(): HTMLElement;
+
+  /**
+   * Returns the TJSPosition instance.
+   *
+   * @returns {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPosition} The TJSPosition instance.
+   */
+  get position(): TJSPosition;
+
+  /**
+   * Returns the reactive accessors & Svelte stores for SvelteApp.
+   *
+   * @returns {import('./types').SvelteApp.API.Reactive} The reactive accessors & Svelte stores.
+   */
+  get reactive(): SvelteApp.API.Reactive;
+  /**
+   * Returns the application state manager.
+   *
+   * @returns {import('./types').SvelteApp.API.State} The application state manager.
+   */
+  get state(): SvelteApp.API.State;
+  /**
+   * Returns the `Svelte` helper class w/ various methods to access the mounted application shell component.
+   *
+   * @returns {import('./types').SvelteApp.API.Svelte<Options>} `Svelte` / mounted application shell API.
+   */
+  get svelte(): SvelteApp.API.Svelte<Options>;
+  /**
+   * Specify the set of config buttons which should appear in the SvelteApp header. Buttons should be returned as
+   * an Array of objects. The header buttons which are added to the application can be modified by the
+   * `getApplicationHeaderButtons` hook.
+   *
+   * SvelteApp extends the button functionality with full reactivity for state changes during callbacks. Callbacks
+   * receive the button data and can modify it to update the button state.
+   *
+   * @privateRemarks Provide a basic override implementation to extend types with additional SvelteApp functionality.
+   *
+   * @returns {import('./types').SvelteApp.HeaderButton[]} All header buttons.
+   * @protected
+   */
+  protected _getHeaderButtons(): SvelteApp.HeaderButton[];
+  /**
+   * Provides a mechanism to update the UI options store for maximized.
+   *
+   * Note: the sanity check is duplicated from {@link Application.maximize} the store is updated _before_
+   * performing the rest of animations. This allows application shells to remove / show any resize handlers
+   * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApp.minimize}
+   * to animate the content area.
+   *
+   * @param {object}   [opts] - Optional parameters.
+   *
+   * @param {boolean}  [opts.animate=true] - When true perform default maximizing animation.
+   *
+   * @param {number}   [opts.duration=0.1] - Controls content area animation duration in seconds.
+   */
+  maximize({ animate, duration }?: { animate?: boolean; duration?: number }): Promise<void>;
+  /**
+   * Provides a mechanism to update the UI options store for minimized.
+   *
+   * Note: the sanity check is duplicated from {@link Application.minimize} the store is updated _before_
+   * performing the rest of animations. This allows application shells to remove / show any resize handlers
+   * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApp.minimize}
+   * to animate the content area.
+   *
+   * @param {object}   [opts] - Optional parameters.
+   *
+   * @param {boolean}  [opts.animate=true] - When true perform default minimizing animation.
+   *
+   * @param {number}   [opts.duration=0.1] - Controls content area animation duration in seconds.
+   */
+  minimize({ animate, duration }?: { animate?: boolean; duration?: number }): Promise<void>;
+  /**
+   * Provides a callback after all Svelte components are initialized.
+   */
+  onSvelteMount(): void;
+  /**
+   * Provides a callback after the main application shell is remounted. This may occur during HMR / hot module
+   * replacement or directly invoked from the `elementRootUpdate` callback passed to the application shell component
+   * context.
+   */
+  onSvelteRemount(): void;
+  /**
+   * All calculation and updates of position are implemented in {@link #runtime/svelte/store/position!TJSPosition.set}.
+   * This allows position to be fully reactive and in control of updating inline styles for the application.
+   *
+   * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
+   * to update to using the {@link TJSPosition.validators} / ValidatorAPI functionality.
+   *
+   * @param {import('#runtime/svelte/store/position').Data.TJSPositionDataRelative}   [position] - TJSPosition data.
+   *
+   * @returns {TJSPosition} The updated position object for the application containing the new values.
+   * @ignore
+   */
+  setPosition(position?: _runtime_svelte_store_position.Data.TJSPositionDataRelative): TJSPosition;
+  #private;
+}
 
 /**
  * Provides all types associated with {@link SvelteApp}.
@@ -962,139 +1091,6 @@ type AppShell<Options extends SvelteApp.Options> = OmitPropsTRL<Options> & {
   $set(props: Partial<OmitPropsTRL<Options>>): void;
 };
 
-/**
- * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
- * appropriately. You can declaratively load one or more components from `defaultOptions` using a
- * {@link #runtime/svelte/util!TJSSvelteConfig} object in the {@link SvelteApp.Options.svelte} property.
- *
- * @template [Options = import('./types').SvelteApp.Options]
- * @augments {Application<Options>}
- *
- * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
- */
-declare class SvelteApp<Options extends SvelteApp.Options = SvelteApp.Options>
-  extends Application<Options>
-  implements TJSPositionTypes.Positionable
-{
-  /**
-   * Specifies the default options that SvelteApp supports.
-   *
-   * @returns {import('./types').SvelteApp.Options} options - Application options.
-   * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
-   */
-  static get defaultOptions(): SvelteApp.Options;
-  /**
-   * @param {Partial<import('./types').SvelteApp.Options>} [options] - The options for the application.
-   */
-  constructor(options?: Partial<SvelteApp.Options>);
-  /**
-   * Returns the content element if an application shell is mounted.
-   *
-   * @returns {HTMLElement} Content element.
-   */
-  get elementContent(): HTMLElement;
-  /**
-   * Returns the target element or main element if no target defined.
-   *
-   * @returns {HTMLElement} Target element.
-   */
-  get elementTarget(): HTMLElement;
-
-  /**
-   * Returns the TJSPosition instance.
-   *
-   * @returns {import('@typhonjs-svelte/runtime-base/svelte/store/position').TJSPosition} The TJSPosition instance.
-   */
-  get position(): TJSPosition;
-
-  /**
-   * Returns the reactive accessors & Svelte stores for SvelteApp.
-   *
-   * @returns {import('./types').SvelteApp.API.Reactive} The reactive accessors & Svelte stores.
-   */
-  get reactive(): SvelteApp.API.Reactive;
-  /**
-   * Returns the application state manager.
-   *
-   * @returns {import('./types').SvelteApp.API.State} The application state manager.
-   */
-  get state(): SvelteApp.API.State;
-  /**
-   * Returns the `Svelte` helper class w/ various methods to access the mounted application shell component.
-   *
-   * @returns {import('./types').SvelteApp.API.Svelte<Options>} `Svelte` / mounted application shell API.
-   */
-  get svelte(): SvelteApp.API.Svelte<Options>;
-  /**
-   * Specify the set of config buttons which should appear in the SvelteApp header. Buttons should be returned as
-   * an Array of objects. The header buttons which are added to the application can be modified by the
-   * `getApplicationHeaderButtons` hook.
-   *
-   * SvelteApp extends the button functionality with full reactivity for state changes during callbacks. Callbacks
-   * receive the button data and can modify it to update the button state.
-   *
-   * @privateRemarks Provide a basic override implementation to extend types with additional SvelteApp functionality.
-   *
-   * @returns {import('./types').SvelteApp.HeaderButton[]} All header buttons.
-   * @protected
-   */
-  protected _getHeaderButtons(): SvelteApp.HeaderButton[];
-  /**
-   * Provides a mechanism to update the UI options store for maximized.
-   *
-   * Note: the sanity check is duplicated from {@link Application.maximize} the store is updated _before_
-   * performing the rest of animations. This allows application shells to remove / show any resize handlers
-   * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApp.minimize}
-   * to animate the content area.
-   *
-   * @param {object}   [opts] - Optional parameters.
-   *
-   * @param {boolean}  [opts.animate=true] - When true perform default maximizing animation.
-   *
-   * @param {number}   [opts.duration=0.1] - Controls content area animation duration in seconds.
-   */
-  maximize({ animate, duration }?: { animate?: boolean; duration?: number }): Promise<void>;
-  /**
-   * Provides a mechanism to update the UI options store for minimized.
-   *
-   * Note: the sanity check is duplicated from {@link Application.minimize} the store is updated _before_
-   * performing the rest of animations. This allows application shells to remove / show any resize handlers
-   * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApp.minimize}
-   * to animate the content area.
-   *
-   * @param {object}   [opts] - Optional parameters.
-   *
-   * @param {boolean}  [opts.animate=true] - When true perform default minimizing animation.
-   *
-   * @param {number}   [opts.duration=0.1] - Controls content area animation duration in seconds.
-   */
-  minimize({ animate, duration }?: { animate?: boolean; duration?: number }): Promise<void>;
-  /**
-   * Provides a callback after all Svelte components are initialized.
-   */
-  onSvelteMount(): void;
-  /**
-   * Provides a callback after the main application shell is remounted. This may occur during HMR / hot module
-   * replacement or directly invoked from the `elementRootUpdate` callback passed to the application shell component
-   * context.
-   */
-  onSvelteRemount(): void;
-  /**
-   * All calculation and updates of position are implemented in {@link #runtime/svelte/store/position!TJSPosition.set}.
-   * This allows position to be fully reactive and in control of updating inline styles for the application.
-   *
-   * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
-   * to update to using the {@link TJSPosition.validators} / ValidatorAPI functionality.
-   *
-   * @param {import('#runtime/svelte/store/position').Data.TJSPositionDataRelative}   [position] - TJSPosition data.
-   *
-   * @returns {TJSPosition} The updated position object for the application containing the new values.
-   * @ignore
-   */
-  setPosition(position?: _runtime_svelte_store_position.Data.TJSPositionDataRelative): TJSPosition;
-  #private;
-}
-
 declare namespace TJSDialog {
   /**
    * TJSDialog button data.
@@ -1552,7 +1548,7 @@ declare namespace TJSDialog {
  * There are a couple of static helper methods to quickly create standard dialogs such as a 'yes' / 'no' confirmation
  * dialog with {@link TJSDialog.confirm} and an 'ok' single button dialog with {@link TJSDialog.prompt}.
  */
-declare class TJSDialog extends SvelteApp {
+declare class TJSDialog extends SvelteApp<any> {
   /**
    * A helper factory method to create simple confirmation dialog windows which consist of simple yes / no prompts.
    * If you require more flexibility, a custom TJSDialog instance is preferred. The default focused button is 'yes'.
@@ -1704,4 +1700,4 @@ declare class TJSDialog extends SvelteApp {
   #private;
 }
 
-export { SvelteApp, SvelteApp as SvelteApplication, TJSDialog, TJSDialog };
+export { SvelteApp, SvelteApp as SvelteApplication, TJSDialog };

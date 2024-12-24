@@ -16,7 +16,7 @@ import { ManagedPromise } from '@typhonjs-svelte/runtime-base/util/async';
  */
 class ApplicationState
 {
-   /** @type {import('../../SvelteApp').SvelteApp} */
+   /** @type {import('../../SvelteApp.js').SvelteApp} */
    #application;
 
    /**
@@ -31,7 +31,7 @@ class ApplicationState
    #dataSaved = new Map();
 
    /**
-    * @param {import('../../SvelteApp').SvelteApp}   application - The application.
+    * @param {import('../../SvelteApp.js').SvelteApp}   application - The application.
     */
    constructor(application)
    {
