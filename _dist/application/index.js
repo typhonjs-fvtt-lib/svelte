@@ -2931,7 +2931,7 @@ class TJSDialog extends SvelteApp
    #managedPromise;
 
    /**
-    * @param {import('./internal/state-dialog/types').TJSDialogOptions} data - Dialog options.
+    * @param {import('./internal/state-dialog/types').TJSDialog.Options} data - Dialog options.
     *
     * @param {import('./types').SvelteApp.OptionsCore}   [options] - SvelteApp options.
     */
@@ -2985,7 +2985,7 @@ class TJSDialog extends SvelteApp
    /**
     * Returns the dialog data.
     *
-    * @returns {import('./internal/state-dialog/types').TJSDialogData} Dialog data.
+    * @returns {import('./internal/state-dialog/types').TJSDialog.Data} Dialog data.
     */
    get data() { return this.#data; }
 
@@ -3088,7 +3088,7 @@ class TJSDialog extends SvelteApp
     *
     * @template T
     *
-    * @param {import('./internal/state-dialog/types').TJSDialogOptions & {
+    * @param {import('./internal/state-dialog/types').TJSDialog.Options & {
     *    onYes?: string | ((data?: { application?: TJSDialog }) => any),
     *    onNo?: string | ((data?: { application?: TJSDialog }) => any)
     * }} [data] - Confirm dialog options.
@@ -3207,7 +3207,7 @@ class TJSDialog extends SvelteApp
     *
     * @template T
     *
-    * @param {import('./internal/state-dialog/types').TJSDialogOptions & {
+    * @param {import('./internal/state-dialog/types').TJSDialog.Options & {
     *    onOk?: string | ((data?: { application?: TJSDialog }) => any),
     *    label?: string,
     *    icon?: string
@@ -3261,7 +3261,7 @@ class TJSDialog extends SvelteApp
     *
     * @template T
     *
-    * @param {import('./internal/state-dialog/types').TJSDialogOptions}  data - Dialog data passed to the TJSDialog
+    * @param {import('./internal/state-dialog/types').TJSDialog.Options}  data - Dialog data passed to the TJSDialog
     *        constructor.
     *
     * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApp options passed to the
