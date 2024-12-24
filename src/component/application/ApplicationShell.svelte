@@ -46,7 +46,7 @@
    /**
     * Application reference.
     *
-    * @type {SvelteApplication}
+    * @type {SvelteApp}
     */
    const application = getContext('#external')?.application;
 

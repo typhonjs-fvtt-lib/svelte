@@ -1,7 +1,7 @@
 /**
  * Provides a mechanism to retrieve and query all mounted Svelte components including the main application shell.
  *
- * @implements {import('../../types').SvelteApp.API.Svelte}
+ * @implements {import('../../types').SvelteAppNS.API.Svelte}
  */
 export class GetSvelteData
 {
@@ -12,7 +12,7 @@ export class GetSvelteData
    #svelteData;
 
    /**
-    * Keep a direct reference to the SvelteData array in an associated {@link SvelteApplication}.
+    * Keep a direct reference to the SvelteData array in an associated {@link SvelteApp}.
     *
     * @param {import('svelte').SvelteComponent[] | null[]}  applicationShellHolder - A reference to the mounted app shell.
     *

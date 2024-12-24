@@ -7,7 +7,7 @@ import {
    isObject }                 from '#runtime/util/object';
 
 import { TJSDialogData }      from './internal/state-dialog/index.js';
-import { SvelteApplication }  from './SvelteApplication.js';
+import { SvelteApp }  from './SvelteApp.js';
 
 /**
  * Provides a reactive dialog implementation configured from a unique dialog options object. The dialog features a
@@ -40,7 +40,7 @@ import { SvelteApplication }  from './SvelteApplication.js';
  * There are a couple of static helper methods to quickly create standard dialogs such as a 'yes' / 'no' confirmation
  * dialog with {@link TJSDialog.confirm} and an 'ok' single button dialog with {@link TJSDialog.prompt}.
  */
-export class TJSDialog extends SvelteApplication
+export class TJSDialog extends SvelteApp
 {
    /** @type {TJSDialogData} */
    #data;
@@ -51,7 +51,7 @@ export class TJSDialog extends SvelteApplication
    /**
     * @param {import('./internal/state-dialog/types').TJSDialogNS.Options} data - Dialog options.
     *
-    * @param {import('./types').SvelteApp.OptionsCore}   [options] - SvelteApplication options.
+    * @param {import('./types').SvelteAppNS.OptionsCore}   [options] - SvelteApp options.
     */
    constructor(data, options = {})
    {
@@ -70,11 +70,11 @@ export class TJSDialog extends SvelteApplication
     * content even if it changes. The default `DialogShell` / `svelte` options should not be changed and instead mount
     * the dialog content component by supplying a Svelte configuration object to dialog data `content` field.
     *
-    * @returns {import('./types').SvelteApp.Options} Default options
+    * @returns {import('./types').SvelteAppNS.Options} Default options
     */
    static get defaultOptions()
    {
-      return /** @type {import('./types').SvelteApp.Options} */ deepMerge(super.defaultOptions, {
+      return /** @type {import('./types').SvelteAppNS.Options} */ deepMerge(super.defaultOptions, {
          classes: ['dialog', 'tjs-dialog'],
          width: 400,
          height: 'auto',
@@ -219,7 +219,7 @@ export class TJSDialog extends SvelteApplication
     *        async function. When defined as a string any matching function by name exported from content Svelte
     *        component is invoked.
     *
-    * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApplication options passed to the
+    * @param {import('./types').SvelteAppNS.OptionsCore}  [options]  SvelteApp options passed to the
     *        TJSDialog constructor.
     *
     * @returns {Promise<T>} A promise which resolves with result of yes / no callbacks or true / false.
@@ -339,7 +339,7 @@ export class TJSDialog extends SvelteApplication
     *
     * @param {string}   [data.icon="fas fa-check"] - Set another icon besides `fas fa-check` for button.
     *
-    * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApplication options passed to the
+    * @param {import('./types').SvelteAppNS.OptionsCore}  [options]  SvelteApp options passed to the
     *        TJSDialog constructor.
     *
     * @returns {Promise<T>} The returned value from the provided callback function or `true` if the button
@@ -382,7 +382,7 @@ export class TJSDialog extends SvelteApplication
     * @param {import('./internal/state-dialog/types').TJSDialogNS.Options}  data - Dialog data passed to the TJSDialog
     *        constructor.
     *
-    * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApplication options passed to the
+    * @param {import('./types').SvelteAppNS.OptionsCore}  [options]  SvelteApp options passed to the
     *        TJSDialog constructor.
     *
     * @returns {Promise<T>} A Promise that resolves to the chosen result.

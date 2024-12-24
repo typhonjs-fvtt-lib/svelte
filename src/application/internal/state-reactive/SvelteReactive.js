@@ -14,12 +14,12 @@ import {
    safeSet }                     from '#runtime/util/object';
 
 /**
- * API docs and description in {@link SvelteApp.API.Reactive}.
+ * API docs and description in {@link SvelteAppNS.API.Reactive}.
  */
 export class SvelteReactive
 {
    /**
-    * @type {import('../SvelteApplication').SvelteApplication}
+    * @type {import('../SvelteApp').SvelteApp}
     */
    #application;
 
@@ -74,7 +74,7 @@ export class SvelteReactive
    #storeUnsubscribe = [];
 
    /**
-    * @param {import('../SvelteApplication').SvelteApplication} application - The host Foundry application.
+    * @param {import('../SvelteApp').SvelteApp} application - The host Foundry application.
     */
    constructor(application)
    {
@@ -128,14 +128,14 @@ export class SvelteReactive
    /**
     * Returns the store for app options.
     *
-    * @returns {import('../../types').SvelteApp.API.Reactive.AppOptions} App options store.
+    * @returns {import('../../types').SvelteAppNS.API.Reactive.AppOptions} App options store.
     */
    get storeAppOptions() { return this.#storeAppOptions; }
 
    /**
     * Returns the store for UI options.
     *
-    * @returns {import('../../types').SvelteApp.API.Reactive.UIState} UI options store.
+    * @returns {import('../../types').SvelteAppNS.API.Reactive.UIState} UI options store.
     */
    get storeUIState() { return this.#storeUIState; }
 
@@ -262,7 +262,7 @@ export class SvelteReactive
    get popOut() { return this.#application.popOut; }
 
    /**
-    * Returns the positionable app option; {@link SvelteApp.Options.positionable}
+    * Returns the positionable app option; {@link SvelteAppNS.Options.positionable}
     *
     * @returns {boolean} Positionable app option.
     */
@@ -390,7 +390,7 @@ export class SvelteReactive
    }
 
    /**
-    * Sets `this.options.positionable` enabling / disabling {@link SvelteApplication.position}.
+    * Sets `this.options.positionable` enabling / disabling {@link SvelteApp.position}.
     *
     * @param {boolean}  positionable - Sets the positionable option.
     */
@@ -484,9 +484,9 @@ export class SvelteReactive
    }
 
    /**
-    * Serializes the main {@link SvelteApp.Options} for common application state.
+    * Serializes the main {@link SvelteAppNS.Options} for common application state.
     *
-    * @returns {import('../../types').SvelteApp.API.Reactive.Data} Common application state.
+    * @returns {import('../../types').SvelteAppNS.API.Reactive.Data} Common application state.
     */
    toJSON()
    {
@@ -510,8 +510,8 @@ export class SvelteReactive
     * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
     * the new buttons.
     *
-    * Optionally you can set in the SvelteApplication app options {@link SvelteApp.Options.headerButtonNoClose}
-    * to remove the close button and {@link SvelteApp.Options.headerButtonNoLabel} to true and labels will be
+    * Optionally you can set in the SvelteApp app options {@link SvelteAppNS.Options.headerButtonNoClose}
+    * to remove the close button and {@link SvelteAppNS.Options.headerButtonNoLabel} to true and labels will be
     * removed from the header buttons.
     *
     * @param {object} [opts] - Optional parameters (for internal use)
@@ -627,7 +627,7 @@ export class SvelteReactive
    /**
     * Registers local store subscriptions for app options. `popOut` controls registering this app with `ui.windows`.
     *
-    * @see SvelteApplication._injectHTML
+    * @see SvelteApp._injectHTML
     */
    #storesSubscribe()
    {
@@ -662,7 +662,7 @@ export class SvelteReactive
    /**
     * Unsubscribes from any locally monitored stores.
     *
-    * @see SvelteApplication.close
+    * @see SvelteApp.close
     */
    #storesUnsubscribe()
    {

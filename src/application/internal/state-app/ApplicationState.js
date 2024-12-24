@@ -6,7 +6,7 @@ import { isObject }  from '#runtime/util/object';
  */
 export class ApplicationState
 {
-   /** @type {import('../../SvelteApplication').SvelteApplication} */
+   /** @type {import('../../SvelteApp.js').SvelteApp} */
    #application;
 
    /**
@@ -17,11 +17,11 @@ export class ApplicationState
     */
    #currentRestoreKey;
 
-   /** @type {Map<string, import('../../types').SvelteApp.API.State.Data>} */
+   /** @type {Map<string, import('../../types').SvelteAppNS.API.State.Data>} */
    #dataSaved = new Map();
 
    /**
-    * @param {import('../../SvelteApplication').SvelteApplication}   application - The application.
+    * @param {import('../../SvelteApp.js').SvelteApp}   application - The application.
     */
    constructor(application)
    {
@@ -43,7 +43,7 @@ export class ApplicationState
     *
     * @param {object} [extra] - Extra data to add to application state.
     *
-    * @returns {import('../../types').SvelteApp.API.State.Data} Passed in object with current application state.
+    * @returns {import('../../types').SvelteAppNS.API.State.Data} Passed in object with current application state.
     */
    current(extra = {})
    {
@@ -62,7 +62,7 @@ export class ApplicationState
     *
     * @param {string}   options.name - Saved data set name.
     *
-    * @returns {import('../../types').SvelteApp.API.State.Data | undefined} Any saved application state.
+    * @returns {import('../../types').SvelteAppNS.API.State.Data | undefined} Any saved application state.
     */
    get({ name })
    {
@@ -89,7 +89,7 @@ export class ApplicationState
     *
     * @param {string}   options.name - Name to remove and retrieve.
     *
-    * @returns {import('../../types').SvelteApp.API.State.Data | undefined} Any saved application state.
+    * @returns {import('../../types').SvelteAppNS.API.State.Data | undefined} Any saved application state.
     */
    remove({ name })
    {
@@ -120,7 +120,7 @@ export class ApplicationState
     * @param {import('#runtime/svelte/easing').EasingReference} [options.ease='linear'] - Easing function or easing
     *        function name.
     *
-    * @returns {import('../../types').SvelteApp.API.State.Data | undefined} Any saved application state.
+    * @returns {import('../../types').SvelteAppNS.API.State.Data | undefined} Any saved application state.
     */
    restore({ name, remove = false, animateTo = false, duration = 0.1, ease = 'linear' })
    {
@@ -164,7 +164,7 @@ export class ApplicationState
     *
     * @param {string}   options.name - Name to index this saved state.
     *
-    * @returns {import('../../types').SvelteApp.API.State.Data} Current saved application state.
+    * @returns {import('../../types').SvelteAppNS.API.State.Data} Current saved application state.
     */
    save({ name, ...extra })
    {
@@ -186,7 +186,7 @@ export class ApplicationState
     * Note: If serializing application state any minimized apps will use the before minimized state on initial render
     * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
     *
-    * @param {import('../../types').SvelteApp.API.State.Data}   data - Saved data set name.
+    * @param {import('../../types').SvelteAppNS.API.State.Data}   data - Saved data set name.
     *
     * @param {object}         [options] - Optional parameters
     *
@@ -216,7 +216,7 @@ export class ApplicationState
     * @privateRemarks
     * TODO: THIS METHOD NEEDS TO BE REFACTORED WHEN TRL IS MADE INTO A STANDALONE FRAMEWORK.
     *
-    * @param {import('../../types').SvelteApp.API.State.Data}   data - Saved data set name.
+    * @param {import('../../types').SvelteAppNS.API.State.Data}   data - Saved data set name.
     *
     * @param {object}            [opts] - Optional parameters
     *

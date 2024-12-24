@@ -1,4 +1,4 @@
-import { SvelteApplication } from '../SvelteApplication.js';
+import { SvelteApp } from '../SvelteApp.js';
 
 /**
  * Handle `PopOut!` module hooks to allow applications to popout to their own browser window.
@@ -9,7 +9,7 @@ export class PopoutSupport
    {
       Hooks.on('PopOut:loading', (app, popout) =>
       {
-         if (app instanceof SvelteApplication)
+         if (app instanceof SvelteApp)
          {
             // Disable app position system.
             app.position.enabled = false;
@@ -39,7 +39,7 @@ export class PopoutSupport
     */
    static #handleRejoin(app)
    {
-      if (app instanceof SvelteApplication)
+      if (app instanceof SvelteApp)
       {
          // Enable the app position system.
          app.position.enabled = true;

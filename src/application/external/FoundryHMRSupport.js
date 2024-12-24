@@ -28,7 +28,7 @@ export class FoundryHMRSupport
                         {
                            try
                            {
-                              // Replace with self; this will invoke `on_hmr` callback in associated SvelteApplication.
+                              // Replace with self; this will invoke `on_hmr` callback in associated SvelteApp.
                               hmrComponent.$replace(hmrComponent.constructor, {
                                  target: svelteData.config.target,
                                  anchor: svelteData.config.anchor,

@@ -1,5 +1,5 @@
 /**
- * Provides an index of all visible rendered {@link SvelteApplication} instances in a given Svelte runtime. This allows
+ * Provides an index of all visible rendered {@link SvelteApp} instances in a given Svelte runtime. This allows
  * bulk operations to be performed across all apps.
  */
 export class TJSAppIndex
@@ -7,14 +7,14 @@ export class TJSAppIndex
    /**
     * Stores all visible / rendered apps.
     *
-    * @type {Map<string, import('#svelte-fvtt/application').SvelteApplication>}
+    * @type {Map<string, import('#svelte-fvtt/application').SvelteApp>}
     */
    static #visibleApps = new Map();
 
    /**
-    * Adds a SvelteApplication to all visible apps tracked.
+    * Adds a SvelteApp to all visible apps tracked.
     *
-    * @param {import('#svelte-fvtt/application').SvelteApplication} app - A SvelteApplication
+    * @param {import('#svelte-fvtt/application').SvelteApp} app - A SvelteApp
     *
     * @package
     */
@@ -24,9 +24,9 @@ export class TJSAppIndex
    }
 
    /**
-    * Removes a SvelteApplication from all visible apps tracked.
+    * Removes a SvelteApp from all visible apps tracked.
     *
-    * @param {import('#svelte-fvtt/application').SvelteApplication} app - A SvelteApplication
+    * @param {import('#svelte-fvtt/application').SvelteApp} app - A SvelteApp
     *
     * @package
     */
@@ -40,7 +40,7 @@ export class TJSAppIndex
     *
     * @param {string}   key - App ID.
     *
-    * @returns {import('#svelte-fvtt/application').SvelteApplication} Associated app.
+    * @returns {import('#svelte-fvtt/application').SvelteApp} Associated app.
     */
    static get(key)
    {
@@ -68,7 +68,7 @@ export class TJSAppIndex
    }
 
    /**
-    * @returns {IterableIterator<import('#svelte-fvtt/application').SvelteApplication>} All visible apps.
+    * @returns {IterableIterator<import('#svelte-fvtt/application').SvelteApp>} All visible apps.
     */
    static values()
    {

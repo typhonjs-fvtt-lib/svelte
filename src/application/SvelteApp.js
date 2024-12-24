@@ -18,14 +18,14 @@ import {
 /**
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
- * {@link #runtime/svelte/util!TJSSvelteConfig} object in the {@link SvelteApp.Options.svelte} property.
+ * {@link #runtime/svelte/util!TJSSvelteConfig} object in the {@link SvelteAppNS.Options.svelte} property.
  *
  * @template [Options = import('./types').SvelteApp.Options]
  * @augments {Application<Options>}
  *
  * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
  */
-export class SvelteApplication extends Application
+export class SvelteApp extends Application
 {
    /**
     * Stores the first mounted component which follows the application shell contract.
@@ -37,7 +37,7 @@ export class SvelteApplication extends Application
    /**
     * Stores and manages application state for saving / restoring / serializing.
     *
-    * @type {import('./types').SvelteApp.API.State}
+    * @type {import('./types').SvelteAppNS.API.State}
     */
    #applicationState;
 
@@ -102,7 +102,7 @@ export class SvelteApplication extends Application
     * Provides a helper class that combines multiple methods for interacting with the mounted components tracked in
     * #svelteData.
     *
-    * @type {import('./types').SvelteApp.API.Svelte<Options>}
+    * @type {import('./types').SvelteAppNS.API.Svelte<Options>}
     */
    #getSvelteData = new GetSvelteData(this.#applicationShellHolder, this.#svelteData);
 
@@ -114,7 +114,7 @@ export class SvelteApplication extends Application
    #stores;
 
    /**
-    * @param {Partial<import('./types').SvelteApp.Options>} [options] - The options for the application.
+    * @param {Partial<import('./types').SvelteAppNS.Options>} [options] - The options for the application.
     */
    constructor(options = {})
    {
@@ -122,7 +122,7 @@ export class SvelteApplication extends Application
 
       if (!isObject(this.options.svelte))
       {
-         throw new Error(`SvelteApplication - constructor - No Svelte configuration object found in 'options'.`);
+         throw new Error(`SvelteApp - constructor - No Svelte configuration object found in 'options'.`);
       }
 
       this.#applicationState = new ApplicationState(this);
@@ -142,9 +142,9 @@ export class SvelteApplication extends Application
       /**
        * Define accessors to retrieve TJSPosition by `this.position`.
        *
-       * @member {TJSPosition} position - Adds accessors to SvelteApplication to get / set the position data.
+       * @member {TJSPosition} position - Adds accessors to SvelteApp to get / set the position data.
        *
-       * @memberof SvelteApplication#
+       * @memberof SvelteApp#
        */
       Object.defineProperty(this, 'position', {
          get: () => this.#position,
@@ -157,14 +157,14 @@ export class SvelteApplication extends Application
    }
 
    /**
-    * Specifies the default options that SvelteApplication supports.
+    * Specifies the default options that SvelteApp supports.
     *
-    * @returns {import('./types').SvelteApp.Options} options - Application options.
+    * @returns {import('./types').SvelteAppNS.Options} options - Application options.
     * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
     */
    static get defaultOptions()
    {
-      return /** @type {import('./types').SvelteApp.Options} */ deepMerge(super.defaultOptions, {
+      return /** @type {import('./types').SvelteAppNS.Options} */ deepMerge(super.defaultOptions, {
          defaultCloseAnimation: true,     // If false the default slide close animation is not run.
          draggable: true,                 // If true then application shells are draggable.
          focusAuto: true,                 // When true auto-management of app focus is enabled.
@@ -181,7 +181,7 @@ export class SvelteApplication extends Application
          positionInitial: TJSPosition.Initial.browserCentered,      // A helper for initial position placement.
          positionOrtho: true,             // When true TJSPosition is optimized for orthographic use.
          positionValidator: TJSPosition.Validators.transformWindow, // A function providing the default validator.
-         sessionStorage: void 0,          // An instance of WebStorage (session) to share across SvelteApplications.
+         sessionStorage: void 0,          // An instance of WebStorage (session) to share across SvelteApps.
          svelte: void 0,                  // A Svelte configuration object.
          transformOrigin: 'top left'      // By default, 'top / left' respects rotation when minimizing.
       });
@@ -202,23 +202,23 @@ export class SvelteApplication extends Application
    get elementTarget() { return this.#elementTarget; }
 
    /**
-    * Returns the reactive accessors & Svelte stores for SvelteApplication.
+    * Returns the reactive accessors & Svelte stores for SvelteApp.
     *
-    * @returns {import('./types').SvelteApp.API.Reactive} The reactive accessors & Svelte stores.
+    * @returns {import('./types').SvelteAppNS.API.Reactive} The reactive accessors & Svelte stores.
     */
    get reactive() { return this.#reactive; }
 
    /**
     * Returns the application state manager.
     *
-    * @returns {import('./types').SvelteApp.API.State} The application state manager.
+    * @returns {import('./types').SvelteAppNS.API.State} The application state manager.
     */
    get state() { return this.#applicationState; }
 
    /**
     * Returns the `Svelte` helper class w/ various methods to access the mounted application shell component.
     *
-    * @returns {import('./types').SvelteApp.API.Svelte<Options>} `Svelte` / mounted application shell API.
+    * @returns {import('./types').SvelteAppNS.API.Svelte<Options>} `Svelte` / mounted application shell API.
     */
    get svelte() { return this.#getSvelteData; }
 
@@ -472,7 +472,7 @@ export class SvelteApplication extends Application
     *
     * @privateRemarks Provide a basic override implementation to extend types with additional SvelteApp functionality.
     *
-    * @returns {import('./types').SvelteApp.HeaderButton[]} All header buttons.
+    * @returns {import('./types').SvelteAppNS.HeaderButton[]} All header buttons.
     * @protected
     */
    _getHeaderButtons()
@@ -516,7 +516,7 @@ export class SvelteApplication extends Application
       // A sanity check; absence should be detected in constructor.
       if (!isObject(this.options.svelte))
       {
-         throw new Error(`SvelteApplication - _injectHTML - No Svelte configuration object found in 'options'.`);
+         throw new Error(`SvelteApp - _injectHTML - No Svelte configuration object found in 'options'.`);
       }
 
       const svelteData = loadSvelteConfig({
@@ -529,7 +529,7 @@ export class SvelteApplication extends Application
       if (this.svelte.appShell !== null)
       {
          throw new Error(
-          `SvelteApplication - _injectHTML - An application shell is already mounted; offending config:\n` +
+          `SvelteApp - _injectHTML - An application shell is already mounted; offending config:\n` +
            `${JSON.stringify(this.options.svelte)}`);
       }
 
@@ -575,7 +575,7 @@ export class SvelteApplication extends Application
     *
     * Note: the sanity check is duplicated from {@link Application.maximize} the store is updated _before_
     * performing the rest of animations. This allows application shells to remove / show any resize handlers
-    * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
+    * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApp.minimize}
     * to animate the content area.
     *
     * @param {object}   [opts] - Optional parameters.
@@ -677,7 +677,7 @@ export class SvelteApplication extends Application
     *
     * Note: the sanity check is duplicated from {@link Application.minimize} the store is updated _before_
     * performing the rest of animations. This allows application shells to remove / show any resize handlers
-    * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApplication.minimize}
+    * correctly. Extra constraint data is stored in a saved position state in {@link SvelteApp.minimize}
     * to animate the content area.
     *
     * @param {object}   [opts] - Optional parameters.
@@ -827,7 +827,7 @@ export class SvelteApplication extends Application
    /**
     * Provides an override verifying that a new Application being rendered for the first time doesn't have a
     * corresponding DOM element already loaded. This is a check that only occurs when `this._state` is
-    * `Application.RENDER_STATES.NONE`. It is useful in particular when SvelteApplication has a static ID
+    * `Application.RENDER_STATES.NONE`. It is useful in particular when SvelteApp has a static ID
     * explicitly set in `this.options.id` and long intro / outro transitions are assigned. If a new application
     * sharing this static ID attempts to open / render for the first time while an existing DOM element sharing
     * this static ID exists then the initial render is cancelled below rather than crashing later in the render
@@ -849,7 +849,7 @@ export class SvelteApplication extends Application
          if (this._state === Application.RENDER_STATES.NONE &&
           A11yHelper.isFocusTarget(activeWindow.document.querySelector(`#${this.id}`)))
          {
-            console.warn(`SvelteApplication - _render: A DOM element already exists for CSS ID '${this.id
+            console.warn(`SvelteApp - _render: A DOM element already exists for CSS ID '${this.id
              }'. Cancelling initial render for new application with appId '${this.appId}'.`);
 
             return;
@@ -857,7 +857,7 @@ export class SvelteApplication extends Application
       }
       catch (err)
       {
-         console.warn(`SvelteApplication - _render: Potentially malformed application ID '${this.id
+         console.warn(`SvelteApp - _render: Potentially malformed application ID '${this.id
           }'. Cancelling initial render for new application with appId '${this.appId}'.`);
 
          return;
@@ -964,7 +964,7 @@ export class SvelteApplication extends Application
 
    /**
     * This method is invoked by the `elementRootUpdate` callback that is added to the external context passed to
-    * Svelte components. When invoked it updates the local element roots tracked by SvelteApplication.
+    * Svelte components. When invoked it updates the local element roots tracked by SvelteApp.
     *
     * This method may also be invoked by HMR / hot module replacement via `svelte-hmr`.
     */

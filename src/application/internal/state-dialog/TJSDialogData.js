@@ -12,7 +12,7 @@ import {
 export class TJSDialogData
 {
    /**
-    * @type {import('../../index.js').SvelteApplication}
+    * @type {import('../../index.js').SvelteApp}
     */
    #application;
 
@@ -24,7 +24,7 @@ export class TJSDialogData
    #internal = {};
 
    /**
-    * @param {import('../../index.js').SvelteApplication} application - The host Foundry application.
+    * @param {import('../../index.js').SvelteApp} application - The host Foundry application.
     */
    constructor(application)
    {

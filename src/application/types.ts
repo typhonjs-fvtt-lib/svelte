@@ -24,11 +24,11 @@ import type {
    TJSSvelteConfigDynamic }         from '#runtime/svelte/util';
 
 /**
- * Provides all types associated with {@link SvelteApplication}.
+ * Provides all types associated with {@link SvelteApp}.
  */
-declare namespace SvelteApp {
+declare namespace SvelteAppNS {
    /**
-    * Defines the application header button data handled in {@link SvelteApplication._getHeaderButtons} and associated
+    * Defines the application header button data handled in {@link SvelteApp._getHeaderButtons} and associated
     * `getApplicationHeaderButtons` hooks. SvelteApp extends the header button data from
     * {@link fvtt!ApplicationHeaderButton} bringing an expanded feature set.
     */
@@ -114,7 +114,7 @@ declare namespace SvelteApp {
     * @param args.event - The event triggering the callback (pointer or keyboard).
     */
    export type HeaderButtonCallback = (args: {
-      button: SvelteApp.HeaderButton;
+      button: SvelteAppNS.HeaderButton;
       event: PointerEvent | KeyboardEvent
    }) => void;
 
@@ -125,7 +125,7 @@ declare namespace SvelteApp {
 
       /**
        * Contains the reactive functionality / Svelte stores associated with SvelteApp and retrievable by
-       * {@link SvelteApplication.reactive}.
+       * {@link SvelteApp.reactive}.
        *
        * There are several reactive getters for UI state such and for two-way bindings / stores see
        * {@link Reactive.storeUIState}:
@@ -133,7 +133,7 @@ declare namespace SvelteApp {
        * - {@link Reactive.minimized}
        * - {@link Reactive.resizing}
        *
-       * There are also reactive getters / setters for {@link SvelteApp.Options} and Foundry
+       * There are also reactive getters / setters for {@link SvelteAppNS.Options} and Foundry
        * {@link fvtt!ApplicationOptions}. You can use the following as one way bindings and update the associated
        * stores. For two-way bindings / stores see {@link Reactive.storeAppOptions}.
        *
@@ -153,7 +153,7 @@ declare namespace SvelteApp {
        *
        * An instance of TJSWebStorage (session) / TJSSessionStorage is accessible via
        * {@link Reactive.sessionStorage}. Optionally you can pass in an existing TJSWebStorage instance that can
-       * be shared across multiple SvelteApps by setting {@link SvelteApp.Options.sessionStorage}.
+       * be shared across multiple SvelteApps by setting {@link SvelteAppNS.Options.sessionStorage}.
        */
       export interface Reactive
       {
@@ -163,7 +163,7 @@ declare namespace SvelteApp {
          get sessionStorage(): WebStorage;
 
          /**
-          * Provides a custom readable Svelte store for {@link SvelteApp.Options} state.
+          * Provides a custom readable Svelte store for {@link SvelteAppNS.Options} state.
           *
           * @returns App options store.
           */
@@ -320,14 +320,14 @@ declare namespace SvelteApp {
          set popOut(popOut: boolean);
 
          /**
-          * Returns the positionable app option; {@link SvelteApp.Options.positionable}
+          * Returns the positionable app option; {@link SvelteAppNS.Options.positionable}
           *
           * @returns {boolean} Positionable app option.
           */
          get positionable(): boolean;
 
          /**
-          * Sets `this.options.positionable` enabling / disabling {@link SvelteApplication.position}.
+          * Sets `this.options.positionable` enabling / disabling {@link SvelteApp.position}.
           *
           * @param {boolean}  positionable - Sets the positionable option.
           */
@@ -441,7 +441,7 @@ declare namespace SvelteApp {
          setOptions(accessor: string, value: any): void;
 
          /**
-          * Serializes the main {@link SvelteApp.Options} for common application state.
+          * Serializes the main {@link SvelteAppNS.Options} for common application state.
           */
          toJSON(): Reactive.Data;
 
@@ -451,8 +451,8 @@ declare namespace SvelteApp {
           * responding to the Hooks fired return a new button array and the uiOptions store is updated and the
           * application shell will render the new buttons.
           *
-          * Optionally you can set in the SvelteApp app options {@link SvelteApp.Options.headerButtonNoClose}
-          * to remove the close button and {@link SvelteApp.Options.headerButtonNoLabel} to true and labels will be
+          * Optionally you can set in the SvelteApp app options {@link SvelteAppNS.Options.headerButtonNoClose}
+          * to remove the close button and {@link SvelteAppNS.Options.headerButtonNoLabel} to true and labels will be
           * removed from the header buttons.
           *
           * @param {object} [opts] - Optional parameters (for internal use)
@@ -524,7 +524,7 @@ declare namespace SvelteApp {
          }
 
          /**
-          * Provides a custom readable Svelte store for {@link SvelteApp.Options} state.
+          * Provides a custom readable Svelte store for {@link SvelteAppNS.Options} state.
           */
          type AppOptions = {
             /**
@@ -616,7 +616,7 @@ declare namespace SvelteApp {
             /**
              * Derived store for `headerButtons` updates.
              */
-            headerButtons: Readable<SvelteApp.HeaderButton>;
+            headerButtons: Readable<SvelteAppNS.HeaderButton>;
 
             /**
              * Derived store for `minimized` updates.
@@ -775,7 +775,7 @@ declare namespace SvelteApp {
             /**
              * Common SvelteApp reactive app options.
              */
-            options: SvelteApp.API.Reactive.Data;
+            options: SvelteAppNS.API.Reactive.Data;
 
             /**
              * Application UI state.
@@ -789,7 +789,7 @@ declare namespace SvelteApp {
       /**
        * Provides a mechanism to retrieve and query mounted Svelte application shell.
        */
-      export interface Svelte<Options extends SvelteApp.Options>
+      export interface Svelte<Options extends SvelteAppNS.Options>
       {
          /**
           * Returns mounted application shell Svelte component.
@@ -817,7 +817,7 @@ declare namespace SvelteApp {
    }
 
    /**
-    * Svelte context interfaces for {@link SvelteApplication}.
+    * Svelte context interfaces for {@link SvelteApp}.
     */
    export namespace Context {
       /**
@@ -834,9 +834,9 @@ declare namespace SvelteApp {
        * The `#external` context.
        */
       // @ts-ignore
-      export interface External<App extends import('./SvelteApplication').SvelteApplication =
+      export interface External<App extends import('./SvelteApp').SvelteApp =
        // @ts-ignore
-       import('./SvelteApplication').SvelteApplication> extends AbstractExternal {
+       import('./SvelteApp').SvelteApp> extends AbstractExternal {
          /**
           * The external application instance.
           */
@@ -1039,18 +1039,18 @@ declare namespace SvelteApp {
     *
     * Note: Unlike standard Svelte component loading any `context` provided is loaded as additional data into the
     * `#external` context key along with data such as the outer application instance reference. This allows one to
-    * extend the {@link SvelteApp.Context.External} interface with additional data that you are loading and use one
+    * extend the {@link SvelteAppNS.Context.External} interface with additional data that you are loading and use one
     * type to conveniently retrieve all external context data inside a Svelte component.
     *
     * Note that the `svelte` configuration includes dynamic options to define `context` and `props` as a `function` as
     * well as an `object`. There are times when the `context` and `prop` data to load needs to come from data associated
     * with the instance of the application. When defining the configuration from the overloaded static accessor
-    * {@link SvelteApplication.defaultOptions} you may use a standard function IE `function() {}` for `context` or
+    * {@link SvelteApp.defaultOptions} you may use a standard function IE `function() {}` for `context` or
     * `props`. When `SvelteApp` loads the component these functions will be invoked with the `this` reference of the
     * actual instance allowing association of instance data from within a static context.
     */
    interface Options<Component extends SvelteComponent = SvelteComponent,
-    ContextExternal extends SvelteApp.Context.AbstractExternal = SvelteApp.Context.AbstractExternal> extends OptionsCore
+    ContextExternal extends SvelteAppNS.Context.AbstractExternal = SvelteAppNS.Context.AbstractExternal> extends OptionsCore
    {
       /**
        * A Svelte configuration object defining the main component loaded.
@@ -1065,14 +1065,14 @@ declare namespace SvelteApp {
    }
 }
 
-export { SvelteApp };
+export { SvelteAppNS };
 
 // Internal types ----------------------------------------------------------------------------------------------------
 
 /**
  * Omits the protected application shell contract properties.
  */
-type OmitPropsTRL<Options extends SvelteApp.Options> = Omit<
+type OmitPropsTRL<Options extends SvelteAppNS.Options> = Omit<
    ComponentProps<InstanceType<Options['svelte']['class']>>,
    'elementRoot' | 'elementContent' | 'elementTarget'
 >;
@@ -1081,7 +1081,7 @@ type OmitPropsTRL<Options extends SvelteApp.Options> = Omit<
  * Based on the `SvelteApp.Options` -> `svelte.class` property limit the props exposed and add the safe methods that
  * can be accessed
  */
-type AppShell<Options extends SvelteApp.Options> = OmitPropsTRL<Options> & {
+type AppShell<Options extends SvelteAppNS.Options> = OmitPropsTRL<Options> & {
    /**
     * Register an event callback.
     *
