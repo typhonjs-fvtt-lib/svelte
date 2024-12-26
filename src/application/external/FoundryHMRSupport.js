@@ -11,7 +11,7 @@ export class FoundryHMRSupport
             // Only handle JSON hot reload presumably specified in package manifest for language translation files.
             if (data?.extension === 'json')
             {
-               // Postpone until next macro task to allow Foundry to update localization first.
+               // Postpone until next macrotask to allow Foundry to update localization first.
                setTimeout(() =>
                {
                   for (const app of TJSAppIndex.values())
