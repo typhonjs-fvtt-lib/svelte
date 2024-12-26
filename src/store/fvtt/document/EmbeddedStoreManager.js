@@ -53,11 +53,14 @@ export class EmbeddedStoreManager
    }
 
    /**
+    * Create a reactive embedded collection. When no options are provided the name of the embedded collection matches
+    * the document name.
+    *
     * @template [T=import('./types').NamedDocumentConstructor]
     *
     * @param {T} FoundryDoc - A Foundry document class / constructor.
     *
-    * @param {import('#runtime/svelte/store/reducer').DynOptionsMapCreate<string, T>} options - DynMapReducer
+    * @param {import('#runtime/svelte/store/reducer').DynOptionsMapCreate<string, T>} [options] - DynMapReducer
     *        creation options.
     *
     * @returns {import('#runtime/svelte/store/reducer').DynMapReducer<string, T>} DynMapReducer instance.
@@ -129,7 +132,8 @@ export class EmbeddedStoreManager
       }
       else
       {
-         throw new TypeError(`EmbeddedStoreManager.create error: 'options' does not conform to allowed parameters.`);
+         name = docName;
+         ctor = DynMapReducer;
       }
 
       if (!hasPrototype(ctor, DynMapReducer))
@@ -237,7 +241,7 @@ export class EmbeddedStoreManager
     *
     * @param {T} FoundryDoc - A Foundry document class / constructor.
     *
-    * @param {string} storeName - Name of the embedded collection to retrieve.
+    * @param {string} [storeName] - Name of the embedded collection to retrieve.
     *
     * @returns {import('#runtime/svelte/store/reducer').DynMapReducer<string, InstanceType<T>>} DynMapReducer
     *          instance.
@@ -254,7 +258,7 @@ export class EmbeddedStoreManager
 
       if (!this.#name.has(docName)) { return void 0; }
 
-      return this.#name.get(docName).stores.get(storeName);
+      return this.#name.get(docName).stores.get(storeName ?? docName);
    }
 
    /**

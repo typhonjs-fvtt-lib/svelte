@@ -7,20 +7,23 @@ import type {
  */
 interface EmbeddedAPI {
    /**
-    * Creates an embedded collection store.
+    * Create a reactive embedded collection store. When no options are provided the name of the embedded collection
+    * matches the document name.
     */
-   create<T extends NamedDocumentConstructor>(doc: T, options: DynOptionsMapCreate<string, InstanceType<T>>):
+   create<T extends NamedDocumentConstructor>(doc: T, options?: DynOptionsMapCreate<string, InstanceType<T>>):
     DynMapReducer<string, InstanceType<T>>;
 
    /**
-    * - Destroys one or more embedded collection stores.
+    * Destroys one or more embedded collection stores. When no `storeName` is provided all reactive embedded collections
+    * are destroyed for the given document type.
     */
    destroy<T extends NamedDocumentConstructor>(doc?: T, storeName?: string): boolean;
 
    /**
-    * - Returns a specific existing embedded collection store.
+    * Returns a specific existing embedded collection store. When no `storeName` is provided the document name
+    * is used instead.
     */
-   get<T extends NamedDocumentConstructor>(doc: T, storeName: string): DynMapReducer<string, InstanceType<T>>;
+   get<T extends NamedDocumentConstructor>(doc: T, storeName?: string): DynMapReducer<string, InstanceType<T>>;
 }
 
 /**
