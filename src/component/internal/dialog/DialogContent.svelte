@@ -72,7 +72,7 @@
 
          if (A11yHelper.isFocusTarget(focusEl))
          {
-            // Focus on next tick to allow application / dialog to mount to bypass ApplicationShell onMount focus
+            // Focus on next macro task to allow application / dialog to mount to bypass ApplicationShell onMount focus
             // handling.
             setTimeout(() => focusEl.focus(), 0);
          }
