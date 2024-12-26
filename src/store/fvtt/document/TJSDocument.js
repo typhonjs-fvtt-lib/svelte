@@ -234,17 +234,18 @@ export class TJSDocument
       return uuid;
    }
 
-
    /**
-    * @param {T | undefined}  document - New document to set.
+    * Sets a new document target to be monitored. To unset use `undefined` or `null`.
+    *
+    * @param {T | undefined | null}  doc - New document to set.
     *
     * @param {TJSDocumentUpdateOptions}   [options] - New document update options to set.
     */
-   set(document, options = {})
+   set(doc, options = {})
    {
-      if (document !== void 0 && !(document instanceof globalThis.foundry.abstract.Document))
+      if (doc !== void 0 && doc !== null && !(doc instanceof globalThis.foundry.abstract.Document))
       {
-         throw new TypeError(`TJSDocument set error: 'document' is not a valid Document or undefined.`);
+         throw new TypeError(`TJSDocument set error: 'document' is not a valid Document or undefined / null.`);
       }
 
       if (!isObject(options))
@@ -253,22 +254,25 @@ export class TJSDocument
       }
 
       // Only post an update if the document has changed.
-      if (this.#setDocument(document))
+      if (this.#setDocument(doc))
       {
          // Only add registration if there are current subscribers.
-         if (document instanceof globalThis.foundry.abstract.Document && this.#subscriptions.length)
+         if (doc instanceof globalThis.foundry.abstract.Document && this.#subscriptions.length)
          {
             this.#callbackRegister();
          }
 
-         this.#updateSubscribers(false, { action: `tjs-set-${document === void 0 ? 'undefined' : 'new'}`, ...options });
+         this.#updateSubscribers(false, {
+            action: `tjs-set-${doc === void 0 || doc === null ? 'undefined' : 'new'}`,
+            ...options
+         });
       }
    }
 
    /**
     * Internally sets the new document being tracked.
     *
-    * @param {T | undefined} doc -
+    * @param {T | undefined | null} doc -
     *
     * @returns {boolean} Whether the document changed.
     */
@@ -279,7 +283,7 @@ export class TJSDocument
       // Unregister before setting new document state.
       if (changed) { this.#callbackUnregister(); }
 
-      this.#document[0] = doc;
+      this.#document[0] = doc === void 0 || doc === null ? void 0 : doc;
 
       if (changed && this.#embeddedStoreManager) { this.#embeddedStoreManager.handleDocChange(); }
 

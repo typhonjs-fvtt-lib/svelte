@@ -160,13 +160,15 @@ export class TJSDocumentCollection
    get() { return this.#collection; }
 
    /**
-    * @param {T | undefined}  collection - New collection to set.
+    * Sets a new document collection target to be monitored. To unset use `undefined` or `null`.
+    *
+    * @param {T | undefined | null}  collection - New collection to set.
     *
     * @param {TJSDocumentCollectionUpdateOptions<T>}  [options] - New collection update options to set.
     */
    set(collection, options = {})
    {
-      if (collection !== void 0 && !(collection instanceof DocumentCollection))
+      if (collection !== void 0 && collection !== null && !(collection instanceof DocumentCollection))
       {
          throw new TypeError(
           `TJSDocumentCollection set error: 'collection' is not a valid DocumentCollection or undefined.`);
@@ -181,15 +183,17 @@ export class TJSDocumentCollection
 
       if (changed) { this.#callbackUnregister(); }
 
-      this.#collection = collection;
+      this.#collection = collection === void 0 || collection === null ? void 0 : collection;
       this.#updateOptions = options;
 
       if (changed)
       {
          if (collection instanceof DocumentCollection && this.#subscriptions.length) { this.#callbackRegister(); }
 
-         this.#updateSubscribers(false,
-          { action: `tjs-set-${collection === void 0 ? 'undefined' : 'new'}`, ...options });
+         this.#updateSubscribers(false, {
+            action: `tjs-set-${collection === void 0 || collection === null ? 'undefined' : 'new'}`,
+            ...options
+         });
       }
    }
 
