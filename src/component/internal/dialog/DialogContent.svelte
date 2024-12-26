@@ -268,7 +268,7 @@
          case 'Tab':
             event.stopPropagation();
 
-            // Check `activeElement` on next tick to potentially update `currentButtonId` from tab / keyboard
+            // Check `activeElement` on next macro task to potentially update `currentButtonId` from tab / keyboard
             // navigation.
             setTimeout(() =>
             {
