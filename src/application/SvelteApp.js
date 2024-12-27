@@ -20,9 +20,6 @@ import {
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
  * {@link #runtime/svelte/util!TJSSvelteConfig} object in the {@link SvelteAppNS.Options.svelte} property.
  *
- * @template [Options = import('./types').SvelteApp.Options]
- * @augments {Application<Options>}
- *
  * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
  */
 export class SvelteApp extends Application
