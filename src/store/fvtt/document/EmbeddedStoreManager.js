@@ -60,8 +60,8 @@ export class EmbeddedStoreManager
     *
     * @param {T} FoundryDoc - A Foundry document class / constructor.
     *
-    * @param {import('#runtime/svelte/store/reducer').DynOptionsMapCreate<string, T>} [options] - DynMapReducer
-    *        creation options.
+    * @param {import('#runtime/svelte/store/reducer').DynReducer.Options.MapCreate<string, InstanceType<T>>} [options] -
+    *        DynMapReducer creation options.
     *
     * @returns {import('#runtime/svelte/store/reducer').DynMapReducer<string, T>} DynMapReducer instance.
     */
@@ -111,10 +111,10 @@ export class EmbeddedStoreManager
       /** @type {string} */
       let name;
 
-      /** @type {import('#runtime/svelte/store/reducer').DynDataOptions<T>} */
+      /** @type {import('#runtime/svelte/store/reducer').DynReducer.Options.Common<T>} */
       let rest = {};
 
-      /** @type {import('#runtime/svelte/store/reducer').IDynMapReducerCtor<string, T>} */
+      /** @type {typeof import('#runtime/svelte/store/reducer').DynMapReducer<string, InstanceType<T>>} */
       let ctor;
 
       if (typeof options === 'string')
@@ -154,10 +154,13 @@ export class EmbeddedStoreManager
       }
       else
       {
-         const storeOptions = collection ? { data: collection, ...rest } : { ...rest };
-         const store = new ctor(storeOptions);
-         embeddedData.stores.set(name, store);
-         return store;
+         const reducerOptions = collection ? { data: collection, ...rest } : { ...rest };
+         const instance = new ctor(reducerOptions);
+         embeddedData.stores.set(name, instance);
+
+         if (typeof instance?.initialize === 'function') { instance.initialize(rest); }
+
+         return instance;
       }
    }
 
@@ -170,11 +173,11 @@ export class EmbeddedStoreManager
     *
     * @param {T}   [FoundryDoc] - A Foundry document class / constructor.
     *
-    * @param {string}   [storeName] - Specific store name.
+    * @param {string}   [reducerName] - Specific store name.
     *
     * @returns {boolean} One or more stores destroyed?
     */
-   destroy(FoundryDoc, storeName)
+   destroy(FoundryDoc, reducerName)
    {
       let count = 0;
 
@@ -203,7 +206,7 @@ export class EmbeddedStoreManager
              `EmbeddedStoreManager.delete error: 'FoundryDoc' does not have a valid 'documentName' property.`);
          }
 
-         if (storeName === void 0)
+         if (reducerName === void 0)
          {
             const embeddedData = this.#name.get(docName);
             if (embeddedData)
@@ -218,12 +221,12 @@ export class EmbeddedStoreManager
 
             this.#name.delete(docName);
          }
-         else if (storeName === 'string')
+         else if (reducerName === 'string')
          {
             const embeddedData = this.#name.get(docName);
             if (embeddedData)
             {
-               const store = embeddedData.stores.get(storeName);
+               const store = embeddedData.stores.get(reducerName);
                if (store)
                {
                   store.destroy();
@@ -241,12 +244,12 @@ export class EmbeddedStoreManager
     *
     * @param {T} FoundryDoc - A Foundry document class / constructor.
     *
-    * @param {string} [storeName] - Name of the embedded collection to retrieve.
+    * @param {string} [reducerName] - Name of the embedded collection to retrieve.
     *
     * @returns {import('#runtime/svelte/store/reducer').DynMapReducer<string, InstanceType<T>>} DynMapReducer
     *          instance.
     */
-   get(FoundryDoc, storeName)
+   get(FoundryDoc, reducerName)
    {
       const docName = FoundryDoc?.documentName;
 
@@ -258,7 +261,7 @@ export class EmbeddedStoreManager
 
       if (!this.#name.has(docName)) { return void 0; }
 
-      return this.#name.get(docName).stores.get(storeName ?? docName);
+      return this.#name.get(docName).stores.get(reducerName ?? docName);
    }
 
    /**
