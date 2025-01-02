@@ -56,14 +56,13 @@ export class EmbeddedStoreManager
     * Create a reactive embedded collection. When no options are provided the name of the embedded collection matches
     * the document name.
     *
-    * @template [T=import('./types').NamedDocumentConstructor]
+    * @template [D=fvtt.DocumentConstructor]
     *
-    * @param {T} FoundryDoc - A Foundry document class / constructor.
+    * @param {D} FoundryDoc - A Foundry document class / constructor.
     *
-    * @param {import('#runtime/svelte/store/reducer').DynReducer.Options.MapCreate<string, InstanceType<T>>} [options] -
-    *        DynMapReducer creation options.
+    * @param {import('./types').EmbeddedCreateOptions} [options] - DynMapReducer creation options.
     *
-    * @returns {import('#runtime/svelte/store/reducer').DynMapReducer<string, T>} DynMapReducer instance.
+    * @returns {import('#runtime/svelte/store/reducer').DynMapReducer<string, D>} DynMapReducer instance.
     */
    create(FoundryDoc, options)
    {
@@ -165,13 +164,13 @@ export class EmbeddedStoreManager
    }
 
    /**
-    * @template [T=import('./types').NamedDocumentConstructor]
+    * @template [D=fvtt.DocumentConstructor]
     *
     * Destroys and removes embedded collection stores. Invoking this method with no parameters destroys all stores.
     * Invoking with an embedded name destroys all stores for that particular collection. If you provide an embedded and
     * store name just that particular store is destroyed and removed.
     *
-    * @param {T}   [FoundryDoc] - A Foundry document class / constructor.
+    * @param {D}   [FoundryDoc] - A Foundry document class / constructor.
     *
     * @param {string}   [reducerName] - Specific store name.
     *
@@ -240,13 +239,13 @@ export class EmbeddedStoreManager
    }
 
    /**
-    * @template [T=import('./types').NamedDocumentConstructor]
+    * @template [D=fvtt.DocumentConstructor]
     *
-    * @param {T} FoundryDoc - A Foundry document class / constructor.
+    * @param {D} FoundryDoc - A Foundry document class / constructor.
     *
     * @param {string} [reducerName] - Name of the embedded collection to retrieve.
     *
-    * @returns {import('#runtime/svelte/store/reducer').DynMapReducer<string, InstanceType<T>>} DynMapReducer
+    * @returns {import('#runtime/svelte/store/reducer').DynMapReducer<string, InstanceType<D>>} DynMapReducer
     *          instance.
     */
    get(FoundryDoc, reducerName)

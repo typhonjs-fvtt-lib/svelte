@@ -11,7 +11,9 @@ import {
  * document collections reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
  *
- * @template [T=DocumentCollection]
+ * @template [C=fvtt.DocumentCollection]
+ *
+ * @typeParam C `Foundry Collection`.
  */
 export class TJSDocumentCollection
 {
@@ -23,7 +25,7 @@ export class TJSDocumentCollection
    #callbackAPI;
 
    /**
-    * @type {DocumentCollection}
+    * @type {C}
     */
    #collection;
 
@@ -38,19 +40,20 @@ export class TJSDocumentCollection
    #options = { delete: void 0, preDelete: void 0 };
 
    /**
-    * @type {((value: T, updateOptions?: TJSDocumentCollectionUpdateOptions<T>) => void)[]}
+    * @type {((value: C, updateOptions?: import('./types').TJSDocumentCollectionUpdateOptions<C>) => void)[]}
     */
    #subscribers = [];
 
    /**
-    * @type {TJSDocumentCollectionUpdateOptions<T>}
+    * @type {import('./types').TJSDocumentCollectionUpdateOptions<C>}
     */
    #updateOptions;
 
    /**
-    * @param {T | TJSDocumentCollectionOptions}   [collection] - Collection to wrap or TJSDocumentCollectionOptions.
+    * @param {C | import('./types').TJSDocumentCollectionOptions<C>}   [collection] - Collection to wrap or
+    *        TJSDocumentCollectionOptions.
     *
-    * @param {TJSDocumentCollectionOptions}     [options] - TJSDocumentCollection options.
+    * @param {import('./types').TJSDocumentCollectionOptions<C>}     [options] - TJSDocumentCollection options.
     */
    constructor(collection, options = {})
    {
@@ -76,7 +79,7 @@ export class TJSDocumentCollection
    /**
     * Returns the options passed on last update.
     *
-    * @returns {TJSDocumentCollectionUpdateOptions<T>} Last update options.
+    * @returns {import('./types').TJSDocumentCollectionUpdateOptions<C>} Last update options.
     */
    get updateOptions() { return this.#updateOptions ?? {}; }
 
@@ -155,16 +158,17 @@ export class TJSDocumentCollection
    }
 
    /**
-    * @returns {T} Current collection
+    * @returns {C | undefined} Current collection
     */
    get() { return this.#collection; }
 
    /**
     * Sets a new document collection target to be monitored. To unset use `undefined` or `null`.
     *
-    * @param {T | undefined | null}  collection - New collection to set.
+    * @param {C | undefined | null}  collection - New collection to set.
     *
-    * @param {TJSDocumentCollectionUpdateOptions<T>}  [options] - New collection update options to set.
+    * @param {import('./types').TJSDocumentCollectionUpdateOptions<C>}  [options] - New collection update options to
+    *        set.
     */
    set(collection, options = {})
    {
@@ -200,7 +204,7 @@ export class TJSDocumentCollection
    /**
     * Sets options for this collection wrapper / store.
     *
-    * @param {TJSDocumentCollectionOptions}   options - Options for TJSDocumentCollection.
+    * @param {import('./types').TJSDocumentCollectionOptions<C>}  options - Options for TJSDocumentCollection.
     */
    setOptions(options)
    {
@@ -236,8 +240,8 @@ export class TJSDocumentCollection
    }
 
    /**
-    * @param {(value: T, updateOptions?: TJSDocumentCollectionUpdateOptions<T>) => void} handler - Callback function
-    * that is invoked on update / changes.
+    * @param {(value: C, updateOptions?: import('./types').TJSDocumentCollectionUpdateOptions<C>) => void} handler -
+    *        Callback function that is invoked on update / changes.
     *
     * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
     */
@@ -280,8 +284,8 @@ export class TJSDocumentCollection
    /**
     * @param {boolean}  [force] - unused - signature from Foundry render function.
     *
-    * @param {TJSDocumentCollectionUpdateOptions<T>}   [options] - Options from render call; will have collection
-    *        update context.
+    * @param {import('./types').TJSDocumentCollectionUpdateOptions<C>}   [options] - Options from render call; will
+    *        have collection update context.
     */
    #updateSubscribers(force = false, options = {}) // eslint-disable-line no-unused-vars
    {
@@ -293,26 +297,3 @@ export class TJSDocumentCollection
       for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](collection, options); }
    }
 }
-
-/**
- * @typedef TJSDocumentCollectionOptions
- *
- * @property {((collection: DocumentCollection) => void) | null} [delete] Optional post delete function
- *           to invoke when document is deleted _after_ subscribers have been notified.
- *
- * @property {((collection: DocumentCollection) => void) | null} [preDelete] Optional pre delete function to
- *           invoke when document is deleted _before_ subscribers are notified.
- */
-
-/**
- * @template T
- * @typedef TJSDocumentCollectionUpdateOptions Provides data regarding the latest collection change.
- *
- * @property {string}   action The update action. Useful for filtering.
- *
- * @property {string}   documentType The document name.
- *
- * @property {T[]}      documents associated documents that changed.
- *
- * @property {object[]|string[]} data Foundry data associated with document changes.
- */

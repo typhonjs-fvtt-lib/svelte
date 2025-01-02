@@ -14,12 +14,12 @@ interface EmbeddedAPI {
     *
     * @param [options] - Dynamic reducer create options.
     *
-    * @typeParam D `Foundry Document`
+    * @typeParam D `Foundry Document`.
     *
     * @typeParam O `EmbeddedCreate` - create options.
     */
-   create<D extends NamedDocumentConstructor, O extends EmbeddedCreate<InstanceType<D>>>(doc: D,
-    options?: O): O extends typeof DynMapReducer<string, InstanceType<D>>
+   create<D extends fvtt.DocumentConstructor, O extends EmbeddedCreateOptions<InstanceType<D>>>(doc: D, options?: O):
+    O extends typeof DynMapReducer<string, InstanceType<D>>
       ? InstanceType<O>
       : O extends { ctor: typeof DynMapReducer<string, InstanceType<D>> }
          ? InstanceType<O['ctor']>
@@ -32,14 +32,23 @@ interface EmbeddedAPI {
     * @param doc - A Foundry document.
     *
     * @param [reducerName] - Optional name of a specific reducer to destroy.
+    *
+    * @typeParam D `Foundry Document`.
     */
-   destroy<T extends NamedDocumentConstructor>(doc?: T, reducerName?: string): boolean;
+   destroy<D extends fvtt.DocumentConstructor>(doc?: D, reducerName?: string): boolean;
 
    /**
     * Returns a specific existing embedded collection store. When no `reducerName` is provided the document name
     * is used instead.
+    *
+    * @param doc - A Foundry document.
+    *
+    * @param [reducerName] - Optional name of a specific reducer to get.
+    *
+    * @typeParam D `Foundry Document`.
     */
-   get<T extends NamedDocumentConstructor>(doc: T, reducerName?: string): DynMapReducer<string, InstanceType<T>>;
+   get<D extends fvtt.DocumentConstructor>(doc: D, reducerName?: string): DynMapReducer<string, InstanceType<D>> |
+    undefined;
 }
 
 /**
@@ -50,7 +59,7 @@ interface EmbeddedAPI {
  *
  * @typeParam T `any` - Type of data.
  */
-type EmbeddedCreate<T> =
+type EmbeddedCreateOptions<T> =
    | string
    | typeof DynMapReducer<string, T>
    | (DynReducer.Data.MapCreate<string, T> & { ctor: typeof DynMapReducer<string, T> })
@@ -59,12 +68,84 @@ type EmbeddedCreate<T> =
       | { sort: DynReducer.Data.CompareFn<T> | DynReducer.Data.Sort<T> }
    ));
 
-/**
- * Provides a basic duck type for Foundry documents. Expects a constructor / class w/ static property `name`.
- */
-interface NamedDocumentConstructor {
-   new (...args: any[]): any;
-   readonly documentName: string;
+interface TJSDocumentOptions<D extends fvtt.Document> {
+   /**
+    * Optional post-delete function to invoke when document is deleted _after_ subscribers have been notified.
+    */
+   delete?: ((doc?: D) => void) | null;
+
+   /**
+    * Optional pre-delete function to invoke when document is deleted _before_ subscribers are notified.
+    */
+   preDelete?: ((doc?: D) => void) | null;
 }
 
-export { EmbeddedAPI, EmbeddedCreate, NamedDocumentConstructor };
+/**
+ * Provides data regarding the latest document change.
+ */
+interface TJSDocumentUpdateOptions {
+   /**
+    * The update action. Useful for filtering.
+    */
+   action?: string;
+
+   /**
+    * Foundry data associated with document changes.
+    */
+   data?: object[] | string[];
+
+   /**
+    * The update action. Useful for filtering.
+    */
+   renderContext?: string;
+}
+
+interface TJSDocumentCollectionOptions<C extends fvtt.DocumentCollection> {
+   /**
+    * Optional post-delete function to invoke when document is deleted _after_ subscribers have been notified.
+    *
+    * @param collection
+    */
+   delete?: (collection: C) => void | null;
+
+   /**
+    * Optional pre-delete function to invoke when document is deleted _before_ subscribers are notified.
+    *
+    * @param collection
+    */
+   preDelete?: (collection: C) => void | null;
+}
+
+/**
+ * Provides data regarding the latest collection change.
+ */
+interface TJSDocumentCollectionUpdateOptions<C extends fvtt.DocumentCollection> {
+   /**
+    * The update action. Useful for filtering.
+    */
+   action?: string;
+
+   /**
+    * The document name.
+    */
+   documentType?: string;
+
+   /**
+    * Associated documents that changed.
+    */
+   documents?: C[];
+
+   /**
+    * Foundry data associated with document changes.
+    */
+   data?: object[] | string[];
+}
+
+export {
+   EmbeddedAPI,
+   EmbeddedCreateOptions,
+   TJSDocumentOptions,
+   TJSDocumentUpdateOptions,
+   TJSDocumentCollectionOptions,
+   TJSDocumentCollectionUpdateOptions
+};
