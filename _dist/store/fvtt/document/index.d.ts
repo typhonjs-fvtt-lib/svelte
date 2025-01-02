@@ -1,4 +1,5 @@
 import * as svelte_store from 'svelte/store';
+import { Readable } from 'svelte/store';
 import { DynMapReducer, DynReducer } from '@typhonjs-svelte/runtime-base/svelte/store/reducer';
 
 /**
@@ -147,8 +148,10 @@ interface TJSDocumentCollectionUpdateOptions<C extends fvtt.DocumentCollection> 
  * Svelte.
  *
  * @typeParam D `Foundry Document`.
+ *
+ * @implements {import('svelte/store').Readable<D>}
  */
-declare class TJSDocument<D = fvtt.Document> {
+declare class TJSDocument<D = fvtt.Document> implements Readable<D> {
   /**
    * Attempts to create a Foundry UUID from standard drop data. This may not work for all systems.
    *
@@ -267,8 +270,10 @@ declare class TJSDocument<D = fvtt.Document> {
  * @template [C=fvtt.DocumentCollection]
  *
  * @typeParam C `Foundry Collection`.
+ *
+ * @implements {import('svelte/store').Readable<C>}
  */
-declare class TJSDocumentCollection<C = fvtt.DocumentCollection> {
+declare class TJSDocumentCollection<C = fvtt.DocumentCollection> implements Readable<C> {
   /**
    * @param {C | import('./types').TJSDocumentCollectionOptions<C>}   [collection] - Collection to wrap or
    *        TJSDocumentCollectionOptions.

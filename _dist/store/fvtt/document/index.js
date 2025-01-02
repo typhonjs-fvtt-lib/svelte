@@ -400,6 +400,8 @@ class EmbeddedStoreManager
  * Svelte.
  *
  * @typeParam D `Foundry Document`.
+ *
+ * @implements {import('svelte/store').Readable<D>}
  */
 class TJSDocument
 {
@@ -823,6 +825,8 @@ class TJSDocument
  * @template [C=fvtt.DocumentCollection]
  *
  * @typeParam C `Foundry Collection`.
+ *
+ * @implements {import('svelte/store').Readable<C>}
  */
 class TJSDocumentCollection
 {

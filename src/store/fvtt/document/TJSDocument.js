@@ -16,6 +16,8 @@ import { EmbeddedStoreManager }     from './EmbeddedStoreManager.js';
  * Svelte.
  *
  * @typeParam D `Foundry Document`.
+ *
+ * @implements {import('svelte/store').Readable<D>}
  */
 export class TJSDocument
 {

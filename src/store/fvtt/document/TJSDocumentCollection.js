@@ -14,6 +14,8 @@ import {
  * @template [C=fvtt.DocumentCollection]
  *
  * @typeParam C `Foundry Collection`.
+ *
+ * @implements {import('svelte/store').Readable<C>}
  */
 export class TJSDocumentCollection
 {
