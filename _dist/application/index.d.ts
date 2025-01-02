@@ -21,12 +21,12 @@ import { TransitionFunction } from '@typhonjs-svelte/runtime-base/svelte/transit
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
  * {@link #runtime/svelte/util!TJSSvelteConfig} object in the {@link SvelteApp.Options.svelte} property.
  *
- * @template [Options = import('./types').SvelteApp.Options]
- * @augments {Application<Options>}
- *
  * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
  */
-declare class SvelteApp<Options = any> implements TJSPositionTypes.Positionable {
+declare class SvelteApp<Options extends SvelteApp.Options = SvelteApp.Options>
+  extends Application<Options>
+  implements TJSPositionTypes.Positionable
+{
   /**
    * Specifies the default options that SvelteApp supports.
    *
@@ -1548,7 +1548,7 @@ declare namespace TJSDialog {
  * There are a couple of static helper methods to quickly create standard dialogs such as a 'yes' / 'no' confirmation
  * dialog with {@link TJSDialog.confirm} and an 'ok' single button dialog with {@link TJSDialog.prompt}.
  */
-declare class TJSDialog extends SvelteApp<any> {
+declare class TJSDialog extends SvelteApp {
   /**
    * A helper factory method to create simple confirmation dialog windows which consist of simple yes / no prompts.
    * If you require more flexibility, a custom TJSDialog instance is preferred. The default focused button is 'yes'.

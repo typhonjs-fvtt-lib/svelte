@@ -72,7 +72,7 @@
 
          if (A11yHelper.isFocusTarget(focusEl))
          {
-            // Focus on next tick to allow application / dialog to mount to bypass ApplicationShell onMount focus
+            // Focus on next macrotask to allow application / dialog to mount to bypass ApplicationShell onMount focus
             // handling.
             setTimeout(() => focusEl.focus(), 0);
          }
@@ -268,7 +268,7 @@
          case 'Tab':
             event.stopPropagation();
 
-            // Check `activeElement` on next tick to potentially update `currentButtonId` from tab / keyboard
+            // Check `activeElement` on next macrotask to potentially update `currentButtonId` from tab / keyboard
             // navigation.
             setTimeout(() =>
             {

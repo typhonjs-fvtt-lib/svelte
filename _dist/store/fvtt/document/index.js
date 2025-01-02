@@ -52,14 +52,16 @@ class EmbeddedStoreManager
    }
 
    /**
-    * @template [T=import('./types').NamedDocumentConstructor]
+    * Create a reactive embedded collection. When no options are provided the name of the embedded collection matches
+    * the document name.
     *
-    * @param {T} FoundryDoc - A Foundry document class / constructor.
+    * @template [D=fvtt.DocumentConstructor]
     *
-    * @param {import('#runtime/svelte/store/reducer').DynOptionsMapCreate<string, T>} options - DynMapReducer
-    *        creation options.
+    * @param {D} FoundryDoc - A Foundry document class / constructor.
     *
-    * @returns {import('#runtime/svelte/store/reducer').DynMapReducer<string, T>} DynMapReducer instance.
+    * @param {import('./types').EmbeddedCreateOptions} [options] - DynMapReducer creation options.
+    *
+    * @returns {import('#runtime/svelte/store/reducer').DynMapReducer<string, D>} DynMapReducer instance.
     */
    create(FoundryDoc, options)
    {
@@ -107,10 +109,10 @@ class EmbeddedStoreManager
       /** @type {string} */
       let name;
 
-      /** @type {import('#runtime/svelte/store/reducer').DynDataOptions<T>} */
+      /** @type {import('#runtime/svelte/store/reducer').DynReducer.Options.Common<T>} */
       let rest = {};
 
-      /** @type {import('#runtime/svelte/store/reducer').IDynMapReducerCtor<string, T>} */
+      /** @type {typeof import('#runtime/svelte/store/reducer').DynMapReducer<string, InstanceType<T>>} */
       let ctor;
 
       if (typeof options === 'string')
@@ -128,7 +130,8 @@ class EmbeddedStoreManager
       }
       else
       {
-         throw new TypeError(`EmbeddedStoreManager.create error: 'options' does not conform to allowed parameters.`);
+         name = docName;
+         ctor = DynMapReducer;
       }
 
       if (!hasPrototype(ctor, DynMapReducer))
@@ -149,27 +152,30 @@ class EmbeddedStoreManager
       }
       else
       {
-         const storeOptions = collection ? { data: collection, ...rest } : { ...rest };
-         const store = new ctor(storeOptions);
-         embeddedData.stores.set(name, store);
-         return store;
+         const reducerOptions = collection ? { data: collection, ...rest } : { ...rest };
+         const instance = new ctor(reducerOptions);
+         embeddedData.stores.set(name, instance);
+
+         if (typeof instance?.initialize === 'function') { instance.initialize(rest); }
+
+         return instance;
       }
    }
 
    /**
-    * @template [T=import('./types').NamedDocumentConstructor]
+    * @template [D=fvtt.DocumentConstructor]
     *
     * Destroys and removes embedded collection stores. Invoking this method with no parameters destroys all stores.
     * Invoking with an embedded name destroys all stores for that particular collection. If you provide an embedded and
     * store name just that particular store is destroyed and removed.
     *
-    * @param {T}   [FoundryDoc] - A Foundry document class / constructor.
+    * @param {D}   [FoundryDoc] - A Foundry document class / constructor.
     *
-    * @param {string}   [storeName] - Specific store name.
+    * @param {string}   [reducerName] - Specific store name.
     *
     * @returns {boolean} One or more stores destroyed?
     */
-   destroy(FoundryDoc, storeName)
+   destroy(FoundryDoc, reducerName)
    {
       let count = 0;
 
@@ -198,7 +204,7 @@ class EmbeddedStoreManager
              `EmbeddedStoreManager.delete error: 'FoundryDoc' does not have a valid 'documentName' property.`);
          }
 
-         if (storeName === void 0)
+         if (reducerName === void 0)
          {
             const embeddedData = this.#name.get(docName);
             if (embeddedData)
@@ -213,12 +219,12 @@ class EmbeddedStoreManager
 
             this.#name.delete(docName);
          }
-         else if (storeName === 'string')
+         else if (reducerName === 'string')
          {
             const embeddedData = this.#name.get(docName);
             if (embeddedData)
             {
-               const store = embeddedData.stores.get(storeName);
+               const store = embeddedData.stores.get(reducerName);
                if (store)
                {
                   store.destroy();
@@ -232,16 +238,16 @@ class EmbeddedStoreManager
    }
 
    /**
-    * @template [T=import('./types').NamedDocumentConstructor]
+    * @template [D=fvtt.DocumentConstructor]
     *
-    * @param {T} FoundryDoc - A Foundry document class / constructor.
+    * @param {D} FoundryDoc - A Foundry document class / constructor.
     *
-    * @param {string} storeName - Name of the embedded collection to retrieve.
+    * @param {string} [reducerName] - Name of the embedded collection to retrieve.
     *
-    * @returns {import('#runtime/svelte/store/reducer').DynMapReducer<string, InstanceType<T>>} DynMapReducer
+    * @returns {import('#runtime/svelte/store/reducer').DynMapReducer<string, InstanceType<D>>} DynMapReducer
     *          instance.
     */
-   get(FoundryDoc, storeName)
+   get(FoundryDoc, reducerName)
    {
       const docName = FoundryDoc?.documentName;
 
@@ -253,7 +259,7 @@ class EmbeddedStoreManager
 
       if (!this.#name.has(docName)) { return void 0; }
 
-      return this.#name.get(docName).stores.get(storeName);
+      return this.#name.get(docName).stores.get(reducerName ?? docName);
    }
 
    /**
@@ -387,11 +393,13 @@ class EmbeddedStoreManager
  */
 
 /**
- * @template [T=import('./types').NamedDocumentConstructor]
+ * @template [D=fvtt.Document]
  *
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.
  * This makes documents reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
+ *
+ * @typeParam D `Foundry Document`.
  */
 class TJSDocument
 {
@@ -403,7 +411,7 @@ class TJSDocument
    #callbackAPI;
 
    /**
-    * @type {T[]}
+    * @type {D[]}
     */
    #document = [void 0];
 
@@ -428,19 +436,19 @@ class TJSDocument
    #options = { delete: void 0, preDelete: void 0 };
 
    /**
-    * @type {((value: T, updateOptions?: TJSDocumentUpdateOptions) => void)[]}
+    * @type {((value: D, updateOptions?: import('./types').TJSDocumentUpdateOptions) => void)[]}
     */
-   #subscriptions = [];
+   #subscribers = [];
 
    /**
-    * @type {TJSDocumentUpdateOptions}
+    * @type {import('./types').TJSDocumentUpdateOptions}
     */
    #updateOptions;
 
    /**
-    * @param {T | TJSDocumentOptions}  [document] - Document to wrap or TJSDocumentOptions.
+    * @param {D | import('./types').TJSDocumentOptions<D>}  [document] - Document to wrap or TJSDocumentOptions.
     *
-    * @param {TJSDocumentOptions}      [options] - TJSDocument options.
+    * @param {import('./types').TJSDocumentOptions<D>}      [options] - TJSDocument options.
     */
    constructor(document, options = {})
    {
@@ -485,7 +493,7 @@ class TJSDocument
    /**
     * Returns the options passed on last update.
     *
-    * @returns {TJSDocumentUpdateOptions} Last update options.
+    * @returns {import('./types').TJSDocumentUpdateOptions} Last update options.
     */
    get updateOptions() { return this.#updateOptions ?? {}; }
 
@@ -565,11 +573,11 @@ class TJSDocument
       this.#options.delete = void 0;
       this.#options.preDelete = void 0;
 
-      this.#subscriptions.length = 0;
+      this.#subscribers.length = 0;
    }
 
    /**
-    * @returns {T} Current document
+    * @returns {D | undefined} Current document
     */
    get() { return this.#document[0]; }
 
@@ -612,17 +620,18 @@ class TJSDocument
       return uuid;
    }
 
-
    /**
-    * @param {T | undefined}  document - New document to set.
+    * Sets a new document target to be monitored. To unset use `undefined` or `null`.
     *
-    * @param {TJSDocumentUpdateOptions}   [options] - New document update options to set.
+    * @param {D | undefined | null}  doc - New document to set.
+    *
+    * @param {import('./types').TJSDocumentUpdateOptions}   [options] - New document update options to set.
     */
-   set(document, options = {})
+   set(doc, options = {})
    {
-      if (document !== void 0 && !(document instanceof globalThis.foundry.abstract.Document))
+      if (doc !== void 0 && doc !== null && !(doc instanceof globalThis.foundry.abstract.Document))
       {
-         throw new TypeError(`TJSDocument set error: 'document' is not a valid Document or undefined.`);
+         throw new TypeError(`TJSDocument set error: 'document' is not a valid Document or undefined / null.`);
       }
 
       if (!isObject(options))
@@ -631,22 +640,25 @@ class TJSDocument
       }
 
       // Only post an update if the document has changed.
-      if (this.#setDocument(document))
+      if (this.#setDocument(doc))
       {
          // Only add registration if there are current subscribers.
-         if (document instanceof globalThis.foundry.abstract.Document && this.#subscriptions.length)
+         if (doc instanceof globalThis.foundry.abstract.Document && this.#subscribers.length)
          {
             this.#callbackRegister();
          }
 
-         this.#updateSubscribers(false, { action: `tjs-set-${document === void 0 ? 'undefined' : 'new'}`, ...options });
+         this.#updateSubscribers(false, {
+            action: `tjs-set-${doc === void 0 || doc === null ? 'undefined' : 'new'}`,
+            ...options
+         });
       }
    }
 
    /**
     * Internally sets the new document being tracked.
     *
-    * @param {T | undefined} doc -
+    * @param {D | undefined | null} doc -
     *
     * @returns {boolean} Whether the document changed.
     */
@@ -657,7 +669,7 @@ class TJSDocument
       // Unregister before setting new document state.
       if (changed) { this.#callbackUnregister(); }
 
-      this.#document[0] = doc;
+      this.#document[0] = doc === void 0 || doc === null ? void 0 : doc;
 
       if (changed && this.#embeddedStoreManager) { this.#embeddedStoreManager.handleDocChange(); }
 
@@ -684,7 +696,7 @@ class TJSDocument
     *
     * @param {string}   uuid - A Foundry UUID to lookup.
     *
-    * @param {TJSDocumentUpdateOptions}   [options] - New document update options to set.
+    * @param {import('./types').TJSDocumentUpdateOptions}   [options] - New document update options to set.
     *
     * @returns {Promise<boolean>} True if successfully set document from UUID.
     */
@@ -710,7 +722,7 @@ class TJSDocument
    /**
     * Sets options for this document wrapper / store.
     *
-    * @param {TJSDocumentOptions}   options - Options for TJSDocument.
+    * @param {import('./types').TJSDocumentOptions<D>}   options - Options for TJSDocument.
     */
    setOptions(options)
    {
@@ -745,37 +757,48 @@ class TJSDocument
    }
 
    /**
-    * @param {(value: T, updateOptions?: TJSDocumentUpdateOptions) => void} handler - Callback function that is
-    * invoked on update / changes.
+    * @param {(value: D, updateOptions?: import('./types').TJSDocumentUpdateOptions) => void} handler - Callback
+    * function that is invoked on update / changes.
     *
     * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
     */
    subscribe(handler)
    {
-      this.#subscriptions.push(handler);           // Add handler to the array of subscribers.
+      let addedSubscriber = false;
 
-      // Register callback with first subscriber.
-      if (this.#subscriptions.length === 1) { this.#callbackRegister(); }
+      const currentIdx = this.#subscribers.findIndex((entry) => entry === handler);
+      if (currentIdx === -1)
+      {
+         this.#subscribers.push(handler);
+         addedSubscriber = true;
+      }
 
-      const updateOptions = { action: 'subscribe', data: void 0 };
+      if (addedSubscriber)
+      {
+         // Register callback with first subscriber.
+         if (this.#subscribers.length === 1) { this.#callbackRegister(); }
 
-      handler(this.#document[0], updateOptions);      // Call handler with current value and update options.
+         const updateOptions = { action: 'subscribe', data: void 0 };
+
+         handler(this.#document[0], updateOptions);      // Call handler with current value and update options.
+      }
 
       // Return unsubscribe function.
       return () =>
       {
-         const index = this.#subscriptions.findIndex((sub) => sub === handler);
-         if (index >= 0) { this.#subscriptions.splice(index, 1); }
+         const index = this.#subscribers.findIndex((sub) => sub === handler);
+         if (index !== -1) { this.#subscribers.splice(index, 1); }
 
          // Unsubscribe from document callback if there are no subscribers.
-         if (this.#subscriptions.length === 0) { this.#callbackUnregister(); }
+         if (this.#subscribers.length === 0) { this.#callbackUnregister(); }
       };
    }
 
    /**
     * @param {boolean}  [force] - unused - signature from Foundry render function.
     *
-    * @param {TJSDocumentUpdateOptions}   [options] - Options from render call; will have document update context.
+    * @param {import('./types').TJSDocumentUpdateOptions}   [options] - Options from render call; will have document
+    *        update context.
     */
    #updateSubscribers(force = false, options = {}) // eslint-disable-line no-unused-vars
    {
@@ -783,7 +806,7 @@ class TJSDocument
 
       const doc = this.#document[0];
 
-      for (let cntr = 0; cntr < this.#subscriptions.length; cntr++) { this.#subscriptions[cntr](doc, options); }
+      for (let cntr = 0; cntr < this.#subscribers.length; cntr++) { this.#subscribers[cntr](doc, options); }
 
       if (this.#embeddedStoreManager)
       {
@@ -793,31 +816,13 @@ class TJSDocument
 }
 
 /**
- * @typedef {object} TJSDocumentOptions
- *
- * @property {((doc?: object) => void) | null} [delete] Optional post delete function to invoke when
- * document is deleted _after_ subscribers have been notified.
- *
- * @property {((doc?: object) => void) | null} [preDelete] Optional pre delete function to invoke
- * when document is deleted _before_ subscribers are notified.
- */
-
-/**
- * @typedef TJSDocumentUpdateOptions Provides data regarding the latest document change.
- *
- * @property {string}   [action] The update action. Useful for filtering.
- *
- * @property {string}   [renderContext] The update action. Useful for filtering.
- *
- * @property {object[]|string[]} [data] Foundry data associated with document changes.
- */
-
-/**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any DocumentCollection. This makes
  * document collections reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
  *
- * @template [T=DocumentCollection]
+ * @template [C=fvtt.DocumentCollection]
+ *
+ * @typeParam C `Foundry Collection`.
  */
 class TJSDocumentCollection
 {
@@ -829,7 +834,7 @@ class TJSDocumentCollection
    #callbackAPI;
 
    /**
-    * @type {DocumentCollection}
+    * @type {C}
     */
    #collection;
 
@@ -844,19 +849,20 @@ class TJSDocumentCollection
    #options = { delete: void 0, preDelete: void 0 };
 
    /**
-    * @type {((value: T, updateOptions?: TJSDocumentCollectionUpdateOptions<T>) => void)[]}
+    * @type {((value: C, updateOptions?: import('./types').TJSDocumentCollectionUpdateOptions<C>) => void)[]}
     */
-   #subscriptions = [];
+   #subscribers = [];
 
    /**
-    * @type {TJSDocumentCollectionUpdateOptions<T>}
+    * @type {import('./types').TJSDocumentCollectionUpdateOptions<C>}
     */
    #updateOptions;
 
    /**
-    * @param {T | TJSDocumentCollectionOptions}   [collection] - Collection to wrap or TJSDocumentCollectionOptions.
+    * @param {C | import('./types').TJSDocumentCollectionOptions<C>}   [collection] - Collection to wrap or
+    *        TJSDocumentCollectionOptions.
     *
-    * @param {TJSDocumentCollectionOptions}     [options] - TJSDocumentCollection options.
+    * @param {import('./types').TJSDocumentCollectionOptions<C>}     [options] - TJSDocumentCollection options.
     */
    constructor(collection, options = {})
    {
@@ -882,7 +888,7 @@ class TJSDocumentCollection
    /**
     * Returns the options passed on last update.
     *
-    * @returns {TJSDocumentCollectionUpdateOptions<T>} Last update options.
+    * @returns {import('./types').TJSDocumentCollectionUpdateOptions<C>} Last update options.
     */
    get updateOptions() { return this.#updateOptions ?? {}; }
 
@@ -957,22 +963,25 @@ class TJSDocumentCollection
       this.#options.delete = void 0;
       this.#options.preDelete = void 0;
 
-      this.#subscriptions.length = 0;
+      this.#subscribers.length = 0;
    }
 
    /**
-    * @returns {T} Current collection
+    * @returns {C | undefined} Current collection
     */
    get() { return this.#collection; }
 
    /**
-    * @param {T | undefined}  collection - New collection to set.
+    * Sets a new document collection target to be monitored. To unset use `undefined` or `null`.
     *
-    * @param {TJSDocumentCollectionUpdateOptions<T>}  [options] - New collection update options to set.
+    * @param {C | undefined | null}  collection - New collection to set.
+    *
+    * @param {import('./types').TJSDocumentCollectionUpdateOptions<C>}  [options] - New collection update options to
+    *        set.
     */
    set(collection, options = {})
    {
-      if (collection !== void 0 && !(collection instanceof DocumentCollection))
+      if (collection !== void 0 && collection !== null && !(collection instanceof DocumentCollection))
       {
          throw new TypeError(
           `TJSDocumentCollection set error: 'collection' is not a valid DocumentCollection or undefined.`);
@@ -987,22 +996,24 @@ class TJSDocumentCollection
 
       if (changed) { this.#callbackUnregister(); }
 
-      this.#collection = collection;
+      this.#collection = collection === void 0 || collection === null ? void 0 : collection;
       this.#updateOptions = options;
 
       if (changed)
       {
-         if (collection instanceof DocumentCollection && this.#subscriptions.length) { this.#callbackRegister(); }
+         if (collection instanceof DocumentCollection && this.#subscribers.length) { this.#callbackRegister(); }
 
-         this.#updateSubscribers(false,
-          { action: `tjs-set-${collection === void 0 ? 'undefined' : 'new'}`, ...options });
+         this.#updateSubscribers(false, {
+            action: `tjs-set-${collection === void 0 || collection === null ? 'undefined' : 'new'}`,
+            ...options
+         });
       }
    }
 
    /**
     * Sets options for this collection wrapper / store.
     *
-    * @param {TJSDocumentCollectionOptions}   options - Options for TJSDocumentCollection.
+    * @param {import('./types').TJSDocumentCollectionOptions<C>}  options - Options for TJSDocumentCollection.
     */
    setOptions(options)
    {
@@ -1038,76 +1049,63 @@ class TJSDocumentCollection
    }
 
    /**
-    * @param {(value: T, updateOptions?: TJSDocumentCollectionUpdateOptions<T>) => void} handler - Callback function
-    * that is invoked on update / changes.
+    * @param {(value: C, updateOptions?: import('./types').TJSDocumentCollectionUpdateOptions<C>) => void} handler -
+    *        Callback function that is invoked on update / changes.
     *
     * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
     */
    subscribe(handler)
    {
-      this.#subscriptions.push(handler);              // Add handler to the array of subscribers.
+      let addedSubscriber = false;
 
-      // Register callback with first subscriber.
-      if (this.#subscriptions.length === 1) { this.#callbackRegister(); }
+      const currentIdx = this.#subscribers.findIndex((entry) => entry === handler);
+      if (currentIdx === -1)
+      {
+         this.#subscribers.push(handler);
+         addedSubscriber = true;
+      }
 
-      const collection = this.#collection;
+      if (addedSubscriber)
+      {
+         // Register callback with first subscriber.
+         if (this.#subscribers.length === 1) { this.#callbackRegister(); }
 
-      const documentType = collection?.documentName ?? void 0;
+         const collection = this.#collection;
 
-      const updateOptions = { action: 'subscribe', documentType, documents: [], data: [] };
+         const documentType = collection?.documentName ?? void 0;
 
-      handler(collection, updateOptions);  // Call handler with current value and update options.
+         const updateOptions = { action: 'subscribe', documentType, documents: [], data: [] };
+
+         handler(collection, updateOptions);  // Call handler with current value and update options.
+      }
 
       // Return unsubscribe function.
       return () =>
       {
-         const index = this.#subscriptions.findIndex((sub) => sub === handler);
-         if (index >= 0) { this.#subscriptions.splice(index, 1); }
+         const index = this.#subscribers.findIndex((sub) => sub === handler);
+         if (index !== -1) { this.#subscribers.splice(index, 1); }
 
          // Unsubscribe from collection if there are no subscribers.
-         if (this.#subscriptions.length === 0) { this.#callbackUnregister(); }
+         if (this.#subscribers.length === 0) { this.#callbackUnregister(); }
       };
    }
 
    /**
     * @param {boolean}  [force] - unused - signature from Foundry render function.
     *
-    * @param {TJSDocumentCollectionUpdateOptions<T>}   [options] - Options from render call; will have collection
-    *        update context.
+    * @param {import('./types').TJSDocumentCollectionUpdateOptions<C>}   [options] - Options from render call; will
+    *        have collection update context.
     */
    #updateSubscribers(force = false, options = {}) // eslint-disable-line no-unused-vars
    {
       this.#updateOptions = options;
 
-      const subscriptions = this.#subscriptions;
+      const subscriptions = this.#subscribers;
       const collection = this.#collection;
 
       for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](collection, options); }
    }
 }
-
-/**
- * @typedef TJSDocumentCollectionOptions
- *
- * @property {((collection: DocumentCollection) => void) | null} [delete] Optional post delete function
- *           to invoke when document is deleted _after_ subscribers have been notified.
- *
- * @property {((collection: DocumentCollection) => void) | null} [preDelete] Optional pre delete function to
- *           invoke when document is deleted _before_ subscribers are notified.
- */
-
-/**
- * @template T
- * @typedef TJSDocumentCollectionUpdateOptions Provides data regarding the latest collection change.
- *
- * @property {string}   action The update action. Useful for filtering.
- *
- * @property {string}   documentType The document name.
- *
- * @property {T[]}      documents associated documents that changed.
- *
- * @property {object[]|string[]} data Foundry data associated with document changes.
- */
 
 export { TJSDocument, TJSDocumentCollection };
 //# sourceMappingURL=index.js.map

@@ -1,42 +1,154 @@
 import * as svelte_store from 'svelte/store';
-import { DynOptionsMapCreate, DynMapReducer } from '@typhonjs-svelte/runtime-base/svelte/store/reducer';
+import { DynMapReducer, DynReducer } from '@typhonjs-svelte/runtime-base/svelte/store/reducer';
 
 /**
  * Provides the public embedded reactive collection API.
  */
 interface EmbeddedAPI {
   /**
-   * Creates an embedded collection store.
+   * Create a reactive embedded collection store. When no options are provided the name of the embedded collection
+   * matches the document name.
+   *
+   * @param doc - A Foundry document.
+   *
+   * @param [options] - Dynamic reducer create options.
+   *
+   * @typeParam D `Foundry Document`.
+   *
+   * @typeParam O `EmbeddedCreate` - create options.
    */
-  create<T extends NamedDocumentConstructor>(
-    doc: T,
-    options: DynOptionsMapCreate<string, InstanceType<T>>,
-  ): DynMapReducer<string, InstanceType<T>>;
+  create<D extends fvtt.DocumentConstructor, O extends EmbeddedCreateOptions<InstanceType<D>>>(
+    doc: D,
+    options?: O,
+  ): O extends typeof DynMapReducer<string, InstanceType<D>>
+    ? InstanceType<O>
+    : O extends {
+          ctor: typeof DynMapReducer<string, InstanceType<D>>;
+        }
+      ? InstanceType<O['ctor']>
+      : DynMapReducer<string, InstanceType<D>>;
   /**
-   * - Destroys one or more embedded collection stores.
+   * Destroys one or more embedded collection reducers. When no `reducerName` is provided all reactive embedded
+   * collections are destroyed for the given document type.
+   *
+   * @param doc - A Foundry document.
+   *
+   * @param [reducerName] - Optional name of a specific reducer to destroy.
+   *
+   * @typeParam D `Foundry Document`.
    */
-  destroy<T extends NamedDocumentConstructor>(doc?: T, storeName?: string): boolean;
+  destroy<D extends fvtt.DocumentConstructor>(doc?: D, reducerName?: string): boolean;
   /**
-   * - Returns a specific existing embedded collection store.
+   * Returns a specific existing embedded collection store. When no `reducerName` is provided the document name
+   * is used instead.
+   *
+   * @param doc - A Foundry document.
+   *
+   * @param [reducerName] - Optional name of a specific reducer to get.
+   *
+   * @typeParam D `Foundry Document`.
    */
-  get<T extends NamedDocumentConstructor>(doc: T, storeName: string): DynMapReducer<string, InstanceType<T>>;
+  get<D extends fvtt.DocumentConstructor>(
+    doc: D,
+    reducerName?: string,
+  ): DynMapReducer<string, InstanceType<D>> | undefined;
 }
 /**
- * Provides a basic duck type for Foundry documents. Expects a constructor / class w/ static property `name`.
+ * Creates a compound type for embedded collection map reducer 'create' option combinations.
+ *
+ * Includes additional type inference constraints for {@link DynReducer.Data.MapCreate} requiring either `ctor` or
+ * `sort` / `filters` to be defined.
+ *
+ * @typeParam T `any` - Type of data.
  */
-interface NamedDocumentConstructor {
-  new (...args: any[]): any;
-  readonly documentName: string;
+type EmbeddedCreateOptions<T> =
+  | string
+  | typeof DynMapReducer<string, T>
+  | (DynReducer.Data.MapCreate<string, T> & {
+      ctor: typeof DynMapReducer<string, T>;
+    })
+  | (DynReducer.Data.MapCreate<string, T> &
+      (
+        | {
+            filters: Iterable<DynReducer.Data.FilterFn<T> | DynReducer.Data.Filter<T>>;
+          }
+        | {
+            sort: DynReducer.Data.CompareFn<T> | DynReducer.Data.Sort<T>;
+          }
+      ));
+interface TJSDocumentOptions<D extends fvtt.Document> {
+  /**
+   * Optional post-delete function to invoke when document is deleted _after_ subscribers have been notified.
+   */
+  delete?: ((doc?: D) => void) | null;
+  /**
+   * Optional pre-delete function to invoke when document is deleted _before_ subscribers are notified.
+   */
+  preDelete?: ((doc?: D) => void) | null;
+}
+/**
+ * Provides data regarding the latest document change.
+ */
+interface TJSDocumentUpdateOptions {
+  /**
+   * The update action. Useful for filtering.
+   */
+  action?: string;
+  /**
+   * Foundry data associated with document changes.
+   */
+  data?: object[] | string[];
+  /**
+   * The update action. Useful for filtering.
+   */
+  renderContext?: string;
+}
+interface TJSDocumentCollectionOptions<C extends fvtt.DocumentCollection> {
+  /**
+   * Optional post-delete function to invoke when document is deleted _after_ subscribers have been notified.
+   *
+   * @param collection
+   */
+  delete?: (collection: C) => void | null;
+  /**
+   * Optional pre-delete function to invoke when document is deleted _before_ subscribers are notified.
+   *
+   * @param collection
+   */
+  preDelete?: (collection: C) => void | null;
+}
+/**
+ * Provides data regarding the latest collection change.
+ */
+interface TJSDocumentCollectionUpdateOptions<C extends fvtt.DocumentCollection> {
+  /**
+   * The update action. Useful for filtering.
+   */
+  action?: string;
+  /**
+   * The document name.
+   */
+  documentType?: string;
+  /**
+   * Associated documents that changed.
+   */
+  documents?: C[];
+  /**
+   * Foundry data associated with document changes.
+   */
+  data?: object[] | string[];
 }
 
 /**
- * @template [T=import('./types').NamedDocumentConstructor]
+ * @template [D=fvtt.Document]
  *
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.
  * This makes documents reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
+ *
+ * @typeParam D `Foundry Document`.
  */
-declare class TJSDocument<T = NamedDocumentConstructor> {
+declare class TJSDocument<D = fvtt.Document> {
   /**
    * Attempts to create a Foundry UUID from standard drop data. This may not work for all systems.
    *
@@ -65,11 +177,11 @@ declare class TJSDocument<T = NamedDocumentConstructor> {
     },
   ): string | undefined;
   /**
-   * @param {T | TJSDocumentOptions}  [document] - Document to wrap or TJSDocumentOptions.
+   * @param {D | import('./types').TJSDocumentOptions<D>}  [document] - Document to wrap or TJSDocumentOptions.
    *
-   * @param {TJSDocumentOptions}      [options] - TJSDocument options.
+   * @param {import('./types').TJSDocumentOptions<D>}      [options] - TJSDocument options.
    */
-  constructor(document?: T | TJSDocumentOptions, options?: TJSDocumentOptions);
+  constructor(document?: D | TJSDocumentOptions<D>, options?: TJSDocumentOptions<D>);
   /**
    * @returns {import('./types').EmbeddedAPI} Embedded store manager.
    */
@@ -77,7 +189,7 @@ declare class TJSDocument<T = NamedDocumentConstructor> {
   /**
    * Returns the options passed on last update.
    *
-   * @returns {TJSDocumentUpdateOptions} Last update options.
+   * @returns {import('./types').TJSDocumentUpdateOptions} Last update options.
    */
   get updateOptions(): TJSDocumentUpdateOptions;
   /**
@@ -92,15 +204,17 @@ declare class TJSDocument<T = NamedDocumentConstructor> {
    */
   destroy(): void;
   /**
-   * @returns {T} Current document
+   * @returns {D | undefined} Current document
    */
-  get(): T;
+  get(): D | undefined;
   /**
-   * @param {T | undefined}  document - New document to set.
+   * Sets a new document target to be monitored. To unset use `undefined` or `null`.
    *
-   * @param {TJSDocumentUpdateOptions}   [options] - New document update options to set.
+   * @param {D | undefined | null}  doc - New document to set.
+   *
+   * @param {import('./types').TJSDocumentUpdateOptions}   [options] - New document update options to set.
    */
-  set(document: T | undefined, options?: TJSDocumentUpdateOptions): void;
+  set(doc: D | undefined | null, options?: TJSDocumentUpdateOptions): void;
   /**
    * Potentially sets new document from data transfer object.
    *
@@ -124,7 +238,7 @@ declare class TJSDocument<T = NamedDocumentConstructor> {
    *
    * @param {string}   uuid - A Foundry UUID to lookup.
    *
-   * @param {TJSDocumentUpdateOptions}   [options] - New document update options to set.
+   * @param {import('./types').TJSDocumentUpdateOptions}   [options] - New document update options to set.
    *
    * @returns {Promise<boolean>} True if successfully set document from UUID.
    */
@@ -132,68 +246,42 @@ declare class TJSDocument<T = NamedDocumentConstructor> {
   /**
    * Sets options for this document wrapper / store.
    *
-   * @param {TJSDocumentOptions}   options - Options for TJSDocument.
+   * @param {import('./types').TJSDocumentOptions<D>}   options - Options for TJSDocument.
    */
-  setOptions(options: TJSDocumentOptions): void;
+  setOptions(options: TJSDocumentOptions<D>): void;
   /**
-   * @param {(value: T, updateOptions?: TJSDocumentUpdateOptions) => void} handler - Callback function that is
-   * invoked on update / changes.
+   * @param {(value: D, updateOptions?: import('./types').TJSDocumentUpdateOptions) => void} handler - Callback
+   * function that is invoked on update / changes.
    *
    * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
    */
-  subscribe(handler: (value: T, updateOptions?: TJSDocumentUpdateOptions) => void): svelte_store.Unsubscriber;
+  subscribe(handler: (value: D, updateOptions?: TJSDocumentUpdateOptions) => void): svelte_store.Unsubscriber;
   #private;
 }
-type TJSDocumentOptions = {
-  /**
-   * Optional post delete function to invoke when
-   * document is deleted _after_ subscribers have been notified.
-   */
-  delete?: ((doc?: object) => void) | null;
-  /**
-   * Optional pre delete function to invoke
-   * when document is deleted _before_ subscribers are notified.
-   */
-  preDelete?: ((doc?: object) => void) | null;
-};
-/**
- * Provides data regarding the latest document change.
- */
-type TJSDocumentUpdateOptions = {
-  /**
-   * The update action. Useful for filtering.
-   */
-  action?: string;
-  /**
-   * The update action. Useful for filtering.
-   */
-  renderContext?: string;
-  /**
-   * Foundry data associated with document changes.
-   */
-  data?: object[] | string[];
-};
 
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any DocumentCollection. This makes
  * document collections reactive in a Svelte component, but otherwise provides subscriber functionality external to
  * Svelte.
  *
- * @template [T=DocumentCollection]
+ * @template [C=fvtt.DocumentCollection]
+ *
+ * @typeParam C `Foundry Collection`.
  */
-declare class TJSDocumentCollection<T = DocumentCollection> {
+declare class TJSDocumentCollection<C = fvtt.DocumentCollection> {
   /**
-   * @param {T | TJSDocumentCollectionOptions}   [collection] - Collection to wrap or TJSDocumentCollectionOptions.
+   * @param {C | import('./types').TJSDocumentCollectionOptions<C>}   [collection] - Collection to wrap or
+   *        TJSDocumentCollectionOptions.
    *
-   * @param {TJSDocumentCollectionOptions}     [options] - TJSDocumentCollection options.
+   * @param {import('./types').TJSDocumentCollectionOptions<C>}     [options] - TJSDocumentCollection options.
    */
-  constructor(collection?: T | TJSDocumentCollectionOptions, options?: TJSDocumentCollectionOptions);
+  constructor(collection?: C | TJSDocumentCollectionOptions<C>, options?: TJSDocumentCollectionOptions<C>);
   /**
    * Returns the options passed on last update.
    *
-   * @returns {TJSDocumentCollectionUpdateOptions<T>} Last update options.
+   * @returns {import('./types').TJSDocumentCollectionUpdateOptions<C>} Last update options.
    */
-  get updateOptions(): TJSDocumentCollectionUpdateOptions<T>;
+  get updateOptions(): TJSDocumentCollectionUpdateOptions<C>;
   /**
    * Returns the UUID assigned to this store.
    *
@@ -206,69 +294,39 @@ declare class TJSDocumentCollection<T = DocumentCollection> {
    */
   destroy(): void;
   /**
-   * @returns {T} Current collection
+   * @returns {C | undefined} Current collection
    */
-  get(): T;
+  get(): C | undefined;
   /**
-   * @param {T | undefined}  collection - New collection to set.
+   * Sets a new document collection target to be monitored. To unset use `undefined` or `null`.
    *
-   * @param {TJSDocumentCollectionUpdateOptions<T>}  [options] - New collection update options to set.
+   * @param {C | undefined | null}  collection - New collection to set.
+   *
+   * @param {import('./types').TJSDocumentCollectionUpdateOptions<C>}  [options] - New collection update options to
+   *        set.
    */
-  set(collection: T | undefined, options?: TJSDocumentCollectionUpdateOptions<T>): void;
+  set(collection: C | undefined | null, options?: TJSDocumentCollectionUpdateOptions<C>): void;
   /**
    * Sets options for this collection wrapper / store.
    *
-   * @param {TJSDocumentCollectionOptions}   options - Options for TJSDocumentCollection.
+   * @param {import('./types').TJSDocumentCollectionOptions<C>}  options - Options for TJSDocumentCollection.
    */
-  setOptions(options: TJSDocumentCollectionOptions): void;
+  setOptions(options: TJSDocumentCollectionOptions<C>): void;
   /**
-   * @param {(value: T, updateOptions?: TJSDocumentCollectionUpdateOptions<T>) => void} handler - Callback function
-   * that is invoked on update / changes.
+   * @param {(value: C, updateOptions?: import('./types').TJSDocumentCollectionUpdateOptions<C>) => void} handler -
+   *        Callback function that is invoked on update / changes.
    *
    * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
    */
   subscribe(
-    handler: (value: T, updateOptions?: TJSDocumentCollectionUpdateOptions<T>) => void,
+    handler: (value: C, updateOptions?: TJSDocumentCollectionUpdateOptions<C>) => void,
   ): svelte_store.Unsubscriber;
   #private;
 }
-type TJSDocumentCollectionOptions = {
-  /**
-   * Optional post delete function
-   * to invoke when document is deleted _after_ subscribers have been notified.
-   */
-  delete?: ((collection: DocumentCollection) => void) | null;
-  /**
-   * Optional pre delete function to
-   * invoke when document is deleted _before_ subscribers are notified.
-   */
-  preDelete?: ((collection: DocumentCollection) => void) | null;
-};
-/**
- * Provides data regarding the latest collection change.
- */
-type TJSDocumentCollectionUpdateOptions<T> = {
-  /**
-   * The update action. Useful for filtering.
-   */
-  action: string;
-  /**
-   * The document name.
-   */
-  documentType: string;
-  /**
-   * associated documents that changed.
-   */
-  documents: T[];
-  /**
-   * Foundry data associated with document changes.
-   */
-  data: object[] | string[];
-};
 
 export {
   type EmbeddedAPI,
-  type NamedDocumentConstructor,
+  type EmbeddedCreateOptions,
   TJSDocument,
   TJSDocumentCollection,
   type TJSDocumentCollectionOptions,

@@ -1323,7 +1323,7 @@ class FoundryHMRSupport
             // Only handle JSON hot reload presumably specified in package manifest for language translation files.
             if (data?.extension === 'json')
             {
-               // Postpone until next clock tick to allow Foundry to update localization first.
+               // Postpone until next macrotask to allow Foundry to update localization first.
                setTimeout(() =>
                {
                   for (const app of TJSAppIndex.values())
@@ -1370,9 +1370,6 @@ class FoundryHMRSupport
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
  * {@link #runtime/svelte/util!TJSSvelteConfig} object in the {@link SvelteApp.Options.svelte} property.
- *
- * @template [Options = import('./types').SvelteApp.Options]
- * @augments {Application<Options>}
  *
  * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
  */
