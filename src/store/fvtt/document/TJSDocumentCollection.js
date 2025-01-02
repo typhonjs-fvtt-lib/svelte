@@ -40,7 +40,7 @@ export class TJSDocumentCollection
    /**
     * @type {((value: T, updateOptions?: TJSDocumentCollectionUpdateOptions<T>) => void)[]}
     */
-   #subscriptions = [];
+   #subscribers = [];
 
    /**
     * @type {TJSDocumentCollectionUpdateOptions<T>}
@@ -151,7 +151,7 @@ export class TJSDocumentCollection
       this.#options.delete = void 0;
       this.#options.preDelete = void 0;
 
-      this.#subscriptions.length = 0;
+      this.#subscribers.length = 0;
    }
 
    /**
@@ -188,7 +188,7 @@ export class TJSDocumentCollection
 
       if (changed)
       {
-         if (collection instanceof DocumentCollection && this.#subscriptions.length) { this.#callbackRegister(); }
+         if (collection instanceof DocumentCollection && this.#subscribers.length) { this.#callbackRegister(); }
 
          this.#updateSubscribers(false, {
             action: `tjs-set-${collection === void 0 || collection === null ? 'undefined' : 'new'}`,
@@ -243,27 +243,37 @@ export class TJSDocumentCollection
     */
    subscribe(handler)
    {
-      this.#subscriptions.push(handler);              // Add handler to the array of subscribers.
+      let addedSubscriber = false;
 
-      // Register callback with first subscriber.
-      if (this.#subscriptions.length === 1) { this.#callbackRegister(); }
+      const currentIdx = this.#subscribers.findIndex((entry) => entry === handler);
+      if (currentIdx === -1)
+      {
+         this.#subscribers.push(handler);
+         addedSubscriber = true;
+      }
 
-      const collection = this.#collection;
+      if (addedSubscriber)
+      {
+         // Register callback with first subscriber.
+         if (this.#subscribers.length === 1) { this.#callbackRegister(); }
 
-      const documentType = collection?.documentName ?? void 0;
+         const collection = this.#collection;
 
-      const updateOptions = { action: 'subscribe', documentType, documents: [], data: [] };
+         const documentType = collection?.documentName ?? void 0;
 
-      handler(collection, updateOptions);  // Call handler with current value and update options.
+         const updateOptions = { action: 'subscribe', documentType, documents: [], data: [] };
+
+         handler(collection, updateOptions);  // Call handler with current value and update options.
+      }
 
       // Return unsubscribe function.
       return () =>
       {
-         const index = this.#subscriptions.findIndex((sub) => sub === handler);
-         if (index >= 0) { this.#subscriptions.splice(index, 1); }
+         const index = this.#subscribers.findIndex((sub) => sub === handler);
+         if (index !== -1) { this.#subscribers.splice(index, 1); }
 
          // Unsubscribe from collection if there are no subscribers.
-         if (this.#subscriptions.length === 0) { this.#callbackUnregister(); }
+         if (this.#subscribers.length === 0) { this.#callbackUnregister(); }
       };
    }
 
@@ -277,7 +287,7 @@ export class TJSDocumentCollection
    {
       this.#updateOptions = options;
 
-      const subscriptions = this.#subscriptions;
+      const subscriptions = this.#subscribers;
       const collection = this.#collection;
 
       for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](collection, options); }

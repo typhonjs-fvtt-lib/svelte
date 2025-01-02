@@ -52,7 +52,7 @@ export class TJSDocument
    /**
     * @type {((value: T, updateOptions?: TJSDocumentUpdateOptions) => void)[]}
     */
-   #subscriptions = [];
+   #subscribers = [];
 
    /**
     * @type {TJSDocumentUpdateOptions}
@@ -187,7 +187,7 @@ export class TJSDocument
       this.#options.delete = void 0;
       this.#options.preDelete = void 0;
 
-      this.#subscriptions.length = 0;
+      this.#subscribers.length = 0;
    }
 
    /**
@@ -257,7 +257,7 @@ export class TJSDocument
       if (this.#setDocument(doc))
       {
          // Only add registration if there are current subscribers.
-         if (doc instanceof globalThis.foundry.abstract.Document && this.#subscriptions.length)
+         if (doc instanceof globalThis.foundry.abstract.Document && this.#subscribers.length)
          {
             this.#callbackRegister();
          }
@@ -378,23 +378,33 @@ export class TJSDocument
     */
    subscribe(handler)
    {
-      this.#subscriptions.push(handler);           // Add handler to the array of subscribers.
+      let addedSubscriber = false;
 
-      // Register callback with first subscriber.
-      if (this.#subscriptions.length === 1) { this.#callbackRegister(); }
+      const currentIdx = this.#subscribers.findIndex((entry) => entry === handler);
+      if (currentIdx === -1)
+      {
+         this.#subscribers.push(handler);
+         addedSubscriber = true;
+      }
 
-      const updateOptions = { action: 'subscribe', data: void 0 };
+      if (addedSubscriber)
+      {
+         // Register callback with first subscriber.
+         if (this.#subscribers.length === 1) { this.#callbackRegister(); }
 
-      handler(this.#document[0], updateOptions);      // Call handler with current value and update options.
+         const updateOptions = { action: 'subscribe', data: void 0 };
+
+         handler(this.#document[0], updateOptions);      // Call handler with current value and update options.
+      }
 
       // Return unsubscribe function.
       return () =>
       {
-         const index = this.#subscriptions.findIndex((sub) => sub === handler);
-         if (index >= 0) { this.#subscriptions.splice(index, 1); }
+         const index = this.#subscribers.findIndex((sub) => sub === handler);
+         if (index !== -1) { this.#subscribers.splice(index, 1); }
 
          // Unsubscribe from document callback if there are no subscribers.
-         if (this.#subscriptions.length === 0) { this.#callbackUnregister(); }
+         if (this.#subscribers.length === 0) { this.#callbackUnregister(); }
       };
    }
 
@@ -409,7 +419,7 @@ export class TJSDocument
 
       const doc = this.#document[0];
 
-      for (let cntr = 0; cntr < this.#subscriptions.length; cntr++) { this.#subscriptions[cntr](doc, options); }
+      for (let cntr = 0; cntr < this.#subscribers.length; cntr++) { this.#subscribers[cntr](doc, options); }
 
       if (this.#embeddedStoreManager)
       {
