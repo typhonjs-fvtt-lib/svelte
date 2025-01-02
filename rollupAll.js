@@ -72,8 +72,19 @@ const applicationDTSOptions = {
       // Remove unused barrel import of `svelte`.
       [`import \\* as svelte from 'svelte';`]: ''
    },
+   rollupExternal: external
+};
+
+const documentDTSOptions = {
+   dtsReplace: {
+      ...dtsReplace,
+      'declare class TJSDocument<T = fvtt.Document>': 'declare class TJSDocument<T extends fvtt.Document>',
+      'declare class TJSDocumentCollection<T = fvtt.DocumentCollection>': 'declare class TJSDocumentCollection<T extends fvtt.DocumentCollection>'
+   },
    rollupExternal: external,
-   logLevel: 'debug'
+
+   // TODO: Uncomment when `esm-d-ts` is updated to allow default filter + user filter to be combined.
+   // tsDiagnosticFilter: ({ message }) => !!message.includes(`Cannot find namespace 'fvtt'`)
 };
 
 // -------------------------------------------------------------------------------------------------------------------
@@ -124,7 +135,7 @@ const rollupConfigs = [
          plugins: [
             importsExternal(),
             resolve(s_RESOLVE_CONFIG),
-            generateDTS.plugin(dtsPluginOptions)
+            generateDTS.plugin(documentDTSOptions)
          ]
       },
       output: {
