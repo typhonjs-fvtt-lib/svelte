@@ -546,7 +546,7 @@ class TJSDocument
 
          if (typeof this.#options.preDelete === 'function') { await this.#options.preDelete(doc); }
 
-         this.#updateSubscribers(false, { action: 'delete', data: void 0 });
+         this.#updateSubscribers(false, { action: 'delete' });
 
          if (typeof this.#options.delete === 'function') { await this.#options.delete(doc); }
 
@@ -651,8 +651,8 @@ class TJSDocument
          }
 
          this.#updateSubscribers(false, {
-            action: `tjs-set-${doc === void 0 || doc === null ? 'undefined' : 'new'}`,
-            ...options
+            ...options,
+            action: `tjs-set-${doc === void 0 || doc === null ? 'undefined' : 'new'}`
          });
       }
    }
@@ -780,7 +780,7 @@ class TJSDocument
          // Register callback with first subscriber.
          if (this.#subscribers.length === 1) { this.#callbackRegister(); }
 
-         const updateOptions = { action: 'subscribe', data: void 0 };
+         const updateOptions = { action: 'tjs-subscribe', data: [] };
 
          handler(this.#document[0], updateOptions);      // Call handler with current value and update options.
       }
@@ -799,20 +799,29 @@ class TJSDocument
    /**
     * @param {boolean}  [force] - unused - signature from Foundry render function.
     *
-    * @param {import('./types').TJSDocumentUpdateOptions}   [options] - Options from render call; will have document
-    *        update context.
+    * @param {object}   [options] - Options from render call; will have document update context.
     */
-   #updateSubscribers(force = false, options = {}) // eslint-disable-line no-unused-vars
+   #updateSubscribers(force, options = {}) // eslint-disable-line no-unused-vars
    {
-      this.#updateOptions = options;
+      // Shallow copy w/ remapped keys.
+      const optionsRemap = {
+         action: options.action ?? options.renderContext ?? 'tjs-unknown',
+         data: options.data ?? options.renderData ?? []
+      };
 
+      // Coerce `data` as necessary into an array to standardize receiving processing.
+      if (!Array.isArray(optionsRemap.data)) { optionsRemap.data = [optionsRemap.data]; }
+
+      this.#updateOptions = optionsRemap;
+
+      const subscribers = this.#subscribers;
       const doc = this.#document[0];
 
-      for (let cntr = 0; cntr < this.#subscribers.length; cntr++) { this.#subscribers[cntr](doc, options); }
+      for (let cntr = 0; cntr < subscribers.length; cntr++) { subscribers[cntr](doc, optionsRemap); }
 
       if (this.#embeddedStoreManager)
       {
-         this.#embeddedStoreManager.handleUpdate(options.renderContext);
+         this.#embeddedStoreManager.handleUpdate(optionsRemap.action);
       }
    }
 }
@@ -944,8 +953,7 @@ class TJSDocumentCollection
 
       if (typeof this.#options.preDelete === 'function') { await this.#options.preDelete(collection); }
 
-      this.#updateSubscribers(false,
-       { action: 'delete', documentType: collection.documentName, documents: [], data: [] });
+      this.#updateSubscribers(false, { action: 'delete' });
 
       if (typeof this.#options.delete === 'function') { await this.#options.delete(collection); }
 
@@ -1008,8 +1016,8 @@ class TJSDocumentCollection
          if (collection instanceof DocumentCollection && this.#subscribers.length) { this.#callbackRegister(); }
 
          this.#updateSubscribers(false, {
-            action: `tjs-set-${collection === void 0 || collection === null ? 'undefined' : 'new'}`,
-            ...options
+            ...options,
+            action: `tjs-set-${collection === void 0 || collection === null ? 'undefined' : 'new'}`
          });
       }
    }
@@ -1076,9 +1084,7 @@ class TJSDocumentCollection
 
          const collection = this.#collection;
 
-         const documentType = collection?.documentName ?? void 0;
-
-         const updateOptions = { action: 'subscribe', documentType, documents: [], data: [] };
+         const updateOptions = { action: 'tjs-subscribe', data: [] };
 
          handler(collection, updateOptions);  // Call handler with current value and update options.
       }
@@ -1097,17 +1103,25 @@ class TJSDocumentCollection
    /**
     * @param {boolean}  [force] - unused - signature from Foundry render function.
     *
-    * @param {import('./types').TJSDocumentCollectionUpdateOptions<C>}   [options] - Options from render call; will
-    *        have collection update context.
+    * @param {object}   [options] - Options from render call; will have collection update context.
     */
-   #updateSubscribers(force = false, options = {}) // eslint-disable-line no-unused-vars
+   #updateSubscribers(force, options = {}) // eslint-disable-line no-unused-vars
    {
-      this.#updateOptions = options;
+      // Shallow copy w/ remapped keys.
+      const optionsRemap = {
+         action: options.action ?? options.renderContext ?? 'tjs-unknown',
+         data: options.data ?? options.renderData ?? []
+      };
 
-      const subscriptions = this.#subscribers;
+      // Coerce `data` as necessary into an array to standardize receiving processing.
+      if (!Array.isArray(optionsRemap.data)) { optionsRemap.data = [optionsRemap.data]; }
+
+      this.#updateOptions = optionsRemap;
+
+      const subscribers = this.#subscribers;
       const collection = this.#collection;
 
-      for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](collection, options); }
+      for (let cntr = 0; cntr < subscribers.length; cntr++) { subscribers[cntr](collection, optionsRemap); }
    }
 }
 

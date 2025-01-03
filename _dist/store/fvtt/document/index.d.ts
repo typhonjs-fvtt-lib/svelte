@@ -94,15 +94,15 @@ interface TJSDocumentUpdateOptions {
   /**
    * The update action. Useful for filtering.
    */
-  action?: string;
+  action: string;
   /**
    * Foundry data associated with document changes.
    */
-  data?: object[] | string[];
-  /**
-   * The update action. Useful for filtering.
-   */
-  renderContext?: string;
+  data:
+    | {
+        [key: string]: unknown;
+      }[]
+    | string[];
 }
 interface TJSDocumentCollectionOptions<C extends fvtt.DocumentCollection> {
   /**
@@ -127,17 +127,13 @@ interface TJSDocumentCollectionUpdateOptions<C extends fvtt.DocumentCollection> 
    */
   action?: string;
   /**
-   * The document name.
-   */
-  documentType?: string;
-  /**
-   * Associated documents that changed.
-   */
-  documents?: C[];
-  /**
    * Foundry data associated with document changes.
    */
-  data?: object[] | string[];
+  data:
+    | {
+        [key: string]: unknown;
+      }[]
+    | string[];
 }
 
 /**
