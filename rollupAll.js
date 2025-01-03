@@ -1,4 +1,5 @@
 import resolve                   from '@rollup/plugin-node-resolve';
+import typescript                from '@rollup/plugin-typescript';
 import { generateDTS }           from '@typhonjs-build-test/esm-d-ts';
 import { importsExternal }       from '@typhonjs-build-test/rollup-plugin-pkg-imports';
 import { getFileList }           from '@typhonjs-utils/file-util';
@@ -83,8 +84,7 @@ const documentDTSOptions = {
    },
    rollupExternal: external,
 
-   // TODO: Uncomment when `esm-d-ts` is updated to allow default filter + user filter to be combined.
-   // tsDiagnosticFilter: ({ message }) => !!message.includes(`Cannot find namespace 'fvtt'`)
+
 };
 
 // -------------------------------------------------------------------------------------------------------------------
@@ -130,12 +130,17 @@ const rollupConfigs = [
    },
    {
       input: {
-         input: 'src/store/fvtt/document/index.js',
+         input: 'src/store/fvtt/document/index.ts',
          external,
          plugins: [
             importsExternal(),
             resolve(s_RESOLVE_CONFIG),
-            generateDTS.plugin(documentDTSOptions)
+            typescript({ tsconfig: './src/store/fvtt/document/tsconfig.json' }),
+            generateDTS.plugin({
+               ...dtsPluginOptions
+               // TODO: Uncomment when `esm-d-ts` is updated to allow default filter + user filter to be combined.
+               // tsDiagnosticFilter: ({ message }) => !!message.includes(`Cannot find namespace 'fvtt'`)
+            })
          ]
       },
       output: {
@@ -196,78 +201,78 @@ for (const config of rollupConfigs)
    await bundle.close();
 }
 
-// Application rewriting types / exports -----------------------------------------------------------------------------
-
-// The manipulation below is to rewrite `SvelteApplication` as `SvelteApp` to be able to merge with the namespace
-// `SvelteApp`. `SvelteApp` is then reexported as `SvelteApplication` in both the sub-path JS bundle and declarations.
-{
-   // JS Bundle mods --------------
-   let applicationIndexJS = fs.readFileSync('./_dist/application/index.js', 'utf-8');
-
-   applicationIndexJS = applicationIndexJS.replaceAll('TJSDialogNS', 'TJSDialog');
-   applicationIndexJS = applicationIndexJS.replaceAll('SvelteAppNS', 'SvelteApp');
-
-   fs.writeFileSync('./_dist/application/index.js', applicationIndexJS);
-
-   // DTS Bundle mods -------------
-   let applicationIndexDTS = fs.readFileSync('./_dist/application/index.d.ts', 'utf-8');
-
-   // Remove merged class / namespace exports.
-   applicationIndexDTS = applicationIndexDTS.replace(
-      'export { SvelteApp, SvelteAppNS, SvelteApp as SvelteApplication, TJSDialog, TJSDialogNS };',
-      'export { SvelteApp, SvelteApp as SvelteApplication, TJSDialog };'
-   );
-
-   applicationIndexDTS = applicationIndexDTS.replaceAll('TJSDialogNS', 'TJSDialog');
-   applicationIndexDTS = applicationIndexDTS.replaceAll('SvelteAppNS', 'SvelteApp');
-
-   fs.writeFileSync('./_dist/application/index.d.ts', applicationIndexDTS);
-}
-
-// Copy components to dist -------------------------------------------------------------------------------------------
-
-fs.emptyDirSync('./_dist/component');
-fs.copySync('./src/component', './_dist/component');
-
-const compFiles = await getFileList({ dir: './_dist/component', resolve: true, walk: true });
-for (const compFile of compFiles)
-{
-   let fileData = fs.readFileSync(compFile, 'utf-8').toString();
-
-   // Ignore any `{@link #runtime...}` enclosed references.
-   fileData = fileData.replaceAll(/(?<!\{@link\s*)#runtime\//g, '@typhonjs-svelte/runtime-base/');
-
-   fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
-   fileData = fileData.replaceAll('\'#svelte', '\'svelte');
-
-   // For types
-   // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');
-
-   fs.writeFileSync(compFile, fileData);
-}
-
-// GSAP plugin loading code is also bespoke and must be copied over.
-
-fs.emptyDirSync('./_dist/animate/gsap/plugin');
-fs.copySync('./src/animate/gsap/plugin', './_dist/animate/gsap/plugin');
-
-const gsapFiles = await getFileList({ dir: './_dist/animate/gsap/plugin', resolve: true, walk: true });
-for (const gsapFile of gsapFiles)
-{
-   let fileData = fs.readFileSync(gsapFile, 'utf-8').toString();
-
-   // Ignore any `{@link #runtime...}` enclosed references.
-   fileData = fileData.replaceAll(/(?<!\{@link\s*)#runtime\//g, '@typhonjs-svelte/runtime-base/');
-
-   fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
-   fileData = fileData.replaceAll('\'#svelte', '\'svelte');
-
-   // For types
-   // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');
-
-   fs.writeFileSync(gsapFile, fileData);
-}
-
-// Svelte components
-await generateDTS({ input: './_dist/component/application/index.js' });
-await generateDTS({ input: './_dist/component/internal/index.js' });
+// // Application rewriting types / exports -----------------------------------------------------------------------------
+//
+// // The manipulation below is to rewrite `SvelteApplication` as `SvelteApp` to be able to merge with the namespace
+// // `SvelteApp`. `SvelteApp` is then reexported as `SvelteApplication` in both the sub-path JS bundle and declarations.
+// {
+//    // JS Bundle mods --------------
+//    let applicationIndexJS = fs.readFileSync('./_dist/application/index.js', 'utf-8');
+//
+//    applicationIndexJS = applicationIndexJS.replaceAll('TJSDialogNS', 'TJSDialog');
+//    applicationIndexJS = applicationIndexJS.replaceAll('SvelteAppNS', 'SvelteApp');
+//
+//    fs.writeFileSync('./_dist/application/index.js', applicationIndexJS);
+//
+//    // DTS Bundle mods -------------
+//    let applicationIndexDTS = fs.readFileSync('./_dist/application/index.d.ts', 'utf-8');
+//
+//    // Remove merged class / namespace exports.
+//    applicationIndexDTS = applicationIndexDTS.replace(
+//       'export { SvelteApp, SvelteAppNS, SvelteApp as SvelteApplication, TJSDialog, TJSDialogNS };',
+//       'export { SvelteApp, SvelteApp as SvelteApplication, TJSDialog };'
+//    );
+//
+//    applicationIndexDTS = applicationIndexDTS.replaceAll('TJSDialogNS', 'TJSDialog');
+//    applicationIndexDTS = applicationIndexDTS.replaceAll('SvelteAppNS', 'SvelteApp');
+//
+//    fs.writeFileSync('./_dist/application/index.d.ts', applicationIndexDTS);
+// }
+//
+// // Copy components to dist -------------------------------------------------------------------------------------------
+//
+// fs.emptyDirSync('./_dist/component');
+// fs.copySync('./src/component', './_dist/component');
+//
+// const compFiles = await getFileList({ dir: './_dist/component', resolve: true, walk: true });
+// for (const compFile of compFiles)
+// {
+//    let fileData = fs.readFileSync(compFile, 'utf-8').toString();
+//
+//    // Ignore any `{@link #runtime...}` enclosed references.
+//    fileData = fileData.replaceAll(/(?<!\{@link\s*)#runtime\//g, '@typhonjs-svelte/runtime-base/');
+//
+//    fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
+//    fileData = fileData.replaceAll('\'#svelte', '\'svelte');
+//
+//    // For types
+//    // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');
+//
+//    fs.writeFileSync(compFile, fileData);
+// }
+//
+// // GSAP plugin loading code is also bespoke and must be copied over.
+//
+// fs.emptyDirSync('./_dist/animate/gsap/plugin');
+// fs.copySync('./src/animate/gsap/plugin', './_dist/animate/gsap/plugin');
+//
+// const gsapFiles = await getFileList({ dir: './_dist/animate/gsap/plugin', resolve: true, walk: true });
+// for (const gsapFile of gsapFiles)
+// {
+//    let fileData = fs.readFileSync(gsapFile, 'utf-8').toString();
+//
+//    // Ignore any `{@link #runtime...}` enclosed references.
+//    fileData = fileData.replaceAll(/(?<!\{@link\s*)#runtime\//g, '@typhonjs-svelte/runtime-base/');
+//
+//    fileData = fileData.replaceAll('#svelte-fvtt/', '@typhonjs-fvtt/svelte/');
+//    fileData = fileData.replaceAll('\'#svelte', '\'svelte');
+//
+//    // For types
+//    // fileData = fileData.replaceAll('_typhonjs_fvtt_svelte_', '_typhonjs_fvtt_runtime_svelte_');
+//
+//    fs.writeFileSync(gsapFile, fileData);
+// }
+//
+// // Svelte components
+// await generateDTS({ input: './_dist/component/application/index.js' });
+// await generateDTS({ input: './_dist/component/internal/index.js' });
