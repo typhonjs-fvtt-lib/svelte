@@ -27,7 +27,7 @@ class ApplicationState
     */
    #currentRestoreKey;
 
-   /** @type {Map<string, import('../../types').SvelteApp.API.State.Data>} */
+   /** @type {Map<string, import('../../types').SvelteAppNS.API.State.Data>} */
    #dataSaved = new Map();
 
    /**
@@ -53,7 +53,7 @@ class ApplicationState
     *
     * @param {object} [extra] - Extra data to add to application state.
     *
-    * @returns {import('../../types').SvelteApp.API.State.Data} Passed in object with current application state.
+    * @returns {import('../../types').SvelteAppNS.API.State.Data} Passed in object with current application state.
     */
    current(extra = {})
    {
@@ -72,7 +72,7 @@ class ApplicationState
     *
     * @param {string}   options.name - Saved data set name.
     *
-    * @returns {import('../../types').SvelteApp.API.State.Data | undefined} Any saved application state.
+    * @returns {import('../../types').SvelteAppNS.API.State.Data | undefined} Any saved application state.
     */
    get({ name })
    {
@@ -99,7 +99,7 @@ class ApplicationState
     *
     * @param {string}   options.name - Name to remove and retrieve.
     *
-    * @returns {import('../../types').SvelteApp.API.State.Data | undefined} Any saved application state.
+    * @returns {import('../../types').SvelteAppNS.API.State.Data | undefined} Any saved application state.
     */
    remove({ name })
    {
@@ -130,7 +130,7 @@ class ApplicationState
     * @param {import('#runtime/svelte/easing').EasingReference} [options.ease='linear'] - Easing function or easing
     *        function name.
     *
-    * @returns {import('../../types').SvelteApp.API.State.Data | undefined} Any saved application state.
+    * @returns {import('../../types').SvelteAppNS.API.State.Data | undefined} Any saved application state.
     */
    restore({ name, remove = false, animateTo = false, duration = 0.1, ease = 'linear' })
    {
@@ -174,7 +174,7 @@ class ApplicationState
     *
     * @param {string}   options.name - Name to index this saved state.
     *
-    * @returns {import('../../types').SvelteApp.API.State.Data} Current saved application state.
+    * @returns {import('../../types').SvelteAppNS.API.State.Data} Current saved application state.
     */
    save({ name, ...extra })
    {
@@ -196,7 +196,7 @@ class ApplicationState
     * Note: If serializing application state any minimized apps will use the before minimized state on initial render
     * of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized state.
     *
-    * @param {import('../../types').SvelteApp.API.State.Data}   data - Saved data set name.
+    * @param {import('../../types').SvelteAppNS.API.State.Data}   data - Saved data set name.
     *
     * @param {object}         [options] - Optional parameters
     *
@@ -226,7 +226,7 @@ class ApplicationState
     * @privateRemarks
     * TODO: THIS METHOD NEEDS TO BE REFACTORED WHEN TRL IS MADE INTO A STANDALONE FRAMEWORK.
     *
-    * @param {import('../../types').SvelteApp.API.State.Data}   data - Saved data set name.
+    * @param {import('../../types').SvelteAppNS.API.State.Data}   data - Saved data set name.
     *
     * @param {object}            [opts] - Optional parameters
     *
@@ -383,7 +383,7 @@ class ApplicationState
 /**
  * Provides a mechanism to retrieve and query all mounted Svelte components including the main application shell.
  *
- * @implements {import('../../types').SvelteApp.API.Svelte}
+ * @implements {import('../../types').SvelteAppNS.API.Svelte}
  */
 class GetSvelteData
 {
@@ -433,7 +433,7 @@ class GetSvelteData
 }
 
 /**
- * API docs and description in {@link SvelteApp.API.Reactive}.
+ * API docs and description in {@link SvelteAppNS.API.Reactive}.
  */
 class SvelteReactive
 {
@@ -547,14 +547,14 @@ class SvelteReactive
    /**
     * Returns the store for app options.
     *
-    * @returns {import('../../types').SvelteApp.API.Reactive.AppOptions} App options store.
+    * @returns {import('../../types').SvelteAppNS.API.Reactive.AppOptions} App options store.
     */
    get storeAppOptions() { return this.#storeAppOptions; }
 
    /**
     * Returns the store for UI options.
     *
-    * @returns {import('../../types').SvelteApp.API.Reactive.UIState} UI options store.
+    * @returns {import('../../types').SvelteAppNS.API.Reactive.UIState} UI options store.
     */
    get storeUIState() { return this.#storeUIState; }
 
@@ -681,7 +681,7 @@ class SvelteReactive
    get popOut() { return this.#application.popOut; }
 
    /**
-    * Returns the positionable app option; {@link SvelteApp.Options.positionable}
+    * Returns the positionable app option; {@link SvelteAppNS.Options.positionable}
     *
     * @returns {boolean} Positionable app option.
     */
@@ -903,9 +903,9 @@ class SvelteReactive
    }
 
    /**
-    * Serializes the main {@link SvelteApp.Options} for common application state.
+    * Serializes the main {@link SvelteAppNS.Options} for common application state.
     *
-    * @returns {import('../../types').SvelteApp.API.Reactive.Data} Common application state.
+    * @returns {import('../../types').SvelteAppNS.API.Reactive.Data} Common application state.
     */
    toJSON()
    {
@@ -929,8 +929,8 @@ class SvelteReactive
     * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
     * the new buttons.
     *
-    * Optionally you can set in the SvelteApp app options {@link SvelteApp.Options.headerButtonNoClose}
-    * to remove the close button and {@link SvelteApp.Options.headerButtonNoLabel} to true and labels will be
+    * Optionally you can set in the SvelteApp app options {@link SvelteAppNS.Options.headerButtonNoClose}
+    * to remove the close button and {@link SvelteAppNS.Options.headerButtonNoLabel} to true and labels will be
     * removed from the header buttons.
     *
     * @param {object} [opts] - Optional parameters (for internal use)
@@ -1369,7 +1369,7 @@ class FoundryHMRSupport
 /**
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
- * {@link #runtime/svelte/util!TJSSvelteConfig} object in the {@link SvelteApp.Options.svelte} property.
+ * {@link #runtime/svelte/util!TJSSvelteConfig} object in the {@link SvelteAppNS.Options.svelte} property.
  *
  * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
  */
@@ -1385,7 +1385,7 @@ class SvelteApp extends Application
    /**
     * Stores and manages application state for saving / restoring / serializing.
     *
-    * @type {import('./types').SvelteApp.API.State}
+    * @type {import('./types').SvelteAppNS.API.State}
     */
    #applicationState;
 
@@ -1450,7 +1450,7 @@ class SvelteApp extends Application
     * Provides a helper class that combines multiple methods for interacting with the mounted components tracked in
     * #svelteData.
     *
-    * @type {import('./types').SvelteApp.API.Svelte<Options>}
+    * @type {import('./types').SvelteAppNS.API.Svelte<Options>}
     */
    #getSvelteData = new GetSvelteData(this.#applicationShellHolder, this.#svelteData);
 
@@ -1462,7 +1462,7 @@ class SvelteApp extends Application
    #stores;
 
    /**
-    * @param {Partial<import('./types').SvelteApp.Options>} [options] - The options for the application.
+    * @param {Partial<import('./types').SvelteAppNS.Options>} [options] - The options for the application.
     */
    constructor(options = {})
    {
@@ -1507,12 +1507,12 @@ class SvelteApp extends Application
    /**
     * Specifies the default options that SvelteApp supports.
     *
-    * @returns {import('./types').SvelteApp.Options} options - Application options.
+    * @returns {import('./types').SvelteAppNS.Options} options - Application options.
     * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
     */
    static get defaultOptions()
    {
-      return /** @type {import('./types').SvelteApp.Options} */ deepMerge(super.defaultOptions, {
+      return /** @type {import('./types').SvelteAppNS.Options} */ deepMerge(super.defaultOptions, {
          defaultCloseAnimation: true,     // If false the default slide close animation is not run.
          draggable: true,                 // If true then application shells are draggable.
          focusAuto: true,                 // When true auto-management of app focus is enabled.
@@ -1552,21 +1552,21 @@ class SvelteApp extends Application
    /**
     * Returns the reactive accessors & Svelte stores for SvelteApp.
     *
-    * @returns {import('./types').SvelteApp.API.Reactive} The reactive accessors & Svelte stores.
+    * @returns {import('./types').SvelteAppNS.API.Reactive} The reactive accessors & Svelte stores.
     */
    get reactive() { return this.#reactive; }
 
    /**
     * Returns the application state manager.
     *
-    * @returns {import('./types').SvelteApp.API.State} The application state manager.
+    * @returns {import('./types').SvelteAppNS.API.State} The application state manager.
     */
    get state() { return this.#applicationState; }
 
    /**
     * Returns the `Svelte` helper class w/ various methods to access the mounted application shell component.
     *
-    * @returns {import('./types').SvelteApp.API.Svelte<Options>} `Svelte` / mounted application shell API.
+    * @returns {import('./types').SvelteAppNS.API.Svelte<Options>} `Svelte` / mounted application shell API.
     */
    get svelte() { return this.#getSvelteData; }
 
@@ -1820,7 +1820,7 @@ class SvelteApp extends Application
     *
     * @privateRemarks Provide a basic override implementation to extend types with additional SvelteApp functionality.
     *
-    * @returns {import('./types').SvelteApp.HeaderButton[]} All header buttons.
+    * @returns {import('./types').SvelteAppNS.HeaderButton[]} All header buttons.
     * @protected
     */
    _getHeaderButtons()
@@ -2928,9 +2928,9 @@ class TJSDialog extends SvelteApp
    #managedPromise;
 
    /**
-    * @param {import('./internal/state-dialog/types').TJSDialog.Options} data - Dialog options.
+    * @param {import('./internal/state-dialog/types').TJSDialogNS.Options} data - Dialog options.
     *
-    * @param {import('./types').SvelteApp.OptionsCore}   [options] - SvelteApp options.
+    * @param {import('./types').SvelteAppNS.OptionsCore}   [options] - SvelteApp options.
     */
    constructor(data, options = {})
    {
@@ -2949,11 +2949,11 @@ class TJSDialog extends SvelteApp
     * content even if it changes. The default `DialogShell` / `svelte` options should not be changed and instead mount
     * the dialog content component by supplying a Svelte configuration object to dialog data `content` field.
     *
-    * @returns {import('./types').SvelteApp.Options} Default options
+    * @returns {import('./types').SvelteAppNS.Options} Default options
     */
    static get defaultOptions()
    {
-      return /** @type {import('./types').SvelteApp.Options} */ deepMerge(super.defaultOptions, {
+      return /** @type {import('./types').SvelteAppNS.Options} */ deepMerge(super.defaultOptions, {
          classes: ['dialog', 'tjs-dialog'],
          width: 400,
          height: 'auto',
@@ -2982,7 +2982,7 @@ class TJSDialog extends SvelteApp
    /**
     * Returns the dialog data.
     *
-    * @returns {import('./internal/state-dialog/types').TJSDialog.Data} Dialog data.
+    * @returns {import('./internal/state-dialog/types').TJSDialogNS.Data} Dialog data.
     */
    get data() { return this.#data; }
 
@@ -3085,7 +3085,7 @@ class TJSDialog extends SvelteApp
     *
     * @template T
     *
-    * @param {import('./internal/state-dialog/types').TJSDialog.Options & {
+    * @param {import('./internal/state-dialog/types').TJSDialogNS.Options & {
     *    onYes?: string | ((data?: { application?: TJSDialog }) => any),
     *    onNo?: string | ((data?: { application?: TJSDialog }) => any)
     * }} [data] - Confirm dialog options.
@@ -3098,7 +3098,7 @@ class TJSDialog extends SvelteApp
     *        async function. When defined as a string any matching function by name exported from content Svelte
     *        component is invoked.
     *
-    * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApp options passed to the
+    * @param {import('./types').SvelteAppNS.OptionsCore}  [options]  SvelteApp options passed to the
     *        TJSDialog constructor.
     *
     * @returns {Promise<T>} A promise which resolves with result of yes / no callbacks or true / false.
@@ -3204,7 +3204,7 @@ class TJSDialog extends SvelteApp
     *
     * @template T
     *
-    * @param {import('./internal/state-dialog/types').TJSDialog.Options & {
+    * @param {import('./internal/state-dialog/types').TJSDialogNS.Options & {
     *    onOk?: string | ((data?: { application?: TJSDialog }) => any),
     *    label?: string,
     *    icon?: string
@@ -3218,7 +3218,7 @@ class TJSDialog extends SvelteApp
     *
     * @param {string}   [data.icon="fas fa-check"] - Set another icon besides `fas fa-check` for button.
     *
-    * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApp options passed to the
+    * @param {import('./types').SvelteAppNS.OptionsCore}  [options]  SvelteApp options passed to the
     *        TJSDialog constructor.
     *
     * @returns {Promise<T>} The returned value from the provided callback function or `true` if the button
@@ -3258,10 +3258,10 @@ class TJSDialog extends SvelteApp
     *
     * @template T
     *
-    * @param {import('./internal/state-dialog/types').TJSDialog.Options}  data - Dialog data passed to the TJSDialog
+    * @param {import('./internal/state-dialog/types').TJSDialogNS.Options}  data - Dialog data passed to the TJSDialog
     *        constructor.
     *
-    * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApp options passed to the
+    * @param {import('./types').SvelteAppNS.OptionsCore}  [options]  SvelteApp options passed to the
     *        TJSDialog constructor.
     *
     * @returns {Promise<T>} A Promise that resolves to the chosen result.
