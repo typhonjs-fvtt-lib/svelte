@@ -1,0 +1,20 @@
+{
+  "compilerOptions" : {
+    "baseUrl": ".",
+    "lib": ["ES2022", "DOM"],
+    "module": "ES2022",
+    "moduleResolution" : "Bundler",
+    "target": "ES2022",
+    "strict": true,
+    "strictNullChecks": true,
+
+    "types": [
+      "@typhonjs-fvtt/types-fvtt-shim/pf2e"
+    ]
+  },
+  "include": [
+    "./**/*",
+    // Uncomment to link the pf2e types / via the shim.
+    // "../../../../node_modules/@typhonjs-fvtt/types-fvtt-shim/node_modules/foundry-pf2e/types/foundry/index.d.ts"
+  ]
+}
