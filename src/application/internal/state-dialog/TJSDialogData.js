@@ -53,7 +53,7 @@ export class TJSDialogData
    }
 
    /**
-    * @returns {import('#runtime/svelte/util').TJSSvelteConfig | string} The Svelte configuration object or HTML string
+    * @returns {import('#runtime/svelte/util').TJSSvelte.Config.Minimal | string} The Svelte configuration object or HTML string
     *          content.
     */
    get content()
@@ -64,7 +64,7 @@ export class TJSDialogData
    /**
     * Set the Svelte configuration object or HTML string content.
     *
-    * @param {import('#runtime/svelte/util').TJSSvelteConfig | string} content - New Svelte configuration object or
+    * @param {import('#runtime/svelte/util').TJSSvelte.Config.Minimal | string} content - New Svelte configuration object or
     *        HTML string content.
     */
    set content(content)

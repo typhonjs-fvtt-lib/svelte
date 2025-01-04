@@ -1,4 +1,4 @@
-import type { TJSSvelteConfig }     from '#runtime/svelte/util';
+import type { TJSSvelte }           from '#runtime/svelte/util';
 
 import type { TransitionFunction }  from '#runtime/svelte/transition';
 
@@ -63,14 +63,14 @@ declare namespace TJSDialogNS
       /**
        * @returns The Svelte configuration object or HTML string content.
        */
-      get content(): TJSSvelteConfig | string;
+      get content(): TJSSvelte.Config.Embed | string;
 
       /**
        * Set the Svelte configuration object or HTML string content.
        *
        * @param content - New Svelte configuration object or HTML string content.
        */
-      set content(content: TJSSvelteConfig | string);
+      set content(content: TJSSvelte.Config.Embed | string);
 
       /**
        * @returns The default button ID to focus initially.
@@ -365,7 +365,7 @@ declare namespace TJSDialogNS
       /**
        * A Svelte configuration object or HTML string content.
        */
-      content?: TJSSvelteConfig | string;
+      content?: TJSSvelte.Config.Embed | string;
 
       /**
        * The default button ID to focus initially.

@@ -13,9 +13,7 @@
 
    import { applyStyles }     from '#runtime/svelte/action/dom/style';
 
-   import {
-      TJSSvelteConfigUtil,
-      TJSSvelteUtil }         from '#runtime/svelte/util';
+   import { TJSSvelte }       from '#runtime/svelte/util';
 
    import { A11yHelper }      from '#runtime/util/a11y';
    import { localize }        from '#runtime/util/i18n';
@@ -146,14 +144,14 @@
 
       try
       {
-         if (TJSSvelteUtil.isComponent(content))
+         if (TJSSvelte.util.isComponent(content))
          {
             dialogClass = content;
             dialogProps = {};
          }
-         else if (TJSSvelteConfigUtil.isConfig(content))
+         else if (TJSSvelte.config.isConfig(content))
          {
-            const svelteConfig = TJSSvelteConfigUtil.parseConfig(content, { thisArg: application });
+            const svelteConfig = TJSSvelte.config.parseConfig(content, { thisArg: application });
             dialogClass = svelteConfig.class;
             dialogProps = svelteConfig.props;
          }

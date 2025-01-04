@@ -6,17 +6,17 @@
     * @componentDocumentation
     * @internal
     */
-   import { getContext }            from '#svelte';
+   import { getContext }         from '#svelte';
 
-   import { TJSSvelteConfigUtil }   from '#runtime/svelte/util';
-   import { A11yHelper }            from '#runtime/util/a11y';
-   import { localize }              from '#runtime/util/i18n';
-   import { isObject }              from '#runtime/util/object';
+   import { TJSSvelte }          from '#runtime/svelte/util';
+   import { A11yHelper }         from '#runtime/util/a11y';
+   import { localize }           from '#runtime/util/i18n';
+   import { isObject }           from '#runtime/util/object';
 
    import {
-      draggable as dragDefault }    from '#runtime/svelte/store/position';
+      draggable as dragDefault } from '#runtime/svelte/store/position';
 
-   import TJSHeaderButton           from './TJSHeaderButton.svelte';
+   import TJSHeaderButton        from './TJSHeaderButton.svelte';
 
    export let draggable = void 0;
    export let draggableOptions = void 0;
@@ -71,9 +71,9 @@
       {
          const buttonsList = typeof button?.alignLeft === 'boolean' && button?.alignLeft ? buttonsLeft : buttonsRight;
 
-         // If the button contains a TJSSvelteConfig object in the `svelte` attribute then use it otherwise use
+         // If the button contains a TJSSvelte.Config.Minimal object in the `svelte` attribute then use it otherwise use
          // `TJSHeaderButton` w/ button as props.
-         buttonsList.push(TJSSvelteConfigUtil.isConfig(button?.svelte) ? { ...button.svelte } :
+         buttonsList.push(TJSSvelte.config.isConfigEmbed(button?.svelte) ? { ...button.svelte } :
           { class: TJSHeaderButton, props: { button } });
       }
    }

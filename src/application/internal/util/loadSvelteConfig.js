@@ -1,4 +1,4 @@
-import { TJSSvelteConfigUtil }   from '#runtime/svelte/util';
+import { TJSSvelte }             from '#runtime/svelte/util';
 import { CrossWindow }           from '#runtime/util/browser';
 import { isObject }              from '#runtime/util/object';
 
@@ -11,7 +11,7 @@ import { isApplicationShell }    from './isApplicationShell.js';
  *
  * @param {object}            [opts.app] - The target application
  *
- * @param {import('#runtime/svelte/util').TJSSvelteConfig}  [opts.config] - Svelte component options
+ * @param {import('#runtime/svelte/util').TJSSvelte.Config.Dynamic}  [opts.config] - Svelte component options
  *
  * @param {Function}          [opts.elementRootUpdate] - A callback to assign to the external context.
  *
@@ -44,7 +44,7 @@ export function loadSvelteConfig({ app, config, elementRootUpdate } = {})
 
    const NewSvelteComponent = config.class;
 
-   const svelteConfig = TJSSvelteConfigUtil.parseConfig({ ...config, target }, { thisArg: app });
+   const svelteConfig = TJSSvelte.config.parseConfig({ ...config, target }, { thisArg: app });
 
    const externalContext = svelteConfig.context.get('#external');
 

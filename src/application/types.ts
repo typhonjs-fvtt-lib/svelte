@@ -1,27 +1,25 @@
 import type {
    ComponentEvents,
    ComponentProps,
-   SvelteComponent }                from 'svelte';
+   SvelteComponent }             from 'svelte';
 
 import type {
    Readable,
-   Writable }                       from 'svelte/store';
+   Writable }                    from 'svelte/store';
 
-import type { A11yFocusSource }     from '#runtime/util/a11y';
+import type { A11yFocusSource }  from '#runtime/util/a11y';
 
-import type { EasingReference }     from '#runtime/svelte/easing';
+import type { EasingReference }  from '#runtime/svelte/easing';
 
 import type {
    Data as PositionData, // TODO REFACTOR
    System,
    ValidatorAPI,
-   TransformAPI }                   from '#runtime/svelte/store/position';
+   TransformAPI }                from '#runtime/svelte/store/position';
 
-import type { WebStorage }          from '#runtime/svelte/store/web-storage';
+import type { WebStorage }       from '#runtime/svelte/store/web-storage';
 
-import type {
-   TJSSvelteConfig,
-   TJSSvelteConfigDynamic }         from '#runtime/svelte/util';
+import type { TJSSvelte }        from '#runtime/svelte/util';
 
 /**
  * Provides all types associated with {@link SvelteApp}.
@@ -93,9 +91,9 @@ declare namespace SvelteAppNS {
       /**
        * You may load a custom Svelte component into the header to replace a button.
        *
-       * Note: supports just `class` and `props` definition.
+       * Note: supports just `class`, `props` definition.
        */
-      svelte?: TJSSvelteConfig;
+      svelte?: TJSSvelte.Config.Embed;
 
       /**
        * A tooltip to display when hovered.
@@ -1057,7 +1055,7 @@ declare namespace SvelteAppNS {
        *
        * Note: that `svelte.class` is required; this is due to type inference requirements by TypeScript.
        */
-      svelte: TJSSvelteConfigDynamic<Component, {
+      svelte: TJSSvelte.Config.Dynamic<Component, {
          PropsOmit: 'elementContent' | 'elementRoot' | 'elementTarget',
          ContextOmit: 'application' | 'elementRootUpdate'| 'sessionStorage',
          ContextShape: ContextExternal,
@@ -1108,9 +1106,9 @@ type AppShell<Options extends SvelteAppNS.Options> = OmitPropsTRL<Options> & {
  */
 type SvelteData = {
    /**
-    * The TJSSvelteConfigDynamic for this component.
+    * The Svelte configuration object for this component.
     */
-   config: TJSSvelteConfigDynamic;
+   config: TJSSvelte.Config.Dynamic;
    /**
     * The svelte component instance.
     */

@@ -1,5 +1,5 @@
 import { TJSPosition }     from '#runtime/svelte/store/position';
-import { TJSSvelteUtil }   from '#runtime/svelte/util';
+import { TJSSvelte }       from '#runtime/svelte/util';
 import { A11yHelper }      from '#runtime/util/a11y';
 import { CrossWindow }     from '#runtime/util/browser';
 
@@ -18,7 +18,7 @@ import {
 /**
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
- * {@link #runtime/svelte/util!TJSSvelteConfig} object in the {@link SvelteAppNS.Options.svelte} property.
+ * {@link #runtime/svelte/util!TJSSvelte.Config.Dynamic} object in the {@link SvelteAppNS.Options.svelte} property.
  *
  * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
  */
@@ -386,7 +386,7 @@ export class SvelteApp extends Application
          if (!isObject(entry)) { continue; }
 
          // Use `outroAndDestroy` to run outro transitions before destroying.
-         svelteDestroyPromises.push(TJSSvelteUtil.outroAndDestroy(entry.component));
+         svelteDestroyPromises.push(TJSSvelte.util.outroAndDestroy(entry.component));
 
          // If any proxy eventbus has been added then remove all event registrations from the component.
          const eventbus = entry.config.eventbus;
@@ -536,7 +536,7 @@ export class SvelteApp extends Application
       // refreshes. Update the element root accordingly and force an update to TJSPosition.
       // See this issue for info about `on_hmr`:
       // https://github.com/sveltejs/svelte-hmr/issues/57
-      if (TJSSvelteUtil.isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
+      if (TJSSvelte.util.isHMRProxy(svelteData.component) && Array.isArray(svelteData.component?.$$?.on_hmr))
       {
          svelteData.component.$$.on_hmr.push(() => () => this.#updateApplicationShell());
       }
