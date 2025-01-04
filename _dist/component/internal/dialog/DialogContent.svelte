@@ -13,9 +13,7 @@
 
    import { applyStyles }     from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
 
-   import {
-      TJSSvelteConfigUtil,
-      TJSSvelteUtil }         from '@typhonjs-svelte/runtime-base/svelte/util';
+   import { TJSSvelte }       from '@typhonjs-svelte/runtime-base/svelte/util';
 
    import { A11yHelper }      from '@typhonjs-svelte/runtime-base/util/a11y';
    import { localize }        from '@typhonjs-svelte/runtime-base/util/i18n';
@@ -146,16 +144,13 @@
 
       try
       {
-         if (TJSSvelteUtil.isComponent(content))
+         if (TJSSvelte.config.isConfigEmbed(content))
          {
-            dialogClass = content;
-            dialogProps = {};
-         }
-         else if (TJSSvelteConfigUtil.isConfig(content))
-         {
-            const svelteConfig = TJSSvelteConfigUtil.parseConfig(content, { thisArg: application });
-            dialogClass = svelteConfig.class;
-            dialogProps = svelteConfig.props;
+            // const svelteConfig = TJSSvelte.config.parseConfig(content, { thisArg: application });
+            // dialogClass = svelteConfig.class;
+            // dialogProps = svelteConfig.props;
+            dialogClass = content.class;
+            dialogProps = content.props;
          }
          else
          {

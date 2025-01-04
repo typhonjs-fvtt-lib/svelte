@@ -13,13 +13,13 @@ import { Readable, Writable } from 'svelte/store';
 import { A11yFocusSource } from '@typhonjs-svelte/runtime-base/util/a11y';
 import { EasingReference } from '@typhonjs-svelte/runtime-base/svelte/easing';
 import { WebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
-import { TJSSvelteConfig, TJSSvelteConfigDynamic } from '@typhonjs-svelte/runtime-base/svelte/util';
+import { TJSSvelte } from '@typhonjs-svelte/runtime-base/svelte/util';
 import { TransitionFunction } from '@typhonjs-svelte/runtime-base/svelte/transition';
 
 /**
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
- * {@link #runtime/svelte/util!TJSSvelteConfig} object in the {@link SvelteAppNS.Options.svelte} property.
+ * {@link #runtime/svelte/util!TJSSvelte.Config.Dynamic} object in the {@link SvelteApp.Options.svelte} property.
  *
  * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
  */
@@ -30,14 +30,14 @@ declare class SvelteApp<Options extends SvelteApp.Options = SvelteApp.Options>
   /**
    * Specifies the default options that SvelteApp supports.
    *
-   * @returns {import('./types').SvelteAppNS.Options} options - Application options.
+   * @returns {import('./types').SvelteApp.Options} options - Application options.
    * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
    */
-  static get defaultOptions(): SvelteAppNS.Options;
+  static get defaultOptions(): SvelteApp.Options;
   /**
-   * @param {Partial<import('./types').SvelteAppNS.Options>} [options] - The options for the application.
+   * @param {Partial<import('./types').SvelteApp.Options>} [options] - The options for the application.
    */
-  constructor(options?: Partial<SvelteAppNS.Options>);
+  constructor(options?: Partial<SvelteApp.Options>);
   /**
    * Returns the content element if an application shell is mounted.
    *
@@ -61,21 +61,21 @@ declare class SvelteApp<Options extends SvelteApp.Options = SvelteApp.Options>
   /**
    * Returns the reactive accessors & Svelte stores for SvelteApp.
    *
-   * @returns {import('./types').SvelteAppNS.API.Reactive} The reactive accessors & Svelte stores.
+   * @returns {import('./types').SvelteApp.API.Reactive} The reactive accessors & Svelte stores.
    */
-  get reactive(): SvelteAppNS.API.Reactive;
+  get reactive(): SvelteApp.API.Reactive;
   /**
    * Returns the application state manager.
    *
-   * @returns {import('./types').SvelteAppNS.API.State} The application state manager.
+   * @returns {import('./types').SvelteApp.API.State} The application state manager.
    */
-  get state(): SvelteAppNS.API.State;
+  get state(): SvelteApp.API.State;
   /**
    * Returns the `Svelte` helper class w/ various methods to access the mounted application shell component.
    *
-   * @returns {import('./types').SvelteAppNS.API.Svelte<Options>} `Svelte` / mounted application shell API.
+   * @returns {import('./types').SvelteApp.API.Svelte<Options>} `Svelte` / mounted application shell API.
    */
-  get svelte(): SvelteAppNS.API.Svelte<Options>;
+  get svelte(): SvelteApp.API.Svelte<Options>;
   /**
    * Specify the set of config buttons which should appear in the SvelteApp header. Buttons should be returned as
    * an Array of objects. The header buttons which are added to the application can be modified by the
@@ -86,10 +86,10 @@ declare class SvelteApp<Options extends SvelteApp.Options = SvelteApp.Options>
    *
    * @privateRemarks Provide a basic override implementation to extend types with additional SvelteApp functionality.
    *
-   * @returns {import('./types').SvelteAppNS.HeaderButton[]} All header buttons.
+   * @returns {import('./types').SvelteApp.HeaderButton[]} All header buttons.
    * @protected
    */
-  protected _getHeaderButtons(): SvelteAppNS.HeaderButton[];
+  protected _getHeaderButtons(): SvelteApp.HeaderButton[];
   /**
    * Provides a mechanism to update the UI options store for maximized.
    *
@@ -149,7 +149,7 @@ declare class SvelteApp<Options extends SvelteApp.Options = SvelteApp.Options>
 /**
  * Provides all types associated with {@link SvelteApp}.
  */
-declare namespace SvelteAppNS {
+declare namespace SvelteApp {
   /**
    * Defines the application header button data handled in {@link SvelteApp._getHeaderButtons} and associated
    * `getApplicationHeaderButtons` hooks. SvelteApp extends the header button data from
@@ -208,9 +208,9 @@ declare namespace SvelteAppNS {
     /**
      * You may load a custom Svelte component into the header to replace a button.
      *
-     * Note: supports just `class` and `props` definition.
+     * Note: supports just `class`, `props` definition.
      */
-    svelte?: TJSSvelteConfig;
+    svelte?: TJSSvelte.Config.Embed;
     /**
      * A tooltip to display when hovered.
      */
@@ -226,7 +226,7 @@ declare namespace SvelteAppNS {
    *
    * @param args.event - The event triggering the callback (pointer or keyboard).
    */
-  type HeaderButtonCallback = (args: { button: SvelteAppNS.HeaderButton; event: PointerEvent | KeyboardEvent }) => void;
+  type HeaderButtonCallback = (args: { button: SvelteApp.HeaderButton; event: PointerEvent | KeyboardEvent }) => void;
   namespace API {
     /**
      * Contains the reactive functionality / Svelte stores associated with SvelteApp and retrievable by
@@ -238,7 +238,7 @@ declare namespace SvelteAppNS {
      * - {@link Reactive.minimized}
      * - {@link Reactive.resizing}
      *
-     * There are also reactive getters / setters for {@link SvelteAppNS.Options} and Foundry
+     * There are also reactive getters / setters for {@link SvelteApp.Options} and Foundry
      * {@link fvtt!ApplicationOptions}. You can use the following as one way bindings and update the associated
      * stores. For two-way bindings / stores see {@link Reactive.storeAppOptions}.
      *
@@ -258,7 +258,7 @@ declare namespace SvelteAppNS {
      *
      * An instance of TJSWebStorage (session) / TJSSessionStorage is accessible via
      * {@link Reactive.sessionStorage}. Optionally you can pass in an existing TJSWebStorage instance that can
-     * be shared across multiple SvelteApps by setting {@link SvelteAppNS.Options.sessionStorage}.
+     * be shared across multiple SvelteApps by setting {@link SvelteApp.Options.sessionStorage}.
      */
     interface Reactive {
       /**
@@ -266,7 +266,7 @@ declare namespace SvelteAppNS {
        */
       get sessionStorage(): WebStorage;
       /**
-       * Provides a custom readable Svelte store for {@link SvelteAppNS.Options} state.
+       * Provides a custom readable Svelte store for {@link SvelteApp.Options} state.
        *
        * @returns App options store.
        */
@@ -399,7 +399,7 @@ declare namespace SvelteAppNS {
        */
       set popOut(popOut: boolean);
       /**
-       * Returns the positionable app option; {@link SvelteAppNS.Options.positionable}
+       * Returns the positionable app option; {@link SvelteApp.Options.positionable}
        *
        * @returns {boolean} Positionable app option.
        */
@@ -504,7 +504,7 @@ declare namespace SvelteAppNS {
        */
       setOptions(accessor: string, value: any): void;
       /**
-       * Serializes the main {@link SvelteAppNS.Options} for common application state.
+       * Serializes the main {@link SvelteApp.Options} for common application state.
        */
       toJSON(): Reactive.Data;
       /**
@@ -513,8 +513,8 @@ declare namespace SvelteAppNS {
        * responding to the Hooks fired return a new button array and the uiOptions store is updated and the
        * application shell will render the new buttons.
        *
-       * Optionally you can set in the SvelteApp app options {@link SvelteAppNS.Options.headerButtonNoClose}
-       * to remove the close button and {@link SvelteAppNS.Options.headerButtonNoLabel} to true and labels will be
+       * Optionally you can set in the SvelteApp app options {@link SvelteApp.Options.headerButtonNoClose}
+       * to remove the close button and {@link SvelteApp.Options.headerButtonNoLabel} to true and labels will be
        * removed from the header buttons.
        *
        * @param {object} [opts] - Optional parameters (for internal use)
@@ -578,7 +578,7 @@ declare namespace SvelteAppNS {
         resizable: boolean;
       };
       /**
-       * Provides a custom readable Svelte store for {@link SvelteAppNS.Options} state.
+       * Provides a custom readable Svelte store for {@link SvelteApp.Options} state.
        */
       type AppOptions = {
         /**
@@ -653,7 +653,7 @@ declare namespace SvelteAppNS {
         /**
          * Derived store for `headerButtons` updates.
          */
-        headerButtons: Readable<SvelteAppNS.HeaderButton>;
+        headerButtons: Readable<SvelteApp.HeaderButton>;
         /**
          * Derived store for `minimized` updates.
          */
@@ -808,7 +808,7 @@ declare namespace SvelteAppNS {
         /**
          * Common SvelteApp reactive app options.
          */
-        options: SvelteAppNS.API.Reactive.Data;
+        options: SvelteApp.API.Reactive.Data;
         /**
          * Application UI state.
          */
@@ -820,7 +820,7 @@ declare namespace SvelteAppNS {
     /**
      * Provides a mechanism to retrieve and query mounted Svelte application shell.
      */
-    interface Svelte<Options extends SvelteAppNS.Options> {
+    interface Svelte<Options extends SvelteApp.Options> {
       /**
        * Returns mounted application shell Svelte component.
        *
@@ -1028,7 +1028,7 @@ declare namespace SvelteAppNS {
    *
    * Note: Unlike standard Svelte component loading any `context` provided is loaded as additional data into the
    * `#external` context key along with data such as the outer application instance reference. This allows one to
-   * extend the {@link SvelteAppNS.Context.External} interface with additional data that you are loading and use one
+   * extend the {@link SvelteApp.Context.External} interface with additional data that you are loading and use one
    * type to conveniently retrieve all external context data inside a Svelte component.
    *
    * Note that the `svelte` configuration includes dynamic options to define `context` and `props` as a `function` as
@@ -1040,14 +1040,14 @@ declare namespace SvelteAppNS {
    */
   interface Options<
     Component extends SvelteComponent = SvelteComponent,
-    ContextExternal extends SvelteAppNS.Context.AbstractExternal = SvelteAppNS.Context.AbstractExternal,
+    ContextExternal extends SvelteApp.Context.AbstractExternal = SvelteApp.Context.AbstractExternal,
   > extends OptionsCore {
     /**
      * A Svelte configuration object defining the main component loaded.
      *
      * Note: that `svelte.class` is required; this is due to type inference requirements by TypeScript.
      */
-    svelte: TJSSvelteConfigDynamic<
+    svelte: TJSSvelte.Config.Dynamic<
       Component,
       {
         PropsOmit: 'elementContent' | 'elementRoot' | 'elementTarget';
@@ -1061,7 +1061,7 @@ declare namespace SvelteAppNS {
 /**
  * Omits the protected application shell contract properties.
  */
-type OmitPropsTRL<Options extends SvelteAppNS.Options> = Omit<
+type OmitPropsTRL<Options extends SvelteApp.Options> = Omit<
   ComponentProps<InstanceType<Options['svelte']['class']>>,
   'elementRoot' | 'elementContent' | 'elementTarget'
 >;
@@ -1069,7 +1069,7 @@ type OmitPropsTRL<Options extends SvelteAppNS.Options> = Omit<
  * Based on the `SvelteApp.Options` -> `svelte.class` property limit the props exposed and add the safe methods that
  * can be accessed
  */
-type AppShell<Options extends SvelteAppNS.Options> = OmitPropsTRL<Options> & {
+type AppShell<Options extends SvelteApp.Options> = OmitPropsTRL<Options> & {
   /**
    * Register an event callback.
    *
@@ -1091,7 +1091,7 @@ type AppShell<Options extends SvelteAppNS.Options> = OmitPropsTRL<Options> & {
   $set(props: Partial<OmitPropsTRL<Options>>): void;
 };
 
-declare namespace TJSDialogNS {
+declare namespace TJSDialog {
   /**
    * TJSDialog button data.
    */
@@ -1144,13 +1144,13 @@ declare namespace TJSDialogNS {
     /**
      * @returns The Svelte configuration object or HTML string content.
      */
-    get content(): TJSSvelteConfig | string;
+    get content(): TJSSvelte.Config.Embed | string;
     /**
      * Set the Svelte configuration object or HTML string content.
      *
      * @param content - New Svelte configuration object or HTML string content.
      */
-    set content(content: TJSSvelteConfig | string);
+    set content(content: TJSSvelte.Config.Embed | string);
     /**
      * @returns The default button ID to focus initially.
      */
@@ -1405,7 +1405,7 @@ declare namespace TJSDialogNS {
     /**
      * A Svelte configuration object or HTML string content.
      */
-    content?: TJSSvelteConfig | string;
+    content?: TJSSvelte.Config.Embed | string;
     /**
      * The default button ID to focus initially.
      */
@@ -1556,7 +1556,7 @@ declare class TJSDialog extends SvelteApp {
    *
    * @template T
    *
-   * @param {import('./internal/state-dialog/types').TJSDialogNS.Options & {
+   * @param {import('./internal/state-dialog/types').TJSDialog.Options & {
    *    onYes?: string | ((data?: { application?: TJSDialog }) => any),
    *    onNo?: string | ((data?: { application?: TJSDialog }) => any)
    * }} [data] - Confirm dialog options.
@@ -1569,7 +1569,7 @@ declare class TJSDialog extends SvelteApp {
    *        async function. When defined as a string any matching function by name exported from content Svelte
    *        component is invoked.
    *
-   * @param {import('./types').SvelteAppNS.OptionsCore}  [options]  SvelteApp options passed to the
+   * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApp options passed to the
    *        TJSDialog constructor.
    *
    * @returns {Promise<T>} A promise which resolves with result of yes / no callbacks or true / false.
@@ -1590,18 +1590,18 @@ declare class TJSDialog extends SvelteApp {
       onYes,
       onNo,
       ...data
-    }?: TJSDialogNS.Options & {
+    }?: TJSDialog.Options & {
       onYes?: string | ((data?: { application?: TJSDialog }) => any);
       onNo?: string | ((data?: { application?: TJSDialog }) => any);
     },
-    options?: SvelteAppNS.OptionsCore,
+    options?: SvelteApp.OptionsCore,
   ): Promise<T>;
   /**
    * A helper factory method to display a basic "prompt" style TJSDialog with a single button.
    *
    * @template T
    *
-   * @param {import('./internal/state-dialog/types').TJSDialogNS.Options & {
+   * @param {import('./internal/state-dialog/types').TJSDialog.Options & {
    *    onOk?: string | ((data?: { application?: TJSDialog }) => any),
    *    label?: string,
    *    icon?: string
@@ -1615,7 +1615,7 @@ declare class TJSDialog extends SvelteApp {
    *
    * @param {string}   [data.icon="fas fa-check"] - Set another icon besides `fas fa-check` for button.
    *
-   * @param {import('./types').SvelteAppNS.OptionsCore}  [options]  SvelteApp options passed to the
+   * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApp options passed to the
    *        TJSDialog constructor.
    *
    * @returns {Promise<T>} The returned value from the provided callback function or `true` if the button
@@ -1638,12 +1638,12 @@ declare class TJSDialog extends SvelteApp {
       label,
       icon,
       ...data
-    }?: TJSDialogNS.Options & {
+    }?: TJSDialog.Options & {
       onOk?: string | ((data?: { application?: TJSDialog }) => any);
       label?: string;
       icon?: string;
     },
-    options?: SvelteAppNS.OptionsCore,
+    options?: SvelteApp.OptionsCore,
   ): Promise<T>;
   /**
    * Creates an anonymous data defined TJSDialog returning a Promise that can be awaited upon for the user to make a
@@ -1653,27 +1653,27 @@ declare class TJSDialog extends SvelteApp {
    *
    * @template T
    *
-   * @param {import('./internal/state-dialog/types').TJSDialogNS.Options}  data - Dialog data passed to the TJSDialog
+   * @param {import('./internal/state-dialog/types').TJSDialog.Options}  data - Dialog data passed to the TJSDialog
    *        constructor.
    *
-   * @param {import('./types').SvelteAppNS.OptionsCore}  [options]  SvelteApp options passed to the
+   * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApp options passed to the
    *        TJSDialog constructor.
    *
    * @returns {Promise<T>} A Promise that resolves to the chosen result.
    */
-  static wait<T>(data: TJSDialogNS.Options, options?: SvelteAppNS.OptionsCore): Promise<T>;
+  static wait<T>(data: TJSDialog.Options, options?: SvelteApp.OptionsCore): Promise<T>;
   /**
-   * @param {import('./internal/state-dialog/types').TJSDialogNS.Options} data - Dialog options.
+   * @param {import('./internal/state-dialog/types').TJSDialog.Options} data - Dialog options.
    *
-   * @param {import('./types').SvelteAppNS.OptionsCore}   [options] - SvelteApp options.
+   * @param {import('./types').SvelteApp.OptionsCore}   [options] - SvelteApp options.
    */
-  constructor(data: TJSDialogNS.Options, options?: SvelteAppNS.OptionsCore);
+  constructor(data: TJSDialog.Options, options?: SvelteApp.OptionsCore);
   /**
    * Returns the dialog data.
    *
-   * @returns {import('./internal/state-dialog/types').TJSDialogNS.Data} Dialog data.
+   * @returns {import('./internal/state-dialog/types').TJSDialog.Data} Dialog data.
    */
-  get data(): TJSDialogNS.Data;
+  get data(): TJSDialog.Data;
   /**
    * @returns {import('#runtime/util/async').ManagedPromise} Returns the managed promise.
    */
@@ -1700,4 +1700,4 @@ declare class TJSDialog extends SvelteApp {
   #private;
 }
 
-export { SvelteApp, SvelteAppNS, SvelteApp as SvelteApplication, TJSDialog, TJSDialogNS };
+export { SvelteApp, SvelteApp as SvelteApplication, TJSDialog };
