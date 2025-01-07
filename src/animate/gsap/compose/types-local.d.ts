@@ -1,6 +1,4 @@
-import type {
-   Data,
-   TJSPosition } from '#runtime/svelte/store/position';
+import type { TJSPosition } from '#runtime/svelte/store/position';
 
 /**
  * Stores and tracks any associated `TJSPosition` instance utilized by {@link GsapCompose}.
@@ -8,7 +6,7 @@ import type {
 export type TJSPositionInfo = {
    position: TJSPosition[];
 
-   positionData: Partial<Data.TJSPositionData>[];
+   positionData: Partial<TJSPosition.API.Data.TJSPositionData>[];
 
    /**
     * Contains the full data object when a list of object w/ position is used.

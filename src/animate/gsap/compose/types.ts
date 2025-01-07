@@ -1,7 +1,4 @@
-import type {
-   Data,
-   TJSPosition,
-   TJSPositionTypes } from '#runtime/svelte/store/position';
+import type { TJSPosition } from '#runtime/svelte/store/position';
 
 /**
  * Defines the types for {@link GsapCompose}.
@@ -30,8 +27,8 @@ namespace Compose {
     object |
     TJSPosition |
     Iterable<TJSPosition> |
-    TJSPositionTypes.Positionable |
-    Iterable<TJSPositionTypes.Positionable> |
+    TJSPosition.Positionable |
+    Iterable<TJSPosition.Positionable> |
     Array<HTMLElement | object>;
 }
 

@@ -44,7 +44,7 @@ export function loadSvelteConfig({ app, config, elementRootUpdate } = {})
 
    const NewSvelteComponent = config.class;
 
-   const svelteConfig = TJSSvelte.config.parseConfig({ ...config, target }, { thisArg: app });
+   const svelteConfig = TJSSvelte.config.parseConfig({ ...config, target }, { contextExternal: true, thisArg: app });
 
    const externalContext = svelteConfig.context.get('#external');
 

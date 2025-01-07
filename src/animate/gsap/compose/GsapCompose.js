@@ -11,8 +11,7 @@ import { GsapPosition } from './GsapPosition.js';
 import { TimelineImpl } from './TimelineImpl.js';
 
 /**
- * Provides a data driven ways to connect a {@link #runtime/svelte/store/position!TJSPosition} instance with a GSAP
- * timeline and tweens.
+ * Provides a data driven ways to connect a {@link TJSPosition} instance with a GSAP timeline and tweens.
  *
  * {@link GsapPosition.timeline} supports the following types: 'add', 'addLabel', 'addPause', 'call', 'from',
  * 'fromTo', 'set', 'to'.

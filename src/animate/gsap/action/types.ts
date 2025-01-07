@@ -4,9 +4,7 @@ import type {
 
 import type { EasingFunction }   from '#runtime/svelte/easing';
 
-import type {
-   TJSPosition,
-   TJSPositionTypes }            from '#runtime/svelte/store/position';
+import type { TJSPosition }      from '#runtime/svelte/store/position';
 
 /**
  * Defines the types for the {@link draggableGsap} action.
@@ -19,7 +17,7 @@ namespace Action {
       /**
        * A position or positionable instance.
        */
-      position: TJSPosition | TJSPositionTypes.Positionable;
+      position: TJSPosition | TJSPosition.Positionable;
 
       /**
        * MouseEvent button that activates dragging; default: 0

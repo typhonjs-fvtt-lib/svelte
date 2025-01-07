@@ -20,7 +20,7 @@ import {
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
  * {@link #runtime/svelte/util!TJSSvelte.Config.Dynamic} object in the {@link SvelteAppNS.Options.svelte} property.
  *
- * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
+ * @implements {TJSPosition.Positionable}
  */
 export class SvelteApp extends Application
 {
@@ -943,13 +943,13 @@ export class SvelteApp extends Application
    }
 
    /**
-    * All calculation and updates of position are implemented in {@link #runtime/svelte/store/position!TJSPosition.set}.
+    * All calculation and updates of position are implemented in {@link TJSPosition.set}.
     * This allows position to be fully reactive and in control of updating inline styles for the application.
     *
     * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
     * to update to using the {@link TJSPosition.validators} / ValidatorAPI functionality.
     *
-    * @param {import('#runtime/svelte/store/position').Data.TJSPositionDataRelative}   [position] - TJSPosition data.
+    * @param {TJSPosition.API.Data.TJSPositionDataRelative}   [position] - TJSPosition data.
     *
     * @returns {TJSPosition} The updated position object for the application containing the new values.
     * @ignore
