@@ -19,7 +19,7 @@ export class TJSDialogData
    /**
     * Stores the dialog options data.
     *
-    * @type {import('./types').TJSDialogOptions}
+    * @type {import('./types').TJSDialog.OptionsData}
     */
    #internal = {};
 
@@ -207,7 +207,7 @@ export class TJSDialogData
    }
 
    /**
-    * @returns {import('./types').TJSDialogModalOptions} Additional options for modal dialog display.
+    * @returns {import('./types').TJSDialog.OptionsModal} Additional options for modal dialog display.
     */
    get modalOptions()
    {
@@ -217,7 +217,7 @@ export class TJSDialogData
    /**
     * Set additional options for modal dialog display.
     *
-    * @param {import('./types').TJSDialogModalOptions} modalOptions - New additional options for modal dialog display.
+    * @param {import('./types').TJSDialog.OptionsModal} modalOptions - New additional options for modal dialog display.
     */
    set modalOptions(modalOptions)
    {
@@ -349,7 +349,7 @@ export class TJSDialogData
    }
 
    /**
-    * @returns {import('./types').TJSDialogTransitionOptions} Transition options for the dialog.
+    * @returns {import('./types').TJSDialog.OptionsTransition} Transition options for the dialog.
     */
    get transition()
    {
@@ -359,7 +359,7 @@ export class TJSDialogData
    /**
     * Set transition options for the dialog.
     *
-    * @param {import('./types').TJSDialogTransitionOptions} transition - New transition options for the dialog.
+    * @param {import('./types').TJSDialog.OptionsTransition} transition - New transition options for the dialog.
     */
    set transition(transition)
    {
@@ -391,7 +391,7 @@ export class TJSDialogData
     * Provides a cloned copy of the dialog data.
     * Note: The content attribute is not cloned as complex / props may be present.
     *
-    * @returns {import('./types').TJSDialogOptions} A clone of the dialog data.
+    * @returns {import('./types').TJSDialog.OptionsData} A clone of the dialog data.
     */
    clone()
    {
@@ -425,7 +425,7 @@ export class TJSDialogData
    }
 
    /**
-    * @param {import('./types').TJSDialogOptions} data - Merge provided data object into Dialog data.
+    * @param {import('./types').TJSDialog.OptionsData} data - Merge provided data object into Dialog data.
     */
    merge(data)
    {
@@ -436,7 +436,7 @@ export class TJSDialogData
    /**
     * Sets the dialog data; this is reactive.
     *
-    * @param {import('./types').TJSDialogOptions}   data - Dialog data.
+    * @param {import('./types').TJSDialog.OptionsData}   data - Dialog data.
     */
    replace(data)
    {

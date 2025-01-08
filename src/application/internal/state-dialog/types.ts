@@ -159,14 +159,14 @@ declare namespace TJSDialogNS
       /**
        * @returns Additional options for modal dialog display.
        */
-      get modalOptions(): ModalOptions;
+      get modalOptions(): OptionsModal;
 
       /**
        * Set additional options for modal dialog display.
        *
        * @param modalOptions - New additional options for modal dialog display.
        */
-      set modalOptions(modalOptions: ModalOptions);
+      set modalOptions(modalOptions: OptionsModal);
 
       /**
        * @returns When true and an error is raised in dialog callback functions post a UI error notification.
@@ -251,14 +251,14 @@ declare namespace TJSDialogNS
       /**
        * @returns Transition options for the dialog.
        */
-      get transition(): TransitionOptions;
+      get transition(): OptionsTransition;
 
       /**
        * Set transition options for the dialog.
        *
        * @param transition - New transition options for the dialog.
        */
-      set transition(transition: TransitionOptions)
+      set transition(transition: OptionsTransition)
 
       /**
        * @returns A specific z-index for the dialog. Pass null for the dialog to act like other applications in regard
@@ -279,7 +279,7 @@ declare namespace TJSDialogNS
        *
        * @returns A clone of the dialog data.
        */
-      clone(): Options;
+      clone(): OptionsData;
 
       /**
        * Provides a way to safely get this dialogs data given an accessor string which describes the
@@ -297,14 +297,14 @@ declare namespace TJSDialogNS
       /**
        * @param data - Merge provided data object into Dialog data.
        */
-      merge(data: Options): void;
+      merge(data: OptionsData): void;
 
       /**
        * Replaces all dialog data; this is reactive.
        *
        * @param data - Dialog data.
        */
-      replace(data: Options): void
+      replace(data: OptionsData): void
 
       /**
        * Provides a way to safely set this dialogs data given an accessor string which describes the
@@ -325,7 +325,7 @@ declare namespace TJSDialogNS
    /**
     * Defines additional modal options to control the display of the modal dialog and glasspane.
     */
-   export type ModalOptions = {
+   export type OptionsModal = {
       /**
        * CSS background style for glasspane.
        */
@@ -350,13 +350,13 @@ declare namespace TJSDialogNS
       /**
        * Custom transition options for modal background / glasspane.
        */
-      transition?: TransitionOptions;
+      transition?: OptionsTransition;
    }
 
    /**
     * Defines the common dialog configuration data.
     */
-   export type Options = {
+   export type OptionsData = {
       /**
        * Provides configuration of the dialog button bar.
        */
@@ -410,7 +410,7 @@ declare namespace TJSDialogNS
       /**
        * Additional options for modal dialog display.
        */
-      modalOptions?: ModalOptions;
+      modalOptions?: OptionsModal;
 
       /**
        * When true and an error is thrown in dialog callback functions post a UI error notification; default: false.
@@ -449,7 +449,7 @@ declare namespace TJSDialogNS
       /**
        * Transition options for the dialog.
        */
-      transition?: TransitionOptions;
+      transition?: OptionsTransition;
 
       /**
        * A specific z-index for the dialog. Pass null for the dialog to act like other applications in regard bringing to
@@ -461,7 +461,7 @@ declare namespace TJSDialogNS
    /**
     * Defines the transition options when the dialog is rendered / closed.
     */
-   export type TransitionOptions = {
+   export type OptionsTransition = {
       /**
        * A Svelte transition function applied to both in / out transitions.
        */

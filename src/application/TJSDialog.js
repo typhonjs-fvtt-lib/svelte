@@ -35,7 +35,7 @@ import { SvelteApp }  from './SvelteApp.js';
  * To create and wait upon a managed promise for asynchronous return results use the static or member variation of
  * {@link TJSDialog.wait}.
  *
- * Please refer to {@link TJSDialogOptions} for the various options used to construct the dialog.
+ * Please refer to {@link TJSDialog.OptionsData} for the various options used to construct the dialog.
  *
  * There are a couple of static helper methods to quickly create standard dialogs such as a 'yes' / 'no' confirmation
  * dialog with {@link TJSDialog.confirm} and an 'ok' single button dialog with {@link TJSDialog.prompt}.
@@ -49,7 +49,7 @@ export class TJSDialog extends SvelteApp
    #managedPromise;
 
    /**
-    * @param {import('./internal/state-dialog/types').TJSDialogNS.Options} data - Dialog options.
+    * @param {import('./internal/state-dialog/types').TJSDialogNS.OptionsData} data - Dialog options.
     *
     * @param {import('./types').SvelteAppNS.OptionsCore}   [options] - SvelteApp options.
     */
@@ -87,7 +87,7 @@ export class TJSDialog extends SvelteApp
              *
              * @this {TJSDialog}
              *
-             * @returns {{data: import('./types').TJSDialogOptions, managedPromise: ManagedPromise}} Props
+             * @returns {{data: import('./types').TJSDialog.OptionsData, managedPromise: ManagedPromise}} Props
              */
             props: function()
             {
@@ -206,7 +206,7 @@ export class TJSDialog extends SvelteApp
     *
     * @template T
     *
-    * @param {import('./internal/state-dialog/types').TJSDialogNS.Options & {
+    * @param {import('./internal/state-dialog/types').TJSDialogNS.OptionsData & {
     *    onYes?: string | ((data?: { application?: TJSDialog }) => any),
     *    onNo?: string | ((data?: { application?: TJSDialog }) => any)
     * }} [data] - Confirm dialog options.
@@ -325,7 +325,7 @@ export class TJSDialog extends SvelteApp
     *
     * @template T
     *
-    * @param {import('./internal/state-dialog/types').TJSDialogNS.Options & {
+    * @param {import('./internal/state-dialog/types').TJSDialogNS.OptionsData & {
     *    onOk?: string | ((data?: { application?: TJSDialog }) => any),
     *    label?: string,
     *    icon?: string
@@ -379,8 +379,8 @@ export class TJSDialog extends SvelteApp
     *
     * @template T
     *
-    * @param {import('./internal/state-dialog/types').TJSDialogNS.Options}  data - Dialog data passed to the TJSDialog
-    *        constructor.
+    * @param {import('./internal/state-dialog/types').TJSDialogNS.OptionsData}  data - Dialog data passed to the
+    *        TJSDialog constructor.
     *
     * @param {import('./types').SvelteAppNS.OptionsCore}  [options]  SvelteApp options passed to the
     *        TJSDialog constructor.
