@@ -2,7 +2,7 @@ import * as _runtime_svelte_easing from '@typhonjs-svelte/runtime-base/svelte/ea
 import { EasingFunction } from '@typhonjs-svelte/runtime-base/svelte/easing';
 import * as svelte_action from 'svelte/action';
 import { Writable, Readable } from 'svelte/store';
-import { TJSPosition, TJSPositionTypes } from '@typhonjs-svelte/runtime-base/svelte/store/position';
+import { TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 
 /**
  * Defines all the standard 1-dimensional Gsap easing function names.
@@ -137,7 +137,7 @@ declare namespace Action {
     /**
      * A position or positionable instance.
      */
-    position: TJSPosition | TJSPositionTypes.Positionable;
+    position: TJSPosition | TJSPosition.Positionable;
     /**
      * MouseEvent button that activates dragging; default: 0
      *
@@ -400,14 +400,13 @@ declare namespace Compose {
     | object
     | TJSPosition
     | Iterable<TJSPosition>
-    | TJSPositionTypes.Positionable
-    | Iterable<TJSPositionTypes.Positionable>
+    | TJSPosition.Positionable
+    | Iterable<TJSPosition.Positionable>
     | Array<HTMLElement | object>;
 }
 
 /**
- * Provides a data driven ways to connect a {@link #runtime/svelte/store/position!TJSPosition} instance with a GSAP
- * timeline and tweens.
+ * Provides a data driven ways to connect a {@link TJSPosition} instance with a GSAP timeline and tweens.
  *
  * {@link GsapPosition.timeline} supports the following types: 'add', 'addLabel', 'addPause', 'call', 'from',
  * 'fromTo', 'set', 'to'.

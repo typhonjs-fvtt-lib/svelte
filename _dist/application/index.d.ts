@@ -1,13 +1,5 @@
 import * as _runtime_util_async from '@typhonjs-svelte/runtime-base/util/async';
-import * as _runtime_svelte_store_position from '@typhonjs-svelte/runtime-base/svelte/store/position';
-import {
-  TJSPositionTypes,
-  TJSPosition,
-  Data,
-  System,
-  ValidatorAPI,
-  TransformAPI,
-} from '@typhonjs-svelte/runtime-base/svelte/store/position';
+import { TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import { SvelteComponent, ComponentEvents, ComponentProps } from 'svelte';
 import { Readable, Writable } from 'svelte/store';
 import { A11yFocusSource } from '@typhonjs-svelte/runtime-base/util/a11y';
@@ -21,11 +13,11 @@ import { TransitionFunction } from '@typhonjs-svelte/runtime-base/svelte/transit
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
  * {@link #runtime/svelte/util!TJSSvelte.Config.Dynamic} object in the {@link SvelteApp.Options.svelte} property.
  *
- * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
+ * @implements {TJSPosition.Positionable}
  */
 declare class SvelteApp<Options extends SvelteApp.Options = SvelteApp.Options>
   extends Application<Options>
-  implements TJSPositionTypes.Positionable
+  implements TJSPosition.Positionable
 {
   /**
    * Specifies the default options that SvelteApp supports.
@@ -131,18 +123,18 @@ declare class SvelteApp<Options extends SvelteApp.Options = SvelteApp.Options>
    */
   onSvelteRemount(): void;
   /**
-   * All calculation and updates of position are implemented in {@link #runtime/svelte/store/position!TJSPosition.set}.
+   * All calculation and updates of position are implemented in {@link TJSPosition.set}.
    * This allows position to be fully reactive and in control of updating inline styles for the application.
    *
    * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
    * to update to using the {@link TJSPosition.validators} / ValidatorAPI functionality.
    *
-   * @param {import('#runtime/svelte/store/position').Data.TJSPositionDataRelative}   [position] - TJSPosition data.
+   * @param {TJSPosition.API.Data.TJSPositionDataRelative}   [position] - TJSPosition data.
    *
    * @returns {TJSPosition} The updated position object for the application containing the new values.
    * @ignore
    */
-  setPosition(position?: _runtime_svelte_store_position.Data.TJSPositionDataRelative): TJSPosition;
+  setPosition(position?: TJSPosition.API.Data.TJSPositionDataRelative): TJSPosition;
   #private;
 }
 
@@ -755,8 +747,8 @@ declare namespace SvelteApp {
       /**
        * Sets application state from the given {@link State.Data} instance. Several optional parameters are
        * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
-       * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
-       * specified.
+       * {@link #runtime/svelte/store/position!TJSPosition.API.Animation.to} and the duration and easing name or
+       * function may be specified.
        *
        * Note: If serializing application state any minimized apps will use the before minimized state on initial
        * render of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized
@@ -794,11 +786,11 @@ declare namespace SvelteApp {
         /**
          * Application position.
          */
-        position: Data.TJSPositionData;
+        position: TJSPosition.API.Data.TJSPositionData;
         /**
          * Any application saved position state for #beforeMinimized including maximized constraints.
          */
-        beforeMinimized?: Data.TJSPositionData & {
+        beforeMinimized?: TJSPosition.API.Data.TJSPositionData & {
           constraints: {
             maxHeight: string;
             paddingTop: string;
@@ -962,7 +954,7 @@ declare namespace SvelteApp {
      *
      * @defaultValue TJSPosition.Initial.browserCentered
      */
-    positionInitial?: System.Initial.InitialSystem;
+    positionInitial?: TJSPosition.API.System.Initial.InitialSystem;
     /**
      * When true TJSPosition is optimized for orthographic use.
      *
@@ -974,7 +966,7 @@ declare namespace SvelteApp {
      *
      * @defaultValue TJSPosition.Validators.transformWindow
      */
-    positionValidator?: ValidatorAPI.ValidatorOption;
+    positionValidator?: TJSPosition.API.Validators.ValidatorOption;
     /**
      * An instance of WebStorage (session) to share across SvelteApps. This is only required to share a
      * WebStorage instance across multiple SvelteApps. By default, a unique
@@ -988,11 +980,11 @@ declare namespace SvelteApp {
      *
      * @defaultValue 'top left'
      */
-    transformOrigin?: TransformAPI.TransformOrigin;
+    transformOrigin?: TJSPosition.API.Transform.TransformOrigin;
     /**
      * The default pixel height for app. You may also use relative units including percentages.
      *
-     * {@link #runtime/svelte/store/position!Data.TJSPositionDataRelative}.
+     * {@link #runtime/svelte/store/position!TJSPosition.API.Data.TJSPositionDataRelative}.
      *
      * @defaultValue `null`
      */
@@ -1000,7 +992,7 @@ declare namespace SvelteApp {
     /**
      * The default pixel height for app. You may also use relative units including percentages.
      *
-     * {@link #runtime/svelte/store/position!Data.TJSPositionDataRelative}.
+     * {@link #runtime/svelte/store/position!TJSPosition.API.Data.TJSPositionDataRelative}.
      *
      * @defaultValue `null`
      */
@@ -1008,7 +1000,7 @@ declare namespace SvelteApp {
     /**
      * The default top offset position for app. You may also use relative units including percentages.
      *
-     * {@link #runtime/svelte/store/position!Data.TJSPositionDataRelative}.
+     * {@link #runtime/svelte/store/position!TJSPosition.API.Data.TJSPositionDataRelative}.
      *
      * @defaultValue `null`
      */
@@ -1016,7 +1008,7 @@ declare namespace SvelteApp {
     /**
      * The default left offset position for app. You may also use relative units including percentages.
      *
-     * {@link #runtime/svelte/store/position!Data.TJSPositionDataRelative}.
+     * {@link #runtime/svelte/store/position!TJSPosition.API.Data.TJSPositionDataRelative}.
      *
      * @defaultValue `null`
      */

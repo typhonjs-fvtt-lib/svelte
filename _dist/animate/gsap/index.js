@@ -228,14 +228,13 @@ class GsapPositionData
    /**
     * Stores the seen TJSPosition properties when building the minimum update data object when animating.
     *
-    * @type {Set<keyof import('#runtime/svelte/store/position').Data.TJSPositionData>}
+    * @type {Set<keyof TJSPosition.API.Data.TJSPositionData>}
     */
    static tjsPositionProps = new Set();
 }
 
 /**
- * Provides a data driven ways to connect a {@link #runtime/svelte/store/position!TJSPosition} instance with a GSAP
- * timeline and tweens.
+ * Provides a data driven ways to connect a {@link TJSPosition} instance with a GSAP timeline and tweens.
  *
  * {@link GsapPosition.timeline} supports the following types: 'add', 'addLabel', 'addPause', 'call', 'from',
  * 'fromTo', 'set', 'to'.
@@ -253,7 +252,7 @@ class GsapPosition
     * Defines the options for {@link TJSPosition.get}.
     *
     * @type {(Readonly<{
-    *    keys: Set<keyof import('#runtime/svelte/store/position').Data.TJSPositionData>,
+    *    keys: Set<keyof TJSPosition.API.Data.TJSPositionData>,
     *    numeric: boolean
     * }>)}
     */
@@ -803,8 +802,8 @@ class TimelinePositionImpl
     * Gets the target from GSAP data entry.
     *
     * @param {(
-    *    import('#runtime/svelte/store/position').Data.TJSPositionDataRelative |
-    *    import('#runtime/svelte/store/position').Data.TJSPositionDataRelative[]
+    *    TJSPosition.API.Data.TJSPositionDataRelative |
+    *    TJSPosition.API.Data.TJSPositionDataRelative[]
     * )}  positionData - TJSPositionInfo data.
     *
     * @param {HTMLElement | HTMLElement[]}  elements - One or more HTMLElements.
@@ -814,8 +813,8 @@ class TimelinePositionImpl
     * @param {number}         cntr - Current GSAP data entry index.
     *
     * @returns {(
-    *    import('#runtime/svelte/store/position').Data.TJSPositionDataRelative |
-    *    import('#runtime/svelte/store/position').Data.TJSPositionDataRelative[] |
+    *    TJSPosition.API.Data.TJSPositionDataRelative |
+    *    TJSPosition.API.Data.TJSPositionDataRelative[] |
     *    HTMLElement | HTMLElement[]
     * )} The target object or HTMLElement.
     */
@@ -959,8 +958,7 @@ class TimelinePositionImpl
 }
 
 /**
- * Provides a data driven ways to connect a {@link #runtime/svelte/store/position!TJSPosition} instance with a GSAP
- * timeline and tweens.
+ * Provides a data driven ways to connect a {@link TJSPosition} instance with a GSAP timeline and tweens.
  *
  * {@link GsapPosition.timeline} supports the following types: 'add', 'addLabel', 'addPause', 'call', 'from',
  * 'fromTo', 'set', 'to'.

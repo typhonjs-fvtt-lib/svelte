@@ -114,7 +114,7 @@ class ApplicationState
    /**
     * Restores a previously saved application state by `name` returning the data. Several optional parameters are
     * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
-    * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
+    * {@link #runtime/svelte/store/position!TJSPosition.API.Animation.to} and the duration and easing name or function may be
     * specified.
     *
     * @param {object}            options - Options.
@@ -1180,7 +1180,7 @@ function loadSvelteConfig({ app, config, elementRootUpdate } = {})
 
    const NewSvelteComponent = config.class;
 
-   const svelteConfig = TJSSvelte.config.parseConfig({ ...config, target }, { thisArg: app });
+   const svelteConfig = TJSSvelte.config.parseConfig({ ...config, target }, { contextExternal: true, thisArg: app });
 
    const externalContext = svelteConfig.context.get('#external');
 
@@ -1371,7 +1371,7 @@ class FoundryHMRSupport
  * appropriately. You can declaratively load one or more components from `defaultOptions` using a
  * {@link #runtime/svelte/util!TJSSvelte.Config.Dynamic} object in the {@link SvelteApp.Options.svelte} property.
  *
- * @implements {import('#runtime/svelte/store/position').TJSPositionTypes.Positionable}
+ * @implements {TJSPosition.Positionable}
  */
 class SvelteApp extends Application
 {
@@ -2294,13 +2294,13 @@ class SvelteApp extends Application
    }
 
    /**
-    * All calculation and updates of position are implemented in {@link #runtime/svelte/store/position!TJSPosition.set}.
+    * All calculation and updates of position are implemented in {@link TJSPosition.set}.
     * This allows position to be fully reactive and in control of updating inline styles for the application.
     *
     * This method remains for backward compatibility with Foundry. If you have a custom override quite likely you need
     * to update to using the {@link TJSPosition.validators} / ValidatorAPI functionality.
     *
-    * @param {import('#runtime/svelte/store/position').Data.TJSPositionDataRelative}   [position] - TJSPosition data.
+    * @param {TJSPosition.API.Data.TJSPositionDataRelative}   [position] - TJSPosition data.
     *
     * @returns {TJSPosition} The updated position object for the application containing the new values.
     * @ignore

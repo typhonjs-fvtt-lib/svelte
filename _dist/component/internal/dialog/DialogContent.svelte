@@ -146,9 +146,6 @@
       {
          if (TJSSvelte.config.isConfigEmbed(content))
          {
-            // const svelteConfig = TJSSvelte.config.parseConfig(content, { thisArg: application });
-            // dialogClass = svelteConfig.class;
-            // dialogProps = svelteConfig.props;
             dialogClass = content.class;
             dialogProps = content.props;
          }
