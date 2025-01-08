@@ -1216,13 +1216,13 @@ declare namespace TJSDialog {
     /**
      * @returns Additional options for modal dialog display.
      */
-    get modalOptions(): ModalOptions;
+    get modalOptions(): OptionsModal;
     /**
      * Set additional options for modal dialog display.
      *
      * @param modalOptions - New additional options for modal dialog display.
      */
-    set modalOptions(modalOptions: ModalOptions);
+    set modalOptions(modalOptions: OptionsModal);
     /**
      * @returns When true and an error is raised in dialog callback functions post a UI error notification.
      */
@@ -1294,13 +1294,13 @@ declare namespace TJSDialog {
     /**
      * @returns Transition options for the dialog.
      */
-    get transition(): TransitionOptions;
+    get transition(): OptionsTransition;
     /**
      * Set transition options for the dialog.
      *
      * @param transition - New transition options for the dialog.
      */
-    set transition(transition: TransitionOptions);
+    set transition(transition: OptionsTransition);
     /**
      * @returns A specific z-index for the dialog. Pass null for the dialog to act like other applications in regard
      *          bringing to top when activated.
@@ -1318,7 +1318,7 @@ declare namespace TJSDialog {
      *
      * @returns A clone of the dialog data.
      */
-    clone(): Options;
+    clone(): OptionsData;
     /**
      * Provides a way to safely get this dialogs data given an accessor string which describes the
      * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
@@ -1334,13 +1334,13 @@ declare namespace TJSDialog {
     /**
      * @param data - Merge provided data object into Dialog data.
      */
-    merge(data: Options): void;
+    merge(data: OptionsData): void;
     /**
      * Replaces all dialog data; this is reactive.
      *
      * @param data - Dialog data.
      */
-    replace(data: Options): void;
+    replace(data: OptionsData): void;
     /**
      * Provides a way to safely set this dialogs data given an accessor string which describes the
      * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
@@ -1359,7 +1359,7 @@ declare namespace TJSDialog {
   /**
    * Defines additional modal options to control the display of the modal dialog and glasspane.
    */
-  type ModalOptions = {
+  type OptionsModal = {
     /**
      * CSS background style for glasspane.
      */
@@ -1382,12 +1382,12 @@ declare namespace TJSDialog {
     /**
      * Custom transition options for modal background / glasspane.
      */
-    transition?: TransitionOptions;
+    transition?: OptionsTransition;
   };
   /**
    * Defines the common dialog configuration data.
    */
-  type Options = {
+  type OptionsData = {
     /**
      * Provides configuration of the dialog button bar.
      */
@@ -1433,7 +1433,7 @@ declare namespace TJSDialog {
     /**
      * Additional options for modal dialog display.
      */
-    modalOptions?: ModalOptions;
+    modalOptions?: OptionsModal;
     /**
      * When true and an error is thrown in dialog callback functions post a UI error notification; default: false.
      */
@@ -1465,7 +1465,7 @@ declare namespace TJSDialog {
     /**
      * Transition options for the dialog.
      */
-    transition?: TransitionOptions;
+    transition?: OptionsTransition;
     /**
      * A specific z-index for the dialog. Pass null for the dialog to act like other applications in regard bringing to
      * top when activated.
@@ -1475,7 +1475,7 @@ declare namespace TJSDialog {
   /**
    * Defines the transition options when the dialog is rendered / closed.
    */
-  type TransitionOptions = {
+  type OptionsTransition = {
     /**
      * A Svelte transition function applied to both in / out transitions.
      */
@@ -1535,7 +1535,7 @@ declare namespace TJSDialog {
  * To create and wait upon a managed promise for asynchronous return results use the static or member variation of
  * {@link TJSDialog.wait}.
  *
- * Please refer to {@link TJSDialogOptions} for the various options used to construct the dialog.
+ * Please refer to {@link TJSDialog.OptionsData} for the various options used to construct the dialog.
  *
  * There are a couple of static helper methods to quickly create standard dialogs such as a 'yes' / 'no' confirmation
  * dialog with {@link TJSDialog.confirm} and an 'ok' single button dialog with {@link TJSDialog.prompt}.
@@ -1548,7 +1548,7 @@ declare class TJSDialog extends SvelteApp {
    *
    * @template T
    *
-   * @param {import('./internal/state-dialog/types').TJSDialog.Options & {
+   * @param {import('./internal/state-dialog/types').TJSDialog.OptionsData & {
    *    onYes?: string | ((data?: { application?: TJSDialog }) => any),
    *    onNo?: string | ((data?: { application?: TJSDialog }) => any)
    * }} [data] - Confirm dialog options.
@@ -1582,7 +1582,7 @@ declare class TJSDialog extends SvelteApp {
       onYes,
       onNo,
       ...data
-    }?: TJSDialog.Options & {
+    }?: TJSDialog.OptionsData & {
       onYes?: string | ((data?: { application?: TJSDialog }) => any);
       onNo?: string | ((data?: { application?: TJSDialog }) => any);
     },
@@ -1593,7 +1593,7 @@ declare class TJSDialog extends SvelteApp {
    *
    * @template T
    *
-   * @param {import('./internal/state-dialog/types').TJSDialog.Options & {
+   * @param {import('./internal/state-dialog/types').TJSDialog.OptionsData & {
    *    onOk?: string | ((data?: { application?: TJSDialog }) => any),
    *    label?: string,
    *    icon?: string
@@ -1630,7 +1630,7 @@ declare class TJSDialog extends SvelteApp {
       label,
       icon,
       ...data
-    }?: TJSDialog.Options & {
+    }?: TJSDialog.OptionsData & {
       onOk?: string | ((data?: { application?: TJSDialog }) => any);
       label?: string;
       icon?: string;
@@ -1645,21 +1645,21 @@ declare class TJSDialog extends SvelteApp {
    *
    * @template T
    *
-   * @param {import('./internal/state-dialog/types').TJSDialog.Options}  data - Dialog data passed to the TJSDialog
-   *        constructor.
+   * @param {import('./internal/state-dialog/types').TJSDialog.OptionsData}  data - Dialog data passed to the
+   *        TJSDialog constructor.
    *
    * @param {import('./types').SvelteApp.OptionsCore}  [options]  SvelteApp options passed to the
    *        TJSDialog constructor.
    *
    * @returns {Promise<T>} A Promise that resolves to the chosen result.
    */
-  static wait<T>(data: TJSDialog.Options, options?: SvelteApp.OptionsCore): Promise<T>;
+  static wait<T>(data: TJSDialog.OptionsData, options?: SvelteApp.OptionsCore): Promise<T>;
   /**
-   * @param {import('./internal/state-dialog/types').TJSDialog.Options} data - Dialog options.
+   * @param {import('./internal/state-dialog/types').TJSDialog.OptionsData} data - Dialog options.
    *
    * @param {import('./types').SvelteApp.OptionsCore}   [options] - SvelteApp options.
    */
-  constructor(data: TJSDialog.Options, options?: SvelteApp.OptionsCore);
+  constructor(data: TJSDialog.OptionsData, options?: SvelteApp.OptionsCore);
   /**
    * Returns the dialog data.
    *
