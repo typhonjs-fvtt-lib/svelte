@@ -1044,7 +1044,8 @@ declare namespace SvelteAppNS {
     * actual instance allowing association of instance data from within a static context.
     */
    interface Options<Component extends SvelteComponent = SvelteComponent,
-    ContextExternal extends SvelteAppNS.Context.AbstractExternal = SvelteAppNS.Context.AbstractExternal> extends OptionsCore
+    ContextExternal extends SvelteAppNS.Context.AbstractExternal = SvelteAppNS.Context.AbstractExternal> extends
+     OptionsCore
    {
       /**
        * A Svelte configuration object defining the main component loaded.
