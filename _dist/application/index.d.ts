@@ -870,7 +870,7 @@ declare namespace SvelteApp {
    *
    * @privateRemarks Note: that this extends the Foundry `ApplicationOptions` in the build process.
    */
-  interface OptionsCore extends ApplicationOptions {
+  interface OptionsCore extends fvtt.ApplicationOptions {
     /**
      * If false the default slide close animation is not run.
      *
