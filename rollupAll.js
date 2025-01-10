@@ -68,7 +68,7 @@ const applicationDTSOptions = {
       'declare class SvelteApp': 'declare class SvelteApp<Options extends SvelteApp.Options = SvelteApp.Options> extends Application<Options>',
 
       // Make the base SvelteApp.OptionsCore extend the global Foundry ApplicationOptions.
-      'interface OptionsCore': 'interface OptionsCore extends fvtt.ApplicationOptions',
+      'interface OptionsCore': 'interface OptionsCore extends Partial<ApplicationOptions>',
 
       // Remove unused barrel import of `svelte`.
       [`import \\* as svelte from 'svelte';`]: ''
