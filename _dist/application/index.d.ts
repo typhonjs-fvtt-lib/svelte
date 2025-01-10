@@ -870,7 +870,7 @@ declare namespace SvelteApp {
    *
    * @privateRemarks Note: that this extends the Foundry `ApplicationOptions` in the build process.
    */
-  interface OptionsCore extends fvtt.ApplicationOptions {
+  interface OptionsCore extends Partial<ApplicationOptions> {
     /**
      * If false the default slide close animation is not run.
      *
@@ -932,17 +932,41 @@ declare namespace SvelteApp {
      */
     headerNoTitleMinimized?: boolean;
     /**
+     * Assigned to position. Number specifying maximum window height.
+     *
+     * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for relative values
+     * supported.
+     *
+     * @defaultValue null
+     */
+    maxHeight?: number | string | null;
+    /**
+     * Assigned to position. Number specifying maximum window width.
+     *
+     * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for relative values
+     * supported.
+     *
+     * @defaultValue null
+     */
+    maxWidth?: number | string | null;
+    /**
      * Assigned to position. Number specifying minimum window height.
+     *
+     * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for relative values
+     * supported.
      *
      * @defaultValue 50
      */
-    minHeight?: number;
+    minHeight?: number | string | null;
     /**
      * Assigned to position. Number specifying minimum window width.
      *
+     * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for relative values
+     * supported.
+     *
      * @defaultValue 200
      */
-    minWidth?: number;
+    minWidth?: number | string | null;
     /**
      * If false then `position.set` does not take effect.
      *
@@ -968,6 +992,38 @@ declare namespace SvelteApp {
      */
     positionValidator?: TJSPosition.API.Validators.ValidatorOption;
     /**
+     * Assigned to position. Number specifying the window rotation around the X-axis in degrees.
+     *
+     * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for values supported.
+     *
+     * @defaultValue null
+     */
+    rotateX?: number | string | null;
+    /**
+     * Assigned to position. Number specifying the window rotation around the Y-axis in degrees.
+     *
+     * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for values supported.
+     *
+     * @defaultValue null
+     */
+    rotateY?: number | string | null;
+    /**
+     * Assigned to position. Number specifying the window rotation around the Z-axis in degrees.
+     *
+     * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for values supported.
+     *
+     * @defaultValue null
+     */
+    rotateZ?: number | string | null;
+    /**
+     * Assigned to position. Number specifying the window rotation around the Z-axis in degrees. Alias for `rotateZ`.
+     *
+     * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for values supported.
+     *
+     * @defaultValue null
+     */
+    rotation?: number | string | null;
+    /**
      * An instance of WebStorage (session) to share across SvelteApps. This is only required to share a
      * WebStorage instance across multiple SvelteApps. By default, a unique
      * {@link #runtime/svelte/store/web-storage!TJSSessionStorage} instance is created per SvelteApp.
@@ -982,33 +1038,37 @@ declare namespace SvelteApp {
      */
     transformOrigin?: TJSPosition.API.Transform.TransformOrigin;
     /**
-     * The default pixel height for app. You may also use relative units including percentages.
+     * The default pixel height for app.
      *
-     * {@link #runtime/svelte/store/position!TJSPosition.API.Data.TJSPositionDataRelative}.
+     * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for relative values
+     * supported.
      *
      * @defaultValue `null`
      */
     width?: number | string | null;
     /**
-     * The default pixel height for app. You may also use relative units including percentages.
+     * The default pixel height for app.
      *
-     * {@link #runtime/svelte/store/position!TJSPosition.API.Data.TJSPositionDataRelative}.
+     * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for relative values
+     * supported.
      *
      * @defaultValue `null`
      */
     height?: number | string | null;
     /**
-     * The default top offset position for app. You may also use relative units including percentages.
+     * The default top offset position for app.
      *
-     * {@link #runtime/svelte/store/position!TJSPosition.API.Data.TJSPositionDataRelative}.
+     * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for relative values
+     * supported.
      *
      * @defaultValue `null`
      */
     top?: number | string | null;
     /**
-     * The default left offset position for app. You may also use relative units including percentages.
+     * The default left offset position for app.
      *
-     * {@link #runtime/svelte/store/position!TJSPosition.API.Data.TJSPositionDataRelative}.
+     * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for relative values
+     * supported.
      *
      * @defaultValue `null`
      */
