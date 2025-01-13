@@ -5,7 +5,9 @@
     *
     * @componentDocumentation
     */
-   import { getContext }         from '#svelte';
+   import { getContext }            from '#svelte';
+
+   import { ResizeHandleTransform } from './ResizeHandleTransform.js';
 
    export let isResizable = false;
 
@@ -62,19 +64,22 @@
       let position = null;
 
       /**
-       * Stores the initial X / Y on drag down.
-       *
-       * @type {object}
-       */
-      let initialPosition = {};
-
-      /**
        * Stores the current resizing state and gates the move pointer as the resizing store is not
        * set until the first pointer move.
        *
        * @type {boolean}
        */
       let resizing = false;
+
+      /**
+       * Stores initial pointer down X in world coordinates.
+       */
+      let pWorldDownX = 0;
+
+      /**
+       * Stores initial pointer down Y in world coordinates.
+       */
+      let pWorldDownY = 0;
 
       /**
        * Remember event handlers associated with this action so they may be later unregistered.
@@ -142,7 +147,8 @@
          if (position.height === 'auto') { position.height = $storeElementRoot.clientHeight; }
          if (position.width === 'auto') { position.width = $storeElementRoot.clientWidth; }
 
-         initialPosition = { x: event.clientX, y: event.clientY };
+         pWorldDownX = event.clientX;
+         pWorldDownY = event.clientY;
 
          // Add temporary handlers
          node.addEventListener(...handlers.resizeMove);
@@ -164,10 +170,19 @@
             storeResizing.set(true);
          }
 
+         const pDeltaLocal = ResizeHandleTransform.computeDelta(application.position.transform.mat4, pWorldDownX,
+          pWorldDownY, event.clientX, event.clientY);
+
          application.position.set({
-            width: position.width + (event.clientX - initialPosition.x),
-            height: position.height + (event.clientY - initialPosition.y)
+            width: position.width + pDeltaLocal[0],
+            height: position.height + pDeltaLocal[1]
          });
+
+         // TODO: REMOVE - ORIGINAL WORLD COORD DELTA ADJUSTMENT
+         // application.position.set({
+         //    width: position.width + (event.clientX - pDownWorld.x),
+         //    height: position.height + (event.clientY - pDownWorld.y)
+         // });
       }
 
       /**
