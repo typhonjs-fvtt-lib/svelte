@@ -72,14 +72,14 @@
       let resizing = false;
 
       /**
-       * Stores initial pointer down X in world coordinates.
+       * Stores initial pointer down X in screen coordinates.
        */
-      let pWorldDownX = 0;
+      let pScreenDownX = 0;
 
       /**
-       * Stores initial pointer down Y in world coordinates.
+       * Stores initial pointer down Y in screen coordinates.
        */
-      let pWorldDownY = 0;
+      let pScreenDownY = 0;
 
       /**
        * Remember event handlers associated with this action so they may be later unregistered.
@@ -147,8 +147,8 @@
          if (position.height === 'auto') { position.height = $storeElementRoot.clientHeight; }
          if (position.width === 'auto') { position.width = $storeElementRoot.clientWidth; }
 
-         pWorldDownX = event.clientX;
-         pWorldDownY = event.clientY;
+         pScreenDownX = event.clientX;
+         pScreenDownY = event.clientY;
 
          // Add temporary handlers
          node.addEventListener(...handlers.resizeMove);
@@ -170,19 +170,13 @@
             storeResizing.set(true);
          }
 
-         const pDeltaLocal = ResizeHandleTransform.computeDelta(application.position.transform.mat4, pWorldDownX,
-          pWorldDownY, event.clientX, event.clientY);
+         const pDeltaLocal = ResizeHandleTransform.computeDelta(application.position.transform.mat4, pScreenDownX,
+          pScreenDownY, event.clientX, event.clientY);
 
          application.position.set({
             width: position.width + pDeltaLocal[0],
             height: position.height + pDeltaLocal[1]
          });
-
-         // TODO: REMOVE - ORIGINAL WORLD COORD DELTA ADJUSTMENT
-         // application.position.set({
-         //    width: position.width + (event.clientX - pDownWorld.x),
-         //    height: position.height + (event.clientY - pDownWorld.y)
-         // });
       }
 
       /**

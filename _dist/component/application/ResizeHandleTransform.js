@@ -1,5 +1,8 @@
 import { Mat4, Vec3 } from '@typhonjs-svelte/runtime-base/math/gl-matrix';
 
+/**
+ * Handles the projection of app resizing from screen to local space of the app transform for accurate resizing.
+ */
 export class ResizeHandleTransform
 {
    /**
@@ -25,44 +28,44 @@ export class ResizeHandleTransform
    /**
     * Stores point down in world space.
     */
-   static #pWorldDown = new Vec3();
+   static #pScreenDown = new Vec3();
 
    /**
     * Stores point drag in world space.
     */
-   static #pWorldDrag = new Vec3();
+   static #pScreenDrag = new Vec3();
 
    /**
-    * Compute the deltaWidth, deltaHeight in local space given the app transform matrix and initial pointer down and
-    * drag world coordinates.
+    * Compute the delta width and height in local space given the app transform matrix and initial pointer down and
+    * drag screen coordinates.
     *
     * @param {Mat4} transformMat - App transform matrix.
     *
-    * @param {number} pWorldDownX - Pointer down X position in world coords.
+    * @param {number} pScreenDownX - Pointer down X position in screen coords.
     *
-    * @param {number} pWorldDownY - Pointer down Y position in world coords.
+    * @param {number} pScreenDownY - Pointer down Y position in screen coords.
     *
-    * @param {number} pDragWorldX - Current pointer drag X position in world coords.
+    * @param {number} pScreenDragX - Current pointer drag X position in screen coords.
     *
-    * @param {number} pDragWorldY - Current pointer drag Y position in world coords.
+    * @param {number} pScreenDragY - Current pointer drag Y position in screen coords.
     *
     * @returns {Vec3} Output vector for width & height changes (x = deltaWidth, y = deltaHeight).
     */
-   static computeDelta(transformMat, pWorldDownX, pWorldDownY, pDragWorldX, pDragWorldY)
+   static computeDelta(transformMat, pScreenDownX, pScreenDownY, pScreenDragX, pScreenDragY)
    {
-      // Invert the transform to go from WORLD -> LOCAL.
+      // Invert the transform to go from SCREEN -> LOCAL.
       Mat4.invert(this.#invMat, transformMat);
 
-      // Store world down and drag coordinates in temp vectors.
-      this.#pWorldDown[0] = pWorldDownX;
-      this.#pWorldDown[1] = pWorldDownY;
+      // Store screen down and drag coordinates in temp vectors.
+      this.#pScreenDown[0] = pScreenDownX;
+      this.#pScreenDown[1] = pScreenDownY;
 
-      this.#pWorldDrag[0] = pDragWorldX;
-      this.#pWorldDrag[1] = pDragWorldY;
+      this.#pScreenDrag[0] = pScreenDragX;
+      this.#pScreenDrag[1] = pScreenDragY;
 
       // Transform both points to local space.
-      Vec3.transformMat4(this.#pLocalDown, this.#pWorldDown, this.#invMat);
-      Vec3.transformMat4(this.#pLocalDrag, this.#pWorldDrag, this.#invMat);
+      Vec3.transformMat4(this.#pLocalDown, this.#pScreenDown, this.#invMat);
+      Vec3.transformMat4(this.#pLocalDrag, this.#pScreenDrag, this.#invMat);
 
       // Compute local delta.
       this.#pDeltaLocal[0] = this.#pLocalDrag[0] - this.#pLocalDown[0];
