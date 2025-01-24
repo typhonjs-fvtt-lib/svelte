@@ -1,6 +1,12 @@
-import { CrossWindow }     from '#runtime/util/browser';
+import { CrossWindow }           from '#runtime/util/browser';
 
-import { TJSGameSettings } from './TJSGameSettings.js';
+import { TJSGameSettings }       from './TJSGameSettings';
+
+import type {
+   Subscriber,
+   Unsubscriber }                from 'svelte/store';
+
+import type { MinimalWritable }  from '#runtime/svelte/store/util';
 
 /**
  * Provides an accessible JS object that is updated reactively from all or subset of TJSGameSettings stores.
@@ -19,50 +25,45 @@ import { TJSGameSettings } from './TJSGameSettings.js';
  */
 export class TJSLiveGameSettings
 {
+   [key: string]: any;
+
    /**
     * Stores the current parsed game setting data.
-    *
-    * @type {{}}
     */
-   #currentData = {};
+   #currentData: { [key: string]: unknown } = {};
 
    /**
     * Map of all game settings stores and unsubscribe functions currently subscribed.
-    *
-    * @type {Map<string, { unsubscribe: Function, store: import('svelte/store').Writable }>}
     */
-   #gameSettings = new Map();
+   #gameSettings: Map<string, { unsubscribe: Function, store: MinimalWritable<unknown> }> = new Map();
 
    /**
     * Stores readable subscribers of this instance.
     *
     * Note: When using from JS a second argument is the key that was updated.
     * From Svelte: Use 'lastKey' accessor to retrieve the last updated key.
-    *
-    * @type {((value: TJSLiveGameSettings, key?: string) => void)[]}
     */
-   #subscriptions = [];
+   #subscribers: ((value: TJSLiveGameSettings, key?: string) => void)[] = [];
 
    /**
     * Stores the last updated key.
-    *
-    * @type {string}
     */
-   #lastKey = void 0;
+   #lastKey: string | undefined = void 0;
 
    /**
     * Creates a live binding against the setting stores. All settings are configured by default, but can also be
     * filtered by setting key with inclusive / exclusive Sets.
     *
-    * @param {TJSGameSettings}   gameSettings - A game settings instance to subscribe to...
+    * @param gameSettings - A game settings instance to subscribe to...
     *
-    * @param {object}            [options] - TJSLiveGameSettings options.
+    * @param [options] - TJSLiveGameSettings options.
     *
-    * @param {Set<string>}       [options.include] - A Set of setting keys to include from subscribing.
+    * @param [options.include] - A Set of setting keys to include from subscribing.
     *
-    * @param {Set<string>}       [options.exclude] - A Set of setting keys to exclude from subscribing.
+    * @param [options.exclude] - A Set of setting keys to exclude from subscribing.
     */
-   constructor(gameSettings, { include, exclude } = {})
+   constructor(gameSettings: TJSGameSettings, { include, exclude }:
+    { include?: Set<string>, exclude?: Set<string> } = {})
    {
       if (!(gameSettings instanceof TJSGameSettings))
       {
@@ -74,7 +75,7 @@ export class TJSLiveGameSettings
 
       for (const setting of gameSettings.data())
       {
-         const key = setting.key;
+         const key: string = setting.key;
 
          // Skip any keys that are in the include set.
          if (include !== void 0 && !include.has(key)) { continue; }
@@ -87,12 +88,14 @@ export class TJSLiveGameSettings
             console.warn(`TJSLiveGameSettings warning: key (${key}) shadows a function. Skipping key.`);
          }
 
-         const store = gameSettings.getStore(key);
+         const store: MinimalWritable<unknown> | undefined = gameSettings.getStore(key);
+
+         if (!store) { continue; }
 
          // Update this instance storing setting data by key.
          this.#gameSettings.set(key, {
             store,
-            unsubscribe: store.subscribe((data) =>
+            unsubscribe: store.subscribe((data: unknown): void =>
             {
                if (this.#currentData !== void 0) { this.#currentData[key] = data; }
 
@@ -108,7 +111,7 @@ export class TJSLiveGameSettings
 
          // Define new accessors for setting key.
          Object.defineProperty(this, key, {
-            get: () =>
+            get: (): unknown =>
             {
                if (this.#currentData === void 0)
                {
@@ -119,7 +122,7 @@ export class TJSLiveGameSettings
                   return this.#currentData[key];
                }
             },
-            set: (data) =>
+            set: (data: any): void =>
             {
                if (this.#currentData === void 0)
                {
@@ -127,7 +130,7 @@ export class TJSLiveGameSettings
                }
                else
                {
-                  this.#gameSettings.get(key).store.set(data);
+                  this.#gameSettings.get(key)?.store.set(data);
                }
             }
          });
@@ -137,9 +140,9 @@ export class TJSLiveGameSettings
    }
 
    /**
-    * @returns {string} Last updated setting key.
+    * @returns Last updated setting key.
     */
-   get lastKey()
+   get lastKey(): string | undefined
    {
       return this.#lastKey;
    }
@@ -149,24 +152,23 @@ export class TJSLiveGameSettings
    /**
     * Destroys this instance of TJSLiveGameSettings and unsubscribes from all game setting stores.
     */
-   destroy()
+   destroy(): void
    {
-      for (const data of this.#gameSettings)
+      for (const data of this.#gameSettings.values())
       {
          if (typeof data.unsubscribe === 'function') { data.unsubscribe(); }
       }
 
       this.#gameSettings.clear();
-      this.#currentData = void 0;
+      this.#currentData = {};
    }
 
    /**
     * Returns an iterator / generator of all setting entries.
     *
-    * @returns {IterableIterator<[key: string, value: any]>} An iterator returning setting entries.
-    * @yields {[key: string, value: any]}
+    * @returns An iterator returning setting entries.
     */
-   *entries()
+   *entries(): IterableIterator<[key: string, value: any]>
    {
       if (this.#currentData === void 0) { throw new Error(`This instance of TJSLiveGameSettings has been destroyed.`); }
 
@@ -179,10 +181,9 @@ export class TJSLiveGameSettings
    /**
     * Returns an iterator / generator of all setting keys.
     *
-    * @returns {IterableIterator<string>} An iterator returning setting keys.
-    * @yields {string}
+    * @returns An iterator returning setting keys.
     */
-   *keys()
+   *keys(): IterableIterator<string>
    {
       if (this.#currentData === void 0) { throw new Error(`This instance of TJSLiveGameSettings has been destroyed.`); }
 
@@ -195,9 +196,9 @@ export class TJSLiveGameSettings
    /**
     * Returns a string / JSON stringify of the current setting data.
     *
-    * @returns {string} Tracked setting data.
+    * @returns Tracked setting data.
     */
-   toString()
+   toString(): string
    {
       if (this.#currentData === void 0) { throw new Error(`This instance of TJSLiveGameSettings has been destroyed.`); }
 
@@ -207,19 +208,16 @@ export class TJSLiveGameSettings
    /**
     * Override to respond to setting update.
     *
-    * @param {string} key - The setting / local key that updated.
-    *
-    * @protected
+    * @param key - The setting / local key that updated.
     */
-   _update(key) {}   // eslint-disable-line no-unused-vars
+   protected _update(key: string): void {}   // eslint-disable-line no-unused-vars
 
    /**
     * Returns an iterator / generator of all values.
     *
-    * @returns {IterableIterator<any>} An iterator returning setting values.
-    * @yields {any}
+    * @returns An iterator returning setting values.
     */
-   *values()
+   *values(): IterableIterator<any>
    {
       if (this.#currentData === void 0) { throw new Error(`This instance of TJSLiveGameSettings has been destroyed.`); }
 
@@ -232,34 +230,32 @@ export class TJSLiveGameSettings
    // Readable store implementation ----------------------------------------------------------------------------------
 
    /**
-    * @param {(value: TJSLiveGameSettings, key?: string) => void} handler - Callback function that is invoked on
-    * update / changes.
+    * @param handler - Callback function that is invoked on update / changes.
     *
-    * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
+    * @returns Unsubscribe function.
     */
-   subscribe(handler)
+   subscribe(handler: (value: TJSLiveGameSettings, key?: string) => void): Unsubscriber
    {
-      this.#subscriptions.push(handler); // add handler to the array of subscribers
+      this.#subscribers.push(handler); // add handler to the array of subscribers
 
       handler(this, void 0);             // call handler with current value
 
       // Return unsubscribe function.
-      return () =>
+      return (): void =>
       {
-         const index = this.#subscriptions.findIndex((sub) => sub === handler);
-         if (index >= 0) { this.#subscriptions.splice(index, 1); }
+         const index: number = this.#subscribers.findIndex((sub: Subscriber<any>): boolean => sub === handler);
+         if (index >= 0) { this.#subscribers.splice(index, 1); }
       };
    }
 
    /**
     * Updates subscribers.
     *
-    * @param {string} key - The key that was updated.
+    * @param key - The key that was updated.
     */
-   #updateSubscribers(key)
+   #updateSubscribers(key: string): void
    {
-      const subscriptions = this.#subscriptions;
-      for (let cntr = 0; cntr < subscriptions.length; cntr++) { subscriptions[cntr](this, key); }
+      for (let cntr: number = 0; cntr < this.#subscribers.length; cntr++) { this.#subscribers[cntr](this, key); }
    }
 }
 

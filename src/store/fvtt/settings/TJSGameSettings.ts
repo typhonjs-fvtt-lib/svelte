@@ -1,14 +1,25 @@
-import { writable }        from '#svelte/store';
+import { writable }              from 'svelte/store';
 
 import {
    isMinimalWritableStore,
-   subscribeIgnoreFirst }  from '#runtime/svelte/store/util';
+   subscribeIgnoreFirst }        from '#runtime/svelte/store/util';
 
-import { CrossWindow }     from '#runtime/util/browser';
+import { CrossWindow }           from '#runtime/util/browser';
 
 import {
    isIterable,
-   isObject }              from '#runtime/util/object';
+   isObject }                    from '#runtime/util/object';
+
+import type {
+   Readable,
+   Writable }                    from 'svelte/store';
+
+import type { MinimalWritable }  from '#runtime/svelte/store/util';
+
+import type {
+   GameSetting,
+   GameSettingData,
+   GameSettingOptions }          from './types';
 
 /**
  * Registers game settings and creates a backing Svelte store for each setting. The Svelte store will update the
@@ -23,23 +34,24 @@ import {
  */
 export class TJSGameSettings
 {
-   /** @type {string} */
-   #namespace;
-
-   /** @type {GameSettingData[]} */
-   #settings = [];
+   /**
+    */
+   readonly #namespace: string;
 
    /**
-    * @type {Map<string, import('svelte/store').Writable>}
     */
-   #stores = new Map();
+   #settings: GameSettingData[] = [];
+
+   /**
+    */
+   #stores: Map<string, MinimalWritable<any>> = new Map();
 
    /**
     * Creates the TJSGameSettings instance.
     *
-    * @param {string}   namespace - The namespace for all settings.
+    * @param namespace - The namespace for all settings.
     */
-   constructor(namespace)
+   constructor(namespace: string)
    {
       if (typeof namespace !== 'string') { throw new TypeError(`'namespace' is not a string.`); }
 
@@ -49,19 +61,19 @@ export class TJSGameSettings
    /**
     * Creates a new writable for the given key.
     *
-    * @param {*}  initialValue - An initial value to set to new stores.
+    * @param initialValue - An initial value to set to new stores.
     *
-    * @returns {import('svelte/store').Writable} The new writable.
+    * @returns The new writable.
     */
-   static #createStore(initialValue)
+   static #createStore<T>(initialValue: any): Writable<T>
    {
       return writable(initialValue);
    }
 
    /**
-    * @returns {string} Returns namespace set in constructor.
+    * @returns Returns namespace set in constructor.
     */
-   get namespace()
+   get namespace(): string
    {
       return this.#namespace;
    }
@@ -69,15 +81,15 @@ export class TJSGameSettings
    /**
     * Gets a store from the `stores` Map or creates a new store for the key.
     *
-    * @param {string}   key - Key to lookup in stores map.
+    * @param key - Key to lookup in stores map.
     *
-    * @param {string}   [initialValue] - An initial value to set to new stores.
+    * @param [initialValue] - An initial value to set to new stores.
     *
-    * @returns {import('svelte/store').Writable} The store for the given key.
+    * @returns The store for the given key.
     */
-   #getStore(key, initialValue)
+   #getStore<T>(key: string, initialValue?: any): MinimalWritable<T>
    {
-      let store = this.#stores.get(key);
+      let store: MinimalWritable<T> | undefined = this.#stores.get(key);
       if (store === void 0)
       {
          store = TJSGameSettings.#createStore(initialValue);
@@ -90,11 +102,11 @@ export class TJSGameSettings
    /**
     * Returns a readable Game Settings store for the associated key.
     *
-    * @param {string}   key - Game setting key.
+    * @param key - Game setting key.
     *
-    * @returns {import('svelte/store').Readable | undefined} The associated store for the given game setting key.
+    * @returns The associated store for the given game setting key.
     */
-   getReadableStore(key)
+   getReadableStore<T>(key: string): Readable<T> | undefined
    {
       if (!this.#stores.has(key))
       {
@@ -102,7 +114,7 @@ export class TJSGameSettings
          return;
       }
 
-      const store = this.#getStore(key);
+      const store: MinimalWritable<any> = this.#getStore(key);
 
       return { subscribe: store.subscribe };
    }
@@ -110,23 +122,23 @@ export class TJSGameSettings
    /**
     * Returns a writable Game Settings store for the associated key.
     *
-    * @param {string}   key - Game setting key.
+    * @param key - Game setting key.
     *
-    * @returns {import('svelte/store').Writable | undefined} The associated store for the given game setting key.
+    * @returns The associated store for the given game setting key.
     */
-   getStore(key)
+   getStore<T>(key: string): MinimalWritable<T> | undefined
    {
-      return this.getWritableStore(key);
+      return this.getWritableStore<T>(key);
    }
 
    /**
     * Returns a writable Game Settings store for the associated key.
     *
-    * @param {string}   key - Game setting key.
+    * @param key - Game setting key.
     *
-    * @returns {import('svelte/store').Writable | undefined} The associated store for the given game setting key.
+    * @returns The associated store for the given game setting key.
     */
-   getWritableStore(key)
+   getWritableStore<T>(key: string): MinimalWritable<T> | undefined
    {
       if (!this.#stores.has(key))
       {
@@ -148,15 +160,15 @@ export class TJSGameSettings
     * This allows the custom store in the `set` implementation to mainly only trigger the TJSGameSettings subscriber
     * handler on updates and not all the connected `propertyStore` instances.
     *
-    * @param {GameSetting} setting - A GameSetting instance to set to Foundry game settings.
+    * @param setting - A GameSetting instance to set to Foundry game settings.
     *
-    * @param {boolean}     coreConfig - When false this overrides the `setting.options.config` parameter when
-    *                                   registering the setting with Foundry. This allows the settings to be displayed
-    *                                   in the app itself, but removed from the standard Foundry configuration location.
+    * @param coreConfig - When false this overrides the `setting.options.config` parameter when registering the setting
+    *        with Foundry. This allows the settings to be displayed in the app itself, but removed from the standard
+    *        Foundry configuration location.
     *
-    * @returns {Function} The specific store subscription handler assigned to the passed in store.
+    * @returns The specific store subscription handler assigned to the passed in store.
     */
-   register(setting, coreConfig = true)
+   register(setting: GameSetting, coreConfig: boolean = true): Function // TODO: better specify
    {
       if (!isObject(setting))
       {
@@ -179,12 +191,12 @@ export class TJSGameSettings
           `TJSGameSettings - register: 'setting.store' attribute is not a minimal writable store.`);
       }
 
-      const namespace = setting.namespace;
-      const key = setting.key;
-      const folder = setting.folder;
+      const namespace: string = setting.namespace ?? this.#namespace;
+      const key: string = setting.key;
+      const folder: string | undefined = setting.folder;
 
       // The `config` parameter passed to Foundry core.
-      const foundryConfig = coreConfig ? setting.options.config : false;
+      const foundryConfig: boolean = coreConfig ? setting.options.config ?? true : false;
 
       if (typeof namespace !== 'string')
       {
@@ -201,22 +213,19 @@ export class TJSGameSettings
          throw new TypeError(`TJSGameSettings - register: 'folder' attribute is not a string.`);
       }
 
-      const store = setting.store;
+      const store: MinimalWritable<any> | undefined = setting.store;
 
-      /**
-       * @type {GameSettingOptions}
-       */
-      const options = setting.options;
+      const options: GameSettingOptions = setting.options;
 
-      const onchangeFunctions = [];
+      const onchangeFunctions: Function[] = [];
 
       // When true prevents local store subscription from a loop when values are object data.
-      let gateSet = false;
+      let gateSet: boolean = false;
 
       // Provides an `onChange` callback to update the associated store.
-      onchangeFunctions.push((value) =>
+      onchangeFunctions.push((value: any): void =>
       {
-         const callbackStore = this.#getStore(key);
+         const callbackStore: MinimalWritable<any> = this.#getStore(key);
          if (callbackStore && !gateSet)
          {
             gateSet = true;
@@ -239,7 +248,7 @@ export class TJSGameSettings
       }
 
       // Provides the final onChange callback that iterates over all the stored onChange callbacks.
-      const onChange = (value) =>
+      const onChange: (value: unknown) => void = (value: any): void =>
       {
          for (const entry of onchangeFunctions) { entry(value); }
       };
@@ -247,7 +256,8 @@ export class TJSGameSettings
       globalThis.game.settings.register(namespace, key, { ...options, config: foundryConfig, onChange });
 
       // Set new store value with existing setting or default value.
-      const targetStore = store ? store : this.#getStore(key, globalThis.game.settings.get(namespace, key));
+      const targetStore: MinimalWritable<any> = store ? store : this.#getStore(key,
+       globalThis.game.settings.get(namespace, key));
 
       // If a store instance is passed into register then initialize it with game settings data.
       if (store)
@@ -256,7 +266,7 @@ export class TJSGameSettings
          store.set(globalThis.game.settings.get(namespace, key));
       }
 
-      const storeHandler = async (value) =>
+      const storeHandler: (value: any) => Promise<void> = async (value: any): Promise<void> =>
       {
          if (!gateSet)
          {
@@ -291,19 +301,19 @@ export class TJSGameSettings
     * Please refer to the note in {@link TJSGameSettings.register} about the returned object of store subscriber handler
     * functions.
     *
-    * @param {Iterable<GameSetting>} settings - An iterable list of game setting configurations to register.
+    * @param settings - An iterable list of game setting configurations to register.
     *
-    * @param {boolean}     coreConfig - When false this overrides the `setting.options.config` parameter when
-    *                                   registering the setting with Foundry. This allows the settings to be displayed
-    *                                   in the app itself, but removed from the standard Foundry configuration location.
+    * @param coreConfig - When false this overrides the `setting.options.config` parameter when registering the setting
+    *        with Foundry. This allows the settings to be displayed in the app itself, but removed from the standard
+    *        Foundry configuration location.
     *
-    * @returns { {[key: string]: Function} } An object containing all TJSGameSetting store subscriber handlers for each
-    *          setting `key` added.
+    * @returns An object containing all TJSGameSetting store subscriber handlers for each setting `key` added.
     */
-   registerAll(settings, coreConfig)
+   registerAll(settings: Iterable<GameSetting>, coreConfig?: boolean): { [key: string]: Function }
    {
-      /** @type { {[key: string]: Function} } */
-      const storeHandlers = {};
+      /**
+       */
+      const storeHandlers: { [key: string]: Function }  = {};
 
       if (!isIterable(settings)) { throw new TypeError(`TJSGameSettings - registerAll: settings is not iterable.`); }
 
@@ -340,12 +350,11 @@ export class TJSGameSettings
    /**
     * Returns an iterable for the game setting data; {@link GameSettingData}.
     *
-    * @param {RegExp} [regex] - Optional regular expression to filter by game setting keys.
+    * @param [regex] - Optional regular expression to filter by game setting keys.
     *
-    * @returns {IterableIterator<GameSettingData>} Iterable iterator of GameSettingData.
-    * @yields {GameSettingData}
+    * @returns Iterable iterator of GameSettingData.
     */
-   *data(regex = void 0)
+   *data(regex: RegExp | undefined = void 0): IterableIterator<GameSettingData>
    {
       if (regex !== void 0 && !CrossWindow.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
@@ -365,16 +374,15 @@ export class TJSGameSettings
    }
 
    /**
-    * @template T
-    *
     * Returns an iterable for the game setting keys and stores.
     *
-    * @param {RegExp} [regex] - Optional regular expression to filter by game setting keys.
+    * @param [regex] - Optional regular expression to filter by game setting keys.
     *
-    * @returns {IterableIterator<[string, import('svelte/store').Writable<T>]>} Iterable iterator of keys and stores.
-    * @yields {import('svelte/store').Writable<T>}
+    * @typeParam T - Store data type.
+    *
+    * @returns Iterable iterator of keys and stores.
     */
-   *entries(regex = void 0)
+   *entries<T>(regex: RegExp | undefined = void 0): IterableIterator<[string, MinimalWritable<T>]>
    {
       if (regex !== void 0 && !CrossWindow.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
@@ -384,24 +392,23 @@ export class TJSGameSettings
       {
          for (const key of this.#stores.keys())
          {
-            if (regex.test(key)) { yield [key, this.getStore(key)]; }
+            if (regex.test(key)) { yield [key, this.getStore<T>(key) as MinimalWritable<T>]; }
          }
       }
       else
       {
-         for (const key of this.#stores.keys()) { yield [key, this.getStore(key)]; }
+         for (const key of this.#stores.keys()) { yield [key, this.getStore<T>(key) as MinimalWritable<T>]; }
       }
    }
 
    /**
     * Returns an iterable for the game setting keys from existing stores.
     *
-    * @param {RegExp} [regex] - Optional regular expression to filter by game setting keys.
+    * @param [regex] - Optional regular expression to filter by game setting keys.
     *
-    * @returns {IterableIterator<string>} Iterable iterator of game setting keys.
-    * @yields {string}
+    * @returns Iterable iterator of game setting keys.
     */
-   *keys(regex = void 0)
+   *keys(regex: RegExp | undefined = void 0): IterableIterator<string>
    {
       if (regex !== void 0 && !CrossWindow.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
@@ -421,16 +428,13 @@ export class TJSGameSettings
    }
 
    /**
-    * @template T
-    *
     * Returns an iterable for the game setting stores.
     *
-    * @param {RegExp} [regex] - Optional regular expression to filter by game setting keys.
+    * @param [regex] - Optional regular expression to filter by game setting keys.
     *
-    * @returns {IterableIterator<import('svelte/store').Writable<T>>} Iterable iterator of stores.
-    * @yields {import('svelte/store').Writable<T>}
+    * @returns Iterable iterator of stores.
     */
-   *stores(regex = void 0)
+   *stores<T>(regex: RegExp | undefined = void 0): IterableIterator<MinimalWritable<T>>
    {
       if (regex !== void 0 && !CrossWindow.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
@@ -440,62 +444,12 @@ export class TJSGameSettings
       {
          for (const key of this.#stores.keys())
          {
-            if (regex.test(key)) { yield this.getStore(key); }
+            if (regex.test(key)) { yield this.getStore(key) as MinimalWritable<T>; }
          }
       }
       else
       {
-         for (const key of this.#stores.keys()) { yield this.getStore(key); }
+         for (const key of this.#stores.keys()) { yield this.getStore(key) as MinimalWritable<T>; }
       }
    }
 }
-
-/**
- * @typedef {object} GameSettingOptions
- *
- * @property {object} [choices] If choices are defined, the resulting setting will be a select menu.
- *
- * @property {boolean} [config=true] Specifies that the setting appears in the configuration view.
- *
- * @property {*} [default] A default value for the setting.
- *
- * @property {string} [hint] A description of the registered setting and its behavior.
- *
- * @property {string} [name] The displayed name of the setting.
- *
- * @property {Function|Iterable<Function>} [onChange] An onChange callback function or iterable list of callbacks to
- * directly receive callbacks from Foundry on setting change.
- *
- * @property {{min: number, max: number, step: number}} [range] If range is specified, the resulting setting will be
- * a range slider.
- *
- * @property {boolean} [requiresReload=false] If true then a prompt to reload after changes occurs.
- *
- * @property {('client' | 'world')} [scope='client'] Scope for setting.
- *
- * @property {object|Function} type A constructable object or function.
- */
-
-/**
- * @typedef {object} GameSetting Defines a game setting.
- *
- * @property {string} namespace The setting namespace; usually the ID of the module / system.
- *
- * @property {string} key The setting key to register.
- *
- * @property {string} [folder] The name of the TJSSvgFolder to put this setting in to group them.
- *
- * @property {import('svelte/store').Writable} [store] An existing store instance to use.
- *
- * @property {GameSettingOptions} options Configuration for setting data.
- */
-
-/**
- * @typedef {GameSettingOptions} GameSettingData Stores the primary TJS game setting keys w/ GameSettingOptions.
- *
- * @property {string} namespace The setting namespace; usually the ID of the module / system.
- *
- * @property {string} key The setting key to register.
- *
- * @property {string} [folder] The name of the TJSSvgFolder to put this setting in to group them.
- */
