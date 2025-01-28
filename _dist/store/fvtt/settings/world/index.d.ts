@@ -1,47 +1,52 @@
-import * as _runtime_svelte_store_reducer_array_object from '@typhonjs-svelte/runtime-base/svelte/store/reducer/array-object';
-import { CrudArrayObjectStore } from '@typhonjs-svelte/runtime-base/svelte/store/reducer/array-object';
+import {
+  BaseObjectEntryStore,
+  CrudArrayObjectStore,
+  ExtractDataType,
+  CrudArrayObjectStoreParams,
+} from '@typhonjs-svelte/runtime-base/svelte/store/reducer/array-object';
+import { TJSGameSettings } from '@typhonjs-fvtt/svelte/store/fvtt/settings';
 
 /**
- * @template [T=import('#runtime/svelte/store/reducer/array-object').BaseArrayObjectEntryStore]
- * @augments {CrudArrayObjectStore<T>}
+ * @typeParam S - Store type.
  */
-declare class WorldSettingArrayStore<
-  T = _runtime_svelte_store_reducer_array_object.BaseArrayObjectEntryStore,
-> extends CrudArrayObjectStore<T> {
+declare class WorldSettingArrayStore<S extends BaseObjectEntryStore<any>> extends CrudArrayObjectStore<S> {
+  #private;
   /**
+   * @param options - WorldSettingArrayStore Options.
    *
-   * @param {object}            [opts] - Optional parameters.
+   * @param options.namespace - Game setting 'namespace' field.
    *
-   * @param {import('#runtime/svelte/store/fvtt/settings').TJSGameSettings}   [opts.gameSettings] - An instance of
-   *        TJSGameSettings.
+   * @param options.key - Game setting 'key' field.
    *
-   * @param {string}            [opts.namespace] - Game setting 'namespace' field.
+   * @param [options.defaultData] - When an instance of TJSGameSettings is defined and automatic game setting
+   *        registered you may provide default data for the Foundry game setting.
    *
-   * @param {string}            [opts.key] - Game setting 'key' field.
+   * @param [options.gameSettings] - An instance of TJSGameSettings. If provided a world game setting will be
+   *        automatically registered for the given `namespace` and `key` with this instance as the associated game
+   *        setting store.
    *
-   * @param {import('#runtime/svelte/store/reducer/array-object').CrudArrayObjectStoreParams} [opts.rest] - Rest
-   *        of CrudArrayObjectStore parameters.
+   * @param options.rest - Rest of {@link CrudArrayObjectStoreParams} / {@link ArrayObjectStoreParams} parameters.
    */
   constructor({
-    gameSettings,
     namespace,
     key,
+    defaultData,
+    gameSettings,
     ...rest
-  }?: {
-    gameSettings?: any;
-    namespace?: string;
-    key?: string;
-    rest?: _runtime_svelte_store_reducer_array_object.CrudArrayObjectStoreParams;
-  });
+  }: {
+    namespace: string;
+    key: string;
+    defaultData?: ExtractDataType<S>[];
+    gameSettings?: TJSGameSettings;
+  } & CrudArrayObjectStoreParams<S>);
   /**
-   * @returns {string} The Foundry game setting key.
+   * @returns The Foundry game setting key.
    */
   get key(): string;
   /**
-   * @returns {string} The Foundry game setting namespace.
+   * @returns The Foundry game setting namespace.
    */
   get namespace(): string;
-  #private;
 }
 
 export { WorldSettingArrayStore };

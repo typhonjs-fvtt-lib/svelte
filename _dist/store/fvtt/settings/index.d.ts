@@ -1,4 +1,105 @@
-import * as svelte_store from 'svelte/store';
+import { Readable, Unsubscriber } from 'svelte/store';
+import { MinimalWritable } from '@typhonjs-svelte/runtime-base/svelte/store/util';
+
+interface GameSettingOptions {
+  /**
+   * If choices are defined, the resulting setting will be a select menu.
+   */
+  choices?: Record<string, unknown>;
+  /**
+   * Specifies that the setting appears in the configuration view; default: `true`.
+   */
+  config?: boolean;
+  /**
+   * A default value for the setting.
+   */
+  default: number | string | boolean | object | (() => number | string | boolean | object);
+  /**
+   * A description of the registered setting and its behavior.
+   */
+  hint?: string;
+  /**
+   * The displayed name of the setting.
+   */
+  name: string;
+  /**
+   * An onChange callback function or iterable list of callbacks to directly receive callbacks from Foundry on setting
+   * change.
+   */
+  onChange?: Function | Iterable<Function>;
+  /**
+   * If range is specified, the resulting setting will be a range slider.
+   */
+  range?: this['type'] extends NumberConstructor
+    ? {
+        min: number;
+        max: number;
+        step?: number;
+      }
+    : never;
+  /**
+   * If true then a prompt to reload after changes occurs; default: `false`.
+   */
+  requiresReload?: boolean;
+  /**
+   * Scope for setting; default: `client`.
+   */
+  scope?: 'client' | 'world';
+  /**
+   * A constructable object or function.
+   */
+  type:
+    | NumberConstructor
+    | StringConstructor
+    | BooleanConstructor
+    | ObjectConstructor
+    | ArrayConstructor
+    | (new (...args: any[]) => fvtt.DataModel)
+    | ((data: unknown) => unknown);
+}
+/**
+ * Defines a game setting.
+ */
+interface GameSetting {
+  /**
+   * The setting key to register.
+   */
+  key: string;
+  /**
+   * Configuration for setting data.
+   */
+  options: GameSettingOptions;
+  /**
+   * The setting namespace; usually the ID of the module / system. If not provided the associated namespace with
+   * the instance of `TJSGameSettings` will be used.
+   */
+  namespace?: string;
+  /**
+   * The name of the `TJSSvgFolder` to put this setting in to group them.
+   */
+  folder?: string;
+  /**
+   * An existing store instance to use.
+   */
+  store?: MinimalWritable<any>;
+}
+/**
+ * Stores the primary TJS game setting keys w/ GameSettingOptions.
+ */
+interface GameSettingData extends GameSettingOptions {
+  /**
+   * The setting namespace; usually the ID of the module / system.
+   */
+  namespace: string;
+  /**
+   * The setting key to register.
+   */
+  key: string;
+  /**
+   * The name of the `TJSSvgFolder` to put this setting in to group them.
+   */
+  folder?: string;
+}
 
 /**
  * Registers game settings and creates a backing Svelte store for each setting. The Svelte store will update the
@@ -12,40 +113,41 @@ import * as svelte_store from 'svelte/store';
  * writable store that has an overloaded `set` method to provide type checking.
  */
 declare class TJSGameSettings {
+  #private;
   /**
    * Creates the TJSGameSettings instance.
    *
-   * @param {string}   namespace - The namespace for all settings.
+   * @param namespace - The namespace for all settings.
    */
   constructor(namespace: string);
   /**
-   * @returns {string} Returns namespace set in constructor.
+   * @returns Returns namespace set in constructor.
    */
   get namespace(): string;
   /**
    * Returns a readable Game Settings store for the associated key.
    *
-   * @param {string}   key - Game setting key.
+   * @param key - Game setting key.
    *
-   * @returns {import('svelte/store').Readable | undefined} The associated store for the given game setting key.
+   * @returns The associated store for the given game setting key.
    */
-  getReadableStore(key: string): svelte_store.Readable<any> | undefined;
+  getReadableStore<T>(key: string): Readable<T> | undefined;
   /**
    * Returns a writable Game Settings store for the associated key.
    *
-   * @param {string}   key - Game setting key.
+   * @param key - Game setting key.
    *
-   * @returns {import('svelte/store').Writable | undefined} The associated store for the given game setting key.
+   * @returns The associated store for the given game setting key.
    */
-  getStore(key: string): svelte_store.Writable<any> | undefined;
+  getStore<T>(key: string): MinimalWritable<T> | undefined;
   /**
    * Returns a writable Game Settings store for the associated key.
    *
-   * @param {string}   key - Game setting key.
+   * @param key - Game setting key.
    *
-   * @returns {import('svelte/store').Writable | undefined} The associated store for the given game setting key.
+   * @returns The associated store for the given game setting key.
    */
-  getWritableStore(key: string): svelte_store.Writable<any> | undefined;
+  getWritableStore<T>(key: string): MinimalWritable<T> | undefined;
   /**
    * Registers a setting with TJSGameSettings and Foundry core.
    *
@@ -57,13 +159,13 @@ declare class TJSGameSettings {
    * This allows the custom store in the `set` implementation to mainly only trigger the TJSGameSettings subscriber
    * handler on updates and not all the connected `propertyStore` instances.
    *
-   * @param {GameSetting} setting - A GameSetting instance to set to Foundry game settings.
+   * @param setting - A GameSetting instance to set to Foundry game settings.
    *
-   * @param {boolean}     coreConfig - When false this overrides the `setting.options.config` parameter when
-   *                                   registering the setting with Foundry. This allows the settings to be displayed
-   *                                   in the app itself, but removed from the standard Foundry configuration location.
+   * @param coreConfig - When false this overrides the `setting.options.config` parameter when registering the setting
+   *        with Foundry. This allows the settings to be displayed in the app itself, but removed from the standard
+   *        Foundry configuration location.
    *
-   * @returns {Function} The specific store subscription handler assigned to the passed in store.
+   * @returns The specific store subscription handler assigned to the passed in store.
    */
   register(setting: GameSetting, coreConfig?: boolean): Function;
   /**
@@ -72,168 +174,106 @@ declare class TJSGameSettings {
    * Please refer to the note in {@link TJSGameSettings.register} about the returned object of store subscriber handler
    * functions.
    *
-   * @param {Iterable<GameSetting>} settings - An iterable list of game setting configurations to register.
+   * @param settings - An iterable list of game setting configurations to register.
    *
-   * @param {boolean}     coreConfig - When false this overrides the `setting.options.config` parameter when
-   *                                   registering the setting with Foundry. This allows the settings to be displayed
-   *                                   in the app itself, but removed from the standard Foundry configuration location.
+   * @param coreConfig - When false this overrides the `setting.options.config` parameter when registering the setting
+   *        with Foundry. This allows the settings to be displayed in the app itself, but removed from the standard
+   *        Foundry configuration location.
    *
-   * @returns { {[key: string]: Function} } An object containing all TJSGameSetting store subscriber handlers for each
-   *          setting `key` added.
+   * @returns An object containing all TJSGameSetting store subscriber handlers for each setting `key` added.
    */
   registerAll(
     settings: Iterable<GameSetting>,
-    coreConfig: boolean,
+    coreConfig?: boolean,
   ): {
     [key: string]: Function;
   };
   /**
    * Returns an iterable for the game setting data; {@link GameSettingData}.
    *
-   * @param {RegExp} [regex] - Optional regular expression to filter by game setting keys.
+   * @param [regex] - Optional regular expression to filter by game setting keys.
    *
-   * @returns {IterableIterator<GameSettingData>} Iterable iterator of GameSettingData.
-   * @yields {GameSettingData}
+   * @returns Iterable iterator of GameSettingData.
    */
-  data(regex?: RegExp): IterableIterator<GameSettingData>;
+  data(regex?: RegExp | undefined): IterableIterator<GameSettingData>;
   /**
-   * @template T
-   *
    * Returns an iterable for the game setting keys and stores.
    *
-   * @param {RegExp} [regex] - Optional regular expression to filter by game setting keys.
+   * @param [regex] - Optional regular expression to filter by game setting keys.
    *
-   * @returns {IterableIterator<[string, import('svelte/store').Writable<T>]>} Iterable iterator of keys and stores.
-   * @yields {import('svelte/store').Writable<T>}
+   * @typeParam T - Store data type.
+   *
+   * @returns Iterable iterator of keys and stores.
    */
-  entries<T>(regex?: RegExp): IterableIterator<[string, svelte_store.Writable<T>]>;
+  entries<T>(regex?: RegExp | undefined): IterableIterator<[string, MinimalWritable<T>]>;
   /**
    * Returns an iterable for the game setting keys from existing stores.
    *
-   * @param {RegExp} [regex] - Optional regular expression to filter by game setting keys.
+   * @param [regex] - Optional regular expression to filter by game setting keys.
    *
-   * @returns {IterableIterator<string>} Iterable iterator of game setting keys.
-   * @yields {string}
+   * @returns Iterable iterator of game setting keys.
    */
-  keys(regex?: RegExp): IterableIterator<string>;
+  keys(regex?: RegExp | undefined): IterableIterator<string>;
   /**
-   * @template T
-   *
    * Returns an iterable for the game setting stores.
    *
-   * @param {RegExp} [regex] - Optional regular expression to filter by game setting keys.
+   * @param [regex] - Optional regular expression to filter by game setting keys.
    *
-   * @returns {IterableIterator<import('svelte/store').Writable<T>>} Iterable iterator of stores.
-   * @yields {import('svelte/store').Writable<T>}
+   * @returns Iterable iterator of stores.
    */
-  stores<T>(regex?: RegExp): IterableIterator<svelte_store.Writable<T>>;
-  #private;
+  stores<T>(regex?: RegExp | undefined): IterableIterator<MinimalWritable<T>>;
 }
-type GameSettingOptions = {
-  /**
-   * If choices are defined, the resulting setting will be a select menu.
-   */
-  choices?: object;
-  /**
-   * Specifies that the setting appears in the configuration view.
-   */
-  config?: boolean;
-  /**
-   * A default value for the setting.
-   */
-  default?: any;
-  /**
-   * A description of the registered setting and its behavior.
-   */
-  hint?: string;
-  /**
-   * The displayed name of the setting.
-   */
-  name?: string;
-  /**
-   * An onChange callback function or iterable list of callbacks to
-   * directly receive callbacks from Foundry on setting change.
-   */
-  onChange?: Function | Iterable<Function>;
-  /**
-   * If range is specified, the resulting setting will be
-   * a range slider.
-   */
-  range?: {
-    min: number;
-    max: number;
-    step: number;
-  };
-  /**
-   * If true then a prompt to reload after changes occurs.
-   */
-  requiresReload?: boolean;
-  /**
-   * Scope for setting.
-   */
-  scope?: 'client' | 'world';
-  /**
-   * A constructable object or function.
-   */
-  type: object | Function;
-};
-/**
- * Defines a game setting.
- */
-type GameSetting = {
-  /**
-   * The setting namespace; usually the ID of the module / system.
-   */
-  namespace: string;
-  /**
-   * The setting key to register.
-   */
-  key: string;
-  /**
-   * The name of the TJSSvgFolder to put this setting in to group them.
-   */
-  folder?: string;
-  /**
-   * An existing store instance to use.
-   */
-  store?: svelte_store.Writable<any>;
-  /**
-   * Configuration for setting data.
-   */
-  options: GameSettingOptions;
-};
-/**
- * Stores the primary TJS game setting keys w/ GameSettingOptions.
- */
-type GameSettingData = GameSettingOptions;
 
 /**
  * Provides an accessible JS object that is updated reactively from all or subset of TJSGameSettings stores.
  * Accessors are provided to directly get / set current setting data. Using a setter will update the setting and backing
  * store.
  *
+ * TJSLiveGameSettings is also a readable Svelte store essentially providing a customizable derived store of all
+ * settings tracked.
+ *
  * Note: You can create a JSDoc / `@typedef` to apply with `@type` and achieve typing support in IDEs for the
  * customizable live settings instance. Please see the example at the end of this source file on how to accomplish this
  * task.
  *
- * TJSLiveGameSettings is also a readable Svelte store essentially providing a customizable derived store of all
- * settings tracked.
+ * Note: Presently `TJSLiveGameSettings` is openly typed, but there will be a TypeScript friendly way to strongly type
+ * additional instance properties.
  *
  * Note: When using from JS a second subscriber function argument is the key that was updated.
  * From Svelte: Use 'lastKey' accessor to retrieve the last updated key.
+ *
+ * Note: In the future this class will be reworked w/ Svelte 5 state handling.
+ *
+ * @example
+ * ```js
+ * // Example of creating a typedef to type your specific live game settings instance. Add all relevant `@property`
+ * // entries.
+ *
+ * /**
+ *  * @typedef {TJSLiveGameSettings} MyLiveGameSettings - Extend TJSLiveGameSettings and name this anything.
+ *  *
+ *  * @property {boolean} myBooleanSetting - Add property / type entries for setting keys associated w/ accessors.
+ *  *\/
+ *
+ * /** @type {MyLiveGameSettings} *\/
+ * const liveGameSettings = new TJSLiveGameSettings(gameSettings);
+ * liveGameSettings.myBooleanSetting is now typed as a boolean.
+ * ```
  */
 declare class TJSLiveGameSettings {
+  #private;
+  [key: string]: any;
   /**
    * Creates a live binding against the setting stores. All settings are configured by default, but can also be
    * filtered by setting key with inclusive / exclusive Sets.
    *
-   * @param {TJSGameSettings}   gameSettings - A game settings instance to subscribe to...
+   * @param gameSettings - A game settings instance to subscribe to...
    *
-   * @param {object}            [options] - TJSLiveGameSettings options.
+   * @param [options] - TJSLiveGameSettings options.
    *
-   * @param {Set<string>}       [options.include] - A Set of setting keys to include from subscribing.
+   * @param [options.include] - A Set of setting keys to include from subscribing.
    *
-   * @param {Set<string>}       [options.exclude] - A Set of setting keys to exclude from subscribing.
+   * @param [options.exclude] - A Set of setting keys to exclude from subscribing.
    */
   constructor(
     gameSettings: TJSGameSettings,
@@ -246,9 +286,9 @@ declare class TJSLiveGameSettings {
     },
   );
   /**
-   * @returns {string} Last updated setting key.
+   * @returns Last updated setting key.
    */
-  get lastKey(): string;
+  get lastKey(): string | undefined;
   /**
    * Destroys this instance of TJSLiveGameSettings and unsubscribes from all game setting stores.
    */
@@ -256,46 +296,39 @@ declare class TJSLiveGameSettings {
   /**
    * Returns an iterator / generator of all setting entries.
    *
-   * @returns {IterableIterator<[key: string, value: any]>} An iterator returning setting entries.
-   * @yields {[key: string, value: any]}
+   * @returns An iterator returning setting entries.
    */
   entries(): IterableIterator<[key: string, value: any]>;
   /**
    * Returns an iterator / generator of all setting keys.
    *
-   * @returns {IterableIterator<string>} An iterator returning setting keys.
-   * @yields {string}
+   * @returns An iterator returning setting keys.
    */
   keys(): IterableIterator<string>;
   /**
    * Returns a string / JSON stringify of the current setting data.
    *
-   * @returns {string} Tracked setting data.
+   * @returns Tracked setting data.
    */
   toString(): string;
   /**
    * Override to respond to setting update.
    *
-   * @param {string} key - The setting / local key that updated.
-   *
-   * @protected
+   * @param key - The setting / local key that updated.
    */
   protected _update(key: string): void;
   /**
    * Returns an iterator / generator of all values.
    *
-   * @returns {IterableIterator<any>} An iterator returning setting values.
-   * @yields {any}
+   * @returns An iterator returning setting values.
    */
   values(): IterableIterator<any>;
   /**
-   * @param {(value: TJSLiveGameSettings, key?: string) => void} handler - Callback function that is invoked on
-   * update / changes.
+   * @param handler - Callback function that is invoked on update / changes.
    *
-   * @returns {import('svelte/store').Unsubscriber} Unsubscribe function.
+   * @returns Unsubscribe function.
    */
-  subscribe(handler: (value: TJSLiveGameSettings, key?: string) => void): svelte_store.Unsubscriber;
-  #private;
+  subscribe(handler: (value: TJSLiveGameSettings, key?: string) => void): Unsubscriber;
 }
 
 export { type GameSetting, type GameSettingData, type GameSettingOptions, TJSGameSettings, TJSLiveGameSettings };
