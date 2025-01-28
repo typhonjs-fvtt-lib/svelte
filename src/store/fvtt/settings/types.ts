@@ -1,7 +1,5 @@
 import type { MinimalWritable }     from '#runtime/svelte/store/util';
 
-import type { TJSLiveGameSettings } from './TJSLiveGameSettings';
-
 interface GameSettingOptions {
    /**
     * If choices are defined, the resulting setting will be a select menu.
