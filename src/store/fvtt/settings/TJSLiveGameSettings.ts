@@ -13,15 +13,36 @@ import type { MinimalWritable }  from '#runtime/svelte/store/util';
  * Accessors are provided to directly get / set current setting data. Using a setter will update the setting and backing
  * store.
  *
+ * TJSLiveGameSettings is also a readable Svelte store essentially providing a customizable derived store of all
+ * settings tracked.
+ *
  * Note: You can create a JSDoc / `@typedef` to apply with `@type` and achieve typing support in IDEs for the
  * customizable live settings instance. Please see the example at the end of this source file on how to accomplish this
  * task.
  *
- * TJSLiveGameSettings is also a readable Svelte store essentially providing a customizable derived store of all
- * settings tracked.
+ * Note: Presently `TJSLiveGameSettings` is openly typed, but there will be a TypeScript friendly way to strongly type
+ * additional instance properties.
  *
  * Note: When using from JS a second subscriber function argument is the key that was updated.
  * From Svelte: Use 'lastKey' accessor to retrieve the last updated key.
+ *
+ * Note: In the future this class will be reworked w/ Svelte 5 state handling.
+ *
+ * @example
+ * ```js
+ * // Example of creating a typedef to type your specific live game settings instance. Add all relevant `@property`
+ * // entries.
+ *
+ * /**
+ *  * @typedef {TJSLiveGameSettings} MyLiveGameSettings - Extend TJSLiveGameSettings and name this anything.
+ *  *
+ *  * @property {boolean} myBooleanSetting - Add property / type entries for setting keys associated w/ accessors.
+ *  *\/
+ *
+ * /** @type {MyLiveGameSettings} *\/
+ * const liveGameSettings = new TJSLiveGameSettings(gameSettings);
+ * liveGameSettings.myBooleanSetting is now typed as a boolean.
+ * ```
  */
 export class TJSLiveGameSettings
 {
