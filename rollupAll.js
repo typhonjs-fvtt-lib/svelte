@@ -143,11 +143,12 @@ const rollupConfigs = [
    },
    {
       input: {
-         input: 'src/store/fvtt/settings/index.js',
+         input: 'src/store/fvtt/settings/index.ts',
          external,
          plugins: [
             importsExternal(),
             resolve(s_RESOLVE_CONFIG),
+            typescript({ tsconfig: './src/store/fvtt/settings/tsconfig.json' }),
             generateDTS.plugin(dtsPluginOptions)
          ]
       },
@@ -162,11 +163,12 @@ const rollupConfigs = [
    },
    {
       input: {
-         input: 'src/store/fvtt/settings/world/index.js',
+         input: 'src/store/fvtt/settings/world/index.ts',
          external,
          plugins: [
             importsExternal(),
             resolve(s_RESOLVE_CONFIG),
+            typescript({ tsconfig: './src/store/fvtt/settings/world/tsconfig.json' }),
             generateDTS.plugin(dtsPluginOptions)
          ]
       },
