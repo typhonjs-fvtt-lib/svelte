@@ -2,30 +2,23 @@ import { CrudArrayObjectStore } from '@typhonjs-svelte/runtime-base/svelte/store
 import { Hashing } from '@typhonjs-svelte/runtime-base/util';
 
 /**
+ * Defines a {@link CrudArrayObjectStore} with streamlined configuration through {@link TJSGameSettings} to register
+ * a world game setting. WorldArrayObjectStore is automatically associated as the store receiving updates with the
+ * associated game setting.
+ *
  * @typeParam S - Store type.
  */
-class WorldSettingArrayStore extends CrudArrayObjectStore {
+class WorldArrayObjectStore extends CrudArrayObjectStore {
     /**
+     * Game setting 'key' field.
      */
     #key;
     /**
+     * Game setting 'namespace' field.
      */
     #namespace;
     /**
-     * @param options - WorldSettingArrayStore Options.
-     *
-     * @param options.namespace - Game setting 'namespace' field.
-     *
-     * @param options.key - Game setting 'key' field.
-     *
-     * @param [options.defaultData] - When an instance of TJSGameSettings is defined and automatic game setting
-     *        registered you may provide default data for the Foundry game setting.
-     *
-     * @param [options.gameSettings] - An instance of TJSGameSettings. If provided a world game setting will be
-     *        automatically registered for the given `namespace` and `key` with this instance as the associated game
-     *        setting store.
-     *
-     * @param options.rest - Rest of {@link CrudArrayObjectStoreParams} / {@link ArrayObjectStoreParams} parameters.
+     * @param options - WorldArrayObjectStore Options.
      */
     constructor({ namespace, key, defaultData = [], gameSettings, ...rest }) {
         super({
@@ -74,5 +67,5 @@ class WorldSettingArrayStore extends CrudArrayObjectStore {
     get namespace() { return this.#namespace; }
 }
 
-export { WorldSettingArrayStore };
+export { WorldArrayObjectStore };
 //# sourceMappingURL=index.js.map
