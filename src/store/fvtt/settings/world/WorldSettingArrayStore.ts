@@ -1,45 +1,33 @@
 import { CrudArrayObjectStore }  from '#runtime/svelte/store/reducer/array-object';
 import { Hashing }               from '#runtime/util';
 
-import type {
-   ArrayObjectStoreParams,
-   BaseObjectEntryStore,
-   CrudArrayObjectStoreParams,
-   ExtractDataType }             from '#runtime/svelte/store/reducer/array-object';
-
 import type { TJSGameSettings }  from '#svelte-fvtt/store/fvtt/settings';
 
 /**
+ * Defines a {@link CrudArrayObjectStore} with streamlined configuration through {@link TJSGameSettings} to register
+ * a world game setting. WorldArrayObjectStore is automatically associated as the store receiving updates with the
+ * associated game setting.
+ *
  * @typeParam S - Store type.
  */
-export class WorldSettingArrayStore<S extends BaseObjectEntryStore<any>> extends CrudArrayObjectStore<S>
+class WorldArrayObjectStore<S extends WorldArrayObjectStore.Data.BaseObjectEntryStore<any>> extends
+ CrudArrayObjectStore<S>
 {
    /**
+    * Game setting 'key' field.
     */
    readonly #key: string;
 
    /**
+    * Game setting 'namespace' field.
     */
    readonly #namespace: string;
 
    /**
-    * @param options - WorldSettingArrayStore Options.
-    *
-    * @param options.namespace - Game setting 'namespace' field.
-    *
-    * @param options.key - Game setting 'key' field.
-    *
-    * @param [options.defaultData] - When an instance of TJSGameSettings is defined and automatic game setting
-    *        registered you may provide default data for the Foundry game setting.
-    *
-    * @param [options.gameSettings] - An instance of TJSGameSettings. If provided a world game setting will be
-    *        automatically registered for the given `namespace` and `key` with this instance as the associated game
-    *        setting store.
-    *
-    * @param options.rest - Rest of {@link CrudArrayObjectStoreParams} / {@link ArrayObjectStoreParams} parameters.
+    * @param options - WorldArrayObjectStore Options.
     */
-   constructor({ namespace, key, defaultData = [], gameSettings, ...rest }: { namespace: string, key: string,
-    defaultData?: ExtractDataType<S>[], gameSettings?: TJSGameSettings } & CrudArrayObjectStoreParams<S>)
+   constructor({ namespace, key, defaultData = [], gameSettings, ...rest }: WorldArrayObjectStore.Options.Config<S> &
+     CrudArrayObjectStore.Options.Config<S>)
    {
       super({
          ...rest,
@@ -87,3 +75,39 @@ export class WorldSettingArrayStore<S extends BaseObjectEntryStore<any>> extends
     */
    get namespace(): string { return this.#namespace; }
 }
+
+declare namespace WorldArrayObjectStore {
+   export import Data = CrudArrayObjectStore.Data;
+   export import Util = CrudArrayObjectStore.Util;
+
+   export namespace Options {
+      /**
+       * @typeParam S - Store type.
+       */
+      export interface Config<S extends Data.BaseObjectEntryStore<any>> extends CrudArrayObjectStore.Options.Config<S> {
+         /**
+          * Game setting 'namespace' field.
+          */
+         namespace: string;
+
+         /**
+          * Game setting 'key' field.
+          */
+         key: string;
+
+         /**
+          * When an instance of {@link TJSGameSettings} is defined and automatic game setting registered you may
+          * provide default data for the Foundry game setting.
+          */
+         defaultData?: WorldArrayObjectStore.Util.ExtractDataType<S>[];
+
+         /**
+          * An instance of {@link TJSGameSettings}. If provided a world game setting will be automatically registered
+          * for the given `namespace` and `key` with this instance as the associated game setting store.
+          */
+         gameSettings?: TJSGameSettings;
+      }
+   }
+}
+
+export { WorldArrayObjectStore };
