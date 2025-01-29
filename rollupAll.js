@@ -35,7 +35,10 @@ const dtsReplace = {
 };
 
 // Rollup plugin options for generateDTS.
-const dtsPluginOptions = { bundlePackageExports: true, dtsReplace };
+const dtsPluginOptions = {
+   bundlePackageExports: true,
+   dtsReplace
+};
 
 // -------------------------------------------------------------------------------------------------------------------
 
