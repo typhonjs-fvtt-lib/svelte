@@ -19,7 +19,7 @@ import type { MinimalWritable }  from '#runtime/svelte/store/util';
 import type {
    GameSetting,
    GameSettingData,
-   GameSettingOptions }          from './types';
+   CoreSettingOptions }          from './types';
 
 /**
  * Registers game settings and creates a backing Svelte store for each setting. The Svelte store will update the
@@ -165,10 +165,8 @@ export class TJSGameSettings
     * @param coreConfig - When false this overrides the `setting.options.config` parameter when registering the setting
     *        with Foundry. This allows the settings to be displayed in the app itself, but removed from the standard
     *        Foundry configuration location.
-    *
-    * @returns The specific store subscription handler assigned to the passed in store.
     */
-   register(setting: GameSetting, coreConfig: boolean = true): Function // TODO: better specify
+   register(setting: GameSetting, coreConfig: boolean = true): void
    {
       if (!isObject(setting))
       {
@@ -215,7 +213,7 @@ export class TJSGameSettings
 
       const store: MinimalWritable<any> | undefined = setting.store;
 
-      const options: GameSettingOptions = setting.options;
+      const options: CoreSettingOptions = setting.options;
 
       const onchangeFunctions: Function[] = [];
 
@@ -253,6 +251,7 @@ export class TJSGameSettings
          for (const entry of onchangeFunctions) { entry(value); }
       };
 
+      // @ts-expect-error PF2E types do not have partial aspects for `name`.
       globalThis.game.settings.register(namespace, key, { ...options, config: foundryConfig, onChange });
 
       // Set new store value with existing setting or default value.
@@ -281,18 +280,16 @@ export class TJSGameSettings
       // existing game setting.
       subscribeIgnoreFirst(targetStore, storeHandler);
 
-      const gameSettingData = {
+      const gameSettingData: GameSettingData = {
          namespace,
          key,
          folder,
-         ...options
+         options
       };
 
       Object.freeze(gameSettingData);
 
       this.#settings.push(gameSettingData);
-
-      return storeHandler;
    }
 
    /**
@@ -309,12 +306,8 @@ export class TJSGameSettings
     *
     * @returns An object containing all TJSGameSetting store subscriber handlers for each setting `key` added.
     */
-   registerAll(settings: Iterable<GameSetting>, coreConfig?: boolean): { [key: string]: Function }
+   registerAll(settings: Iterable<GameSetting>, coreConfig?: boolean): void
    {
-      /**
-       */
-      const storeHandlers: { [key: string]: Function }  = {};
-
       if (!isIterable(settings)) { throw new TypeError(`TJSGameSettings - registerAll: settings is not iterable.`); }
 
       for (const entry of settings)
@@ -339,10 +332,8 @@ export class TJSGameSettings
             throw new TypeError(`TJSGameSettings - registerAll: entry in settings missing 'options' attribute.`);
          }
 
-         storeHandlers[entry.key] = this.register(entry, coreConfig);
+         this.register(entry, coreConfig);
       }
-
-      return storeHandlers;
    }
 
    // Iterators ------------------------------------------------------------------------------------------------------

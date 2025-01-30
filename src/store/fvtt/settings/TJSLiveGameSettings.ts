@@ -279,16 +279,3 @@ export class TJSLiveGameSettings
       for (let cntr: number = 0; cntr < this.#subscribers.length; cntr++) { this.#subscribers[cntr](this, key); }
    }
 }
-
-// Example of creating a typedef to type your specific live game settings instance. Add all relevant `@property`
-// entries.
-//
-// /**
-//  * @typedef {TJSLiveGameSettings} MyLiveGameSettings - Extend TJSLiveGameSettings and name this anything.
-//  *
-//  * @property {boolean} myBooleanSetting - Add property / type entries for setting keys associated w/ accessors.
-//  */
-//
-// /** @type {MyLiveGameSettings} */
-// const liveGameSettings = new TJSLiveGameSettings(gameSettings);
-// liveGameSettings.myBooleanSetting is now typed as a boolean.

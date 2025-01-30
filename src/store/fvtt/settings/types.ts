@@ -1,8 +1,11 @@
-import type { MinimalWritable }     from '#runtime/svelte/store/util';
+import type { MinimalWritable }  from '#runtime/svelte/store/util';
 
-interface GameSettingOptions {
+/**
+ * Defines the core Foundry options for a game setting.
+ */
+interface CoreSettingOptions {
    /**
-    * If choices are defined, the resulting setting will be a select menu.
+    * If choices are defined, the resulting setting will be a select menu and `type` must be a `string`.
     */
    choices?: Record<string, unknown>;
 
@@ -14,7 +17,13 @@ interface GameSettingOptions {
    /**
     * A default value for the setting.
     */
-   default: number | string | boolean | object | (() => number | string | boolean | object);
+   default: number | string | boolean | object;
+
+   /**
+    * Setting is a file picker and `type` must be a `string`. You may use a boolean for `any` file type or select a
+    * specific file type.
+    */
+   filePicker?: boolean | 'any' | 'audio' | 'folder' | 'font' | 'image' | 'imagevideo' | 'text' | 'video';
 
    /**
     * A description of the registered setting and its behavior.
@@ -35,7 +44,7 @@ interface GameSettingOptions {
    /**
     * If range is specified, the resulting setting will be a range slider.
     */
-   range?: this['type'] extends NumberConstructor ? { min: number; max: number; step?: number } : never;
+   range?: { min: number; max: number; step?: number };
 
    /**
     * If true then a prompt to reload after changes occurs; default: `false`.
@@ -48,7 +57,7 @@ interface GameSettingOptions {
    scope?: 'client' | 'world';
 
    /**
-    * A constructable object or function.
+    * A constructable object, function, or DataModel.
     */
    type: NumberConstructor | StringConstructor | BooleanConstructor | ObjectConstructor | ArrayConstructor |
     (new (...args: any[]) => fvtt.DataModel) | ((data: unknown) => unknown);
@@ -64,13 +73,13 @@ interface GameSetting {
    key: string;
 
    /**
-    * Configuration for setting data.
+    * Core game setting configuration options.
     */
-   options: GameSettingOptions;
+   options: CoreSettingOptions;
 
    /**
-    * The setting namespace; usually the ID of the module / system. If not provided the associated namespace with
-    * the instance of `TJSGameSettings` will be used.
+    * The setting namespace; usually the ID of the package. If not provided the associated namespace with the instance
+    * of `TJSGameSettings` will be used.
     */
    namespace?: string;
 
@@ -88,16 +97,22 @@ interface GameSetting {
 /**
  * Stores the primary TJS game setting keys w/ GameSettingOptions.
  */
-interface GameSettingData extends GameSettingOptions {
-   /**
-    * The setting namespace; usually the ID of the module / system.
-    */
-   namespace: string;
-
+interface GameSettingData {
    /**
     * The setting key to register.
     */
    key: string;
+
+   /**
+    * The setting namespace; usually the ID of the package. If not provided the associated namespace with the instance
+    * of `TJSGameSettings` will be used.
+    */
+   namespace: string;
+
+   /**
+    * Core game setting configuration options.
+    */
+   options: CoreSettingOptions;
 
    /**
     * The name of the `TJSSvgFolder` to put this setting in to group them.
@@ -105,9 +120,8 @@ interface GameSettingData extends GameSettingOptions {
    folder?: string;
 }
 
-
 export {
    GameSetting,
    GameSettingData,
-   GameSettingOptions
+   CoreSettingOptions
 }
