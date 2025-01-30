@@ -124,8 +124,6 @@ class TJSGameSettings {
      * @param coreConfig - When false this overrides the `setting.options.config` parameter when registering the setting
      *        with Foundry. This allows the settings to be displayed in the app itself, but removed from the standard
      *        Foundry configuration location.
-     *
-     * @returns The specific store subscription handler assigned to the passed in store.
      */
     register(setting, coreConfig = true) {
         if (!isObject(setting)) {
@@ -185,6 +183,7 @@ class TJSGameSettings {
                 entry(value);
             }
         };
+        // @ts-expect-error PF2E types do not have partial aspects for `name`.
         globalThis.game.settings.register(namespace, key, { ...options, config: foundryConfig, onChange });
         // Set new store value with existing setting or default value.
         const targetStore = store ? store : this.#getStore(key, globalThis.game.settings.get(namespace, key));
@@ -207,11 +206,10 @@ class TJSGameSettings {
             namespace,
             key,
             folder,
-            ...options
+            options
         };
         Object.freeze(gameSettingData);
         this.#settings.push(gameSettingData);
-        return storeHandler;
     }
     /**
      * Registers multiple settings.
@@ -228,9 +226,6 @@ class TJSGameSettings {
      * @returns An object containing all TJSGameSetting store subscriber handlers for each setting `key` added.
      */
     registerAll(settings, coreConfig) {
-        /**
-         */
-        const storeHandlers = {};
         if (!isIterable(settings)) {
             throw new TypeError(`TJSGameSettings - registerAll: settings is not iterable.`);
         }
@@ -247,9 +242,8 @@ class TJSGameSettings {
             if (!isObject(entry.options)) {
                 throw new TypeError(`TJSGameSettings - registerAll: entry in settings missing 'options' attribute.`);
             }
-            storeHandlers[entry.key] = this.register(entry, coreConfig);
+            this.register(entry, coreConfig);
         }
-        return storeHandlers;
     }
     // Iterators ------------------------------------------------------------------------------------------------------
     /**
@@ -599,18 +593,6 @@ class TJSLiveGameSettings {
         }
     }
 }
-// Example of creating a typedef to type your specific live game settings instance. Add all relevant `@property`
-// entries.
-//
-// /**
-//  * @typedef {TJSLiveGameSettings} MyLiveGameSettings - Extend TJSLiveGameSettings and name this anything.
-//  *
-//  * @property {boolean} myBooleanSetting - Add property / type entries for setting keys associated w/ accessors.
-//  */
-//
-// /** @type {MyLiveGameSettings} */
-// const liveGameSettings = new TJSLiveGameSettings(gameSettings);
-// liveGameSettings.myBooleanSetting is now typed as a boolean.
 
 export { TJSGameSettings, TJSLiveGameSettings };
 //# sourceMappingURL=index.js.map
