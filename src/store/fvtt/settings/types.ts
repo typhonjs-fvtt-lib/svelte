@@ -7,7 +7,7 @@ interface CoreSettingOptions {
    /**
     * If choices are defined, the resulting setting will be a select menu and `type` must be a `string`.
     */
-   choices?: Record<string, unknown>;
+   choices?: Record<string, string>;
 
    /**
     * Specifies that the setting appears in the configuration view; default: `true`.
@@ -33,7 +33,7 @@ interface CoreSettingOptions {
    /**
     * The displayed name of the setting.
     */
-   name: string;
+   name?: string;
 
    /**
     * An onChange callback function or iterable list of callbacks to directly receive callbacks from Foundry on setting
@@ -52,9 +52,9 @@ interface CoreSettingOptions {
    requiresReload?: boolean;
 
    /**
-    * Scope for setting; default: `client`.
+    * Scope for setting. `client` uses local storage and `world` is saved in Foundry DB.
     */
-   scope?: 'client' | 'world';
+   scope: 'client' | 'world';
 
    /**
     * A constructable object, function, or DataModel.
