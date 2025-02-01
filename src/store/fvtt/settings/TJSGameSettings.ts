@@ -16,11 +16,6 @@ import type {
 
 import type { MinimalWritable }  from '#runtime/svelte/store/util';
 
-import type {
-   GameSetting,
-   GameSettingData,
-   CoreSettingOptions }          from './types';
-
 /**
  * Registers game settings and creates a backing Svelte store for each setting. The Svelte store will update the
  * Foundry game settings and vice versa when changes occur to the Foundry game settings the updated data is set to the
@@ -28,11 +23,14 @@ import type {
  *
  * Note: It is possible to add multiple `onChange` callbacks on registration.
  *
+ * @typeParam `ExtraProps` - Defines additional properties for game setting options / data that child implementations
+ * may define.
+ *
  * @privateRemarks
  * TODO: A possible future extension is to offer type checking against the setting type by creating a customized
  * writable store that has an overloaded `set` method to provide type checking.
  */
-export class TJSGameSettings
+class TJSGameSettings<ExtraProps extends Record<string, any> = {}>
 {
    /**
     */
@@ -40,7 +38,7 @@ export class TJSGameSettings
 
    /**
     */
-   #settings: GameSettingData[] = [];
+   #settings: TJSGameSettings.Data.GameSetting<ExtraProps>[] = [];
 
    /**
     */
@@ -152,21 +150,13 @@ export class TJSGameSettings
    /**
     * Registers a setting with TJSGameSettings and Foundry core.
     *
-    * Note: The specific store subscription handler assigned to the passed in store or store created for the setting
-    * internally is returned from this function. In some cases when setting up custom stores particularly of object
-    * types with several child property stores (`propertyStore`) it is necessary to only update the setting store and
-    * not all subscribers to the custom store as the `propertyStore` instances are also subscribers to the custom store.
-    *
-    * This allows the custom store in the `set` implementation to mainly only trigger the TJSGameSettings subscriber
-    * handler on updates and not all the connected `propertyStore` instances.
-    *
     * @param setting - A GameSetting instance to set to Foundry game settings.
     *
     * @param coreConfig - When false this overrides the `setting.options.config` parameter when registering the setting
     *        with Foundry. This allows the settings to be displayed in the app itself, but removed from the standard
     *        Foundry configuration location.
     */
-   register(setting: GameSetting, coreConfig: boolean = true): void
+   register(setting: TJSGameSettings.Options.GameSetting<ExtraProps>, coreConfig: boolean = true): void
    {
       if (!isObject(setting))
       {
@@ -191,7 +181,6 @@ export class TJSGameSettings
 
       const namespace: string = setting.namespace ?? this.#namespace;
       const key: string = setting.key;
-      const folder: string | undefined = setting.folder;
 
       // The `config` parameter passed to Foundry core.
       const foundryConfig: boolean = coreConfig ? setting.options.config ?? true : false;
@@ -206,14 +195,9 @@ export class TJSGameSettings
          throw new TypeError(`TJSGameSettings - register: 'key' attribute is not a string.`);
       }
 
-      if (folder !== void 0 && typeof folder !== 'string')
-      {
-         throw new TypeError(`TJSGameSettings - register: 'folder' attribute is not a string.`);
-      }
-
       const store: MinimalWritable<any> | undefined = setting.store;
 
-      const options: CoreSettingOptions = setting.options;
+      const options: TJSGameSettings.Options.CoreSetting = setting.options;
 
       const onchangeFunctions: Function[] = [];
 
@@ -280,23 +264,21 @@ export class TJSGameSettings
       // existing game setting.
       subscribeIgnoreFirst(targetStore, storeHandler);
 
-      const gameSettingData: GameSettingData = {
-         namespace,
-         key,
-         folder,
-         options
-      };
+      // Transfer setting options to data.
+      {
+         const { store, ...rest } = setting;
 
-      Object.freeze(gameSettingData);
+         const gameSettingData: TJSGameSettings.Data.GameSetting<ExtraProps> = Object.assign({}, rest,
+          { namespace, key, options }) as TJSGameSettings.Data.GameSetting<ExtraProps>;
 
-      this.#settings.push(gameSettingData);
+         Object.freeze(gameSettingData);
+
+         this.#settings.push(gameSettingData);
+      }
    }
 
    /**
     * Registers multiple settings.
-    *
-    * Please refer to the note in {@link TJSGameSettings.register} about the returned object of store subscriber handler
-    * functions.
     *
     * @param settings - An iterable list of game setting configurations to register.
     *
@@ -306,7 +288,7 @@ export class TJSGameSettings
     *
     * @returns An object containing all TJSGameSetting store subscriber handlers for each setting `key` added.
     */
-   registerAll(settings: Iterable<GameSetting>, coreConfig?: boolean): void
+   registerAll(settings: Iterable<TJSGameSettings.Options.GameSetting<ExtraProps>>, coreConfig?: boolean): void
    {
       if (!isIterable(settings)) { throw new TypeError(`TJSGameSettings - registerAll: settings is not iterable.`); }
 
@@ -339,13 +321,13 @@ export class TJSGameSettings
    // Iterators ------------------------------------------------------------------------------------------------------
 
    /**
-    * Returns an iterable for the game setting data; {@link GameSettingData}.
+    * Returns an iterable for the game setting data; {@link TJSGameSettings.Data.GameSetting}.
     *
     * @param [regex] - Optional regular expression to filter by game setting keys.
     *
-    * @returns Iterable iterator of GameSettingData.
+    * @returns Iterable iterator of `TJSGameSettings.Data.GameSetting`.
     */
-   *data(regex: RegExp | undefined = void 0): IterableIterator<GameSettingData>
+   *data(regex: RegExp | undefined = void 0): IterableIterator<TJSGameSettings.Data.GameSetting<ExtraProps>>
    {
       if (regex !== void 0 && !CrossWindow.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
@@ -444,3 +426,132 @@ export class TJSGameSettings
       }
    }
 }
+
+declare namespace TJSGameSettings
+{
+   export namespace Data {
+      /**
+       * Stores the primary TJS game setting keys w/ GameSettingOptions.
+       */
+      export interface GameSettingBase {
+         /**
+          * The setting key to register.
+          */
+         key: string;
+
+         /**
+          * The setting namespace; usually the ID of the package. If not provided the associated namespace with the
+          * instance of `TJSGameSettings` will be used.
+          */
+         namespace: string;
+
+         /**
+          * Core game setting configuration options.
+          */
+         options: Options.CoreSetting;
+      }
+
+      /**
+       * Defines the parsed game setting data with potential extra props.
+       */
+      export type GameSetting<ExtraProps extends Record<string, any> = {}> = GameSettingBase & ExtraProps;
+   }
+
+   export namespace Options {
+      /**
+       * Defines the core Foundry options for a game setting.
+       */
+      export interface CoreSetting {
+         /**
+          * If choices are defined, the resulting setting will be a select menu and `type` must be a `string`.
+          */
+         choices?: Record<string, string>;
+
+         /**
+          * Specifies that the setting appears in the configuration view; default: `true`.
+          */
+         config?: boolean;
+
+         /**
+          * A default value for the setting.
+          */
+         default: number | string | boolean | object;
+
+         /**
+          * Setting is a file picker and `type` must be a `string`. You may use a boolean for `any` file type or
+          * select a specific file type.
+          */
+         filePicker?: boolean | 'any' | 'audio' | 'folder' | 'font' | 'image' | 'imagevideo' | 'text' | 'video';
+
+         /**
+          * A description of the registered setting and its behavior.
+          */
+         hint?: string;
+
+         /**
+          * The displayed name of the setting.
+          */
+         name?: string;
+
+         /**
+          * An onChange callback function or iterable list of callbacks to directly receive callbacks from Foundry on
+          * setting change.
+          */
+         onChange?: Function | Iterable<Function>;
+
+         /**
+          * If range is specified, the resulting setting will be a range slider.
+          */
+         range?: { min: number; max: number; step?: number };
+
+         /**
+          * If true then a prompt to reload after changes occurs; default: `false`.
+          */
+         requiresReload?: boolean;
+
+         /**
+          * Scope for setting. `client` uses local storage and `world` is saved in Foundry DB.
+          */
+         scope: 'client' | 'world';
+
+         /**
+          * A constructable object, function, or DataModel.
+          */
+         type: NumberConstructor | StringConstructor | BooleanConstructor | ObjectConstructor | ArrayConstructor |
+          (new (...args: any[]) => fvtt.DataModel) | ((data: unknown) => unknown);
+      }
+
+      /**
+       * Defines a game setting.
+       */
+      export interface GameSettingBase {
+         /**
+          * The setting key to register.
+          */
+         key: string;
+
+         /**
+          * Core game setting configuration options.
+          */
+         options: Options.CoreSetting;
+
+         /**
+          * The setting namespace; usually the ID of the package. If not provided the associated namespace with the
+          * instance of `TJSGameSettings` will be used.
+          */
+         namespace?: string;
+
+         /**
+          * An existing store instance to use.
+          */
+         store?: MinimalWritable<any>;
+      }
+
+      /**
+       * Defines the game setting options with potential extra props.
+       */
+      export type GameSetting<ExtraProps extends Record<string, any> = {}> = GameSettingBase & ExtraProps;
+   }
+}
+
+export { TJSGameSettings };

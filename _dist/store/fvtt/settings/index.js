@@ -11,6 +11,9 @@ var _a;
  *
  * Note: It is possible to add multiple `onChange` callbacks on registration.
  *
+ * @typeParam `ExtraProps` - Defines additional properties for game setting options / data that child implementations
+ * may define.
+ *
  * @privateRemarks
  * TODO: A possible future extension is to offer type checking against the setting type by creating a customized
  * writable store that has an overloaded `set` method to provide type checking.
@@ -111,14 +114,6 @@ class TJSGameSettings {
     /**
      * Registers a setting with TJSGameSettings and Foundry core.
      *
-     * Note: The specific store subscription handler assigned to the passed in store or store created for the setting
-     * internally is returned from this function. In some cases when setting up custom stores particularly of object
-     * types with several child property stores (`propertyStore`) it is necessary to only update the setting store and
-     * not all subscribers to the custom store as the `propertyStore` instances are also subscribers to the custom store.
-     *
-     * This allows the custom store in the `set` implementation to mainly only trigger the TJSGameSettings subscriber
-     * handler on updates and not all the connected `propertyStore` instances.
-     *
      * @param setting - A GameSetting instance to set to Foundry game settings.
      *
      * @param coreConfig - When false this overrides the `setting.options.config` parameter when registering the setting
@@ -140,7 +135,6 @@ class TJSGameSettings {
         }
         const namespace = setting.namespace ?? this.#namespace;
         const key = setting.key;
-        const folder = setting.folder;
         // The `config` parameter passed to Foundry core.
         const foundryConfig = coreConfig ? setting.options.config ?? true : false;
         if (typeof namespace !== 'string') {
@@ -148,9 +142,6 @@ class TJSGameSettings {
         }
         if (typeof key !== 'string') {
             throw new TypeError(`TJSGameSettings - register: 'key' attribute is not a string.`);
-        }
-        if (folder !== void 0 && typeof folder !== 'string') {
-            throw new TypeError(`TJSGameSettings - register: 'folder' attribute is not a string.`);
         }
         const store = setting.store;
         const options = setting.options;
@@ -202,20 +193,16 @@ class TJSGameSettings {
         // Subscribe to self to set associated game setting on updates after verifying that the new value does not match
         // existing game setting.
         subscribeIgnoreFirst(targetStore, storeHandler);
-        const gameSettingData = {
-            namespace,
-            key,
-            folder,
-            options
-        };
-        Object.freeze(gameSettingData);
-        this.#settings.push(gameSettingData);
+        // Transfer setting options to data.
+        {
+            const { store, ...rest } = setting;
+            const gameSettingData = Object.assign({}, rest, { namespace, key, options });
+            Object.freeze(gameSettingData);
+            this.#settings.push(gameSettingData);
+        }
     }
     /**
      * Registers multiple settings.
-     *
-     * Please refer to the note in {@link TJSGameSettings.register} about the returned object of store subscriber handler
-     * functions.
      *
      * @param settings - An iterable list of game setting configurations to register.
      *
@@ -247,11 +234,11 @@ class TJSGameSettings {
     }
     // Iterators ------------------------------------------------------------------------------------------------------
     /**
-     * Returns an iterable for the game setting data; {@link GameSettingData}.
+     * Returns an iterable for the game setting data; {@link TJSGameSettings.Data.GameSetting}.
      *
      * @param [regex] - Optional regular expression to filter by game setting keys.
      *
-     * @returns Iterable iterator of GameSettingData.
+     * @returns Iterable iterator of `TJSGameSettings.Data.GameSetting`.
      */
     *data(regex = void 0) {
         if (regex !== void 0 && !CrossWindow.isRegExp(regex)) {
