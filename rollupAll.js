@@ -37,7 +37,8 @@ const dtsReplace = {
 // Rollup plugin options for generateDTS.
 const dtsPluginOptions = {
    bundlePackageExports: true,
-   dtsReplace
+   dtsReplace,
+   tsDiagnosticFilter: ({ message }) => message.includes(`Cannot find namespace 'fvtt'`)
 };
 
 // -------------------------------------------------------------------------------------------------------------------
@@ -128,11 +129,7 @@ const rollupConfigs = [
             importsExternal(),
             resolve(s_RESOLVE_CONFIG),
             typescript({ tsconfig: './src/store/fvtt/document/tsconfig.json' }),
-            generateDTS.plugin({
-               ...dtsPluginOptions
-               // TODO: Uncomment when `esm-d-ts` is updated to allow default filter + user filter to be combined.
-               // tsDiagnosticFilter: ({ message }) => !!message.includes(`Cannot find namespace 'fvtt'`)
-            })
+            generateDTS.plugin(dtsPluginOptions)
          ]
       },
       output: {
