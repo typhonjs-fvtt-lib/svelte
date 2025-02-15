@@ -882,10 +882,8 @@ class SvelteReactive
     * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
     * to walk.
     *
-    * Additionally if an application shell Svelte component is mounted and exports the `appOptions` property then
+    * Additionally, if an application shell Svelte component is mounted and exports the `appOptions` property then
     * the application options is set to `appOptions` potentially updating the application shell / Svelte component.
-    *
-    * // TODO DOCUMENT the accessor in more detail.
     *
     * @param {string}   accessor - The path / key to set. You can set multiple levels.
     *
@@ -893,7 +891,7 @@ class SvelteReactive
     */
    setOptions(accessor, value)
    {
-      const success = safeSet(this.#application.options, accessor, value);
+      const success = safeSet(this.#application.options, accessor, value, { createMissing: true });
 
       // If `this.options` modified then update the app options store.
       if (success)
@@ -2870,7 +2868,7 @@ class TJSDialogData
     */
    set(accessor, value)
    {
-      const success = safeSet(this.#internal, accessor, value);
+      const success = safeSet(this.#internal, accessor, value, { createMissing: true });
 
       // If `this.#internal` modified then update the app options store.
       if (success) { this.#updateComponent(); }

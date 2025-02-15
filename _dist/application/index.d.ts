@@ -1,6 +1,6 @@
 import * as _runtime_util_async from '@typhonjs-svelte/runtime-base/util/async';
 import { TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
-import { SvelteComponent, ComponentEvents, ComponentProps } from 'svelte';
+import { ComponentProps, ComponentEvents, SvelteComponent } from 'svelte';
 import { Readable, Writable } from 'svelte/store';
 import { A11yFocusSource } from '@typhonjs-svelte/runtime-base/util/a11y';
 import { EasingReference } from '@typhonjs-svelte/runtime-base/svelte/easing';
