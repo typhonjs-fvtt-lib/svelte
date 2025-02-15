@@ -463,7 +463,7 @@ export class TJSDialogData
     */
    set(accessor, value)
    {
-      const success = safeSet(this.#internal, accessor, value);
+      const success = safeSet(this.#internal, accessor, value, { createMissing: true });
 
       // If `this.#internal` modified then update the app options store.
       if (success) { this.#updateComponent(); }
