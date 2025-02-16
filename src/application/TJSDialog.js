@@ -7,7 +7,7 @@ import {
    isObject }                 from '#runtime/util/object';
 
 import { TJSDialogData }      from './internal/state-dialog/index.js';
-import { SvelteApp }  from './SvelteApp.js';
+import { SvelteApp }          from './SvelteApp.js';
 
 /**
  * Provides a reactive dialog implementation configured from a unique dialog options object. The dialog features a
