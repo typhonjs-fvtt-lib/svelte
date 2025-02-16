@@ -1,6 +1,6 @@
 {
   "name": "@typhonjs-fvtt/svelte",
-  "version": "0.2.0-next.5",
+  "version": "0.2.0",
   "description": "Provides resources to integrate Svelte w/ Foundry VTT.",
   "type": "module",
   "author": "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)",
@@ -64,13 +64,13 @@
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-typescript": "^12.1.2",
-    "@typhonjs-build-test/esm-d-ts": "^0.3.0-next.10",
+    "@typhonjs-build-test/esm-d-ts": "^0.3.0-next.11",
     "@typhonjs-build-test/esm-d-ts-plugin-svelte": "^0.1.0-next.1",
     "@typhonjs-build-test/rollup-plugin-pkg-imports": "^0.6.0",
     "@typhonjs-config/eslint-config": "^0.6.3",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "@typhonjs-fvtt/types-fvtt-shim": "github:typhonjs-fvtt-lib/types-fvtt-shim",
-    "@typhonjs-svelte/runtime-base": "github:typhonjs-svelte/runtime-base#0.2.0-next.2",
+    "@typhonjs-svelte/runtime-base": "github:typhonjs-svelte/runtime-base#0.2.0",
     "@typhonjs-utils/file-util": "^0.1.0",
     "eslint": "^8.57.0",
     "fs-extra": "^11.3.0",
