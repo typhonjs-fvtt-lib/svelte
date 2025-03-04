@@ -19,6 +19,7 @@
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
    import ResizableHandle              from './ResizableHandle.svelte';
 
+   import { ThemeObserver }            from './ThemeObserver.js';
    import TJSFocusWrap                 from '../internal/dom/TJSFocusWrap.svelte';
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
@@ -166,6 +167,17 @@
 
    // Handle cases if outTransitionOptions is unset; assign empty default transition options.
    $: if (!isObject(outTransitionOptions)) { outTransitionOptions = TJSDefaultTransition.options; }
+
+   // ---------------------------------------------------------------------------------------------------------------
+
+   // Reactive observation of core theme.
+   const themeStore = ThemeObserver.stores.theme;
+
+   // Stores current application optional classes with current theme applied.
+   let appClasses = '';
+
+   // Apply current theme to optional app classes.
+   $: if ($themeStore) { appClasses = ThemeObserver.appClasses(application); }
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -380,7 +392,7 @@
 {:else}
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
-         class={application.options.classes.join(' ')}
+         class="application {appClasses}"
          data-appid={application.appId}
          bind:this={elementRoot}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}

@@ -35,6 +35,7 @@
    const storeDraggable = application.reactive.storeAppOptions.draggable;
    const storeDragging = application.reactive.storeUIState.dragging;
    const storeHeaderButtons = application.reactive.storeUIState.headerButtons;
+   const storeHeaderButtonNoLabel = application.reactive.storeAppOptions.headerButtonNoLabel;
    const storeHeaderIcon = application.reactive.storeAppOptions.headerIcon;
    const storeHeaderNoTitleMinimized = application.reactive.storeAppOptions.headerNoTitleMinimized;
    const storeMinimizable = application.reactive.storeAppOptions.minimizable;
@@ -74,7 +75,7 @@
          // If the button contains a TJSSvelte.Config.Minimal object in the `svelte` attribute then use it otherwise use
          // `TJSHeaderButton` w/ button as props.
          buttonsList.push(TJSSvelte.config.isConfigEmbed(button?.svelte) ? { ...button.svelte } :
-          { class: TJSHeaderButton, props: { button } });
+          { class: TJSHeaderButton, props: { button, storeHeaderButtonNoLabel } });
       }
    }
 
@@ -151,6 +152,7 @@
 
 {#key draggable}
    <header class="window-header flexrow"
+           class:not-draggable={!$storeDraggable}
            on:pointerdown={onPointerdown}
            use:draggable={dragOptions}
            use:minimizable={$storeMinimizable}>
@@ -171,6 +173,10 @@
 {/key}
 
 <style>
+   .not-draggable {
+      cursor: default;
+   }
+
    /**
     * Provides a zero space element that expands to the right creating the gap between window title and left aligned
     * buttons and right aligned buttons. Note the use of a negative left margin to remove the gap between elements.
@@ -182,7 +188,7 @@
    }
 
    .window-header {
-      flex: var(--tjs-app-header-flex, 0 0 30px);
+      flex: var(--tjs-app-header-flex, 0 0 var(--header-height));
       gap: var(--tjs-app-header-gap, 5px);
       padding: var(--tjs-app-header-padding, 0 4px);
       touch-action: none;
