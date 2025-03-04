@@ -446,18 +446,14 @@ declare namespace SvelteAppNS {
           * application shell will render the new buttons.
           *
           * Optionally you can set in the SvelteApp app options {@link SvelteAppNS.Options.headerButtonNoClose}
-          * to remove the close button and {@link SvelteAppNS.Options.headerButtonNoLabel} to true and labels will be
-          * removed from the header buttons.
+          * to remove the close button from the header buttons.
           *
           * @param {object} [opts] - Optional parameters (for internal use)
           *
           * @param {boolean} [opts.headerButtonNoClose] - The value for `headerButtonNoClose`.
-          *
-          * @param {boolean} [opts.headerButtonNoLabel] - The value for `headerButtonNoLabel`.
           */
-         updateHeaderButtons({ headerButtonNoClose, headerButtonNoLabel }?: {
+         updateHeaderButtons({ headerButtonNoClose }?: {
             headerButtonNoClose?: boolean;
-            headerButtonNoLabel?: boolean;
          }): void;
       }
 

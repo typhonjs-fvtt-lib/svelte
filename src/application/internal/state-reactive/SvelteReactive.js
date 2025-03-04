@@ -509,17 +509,13 @@ export class SvelteReactive
     * the new buttons.
     *
     * Optionally you can set in the SvelteApp app options {@link SvelteAppNS.Options.headerButtonNoClose}
-    * to remove the close button and {@link SvelteAppNS.Options.headerButtonNoLabel} to true and labels will be
-    * removed from the header buttons.
+    * to remove the close button from the header buttons.
     *
     * @param {object} [opts] - Optional parameters (for internal use)
     *
     * @param {boolean} [opts.headerButtonNoClose] - The value for `headerButtonNoClose`.
-    *
-    * @param {boolean} [opts.headerButtonNoLabel] - The value for `headerButtonNoLabel`.
     */
-   updateHeaderButtons({ headerButtonNoClose = this.#application.options.headerButtonNoClose,
-    headerButtonNoLabel = this.#application.options.headerButtonNoLabel } = {})
+   updateHeaderButtons({ headerButtonNoClose = this.#application.options.headerButtonNoClose } = {})
    {
       let buttons = this.#application._getHeaderButtons();
 
@@ -529,11 +525,9 @@ export class SvelteReactive
          buttons = buttons.filter((button) => button.class !== 'close');
       }
 
-      // Remove labels if this.options.headerButtonNoLabel is true;
-      if (typeof headerButtonNoLabel === 'boolean' && headerButtonNoLabel)
-      {
-         for (const button of buttons) { button.label = void 0; }
-      }
+      // For AppV2 label compatibility for close button: `Close Window` instead of `Close`.
+      const closeButton = buttons.find((button) => button.class === 'close');
+      if (closeButton) { closeButton.label = 'APPLICATION.TOOLS.Close'; }
 
       this.#storeUIStateUpdate((options) =>
       {
@@ -637,11 +631,11 @@ export class SvelteReactive
          this.updateHeaderButtons({ headerButtonNoClose: value });
       }));
 
-      // Handles updating header buttons to add / remove button labels.
-      this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.headerButtonNoLabel, (value) =>
-      {
-         this.updateHeaderButtons({ headerButtonNoLabel: value });
-      }));
+      // // Handles updating header buttons to add / remove button labels.
+      // this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.headerButtonNoLabel, (value) =>
+      // {
+      //    this.updateHeaderButtons({ headerButtonNoLabel: value });
+      // }));
 
       // Handles adding / removing this application from `ui.windows` when popOut changes.
       this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.popOut, (value) =>
