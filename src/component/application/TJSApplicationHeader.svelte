@@ -56,9 +56,13 @@
     isObject(draggableOptions) ? draggableOptions : {}, { position: application.position, enabled:
      $storeDraggable, storeDragging, hasTargetClassList: s_DRAG_TARGET_CLASSLIST });
 
+   // ----------------------------------------------------------------------------------------------------------------
+
    let displayHeaderTitle;
 
    $: displayHeaderTitle = $storeHeaderNoTitleMinimized && $storeMinimized ? 'none' : null;
+
+   // ----------------------------------------------------------------------------------------------------------------
 
    let buttonsLeft;
    let buttonsRight;
@@ -78,6 +82,25 @@
           { class: TJSHeaderButton, props: { button, storeHeaderButtonNoLabel } });
       }
    }
+
+   // ----------------------------------------------------------------------------------------------------------------
+
+   let mediaType = void 0;
+   const validExt = new Set(['jpg', 'jpeg', 'png', 'webp']);
+
+   $: if (typeof $storeHeaderIcon === 'string')
+   {
+      // Detect if header icon is an image otherwise treat as a Font Awesome icon.
+      const extensionMatch = $storeHeaderIcon.match(/\.([a-z]+)$/);
+      const extension = extensionMatch ? extensionMatch[1].toLowerCase() : null;
+      mediaType = validExt.has(extension) ? 'img' : 'font';
+   }
+   else
+   {
+      mediaType = void 0;
+   }
+
+   // ----------------------------------------------------------------------------------------------------------------
 
    function minimizable(node, booleanStore)
    {
@@ -156,8 +179,10 @@
            on:pointerdown={onPointerdown}
            use:draggable={dragOptions}
            use:minimizable={$storeMinimizable}>
-      {#if typeof $storeHeaderIcon === 'string'}
-         <img class="tjs-app-icon keep-minimized" src={$storeHeaderIcon} alt=icon>
+      {#if mediaType === 'img'}
+         <img class="tjs-app-icon keep-minimized" src={globalThis.foundry.utils.getRoute($storeHeaderIcon)} alt=icon>
+      {:else if mediaType === 'font'}
+         <i class="window-icon keep-minimized {$storeHeaderIcon}"></i>
       {/if}
       <h4 class=window-title style:display={displayHeaderTitle}>
          {localize($storeTitle)}
