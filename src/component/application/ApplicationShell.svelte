@@ -460,6 +460,14 @@
 {/if}
 
 <style>
+   /* Note: Override stock Foundry removing max width / height as TJSPosition & `auto` sizing is better without. */
+   .application {
+      max-width: unset;
+      max-height: unset;
+
+      overflow: var(--tjs-app-overflow, hidden);
+   }
+
    /* Note: this is different than stock Foundry and allows rounded corners from .app core styles */
    .window-app {
       contain: layout style paint;
