@@ -408,7 +408,7 @@
 {#if inTransition !== TJSDefaultTransition.default || outTransition !== TJSDefaultTransition.default}
    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
    <div id={application.id}
-        class="app window-app {application.options.classes.join(' ')}"
+        class="application {appClasses}"
         data-appid={application.appId}
         bind:this={elementRoot}
         in:inTransition|global={inTransitionOptions}
@@ -460,44 +460,25 @@
 {/if}
 
 <style>
-   /* Note: Override stock Foundry removing max width / height as TJSPosition & `auto` sizing is better without. */
+   /* Override stock Foundry removing min & max width / height as TJSPosition & `auto` sizing is better without. */
    .application {
-      max-width: unset;
-      max-height: unset;
+      max-width: var(--tjs-app-max-width, unset);
+      max-height: var(--tjs-app-max-height, unset);
+
+      min-width: var(--tjs-app-min-width, unset);
+      min-height: var(--tjs-app-min-height, unset);
 
       overflow: var(--tjs-app-overflow, hidden);
+
+      scrollbar-width: var(--tjs-app-scrollbar-width, inherit);
+      scrollbar-color: var(--tjs-app-scrollbar-color, inherit);
    }
 
-   /* Note: this is different than stock Foundry and allows rounded corners from .app core styles */
-   .window-app {
-      contain: layout style paint;
-      overflow: var(--tjs-app-overflow, hidden);
-   }
-
-   .window-content {
-      gap: var(--tjs-app-content-gap);
-
-      /* For Firefox */
-      scrollbar-width: var(--tjs-app-content-scrollbar-width, thin);
-      scrollbar-color: var(--tjs-app-content-scrollbar-color, inherit);
-   }
-
-   .window-app:focus-visible {
-      outline: var(--tjs-app-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
+   .application:focus-visible {
+      outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
    }
 
    .window-content:focus-visible {
       outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
-   }
-
-   /* Override Foundry default; adjust --tjs-app-header-gap to change gap size */
-   .window-app :global(.window-header a) {
-      flex: none;
-      margin: 0;
-   }
-
-   /* Override Foundry default; See TJSHeaderButton for CSS variables */
-   .window-app :global(.window-header i[class^=fa]) {
-      margin: 0
    }
 </style>

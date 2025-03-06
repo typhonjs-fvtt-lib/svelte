@@ -372,7 +372,7 @@
 {#if inTransition !== TJSDefaultTransition.default || outTransition !== TJSDefaultTransition.default}
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
-         class={application.options.classes.join(' ')}
+         class="application {appClasses}"
          data-appid={application.appId}
          bind:this={elementRoot}
          in:inTransition|global={inTransitionOptions}
@@ -412,34 +412,40 @@
 <style>
    /* Note: Override stock Foundry removing max width / height as TJSPosition & `auto` sizing is better without. */
    .application {
-      max-width: unset;
-      max-height: unset;
+      max-width: var(--tjs-app-max-width, unset);
+      max-height: var(--tjs-app-max-height, unset);
+
+      min-width: var(--tjs-app-min-width, unset);
+      min-height: var(--tjs-app-min-height, unset);
 
       overflow: var(--tjs-app-overflow, hidden);
+
+      scrollbar-width: var(--tjs-app-scrollbar-width, inherit);
+      scrollbar-color: var(--tjs-app-scrollbar-color, inherit);
    }
 
-    div {
-        contain: layout style paint;
+   div {
+      contain: layout style paint;
 
-        display: var(--tjs-app-display, flex);
-        flex-direction: var(--tjs-app-flex-direction, column);
-        flex-wrap: var(--tjs-app-flex-wrap, nowrap);
-        justify-content: var(--tjs-app-justify-content, flex-start);
-        gap: var(--tjs-app-content-gap);
+      display: var(--tjs-app-display, flex);
+      flex-direction: var(--tjs-app-flex-direction, column);
+      flex-wrap: var(--tjs-app-flex-wrap, nowrap);
+      justify-content: var(--tjs-app-justify-content, flex-start);
+      gap: var(--tjs-app-content-gap);
 
-        background: var(--tjs-empty-app-background, none);
-        border-radius: var(--tjs-app-border-radius, 5px);
-        box-shadow: var(--tjs-app-box-shadow, none);
+      background: var(--tjs-empty-app-background, none);
+      border-radius: var(--tjs-app-border-radius, 5px);
+      box-shadow: var(--tjs-app-box-shadow, none);
 
-        color: var(--tjs-app-color, inherit);
-        margin: var(--tjs-app-margin, 0);
-        max-height: var(--tjs-app-max-height, 100%);
-        overflow: var(--tjs-app-overflow, hidden);
-        padding: var(--tjs-app-padding, 0);
-        position: var(--tjs-app-position, absolute);
-    }
+      color: var(--tjs-app-color, inherit);
+      margin: var(--tjs-app-margin, 0);
+      max-height: var(--tjs-app-max-height, 100%);
+      overflow: var(--tjs-app-overflow, hidden);
+      padding: var(--tjs-app-padding, 0);
+      position: var(--tjs-app-position, absolute);
+   }
 
-    div:focus-visible {
-        outline: var(--tjs-app-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
-    }
+   div:focus-visible {
+      outline: var(--tjs-app-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
+   }
 </style>
