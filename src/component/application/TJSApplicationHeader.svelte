@@ -215,7 +215,7 @@
    .window-header {
       flex: var(--tjs-app-header-flex, 0 0 var(--header-height));
       gap: var(--tjs-app-header-gap, 5px);
-      padding: var(--tjs-app-header-padding, 0 4px);
+      padding: var(--tjs-app-header-padding, 0 0.5rem);
       touch-action: none;
    }
 
