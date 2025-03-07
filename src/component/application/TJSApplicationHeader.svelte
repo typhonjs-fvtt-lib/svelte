@@ -213,6 +213,7 @@
    }
 
    .window-header {
+      background: var(--tjs-app-header-background);
       cursor: var(--tjs-app-header-cursor, var(--cursor-grab));
       flex: var(--tjs-app-header-flex, 0 0 var(--header-height));
       gap: var(--tjs-app-header-gap, 5px);
