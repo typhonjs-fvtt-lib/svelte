@@ -462,6 +462,8 @@
 <style>
    /* Override stock Foundry removing min & max width / height as TJSPosition & `auto` sizing is better without. */
    .application {
+      contain: layout style paint;
+
       max-width: var(--tjs-app-max-width, unset);
       max-height: var(--tjs-app-max-height, unset);
 
