@@ -64,19 +64,39 @@ export class ThemeObserver
     *
     * @param {import('#svelte-fvtt/application').SvelteApp} application - Svelte application.
     *
+    * @param {object} [options] - Options.
+    *
+    * @param {boolean} [options.hasThemed] - Verify that the original application default options contains the `themed`
+    *        class otherwise do not add the core theme classes.
+    *
     * @returns {string} App classes CSS string with current core theme applied.
     */
-   static appClasses(application)
+   static appClasses(application, { hasThemed = false } = {})
    {
       const classes = new Set([
          ...Array.isArray(application?.options?.classes) ? application.options.classes : [],
       ]);
 
-      // In AppV1 `theme-light` is always applied. Remove it and add the actual AppV2 theme.
+      // In AppV1 `theme-light` is always applied. Remove it.
+      classes.delete('themed');
       classes.delete('theme-light');
 
-      classes.add('themed');
-      classes.add(this.#theme);
+      if (!hasThemed)
+      {
+         // Add core theme classes.
+         classes.add('themed');
+         classes.add(this.#theme);
+      }
+      else
+      {
+         // Verify original app options has `themed` class then add core theme classes.
+         const origOptions = application.constructor.defaultOptions;
+         if (origOptions?.classes?.includes('themed'))
+         {
+            classes.add('themed');
+            classes.add(this.#theme);
+         }
+      }
 
       return Array.from(classes).join(' ');
    }
