@@ -14,4 +14,6 @@ cssVariables.setProperties({
 
    // TJSApplicationShell app background.
    '--tjs-app-background': `url("${globalThis.foundry.utils.getRoute('/ui/denim075.png')}")`,
+
+   '--tjs-app-resize-handle-background': `transparent url("${globalThis.foundry.utils.getRoute('/ui/resize-handle.webp')}") no-repeat center / contain`,
 }, false);

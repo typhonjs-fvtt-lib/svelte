@@ -928,17 +928,13 @@ class SvelteReactive
     * the new buttons.
     *
     * Optionally you can set in the SvelteApp app options {@link SvelteApp.Options.headerButtonNoClose}
-    * to remove the close button and {@link SvelteApp.Options.headerButtonNoLabel} to true and labels will be
-    * removed from the header buttons.
+    * to remove the close button from the header buttons.
     *
     * @param {object} [opts] - Optional parameters (for internal use)
     *
     * @param {boolean} [opts.headerButtonNoClose] - The value for `headerButtonNoClose`.
-    *
-    * @param {boolean} [opts.headerButtonNoLabel] - The value for `headerButtonNoLabel`.
     */
-   updateHeaderButtons({ headerButtonNoClose = this.#application.options.headerButtonNoClose,
-    headerButtonNoLabel = this.#application.options.headerButtonNoLabel } = {})
+   updateHeaderButtons({ headerButtonNoClose = this.#application.options.headerButtonNoClose } = {})
    {
       let buttons = this.#application._getHeaderButtons();
 
@@ -948,11 +944,9 @@ class SvelteReactive
          buttons = buttons.filter((button) => button.class !== 'close');
       }
 
-      // Remove labels if this.options.headerButtonNoLabel is true;
-      if (typeof headerButtonNoLabel === 'boolean' && headerButtonNoLabel)
-      {
-         for (const button of buttons) { button.label = void 0; }
-      }
+      // For AppV2 label compatibility for close button: `Close Window` instead of `Close`.
+      const closeButton = buttons.find((button) => button.class === 'close');
+      if (closeButton) { closeButton.label = 'APPLICATION.TOOLS.Close'; }
 
       this.#storeUIStateUpdate((options) =>
       {
@@ -1056,11 +1050,11 @@ class SvelteReactive
          this.updateHeaderButtons({ headerButtonNoClose: value });
       }));
 
-      // Handles updating header buttons to add / remove button labels.
-      this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.headerButtonNoLabel, (value) =>
-      {
-         this.updateHeaderButtons({ headerButtonNoLabel: value });
-      }));
+      // // Handles updating header buttons to add / remove button labels.
+      // this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.headerButtonNoLabel, (value) =>
+      // {
+      //    this.updateHeaderButtons({ headerButtonNoLabel: value });
+      // }));
 
       // Handles adding / removing this application from `ui.windows` when popOut changes.
       this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.popOut, (value) =>
@@ -2411,6 +2405,135 @@ class PopoutSupport
 }
 
 /**
+ * Provides reactive observation of the Foundry core theme applied to `document.body`. There are several stores
+ * available to receive updates when the theme changes.
+ */
+class ThemeObserver
+{
+   /**
+    * All readable theme stores.
+    *
+    * @type {Readonly<({
+    *    theme: Readonly<import('#svelte/store').Readable<'theme-dark' | 'theme-light'>>,
+    *    themeDark: Readonly<import('#svelte/store').Readable<boolean>>,
+    *    themeLight: Readonly<import('#svelte/store').Readable<boolean>>,
+    * })>}
+    */
+   static #stores;
+
+   /**
+    * Internal setter for theme stores.
+    *
+    * @type {({
+    *    theme: Function,
+    *    themeDark: Function,
+    *    themeLight: Function,
+    * })}
+    */
+   static #storeSet;
+
+   /**
+    * Current theme.
+    *
+    * @type {string}
+    */
+   static #theme = '';
+
+   /**
+    * @returns {Readonly<({
+    *    theme: Readonly<import('#svelte/store').Readable<'theme-dark' | 'theme-light'>>,
+    *    themeDark: Readonly<import('#svelte/store').Readable<boolean>>,
+    *    themeLight: Readonly<import('#svelte/store').Readable<boolean>>,
+    * })>} Current core theme stores.
+    */
+   static get stores() { return this.#stores; }
+
+   /**
+    * @returns {'theme-dark' | 'theme-light'} Current core theme.
+    */
+   static get theme() { return this.#theme; }
+
+   /**
+    * @returns {boolean} Is the core theme `dark`.
+    */
+   static get themeDark() { return this.#theme === 'theme-dark'; }
+
+   /**
+    * @returns {boolean} Is the core theme `light`.
+    */
+   static get themeLight() { return this.#theme === 'theme-light'; }
+
+   /**
+    * Helper to apply current core theme to a given SvelteApp optional classes.
+    *
+    * @param {import('#svelte-fvtt/application').SvelteApp} application - Svelte application.
+    *
+    * @returns {string} App classes CSS string with current core theme applied.
+    */
+   static appClasses(application)
+   {
+      const classes = new Set([
+         ...Array.isArray(application?.options?.classes) ? application.options.classes : [],
+      ]);
+
+      // In AppV1 `theme-light` is always applied. Remove it and add the actual AppV2 theme.
+      classes.delete('theme-light');
+
+      classes.add('themed');
+      classes.add(this.#theme);
+
+      return Array.from(classes).join(' ');
+   }
+
+   /**
+    * Initialize `document.body` theme observation.
+    */
+   static initialize()
+   {
+      if (this.#stores !== void 0) { return; }
+
+      const themeStore = writable(this.#theme);
+      const themeDarkStore = writable(false);
+      const themeLightStore = writable(false);
+
+      this.#stores = Object.freeze({
+         theme: Object.freeze({ subscribe: themeStore.subscribe }),
+         themeDark: Object.freeze({ subscribe: themeDarkStore.subscribe }),
+         themeLight: Object.freeze({ subscribe: themeLightStore.subscribe })
+      });
+
+      this.#storeSet = {
+         theme: themeStore.set,
+         themeDark: themeDarkStore.set,
+         themeLight: themeLightStore.set
+      };
+
+      const observer = new MutationObserver(() =>
+      {
+         if (document.body.classList.contains('theme-light'))
+         {
+            this.#theme = 'theme-light';
+
+            this.#storeSet.themeDark(false);
+            this.#storeSet.themeLight(true);
+         }
+         else if (document.body.classList.contains('theme-dark'))
+         {
+            this.#theme = 'theme-dark';
+
+            this.#storeSet.themeDark(true);
+            this.#storeSet.themeLight(false);
+         }
+
+         this.#storeSet.theme(this.#theme);
+      });
+
+      // Only listen for class changes.
+      observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+   }
+}
+
+/**
  * Provides storage for all dialog options through individual accessors and `get`, `merge`, `replace` and `set` methods
  * that safely access and update data changed to the mounted DialogShell component reactively.
  */
@@ -2934,7 +3057,13 @@ class TJSDialog extends SvelteApp
    {
       // Note: explicit setting of `popOutModuleDisable` to prevent the PopOut! module from acting on modal dialogs.
       // @ts-expect-error
-      super({ popOutModuleDisable: typeof data?.modal === 'boolean' ? data.modal : false, ...options });
+      super({
+         popOutModuleDisable: typeof data?.modal === 'boolean' ? data.modal : false,
+         ...options,
+
+         // Always ensure adding `dialog` class for core styles.
+         classes: Array.isArray(options.classes) ? [...options.classes, 'dialog'] : ['dialog']
+      });
 
       this.#managedPromise = new ManagedPromise();
 
@@ -3273,11 +3402,14 @@ class TJSDialog extends SvelteApp
    }
 }
 
+// Initialize core theme observation / changes.
+ThemeObserver.initialize();
+
 // Handle `hotReload` Foundry hook when running the Vite dev server.
 if (import.meta.hot) { FoundryHMRSupport.initialize(); }
 
 // Handle `PopOut!` module hooks to allow applications to popout to their own browser window.
 PopoutSupport.initialize();
 
-export { SvelteApp, SvelteApp as SvelteApplication, TJSDialog };
+export { SvelteApp, SvelteApp as SvelteApplication, TJSDialog, ThemeObserver };
 //# sourceMappingURL=index.js.map

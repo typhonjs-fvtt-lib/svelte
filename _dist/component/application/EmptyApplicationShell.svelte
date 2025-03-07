@@ -12,6 +12,7 @@
    import { resizeObserver }           from '@typhonjs-svelte/runtime-base/svelte/action/dom/observer';
    import { applyStyles }              from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
    import { dynamicAction }            from '@typhonjs-svelte/runtime-base/svelte/action/util';
+   import { ThemeObserver }            from '@typhonjs-fvtt/svelte/application';
    import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
    import { A11yHelper }               from '@typhonjs-svelte/runtime-base/util/a11y';
    import { isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
@@ -166,6 +167,17 @@
 
    // Handle cases if outTransitionOptions is unset; assign empty default transition options.
    $: if (!isObject(outTransitionOptions)) { outTransitionOptions = TJSDefaultTransition.options; }
+
+   // ---------------------------------------------------------------------------------------------------------------
+
+   // Reactive observation of core theme.
+   const themeStore = ThemeObserver.stores.theme;
+
+   // Stores current application optional classes with current theme applied.
+   let appClasses = '';
+
+   // Apply current theme to optional app classes.
+   $: if ($themeStore) { appClasses = ThemeObserver.appClasses(application); }
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -360,7 +372,7 @@
 {#if inTransition !== TJSDefaultTransition.default || outTransition !== TJSDefaultTransition.default}
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
-         class={application.options.classes.join(' ')}
+         class="application {appClasses}"
          data-appid={application.appId}
          bind:this={elementRoot}
          in:inTransition|global={inTransitionOptions}
@@ -380,7 +392,7 @@
 {:else}
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
-         class={application.options.classes.join(' ')}
+         class="application {appClasses}"
          data-appid={application.appId}
          bind:this={elementRoot}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
@@ -398,28 +410,42 @@
 {/if}
 
 <style>
-    div {
-        contain: layout style paint;
+   /* Note: Override stock Foundry removing max width / height as TJSPosition & `auto` sizing is better without. */
+   .application {
+      max-width: var(--tjs-app-max-width, unset);
+      max-height: var(--tjs-app-max-height, unset);
 
-        display: var(--tjs-app-display, flex);
-        flex-direction: var(--tjs-app-flex-direction, column);
-        flex-wrap: var(--tjs-app-flex-wrap, nowrap);
-        justify-content: var(--tjs-app-justify-content, flex-start);
-        gap: var(--tjs-app-content-gap);
+      min-width: var(--tjs-app-min-width, unset);
+      min-height: var(--tjs-app-min-height, unset);
 
-        background: var(--tjs-empty-app-background, none);
-        border-radius: var(--tjs-app-border-radius, 5px);
-        box-shadow: var(--tjs-app-box-shadow, none);
+      overflow: var(--tjs-app-overflow, hidden);
 
-        color: var(--tjs-app-color, inherit);
-        margin: var(--tjs-app-margin, 0);
-        max-height: var(--tjs-app-max-height, 100%);
-        overflow: var(--tjs-app-overflow, hidden);
-        padding: var(--tjs-app-padding, 0);
-        position: var(--tjs-app-position, absolute);
-    }
+      scrollbar-width: var(--tjs-app-scrollbar-width, inherit);
+      scrollbar-color: var(--tjs-app-scrollbar-color, inherit);
+   }
 
-    div:focus-visible {
-        outline: var(--tjs-app-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
-    }
+   div {
+      contain: layout style paint;
+
+      display: var(--tjs-app-display, flex);
+      flex-direction: var(--tjs-app-flex-direction, column);
+      flex-wrap: var(--tjs-app-flex-wrap, nowrap);
+      justify-content: var(--tjs-app-justify-content, flex-start);
+      gap: var(--tjs-app-content-gap);
+
+      background: var(--tjs-empty-app-background, none);
+      border-radius: var(--tjs-app-border-radius, 5px);
+      box-shadow: var(--tjs-app-box-shadow, none);
+
+      color: var(--tjs-app-color, inherit);
+      margin: var(--tjs-app-margin, 0);
+      max-height: var(--tjs-app-max-height, 100%);
+      overflow: var(--tjs-app-overflow, hidden);
+      padding: var(--tjs-app-padding, 0);
+      position: var(--tjs-app-position, absolute);
+   }
+
+   div:focus-visible {
+      outline: var(--tjs-app-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
+   }
 </style>

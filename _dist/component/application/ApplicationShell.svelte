@@ -14,6 +14,7 @@
    import { resizeObserver }           from '@typhonjs-svelte/runtime-base/svelte/action/dom/observer';
    import { applyStyles }              from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
    import { dynamicAction }            from '@typhonjs-svelte/runtime-base/svelte/action/util';
+   import { ThemeObserver }            from '@typhonjs-fvtt/svelte/application';
    import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
    import { A11yHelper }               from '@typhonjs-svelte/runtime-base/util/a11y';
    import { isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
@@ -184,6 +185,17 @@
 
    // Handle cases if outTransitionOptions is unset; assign empty default transition options.
    $: if (!isObject(outTransitionOptions)) { outTransitionOptions = TJSDefaultTransition.options; }
+
+   // ---------------------------------------------------------------------------------------------------------------
+
+   // Reactive observation of core theme.
+   const themeStore = ThemeObserver.stores.theme;
+
+   // Stores current application optional classes with current theme applied.
+   let appClasses = '';
+
+   // Apply current theme to optional app classes.
+   $: if ($themeStore) { appClasses = ThemeObserver.appClasses(application); }
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -396,7 +408,7 @@
 {#if inTransition !== TJSDefaultTransition.default || outTransition !== TJSDefaultTransition.default}
    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
    <div id={application.id}
-        class="app window-app {application.options.classes.join(' ')}"
+        class="application {appClasses}"
         data-appid={application.appId}
         bind:this={elementRoot}
         in:inTransition|global={inTransitionOptions}
@@ -423,7 +435,7 @@
 {:else}
    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
    <div id={application.id}
-        class="app window-app {application.options.classes.join(' ')}"
+        class="application {appClasses}"
         data-appid={application.appId}
         bind:this={elementRoot}
         on:close:popup|preventDefault|stopPropagation={onClosePopup}
@@ -434,7 +446,7 @@
         role=application
         tabindex=-1>
       <TJSApplicationHeader {draggable} {draggableOptions} />
-      <section class=window-content
+      <section class="window-content"
                bind:this={elementContent}
                on:pointerdown={onPointerdownContent}
                use:applyStyles={stylesContent}
@@ -448,36 +460,25 @@
 {/if}
 
 <style>
-   /* Note: this is different than stock Foundry and allows rounded corners from .app core styles */
-   .window-app {
-      contain: layout style paint;
+   /* Override stock Foundry removing min & max width / height as TJSPosition & `auto` sizing is better without. */
+   .application {
+      max-width: var(--tjs-app-max-width, unset);
+      max-height: var(--tjs-app-max-height, unset);
+
+      min-width: var(--tjs-app-min-width, unset);
+      min-height: var(--tjs-app-min-height, unset);
+
       overflow: var(--tjs-app-overflow, hidden);
+
+      scrollbar-width: var(--tjs-app-scrollbar-width, inherit);
+      scrollbar-color: var(--tjs-app-scrollbar-color, inherit);
    }
 
-   .window-content {
-      gap: var(--tjs-app-content-gap);
-
-      /* For Firefox */
-      scrollbar-width: var(--tjs-app-content-scrollbar-width, thin);
-      scrollbar-color: var(--tjs-app-content-scrollbar-color, inherit);
-   }
-
-   .window-app:focus-visible {
-      outline: var(--tjs-app-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
+   .application:focus-visible {
+      outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
    }
 
    .window-content:focus-visible {
       outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
-   }
-
-   /* Override Foundry default; adjust --tjs-app-header-gap to change gap size */
-   .window-app :global(.window-header a) {
-      flex: none;
-      margin: 0;
-   }
-
-   /* Override Foundry default; See TJSHeaderButton for CSS variables */
-   .window-app :global(.window-header i[class^=fa]) {
-      margin: 0
    }
 </style>

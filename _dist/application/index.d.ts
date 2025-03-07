@@ -7,6 +7,7 @@ import { EasingReference } from '@typhonjs-svelte/runtime-base/svelte/easing';
 import { WebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import { TJSSvelte } from '@typhonjs-svelte/runtime-base/svelte/util';
 import { TransitionFunction } from '@typhonjs-svelte/runtime-base/svelte/transition';
+import * as _typhonjs_fvtt_svelte_application from '@typhonjs-fvtt/svelte/application';
 
 /**
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
@@ -506,22 +507,13 @@ declare namespace SvelteApp {
        * application shell will render the new buttons.
        *
        * Optionally you can set in the SvelteApp app options {@link SvelteApp.Options.headerButtonNoClose}
-       * to remove the close button and {@link SvelteApp.Options.headerButtonNoLabel} to true and labels will be
-       * removed from the header buttons.
+       * to remove the close button from the header buttons.
        *
        * @param {object} [opts] - Optional parameters (for internal use)
        *
        * @param {boolean} [opts.headerButtonNoClose] - The value for `headerButtonNoClose`.
-       *
-       * @param {boolean} [opts.headerButtonNoLabel] - The value for `headerButtonNoLabel`.
        */
-      updateHeaderButtons({
-        headerButtonNoClose,
-        headerButtonNoLabel,
-      }?: {
-        headerButtonNoClose?: boolean;
-        headerButtonNoLabel?: boolean;
-      }): void;
+      updateHeaderButtons({ headerButtonNoClose }?: { headerButtonNoClose?: boolean }): void;
     }
     namespace Reactive {
       /**
@@ -1752,4 +1744,47 @@ declare class TJSDialog extends SvelteApp {
   #private;
 }
 
-export { SvelteApp, SvelteApp as SvelteApplication, TJSDialog };
+/**
+ * Provides reactive observation of the Foundry core theme applied to `document.body`. There are several stores
+ * available to receive updates when the theme changes.
+ */
+declare class ThemeObserver {
+  /**
+   * @returns {Readonly<({
+   *    theme: Readonly<import('#svelte/store').Readable<'theme-dark' | 'theme-light'>>,
+   *    themeDark: Readonly<import('#svelte/store').Readable<boolean>>,
+   *    themeLight: Readonly<import('#svelte/store').Readable<boolean>>,
+   * })>} Current core theme stores.
+   */
+  static get stores(): Readonly<{
+    theme: Readonly<any>;
+    themeDark: Readonly<any>;
+    themeLight: Readonly<any>;
+  }>;
+  /**
+   * @returns {'theme-dark' | 'theme-light'} Current core theme.
+   */
+  static get theme(): 'theme-dark' | 'theme-light';
+  /**
+   * @returns {boolean} Is the core theme `dark`.
+   */
+  static get themeDark(): boolean;
+  /**
+   * @returns {boolean} Is the core theme `light`.
+   */
+  static get themeLight(): boolean;
+  /**
+   * Helper to apply current core theme to a given SvelteApp optional classes.
+   *
+   * @param {import('@typhonjs-fvtt/svelte/application').SvelteApp} application - Svelte application.
+   *
+   * @returns {string} App classes CSS string with current core theme applied.
+   */
+  static appClasses(application: _typhonjs_fvtt_svelte_application.SvelteApp): string;
+  /**
+   * Initialize `document.body` theme observation.
+   */
+  static initialize(): void;
+}
+
+export { SvelteApp, SvelteApp, SvelteApp as SvelteApplication, TJSDialog, TJSDialog, ThemeObserver };

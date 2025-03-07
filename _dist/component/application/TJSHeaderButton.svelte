@@ -17,8 +17,6 @@
     *
     * - {{ [key: string]: string | null }}   styles: Additional inline styles to apply to button.
     *
-    * - {string}                    title: Tooltip title.
-    *
     * @componentDocumentation
     * @internal
     */
@@ -28,13 +26,9 @@
 
    export let button = void 0;
 
-   const s_REGEX_HTML = /^\s*<.*>$/;
+   export let storeHeaderButtonNoLabel = void 0;
 
-   $: title = isObject(button) && typeof button.title === 'string' ? localize(button.title) : '';
-
-   // Handle icon and treat bare strings as the icon class; otherwise assume the icon is fully formed HTML.
-   $: icon = isObject(button) && typeof button.icon !== 'string' ? void 0 : s_REGEX_HTML.test(button.icon) ?
-    button.icon : `<i class="${button.icon}" title="${title}"></i>`;
+   $: icon = isObject(button) && typeof button.icon === 'string' ? button.icon : void 0;
 
    $: label = isObject(button) && typeof button.label === 'string' ? localize(button.label) : void 0;
 
@@ -105,47 +99,14 @@
 
 <svelte:options accessors={true}/>
 
-<!-- svelte-ignore a11y-missing-attribute -->
-<a on:click|preventDefault|stopPropagation={onClick}
+<button type=button
+   on:click|preventDefault|stopPropagation={onClick}
    on:contextmenu|preventDefault|stopPropagation={onContextMenu}
    on:keydown={onKeydown}
    on:keyup={onKeyup}
    use:applyStyles={styles}
-   class="header-button {button.class}"
+   class="header-control icon {icon}"
    class:keep-minimized={keepMinimized}
-   aria-label={label}
-   tabindex=0
-   role=button>
-    {@html icon}{#if label}<span class:has-icon={icon !== void 0}>{label}</span>{/if}
-</a>
-
-<style>
-   a {
-      padding: var(--tjs-app-header-button-padding, 0 3px);
-      user-select: none;
-      -webkit-tap-highlight-color: var(--tjs-default-webkit-tap-highlight-color, revert);
-   }
-
-   a :global(i) {
-      padding: var(--tjs-app-header-button-icon-padding, 0);
-   }
-
-   a:hover {
-      text-shadow: var(--tjs-app-header-button-text-shadow-hover, var(--tjs-default-text-shadow-focus-hover, inherit));
-   }
-
-   a:focus-visible {
-      box-shadow: var(--tjs-app-header-button-box-shadow-focus-visible, var(--tjs-default-box-shadow-focus-visible));
-      outline: var(--tjs-app-header-button-outline-focus-visible, var(--tjs-default-outline-focus-visible, revert));
-      transition: var(--tjs-app-header-button-transition-focus-visible, var(--tjs-default-transition-focus-visible));
-      text-shadow: var(--tjs-app-header-button-text-shadow-focus-visible, var(--tjs-default-text-shadow-focus-hover, inherit));
-   }
-
-   span {
-      padding: var(--tjs-app-header-button-label-padding, 0);
-   }
-
-   span.has-icon {
-      padding: var(--tjs-app-header-button-label-padding, 0 0 0 3px);
-   }
-</style>
+   data-tooltip={$storeHeaderButtonNoLabel ? '' : label}
+   aria-label={label}>
+</button>
