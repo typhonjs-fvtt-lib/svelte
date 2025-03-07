@@ -12,6 +12,7 @@
    import { resizeObserver }           from '#runtime/svelte/action/dom/observer';
    import { applyStyles }              from '#runtime/svelte/action/dom/style';
    import { dynamicAction }            from '#runtime/svelte/action/util';
+   import { ThemeObserver }            from '#svelte-fvtt/application';
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
    import { A11yHelper }               from '#runtime/util/a11y';
    import { isObject }                 from '#runtime/util/object';
@@ -19,7 +20,6 @@
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
    import ResizableHandle              from './ResizableHandle.svelte';
 
-   import { ThemeObserver }            from './ThemeObserver.js';
    import TJSFocusWrap                 from '../internal/dom/TJSFocusWrap.svelte';
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also

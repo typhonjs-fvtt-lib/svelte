@@ -1,12 +1,18 @@
 import {
    FoundryHMRSupport,
-   PopoutSupport }   from './external/index.js';
+   PopoutSupport,
+   ThemeObserver }   from './external/index.js';
 
 import { SvelteApp } from './SvelteApp.js';
 
 export { SvelteApp, SvelteApp as SvelteApplication };
 
 export * from './TJSDialog.js';
+
+export { ThemeObserver };
+
+// Initialize core theme observation / changes.
+ThemeObserver.initialize();
 
 // Handle `hotReload` Foundry hook when running the Vite dev server.
 if (import.meta.hot) { FoundryHMRSupport.initialize(); }
