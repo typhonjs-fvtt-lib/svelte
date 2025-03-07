@@ -199,7 +199,7 @@
 
 <style>
    .not-draggable {
-      --tjs-app-header-cursor: default;
+      --tjs-app-header-cursor: var(--tjs-app-header-cursor-not-draggable, default);
    }
 
    /**
