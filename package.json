@@ -58,8 +58,7 @@
   "sideEffects": [
     "./_dist/animate/gsap/plugin/*.js",
     "./_dist/animate/gsap/plugin/bonus/*.js",
-    "./_dist/application/index.js",
-    "./_dist/component/application/index.js"
+    "./_dist/application/index.js"
   ],
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.0",
