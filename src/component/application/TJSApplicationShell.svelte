@@ -500,7 +500,12 @@
       background: var(--tjs-app-content-background, none);
       color: var(--tjs-app-content-color, inherit);
       overflow: var(--tjs-app-content-overflow, hidden);
-      padding: var(--tjs-app-content-padding, 16px);
+      padding: var(--tjs-app-content-padding, 1rem);
+
+      flex: var(--tjs-app-content-flex, 1);
+      display: var(--tjs-app-content-display, flex);
+      flex-direction: var(--tjs-app-content-flex-direction, column);
+      flex-wrap: var(--tjs-app-content-flex-wrap, nowrap);
    }
 
    .tjs-app:focus-visible {
@@ -523,6 +528,7 @@
       justify-content: var(--tjs-app-justify-content, flex-start);
       position: var(--tjs-app-position, absolute);
       border-radius: var(--tjs-app-border-radius, 6px);
+      border: var(--tjs-app-border, 1px solid var(--color-cool-4));
       box-shadow: var(--tjs-app-box-shadow, 0 0 10px #000);
       padding: var(--tjs-app-padding, 0);
    }
@@ -573,7 +579,7 @@
 
    /* Explicit not themed resize handle filter */
    .tjs-app:not(.themed) :global(.window-resize-handle) {
-      --tjs-app-resize-handle-filter: invert(1);
+      --tjs-app-resize-handle-filter-default: invert(1);
    }
 
    /* Themed app color using core dark / light CSS var */
@@ -583,11 +589,11 @@
 
    .tjs-app:is(.themed.theme-dark) {
       --color-header-background: rgba(0, 0, 0, 0.5);
-      --tjs-app-resize-handle-filter: invert(1);
+      --tjs-app-resize-handle-filter-default: invert(1);
    }
 
    .tjs-app:is(.themed.theme-light) {
       --color-header-background: var(--color-dark-3);
-      --tjs-app-resize-handle-filter: none;
+      --tjs-app-resize-handle-filter-default: none;
    }
 </style>
