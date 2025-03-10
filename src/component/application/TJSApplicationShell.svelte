@@ -572,13 +572,11 @@
     * reasonable defaults for the app color, app header background color and resize handle filter.
     */
 
-   /* Explicit not themed color */
    .tjs-app:not(.themed) {
+      /* Explicit not themed color */
       --tjs-app-color: var(--color-light-2);
-   }
 
-   /* Explicit not themed resize handle filter */
-   .tjs-app:not(.themed) :global(.window-resize-handle) {
+      /* Explicit not themed resize handle filter */
       --tjs-app-resize-handle-filter-default: invert(1);
    }
 
