@@ -20,6 +20,7 @@
    import { resizeObserver }           from '#runtime/svelte/action/dom/observer';
    import { applyStyles }              from '#runtime/svelte/action/dom/style';
    import { dynamicAction }            from '#runtime/svelte/action/util';
+   import { ThemeObserver }            from '#svelte-fvtt/application';
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
    import { A11yHelper }               from '#runtime/util/a11y';
    import { isObject }                 from '#runtime/util/object';
@@ -187,6 +188,17 @@
 
    // Handle cases if outTransitionOptions is unset; assign empty default transition options.
    $: if (!isObject(outTransitionOptions)) { outTransitionOptions = TJSDefaultTransition.options; }
+
+   // ---------------------------------------------------------------------------------------------------------------
+
+   // Reactive observation of core theme.
+   const themeStore = ThemeObserver.stores.theme;
+
+   // Stores current application optional classes with current theme applied.
+   let appClasses = '';
+
+   // Apply current theme to optional app classes.
+   $: if ($themeStore) { appClasses = ThemeObserver.appClasses(application, { hasThemed: true }); }
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -402,7 +414,7 @@
 {#if inTransition !== TJSDefaultTransition.default || outTransition !== TJSDefaultTransition.default}
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
-         class="tjs-app tjs-window-app {application.options.classes.join(' ')}"
+         class="tjs-app tjs-window-app {appClasses}"
          data-appid={application.appId}
          bind:this={elementRoot}
          in:inTransition|global={inTransitionOptions}
@@ -429,7 +441,7 @@
 {:else}
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
-         class="tjs-app tjs-window-app {application.options.classes.join(' ')}"
+         class="tjs-app tjs-window-app {appClasses}"
          data-appid={application.appId}
          bind:this={elementRoot}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
@@ -454,113 +466,128 @@
 {/if}
 
 <style>
-    /**
-     * Defines styles that mimic a Foundry popout Application. `:global` is used to preserve the unused CSS in the
-     * template above. A primary benefit of a separate application shell implementation is that the styles are not
-     * overridden by any given game system / modules that might alter the standard Foundry Application CSS. This allows
-     * separate and unique styles to be given to this application regardless of game system / module modifications.
-     */
+   /**
+    * Defines styles that mimic a Foundry popout Application. `:global` is used to preserve the unused CSS in the
+    * template above. A primary benefit of a separate application shell implementation is that the styles are not
+    * overridden by any given game system / modules that might alter the standard Foundry Application CSS. This allows
+    * separate and unique styles to be given to this application regardless of game system / module modifications.
+    */
 
-    .tjs-app {
-        contain: layout style paint;
+   .tjs-app {
+      contain: layout style paint;
 
-        max-height: var(--tjs-app-max-height, 100%);
-        background: var(--tjs-app-background);
-        border-radius: var(--tjs-app-border-radius, 5px);
-        box-shadow: var(--tjs-app-box-shadow, 0 0 20px #000);
-        margin: var(--tjs-app-margin, 3px 0);
-        padding: var(--tjs-app-padding, 0.5em);
-        color: var(--tjs-app-color, #f0f0e0);
-    }
+      background: var(--tjs-app-background, var(--tjs-app-background-default));
+      margin: var(--tjs-app-margin);
+      padding: var(--tjs-app-padding);
+      color: var(--tjs-app-color);
+      font-size: var(--tjs-app-font-size, var(--font-size-14));
+      font-family: var(--tjs-app-font-family, var(--font-sans)), "Signika", "Palatino Linotype", sans-serif;
+      font-weight: var(--tjs-app-font-weight, inherit);
 
-    .tjs-window-app:focus-visible {
-        outline: var(--tjs-app-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
-    }
+      max-width: var(--tjs-app-max-width, unset);
+      max-height: var(--tjs-app-max-height, unset);
 
-    .tjs-window-app .window-content:focus-visible {
-        outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
-    }
+      min-width: var(--tjs-app-min-width, unset);
+      min-height: var(--tjs-app-min-height, unset);
 
-    .tjs-window-app {
-        /* Note: this is different than stock Foundry and allows rounded corners from .app core styles */
-        overflow: var(--tjs-app-overflow, hidden);
+      overflow: var(--tjs-app-overflow, hidden);
 
-        display: var(--tjs-app-display, flex);
-        flex-direction: var(--tjs-app-flex-direction, column);
-        flex-wrap: var(--tjs-app-flex-wrap, nowrap);
-        justify-content: var(--tjs-app-justify-content, flex-start);
-        position: var(--tjs-app-position, absolute);
-        box-shadow: var(--tjs-app-box-shadow, 0 0 20px #000);
-        padding: var(--tjs-app-padding, 0);
-    }
+      scrollbar-width: var(--tjs-app-scrollbar-width, thin);
+      scrollbar-color: var(--tjs-app-scrollbar-color, var(--color-scrollbar) var(--color-scrollbar-track));
+   }
 
-    .tjs-window-app :global(> .flex0) {
-        display: block;
-        flex: 0;
-    }
+   .tjs-app .window-content {
+      background: var(--tjs-app-content-background, none);
+      color: var(--tjs-app-content-color, inherit);
+      overflow: var(--tjs-app-content-overflow, hidden);
+      padding: var(--tjs-app-content-padding, 16px);
+   }
 
-    .tjs-window-app :global(> .flex1) {
-        flex: 1;
-    }
+   .tjs-app:focus-visible {
+      outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
+   }
 
-    .tjs-window-app :global(> .flex2) {
-        flex: 2;
-    }
+   .tjs-app .window-content:focus-visible {
+      outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
+   }
 
-    .tjs-window-app :global(> .flex3) {
-        flex: 3;
-    }
+   .tjs-window-app {
+      --header-height: 36px; /* Set in `.application` */
 
-    .tjs-window-app :global(.window-header) {
-        overflow: var(--tjs-app-header-overflow, hidden);
-        line-height: var(--tjs-app-header-line-height, 30px);
-        border-bottom: var(--tjs-app-header-border-bottom, 1px solid #000);
-    }
+      /* Note: this is different than stock Foundry and allows rounded corners from .app core styles */
+      overflow: var(--tjs-app-overflow, hidden);
 
-    .tjs-window-app :global(.window-header .window-title) {
-        margin: var(--tjs-app-header-title-margin, 0);
-        word-break: var(--tjs-app-header-title-word-break, break-all);
-    }
+      display: var(--tjs-app-display, flex);
+      flex-direction: var(--tjs-app-flex-direction, column);
+      flex-wrap: var(--tjs-app-flex-wrap, nowrap);
+      justify-content: var(--tjs-app-justify-content, flex-start);
+      position: var(--tjs-app-position, absolute);
+      border-radius: var(--tjs-app-border-radius, 6px);
+      box-shadow: var(--tjs-app-box-shadow, 0 0 10px #000);
+      padding: var(--tjs-app-padding, 0);
+   }
 
-    .tjs-window-app :global(.window-header a) {
-        flex: none;
-    }
+   .tjs-window-app :global(.window-header) {
+      --button-size: 24px;
+   }
 
-    .tjs-window-app.minimized :global(.window-header) {
-        border: var(--tjs-app-header-margin-minimized, none);
-    }
+   .tjs-window-app :global(.window-header .window-title) {
+      flex: 1;
+      margin: 0;
 
-    .tjs-window-app .window-content {
-        display: var(--tjs-app-content-display, flex);
-        flex-direction: var(--tjs-app-content-flex-direction, column);
-        flex-wrap: var(--tjs-app-content-flex-wrap, nowrap);
-        flex: var(--tjs-app-content-flex, 1);
-        justify-content: var(--tjs-app-content-justify-content, flex-start);
-        gap: var(--tjs-app-content-gap);
+      font-family: var(--tjs-app-header-font-family, var(--tjs-app-font-family)), "Signika", "Palatino Linotype", sans-serif;
+      font-size: var(--tjs-app-header-font-size, var(--tjs-app-font-size, var(--font-size-14)));
+      font-weight: var(--tjs-app-header-font-weight, inherit);
 
-        background: var(--tjs-app-content-background, none);
-        color: var(--tjs-app-content-color, #191813);
-        overflow: var(--tjs-app-content-overflow, hidden auto);
-        padding: var(--tjs-app-content-padding, 8px);
+      line-height: var(--header-height);
+      border: none;
+      overflow: hidden;
+      text-align: left;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: var(--tjs-app-header-color, var(--color-light-1));
+   }
 
-        /* For Firefox */
-        scrollbar-width: var(--tjs-app-content-scrollbar-width, thin);
-        scrollbar-color: var(--tjs-app-content-scrollbar-color, inherit);
-    }
+   .tjs-window-app :global(.window-header button.header-control) {
+      --button-text-color: var(--color-light-1);
+      --button-background-color: none;
+      flex: 0 0 var(--button-size);
+      height: var(--button-size);
+      padding: 0;
+      margin: 0;
+      border: none;
+   }
 
-    .tjs-window-app :global(.window-resizable-handle) {
-        width: 20px;
-        height: 20px;
-        position: absolute;
-        bottom: -1px;
-        right: 0;
-        background: #444;
-        padding: 2px;
-        border: 1px solid #111;
-        border-radius: 4px 0 0 0;
-    }
+   /* ------------------------------- */
 
-    .tjs-window-app :global(.window-resizable-handle i.fas) {
-        transform: rotate(45deg);
-    }
+   /**
+    * When the `themed` class is added to the application `classes` option core dark / light theming is enabled adding
+    * `themed.theme-dark` and `themed.theme-light` classes to the main app div element. The following selectors provide
+    * reasonable defaults for the app color, app header background color and resize handle filter.
+    */
+
+   /* Explicit not themed color */
+   .tjs-app:not(.themed) {
+      --tjs-app-color: var(--color-light-2);
+   }
+
+   /* Explicit not themed resize handle filter */
+   .tjs-app:not(.themed) :global(.window-resize-handle) {
+      --tjs-app-resize-handle-filter: invert(1);
+   }
+
+   /* Themed app color using core dark / light CSS var */
+   .tjs-app:is(.themed) {
+      --tjs-app-color: var(--color-text-primary);
+   }
+
+   .tjs-app:is(.themed.theme-dark) {
+      --color-header-background: rgba(0, 0, 0, 0.5);
+      --tjs-app-resize-handle-filter: invert(1);
+   }
+
+   .tjs-app:is(.themed.theme-light) {
+      --color-header-background: var(--color-dark-3);
+      --tjs-app-resize-handle-filter: none;
+   }
 </style>
