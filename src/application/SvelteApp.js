@@ -24,6 +24,9 @@ import {
  */
 export class SvelteApp extends Application
 {
+   static #MIN_WINDOW_HEIGHT = 50;
+   static #MIN_WINDOW_WIDTH = 200;
+
    /**
     * Stores the first mounted component which follows the application shell contract.
     *
@@ -172,8 +175,8 @@ export class SvelteApp extends Application
          headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.
          headerIcon: void 0,              // Sets a header icon given an image URL.
          headerNoTitleMinimized: false,   // If true then header title is hidden when application is minimized.
-         minHeight: MIN_WINDOW_HEIGHT,    // Assigned to position. Number specifying minimum window height.
-         minWidth: MIN_WINDOW_WIDTH,      // Assigned to position. Number specifying minimum window width.
+         minHeight: SvelteApp.#MIN_WINDOW_HEIGHT,    // Assigned to position. Number specifying minimum window height.
+         minWidth: SvelteApp.#MIN_WINDOW_WIDTH,      // Assigned to position. Number specifying minimum window width.
          positionable: true,              // If false then `position.set` does not take effect.
          positionInitial: TJSPosition.Initial.browserCentered,      // A helper for initial position placement.
          positionOrtho: true,             // When true TJSPosition is optimized for orthographic use.
@@ -644,8 +647,8 @@ export class SvelteApp extends Application
 
       // Restore previous min width & height from saved data, app options, or default Foundry values.
       this.position.set({
-         minHeight: positionBefore.minHeight ?? this.options?.minHeight ?? MIN_WINDOW_HEIGHT,
-         minWidth: positionBefore.minWidth ?? this.options?.minWidth ?? MIN_WINDOW_WIDTH,
+         minHeight: positionBefore.minHeight ?? this.options?.minHeight ?? SvelteApp.#MIN_WINDOW_HEIGHT,
+         minWidth: positionBefore.minWidth ?? this.options?.minWidth ?? SvelteApp.#MIN_WINDOW_WIDTH,
       });
 
       // Remove inline styles that override any styles assigned to the app.
@@ -786,7 +789,7 @@ export class SvelteApp extends Application
       if (animate)
       {
          // Await animation of width to the left / minimum width.
-         await this.position.animate.to({ width: MIN_WINDOW_WIDTH }, { duration: 0.1 }).finished;
+         await this.position.animate.to({ width: SvelteApp.#MIN_WINDOW_WIDTH }, { duration: 0.1 }).finished;
       }
 
       element.classList.add('minimized');
