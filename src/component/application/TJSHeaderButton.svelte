@@ -108,6 +108,6 @@
    class="header-control icon {icon} {button.class}"
    class:keep-minimized={keepMinimized}
    data-action={button.class}
-   data-tooltip={$storeHeaderButtonNoLabel ? '' : label}
+   data-tooltip={$storeHeaderButtonNoLabel ? null : label}
    aria-label={label}>
 </button>
