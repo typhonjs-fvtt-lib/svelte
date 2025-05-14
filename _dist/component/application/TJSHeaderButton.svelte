@@ -105,8 +105,9 @@
    on:keydown={onKeydown}
    on:keyup={onKeyup}
    use:applyStyles={styles}
-   class="header-control icon {icon}"
+   class="header-control icon {icon} {button.class}"
    class:keep-minimized={keepMinimized}
-   data-tooltip={$storeHeaderButtonNoLabel ? '' : label}
+   data-action={button.class}
+   data-tooltip={$storeHeaderButtonNoLabel ? null : label}
    aria-label={label}>
 </button>

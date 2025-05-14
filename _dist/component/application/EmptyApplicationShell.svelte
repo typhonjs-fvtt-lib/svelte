@@ -177,7 +177,7 @@
    let appClasses = '';
 
    // Apply current theme to optional app classes.
-   $: if ($themeStore) { appClasses = ThemeObserver.appClasses(application); }
+   $: if ($themeStore) { appClasses = ThemeObserver.appClasses(application, { hasThemed: true }); }
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -439,7 +439,6 @@
 
       color: var(--tjs-app-color, inherit);
       margin: var(--tjs-app-margin, 0);
-      max-height: var(--tjs-app-max-height, 100%);
       overflow: var(--tjs-app-overflow, hidden);
       padding: var(--tjs-app-padding, 0);
       position: var(--tjs-app-position, absolute);
@@ -447,5 +446,17 @@
 
    div:focus-visible {
       outline: var(--tjs-app-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
+   }
+
+   div:not(.themed) {
+      /* Explicit not themed color */
+      --tjs-app-color: var(--color-light-2);
+
+      /* Explicit not themed resize handle filter */
+      --tjs-app-resize-handle-filter-default: invert(1);
+   }
+
+   .application:is(.themed.theme-dark) {
+      --tjs-app-resize-handle-filter-default: invert(1);
    }
 </style>

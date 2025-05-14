@@ -389,16 +389,10 @@
    }
 
    .tjs-dialog-button:hover {
-      box-shadow: var(--tjs-dialog-button-box-shadow-focus-hover, var(--tjs-default-box-shadow-focus-hover));
       outline: var(--tjs-dialog-button-outline-focus-hover, var(--tjs-default-outline-focus-hover, revert));
-      transition: var(--tjs-dialog-button-transition-focus-hover, var(--tjs-default-transition-focus-hover));
-      text-shadow: var(--tjs-dialog-button-text-shadow-focus-hover, var(--tjs-default-text-shadow-focus-hover, inherit));
    }
 
    .tjs-dialog-button:focus-visible {
-      box-shadow: var(--tjs-dialog-button-box-shadow-focus-visible, var(--tjs-default-box-shadow-focus-visible));
       outline: var(--tjs-dialog-button-outline-focus-visible, var(--tjs-default-outline-focus-visible, revert));
-      transition: var(--tjs-dialog-button-transition-focus-visible, var(--tjs-default-transition-focus-visible));
-      text-shadow: var(--tjs-dialog-button-text-shadow-focus-visible, var(--tjs-default-text-shadow-focus-hover, inherit));
    }
 </style>

@@ -462,6 +462,8 @@
 <style>
    /* Override stock Foundry removing min & max width / height as TJSPosition & `auto` sizing is better without. */
    .application {
+      contain: layout style paint;
+
       max-width: var(--tjs-app-max-width, unset);
       max-height: var(--tjs-app-max-height, unset);
 
@@ -480,5 +482,9 @@
 
    .window-content:focus-visible {
       outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
+   }
+
+   .application:is(.themed.theme-dark) {
+      --tjs-app-resize-handle-filter-default: invert(1);
    }
 </style>

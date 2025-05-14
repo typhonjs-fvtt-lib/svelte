@@ -1778,9 +1778,21 @@ declare class ThemeObserver {
    *
    * @param {import('@typhonjs-fvtt/svelte/application').SvelteApp} application - Svelte application.
    *
+   * @param {object} [options] - Options.
+   *
+   * @param {boolean} [options.hasThemed] - Verify that the original application default options contains the `themed`
+   *        class otherwise do not add the core theme classes.
+   *
    * @returns {string} App classes CSS string with current core theme applied.
    */
-  static appClasses(application: _typhonjs_fvtt_svelte_application.SvelteApp): string;
+  static appClasses(
+    application: _typhonjs_fvtt_svelte_application.SvelteApp,
+    {
+      hasThemed,
+    }?: {
+      hasThemed?: boolean;
+    },
+  ): string;
   /**
    * Initialize `document.body` theme observation.
    */
