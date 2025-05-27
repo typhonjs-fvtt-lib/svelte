@@ -1,3 +1,4 @@
+
 import { writable } from '#svelte/store';
 
 /**
@@ -81,20 +82,22 @@ export class ThemeObserver
       classes.delete('themed');
       classes.delete('theme-light');
 
+      const origOptions = application.constructor.defaultOptions;
+      const themeExplicit = this.#hasExplicitTheme(origOptions?.classes);
+
       if (!hasThemed)
       {
          // Add core theme classes.
          classes.add('themed');
-         classes.add(this.#theme);
+         classes.add(themeExplicit ?? this.#theme);
       }
       else
       {
-         // Verify original app options has `themed` class then add core theme classes.
-         const origOptions = application.constructor.defaultOptions;
-         if (origOptions?.classes?.includes('themed'))
+         // Verify original app options has `themed` class or explicit theme specified then add core theme classes.
+         if (origOptions?.classes?.includes('themed') || themeExplicit)
          {
             classes.add('themed');
-            classes.add(this.#theme);
+            classes.add(themeExplicit ?? this.#theme);
          }
       }
 
@@ -146,5 +149,33 @@ export class ThemeObserver
 
       // Only listen for class changes.
       observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+   }
+
+   // Internal implementation ----------------------------------------------------------------------------------------
+
+   /**
+    * @param {string[]} classes - Original application classes.
+    *
+    * @returns {undefined | string} Undefined if no explicit theme is specified otherwise the explicitly `theme-<XXX>`
+    *          class string.
+    */
+   static #hasExplicitTheme(classes)
+   {
+      if (!Array.isArray(classes)) { return void 0; }
+
+      let result = void 0;
+
+      for (const entry of classes)
+      {
+         if (typeof entry !== 'string') { continue; }
+
+         if (entry.startsWith('theme-'))
+         {
+            result = entry;
+            break;
+         }
+      }
+
+      return result;
    }
 }
