@@ -451,12 +451,5 @@
    div:not(.themed) {
       /* Explicit not themed color */
       --tjs-app-color: var(--color-light-2);
-
-      /* Explicit not themed resize handle filter */
-      --tjs-app-resize-handle-filter-default: invert(1);
-   }
-
-   .application:is(.themed.theme-dark) {
-      --tjs-app-resize-handle-filter-default: invert(1);
    }
 </style>

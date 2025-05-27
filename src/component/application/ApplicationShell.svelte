@@ -483,8 +483,4 @@
    .window-content:focus-visible {
       outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
    }
-
-   .application:is(.themed.theme-dark) {
-      --tjs-app-resize-handle-filter-default: invert(1);
-   }
 </style>

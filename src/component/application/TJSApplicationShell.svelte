@@ -476,7 +476,7 @@
    .tjs-app {
       contain: layout style paint;
 
-      background: var(--tjs-app-background, var(--tjs-app-background-default));
+      background: var(--tjs-app-background);
       margin: var(--tjs-app-margin);
       padding: var(--tjs-app-padding);
       color: var(--tjs-app-color);
@@ -575,9 +575,6 @@
    .tjs-app:not(.themed) {
       /* Explicit not themed color */
       --tjs-app-color: var(--color-light-2);
-
-      /* Explicit not themed resize handle filter */
-      --tjs-app-resize-handle-filter-default: invert(1);
    }
 
    /* Themed app color using core dark / light CSS var */
@@ -587,11 +584,9 @@
 
    .tjs-app:is(.themed.theme-dark) {
       --color-header-background: rgba(0, 0, 0, 0.5);
-      --tjs-app-resize-handle-filter-default: invert(1);
    }
 
    .tjs-app:is(.themed.theme-light) {
       --color-header-background: var(--color-dark-3);
-      --tjs-app-resize-handle-filter-default: none;
    }
 </style>
