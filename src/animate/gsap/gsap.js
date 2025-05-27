@@ -1,4 +1,5 @@
-import { easingFunc } from '#runtime/svelte/easing';
+import { easingFunc }      from '#runtime/svelte/easing';
+import { getRoutePrefix }  from '#runtime/util/path';
 
 /**
  * The main GSAP object.
@@ -13,7 +14,7 @@ let gsap = void 0;
  *
  * @type {string}
  */
-const modulePath = `${globalThis.location.origin}${foundry.utils.getRoute(`/scripts/greensock/esm/index.js`)}`;
+const modulePath = `${globalThis.location.origin}${getRoutePrefix(`/scripts/greensock/esm/index.js`)}`;
 
 /**
  * Provides a list of Gsap easing functions that are preconfigured and registered with `gsap`. `gsapEasingList`

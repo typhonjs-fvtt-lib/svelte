@@ -1,3 +1,5 @@
+import { getRoutePrefix } from '#runtime/util/path';
+
 /**
  * @param {string}   name - Name of GSAP plugin to load.
  *
@@ -12,7 +14,7 @@ export async function gsapLoadPlugin(name)
     *
     * @type {string}
     */
-   const modulePath = `${globalThis.location.origin}${foundry.utils.getRoute(`/scripts/greensock/esm/${name}.js`)}`;
+   const modulePath = `${globalThis.location.origin}${getRoutePrefix(`/scripts/greensock/esm/${name}.js`)}`;
 
    try
    {

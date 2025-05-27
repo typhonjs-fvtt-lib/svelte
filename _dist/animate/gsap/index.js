@@ -1,4 +1,5 @@
 import { easingFunc } from '@typhonjs-svelte/runtime-base/svelte/easing';
+import { getRoutePrefix } from '@typhonjs-svelte/runtime-base/util/path';
 import { TJSVelocityTrack } from '@typhonjs-svelte/runtime-base/math/physics';
 import { A11yHelper } from '@typhonjs-svelte/runtime-base/util/a11y';
 import { isObject, isIterable, isPlainObject, klona } from '@typhonjs-svelte/runtime-base/util/object';
@@ -17,7 +18,7 @@ let gsap = void 0;
  *
  * @type {string}
  */
-const modulePath = `${globalThis.location.origin}${foundry.utils.getRoute(`/scripts/greensock/esm/index.js`)}`;
+const modulePath = `${globalThis.location.origin}${getRoutePrefix(`/scripts/greensock/esm/index.js`)}`;
 
 /**
  * Provides a list of Gsap easing functions that are preconfigured and registered with `gsap`. `gsapEasingList`
@@ -2228,7 +2229,7 @@ async function gsapLoadPlugin(name)
     *
     * @type {string}
     */
-   const modulePath = `${globalThis.location.origin}${foundry.utils.getRoute(`/scripts/greensock/esm/${name}.js`)}`;
+   const modulePath = `${globalThis.location.origin}${getRoutePrefix(`/scripts/greensock/esm/${name}.js`)}`;
 
    try
    {

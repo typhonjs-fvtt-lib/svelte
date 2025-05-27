@@ -12,6 +12,7 @@
    import { A11yHelper }         from '#runtime/util/a11y';
    import { localize }           from '#runtime/util/i18n';
    import { isObject }           from '#runtime/util/object';
+   import { getRoutePrefix }     from '#runtime/util/path';
 
    import {
       draggable as dragDefault } from '#runtime/svelte/store/position';
@@ -180,7 +181,7 @@
            use:draggable={dragOptions}
            use:minimizable={$storeMinimizable}>
       {#if mediaType === 'img'}
-         <img class="tjs-app-icon keep-minimized" src={globalThis.foundry.utils.getRoute($storeHeaderIcon)} alt=icon>
+         <img class="tjs-app-icon keep-minimized" src={getRoutePrefix($storeHeaderIcon)} alt=icon>
       {:else if mediaType === 'font'}
          <i class="window-icon keep-minimized {$storeHeaderIcon}"></i>
       {/if}
