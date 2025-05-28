@@ -1745,6 +1745,64 @@ declare class TJSDialog extends SvelteApp {
 }
 
 /**
+ * Parses the core Foundry style sheet creating an indexed object of properties by individual selector parts that are
+ * viable to use for specific element styling.
+ */
+declare class FoundryStyles {
+  /**
+   * @returns {MapIterator<[string, {[p: string]: string}]>} Tracked CSS selector key / value iterator.
+   */
+  static entries(): MapIterator<
+    [
+      string,
+      {
+        [p: string]: string;
+      },
+    ]
+  >;
+  /**
+   * Gets all properties associated with the selector. Try and use a direct match otherwise all keys
+   * are iterated to find a selector string that includes the `selector`.
+   *
+   * @param {string}   selector - Selector to find.
+   *
+   * @returns { {[key: string]: string} } Properties object.
+   */
+  static get(selector: string): {
+    [key: string]: string;
+  };
+  /**
+   * Gets a specific property value from the given `selector` and `property` key. Try and use a direct selector
+   * match otherwise all keys are iterated to find a selector string that includes `selector`.
+   *
+   * @param {string}   selector - Selector to find.
+   *
+   * @param {string}   property - Specific property to locate.
+   *
+   * @returns {string | undefined} Property value.
+   */
+  static getProperty(selector: string, property: string): string | undefined;
+  /**
+   * @param {string}   selector - CSS selector to check.
+   *
+   * @returns {boolean} FoundryStyles tracks the given selector.
+   */
+  static has(selector: string): boolean;
+  /**
+   * @returns {MapIterator<string>} Tracked CSS selector keys iterator.
+   */
+  static keys(): MapIterator<string>;
+  /**
+   * @returns {CSSStyleSheet} Main Foundry stylesheet.
+   */
+  static get sheet(): CSSStyleSheet;
+  /**
+   * @returns {number} Returns the size / count of selector properties tracked.
+   */
+  static get size(): number;
+}
+
+/**
  * Provides reactive observation of the Foundry core theme applied to `document.body`. There are several stores
  * available to receive updates when the theme changes.
  */
@@ -1799,4 +1857,4 @@ declare class ThemeObserver {
   static initialize(): void;
 }
 
-export { SvelteApp, SvelteApp, SvelteApp as SvelteApplication, TJSDialog, TJSDialog, ThemeObserver };
+export { FoundryStyles, SvelteApp, SvelteApp, SvelteApp as SvelteApplication, TJSDialog, TJSDialog, ThemeObserver };

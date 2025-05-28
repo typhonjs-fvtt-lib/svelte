@@ -1,5 +1,6 @@
 import {
    FoundryHMRSupport,
+   FoundryStyles,
    PopoutSupport,
    ThemeObserver }   from './external/index.js';
 
@@ -9,7 +10,10 @@ export { SvelteApp, SvelteApp as SvelteApplication };
 
 export * from './TJSDialog.js';
 
-export { ThemeObserver };
+export {
+   FoundryStyles,
+   ThemeObserver
+};
 
 // Initialize core theme observation / changes.
 ThemeObserver.initialize();
