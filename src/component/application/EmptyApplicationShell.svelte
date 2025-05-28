@@ -447,9 +447,4 @@
    div:focus-visible {
       outline: var(--tjs-app-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
    }
-
-   div:not(.themed) {
-      /* Explicit not themed color */
-      --tjs-app-color: var(--color-light-2);
-   }
 </style>
