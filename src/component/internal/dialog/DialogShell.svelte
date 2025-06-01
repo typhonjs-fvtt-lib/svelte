@@ -294,7 +294,7 @@
 <svelte:options accessors={true}/>
 
 {#if modal}
-   <TJSGlassPane id={`${application.id}-glasspane`} {...modalProps} {zIndex}
+   <TJSGlassPane id={`${application.id}-glasspane`} {...modalProps}
                  on:glasspane:close={() => application.close()}
                  on:glasspane:keydown:escape={() => application.close()}>
       <ApplicationShell bind:elementRoot bind:elementContent {...appProps}>
