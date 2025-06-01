@@ -5,6 +5,8 @@
     *
     * @componentDocumentation
     */
+   import { onMount }                  from '#svelte';
+
    import { applyStyles }              from '#runtime/svelte/action/dom/style';
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
    import { CrossWindow }              from '#runtime/util/browser';
@@ -17,7 +19,7 @@
    export let captureInput = true;
 
    /**
-    * When true any input fires an event `glasspane:close`.
+    * When true, any input fires an event `glasspane:close`.
     *
     * @type {boolean}
     */
@@ -31,9 +33,6 @@
 
    /** @type {{ [key: string]: string | null }} */
    export let styles = void 0;
-
-   /** @type {number} */
-   export let zIndex = Number.MAX_SAFE_INTEGER;
 
    /** @type {HTMLDivElement} */
    let backgroundEl, containerEl, glassPaneEl;
@@ -98,6 +97,14 @@
 
    // ---------------------------------------------------------------------------------------------------------------
 
+   onMount(() =>
+   {
+      // Automatically invoke popover state.
+      glassPaneEl.showPopover();
+   });
+
+   // ---------------------------------------------------------------------------------------------------------------
+
    /**
     * Swallows / stops propagation for all events where the event target is not contained by the glass pane element.
     *
@@ -146,6 +153,7 @@
 <!-- Capture all input -->
 <svelte:window
         on:contextmenu|capture={swallow}
+        on:click|capture={swallow}
         on:dblclick|capture={swallow}
         on:keydown|capture={swallow}
         on:keyup|capture={swallow}
@@ -164,7 +172,7 @@
 <div id={id}
      bind:this={glassPaneEl}
      class=tjs-glass-pane
-     style:z-index={zIndex}
+     popover=manual
      on:glasspane:close
      on:glasspane:keydown:escape
      on:glasspane:pointerdown>
@@ -186,17 +194,23 @@
            style:background={background}
            in:inTransition|global={inTransitionOptions}
            out:outTransition|global={outTransitionOptions}
-           use:applyStyles={styles} >
+           use:applyStyles={styles}>
          <slot />
       </div>
    {/if}
 </div>
 
 <style>
-   .tjs-glass-pane, .tjs-glass-pane-background , .tjs-glass-pane-container {
+   .tjs-glass-pane {
+       border: none;
+       background: transparent;
+    }
+
+   .tjs-glass-pane, .tjs-glass-pane-background, .tjs-glass-pane-container {
       position: absolute;
       overflow: hidden;
 
+      padding: 0;
       height: 100%;
       width: 100%;
       max-height: 100%;
