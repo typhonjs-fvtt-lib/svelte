@@ -265,14 +265,16 @@
     */
    function onKeydown(event)
    {
+      const FVTTKeyboardManager = foundry.helpers.interaction.KeyboardManager;
+
       // TODO: Note this handling is specifically for Foundry v11+ as the platform KeyboardManager uses
       // `document.querySelector(':focus')` to short circuit keyboard handling internally to KeyboardManager.
       // ApplicationShell manages containing focus programmatically and this prevents the Foundry KeyboardManager from
       // activating. We need to check if this key event target is currently the `elementRoot` or `elementContent` and
       // the event matches any KeyboardManager actions and if so blur current focus.
       if ((event.target === elementRoot || event.target === elementContent) &&
-       KeyboardManager && KeyboardManager?._getMatchingActions?.(
-        KeyboardManager?.getKeyboardEventContext?.(event))?.length)
+       FVTTKeyboardManager && FVTTKeyboardManager?._getMatchingActions?.(
+        FVTTKeyboardManager?.getKeyboardEventContext?.(event))?.length)
       {
          event.target?.blur();
          return;
