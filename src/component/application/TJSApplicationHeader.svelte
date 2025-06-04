@@ -175,7 +175,7 @@
 </script>
 
 {#key draggable}
-   <header class="window-header flexrow"
+   <header class="window-header"
            class:not-draggable={!$storeDraggable}
            on:pointerdown={onPointerdown}
            use:draggable={dragOptions}
@@ -214,7 +214,10 @@
    }
 
    .window-header {
-      background: var(--tjs-app-header-background, var(--color-header-background));
+      display: flex;
+      align-items: center;
+
+      background: var(--tjs-app-header-background);
       cursor: var(--tjs-app-header-cursor, var(--cursor-grab));
       flex: var(--tjs-app-header-flex, 0 0 var(--header-height));
       gap: var(--tjs-app-header-gap, 5px);
@@ -223,7 +226,6 @@
    }
 
    .window-header .tjs-app-icon {
-      align-self: center;
       border-radius: var(--tjs-app-header-icon-border-radius, 4px);
       flex: 0 0 var(--tjs-app-header-icon-width, 24px);
       height: var(--tjs-app-header-icon-height, 24px);
