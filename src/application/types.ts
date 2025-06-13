@@ -420,6 +420,15 @@ declare namespace SvelteAppNS {
          mergeOptions(options: object): void;
 
          /**
+          * Provides a way to easily remove the application from active window tracking setting `popOut` to false and
+          * z-index to above the TJS dialog level effectively making the app always on top. When disabled, adds the
+          * application back as a `popOut` window and brings it to the top of tracked windows.
+          *
+          * @param {boolean}  enabled - Enabled state for always on top.
+          */
+         setAlwaysOnTop(enabled: boolean): void;
+
+         /**
           * Provides a way to safely set this applications options given an accessor string which describes the
           * entries to walk. To access deeper entries into the object format the accessor string with `.` between
           * entries to walk.

@@ -126,7 +126,7 @@
       dialogOptions.set(data);
 
       const newZIndex = Number.isInteger(data.zIndex) || data.zIndex === null ? data.zIndex :
-       modal ? Number.MAX_SAFE_INTEGER : Number.MAX_SAFE_INTEGER - 1
+       modal ? 2 ** 31 : (2 ** 31) - 50
       if (zIndex !== newZIndex) { zIndex = newZIndex; }
 
       // Update the main foundry options when data changes. Perform explicit checks against existing data in `application`.

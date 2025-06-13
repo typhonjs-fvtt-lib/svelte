@@ -8,6 +8,8 @@ import {
 
 import { propertyStore }         from '#runtime/svelte/store/writable-derived';
 
+import { nextAnimationFrame }    from '#runtime/util/animate';
+
 import {
    deepMerge,
    safeAccess,
@@ -386,7 +388,30 @@ export class SvelteReactive
     */
    set popOut(popOut)
    {
-      if (typeof popOut === 'boolean') { this.setOptions('popOut', popOut); }
+      if (typeof popOut === 'boolean')
+      {
+         this.setOptions('popOut', popOut);
+
+         // TODO: Note Foundry AppV1 global variable usage.
+         if (popOut)
+         {
+            // Ensure that the app is tracked in current popout windows.
+            if (globalThis?.ui?.windows?.[this.#application.appId] !== this.#application)
+            {
+               globalThis.ui.windows[this.#application.appId] = this.#application;
+            }
+         }
+         else
+         {
+            // Remove app from global window tracking.
+            if (globalThis?.ui?.activeWindow === this.#application) { globalThis.ui.activeWindow = null; }
+
+            if (globalThis?.ui?.windows?.[this.#application.appId] === this.#application)
+            {
+               delete globalThis.ui.windows[this.#application.appId];
+            }
+         }
+      }
    }
 
    /**
@@ -456,6 +481,37 @@ export class SvelteReactive
    mergeOptions(options)
    {
       this.#storeAppOptionsUpdate((instanceOptions) => deepMerge(instanceOptions, options));
+   }
+
+   /**
+    * Provides a way to easily remove the application from active window tracking setting `popOut` to false and
+    * z-index to above the TJS dialog level effectively making the app always on top. When disabled, adds the
+    * application back as a `popOut` window and brings it to the top of tracked windows.
+    *
+    * @param {boolean}  enabled - Enabled state for always on top.
+    */
+   setAlwaysOnTop(enabled)
+   {
+      if (typeof enabled === 'boolean')
+      {
+         if (enabled)
+         {
+            this.#application.reactive.popOut = false;
+
+            // Set z-index to above the TJS dialog level (2 ** 31 - 50).
+            this.#application.position.zIndex = (2 ** 31) - 25;
+         }
+         else
+         {
+            this.#application.reactive.popOut = true;
+
+            // TODO: Note direct Foundry API access.
+            this.#application.position.zIndex = foundry.applications.api.ApplicationV2._maxZ - 1;
+
+            // Wait for `rAF` then bring to the top.
+            nextAnimationFrame().then(() => this.#application.bringToTop());
+         }
+      }
    }
 
    /**
