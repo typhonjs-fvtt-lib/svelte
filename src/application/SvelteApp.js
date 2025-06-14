@@ -24,6 +24,14 @@ import {
  */
 export class SvelteApp extends Application
 {
+   /**
+    * Disable Foundry v13+ warnings for AppV1.
+    *
+    * @type {boolean}
+    * @internal
+    */
+   static _warnedAppV1 = true;
+
    static #MIN_WINDOW_HEIGHT = 50;
    static #MIN_WINDOW_WIDTH = 200;
 
