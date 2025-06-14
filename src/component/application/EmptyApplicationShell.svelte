@@ -2,6 +2,9 @@
    /**
     * Provides an empty application shell as a main top level slotted component.
     *
+    * Container queries are supported and the main app window container is named `tjs-app-window` and the window content
+    * container is `tjs-app-window-content`.
+    *
     * @componentDocumentation
     */
    import {
@@ -414,6 +417,8 @@
 <style>
    /* Note: Override stock Foundry removing max width / height as TJSPosition & `auto` sizing is better without. */
    .application {
+      container: tjs-app-window / inline-size;
+
       max-width: var(--tjs-app-max-width, unset);
       max-height: var(--tjs-app-max-height, unset);
 
@@ -428,6 +433,8 @@
 
    div {
       contain: layout style paint;
+
+      container: tjs-app-window-content / inline-size;
 
       display: var(--tjs-app-display, flex);
       flex-direction: var(--tjs-app-flex-direction, column);

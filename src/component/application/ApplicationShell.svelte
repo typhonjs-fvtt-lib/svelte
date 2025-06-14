@@ -3,6 +3,9 @@
     * Provides an application shell is a main top level slotted component that provides a reactive
     * outer wrapper and header bar for the main content component.
     *
+    * Container queries are supported and the main app window container is named `tjs-app-window` and the window content
+    * container is `tjs-app-window-content`.
+    *
     * @componentDocumentation
     */
 
@@ -448,7 +451,7 @@
         role=application
         tabindex=-1>
       <TJSApplicationHeader {draggable} {draggableOptions} />
-      <section class="window-content"
+      <section class=window-content
                bind:this={elementContent}
                on:pointerdown={onPointerdownContent}
                use:applyStyles={stylesContent}
@@ -466,6 +469,8 @@
    .application {
       contain: layout style paint;
 
+      container: tjs-app-window / inline-size;
+
       max-width: var(--tjs-app-max-width, unset);
       max-height: var(--tjs-app-max-height, unset);
 
@@ -480,6 +485,10 @@
 
    .application:focus-visible {
       outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
+   }
+
+   .window-content {
+      container: tjs-app-window-content / inline-size;
    }
 
    .window-content:focus-visible {

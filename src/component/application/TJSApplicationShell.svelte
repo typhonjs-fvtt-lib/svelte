@@ -4,6 +4,9 @@
     * {@link ApplicationShell}. An application shell is a main top level slotted component that provides a reactive
     * outer wrapper and header bar for the main content component.
     *
+    * Container queries are supported and the main app window container is named `tjs-app-window` and the window content
+    * container is `tjs-app-window-content`.
+    *
     * ### CSS variables
     *
     * ```
@@ -478,6 +481,8 @@
    .tjs-app {
       contain: layout style paint;
 
+      container: tjs-app-window / inline-size;
+
       background: var(--tjs-app-background);
       margin: var(--tjs-app-margin);
       padding: var(--tjs-app-padding);
@@ -499,6 +504,8 @@
    }
 
    .tjs-app .window-content {
+      container: tjs-app-window-content / inline-size;
+
       background: var(--tjs-app-content-background, none);
       color: var(--tjs-app-content-color, inherit);
       overflow: var(--tjs-app-content-overflow, hidden);
