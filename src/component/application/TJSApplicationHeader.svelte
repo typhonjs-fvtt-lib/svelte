@@ -200,7 +200,7 @@
 
 <style>
    .not-draggable {
-      --tjs-app-header-cursor: var(--tjs-app-header-cursor-not-draggable, default);
+      --tjs-app-header-cursor: var(--tjs-app-header-cursor-not-draggable, var(--tjs-cursor-default, default));
    }
 
    /**
@@ -218,7 +218,7 @@
       align-items: center;
 
       background: var(--tjs-app-header-background);
-      cursor: var(--tjs-app-header-cursor, var(--cursor-grab));
+      cursor: var(--tjs-app-header-cursor, var(--tjs-cursor-grab, grab));
       flex: var(--tjs-app-header-flex, 0 0 var(--header-height));
       gap: var(--tjs-app-header-gap, 5px);
       padding: var(--tjs-app-header-padding, 0 0.5rem);

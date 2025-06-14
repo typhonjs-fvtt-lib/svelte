@@ -223,7 +223,7 @@
       height: var(--tjs-app-resize-handle-height, 11px);
 
       background: var(--tjs-app-resize-handle-background);
-      cursor: var(--tjs-app-resize-handle-cursor, nwse-resize);
+      cursor: var(--tjs-app-resize-handle-cursor, var(--tjs-cursor-resize-nwse, nwse-resize));
       filter: var(--tjs-app-resize-handle-filter, none);
       inset: var(--tjs-app-resize-handle-inset, auto 1px 1px auto);
       padding: var(--tjs-app-resize-handle-padding, 0);
