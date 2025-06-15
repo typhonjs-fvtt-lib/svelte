@@ -28,7 +28,7 @@ declare namespace SvelteAppNS {
     */
    export type HeaderButton = {
       /**
-       * When true the button is left aligned after the window title.
+       * When true, the button is left aligned after the window title.
        *
        * @defaultValue `false`
        */
@@ -152,7 +152,7 @@ declare namespace SvelteAppNS {
       export interface Reactive
       {
          /**
-          * @returns {WebStorage} Returns WebStorage (session) instance.
+          * @returns Returns WebStorage (session) instance.
           */
          get sessionStorage(): WebStorage;
 
@@ -175,216 +175,215 @@ declare namespace SvelteAppNS {
          /**
           * Returns the draggable app option.
           *
-          * @returns {boolean} Draggable app option.
+          * @returns Draggable app option.
           */
          get draggable(): boolean;
 
          /**
-          * Sets `this.options.draggable` which is reactive for application shells.
+          * Sets `this.options.draggable`, which is reactive for application shells.
           *
-          * @param {boolean}  draggable - Sets the draggable option.
+          * @param draggable - Sets the draggable option.
           */
          set draggable(draggable: boolean);
 
          /**
           * Returns the focusAuto app option.
           *
-          * @returns {boolean} When true auto-management of app focus is enabled.
+          * @returns When true auto-management of app focus is enabled.
           */
          get focusAuto(): boolean;
 
          /**
-          * Sets `this.options.focusAuto` which is reactive for application shells.
+          * Sets `this.options.focusAuto`, which is reactive for application shells.
           *
-          * @param {boolean}  focusAuto - Sets the focusAuto option.
+          * @param focusAuto - Sets the focusAuto option.
           */
          set focusAuto(focusAuto: boolean);
 
          /**
           * Returns the focusKeep app option.
           *
-          * @returns {boolean} When `focusAuto` and `focusKeep` is true; keeps internal focus.
+          * @returns When `focusAuto` and `focusKeep` is true; keeps internal focus.
           */
          get focusKeep(): boolean;
 
          /**
-          * Sets `this.options.focusKeep` which is reactive for application shells.
+          * Sets `this.options.focusKeep`, which is reactive for application shells.
           *
-          * @param {boolean}  focusKeep - Sets the focusKeep option.
+          * @param focusKeep - Sets the focusKeep option.
           */
          set focusKeep(focusKeep: boolean);
 
          /**
           * Returns the focusTrap app option.
           *
-          * @returns {boolean} When true focus trapping / wrapping is enabled keeping focus inside app.
+          * @returns When true focus trapping / wrapping is enabled keeping focus inside app.
           */
          get focusTrap(): boolean;
 
          /**
-          * Sets `this.options.focusTrap` which is reactive for application shells.
+          * Sets `this.options.focusTrap`, which is reactive for application shells.
           *
-          * @param {boolean}  focusTrap - Sets the focusTrap option.
+          * @param focusTrap - Sets the focusTrap option.
           */
          set focusTrap(focusTrap: boolean);
 
          /**
           * Returns the headerButtonNoClose app option.
           *
-          * @returns {boolean} Remove the close the button in header app option.
+          * @returns Remove the close the button in header app option.
           */
          get headerButtonNoClose(): boolean;
 
          /**
-          * Sets `this.options.headerButtonNoClose` which is reactive for application shells.
+          * Sets `this.options.headerButtonNoClose`, which is reactive for application shells.
           *
-          * @param {boolean}  headerButtonNoClose - Sets the headerButtonNoClose option.
+          * @param headerButtonNoClose - Sets the headerButtonNoClose option.
           */
          set headerButtonNoClose(headerButtonNoClose: boolean);
 
          /**
           * Returns the headerButtonNoLabel app option.
           *
-          * @returns {boolean} Remove the labels from buttons in header app option.
+          * @returns Remove the labels from buttons in the header app option.
           */
          get headerButtonNoLabel(): boolean;
 
          /**
-          * Sets `this.options.headerButtonNoLabel` which is reactive for application shells.
+          * Sets `this.options.headerButtonNoLabel`, which is reactive for application shells.
           *
-          * @param {boolean}  headerButtonNoLabel - Sets the headerButtonNoLabel option.
+          * @param headerButtonNoLabel - Sets the headerButtonNoLabel option.
           */
          set headerButtonNoLabel(headerButtonNoLabel: boolean);
 
          /**
           * Returns the headerIcon app option.
           *
-          * @returns {string | undefined} URL for header app icon.
+          * @returns URL for header app icon.
           */
          get headerIcon(): string | undefined;
 
          /**
-          * Sets `this.options.headerIcon` which is reactive for application shells.
+          * Sets `this.options.headerIcon`, which is reactive for application shells.
           *
-          * @param {string | undefined}  headerIcon - Sets the headerButtonNoLabel option.
+          * @param headerIcon - Sets the headerButtonNoLabel option.
           */
          set headerIcon(headerIcon: string | undefined);
 
          /**
           * Returns the headerNoTitleMinimized app option.
           *
-          * @returns {boolean} When true removes the header title when minimized.
+          * @returns When true removes the header title when minimized.
           */
          get headerNoTitleMinimized(): boolean;
 
          /**
-          * Sets `this.options.headerNoTitleMinimized` which is reactive for application shells.
+          * Sets `this.options.headerNoTitleMinimized`, which is reactive for application shells.
           *
-          * @param {boolean}  headerNoTitleMinimized - Sets the headerNoTitleMinimized option.
+          * @param headerNoTitleMinimized - Sets the headerNoTitleMinimized option.
           */
          set headerNoTitleMinimized(headerNoTitleMinimized: boolean);
 
          /**
           * Returns the minimizable app option.
           *
-          * @returns {boolean} Minimizable app option.
+          * @returns Minimizable app option.
           */
          get minimizable(): boolean;
 
          /**
-          * Sets `this.options.minimizable` which is reactive for application shells that are also pop out.
+          * Sets `this.options.minimizable`, which is reactive for application shells that are also pop out.
           *
-          * @param {boolean}  minimizable - Sets the minimizable option.
+          * @param minimizable - Sets the minimizable option.
           */
          set minimizable(minimizable: boolean);
 
          /**
           * Returns the Foundry popOut state; {@link fvtt!ApplicationOptions.popOut}
           *
-          * @returns {boolean} Positionable app option.
+          * @returns Positionable app option.
           */
          get popOut(): boolean;
 
          /**
-          * Sets `this.options.popOut` which is reactive for application shells. This will add / remove this application
-          * from `ui.windows`.
+          * Sets `this.options.popOut`, which is reactive for application shells. This will add / remove this
+          * application from `ui.windows`.
           *
-          * @param {boolean}  popOut - Sets the popOut option.
+          * @param popOut - Sets the popOut option.
           */
          set popOut(popOut: boolean);
 
          /**
           * Returns the positionable app option; {@link SvelteAppNS.Options.positionable}
           *
-          * @returns {boolean} Positionable app option.
+          * @returns Positionable app option.
           */
          get positionable(): boolean;
 
          /**
           * Sets `this.options.positionable` enabling / disabling {@link SvelteApp.position}.
           *
-          * @param {boolean}  positionable - Sets the positionable option.
+          * @param positionable - Sets the positionable option.
           */
          set positionable(positionable: boolean);
 
          /**
           * Returns the resizable option.
           *
-          * @returns {boolean} Resizable app option.
+          * @returns Resizable app option.
           */
          get resizable(): boolean;
 
          /**
-          * Sets `this.options.resizable` which is reactive for application shells.
+          * Sets `this.options.resizable`, which is reactive for application shells.
           *
-          * @param {boolean}  resizable - Sets the resizable option.
+          * @param resizable - Sets the resizable option.
           */
          set resizable(resizable: boolean);
 
          /**
-          * Returns the title accessor from the parent Application class; {@link ApplicationOptions.title}
+          * Returns the title accessor from the parent Application class; {@link fvtt!ApplicationOptions}.
           *
-          * @returns {string} Title.
+          * @returns Title.
           */
          get title(): string;
 
          /**
-          * Sets `this.options.title` which is reactive for application shells.
+          * Sets `this.options.title`, which is reactive for application shells.
           *
           * Note: Will set empty string if title is undefined or null.
           *
-          * @param {string | undefined | null}   title - Application title; will be localized, so a translation key is
-          *        fine.
+          * @param title - Application title; will be localized, so a translation key is fine.
           */
-         set title(title: string);
+         set title(title: string | undefined | null);
 
          // Accessors for UI state -----------------------------------------------------------------------------------
 
          /**
           * Returns the current active Window / WindowProxy UI state.
           *
-          * @returns {Window} Active window UI state.
+          * @returns Active window UI state.
           */
          get activeWindow(): Window;
 
          /**
           * Returns the current dragging UI state.
           *
-          * @returns {boolean} Dragging UI state.
+          * @returns Dragging UI state.
           */
          get dragging(): boolean;
 
          /**
           * Returns the current minimized UI state.
           *
-          * @returns {boolean} Minimized UI state.
+          * @returns Minimized UI state.
           */
          get minimized(): boolean;
 
          /**
           * Returns the current resizing UI state.
           *
-          * @returns {boolean} Resizing UI state.
+          * @returns Resizing UI state.
           */
          get resizing(): boolean;
 
@@ -393,53 +392,54 @@ declare namespace SvelteAppNS {
           *
           * Note: This is protected usage and used internally.
           *
-          * @param {Window} activeWindow - Active Window / WindowProxy UI state.
+          * @param activeWindow - Active Window / WindowProxy UI state.
           *
           * @hidden
           */
          set activeWindow(activeWindow: Window);
 
          /**
-          * Provides a way to safely get this applications options given an accessor string which describes the
-          * entries to walk. To access deeper entries into the object format the accessor string with `.` between
+          * Provides a way to safely get the application options given an accessor string which describes the
+          * entries to walk. To access deeper entries into the object format, the accessor string with `.` between
           * entries to walk.
           *
-          * @param {string}   accessor - The path / key to set. You can set multiple levels.
+          * @param accessor - The path / key to set. You can set multiple levels.
           *
-          * @param {*}        [defaultValue] - A default value returned if the accessor is not found.
+          * @param [defaultValue] - A default value returned if the accessor is not found.
           *
-          * @returns {*} Value at the accessor.
+          * @returns Value at the accessor.
           */
          getOptions(accessor: string, defaultValue?: any): any;
 
          /**
-          * Provides a way to merge `options` into this applications options and update the appOptions store.
+          * Provides a way to merge `options` into the application options and update the appOptions store.
           *
-          * @param {object}   options - The options object to merge with `this.options`.
+          * @param options - The options object to merge with `this.options`.
           */
          mergeOptions(options: object): void;
 
-         /**
-          * Provides a way to easily remove the application from active window tracking setting `popOut` to false and
-          * z-index to above the TJS dialog level effectively making the app always on top. When disabled, adds the
-          * application back as a `popOut` window and brings it to the top of tracked windows.
-          *
-          * @param {boolean}  enabled - Enabled state for always on top.
-          */
-         setAlwaysOnTop(enabled: boolean): void;
+         // TODO: REMOVE
+         // /**
+         //  * Provides a way to easily remove the application from active window tracking setting `popOut` to false and
+         //  * z-index to above the TJS dialog level effectively making the app always on top. When disabled, adds the
+         //  * application back as a `popOut` window and brings it to the top of tracked windows.
+         //  *
+         //  * @param enabled - Enabled state for always on top.
+         //  */
+         // setAlwaysOnTop(enabled: boolean): void;
 
          /**
-          * Provides a way to safely set this applications options given an accessor string which describes the
-          * entries to walk. To access deeper entries into the object format the accessor string with `.` between
+          * Provides a way to safely set the application options given an accessor string which describes the
+          * entries to walk. To access deeper entries into the object format, the accessor string with `.` between
           * entries to walk.
           *
-          * Additionally, if an application shell Svelte component is mounted and exports the `appOptions` property then
-          * the application options is set to `appOptions` potentially updating the application shell / Svelte
+          * Additionally, if an application shell Svelte component is mounted and exports the `appOptions` property,
+          * then the application options are set to `appOptions` potentially updating the application shell / Svelte
           * component.
           *
-          * @param {string}   accessor - The path / key to set. You can set multiple levels.
+          * @param accessor - The path / key to set. You can set multiple levels.
           *
-          * @param {any}        value - Value to set.
+          * @param value - Value to set.
           */
          setOptions(accessor: string, value: any): void;
 
@@ -451,15 +451,15 @@ declare namespace SvelteAppNS {
          /**
           * Updates the UI Options store with the current header buttons. You may dynamically add / remove header
           * buttons if using an application shell Svelte component. In either overriding `_getHeaderButtons` or
-          * responding to the Hooks fired return a new button array and the uiOptions store is updated and the
+          * responding to the Hooks fired return a new button array, and the uiOptions store is updated, and the
           * application shell will render the new buttons.
           *
           * Optionally you can set in the SvelteApp app options {@link SvelteAppNS.Options.headerButtonNoClose}
           * to remove the close button from the header buttons.
           *
-          * @param {object} [opts] - Optional parameters (for internal use)
+          * @param [opts] - Optional parameters (for internal use)
           *
-          * @param {boolean} [opts.headerButtonNoClose] - The value for `headerButtonNoClose`.
+          * @param [opts.headerButtonNoClose] - The value for `headerButtonNoClose`.
           */
          updateHeaderButtons({ headerButtonNoClose }?: {
             headerButtonNoClose?: boolean;
@@ -472,12 +472,12 @@ declare namespace SvelteAppNS {
           */
          type Data = {
             /**
-             * If true then application shells are draggable.
+             * If true, then application shells are draggable.
              */
             draggable: boolean;
 
             /**
-             * When true auto-management of app focus is enabled.
+             * When true, auto-management of app focus is enabled.
              */
             focusAuto: boolean;
 
@@ -487,37 +487,37 @@ declare namespace SvelteAppNS {
             focusKeep: boolean;
 
             /**
-             * When true focus trapping / wrapping is enabled keeping focus inside app.
+             * When true, focus trapping / wrapping is enabled keeping focus inside the app.
              */
             focusTrap: boolean;
 
             /**
-             * If true then the close header button is removed.
+             * If true, then the close header button is removed.
              */
             headerButtonNoClose: boolean;
 
             /**
-             * If true then header button labels are removed.
+             * If true, then the header button labels are removed.
              */
             headerButtonNoLabel: boolean;
 
             /**
-             * If true then header title is hidden when minimized.
+             * If true, then the header title is hidden when minimized.
              */
             headerNoTitleMinimized: boolean;
 
             /**
-             * If true then application shells are minimizable.
+             * If true, then application shells are minimizable.
              */
             minimizable: boolean;
 
             /**
-             * If false then `position.set` does not take effect.
+             * If false, then `position.set` does not take effect.
              */
             positionable: boolean;
 
             /**
-             * If true then application shells are resizable.
+             * If true, then application shells are resizable.
              */
             resizable: boolean;
          }
@@ -647,7 +647,7 @@ declare namespace SvelteAppNS {
           *
           * @param [extra] - Extra data to add to application state.
           *
-          * @returns Passed in object with current application state.
+          * @returns The passed in extra object with current application state.
           */
          current(extra?: object): State.Data;
 
@@ -684,7 +684,7 @@ declare namespace SvelteAppNS {
 
          /**
           * Restores a previously saved application state by `name` returning the data. Several optional parameters are
-          * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
+          * available to animate / tween to the new state. When `animateTo` is true, an animation is scheduled via
           * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
           * specified.
           *
@@ -711,7 +711,7 @@ declare namespace SvelteAppNS {
          }): State.Data | undefined;
 
          /**
-          * Saves current application state with the opportunity to add extra data to the saved state.
+          * Saves the current application state with the opportunity to add extra data to the saved state.
           *
           * @param options - Options.
           *
@@ -719,7 +719,7 @@ declare namespace SvelteAppNS {
           *
           * @param [options.extra] - Extra data to add to saved state.
           *
-          * @returns {State.Data} Current saved application state.
+          * @returns Current saved application state.
           */
          save({ name, ...extra }: {
             name: string;
@@ -728,11 +728,11 @@ declare namespace SvelteAppNS {
 
          /**
           * Sets application state from the given {@link State.Data} instance. Several optional parameters are
-          * available to animate / tween to the new state. When `animateTo` is true an animation is scheduled via
+          * available to animate / tween to the new state. When `animateTo` is true, an animation is scheduled via
           * {@link #runtime/svelte/store/position!TJSPosition.API.Animation.to} and the duration and easing name or
           * function may be specified.
           *
-          * Note: If serializing application state any minimized apps will use the before minimized state on initial
+          * Note: If serializing application state, any minimized apps will use the before minimized state on initial
           * render of the app as it is currently not possible to render apps with Foundry VTT core API in the minimized
           * state.
           *
@@ -791,7 +791,7 @@ declare namespace SvelteAppNS {
       export interface Svelte<Options extends SvelteAppNS.Options>
       {
          /**
-          * Returns mounted application shell Svelte component.
+          * Returns the mounted application shell Svelte component.
           *
           * @deprecated Use {@link Svelte.appShell}; since `0.2.0` removal in `0.5.0`.
           *
@@ -800,7 +800,7 @@ declare namespace SvelteAppNS {
          get applicationShell(): AppShell<Options> | null;
 
          /**
-          * Returns mounted application shell Svelte component.
+          * Returns the mounted application shell Svelte component.
           *
           * @returns Any mounted application shell.
           */
@@ -866,21 +866,21 @@ declare namespace SvelteAppNS {
    interface OptionsCore
    {
       /**
-       * If false the default slide close animation is not run.
+       * If false, the default slide close animation is not run.
        *
        * @defaultValue true
        */
       defaultCloseAnimation?: boolean;
 
       /**
-       * If true then application shells are draggable.
+       * If true, then application shells are draggable.
        *
        * @defaultValue true
        */
       draggable?: boolean;
 
       /**
-       * When true auto-management of app focus is enabled.
+       * When true, auto-management of app focus is enabled.
        *
        * @defaultValue true
        */
@@ -894,7 +894,7 @@ declare namespace SvelteAppNS {
       focusKeep?: boolean;
 
       /**
-       * Defines A11yHelper focus source to apply when application closes.
+       * Defines A11yHelper focus source to apply when the application closes.
        *
        * @defaultValue: undefined
        */
@@ -908,14 +908,14 @@ declare namespace SvelteAppNS {
       focusTrap?: boolean;
 
       /**
-       * If true then the close header button is removed.
+       * If true, then the close header button is removed.
        *
        * @defaultValue false
        */
       headerButtonNoClose?: boolean;
 
       /**
-       * If true then header button labels are removed.
+       * If true, then the header button labels are removed.
        *
        * @defaultValue false
        */
@@ -929,7 +929,7 @@ declare namespace SvelteAppNS {
       headerIcon?: string;
 
       /**
-       * If true then header title is hidden when minimized.
+       * If true, then the header title is hidden when minimized.
        *
        * @defaultValue false
        */
@@ -976,7 +976,7 @@ declare namespace SvelteAppNS {
       minWidth?: number | string | null;
 
       /**
-       * If false then `position.set` does not take effect.
+       * If false, then `position.set` does not take effect.
        *
        * @defaultValue true
        */
@@ -990,7 +990,7 @@ declare namespace SvelteAppNS {
       positionInitial?: TJSPosition.API.System.Initial.InitialSystem;
 
       /**
-       * When true TJSPosition is optimized for orthographic use.
+       * When true, TJSPosition is optimized for orthographic use.
        *
        * @defaultValue true
        */
@@ -1058,7 +1058,7 @@ declare namespace SvelteAppNS {
       // The following are overrides of core Foundry `ApplicationOptions` providing type expansion and comments.
 
       /**
-       * The default pixel height for app.
+       * The default pixel height for app; may use percentage.
        *
        * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for relative values
        * supported.
@@ -1068,7 +1068,7 @@ declare namespace SvelteAppNS {
       width?: number | string | null;
 
       /**
-       * The default pixel height for app.
+       * The default pixel height for app; may use percentage.
        *
        * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for relative values
        * supported.
@@ -1078,7 +1078,7 @@ declare namespace SvelteAppNS {
       height?: number | string | null;
 
       /**
-       * The default top offset position for app.
+       * The default top offset position for app; may use percentage.
        *
        * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for relative values
        * supported.
@@ -1088,7 +1088,7 @@ declare namespace SvelteAppNS {
       top?: number | string | null;
 
       /**
-       * The default left offset position for app.
+       * The default left offset position for app; may use percentage.
        *
        * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for relative values
        * supported.
@@ -1102,7 +1102,7 @@ declare namespace SvelteAppNS {
     * Options for SvelteApp including the `svelte` property which defines the Svelte component to load as the
     * "application shell".
     *
-    * Note: Unlike standard Svelte component loading any `context` provided is loaded as additional data into the
+    * Note: Unlike standard Svelte component loading, any `context` provided is loaded as additional data into the
     * `#external` context key along with data such as the outer application instance reference. This allows one to
     * extend the {@link SvelteAppNS.Context.External} interface with additional data that you are loading and use one
     * type to conveniently retrieve all external context data inside a Svelte component.
@@ -1111,7 +1111,7 @@ declare namespace SvelteAppNS {
     * well as an `object`. There are times when the `context` and `prop` data to load needs to come from data associated
     * with the instance of the application. When defining the configuration from the overloaded static accessor
     * {@link SvelteApp.defaultOptions} you may use a standard function IE `function() {}` for `context` or
-    * `props`. When `SvelteApp` loads the component these functions will be invoked with the `this` reference of the
+    * `props`. When `SvelteApp` loads the component, these functions will be invoked with the `this` reference of the
     * actual instance allowing association of instance data from within a static context.
     */
    interface Options<Component extends SvelteComponent = SvelteComponent,
@@ -1161,7 +1161,7 @@ type AppShell<Options extends SvelteAppNS.Options> = OmitPropsTRL<Options> & {
     ((e: ComponentEvents<InstanceType<Options['svelte']['class']>>[K]) => void) | null | undefined): () => void;
 
    /**
-    * Set props of component.
+    * Set props of the component.
     *
     * @param props - Props to set.
     */

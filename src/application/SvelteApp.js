@@ -173,21 +173,24 @@ export class SvelteApp extends Application
    static get defaultOptions()
    {
       return /** @type {import('./types').SvelteAppNS.Options} */ deepMerge(super.defaultOptions, {
-         defaultCloseAnimation: true,     // If false the default slide close animation is not run.
-         draggable: true,                 // If true then application shells are draggable.
-         focusAuto: true,                 // When true auto-management of app focus is enabled.
+         alwaysOnTop: false,              // Assigned to position. When true, the app window is floated always on top.
+         defaultCloseAnimation: true,     // If false, the default slide close animation is not run.
+         draggable: true,                 // If true, then application shells are draggable.
+         focusAuto: true,                 // When true, auto-management of app focus is enabled.
          focusKeep: false,                // When `focusAuto` and `focusKeep` is true; keeps internal focus.
          focusSource: void 0,             // Stores any A11yFocusSource data that is applied when app is closed.
          focusTrap: true,                 // When true focus trapping / wrapping is enabled keeping focus inside app.
-         headerButtonNoClose: false,      // If true then the close header button is removed.
-         headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.
+         headerButtonNoClose: false,      // If true, then the close header button is removed.
+         headerButtonNoLabel: false,      // If true, then the header button labels are removed for application shells.
          headerIcon: void 0,              // Sets a header icon given an image URL.
-         headerNoTitleMinimized: false,   // If true then header title is hidden when application is minimized.
+         headerNoTitleMinimized: false,   // If true, then the header title is hidden when the application is minimized.
+         maxHeight: void 0,               // Assigned to position. Number specifying maximum window height.
+         maxWidth: void 0,                // Assigned to position. Number specifying maximum window width.
          minHeight: SvelteApp.#MIN_WINDOW_HEIGHT,    // Assigned to position. Number specifying minimum window height.
          minWidth: SvelteApp.#MIN_WINDOW_WIDTH,      // Assigned to position. Number specifying minimum window width.
-         positionable: true,              // If false then `position.set` does not take effect.
+         positionable: true,              // If false, then `position.set` does not take effect.
          positionInitial: TJSPosition.Initial.browserCentered,      // A helper for initial position placement.
-         positionOrtho: true,             // When true TJSPosition is optimized for orthographic use.
+         positionOrtho: true,             // When true, TJSPosition is optimized for orthographic use.
          positionValidator: TJSPosition.Validators.transformWindow, // A function providing the default validator.
          sessionStorage: void 0,          // An instance of WebStorage (session) to share across SvelteApps.
          svelte: void 0,                  // A Svelte configuration object.

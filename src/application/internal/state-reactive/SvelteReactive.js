@@ -36,7 +36,7 @@ export class SvelteReactive
    /**
     * The Application option store which is injected into mounted Svelte component context under the `external` key.
     *
-    * @type {import('./types').StoreAppOptions}
+    * @type {import('../../types').SvelteAppNS.API.Reactive.AppOptions}
     */
    #storeAppOptions;
 
@@ -57,7 +57,7 @@ export class SvelteReactive
    /**
     * The UI option store which is injected into mounted Svelte component context under the `external` key.
     *
-    * @type {import('./types').StoreUIOptions}
+    * @type {import('../../types').SvelteAppNS.API.Reactive.UIState}
     */
    #storeUIState;
 
@@ -88,7 +88,7 @@ export class SvelteReactive
          throw new TypeError(`'options.sessionStorage' is not an instance of TJSWebStorage.`);
       }
 
-      // If no external web storage API instance is available then create a TJSSessionStorage instance.
+      // If no external web storage API instance is available, then create a TJSSessionStorage instance.
       this.#sessionStorage = optionsSessionStorage !== void 0 ? optionsSessionStorage : new TJSSessionStorage();
    }
 
@@ -231,7 +231,7 @@ export class SvelteReactive
    /**
     * Returns the headerButtonNoLabel app option.
     *
-    * @returns {boolean} Remove the labels from buttons in header app option.
+    * @returns {boolean} Remove the labels from buttons in the header app option.
     */
    get headerButtonNoLabel() { return this.#application?.options?.headerButtonNoLabel; }
 
@@ -288,7 +288,7 @@ export class SvelteReactive
    get title() { return this.#application.title; }
 
    /**
-    * Sets `this.options.draggable` which is reactive for application shells.
+    * Sets `this.options.draggable`, which is reactive for application shells.
     *
     * @param {boolean}  draggable - Sets the draggable option.
     */
@@ -298,7 +298,7 @@ export class SvelteReactive
    }
 
    /**
-    * Sets `this.options.focusAuto` which is reactive for application shells.
+    * Sets `this.options.focusAuto`, which is reactive for application shells.
     *
     * @param {boolean}  focusAuto - Sets the focusAuto option.
     */
@@ -308,7 +308,7 @@ export class SvelteReactive
    }
 
    /**
-    * Sets `this.options.focusKeep` which is reactive for application shells.
+    * Sets `this.options.focusKeep`, which is reactive for application shells.
     *
     * @param {boolean}  focusKeep - Sets the focusKeep option.
     */
@@ -318,7 +318,7 @@ export class SvelteReactive
    }
 
    /**
-    * Sets `this.options.focusTrap` which is reactive for application shells.
+    * Sets `this.options.focusTrap`, which is reactive for application shells.
     *
     * @param {boolean}  focusTrap - Sets the focusTrap option.
     */
@@ -328,7 +328,7 @@ export class SvelteReactive
    }
 
    /**
-    * Sets `this.options.headerButtonNoClose` which is reactive for application shells.
+    * Sets `this.options.headerButtonNoClose`, which is reactive for application shells.
     *
     * @param {boolean}  headerButtonNoClose - Sets the headerButtonNoClose option.
     */
@@ -338,7 +338,7 @@ export class SvelteReactive
    }
 
    /**
-    * Sets `this.options.headerButtonNoLabel` which is reactive for application shells.
+    * Sets `this.options.headerButtonNoLabel`, which is reactive for application shells.
     *
     * @param {boolean}  headerButtonNoLabel - Sets the headerButtonNoLabel option.
     */
@@ -348,7 +348,7 @@ export class SvelteReactive
    }
 
    /**
-    * Sets `this.options.headerIcon` which is reactive for application shells.
+    * Sets `this.options.headerIcon`, which is reactive for application shells.
     *
     * @param {string | undefined}  headerIcon - Sets the headerButtonNoLabel option.
     */
@@ -358,7 +358,7 @@ export class SvelteReactive
    }
 
    /**
-    * Sets `this.options.headerNoTitleMinimized` which is reactive for application shells.
+    * Sets `this.options.headerNoTitleMinimized`, which is reactive for application shells.
     *
     * @param {boolean}  headerNoTitleMinimized - Sets the headerNoTitleMinimized option.
     */
@@ -371,7 +371,7 @@ export class SvelteReactive
    }
 
    /**
-    * Sets `this.options.minimizable` which is reactive for application shells that are also pop out.
+    * Sets `this.options.minimizable`, which is reactive for application shells that are also pop out.
     *
     * @param {boolean}  minimizable - Sets the minimizable option.
     */
@@ -415,7 +415,7 @@ export class SvelteReactive
    }
 
    /**
-    * Sets `this.options.positionable` enabling / disabling {@link SvelteApp.position}.
+    * Sets `this.options.positionable`, enabling / disabling {@link SvelteApp.position}.
     *
     * @param {boolean}  positionable - Sets the positionable option.
     */
@@ -425,7 +425,7 @@ export class SvelteReactive
    }
 
    /**
-    * Sets `this.options.resizable` which is reactive for application shells.
+    * Sets `this.options.resizable`, which is reactive for application shells.
     *
     * @param {boolean}  resizable - Sets the resizable option.
     */
@@ -435,7 +435,7 @@ export class SvelteReactive
    }
 
    /**
-    * Sets `this.options.title` which is reactive for application shells.
+    * Sets `this.options.title`, which is reactive for application shells.
     *
     * Note: Will set empty string if title is undefined or null.
     *
@@ -474,7 +474,7 @@ export class SvelteReactive
    }
 
    /**
-    * Provides a way to merge `options` into this applications options and update the appOptions store.
+    * Provides a way to merge `options` into the application options and update the appOptions store.
     *
     * @param {object}   options - The options object to merge with `this.options`.
     */
@@ -515,12 +515,12 @@ export class SvelteReactive
    }
 
    /**
-    * Provides a way to safely set this applications options given an accessor string which describes the
-    * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
+    * Provides a way to safely set the application options given an accessor string which describes the
+    * entries to walk. To access deeper entries into the object format, the accessor string with `.` between entries
     * to walk.
     *
-    * Additionally, if an application shell Svelte component is mounted and exports the `appOptions` property then
-    * the application options is set to `appOptions` potentially updating the application shell / Svelte component.
+    * Additionally, if an application shell Svelte component is mounted and exports the `appOptions` property, then
+    * the application options are set to `appOptions` potentially updating the application shell / Svelte component.
     *
     * @param {string}   accessor - The path / key to set. You can set multiple levels.
     *
@@ -530,7 +530,7 @@ export class SvelteReactive
    {
       const success = safeSet(this.#application.options, accessor, value, { createMissing: true });
 
-      // If `this.options` modified then update the app options store.
+      // If `this.options` modified, then update the app options store.
       if (success)
       {
          this.#storeAppOptionsUpdate(() => this.#application.options);
@@ -561,7 +561,7 @@ export class SvelteReactive
    /**
     * Updates the UI Options store with the current header buttons. You may dynamically add / remove header buttons
     * if using an application shell Svelte component. In either overriding `_getHeaderButtons` or responding to the
-    * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
+    * Hooks fired return a new button array, and the uiOptions store is updated, and the application shell will render
     * the new buttons.
     *
     * Optionally you can set in the SvelteApp app options {@link SvelteAppNS.Options.headerButtonNoClose}
@@ -597,7 +597,7 @@ export class SvelteReactive
    /**
     * Initializes the Svelte stores and derived stores for the application options and UI state.
     *
-    * While writable stores are created the update method is stored in private variables locally and derived Readable
+    * While writable stores are created, the update method is stored in private variables locally and derived Readable
     * stores are provided for essential options which are commonly used.
     *
     * These stores are injected into all Svelte components mounted under the `external` context: `storeAppOptions` and
@@ -614,7 +614,7 @@ export class SvelteReactive
        * Create custom store. The main subscribe method for all app options changes is provided along with derived
        * writable stores for all reactive options.
        *
-       * @type {import('./types').StoreAppOptions}
+       * @type {import('../../types').SvelteAppNS.API.Reactive.AppOptions}
        */
       const storeAppOptions = {
          subscribe: writableAppOptions.subscribe,
@@ -653,12 +653,11 @@ export class SvelteReactive
       this.#storeUIStateUpdate = writableUIOptions.update;
 
       /**
-       * @type {import('./types').StoreUIOptions}
+       * @type {import('../../types').SvelteAppNS.API.Reactive.UIState}
        */
       const storeUIState = {
          subscribe: writableUIOptions.subscribe,
 
-         // activeWindow: propertyStore(writableUIOptions, 'activeWindow'),
          activeWindow: derived(writableUIOptions, ($options, set) => set($options.activeWindow)),
          dragging: propertyStore(writableUIOptions, 'dragging'),
          headerButtons: derived(writableUIOptions, ($options, set) => set($options.headerButtons)),
@@ -686,12 +685,6 @@ export class SvelteReactive
       {
          this.updateHeaderButtons({ headerButtonNoClose: value });
       }));
-
-      // // Handles updating header buttons to add / remove button labels.
-      // this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.headerButtonNoLabel, (value) =>
-      // {
-      //    this.updateHeaderButtons({ headerButtonNoLabel: value });
-      // }));
 
       // Handles adding / removing this application from `ui.windows` when popOut changes.
       this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.popOut, (value) =>
