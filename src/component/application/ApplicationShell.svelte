@@ -202,8 +202,22 @@
 
    // ---------------------------------------------------------------------------------------------------------------
 
+   /**
+    * Adds the `mounted` class to the main app div from rAF in `onMount` enabling container queries on the main app
+    * div and `.window-content`. This is necessary as browsers (Chrome / Firefox) defer layout calculations which
+    * may affect app positioning via `TJSPosition` when width or height is set to `auto`.
+    *
+    * @type {boolean}
+    */
+   let mounted = false;
+
    // Focus `elementRoot` on mount to allow keyboard tab navigation of header buttons.
-   onMount(() => elementRoot.focus());
+   onMount(() =>
+   {
+      if ($focusAuto) { elementRoot.focus(); }
+
+      requestAnimationFrame(() => mounted = true);
+   });
 
    // ---------------------------------------------------------------------------------------------------------------
 
@@ -414,6 +428,7 @@
    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
    <div id={application.id}
         class="application {appClasses}"
+        class:mounted={mounted}
         data-appid={application.appId}
         bind:this={elementRoot}
         in:inTransition|global={inTransitionOptions}
@@ -441,6 +456,7 @@
    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
    <div id={application.id}
         class="application {appClasses}"
+        class:mounted={mounted}
         data-appid={application.appId}
         bind:this={elementRoot}
         on:close:popup|preventDefault|stopPropagation={onClosePopup}
@@ -469,8 +485,6 @@
    .application {
       contain: layout style paint;
 
-      container: tjs-app-window / inline-size;
-
       max-width: var(--tjs-app-max-width, unset);
       max-height: var(--tjs-app-max-height, unset);
 
@@ -483,11 +497,17 @@
       scrollbar-color: var(--tjs-app-scrollbar-color, inherit);
    }
 
+   /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
+   .application.mounted {
+      container: tjs-app-window / inline-size;
+   }
+
    .application:focus-visible {
       outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
    }
 
-   .window-content {
+   /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
+   .application.mounted .window-content {
       container: tjs-app-window-content / inline-size;
    }
 

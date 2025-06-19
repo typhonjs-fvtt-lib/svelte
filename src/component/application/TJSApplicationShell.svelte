@@ -205,10 +205,21 @@
 
    // ---------------------------------------------------------------------------------------------------------------
 
+   /**
+    * Adds the `mounted` class to the main app div from rAF in `onMount` enabling container queries on the main app
+    * div and `.window-content`. This is necessary as browsers (Chrome / Firefox) defer layout calculations which
+    * may affect app positioning via `TJSPosition` when width or height is set to `auto`.
+    *
+    * @type {boolean}
+    */
+   let mounted = false;
+
    // Focus `elementRoot` on mount to allow keyboard tab navigation of header buttons.
    onMount(() =>
    {
       if ($focusAuto) { elementRoot.focus(); }
+
+      requestAnimationFrame(() => mounted = true);
    });
 
    // ---------------------------------------------------------------------------------------------------------------
@@ -420,6 +431,7 @@
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
          class="tjs-app tjs-window-app {appClasses}"
+         class:mounted={mounted}
          data-appid={application.appId}
          bind:this={elementRoot}
          in:inTransition|global={inTransitionOptions}
@@ -447,6 +459,7 @@
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
          class="tjs-app tjs-window-app {appClasses}"
+         class:mounted={mounted}
          data-appid={application.appId}
          bind:this={elementRoot}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
@@ -481,8 +494,6 @@
    .tjs-app {
       contain: layout style paint;
 
-      container: tjs-app-window / inline-size;
-
       background: var(--tjs-app-background);
       margin: var(--tjs-app-margin);
       padding: var(--tjs-app-padding);
@@ -503,9 +514,12 @@
       scrollbar-color: var(--tjs-app-scrollbar-color, var(--color-scrollbar) var(--color-scrollbar-track));
    }
 
-   .tjs-app .window-content {
-      container: tjs-app-window-content / inline-size;
+   /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
+   .tjs-app.mounted {
+      container: tjs-app-window / inline-size;
+   }
 
+   .tjs-app .window-content {
       background: var(--tjs-app-content-background, none);
       color: var(--tjs-app-content-color, inherit);
       overflow: var(--tjs-app-content-overflow, hidden);
@@ -515,6 +529,11 @@
       display: var(--tjs-app-content-display, flex);
       flex-direction: var(--tjs-app-content-flex-direction, column);
       flex-wrap: var(--tjs-app-content-flex-wrap, nowrap);
+   }
+
+   /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
+   .tjs-app.mounted .window-content {
+      container: tjs-app-window-content / inline-size;
    }
 
    .tjs-app:focus-visible {
