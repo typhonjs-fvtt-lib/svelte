@@ -8,12 +8,12 @@ import {
 
 import { propertyStore }         from '#runtime/svelte/store/writable-derived';
 
-import { nextAnimationFrame }    from '#runtime/util/animate';
-
 import {
    deepMerge,
    safeAccess,
    safeSet }                     from '#runtime/util/object';
+
+import { handleAlwaysOnTop }     from '../util/index.js';
 
 /**
  * API docs and description in {@link SvelteAppNS.API.Reactive}.
@@ -178,7 +178,7 @@ export class SvelteReactive
     *
     * @param {Window} activeWindow - Active Window / WindowProxy UI state.
     *
-    * @hidden
+    * @internal
     */
    set activeWindow(activeWindow)
    {
@@ -192,6 +192,13 @@ export class SvelteReactive
    }
 
 // Reactive getter / setters -----------------------------------------------------------------------------------------
+
+   /**
+    * Returns the alwaysOnTop app option.
+    *
+    * @returns {boolean} Always on top app option.
+    */
+   get alwaysOnTop() { return this.#application?.options?.alwaysOnTop; }
 
    /**
     * Returns the draggable app option.
@@ -288,6 +295,16 @@ export class SvelteReactive
    get title() { return this.#application.title; }
 
    /**
+    * Sets `this.options.alwaysOnTop`, which is reactive for application shells.
+    *
+    * @param {boolean}  alwaysOnTop - Sets the `alwaysOnTop` option.
+    */
+   set alwaysOnTop(alwaysOnTop)
+   {
+      if (typeof alwaysOnTop === 'boolean') { this.setOptions('alwaysOnTop', alwaysOnTop); }
+   }
+
+   /**
     * Sets `this.options.draggable`, which is reactive for application shells.
     *
     * @param {boolean}  draggable - Sets the draggable option.
@@ -382,36 +399,13 @@ export class SvelteReactive
 
    /**
     * Sets `this.options.popOut` which is reactive for application shells. This will add / remove this application
-    * from `ui.windows`.
+    * from `ui.windows` via the subscription set in `#storesSubscribe`.
     *
     * @param {boolean}  popOut - Sets the popOut option.
     */
    set popOut(popOut)
    {
-      if (typeof popOut === 'boolean')
-      {
-         this.setOptions('popOut', popOut);
-
-         // TODO: Note Foundry AppV1 global variable usage.
-         if (popOut)
-         {
-            // Ensure that the app is tracked in current popout windows.
-            if (globalThis?.ui?.windows?.[this.#application.appId] !== this.#application)
-            {
-               globalThis.ui.windows[this.#application.appId] = this.#application;
-            }
-         }
-         else
-         {
-            // Remove app from global window tracking.
-            if (globalThis?.ui?.activeWindow === this.#application) { globalThis.ui.activeWindow = null; }
-
-            if (globalThis?.ui?.windows?.[this.#application.appId] === this.#application)
-            {
-               delete globalThis.ui.windows[this.#application.appId];
-            }
-         }
-      }
+      if (typeof popOut === 'boolean') { this.setOptions('popOut', popOut); }
    }
 
    /**
@@ -484,37 +478,6 @@ export class SvelteReactive
    }
 
    /**
-    * Provides a way to easily remove the application from active window tracking setting `popOut` to false and
-    * z-index to above the TJS dialog level effectively making the app always on top. When disabled, adds the
-    * application back as a `popOut` window and brings it to the top of tracked windows.
-    *
-    * @param {boolean}  enabled - Enabled state for always on top.
-    */
-   setAlwaysOnTop(enabled)
-   {
-      if (typeof enabled === 'boolean')
-      {
-         if (enabled)
-         {
-            this.#application.reactive.popOut = false;
-
-            // Set z-index to above the TJS dialog level (2 ** 31 - 50).
-            this.#application.position.zIndex = (2 ** 31) - 25;
-         }
-         else
-         {
-            this.#application.reactive.popOut = true;
-
-            // TODO: Note direct Foundry API access.
-            this.#application.position.zIndex = foundry.applications.api.ApplicationV2._maxZ - 1;
-
-            // Wait for `rAF` then bring to the top.
-            nextAnimationFrame().then(() => this.#application.bringToTop());
-         }
-      }
-   }
-
-   /**
     * Provides a way to safely set the application options given an accessor string which describes the
     * entries to walk. To access deeper entries into the object format, the accessor string with `.` between entries
     * to walk.
@@ -540,11 +503,12 @@ export class SvelteReactive
    /**
     * Serializes the main {@link SvelteAppNS.Options} for common application state.
     *
-    * @returns {import('../../types').SvelteAppNS.API.Reactive.Data} Common application state.
+    * @returns {import('../../types').SvelteAppNS.API.Reactive.SerializedData} Common application state.
     */
    toJSON()
    {
       return {
+         alwaysOnTop: this.#application?.options?.alwaysOnTop ?? false,
          draggable: this.#application?.options?.draggable ?? true,
          focusAuto: this.#application?.options?.focusAuto ?? true,
          focusKeep: this.#application?.options?.focusKeep ?? false,
@@ -605,6 +569,7 @@ export class SvelteReactive
     */
    #storesInitialize()
    {
+      /** @type {import('svelte/store').Writable<import('../../types').SvelteAppNS.Options>} */
       const writableAppOptions = writable(this.#application.options);
 
       // Keep the update function locally, but make the store essentially readable.
@@ -619,25 +584,56 @@ export class SvelteReactive
       const storeAppOptions = {
          subscribe: writableAppOptions.subscribe,
 
-         draggable: propertyStore(writableAppOptions, 'draggable'),
-         focusAuto: propertyStore(writableAppOptions, 'focusAuto'),
-         focusKeep: propertyStore(writableAppOptions, 'focusKeep'),
-         focusTrap: propertyStore(writableAppOptions, 'focusTrap'),
-         headerButtonNoClose: propertyStore(writableAppOptions, 'headerButtonNoClose'),
-         headerButtonNoLabel: propertyStore(writableAppOptions, 'headerButtonNoLabel'),
-         headerIcon: propertyStore(writableAppOptions, 'headerIcon'),
-         headerNoTitleMinimized: propertyStore(writableAppOptions, 'headerNoTitleMinimized'),
-         minimizable: propertyStore(writableAppOptions, 'minimizable'),
-         popOut: propertyStore(writableAppOptions, 'popOut'),
-         positionable: propertyStore(writableAppOptions, 'positionable'),
-         resizable: propertyStore(writableAppOptions, 'resizable'),
-         title: propertyStore(writableAppOptions, 'title')
+         alwaysOnTop: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'alwaysOnTop'),
+
+         draggable: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'draggable'),
+
+         focusAuto: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'focusAuto'),
+
+         focusKeep: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'focusKeep'),
+
+         focusTrap: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'focusTrap'),
+
+         headerButtonNoClose: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'headerButtonNoClose'),
+
+         headerButtonNoLabel: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'headerButtonNoLabel'),
+
+         headerIcon: /** @type {import('svelte/store').Writable<string>} */
+          propertyStore(writableAppOptions, 'headerIcon'),
+
+         headerNoTitleMinimized: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'headerNoTitleMinimized'),
+
+         minimizable: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'minimizable'),
+
+         popOut: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'popOut'),
+
+         positionable: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'positionable'),
+
+         resizable: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'resizable'),
+
+         title: /** @type {import('svelte/store').Writable<string>} */
+          propertyStore(writableAppOptions, 'title')
       };
 
       Object.freeze(storeAppOptions);
 
       this.#storeAppOptions = storeAppOptions;
 
+      /**
+       * @type {import('../../types').SvelteAppNS.API.Reactive.UIStateData}
+       */
       this.#dataUIState = {
          activeWindow: globalThis,
          dragging: false,
@@ -646,7 +642,11 @@ export class SvelteReactive
          resizing: false
       };
 
-      // Create a store for UI state data.
+      /**
+       * Create a store for UI state data.
+       *
+       * @type {import('svelte/store').Writable<import('../../types').SvelteAppNS.API.Reactive.UIStateData>}
+       */
       const writableUIOptions = writable(this.#dataUIState);
 
       // Keep the update function locally, but make the store essentially readable.
@@ -658,11 +658,20 @@ export class SvelteReactive
       const storeUIState = {
          subscribe: writableUIOptions.subscribe,
 
-         activeWindow: derived(writableUIOptions, ($options, set) => set($options.activeWindow)),
-         dragging: propertyStore(writableUIOptions, 'dragging'),
-         headerButtons: derived(writableUIOptions, ($options, set) => set($options.headerButtons)),
-         minimized: derived(writableUIOptions, ($options, set) => set($options.minimized)),
-         resizing: propertyStore(writableUIOptions, 'resizing')
+         activeWindow: /** @type {import('svelte/store').Readable<Window>} */
+          derived(writableUIOptions, ($options, set) => set($options.activeWindow)),
+
+         dragging: /** @type {import('svelte/store').Readable<boolean>} */
+          propertyStore(writableUIOptions, 'dragging'),
+
+         headerButtons: /** @type {import('svelte/store').Readable<import('../../types').SvelteAppNS.HeaderButton>} */
+          derived(writableUIOptions, ($options, set) => set($options.headerButtons)),
+
+         minimized: /** @type {import('svelte/store').Readable<boolean>} */
+          derived(writableUIOptions, ($options, set) => set($options.minimized)),
+
+         resizing: /** @type {import('svelte/store').Readable<boolean>} */
+          propertyStore(writableUIOptions, 'resizing')
       };
 
       Object.freeze(storeUIState);
@@ -680,22 +689,38 @@ export class SvelteReactive
    {
       // Register local subscriptions.
 
+      /**
+       * Provides a way to easily remove the application from active window tracking setting `popOut` to false and
+       * z-index to above the TJS dialog level effectively making the app always on top. When disabled, adds the
+       * application back as a `popOut` window and brings it to the top of tracked windows.
+       */
+      this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.alwaysOnTop,
+       (enabled) => handleAlwaysOnTop(this.#application, enabled)));
+
       // Handles updating header buttons to add / remove the close button.
       this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.headerButtonNoClose, (value) =>
-      {
-         this.updateHeaderButtons({ headerButtonNoClose: value });
-      }));
+       this.updateHeaderButtons({ headerButtonNoClose: value })));
 
-      // Handles adding / removing this application from `ui.windows` when popOut changes.
+      // Handles adding / removing this application from `ui.windows` when `popOut` changes.
       this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.popOut, (value) =>
       {
-         if (value && this.#application.rendered)
+         if (value)
          {
-            globalThis.ui.windows[this.#application.appId] = this.#application;
+            // Ensure that the app is tracked in current popout windows.
+            if (globalThis?.ui?.windows?.[this.#application.appId] !== this.#application)
+            {
+               globalThis.ui.windows[this.#application.appId] = this.#application;
+            }
          }
          else
          {
-            delete globalThis.ui.windows[this.#application.appId];
+            // Remove app from global window tracking.
+            if (globalThis?.ui?.activeWindow === this.#application) { globalThis.ui.activeWindow = null; }
+
+            if (globalThis?.ui?.windows?.[this.#application.appId] === this.#application)
+            {
+               delete globalThis.ui.windows[this.#application.appId];
+            }
          }
       }));
    }

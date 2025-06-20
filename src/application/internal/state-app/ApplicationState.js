@@ -312,14 +312,14 @@ export class ApplicationState
       }
       else
       {
+         // Merge in saved options to application.
+         if (isObject(data?.options))
+         {
+            application?.reactive.mergeOptions(data.options);
+         }
+
          if (rendered)
          {
-            // Merge in saved options to application.
-            if (isObject(data?.options))
-            {
-               application?.reactive.mergeOptions(data.options);
-            }
-
             if (isObject(data?.ui))
             {
                const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;

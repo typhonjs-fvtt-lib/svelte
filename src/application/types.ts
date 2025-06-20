@@ -173,6 +173,20 @@ declare namespace SvelteAppNS {
          // Accessors for App state ----------------------------------------------------------------------------------
 
          /**
+          * Sets `this.options.alwaysOnTop`, which is reactive for application shells.
+          *
+          * @param alwaysOnTop - Sets the `alwaysOnTop` option.
+          */
+         set alwaysOnTop(alwaysOnTop: boolean);
+
+         /**
+          * Returns the alwaysOnTop app option.
+          *
+          * @returns Always on top app option.
+          */
+         get alwaysOnTop(): boolean;
+
+         /**
           * Returns the draggable app option.
           *
           * @returns Draggable app option.
@@ -418,16 +432,6 @@ declare namespace SvelteAppNS {
           */
          mergeOptions(options: object): void;
 
-         // TODO: REMOVE
-         // /**
-         //  * Provides a way to easily remove the application from active window tracking setting `popOut` to false and
-         //  * z-index to above the TJS dialog level effectively making the app always on top. When disabled, adds the
-         //  * application back as a `popOut` window and brings it to the top of tracked windows.
-         //  *
-         //  * @param enabled - Enabled state for always on top.
-         //  */
-         // setAlwaysOnTop(enabled: boolean): void;
-
          /**
           * Provides a way to safely set the application options given an accessor string which describes the
           * entries to walk. To access deeper entries into the object format, the accessor string with `.` between
@@ -446,7 +450,7 @@ declare namespace SvelteAppNS {
          /**
           * Serializes the main {@link SvelteAppNS.Options} for common application state.
           */
-         toJSON(): Reactive.Data;
+         toJSON(): Reactive.SerializedData;
 
          /**
           * Updates the UI Options store with the current header buttons. You may dynamically add / remove header
@@ -470,7 +474,12 @@ declare namespace SvelteAppNS {
          /**
           * Defines the bulk serializable data from {@link Reactive.toJSON} for common application state.
           */
-         type Data = {
+         type SerializedData = {
+            /**
+             * If true, then application shells are always on top.
+             */
+            alwaysOnTop: boolean;
+
             /**
              * If true, then application shells are draggable.
              */
@@ -523,13 +532,43 @@ declare namespace SvelteAppNS {
          }
 
          /**
+          * UI state data accessible by {@link UIState} store.
+          */
+         type UIStateData = {
+            /**
+             * Active browser window for the app.
+             */
+            activeWindow: Window;
+
+            /**
+             * App dragging state.
+             */
+            dragging: boolean;
+
+            /**
+             * Current app header buttons.
+             */
+            headerButtons: SvelteAppNS.HeaderButton;
+
+            /**
+             * App minimized state.
+             */
+            minimized: boolean;
+
+            /**
+             * App resizing state.
+             */
+            resizing: boolean;
+         };
+
+         /**
           * Provides a custom readable Svelte store for {@link SvelteAppNS.Options} state.
           */
-         type AppOptions = {
+         interface AppOptions extends Readable<SvelteAppNS.Options> {
             /**
-             * Subscribe to all app options updates.
+             * Derived store for `alwaysOnTop` updates.
              */
-            subscribe: Readable<object>;
+            alwaysOnTop: Writable<boolean>;
 
             /**
              * Derived store for `draggable` updates.
@@ -595,22 +634,21 @@ declare namespace SvelteAppNS {
              * Derived store for `title` updates.
              */
             title: Writable<string>;
-         };
+         }
 
          /**
           * Provides a custom readable Svelte store for UI state.
           */
-         type UIState = {
-
+         interface UIState extends Readable<UIStateData> {
             /**
-             * Subscribe to all UI options updates.
+             * Active browser window for the app.
              */
-            subscribe: Readable<object>;
+            activeWindow: Readable<Window>;
 
             /**
              * Derived store for `dragging` updates.
              */
-            dragging: Writable<boolean>;
+            dragging: Readable<boolean>;
 
             /**
              * Derived store for `headerButtons` updates.
@@ -624,8 +662,8 @@ declare namespace SvelteAppNS {
             /**
              * Derived store for `resizing` updates.
              */
-            resizing: Writable<boolean>;
-         };
+            resizing: Readable<boolean>;
+         }
       }
 
       // State API ---------------------------------------------------------------------------------------------------
@@ -774,7 +812,7 @@ declare namespace SvelteAppNS {
             /**
              * Common SvelteApp reactive app options.
              */
-            options: SvelteAppNS.API.Reactive.Data;
+            options: SvelteAppNS.API.Reactive.SerializedData;
 
             /**
              * Application UI state.

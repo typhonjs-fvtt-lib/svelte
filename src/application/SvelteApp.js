@@ -1,7 +1,8 @@
-import { TJSPosition }     from '#runtime/svelte/store/position';
-import { TJSSvelte }       from '#runtime/svelte/util';
-import { A11yHelper }      from '#runtime/util/a11y';
-import { CrossWindow }     from '#runtime/util/browser';
+import { TJSPosition }        from '#runtime/svelte/store/position';
+import { TJSSvelte }          from '#runtime/svelte/util';
+import { A11yHelper }         from '#runtime/util/a11y';
+import { nextAnimationFrame } from "#runtime/util/animate";
+import { CrossWindow }        from '#runtime/util/browser';
 
 import {
    deepMerge,
@@ -11,6 +12,7 @@ import {
 import {
    ApplicationState,
    GetSvelteData,
+   handleAlwaysOnTop,
    loadSvelteConfig,
    SvelteReactive,
    TJSAppIndex }           from './internal/index.js';
@@ -916,12 +918,18 @@ export class SvelteApp extends Application
 
       if (!this.#onMount)
       {
+         this.#onMount = true;
+
          // Add to visible apps tracked.
          TJSAppIndex.add(this);
 
-         this.onSvelteMount();
+         if (typeof this.options.alwaysOnTop === 'boolean' && this.options.alwaysOnTop)
+         {
+            handleAlwaysOnTop(this, true);
+         }
 
-         this.#onMount = true;
+         // Ensure the app element has updated inline styles.
+         nextAnimationFrame().then(() => this.onSvelteMount());
       }
    }
 
@@ -1016,7 +1024,14 @@ export class SvelteApp extends Application
 
          super._activateCoreListeners([this.popOut ? this.#elementTarget?.firstChild : this.#elementTarget]);
 
-         this.onSvelteRemount();
+         // Handle `alwaysOnTop` state with the new element root.
+         if (typeof this.options.alwaysOnTop === 'boolean' && this.options.alwaysOnTop)
+         {
+            handleAlwaysOnTop(this, true);
+         }
+
+         // Ensure the app element has updated inline styles.
+         nextAnimationFrame().then(() => this.onSvelteRemount());
       }
    }
 }
