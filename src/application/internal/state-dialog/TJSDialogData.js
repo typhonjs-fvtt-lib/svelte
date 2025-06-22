@@ -44,7 +44,7 @@ export class TJSDialogData
    /**
     * Set the dialog button configuration.
     *
-    * @param {string} buttons - New dialog button configuration.
+    * @param {{ [key: string]: import('./types').TJSDialogButtonData }} buttons - New dialog button configuration.
     */
    set buttons(buttons)
    {
@@ -53,8 +53,8 @@ export class TJSDialogData
    }
 
    /**
-    * @returns {import('#runtime/svelte/util').TJSSvelte.Config.Minimal | string} The Svelte configuration object or HTML string
-    *          content.
+    * @returns {import('#runtime/svelte/util').TJSSvelte.Config.Embed | string} The Svelte configuration object or
+    *          HTML string content.
     */
    get content()
    {
@@ -64,8 +64,8 @@ export class TJSDialogData
    /**
     * Set the Svelte configuration object or HTML string content.
     *
-    * @param {import('#runtime/svelte/util').TJSSvelte.Config.Minimal | string} content - New Svelte configuration object or
-    *        HTML string content.
+    * @param {import('#runtime/svelte/util').TJSSvelte.Config.Embed | string} content - New Svelte configuration
+    *        object or HTML string content.
     */
    set content(content)
    {
@@ -89,6 +89,25 @@ export class TJSDialogData
    set default(newDefault)
    {
       this.#internal.default = newDefault;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {boolean} The dialog always on top state.
+    */
+   get alwaysOnTop()
+   {
+      return this.#internal.alwaysOnTop;
+   }
+
+   /**
+    * Set the dialog always on top state.
+    *
+    * @param {boolean} alwaysOnTop - New dialog always on top state.
+    */
+   set alwaysOnTop(alwaysOnTop)
+   {
+      this.#internal.alwaysOnTop = alwaysOnTop;
       this.#updateComponent();
    }
 

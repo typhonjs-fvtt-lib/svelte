@@ -49,6 +49,18 @@ declare namespace TJSDialogNS
    export interface Data
    {
       /**
+       * @returns The dialog always on top state.
+       */
+      get alwaysOnTop(): boolean;
+
+      /**
+       * Set the dialog always on top state.
+       *
+       * @param alwaysOnTop - New dialog always on top state.
+       */
+      set alwaysOnTop(alwaysOnTop: boolean);
+
+      /**
        * @returns The dialog button configuration.
        */
       get buttons(): { [key: string]: ButtonData };
@@ -358,6 +370,13 @@ declare namespace TJSDialogNS
     */
    export type OptionsData = {
       /**
+       * The dialog is always on top when true.
+       *
+       * @defaultValue `false`
+       */
+      alwaysOnTop: boolean;
+
+      /**
        * Provides configuration of the dialog button bar.
        */
       buttons?: { [key: string]: ButtonData };
@@ -373,37 +392,51 @@ declare namespace TJSDialogNS
       default?: string;
 
       /**
-       * The dialog is draggable when true; default: true.
+       * The dialog is draggable when true.
+       *
+       * @defaultValue `true`
        */
       draggable?: boolean;
 
       /**
-       * When true auto-management of app focus is enabled; default: true.
+       * When true, auto-management of app focus is enabled.
+       *
+       * @defaultValue `true`
        */
       focusAuto?: boolean;
 
       /**
-       * When true the first focusable element that isn't a button is focused; default: false.
+       * When true, the first focusable element that isn't a button is focused.
+       *
+       * @defaultValue `false`
        */
       focusFirst?: boolean;
 
       /**
-       * When `focusAuto` and `focusKeep` is true; keeps internal focus; default: false.
+       * When `focusAuto` and `focusKeep` is true; keeps internal focus.
+       *
+       * @defaultValue `false`
        */
       focusKeep?: boolean;
 
       /**
-       * When true focus trapping / wrapping is enabled keeping focus inside app; default: true.
+       * When true, focus trapping / wrapping is enabled keeping focus inside the app.
+       *
+       * @defaultValue `true`
        */
       focusTrap?: boolean;
 
       /**
-       * When true the dialog is minimizable; default: true.
+       * When true, the dialog is minimizable.
+       *
+       * @defaultValue `true`
        */
       minimizable?: boolean;
 
       /**
-       * When true a modal dialog is displayed; default: false.
+       * When true, a modal dialog is displayed.
+       *
+       * @defaultValue `false`
        */
       modal?: boolean;
 
@@ -413,31 +446,39 @@ declare namespace TJSDialogNS
       modalOptions?: OptionsModal;
 
       /**
-       * When true and an error is thrown in dialog callback functions post a UI error notification; default: false.
+       * When true and an error is thrown in dialog callback functions post a UI error notification.
+       *
+       * @defaultValue `false`
        */
       notifyError?: boolean;
 
       /**
-       * Callback invoked when dialog is closed; no button option selected. When defined as a string any matching function
-       * by name exported from content Svelte component is invoked.
+       * Callback invoked when the dialog is closed; no button option selected. When defined as a string any matching
+       * function by name exported from content Svelte component is invoked.
        */
       onClose?: string | ((data?: { application: TJSDialog }) => any);
 
       /**
-       * When true and a Promise has been created by {@link TJSDialog.wait} and the Promise is not in the process of being
-       * resolved or rejected on close of the dialog any `onClose` function is invoked and any result that is undefined
-       * will cause the Promise to then be rejected; default: false.
+       * When true and a Promise has been created by {@link TJSDialog.wait} and the Promise is not in the process of
+       * being resolved or rejected on close of the dialog any `onClose` function is invoked and any result that is
+       * undefined will cause the Promise to then be rejected.
+       *
+       * @defaultValue `false`
        */
       rejectClose?: boolean;
 
       /**
-       * When true the dialog is resizable; default: false.
+       * When true, the dialog is resizable.
+       *
+       * @defaultValue `false`
        */
       resizable?: boolean;
 
       /**
        * When true and resolving any Promises and there are undefined results from any button callbacks the button ID is
-       * resolved; default: false.
+       * resolved.
+       *
+       * @defaultValue `false`
        */
       resolveId?: boolean;
 

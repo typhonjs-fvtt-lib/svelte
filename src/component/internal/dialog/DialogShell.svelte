@@ -125,11 +125,14 @@
       // Update internal dialog options store / context with `data`.
       dialogOptions.set(data);
 
-      const newZIndex = Number.isInteger(data.zIndex) || data.zIndex === null ? data.zIndex :
-       modal ? 2 ** 31 : (2 ** 31) - 50
-      if (zIndex !== newZIndex) { zIndex = newZIndex; }
-
       // Update the main foundry options when data changes. Perform explicit checks against existing data in `application`.
+
+      const newAlwaysOnTop = typeof data.alwaysOnTop === 'boolean' ? data.alwaysOnTop : void 0;
+      if (newAlwaysOnTop !== void 0 && application.reactive.alwaysOnTop !== newAlwaysOnTop)
+      {
+         application.reactive.alwaysOnTop = newAlwaysOnTop;
+      }
+
       const newDraggable = typeof data.draggable === 'boolean' ? data.draggable : void 0;
       if (newDraggable !== void 0 && application.reactive.draggable !== newDraggable)
       {
@@ -169,6 +172,9 @@
       // Note application.title from Application localizes `options.title`, so compare with `application.options.title`.
       const newTitle = data.title ?? 'Dialog';
       if (newTitle !== application?.options?.title) { application.reactive.title = newTitle; }
+
+      const newZIndex = Number.isInteger(data.zIndex) || data.zIndex === null ? data.zIndex : void 0
+      if (zIndex !== newZIndex) { zIndex = newZIndex; }
 
       if (application.position.zIndex !== zIndex) { application.position.zIndex = zIndex; }
    }
