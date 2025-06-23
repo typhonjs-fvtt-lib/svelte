@@ -11,7 +11,9 @@ declare namespace TJSDialogNS
     */
    export type ButtonData = {
       /**
-       * When false the dialog does not automatically close when button selected; default: true.
+       * When false, the dialog does not automatically close when button selected.
+       *
+       * @defaultValue `true`
        */
       autoClose?: boolean;
 
@@ -31,8 +33,8 @@ declare namespace TJSDialogNS
       icon?: string;
 
       /**
-       * Callback for button press. When defined as a string any matching function by name exported from content Svelte
-       * component is invoked.
+       * Callback for button press. When defined as a string, any matching function by name exported from the content
+       * Svelte component is invoked.
        */
       onPress?: string | ((data?: { application?: TJSDialog }) => any);
 
@@ -97,14 +99,14 @@ declare namespace TJSDialogNS
       set default(newDefault: string);
 
       /**
-       * @returns The dialog draggable state; draggable when true.
+       * @returns The dialog `draggable` state; draggable when true.
        */
       get draggable(): boolean;
 
       /**
        * Set the dialog state; draggable when true.
        *
-       * @param draggable - New dialog draggable state; draggable when true.
+       * @param draggable - New dialog `draggable` state; draggable when true.
        */
       set draggable(draggable: boolean);
 
@@ -138,7 +140,7 @@ declare namespace TJSDialogNS
       get focusKeep(): boolean;
 
       /**
-       * Set the dialog `focusKeep` state. When `focusAuto` and `focusKeep` is true; keeps internal focus.
+       * Set the dialog `focusKeep` state. When `focusAuto` and `focusKeep` are true, then keep internal focus.
        *
        * @param focusKeep - New dialog `focusKeep` state.
        */
@@ -150,7 +152,7 @@ declare namespace TJSDialogNS
       get minimizable(): boolean;
 
       /**
-       * Set the dialog `minimizable` state. When true the dialog is minimizable.
+       * Set the dialog `minimizable` state. When true, the dialog is minimizable.
        *
        * @param minimizable - New dialog `minimizable` state.
        */
@@ -162,7 +164,7 @@ declare namespace TJSDialogNS
       get modal(): boolean;
 
       /**
-       * Set the dialog `modal` state. When true a modal dialog is displayed.
+       * Set the dialog `modal` state. When true, a modal dialog is displayed.
        *
        * @param modal - New dialog `modal` state.
        */
@@ -186,22 +188,22 @@ declare namespace TJSDialogNS
       get notifyError(): boolean;
 
       /**
-       * Set the dialog `notifyError` state. When true and an error is raised in dialog callback functions post a UI error
-       * notification.
+       * Set the dialog `notifyError` state. When true and an error is raised in the dialog, callback functions post a
+       * UI error notification.
        *
        * @param notifyError - New dialog `notifyError` state.
        */
       set notifyError(notifyError: boolean);
 
       /**
-       * @returns Callback invoked when dialog is closed; no button option selected. When defined as a string any
-       *          matching function by name exported from content Svelte component is invoked.
+       * @returns Callback invoked when dialog is closed; no button option selected. When defined as a string, any
+       *          matching function by name exported from the content Svelte component is invoked.
        */
       get onClose(): string | ((data?: { application?: TJSDialog }) => any);
 
       /**
-       * Set callback invoked when dialog is closed; no button option selected. When defined as a string any matching
-       * function by name exported from content Svelte component is invoked..
+       * Set callback invoked when the dialog is closed; no button option selected. When defined as a string, any
+       * matching function by name exported from the content Svelte component is invoked.
        *
        * @param onClose - New dialog `onClose` state.
        */
@@ -228,7 +230,7 @@ declare namespace TJSDialogNS
       get resizable(): boolean;
 
       /**
-       * Set the dialog `resizable` state. When true the dialog is resizable.
+       * Set the dialog `resizable` state. When true, the dialog is resizable.
        *
        * @param resizable - New dialog `resizable` state.
        */
@@ -242,7 +244,7 @@ declare namespace TJSDialogNS
 
       /**
        * Set the dialog `resolveId` state. When true and resolving any Promises and there are undefined results from any
-       * button callbacks the button ID is resolved.
+       * button callbacks, the button ID is resolved.
        *
        * @param resolveId - New dialog `resolveId` state.
        */
@@ -273,8 +275,7 @@ declare namespace TJSDialogNS
       set transition(transition: OptionsTransition)
 
       /**
-       * @returns A specific z-index for the dialog. Pass null for the dialog to act like other applications in regard
-       *          bringing to top when activated.
+       * @returns A specific z-index for the dialog.
        */
       get zIndex(): number | null;
 
@@ -295,8 +296,8 @@ declare namespace TJSDialogNS
 
       /**
        * Provides a way to safely get this dialogs data given an accessor string which describes the
-       * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
-       * to walk.
+       * entries to walk. To access deeper entries into the object, then format the accessor string with `.` between
+       * entries to walk.
        *
        * @param accessor - The path / key to set. You can set multiple levels.
        *
@@ -319,11 +320,11 @@ declare namespace TJSDialogNS
       replace(data: OptionsData): void
 
       /**
-       * Provides a way to safely set this dialogs data given an accessor string which describes the
-       * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
-       * to walk.
+       * Provides a way to safely set this dialog data given an accessor string which describes the
+       * entries to walk. To access deeper entries into the object, then format the accessor string with `.` between
+       * entries to walk.
        *
-       * Automatically the dialog data will be updated in the associated DialogShell Svelte component.
+       * Automatically, the dialog data will be updated in the associated DialogShell Svelte component.
        *
        * @param accessor - The path / key to set. You can set multiple levels.
        *
@@ -360,7 +361,7 @@ declare namespace TJSDialogNS
       styles?: { [key: string]: string | null };
 
       /**
-       * Custom transition options for modal background / glasspane.
+       * Custom transition options for the modal background / glasspane.
        */
       transition?: OptionsTransition;
    }
@@ -453,8 +454,8 @@ declare namespace TJSDialogNS
       notifyError?: boolean;
 
       /**
-       * Callback invoked when the dialog is closed; no button option selected. When defined as a string any matching
-       * function by name exported from content Svelte component is invoked.
+       * Callback invoked when the dialog is closed; no button option selected. When defined as a string, any matching
+       * function by name exported from the content Svelte component is invoked.
        */
       onClose?: string | ((data?: { application: TJSDialog }) => any);
 
@@ -475,8 +476,8 @@ declare namespace TJSDialogNS
       resizable?: boolean;
 
       /**
-       * When true and resolving any Promises and there are undefined results from any button callbacks the button ID is
-       * resolved.
+       * When true and resolving any Promises and there are undefined results from any of the button callbacks, the
+       * button ID is resolved.
        *
        * @defaultValue `false`
        */
@@ -493,8 +494,7 @@ declare namespace TJSDialogNS
       transition?: OptionsTransition;
 
       /**
-       * A specific z-index for the dialog. Pass null for the dialog to act like other applications in regard bringing to
-       * top when activated.
+       * A specific z-index for the dialog.
        */
       zIndex?: number | null;
    }
