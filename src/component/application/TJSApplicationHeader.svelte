@@ -77,7 +77,7 @@
       {
          const buttonsList = typeof button?.alignLeft === 'boolean' && button?.alignLeft ? buttonsLeft : buttonsRight;
 
-         // If the button contains a TJSSvelte.Config.Minimal object in the `svelte` attribute then use it otherwise use
+         // If the button contains a TJSSvelte.Config.Embed object in the `svelte` attribute, then use it otherwise use
          // `TJSHeaderButton` w/ button as props.
          buttonsList.push(TJSSvelte.config.isConfigEmbed(button?.svelte) ? { ...button.svelte } :
           { class: TJSHeaderButton, props: { button, storeHeaderButtonNoLabel } });
