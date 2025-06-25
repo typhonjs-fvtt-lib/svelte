@@ -294,11 +294,7 @@
       }
 
       // Make sure this application is top most when it receives keyboard events.
-      if (typeof application?.options?.popOut === 'boolean' && application.options.popOut &&
-       application !== globalThis.ui?.activeWindow)
-      {
-         application.bringToTop.call(application);
-      }
+      application.bringToTop.call(application);
    }
 
    /**
@@ -337,19 +333,14 @@
    }
 
    /**
-    * If the application is a popOut application then when clicked bring to top if not already the Foundry
-    * `activeWindow`.
+    * Invoke the app `bringToTop`; this method will determine whether to take the action.
     *
     * Note: `capture` is used so pointer down is always received. Be mindful as `onPointerdownAppTopMost` should only
     * invoke `bringToTop`.
     */
    function onPointerdownAppTopMost()
    {
-      if (typeof application?.options?.popOut === 'boolean' && application.options.popOut &&
-       application !== globalThis.ui?.activeWindow)
-      {
-         application.bringToTop.call(application);
-      }
+      application.bringToTop.call(application);
    }
 
    /**

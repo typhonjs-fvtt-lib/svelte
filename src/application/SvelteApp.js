@@ -266,15 +266,31 @@ export class SvelteApp extends Application
     */
    bringToTop({ focus = true, force = false } = {})
    {
-      // Only perform bring to top when the active window is the main Foundry window instance.
+      // Only perform `bring to top` when the active window is the main Foundry window instance.
       if (this.reactive.activeWindow !== globalThis) { return; }
 
-      if (force || this.popOut) { super.bringToTop(); }
+      if (typeof this?.options?.positionable === 'boolean' && !this.options.positionable) { return; }
+
+      if (force || globalThis.ui.activeWindow !== this)
+      {
+         const z = this.position.zIndex;
+
+         if (this.popOut && z < foundry.applications.api.ApplicationV2._maxZ)
+         {
+            this.position.zIndex = Math.min(++foundry.applications.api.ApplicationV2._maxZ, 99999);
+         }
+         else if (!this.popOut && this.options.alwaysOnTop)
+         {
+            const newAlwaysOnTopZIndex = globalThis?.TRL_SVELTE_APP_DATA?.alwaysOnTop?.getAndIncrement();
+
+            if (typeof newAlwaysOnTopZIndex === 'number') { this.position.zIndex = newAlwaysOnTopZIndex; }
+         }
+      }
 
       const elementTarget = this.elementTarget;
       const activeElement = document.activeElement;
 
-      // If the activeElement is not contained in this app via elementTarget then blur the current active element
+      // If the activeElement is not contained in this app via elementTarget, then blur the current active element
       // and make elementTarget focused.
       if (focus && elementTarget && activeElement !== elementTarget && !elementTarget?.contains(activeElement))
       {

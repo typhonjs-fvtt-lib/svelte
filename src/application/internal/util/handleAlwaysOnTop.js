@@ -22,14 +22,20 @@ export function handleAlwaysOnTop(application, enabled)
       throw new TypeError(`[SvelteApp handleAlwaysOnTop error]: 'enabled' is not a boolean.`);
    }
 
+   const version = globalThis?.TRL_SVELTE_APP_DATA?.VERSION;
+   if (typeof version !== 'number')
+   {
+      console.error('[SvelteApp handleAlwaysOnTop error]: global SvelteApp data unavailable.');
+      return;
+   }
+
    if (enabled)
    {
       globalThis.requestAnimationFrame(() =>
       {
-         // Set z-index to above the TJS dialog level (2 ** 31 - 50).
-         application.position.zIndex = (2 ** 31) - 25;
-
          application.reactive.popOut = false;
+
+         globalThis.requestAnimationFrame(() => application.bringToTop({ force: true }));
       });
    }
    else
@@ -42,7 +48,7 @@ export function handleAlwaysOnTop(application, enabled)
          application.reactive.popOut = true;
 
          // Wait for `rAF` then bring to the top.
-         globalThis.requestAnimationFrame(() => application.bringToTop());
+         globalThis.requestAnimationFrame(() => application.bringToTop({ force: true }));
       });
    }
 }

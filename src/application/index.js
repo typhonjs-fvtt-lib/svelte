@@ -2,9 +2,11 @@ import {
    FoundryHMRSupport,
    FoundryStyles,
    PopoutSupport,
-   ThemeObserver }   from './external/index.js';
+   ThemeObserver }         from './external/index.js';
 
-import { SvelteApp } from './SvelteApp.js';
+import { SvelteAppData }   from './internal/static-global/index.js';
+
+import { SvelteApp }       from './SvelteApp.js';
 
 export { SvelteApp, SvelteApp as SvelteApplication };
 
@@ -14,6 +16,9 @@ export {
    FoundryStyles,
    ThemeObserver
 };
+
+// Initialize global tracking data for SvelteApp.
+SvelteAppData.initialize();
 
 // Initialize core theme observation / changes.
 ThemeObserver.initialize();
