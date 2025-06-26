@@ -904,72 +904,79 @@ declare namespace SvelteAppNS {
    interface OptionsCore
    {
       /**
+       * If true, then application shells are always on top.
+       *
+       * @defaultValue `false`
+       */
+      alwaysOnTop?: boolean;
+
+      /**
        * If false, the default slide close animation is not run.
        *
-       * @defaultValue true
+       * @defaultValue `true`
        */
       defaultCloseAnimation?: boolean;
 
       /**
        * If true, then application shells are draggable.
        *
-       * @defaultValue true
+       * @defaultValue `true`
        */
       draggable?: boolean;
 
       /**
        * When true, auto-management of app focus is enabled.
        *
-       * @defaultValue true
+       * @defaultValue `true`
        */
       focusAuto?: boolean;
 
       /**
        * When `focusAuto` and `focusKeep` is true; keeps internal focus.
        *
-       * @defaultValue false
+       * @defaultValue `false`
        */
       focusKeep?: boolean;
 
       /**
        * Defines A11yHelper focus source to apply when the application closes.
        *
-       * @defaultValue: undefined
+       * @defaultValue: `undefined`
        */
       focusSource?: A11yFocusSource;
 
       /**
        * When true focus trapping / wrapping is enabled keeping focus inside app.
        *
-       * @defaultValue true
+       * @defaultValue `true`
        */
       focusTrap?: boolean;
 
       /**
        * If true, then the close header button is removed.
        *
-       * @defaultValue false
+       * @defaultValue `false`
        */
       headerButtonNoClose?: boolean;
 
       /**
        * If true, then the header button labels are removed.
        *
-       * @defaultValue false
+       * @defaultValue `false`
        */
       headerButtonNoLabel?: boolean;
 
       /**
        * Sets a header icon given an image URL.
        *
-       * @defaultValue undefined
+       * @defaultValue `undefined`
        */
       headerIcon?: string;
 
       /**
        * If true, then the header title is hidden when minimized.
        *
-       * @defaultValue false
+       * @defaultValue `false`
        */
       headerNoTitleMinimized?: boolean;
 
@@ -979,7 +986,7 @@ declare namespace SvelteAppNS {
        * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for relative values
        * supported.
        *
-       * @defaultValue null
+       * @defaultValue `null`
        */
       maxHeight?: number | string | null;
 
@@ -989,7 +996,7 @@ declare namespace SvelteAppNS {
        * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for relative values
        * supported.
        *
-       * @defaultValue null
+       * @defaultValue `null`
        */
       maxWidth?: number | string | null;
 
@@ -999,7 +1006,7 @@ declare namespace SvelteAppNS {
        * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for relative values
        * supported.
        *
-       * @defaultValue 50
+       * @defaultValue `50`
        */
       minHeight?: number | string | null;
 
@@ -1009,35 +1016,35 @@ declare namespace SvelteAppNS {
        * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for relative values
        * supported.
        *
-       * @defaultValue 200
+       * @defaultValue `200`
        */
       minWidth?: number | string | null;
 
       /**
        * If false, then `position.set` does not take effect.
        *
-       * @defaultValue true
+       * @defaultValue `true`
        */
       positionable?: boolean;
 
       /**
        * A helper for initial position placement.
        *
-       * @defaultValue TJSPosition.Initial.browserCentered
+       * @defaultValue `TJSPosition.Initial.browserCentered`
        */
       positionInitial?: TJSPosition.API.System.Initial.InitialSystem;
 
       /**
        * When true, TJSPosition is optimized for orthographic use.
        *
-       * @defaultValue true
+       * @defaultValue `true`
        */
       positionOrtho?: boolean;
 
       /**
        * A validator function or data or list of validators.
        *
-       * @defaultValue TJSPosition.Validators.transformWindow
+       * @defaultValue `TJSPosition.Validators.transformWindow`
        */
       positionValidator?: TJSPosition.API.Validators.ValidatorOption;
 
@@ -1046,7 +1053,7 @@ declare namespace SvelteAppNS {
        *
        * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for values supported.
        *
-       * @defaultValue null
+       * @defaultValue `null`
        */
       rotateX?: number | string | null;
 
@@ -1055,7 +1062,7 @@ declare namespace SvelteAppNS {
        *
        * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for values supported.
        *
-       * @defaultValue null
+       * @defaultValue `null`
        */
       rotateY?: number | string | null;
 
@@ -1064,7 +1071,7 @@ declare namespace SvelteAppNS {
        *
        * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for values supported.
        *
-       * @defaultValue null
+       * @defaultValue `null`
        */
       rotateZ?: number | string | null;
 
@@ -1073,7 +1080,7 @@ declare namespace SvelteAppNS {
        *
        * When defined as a string see {@link TJSPosition.API.Data.TJSPositionDataRelative} for values supported.
        *
-       * @defaultValue null
+       * @defaultValue `null`
        */
       rotation?: number | string | null;
 
@@ -1082,14 +1089,14 @@ declare namespace SvelteAppNS {
        * WebStorage instance across multiple SvelteApps. By default, a unique
        * {@link #runtime/svelte/store/web-storage!TJSSessionStorage} instance is created per SvelteApp.
        *
-       * @defaultValue TJSSessionStorage
+       * @defaultValue `TJSSessionStorage`
        */
       sessionStorage?: WebStorage;
 
       /**
        * By default, 'top / left' respects rotation when minimizing.
        *
-       * @defaultValue 'top left'
+       * @defaultValue `'top left'`
        */
       transformOrigin?: TJSPosition.API.Transform.TransformOrigin;
 

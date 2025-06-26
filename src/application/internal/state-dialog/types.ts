@@ -375,7 +375,7 @@ declare namespace TJSDialogNS
        *
        * @defaultValue `false`
        */
-      alwaysOnTop: boolean;
+      alwaysOnTop?: boolean;
 
       /**
        * Provides configuration of the dialog button bar.
