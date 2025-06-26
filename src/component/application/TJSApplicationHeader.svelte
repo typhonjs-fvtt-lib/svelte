@@ -222,6 +222,11 @@
       flex: var(--tjs-app-header-flex, 0 0 var(--header-height));
       gap: var(--tjs-app-header-gap, 5px);
       padding: var(--tjs-app-header-padding, 0 0.5rem);
+
+      font-family: var(--tjs-app-header-font-family, var(--tjs-app-font-family));
+      font-size: var(--tjs-app-header-font-size, var(--tjs-app-font-size));
+      font-weight: var(--tjs-app-header-font-weight, inherit);
+
       touch-action: none;
    }
 
@@ -232,6 +237,10 @@
    }
 
    .window-title {
+      font-family: inherit;
+      font-size: inherit;
+      font-weight: inherit;
+
       gap: var(--tjs-app-header-gap, 5px);
       max-width: fit-content;
       overflow: hidden;

@@ -560,10 +560,6 @@
       flex: 1;
       margin: 0;
 
-      font-family: var(--tjs-app-header-font-family, var(--tjs-app-font-family)), "Signika", "Palatino Linotype", sans-serif;
-      font-size: var(--tjs-app-header-font-size, var(--tjs-app-font-size, var(--font-size-14)));
-      font-weight: var(--tjs-app-header-font-weight, inherit);
-
       line-height: var(--header-height);
       border: none;
       overflow: hidden;
@@ -574,10 +570,7 @@
    }
 
    .tjs-window-app :global(.window-header button.header-control) {
-      --button-text-color: var(--color-light-1);
       --button-background-color: none;
-      flex: 0 0 var(--button-size);
-      height: var(--button-size);
       padding: 0;
       margin: 0;
       border: none;
