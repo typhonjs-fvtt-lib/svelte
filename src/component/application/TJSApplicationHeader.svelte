@@ -8,6 +8,7 @@
     */
    import { getContext }         from '#svelte';
 
+   import { inlineSvg }          from '#runtime/svelte/action/dom/inline-svg';
    import { TJSSvelte }          from '#runtime/svelte/util';
    import { A11yHelper }         from '#runtime/util/a11y';
    import { localize }           from '#runtime/util/i18n';
@@ -87,14 +88,27 @@
    // ----------------------------------------------------------------------------------------------------------------
 
    let mediaType = void 0;
-   const validExt = new Set(['jpg', 'jpeg', 'png', 'webp']);
+   const validImgExt = new Set(['jpg', 'jpeg', 'png', 'webp']);
+   const validSvgExt = new Set(['svg']);
 
    $: if (typeof $storeHeaderIcon === 'string')
    {
       // Detect if header icon is an image otherwise treat as a Font Awesome icon.
       const extensionMatch = $storeHeaderIcon.match(/\.([a-z]+)$/);
       const extension = extensionMatch ? extensionMatch[1].toLowerCase() : null;
-      mediaType = validExt.has(extension) ? 'img' : 'font';
+
+      if (validImgExt.has(extension))
+      {
+         mediaType = 'img';
+      }
+      else if (validSvgExt.has(extension))
+      {
+         mediaType = 'svg';
+      }
+      else
+      {
+         mediaType = 'font';
+      }
    }
    else
    {
@@ -184,6 +198,8 @@
          <img class="tjs-app-icon keep-minimized" src={getRoutePrefix($storeHeaderIcon)} alt=icon>
       {:else if mediaType === 'font'}
          <i class="window-icon keep-minimized {$storeHeaderIcon}"></i>
+      {:else if mediaType === 'svg'}
+         <svg use:inlineSvg={{ src: $storeHeaderIcon }} class="tjs-app-icon keep-minimized"></svg>
       {/if}
       <h4 class=window-title style:display={displayHeaderTitle}>
          {localize($storeTitle)}
