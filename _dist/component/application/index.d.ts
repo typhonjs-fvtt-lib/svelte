@@ -5,6 +5,9 @@ import { Writable } from 'svelte/store';
  * Provides an application shell is a main top level slotted component that provides a reactive
  * outer wrapper and header bar for the main content component.
  *
+ * Container queries are supported and the main app window container is named `tjs-app-window` and the window content
+ * container is `tjs-app-window-content`.
+ *
  */
 declare class ApplicationShell extends SvelteComponent<
   ApplicationShell.Props,
@@ -140,6 +143,9 @@ declare namespace ApplicationShell {
 /**
  * Provides an empty application shell as a main top level slotted component.
  *
+ * Container queries are supported and the main app window container is named `tjs-app-window` and the window content
+ * container is `tjs-app-window-content`.
+ *
  */
 declare class EmptyApplicationShell extends SvelteComponent<
   EmptyApplicationShell.Props,
@@ -241,6 +247,9 @@ declare namespace EmptyApplicationShell {
  * Provides an alternate application shell that is scoped by slightly different CSS classes than
  * {@link ApplicationShell}. An application shell is a main top level slotted component that provides a reactive
  * outer wrapper and header bar for the main content component.
+ *
+ * Container queries are supported and the main app window container is named `tjs-app-window` and the window content
+ * container is `tjs-app-window-content`.
  *
  * ### CSS variables
  *
@@ -395,8 +404,6 @@ declare namespace TjsGlassPane {
     /** @type {string} */
     background?: string;
     transition?: any;
-    /** @type {number} */
-    zIndex?: number;
     inTransition?: any;
     outTransition?: any;
     transitionOptions?: any;
@@ -405,7 +412,7 @@ declare namespace TjsGlassPane {
     /** @type {boolean} */
     captureInput?: boolean;
     /**
-     * When true any input fires an event `glasspane:close`.
+     * When true, any input fires an event `glasspane:close`.
      *
      * @type {boolean}
      */

@@ -4,6 +4,9 @@
     * {@link ApplicationShell}. An application shell is a main top level slotted component that provides a reactive
     * outer wrapper and header bar for the main content component.
     *
+    * Container queries are supported and the main app window container is named `tjs-app-window` and the window content
+    * container is `tjs-app-window-content`.
+    *
     * ### CSS variables
     *
     * ```
@@ -202,10 +205,21 @@
 
    // ---------------------------------------------------------------------------------------------------------------
 
+   /**
+    * Adds the `mounted` class to the main app div from rAF in `onMount` enabling container queries on the main app
+    * div and `.window-content`. This is necessary as browsers (Chrome / Firefox) defer layout calculations which
+    * may affect app positioning via `TJSPosition` when width or height is set to `auto`.
+    *
+    * @type {boolean}
+    */
+   let mounted = false;
+
    // Focus `elementRoot` on mount to allow keyboard tab navigation of header buttons.
    onMount(() =>
    {
       if ($focusAuto) { elementRoot.focus(); }
+
+      requestAnimationFrame(() => mounted = true);
    });
 
    // ---------------------------------------------------------------------------------------------------------------
@@ -265,14 +279,16 @@
     */
    function onKeydown(event)
    {
+      const FVTTKeyboardManager = foundry.helpers.interaction.KeyboardManager;
+
       // TODO: Note this handling is specifically for Foundry v11+ as the platform KeyboardManager uses
       // `document.querySelector(':focus')` to short circuit keyboard handling internally to KeyboardManager.
       // ApplicationShell manages containing focus programmatically and this prevents the Foundry KeyboardManager from
       // activating. We need to check if this key event target is currently the `elementRoot` or `elementContent` and
       // the event matches any KeyboardManager actions and if so blur current focus.
       if ((event.target === elementRoot || event.target === elementContent) &&
-       KeyboardManager && KeyboardManager?._getMatchingActions?.(
-        KeyboardManager?.getKeyboardEventContext?.(event))?.length)
+       FVTTKeyboardManager && FVTTKeyboardManager?._getMatchingActions?.(
+        FVTTKeyboardManager?.getKeyboardEventContext?.(event))?.length)
       {
          event.target?.blur();
          return;
@@ -302,27 +318,18 @@
       }
 
       // Make sure this application is top most when it receives keyboard events.
-      if (typeof application?.options?.popOut === 'boolean' && application.options.popOut &&
-       application !== globalThis.ui?.activeWindow)
-      {
-         application.bringToTop.call(application);
-      }
+      application.bringToTop.call(application);
    }
 
    /**
-    * If the application is a popOut application then when clicked bring to top if not already the Foundry
-    * `activeWindow`.
+    * Invoke the app `bringToTop`; this method will determine whether to take the action.
     *
     * Note: `capture` is used so pointer down is always received. Be mindful as `onPointerdownApp` should only
     * invoke `bringToTop`.
     */
    function onPointerdownApp()
    {
-      if (typeof application?.options?.popOut === 'boolean' && application.options.popOut &&
-       application !== globalThis.ui?.activeWindow)
-      {
-         application.bringToTop.call(application);
-      }
+      application.bringToTop.call(application);
    }
 
    /**
@@ -415,6 +422,7 @@
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
          class="tjs-app tjs-window-app {appClasses}"
+         class:mounted={mounted}
          data-appid={application.appId}
          bind:this={elementRoot}
          in:inTransition|global={inTransitionOptions}
@@ -442,6 +450,7 @@
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
          class="tjs-app tjs-window-app {appClasses}"
+         class:mounted={mounted}
          data-appid={application.appId}
          bind:this={elementRoot}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
@@ -496,6 +505,11 @@
       scrollbar-color: var(--tjs-app-scrollbar-color, var(--color-scrollbar) var(--color-scrollbar-track));
    }
 
+   /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
+   .tjs-app.mounted {
+      container: tjs-app-window / inline-size;
+   }
+
    .tjs-app .window-content {
       background: var(--tjs-app-content-background, none);
       color: var(--tjs-app-content-color, inherit);
@@ -506,6 +520,11 @@
       display: var(--tjs-app-content-display, flex);
       flex-direction: var(--tjs-app-content-flex-direction, column);
       flex-wrap: var(--tjs-app-content-flex-wrap, nowrap);
+   }
+
+   /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
+   .tjs-app.mounted .window-content {
+      container: tjs-app-window-content / inline-size;
    }
 
    .tjs-app:focus-visible {
@@ -541,10 +560,6 @@
       flex: 1;
       margin: 0;
 
-      font-family: var(--tjs-app-header-font-family, var(--tjs-app-font-family)), "Signika", "Palatino Linotype", sans-serif;
-      font-size: var(--tjs-app-header-font-size, var(--tjs-app-font-size, var(--font-size-14)));
-      font-weight: var(--tjs-app-header-font-weight, inherit);
-
       line-height: var(--header-height);
       border: none;
       overflow: hidden;
@@ -555,10 +570,7 @@
    }
 
    .tjs-window-app :global(.window-header button.header-control) {
-      --button-text-color: var(--color-light-1);
       --button-background-color: none;
-      flex: 0 0 var(--button-size);
-      height: var(--button-size);
       padding: 0;
       margin: 0;
       border: none;

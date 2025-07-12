@@ -111,3 +111,12 @@
    data-tooltip={$storeHeaderButtonNoLabel ? null : label}
    aria-label={label}>
 </button>
+
+<style>
+   button {
+      color: var(--tjs-app-header-button-color);
+      flex: 0 0 var(--tjs-app-header-button-size);
+      height: var(--tjs-app-header-button-size);
+      min-height: var(--tjs-app-header-button-size);
+   }
+</style>

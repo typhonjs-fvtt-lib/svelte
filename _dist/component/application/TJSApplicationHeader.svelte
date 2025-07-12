@@ -8,8 +8,10 @@
     */
    import { getContext }         from 'svelte';
 
+   import { inlineSvg }          from '@typhonjs-svelte/runtime-base/svelte/action/dom/inline-svg';
    import { TJSSvelte }          from '@typhonjs-svelte/runtime-base/svelte/util';
    import { A11yHelper }         from '@typhonjs-svelte/runtime-base/util/a11y';
+   import { AssetValidator }     from '@typhonjs-svelte/runtime-base/util/browser';
    import { localize }           from '@typhonjs-svelte/runtime-base/util/i18n';
    import { isObject }           from '@typhonjs-svelte/runtime-base/util/object';
    import { getRoutePrefix }     from '@typhonjs-svelte/runtime-base/util/path';
@@ -77,7 +79,7 @@
       {
          const buttonsList = typeof button?.alignLeft === 'boolean' && button?.alignLeft ? buttonsLeft : buttonsRight;
 
-         // If the button contains a TJSSvelte.Config.Minimal object in the `svelte` attribute then use it otherwise use
+         // If the button contains a TJSSvelte.Config.Embed object in the `svelte` attribute, then use it otherwise use
          // `TJSHeaderButton` w/ button as props.
          buttonsList.push(TJSSvelte.config.isConfigEmbed(button?.svelte) ? { ...button.svelte } :
           { class: TJSHeaderButton, props: { button, storeHeaderButtonNoLabel } });
@@ -87,19 +89,49 @@
    // ----------------------------------------------------------------------------------------------------------------
 
    let mediaType = void 0;
-   const validExt = new Set(['jpg', 'jpeg', 'png', 'webp']);
+   // const validImgExt = new Set(['jpg', 'jpeg', 'png', 'webp']);
+   // const validSvgExt = new Set(['svg']);
+
+   /**
+    * Only process image / video assets from AssetValidator / skip audio.
+    *
+    * @type {Set<string>}
+    */
+   const mediaTypes = new Set(['img', 'svg']);
 
    $: if (typeof $storeHeaderIcon === 'string')
    {
-      // Detect if header icon is an image otherwise treat as a Font Awesome icon.
-      const extensionMatch = $storeHeaderIcon.match(/\.([a-z]+)$/);
-      const extension = extensionMatch ? extensionMatch[1].toLowerCase() : null;
-      mediaType = validExt.has(extension) ? 'img' : 'font';
+      const result = AssetValidator.parseMedia({ url: $storeHeaderIcon, mediaTypes });
+      mediaType = result.valid ? result.elementType : 'font';
    }
    else
    {
       mediaType = void 0;
    }
+
+   // $: if (typeof $storeHeaderIcon === 'string')
+   // {
+   //    // Detect if header icon is an image otherwise treat as a Font Awesome icon.
+   //    const extensionMatch = $storeHeaderIcon.match(/\.([a-z]+)$/);
+   //    const extension = extensionMatch ? extensionMatch[1].toLowerCase() : null;
+   //
+   //    if (validImgExt.has(extension))
+   //    {
+   //       mediaType = 'img';
+   //    }
+   //    else if (validSvgExt.has(extension))
+   //    {
+   //       mediaType = 'svg';
+   //    }
+   //    else
+   //    {
+   //       mediaType = 'font';
+   //    }
+   // }
+   // else
+   // {
+   //    mediaType = void 0;
+   // }
 
    // ----------------------------------------------------------------------------------------------------------------
 
@@ -175,7 +207,7 @@
 </script>
 
 {#key draggable}
-   <header class="window-header flexrow"
+   <header class="window-header"
            class:not-draggable={!$storeDraggable}
            on:pointerdown={onPointerdown}
            use:draggable={dragOptions}
@@ -184,6 +216,8 @@
          <img class="tjs-app-icon keep-minimized" src={getRoutePrefix($storeHeaderIcon)} alt=icon>
       {:else if mediaType === 'font'}
          <i class="window-icon keep-minimized {$storeHeaderIcon}"></i>
+      {:else if mediaType === 'svg'}
+         <svg use:inlineSvg={{ src: $storeHeaderIcon }} class="tjs-app-icon keep-minimized"></svg>
       {/if}
       <h4 class=window-title style:display={displayHeaderTitle}>
          {localize($storeTitle)}
@@ -200,7 +234,7 @@
 
 <style>
    .not-draggable {
-      --tjs-app-header-cursor: var(--tjs-app-header-cursor-not-draggable, default);
+      --tjs-app-header-cursor: var(--tjs-app-header-cursor-not-draggable, var(--tjs-cursor-default, default));
    }
 
    /**
@@ -214,22 +248,33 @@
    }
 
    .window-header {
-      background: var(--tjs-app-header-background, var(--color-header-background));
-      cursor: var(--tjs-app-header-cursor, var(--cursor-grab));
+      display: flex;
+      align-items: center;
+
+      background: var(--tjs-app-header-background);
+      cursor: var(--tjs-app-header-cursor, var(--tjs-cursor-grab, grab));
       flex: var(--tjs-app-header-flex, 0 0 var(--header-height));
       gap: var(--tjs-app-header-gap, 5px);
       padding: var(--tjs-app-header-padding, 0 0.5rem);
+
+      font-family: var(--tjs-app-header-font-family, var(--tjs-app-font-family));
+      font-size: var(--tjs-app-header-font-size, var(--tjs-app-font-size));
+      font-weight: var(--tjs-app-header-font-weight, inherit);
+
       touch-action: none;
    }
 
    .window-header .tjs-app-icon {
-      align-self: center;
       border-radius: var(--tjs-app-header-icon-border-radius, 4px);
       flex: 0 0 var(--tjs-app-header-icon-width, 24px);
       height: var(--tjs-app-header-icon-height, 24px);
    }
 
    .window-title {
+      font-family: inherit;
+      font-size: inherit;
+      font-weight: inherit;
+
       gap: var(--tjs-app-header-gap, 5px);
       max-width: fit-content;
       overflow: hidden;

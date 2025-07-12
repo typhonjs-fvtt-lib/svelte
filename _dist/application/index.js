@@ -8,6 +8,7 @@ import { CrossWindow } from '@typhonjs-svelte/runtime-base/util/browser';
 import { getRoutePrefix } from '@typhonjs-svelte/runtime-base/util/path';
 import { TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import { A11yHelper } from '@typhonjs-svelte/runtime-base/util/a11y';
+import { nextAnimationFrame } from '@typhonjs-svelte/runtime-base/util/animate';
 import { DialogShell } from '@typhonjs-fvtt/svelte/component/internal';
 import { ManagedPromise } from '@typhonjs-svelte/runtime-base/util/async';
 
@@ -323,14 +324,14 @@ class ApplicationState
       }
       else
       {
+         // Merge in saved options to application.
+         if (isObject(data?.options))
+         {
+            application?.reactive.mergeOptions(data.options);
+         }
+
          if (rendered)
          {
-            // Merge in saved options to application.
-            if (isObject(data?.options))
-            {
-               application?.reactive.mergeOptions(data.options);
-            }
-
             if (isObject(data?.ui))
             {
                const minimized = typeof data.ui?.minimized === 'boolean' ? data.ui.minimized : false;
@@ -434,652 +435,57 @@ class GetSvelteData
 }
 
 /**
- * API docs and description in {@link SvelteApp.API.Reactive}.
+ * Provides a way to easily remove the application from active window tracking setting `popOut` to false and
+ * z-index to above the TJS dialog level effectively making the app always on top. When disabled, adds the
+ * application back as a `popOut` window and brings it to the top of tracked windows.
+ *
+ * Note: This is used by:
+ * - SvelteReactive when `alwaysOnTop` changes.
+ * - SvelteApp when initially rendering for the first time.
+ * - SvelteApp when a new root element is swapped during Vite dev mode / elementRootUpdate.
+ *
+ * Note: A benefit of changing `zIndex` is that this allows the `alwaysOnTop` app state to be captured by changes in
+ * position when serializing `app.state.current()`.
+ *
+ * @param {import('../SvelteApp').SvelteApp}  application - Target application / SvelteApp.
+ *
+ * @param {boolean}  enabled - Enabled state for always on top.
  */
-class SvelteReactive
+function handleAlwaysOnTop(application, enabled)
 {
-   /**
-    * @type {import('../SvelteApp').SvelteApp}
-    */
-   #application;
-
-   /**
-    * @type {boolean}
-    */
-   #initialized = false;
-
-   /** @type {import('#runtime/svelte/store/web-storage').WebStorage} */
-   #sessionStorage;
-
-   /**
-    * The Application option store which is injected into mounted Svelte component context under the `external` key.
-    *
-    * @type {import('./types').StoreAppOptions}
-    */
-   #storeAppOptions;
-
-   /**
-    * Stores the update function for `#storeAppOptions`.
-    *
-    * @type {(this: void, updater: import('svelte/store').Updater<object>) => void}
-    */
-   #storeAppOptionsUpdate;
-
-   /**
-    * Stores the UI state data to make it accessible via getters.
-    *
-    * @type {object}
-    */
-   #dataUIState;
-
-   /**
-    * The UI option store which is injected into mounted Svelte component context under the `external` key.
-    *
-    * @type {import('./types').StoreUIOptions}
-    */
-   #storeUIState;
-
-   /**
-    * Stores the update function for `#storeUIState`.
-    *
-    * @type {(this: void, updater: import('svelte/store').Updater<object>) => void}
-    */
-   #storeUIStateUpdate;
-
-   /**
-    * Stores the unsubscribe functions from local store subscriptions.
-    *
-    * @type {import('svelte/store').Unsubscriber[]}
-    */
-   #storeUnsubscribe = [];
-
-   /**
-    * @param {import('../SvelteApp').SvelteApp} application - The host Foundry application.
-    */
-   constructor(application)
+   if (typeof enabled !== 'boolean')
    {
-      this.#application = application;
-      const optionsSessionStorage = application?.options?.sessionStorage;
+      throw new TypeError(`[SvelteApp handleAlwaysOnTop error]: 'enabled' is not a boolean.`);
+   }
 
-      if (optionsSessionStorage !== void 0 && !(optionsSessionStorage instanceof TJSWebStorage))
+   const version = globalThis?.TRL_SVELTE_APP_DATA?.VERSION;
+   if (typeof version !== 'number')
+   {
+      console.error('[SvelteApp handleAlwaysOnTop error]: global SvelteApp data unavailable.');
+      return;
+   }
+
+   if (enabled)
+   {
+      globalThis.requestAnimationFrame(() =>
       {
-         throw new TypeError(`'options.sessionStorage' is not an instance of TJSWebStorage.`);
-      }
+         application.reactive.popOut = false;
 
-      // If no external web storage API instance is available then create a TJSSessionStorage instance.
-      this.#sessionStorage = optionsSessionStorage !== void 0 ? optionsSessionStorage : new TJSSessionStorage();
-   }
-
-   /**
-    * Initializes reactive support. Package private for internal use.
-    *
-    * @returns {import('./types-local').SvelteReactiveStores | undefined} Internal methods to interact with Svelte
-    * stores.
-    *
-    * @package
-    * @internal
-    */
-   initialize()
-   {
-      if (this.#initialized) { return; }
-
-      this.#initialized = true;
-
-      this.#storesInitialize();
-
-      return {
-         appOptionsUpdate: this.#storeAppOptionsUpdate,
-         uiStateUpdate: this.#storeUIStateUpdate,
-         subscribe: this.#storesSubscribe.bind(this),
-         unsubscribe: this.#storesUnsubscribe.bind(this)
-      };
-   }
-
-// Store getters -----------------------------------------------------------------------------------------------------
-
-   /**
-    * @returns {import('#runtime/svelte/store/web-storage').WebStorage} Returns WebStorage (session) instance.
-    */
-   get sessionStorage()
-   {
-      return this.#sessionStorage;
-   }
-
-   /**
-    * Returns the store for app options.
-    *
-    * @returns {import('../../types').SvelteApp.API.Reactive.AppOptions} App options store.
-    */
-   get storeAppOptions() { return this.#storeAppOptions; }
-
-   /**
-    * Returns the store for UI options.
-    *
-    * @returns {import('../../types').SvelteApp.API.Reactive.UIState} UI options store.
-    */
-   get storeUIState() { return this.#storeUIState; }
-
-// Only reactive getters ---------------------------------------------------------------------------------------------
-
-   /**
-    * Returns the current active Window / WindowProxy UI state.
-    *
-    * @returns {Window} Active window UI state.
-    */
-   get activeWindow() { return this.#dataUIState.activeWindow ?? globalThis; }
-
-   /**
-    * Returns the current dragging UI state.
-    *
-    * @returns {boolean} Dragging UI state.
-    */
-   get dragging() { return this.#dataUIState.dragging; }
-
-   /**
-    * Returns the current minimized UI state.
-    *
-    * @returns {boolean} Minimized UI state.
-    */
-   get minimized() { return this.#dataUIState.minimized; }
-
-   /**
-    * Returns the current resizing UI state.
-    *
-    * @returns {boolean} Resizing UI state.
-    */
-   get resizing() { return this.#dataUIState.resizing; }
-
-   /**
-    * Sets the current active Window / WindowProxy UI state.
-    *
-    * Note: This is protected usage and used internally.
-    *
-    * @param {Window} activeWindow - Active Window / WindowProxy UI state.
-    *
-    * @hidden
-    */
-   set activeWindow(activeWindow)
-   {
-      // Note: when setting activeWindow to undefined `globalThis` is set. There isn't a great test for Window /
-      // WindowProxy, so check `toString`.
-      if (activeWindow === void 0 || activeWindow === null ||
-       (Object.prototype.toString.call(activeWindow) === '[object Window]'))
-      {
-         this.#storeUIStateUpdate((options) => deepMerge(options, { activeWindow: activeWindow ?? globalThis }));
-      }
-   }
-
-// Reactive getter / setters -----------------------------------------------------------------------------------------
-
-   /**
-    * Returns the draggable app option.
-    *
-    * @returns {boolean} Draggable app option.
-    */
-   get draggable() { return this.#application?.options?.draggable; }
-
-   /**
-    * Returns the focusAuto app option.
-    *
-    * @returns {boolean} When true auto-management of app focus is enabled.
-    */
-   get focusAuto() { return this.#application?.options?.focusAuto; }
-
-   /**
-    * Returns the focusKeep app option.
-    *
-    * @returns {boolean} When `focusAuto` and `focusKeep` is true; keeps internal focus.
-    */
-   get focusKeep() { return this.#application?.options?.focusKeep; }
-
-   /**
-    * Returns the focusTrap app option.
-    *
-    * @returns {boolean} When true focus trapping / wrapping is enabled keeping focus inside app.
-    */
-   get focusTrap() { return this.#application?.options?.focusTrap; }
-
-   /**
-    * Returns the headerButtonNoClose app option.
-    *
-    * @returns {boolean} Remove the close the button in header app option.
-    */
-   get headerButtonNoClose() { return this.#application?.options?.headerButtonNoClose; }
-
-   /**
-    * Returns the headerButtonNoLabel app option.
-    *
-    * @returns {boolean} Remove the labels from buttons in header app option.
-    */
-   get headerButtonNoLabel() { return this.#application?.options?.headerButtonNoLabel; }
-
-   /**
-    * Returns the headerIcon app option.
-    *
-    * @returns {string|void} URL for header app icon.
-    */
-   get headerIcon() { return this.#application?.options?.headerIcon; }
-
-   /**
-    * Returns the headerNoTitleMinimized app option.
-    *
-    * @returns {boolean} When true removes the header title when minimized.
-    */
-   get headerNoTitleMinimized() { return this.#application?.options?.headerNoTitleMinimized; }
-
-   /**
-    * Returns the minimizable app option.
-    *
-    * @returns {boolean} Minimizable app option.
-    */
-   get minimizable() { return this.#application?.options?.minimizable; }
-
-   /**
-    * Returns the Foundry popOut state; {@link Application.popOut}
-    *
-    * @returns {boolean} Positionable app option.
-    */
-   get popOut() { return this.#application.popOut; }
-
-   /**
-    * Returns the positionable app option; {@link SvelteApp.Options.positionable}
-    *
-    * @returns {boolean} Positionable app option.
-    */
-   get positionable() { return this.#application?.options?.positionable; }
-
-   /**
-    * Returns the resizable option.
-    *
-    * @returns {boolean} Resizable app option.
-    */
-   get resizable() { return this.#application?.options?.resizable; }
-
-   /**
-    * Returns the title accessor from the parent Application class; {@link Application.title}
-    *
-    * @privateRemarks
-    * TODO: Application v2; note that super.title localizes `this.options.title`; IMHO it shouldn't.    *
-    *
-    * @returns {string} Title.
-    */
-   get title() { return this.#application.title; }
-
-   /**
-    * Sets `this.options.draggable` which is reactive for application shells.
-    *
-    * @param {boolean}  draggable - Sets the draggable option.
-    */
-   set draggable(draggable)
-   {
-      if (typeof draggable === 'boolean') { this.setOptions('draggable', draggable); }
-   }
-
-   /**
-    * Sets `this.options.focusAuto` which is reactive for application shells.
-    *
-    * @param {boolean}  focusAuto - Sets the focusAuto option.
-    */
-   set focusAuto(focusAuto)
-   {
-      if (typeof focusAuto === 'boolean') { this.setOptions('focusAuto', focusAuto); }
-   }
-
-   /**
-    * Sets `this.options.focusKeep` which is reactive for application shells.
-    *
-    * @param {boolean}  focusKeep - Sets the focusKeep option.
-    */
-   set focusKeep(focusKeep)
-   {
-      if (typeof focusKeep === 'boolean') { this.setOptions('focusKeep', focusKeep); }
-   }
-
-   /**
-    * Sets `this.options.focusTrap` which is reactive for application shells.
-    *
-    * @param {boolean}  focusTrap - Sets the focusTrap option.
-    */
-   set focusTrap(focusTrap)
-   {
-      if (typeof focusTrap === 'boolean') { this.setOptions('focusTrap', focusTrap); }
-   }
-
-   /**
-    * Sets `this.options.headerButtonNoClose` which is reactive for application shells.
-    *
-    * @param {boolean}  headerButtonNoClose - Sets the headerButtonNoClose option.
-    */
-   set headerButtonNoClose(headerButtonNoClose)
-   {
-      if (typeof headerButtonNoClose === 'boolean') { this.setOptions('headerButtonNoClose', headerButtonNoClose); }
-   }
-
-   /**
-    * Sets `this.options.headerButtonNoLabel` which is reactive for application shells.
-    *
-    * @param {boolean}  headerButtonNoLabel - Sets the headerButtonNoLabel option.
-    */
-   set headerButtonNoLabel(headerButtonNoLabel)
-   {
-      if (typeof headerButtonNoLabel === 'boolean') { this.setOptions('headerButtonNoLabel', headerButtonNoLabel); }
-   }
-
-   /**
-    * Sets `this.options.headerIcon` which is reactive for application shells.
-    *
-    * @param {string | undefined}  headerIcon - Sets the headerButtonNoLabel option.
-    */
-   set headerIcon(headerIcon)
-   {
-      if (headerIcon === void 0 || typeof headerIcon === 'string') { this.setOptions('headerIcon', headerIcon); }
-   }
-
-   /**
-    * Sets `this.options.headerNoTitleMinimized` which is reactive for application shells.
-    *
-    * @param {boolean}  headerNoTitleMinimized - Sets the headerNoTitleMinimized option.
-    */
-   set headerNoTitleMinimized(headerNoTitleMinimized)
-   {
-      if (typeof headerNoTitleMinimized === 'boolean')
-      {
-         this.setOptions('headerNoTitleMinimized', headerNoTitleMinimized);
-      }
-   }
-
-   /**
-    * Sets `this.options.minimizable` which is reactive for application shells that are also pop out.
-    *
-    * @param {boolean}  minimizable - Sets the minimizable option.
-    */
-   set minimizable(minimizable)
-   {
-      if (typeof minimizable === 'boolean') { this.setOptions('minimizable', minimizable); }
-   }
-
-   /**
-    * Sets `this.options.popOut` which is reactive for application shells. This will add / remove this application
-    * from `ui.windows`.
-    *
-    * @param {boolean}  popOut - Sets the popOut option.
-    */
-   set popOut(popOut)
-   {
-      if (typeof popOut === 'boolean') { this.setOptions('popOut', popOut); }
-   }
-
-   /**
-    * Sets `this.options.positionable` enabling / disabling {@link SvelteApp.position}.
-    *
-    * @param {boolean}  positionable - Sets the positionable option.
-    */
-   set positionable(positionable)
-   {
-      if (typeof positionable === 'boolean') { this.setOptions('positionable', positionable); }
-   }
-
-   /**
-    * Sets `this.options.resizable` which is reactive for application shells.
-    *
-    * @param {boolean}  resizable - Sets the resizable option.
-    */
-   set resizable(resizable)
-   {
-      if (typeof resizable === 'boolean') { this.setOptions('resizable', resizable); }
-   }
-
-   /**
-    * Sets `this.options.title` which is reactive for application shells.
-    *
-    * Note: Will set empty string if title is undefined or null.
-    *
-    * @param {string | undefined | null}   title - Application title; will be localized, so a translation key is fine.
-    */
-   set title(title)
-   {
-      if (typeof title === 'string')
-      {
-         this.setOptions('title', title);
-      }
-      else if (title === void 0 || title === null)
-      {
-         this.setOptions('title', '');
-      }
-   }
-
-   // Reactive Options API -------------------------------------------------------------------------------------------
-
-   /**
-    * Provides a way to safely get this applications options given an accessor string which describes the
-    * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
-    * to walk.
-    *
-    * // TODO DOCUMENT the accessor in more detail.
-    *
-    * @param {string}   accessor - The path / key to set. You can set multiple levels.
-    *
-    * @param {*}        [defaultValue] - A default value returned if the accessor is not found.
-    *
-    * @returns {*} Value at the accessor.
-    */
-   getOptions(accessor, defaultValue)
-   {
-      return safeAccess(this.#application.options, accessor, defaultValue);
-   }
-
-   /**
-    * Provides a way to merge `options` into this applications options and update the appOptions store.
-    *
-    * @param {object}   options - The options object to merge with `this.options`.
-    */
-   mergeOptions(options)
-   {
-      this.#storeAppOptionsUpdate((instanceOptions) => deepMerge(instanceOptions, options));
-   }
-
-   /**
-    * Provides a way to safely set this applications options given an accessor string which describes the
-    * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
-    * to walk.
-    *
-    * Additionally, if an application shell Svelte component is mounted and exports the `appOptions` property then
-    * the application options is set to `appOptions` potentially updating the application shell / Svelte component.
-    *
-    * @param {string}   accessor - The path / key to set. You can set multiple levels.
-    *
-    * @param {any}      value - Value to set.
-    */
-   setOptions(accessor, value)
-   {
-      const success = safeSet(this.#application.options, accessor, value, { createMissing: true });
-
-      // If `this.options` modified then update the app options store.
-      if (success)
-      {
-         this.#storeAppOptionsUpdate(() => this.#application.options);
-      }
-   }
-
-   /**
-    * Serializes the main {@link SvelteApp.Options} for common application state.
-    *
-    * @returns {import('../../types').SvelteApp.API.Reactive.Data} Common application state.
-    */
-   toJSON()
-   {
-      return {
-         draggable: this.#application?.options?.draggable ?? true,
-         focusAuto: this.#application?.options?.focusAuto ?? true,
-         focusKeep: this.#application?.options?.focusKeep ?? false,
-         focusTrap: this.#application?.options?.focusTrap ?? true,
-         headerButtonNoClose: this.#application?.options?.headerButtonNoClose ?? false,
-         headerButtonNoLabel: this.#application?.options?.headerButtonNoLabel ?? false,
-         headerNoTitleMinimized: this.#application?.options?.headerNoTitleMinimized ?? false,
-         minimizable: this.#application?.options?.minimizable ?? true,
-         positionable: this.#application?.options?.positionable ?? true,
-         resizable: this.#application?.options?.resizable ?? true
-      };
-   }
-
-   /**
-    * Updates the UI Options store with the current header buttons. You may dynamically add / remove header buttons
-    * if using an application shell Svelte component. In either overriding `_getHeaderButtons` or responding to the
-    * Hooks fired return a new button array and the uiOptions store is updated and the application shell will render
-    * the new buttons.
-    *
-    * Optionally you can set in the SvelteApp app options {@link SvelteApp.Options.headerButtonNoClose}
-    * to remove the close button from the header buttons.
-    *
-    * @param {object} [opts] - Optional parameters (for internal use)
-    *
-    * @param {boolean} [opts.headerButtonNoClose] - The value for `headerButtonNoClose`.
-    */
-   updateHeaderButtons({ headerButtonNoClose = this.#application.options.headerButtonNoClose } = {})
-   {
-      let buttons = this.#application._getHeaderButtons();
-
-      // Remove close button if this.options.headerButtonNoClose is true;
-      if (typeof headerButtonNoClose === 'boolean' && headerButtonNoClose)
-      {
-         buttons = buttons.filter((button) => button.class !== 'close');
-      }
-
-      // For AppV2 label compatibility for close button: `Close Window` instead of `Close`.
-      const closeButton = buttons.find((button) => button.class === 'close');
-      if (closeButton) { closeButton.label = 'APPLICATION.TOOLS.Close'; }
-
-      this.#storeUIStateUpdate((options) =>
-      {
-         options.headerButtons = buttons;
-         return options;
+         globalThis.requestAnimationFrame(() => application.bringToTop({ force: true }));
       });
    }
-
-   // Internal implementation ----------------------------------------------------------------------------------------
-
-   /**
-    * Initializes the Svelte stores and derived stores for the application options and UI state.
-    *
-    * While writable stores are created the update method is stored in private variables locally and derived Readable
-    * stores are provided for essential options which are commonly used.
-    *
-    * These stores are injected into all Svelte components mounted under the `external` context: `storeAppOptions` and
-    * `storeUIState`.
-    */
-   #storesInitialize()
+   else
    {
-      const writableAppOptions = writable(this.#application.options);
-
-      // Keep the update function locally, but make the store essentially readable.
-      this.#storeAppOptionsUpdate = writableAppOptions.update;
-
-      /**
-       * Create custom store. The main subscribe method for all app options changes is provided along with derived
-       * writable stores for all reactive options.
-       *
-       * @type {import('./types').StoreAppOptions}
-       */
-      const storeAppOptions = {
-         subscribe: writableAppOptions.subscribe,
-
-         draggable: propertyStore(writableAppOptions, 'draggable'),
-         focusAuto: propertyStore(writableAppOptions, 'focusAuto'),
-         focusKeep: propertyStore(writableAppOptions, 'focusKeep'),
-         focusTrap: propertyStore(writableAppOptions, 'focusTrap'),
-         headerButtonNoClose: propertyStore(writableAppOptions, 'headerButtonNoClose'),
-         headerButtonNoLabel: propertyStore(writableAppOptions, 'headerButtonNoLabel'),
-         headerIcon: propertyStore(writableAppOptions, 'headerIcon'),
-         headerNoTitleMinimized: propertyStore(writableAppOptions, 'headerNoTitleMinimized'),
-         minimizable: propertyStore(writableAppOptions, 'minimizable'),
-         popOut: propertyStore(writableAppOptions, 'popOut'),
-         positionable: propertyStore(writableAppOptions, 'positionable'),
-         resizable: propertyStore(writableAppOptions, 'resizable'),
-         title: propertyStore(writableAppOptions, 'title')
-      };
-
-      Object.freeze(storeAppOptions);
-
-      this.#storeAppOptions = storeAppOptions;
-
-      this.#dataUIState = {
-         activeWindow: globalThis,
-         dragging: false,
-         headerButtons: [],
-         minimized: this.#application._minimized,
-         resizing: false
-      };
-
-      // Create a store for UI state data.
-      const writableUIOptions = writable(this.#dataUIState);
-
-      // Keep the update function locally, but make the store essentially readable.
-      this.#storeUIStateUpdate = writableUIOptions.update;
-
-      /**
-       * @type {import('./types').StoreUIOptions}
-       */
-      const storeUIState = {
-         subscribe: writableUIOptions.subscribe,
-
-         // activeWindow: propertyStore(writableUIOptions, 'activeWindow'),
-         activeWindow: derived(writableUIOptions, ($options, set) => set($options.activeWindow)),
-         dragging: propertyStore(writableUIOptions, 'dragging'),
-         headerButtons: derived(writableUIOptions, ($options, set) => set($options.headerButtons)),
-         minimized: derived(writableUIOptions, ($options, set) => set($options.minimized)),
-         resizing: propertyStore(writableUIOptions, 'resizing')
-      };
-
-      Object.freeze(storeUIState);
-
-      // Initialize the store with options set in the Application constructor.
-      this.#storeUIState = storeUIState;
-   }
-
-   /**
-    * Registers local store subscriptions for app options. `popOut` controls registering this app with `ui.windows`.
-    *
-    * @see SvelteApp._injectHTML
-    */
-   #storesSubscribe()
-   {
-      // Register local subscriptions.
-
-      // Handles updating header buttons to add / remove the close button.
-      this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.headerButtonNoClose, (value) =>
+      globalThis.requestAnimationFrame(() =>
       {
-         this.updateHeaderButtons({ headerButtonNoClose: value });
-      }));
+         // TODO: Note direct Foundry API access.
+         application.position.zIndex = foundry.applications.api.ApplicationV2._maxZ - 1;
 
-      // // Handles updating header buttons to add / remove button labels.
-      // this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.headerButtonNoLabel, (value) =>
-      // {
-      //    this.updateHeaderButtons({ headerButtonNoLabel: value });
-      // }));
+         application.reactive.popOut = true;
 
-      // Handles adding / removing this application from `ui.windows` when popOut changes.
-      this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.popOut, (value) =>
-      {
-         if (value && this.#application.rendered)
-         {
-            globalThis.ui.windows[this.#application.appId] = this.#application;
-         }
-         else
-         {
-            delete globalThis.ui.windows[this.#application.appId];
-         }
-      }));
-   }
-
-   /**
-    * Unsubscribes from any locally monitored stores.
-    *
-    * @see SvelteApp.close
-    */
-   #storesUnsubscribe()
-   {
-      this.#storeUnsubscribe.forEach((unsubscribe) => unsubscribe());
-      this.#storeUnsubscribe = [];
+         // Wait for `rAF` then bring to the top.
+         globalThis.requestAnimationFrame(() => application.bringToTop({ force: true }));
+      });
    }
 }
 
@@ -1225,6 +631,728 @@ function loadSvelteConfig({ app, config, elementRootUpdate } = {})
    }
 
    return { config: svelteConfig, component, element };
+}
+
+/**
+ * API docs and description in {@link SvelteApp.API.Reactive}.
+ */
+class SvelteReactive
+{
+   /**
+    * @type {import('../SvelteApp').SvelteApp}
+    */
+   #application;
+
+   /**
+    * @type {boolean}
+    */
+   #initialized = false;
+
+   /** @type {import('#runtime/svelte/store/web-storage').WebStorage} */
+   #sessionStorage;
+
+   /**
+    * The Application option store which is injected into mounted Svelte component context under the `external` key.
+    *
+    * @type {import('../../types').SvelteApp.API.Reactive.AppOptions}
+    */
+   #storeAppOptions;
+
+   /**
+    * Stores the update function for `#storeAppOptions`.
+    *
+    * @type {(this: void, updater: import('svelte/store').Updater<object>) => void}
+    */
+   #storeAppOptionsUpdate;
+
+   /**
+    * Stores the UI state data to make it accessible via getters.
+    *
+    * @type {object}
+    */
+   #dataUIState;
+
+   /**
+    * The UI option store which is injected into mounted Svelte component context under the `external` key.
+    *
+    * @type {import('../../types').SvelteApp.API.Reactive.UIState}
+    */
+   #storeUIState;
+
+   /**
+    * Stores the update function for `#storeUIState`.
+    *
+    * @type {(this: void, updater: import('svelte/store').Updater<object>) => void}
+    */
+   #storeUIStateUpdate;
+
+   /**
+    * Stores the unsubscribe functions from local store subscriptions.
+    *
+    * @type {import('svelte/store').Unsubscriber[]}
+    */
+   #storeUnsubscribe = [];
+
+   /**
+    * @param {import('../SvelteApp').SvelteApp} application - The host Foundry application.
+    */
+   constructor(application)
+   {
+      this.#application = application;
+      const optionsSessionStorage = application?.options?.sessionStorage;
+
+      if (optionsSessionStorage !== void 0 && !(optionsSessionStorage instanceof TJSWebStorage))
+      {
+         throw new TypeError(`'options.sessionStorage' is not an instance of TJSWebStorage.`);
+      }
+
+      // If no external web storage API instance is available, then create a TJSSessionStorage instance.
+      this.#sessionStorage = optionsSessionStorage !== void 0 ? optionsSessionStorage : new TJSSessionStorage();
+   }
+
+   /**
+    * Initializes reactive support. Package private for internal use.
+    *
+    * @returns {import('./types-local').SvelteReactiveStores | undefined} Internal methods to interact with Svelte
+    * stores.
+    *
+    * @package
+    * @internal
+    */
+   initialize()
+   {
+      if (this.#initialized) { return; }
+
+      this.#initialized = true;
+
+      this.#storesInitialize();
+
+      return {
+         appOptionsUpdate: this.#storeAppOptionsUpdate,
+         uiStateUpdate: this.#storeUIStateUpdate,
+         subscribe: this.#storesSubscribe.bind(this),
+         unsubscribe: this.#storesUnsubscribe.bind(this)
+      };
+   }
+
+// Store getters -----------------------------------------------------------------------------------------------------
+
+   /**
+    * @returns {import('#runtime/svelte/store/web-storage').WebStorage} Returns WebStorage (session) instance.
+    */
+   get sessionStorage()
+   {
+      return this.#sessionStorage;
+   }
+
+   /**
+    * Returns the store for app options.
+    *
+    * @returns {import('../../types').SvelteApp.API.Reactive.AppOptions} App options store.
+    */
+   get storeAppOptions() { return this.#storeAppOptions; }
+
+   /**
+    * Returns the store for UI options.
+    *
+    * @returns {import('../../types').SvelteApp.API.Reactive.UIState} UI options store.
+    */
+   get storeUIState() { return this.#storeUIState; }
+
+// Only reactive getters ---------------------------------------------------------------------------------------------
+
+   /**
+    * Returns the current active Window / WindowProxy UI state.
+    *
+    * @returns {Window} Active window UI state.
+    */
+   get activeWindow() { return this.#dataUIState.activeWindow ?? globalThis; }
+
+   /**
+    * Returns the current dragging UI state.
+    *
+    * @returns {boolean} Dragging UI state.
+    */
+   get dragging() { return this.#dataUIState.dragging; }
+
+   /**
+    * Returns the current minimized UI state.
+    *
+    * @returns {boolean} Minimized UI state.
+    */
+   get minimized() { return this.#dataUIState.minimized; }
+
+   /**
+    * Returns the current resizing UI state.
+    *
+    * @returns {boolean} Resizing UI state.
+    */
+   get resizing() { return this.#dataUIState.resizing; }
+
+   /**
+    * Sets the current active Window / WindowProxy UI state.
+    *
+    * Note: This is protected usage and used internally.
+    *
+    * @param {Window} activeWindow - Active Window / WindowProxy UI state.
+    *
+    * @internal
+    */
+   set activeWindow(activeWindow)
+   {
+      // Note: when setting activeWindow to undefined `globalThis` is set. There isn't a great test for Window /
+      // WindowProxy, so check `toString`.
+      if (activeWindow === void 0 || activeWindow === null ||
+       (Object.prototype.toString.call(activeWindow) === '[object Window]'))
+      {
+         this.#storeUIStateUpdate((options) => deepMerge(options, { activeWindow: activeWindow ?? globalThis }));
+      }
+   }
+
+// Reactive getter / setters -----------------------------------------------------------------------------------------
+
+   /**
+    * Returns the alwaysOnTop app option.
+    *
+    * @returns {boolean} Always on top app option.
+    */
+   get alwaysOnTop() { return this.#application?.options?.alwaysOnTop; }
+
+   /**
+    * Returns the draggable app option.
+    *
+    * @returns {boolean} Draggable app option.
+    */
+   get draggable() { return this.#application?.options?.draggable; }
+
+   /**
+    * Returns the focusAuto app option.
+    *
+    * @returns {boolean} When true auto-management of app focus is enabled.
+    */
+   get focusAuto() { return this.#application?.options?.focusAuto; }
+
+   /**
+    * Returns the focusKeep app option.
+    *
+    * @returns {boolean} When `focusAuto` and `focusKeep` is true; keeps internal focus.
+    */
+   get focusKeep() { return this.#application?.options?.focusKeep; }
+
+   /**
+    * Returns the focusTrap app option.
+    *
+    * @returns {boolean} When true focus trapping / wrapping is enabled keeping focus inside app.
+    */
+   get focusTrap() { return this.#application?.options?.focusTrap; }
+
+   /**
+    * Returns the headerButtonNoClose app option.
+    *
+    * @returns {boolean} Remove the close the button in header app option.
+    */
+   get headerButtonNoClose() { return this.#application?.options?.headerButtonNoClose; }
+
+   /**
+    * Returns the headerButtonNoLabel app option.
+    *
+    * @returns {boolean} Remove the labels from buttons in the header app option.
+    */
+   get headerButtonNoLabel() { return this.#application?.options?.headerButtonNoLabel; }
+
+   /**
+    * Returns the headerIcon app option.
+    *
+    * @returns {string|void} URL for header app icon.
+    */
+   get headerIcon() { return this.#application?.options?.headerIcon; }
+
+   /**
+    * Returns the headerNoTitleMinimized app option.
+    *
+    * @returns {boolean} When true removes the header title when minimized.
+    */
+   get headerNoTitleMinimized() { return this.#application?.options?.headerNoTitleMinimized; }
+
+   /**
+    * Returns the minimizable app option.
+    *
+    * @returns {boolean} Minimizable app option.
+    */
+   get minimizable() { return this.#application?.options?.minimizable; }
+
+   /**
+    * Returns the Foundry popOut state; {@link Application.popOut}
+    *
+    * @returns {boolean} Positionable app option.
+    */
+   get popOut() { return this.#application.popOut; }
+
+   /**
+    * Returns the positionable app option; {@link SvelteApp.Options.positionable}
+    *
+    * @returns {boolean} Positionable app option.
+    */
+   get positionable() { return this.#application?.options?.positionable; }
+
+   /**
+    * Returns the resizable option.
+    *
+    * @returns {boolean} Resizable app option.
+    */
+   get resizable() { return this.#application?.options?.resizable; }
+
+   /**
+    * Returns the title accessor from the parent Application class; {@link Application.title}
+    *
+    * @privateRemarks
+    * TODO: Application v2; note that super.title localizes `this.options.title`; IMHO it shouldn't.    *
+    *
+    * @returns {string} Title.
+    */
+   get title() { return this.#application.title; }
+
+   /**
+    * Sets `this.options.alwaysOnTop`, which is reactive for application shells.
+    *
+    * @param {boolean}  alwaysOnTop - Sets the `alwaysOnTop` option.
+    */
+   set alwaysOnTop(alwaysOnTop)
+   {
+      if (typeof alwaysOnTop === 'boolean') { this.setOptions('alwaysOnTop', alwaysOnTop); }
+   }
+
+   /**
+    * Sets `this.options.draggable`, which is reactive for application shells.
+    *
+    * @param {boolean}  draggable - Sets the draggable option.
+    */
+   set draggable(draggable)
+   {
+      if (typeof draggable === 'boolean') { this.setOptions('draggable', draggable); }
+   }
+
+   /**
+    * Sets `this.options.focusAuto`, which is reactive for application shells.
+    *
+    * @param {boolean}  focusAuto - Sets the focusAuto option.
+    */
+   set focusAuto(focusAuto)
+   {
+      if (typeof focusAuto === 'boolean') { this.setOptions('focusAuto', focusAuto); }
+   }
+
+   /**
+    * Sets `this.options.focusKeep`, which is reactive for application shells.
+    *
+    * @param {boolean}  focusKeep - Sets the focusKeep option.
+    */
+   set focusKeep(focusKeep)
+   {
+      if (typeof focusKeep === 'boolean') { this.setOptions('focusKeep', focusKeep); }
+   }
+
+   /**
+    * Sets `this.options.focusTrap`, which is reactive for application shells.
+    *
+    * @param {boolean}  focusTrap - Sets the focusTrap option.
+    */
+   set focusTrap(focusTrap)
+   {
+      if (typeof focusTrap === 'boolean') { this.setOptions('focusTrap', focusTrap); }
+   }
+
+   /**
+    * Sets `this.options.headerButtonNoClose`, which is reactive for application shells.
+    *
+    * @param {boolean}  headerButtonNoClose - Sets the headerButtonNoClose option.
+    */
+   set headerButtonNoClose(headerButtonNoClose)
+   {
+      if (typeof headerButtonNoClose === 'boolean') { this.setOptions('headerButtonNoClose', headerButtonNoClose); }
+   }
+
+   /**
+    * Sets `this.options.headerButtonNoLabel`, which is reactive for application shells.
+    *
+    * @param {boolean}  headerButtonNoLabel - Sets the headerButtonNoLabel option.
+    */
+   set headerButtonNoLabel(headerButtonNoLabel)
+   {
+      if (typeof headerButtonNoLabel === 'boolean') { this.setOptions('headerButtonNoLabel', headerButtonNoLabel); }
+   }
+
+   /**
+    * Sets `this.options.headerIcon`, which is reactive for application shells.
+    *
+    * @param {string | undefined}  headerIcon - Sets the headerButtonNoLabel option.
+    */
+   set headerIcon(headerIcon)
+   {
+      if (headerIcon === void 0 || typeof headerIcon === 'string') { this.setOptions('headerIcon', headerIcon); }
+   }
+
+   /**
+    * Sets `this.options.headerNoTitleMinimized`, which is reactive for application shells.
+    *
+    * @param {boolean}  headerNoTitleMinimized - Sets the headerNoTitleMinimized option.
+    */
+   set headerNoTitleMinimized(headerNoTitleMinimized)
+   {
+      if (typeof headerNoTitleMinimized === 'boolean')
+      {
+         this.setOptions('headerNoTitleMinimized', headerNoTitleMinimized);
+      }
+   }
+
+   /**
+    * Sets `this.options.minimizable`, which is reactive for application shells that are also pop out.
+    *
+    * @param {boolean}  minimizable - Sets the minimizable option.
+    */
+   set minimizable(minimizable)
+   {
+      if (typeof minimizable === 'boolean') { this.setOptions('minimizable', minimizable); }
+   }
+
+   /**
+    * Sets `this.options.popOut` which is reactive for application shells. This will add / remove this application
+    * from `ui.windows` via the subscription set in `#storesSubscribe`.
+    *
+    * @param {boolean}  popOut - Sets the popOut option.
+    */
+   set popOut(popOut)
+   {
+      if (typeof popOut === 'boolean') { this.setOptions('popOut', popOut); }
+   }
+
+   /**
+    * Sets `this.options.positionable`, enabling / disabling {@link SvelteApp.position}.
+    *
+    * @param {boolean}  positionable - Sets the positionable option.
+    */
+   set positionable(positionable)
+   {
+      if (typeof positionable === 'boolean') { this.setOptions('positionable', positionable); }
+   }
+
+   /**
+    * Sets `this.options.resizable`, which is reactive for application shells.
+    *
+    * @param {boolean}  resizable - Sets the resizable option.
+    */
+   set resizable(resizable)
+   {
+      if (typeof resizable === 'boolean') { this.setOptions('resizable', resizable); }
+   }
+
+   /**
+    * Sets `this.options.title`, which is reactive for application shells.
+    *
+    * Note: Will set empty string if title is undefined or null.
+    *
+    * @param {string | undefined | null}   title - Application title; will be localized, so a translation key is fine.
+    */
+   set title(title)
+   {
+      if (typeof title === 'string')
+      {
+         this.setOptions('title', title);
+      }
+      else if (title === void 0 || title === null)
+      {
+         this.setOptions('title', '');
+      }
+   }
+
+   // Reactive Options API -------------------------------------------------------------------------------------------
+
+   /**
+    * Provides a way to safely get this applications options given an accessor string which describes the
+    * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
+    * to walk.
+    *
+    * // TODO DOCUMENT the accessor in more detail.
+    *
+    * @param {string}   accessor - The path / key to set. You can set multiple levels.
+    *
+    * @param {*}        [defaultValue] - A default value returned if the accessor is not found.
+    *
+    * @returns {*} Value at the accessor.
+    */
+   getOptions(accessor, defaultValue)
+   {
+      return safeAccess(this.#application.options, accessor, defaultValue);
+   }
+
+   /**
+    * Provides a way to merge `options` into the application options and update the appOptions store.
+    *
+    * @param {object}   options - The options object to merge with `this.options`.
+    */
+   mergeOptions(options)
+   {
+      this.#storeAppOptionsUpdate((instanceOptions) => deepMerge(instanceOptions, options));
+   }
+
+   /**
+    * Provides a way to safely set the application options given an accessor string which describes the
+    * entries to walk. To access deeper entries into the object format, the accessor string with `.` between entries
+    * to walk.
+    *
+    * Additionally, if an application shell Svelte component is mounted and exports the `appOptions` property, then
+    * the application options are set to `appOptions` potentially updating the application shell / Svelte component.
+    *
+    * @param {string}   accessor - The path / key to set. You can set multiple levels.
+    *
+    * @param {any}      value - Value to set.
+    */
+   setOptions(accessor, value)
+   {
+      const success = safeSet(this.#application.options, accessor, value, { createMissing: true });
+
+      // If `this.options` modified, then update the app options store.
+      if (success)
+      {
+         this.#storeAppOptionsUpdate(() => this.#application.options);
+      }
+   }
+
+   /**
+    * Serializes the main {@link SvelteApp.Options} for common application state.
+    *
+    * @returns {import('../../types').SvelteApp.API.Reactive.SerializedData} Common application state.
+    */
+   toJSON()
+   {
+      return {
+         alwaysOnTop: this.#application?.options?.alwaysOnTop ?? false,
+         draggable: this.#application?.options?.draggable ?? true,
+         focusAuto: this.#application?.options?.focusAuto ?? true,
+         focusKeep: this.#application?.options?.focusKeep ?? false,
+         focusTrap: this.#application?.options?.focusTrap ?? true,
+         headerButtonNoClose: this.#application?.options?.headerButtonNoClose ?? false,
+         headerButtonNoLabel: this.#application?.options?.headerButtonNoLabel ?? false,
+         headerNoTitleMinimized: this.#application?.options?.headerNoTitleMinimized ?? false,
+         minimizable: this.#application?.options?.minimizable ?? true,
+         positionable: this.#application?.options?.positionable ?? true,
+         resizable: this.#application?.options?.resizable ?? true
+      };
+   }
+
+   /**
+    * Updates the UI Options store with the current header buttons. You may dynamically add / remove header buttons
+    * if using an application shell Svelte component. In either overriding `_getHeaderButtons` or responding to the
+    * Hooks fired return a new button array, and the uiOptions store is updated, and the application shell will render
+    * the new buttons.
+    *
+    * Optionally you can set in the SvelteApp app options {@link SvelteApp.Options.headerButtonNoClose}
+    * to remove the close button from the header buttons.
+    *
+    * @param {object} [opts] - Optional parameters (for internal use)
+    *
+    * @param {boolean} [opts.headerButtonNoClose] - The value for `headerButtonNoClose`.
+    */
+   updateHeaderButtons({ headerButtonNoClose = this.#application.options.headerButtonNoClose } = {})
+   {
+      let buttons = this.#application._getHeaderButtons();
+
+      // Remove close button if this.options.headerButtonNoClose is true;
+      if (typeof headerButtonNoClose === 'boolean' && headerButtonNoClose)
+      {
+         buttons = buttons.filter((button) => button.class !== 'close');
+      }
+
+      // For AppV2 label compatibility for close button: `Close Window` instead of `Close`.
+      const closeButton = buttons.find((button) => button.class === 'close');
+      if (closeButton) { closeButton.label = 'APPLICATION.TOOLS.Close'; }
+
+      this.#storeUIStateUpdate((options) =>
+      {
+         options.headerButtons = buttons;
+         return options;
+      });
+   }
+
+   // Internal implementation ----------------------------------------------------------------------------------------
+
+   /**
+    * Initializes the Svelte stores and derived stores for the application options and UI state.
+    *
+    * While writable stores are created, the update method is stored in private variables locally and derived Readable
+    * stores are provided for essential options which are commonly used.
+    *
+    * These stores are injected into all Svelte components mounted under the `external` context: `storeAppOptions` and
+    * `storeUIState`.
+    */
+   #storesInitialize()
+   {
+      /** @type {import('svelte/store').Writable<import('../../types').SvelteApp.Options>} */
+      const writableAppOptions = writable(this.#application.options);
+
+      // Keep the update function locally, but make the store essentially readable.
+      this.#storeAppOptionsUpdate = writableAppOptions.update;
+
+      /**
+       * Create custom store. The main subscribe method for all app options changes is provided along with derived
+       * writable stores for all reactive options.
+       *
+       * @type {import('../../types').SvelteApp.API.Reactive.AppOptions}
+       */
+      const storeAppOptions = {
+         subscribe: writableAppOptions.subscribe,
+
+         alwaysOnTop: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'alwaysOnTop'),
+
+         draggable: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'draggable'),
+
+         focusAuto: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'focusAuto'),
+
+         focusKeep: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'focusKeep'),
+
+         focusTrap: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'focusTrap'),
+
+         headerButtonNoClose: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'headerButtonNoClose'),
+
+         headerButtonNoLabel: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'headerButtonNoLabel'),
+
+         headerIcon: /** @type {import('svelte/store').Writable<string>} */
+          propertyStore(writableAppOptions, 'headerIcon'),
+
+         headerNoTitleMinimized: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'headerNoTitleMinimized'),
+
+         minimizable: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'minimizable'),
+
+         popOut: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'popOut'),
+
+         positionable: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'positionable'),
+
+         resizable: /** @type {import('svelte/store').Writable<boolean>} */
+          propertyStore(writableAppOptions, 'resizable'),
+
+         title: /** @type {import('svelte/store').Writable<string>} */
+          propertyStore(writableAppOptions, 'title')
+      };
+
+      Object.freeze(storeAppOptions);
+
+      this.#storeAppOptions = storeAppOptions;
+
+      /**
+       * @type {import('../../types').SvelteApp.API.Reactive.UIStateData}
+       */
+      this.#dataUIState = {
+         activeWindow: globalThis,
+         dragging: false,
+         headerButtons: [],
+         minimized: this.#application._minimized,
+         resizing: false
+      };
+
+      /**
+       * Create a store for UI state data.
+       *
+       * @type {import('svelte/store').Writable<import('../../types').SvelteApp.API.Reactive.UIStateData>}
+       */
+      const writableUIOptions = writable(this.#dataUIState);
+
+      // Keep the update function locally, but make the store essentially readable.
+      this.#storeUIStateUpdate = writableUIOptions.update;
+
+      /**
+       * @type {import('../../types').SvelteApp.API.Reactive.UIState}
+       */
+      const storeUIState = {
+         subscribe: writableUIOptions.subscribe,
+
+         activeWindow: /** @type {import('svelte/store').Readable<Window>} */
+          derived(writableUIOptions, ($options, set) => set($options.activeWindow)),
+
+         dragging: /** @type {import('svelte/store').Readable<boolean>} */
+          propertyStore(writableUIOptions, 'dragging'),
+
+         headerButtons: /** @type {import('svelte/store').Readable<import('../../types').SvelteApp.HeaderButton>} */
+          derived(writableUIOptions, ($options, set) => set($options.headerButtons)),
+
+         minimized: /** @type {import('svelte/store').Readable<boolean>} */
+          derived(writableUIOptions, ($options, set) => set($options.minimized)),
+
+         resizing: /** @type {import('svelte/store').Readable<boolean>} */
+          propertyStore(writableUIOptions, 'resizing')
+      };
+
+      Object.freeze(storeUIState);
+
+      // Initialize the store with options set in the Application constructor.
+      this.#storeUIState = storeUIState;
+   }
+
+   /**
+    * Registers local store subscriptions for app options. `popOut` controls registering this app with `ui.windows`.
+    *
+    * @see SvelteApp._injectHTML
+    */
+   #storesSubscribe()
+   {
+      // Register local subscriptions.
+
+      /**
+       * Provides a way to easily remove the application from active window tracking setting `popOut` to false and
+       * z-index to above the TJS dialog level effectively making the app always on top. When disabled, adds the
+       * application back as a `popOut` window and brings it to the top of tracked windows.
+       */
+      this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.alwaysOnTop,
+       (enabled) => handleAlwaysOnTop(this.#application, enabled)));
+
+      // Handles updating header buttons to add / remove the close button.
+      this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.headerButtonNoClose, (value) =>
+       this.updateHeaderButtons({ headerButtonNoClose: value })));
+
+      // Handles adding / removing this application from `ui.windows` when `popOut` changes.
+      this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.popOut, (value) =>
+      {
+         if (value)
+         {
+            // Ensure that the app is tracked in current popout windows.
+            if (globalThis?.ui?.windows?.[this.#application.appId] !== this.#application)
+            {
+               globalThis.ui.windows[this.#application.appId] = this.#application;
+            }
+         }
+         else
+         {
+            // Remove app from global window tracking.
+            if (globalThis?.ui?.activeWindow === this.#application) { globalThis.ui.activeWindow = null; }
+
+            if (globalThis?.ui?.windows?.[this.#application.appId] === this.#application)
+            {
+               delete globalThis.ui.windows[this.#application.appId];
+            }
+         }
+      }));
+   }
+
+   /**
+    * Unsubscribes from any locally monitored stores.
+    *
+    * @see SvelteApp.close
+    */
+   #storesUnsubscribe()
+   {
+      this.#storeUnsubscribe.forEach((unsubscribe) => unsubscribe());
+      this.#storeUnsubscribe = [];
+   }
 }
 
 /**
@@ -1651,6 +1779,14 @@ class FoundryStyles
  */
 class SvelteApp extends Application
 {
+   /**
+    * Disable Foundry v13+ warnings for AppV1.
+    *
+    * @type {boolean}
+    * @internal
+    */
+   static _warnedAppV1 = true;
+
    static #MIN_WINDOW_HEIGHT = 50;
    static #MIN_WINDOW_WIDTH = 200;
 
@@ -1792,21 +1928,24 @@ class SvelteApp extends Application
    static get defaultOptions()
    {
       return /** @type {import('./types').SvelteApp.Options} */ deepMerge(super.defaultOptions, {
-         defaultCloseAnimation: true,     // If false the default slide close animation is not run.
-         draggable: true,                 // If true then application shells are draggable.
-         focusAuto: true,                 // When true auto-management of app focus is enabled.
+         alwaysOnTop: false,              // Assigned to position. When true, the app window is floated always on top.
+         defaultCloseAnimation: true,     // If false, the default slide close animation is not run.
+         draggable: true,                 // If true, then application shells are draggable.
+         focusAuto: true,                 // When true, auto-management of app focus is enabled.
          focusKeep: false,                // When `focusAuto` and `focusKeep` is true; keeps internal focus.
          focusSource: void 0,             // Stores any A11yFocusSource data that is applied when app is closed.
          focusTrap: true,                 // When true focus trapping / wrapping is enabled keeping focus inside app.
-         headerButtonNoClose: false,      // If true then the close header button is removed.
-         headerButtonNoLabel: false,      // If true then header button labels are removed for application shells.
+         headerButtonNoClose: false,      // If true, then the close header button is removed.
+         headerButtonNoLabel: false,      // If true, then the header button labels are removed for application shells.
          headerIcon: void 0,              // Sets a header icon given an image URL.
-         headerNoTitleMinimized: false,   // If true then header title is hidden when application is minimized.
+         headerNoTitleMinimized: false,   // If true, then the header title is hidden when the application is minimized.
+         maxHeight: void 0,               // Assigned to position. Number specifying maximum window height.
+         maxWidth: void 0,                // Assigned to position. Number specifying maximum window width.
          minHeight: SvelteApp.#MIN_WINDOW_HEIGHT,    // Assigned to position. Number specifying minimum window height.
          minWidth: SvelteApp.#MIN_WINDOW_WIDTH,      // Assigned to position. Number specifying minimum window width.
-         positionable: true,              // If false then `position.set` does not take effect.
+         positionable: true,              // If false, then `position.set` does not take effect.
          positionInitial: TJSPosition.Initial.browserCentered,      // A helper for initial position placement.
-         positionOrtho: true,             // When true TJSPosition is optimized for orthographic use.
+         positionOrtho: true,             // When true, TJSPosition is optimized for orthographic use.
          positionValidator: TJSPosition.Validators.transformWindow, // A function providing the default validator.
          sessionStorage: void 0,          // An instance of WebStorage (session) to share across SvelteApps.
          svelte: void 0,                  // A Svelte configuration object.
@@ -1880,15 +2019,31 @@ class SvelteApp extends Application
     */
    bringToTop({ focus = true, force = false } = {})
    {
-      // Only perform bring to top when the active window is the main Foundry window instance.
+      // Only perform `bring to top` when the active window is the main Foundry window instance.
       if (this.reactive.activeWindow !== globalThis) { return; }
 
-      if (force || this.popOut) { super.bringToTop(); }
+      if (typeof this?.options?.positionable === 'boolean' && !this.options.positionable) { return; }
+
+      if (force || globalThis.ui.activeWindow !== this)
+      {
+         const z = this.position.zIndex;
+
+         if (this.popOut && z < foundry.applications.api.ApplicationV2._maxZ)
+         {
+            this.position.zIndex = Math.min(++foundry.applications.api.ApplicationV2._maxZ, 99999);
+         }
+         else if (!this.popOut && this.options.alwaysOnTop)
+         {
+            const newAlwaysOnTopZIndex = globalThis?.TRL_SVELTE_APP_DATA?.alwaysOnTop?.getAndIncrement();
+
+            if (typeof newAlwaysOnTopZIndex === 'number') { this.position.zIndex = newAlwaysOnTopZIndex; }
+         }
+      }
 
       const elementTarget = this.elementTarget;
       const activeElement = document.activeElement;
 
-      // If the activeElement is not contained in this app via elementTarget then blur the current active element
+      // If the activeElement is not contained in this app via elementTarget, then blur the current active element
       // and make elementTarget focused.
       if (focus && elementTarget && activeElement !== elementTarget && !elementTarget?.contains(activeElement))
       {
@@ -2532,12 +2687,18 @@ class SvelteApp extends Application
 
       if (!this.#onMount)
       {
+         this.#onMount = true;
+
          // Add to visible apps tracked.
          TJSAppIndex.add(this);
 
-         this.onSvelteMount();
+         if (typeof this.options.alwaysOnTop === 'boolean' && this.options.alwaysOnTop)
+         {
+            handleAlwaysOnTop(this, true);
+         }
 
-         this.#onMount = true;
+         // Ensure the app element has updated inline styles.
+         nextAnimationFrame().then(() => this.onSvelteMount());
       }
    }
 
@@ -2632,7 +2793,14 @@ class SvelteApp extends Application
 
          super._activateCoreListeners([this.popOut ? this.#elementTarget?.firstChild : this.#elementTarget]);
 
-         this.onSvelteRemount();
+         // Handle `alwaysOnTop` state with the new element root.
+         if (typeof this.options.alwaysOnTop === 'boolean' && this.options.alwaysOnTop)
+         {
+            handleAlwaysOnTop(this, true);
+         }
+
+         // Ensure the app element has updated inline styles.
+         nextAnimationFrame().then(() => this.onSvelteRemount());
       }
    }
 }
@@ -2871,6 +3039,81 @@ class ThemeObserver
 }
 
 /**
+ * Stores global tracking data for {@link SvelteApp}.
+ *
+ * This static instance is stored in `globalThis.TRL_SVELTE_APP_DATA`.
+ */
+class SvelteAppData
+{
+   static #initialized = false;
+
+   /**
+    * @returns {number} Version number for SvelteAppData.
+    */
+   static get VERSION() { return 1; }
+
+   static get alwaysOnTop() { return AlwaysOnTop; }
+
+   static initialize()
+   {
+      if (this.#initialized) { return; }
+
+      this.#initialized = true;
+
+      const currentVersion = globalThis?.TRL_SVELTE_APP_DATA?.VERSION;
+
+      if (typeof currentVersion !== 'number' || currentVersion < this.VERSION)
+      {
+         globalThis.TRL_SVELTE_APP_DATA = this;
+      }
+   }
+}
+
+/**
+ * Provides global tracking data for the `alwaysOnTop` SvelteApp option.
+ */
+class AlwaysOnTop
+{
+   /**
+    * Stores the max z-index.
+    *
+    * @type {number}
+    */
+   static #max = 2 ** 31 - 1000;
+
+   /**
+    * Stores the min z-index.
+    *
+    * @type {number}
+    */
+   static #min = 2 ** 31 - 100000;
+
+   /**
+    * Stores the current z-index for the top most `alwaysOnTop` app.
+    *
+    * @type {number}
+    */
+   static #current = this.#min;
+
+
+   /**
+    * @returns {number} Increments the current always on top z-index and returns it.
+    */
+   static getAndIncrement()
+   {
+      this.#current = Math.min(++this.#current, this.#max);
+
+      return this.#current;
+   }
+
+   static get current() { return this.#current; }
+
+   static get max() { return this.#max; }
+
+   static get min() { return this.#min; }
+}
+
+/**
  * Provides storage for all dialog options through individual accessors and `get`, `merge`, `replace` and `set` methods
  * that safely access and update data changed to the mounted DialogShell component reactively.
  */
@@ -2909,7 +3152,7 @@ class TJSDialogData
    /**
     * Set the dialog button configuration.
     *
-    * @param {string} buttons - New dialog button configuration.
+    * @param {{ [key: string]: import('./types').TJSDialogButtonData }} buttons - New dialog button configuration.
     */
    set buttons(buttons)
    {
@@ -2918,8 +3161,8 @@ class TJSDialogData
    }
 
    /**
-    * @returns {import('#runtime/svelte/util').TJSSvelte.Config.Minimal | string} The Svelte configuration object or HTML string
-    *          content.
+    * @returns {import('#runtime/svelte/util').TJSSvelte.Config.Embed | string} The Svelte configuration object or
+    *          HTML string content.
     */
    get content()
    {
@@ -2929,8 +3172,8 @@ class TJSDialogData
    /**
     * Set the Svelte configuration object or HTML string content.
     *
-    * @param {import('#runtime/svelte/util').TJSSvelte.Config.Minimal | string} content - New Svelte configuration object or
-    *        HTML string content.
+    * @param {import('#runtime/svelte/util').TJSSvelte.Config.Embed | string} content - New Svelte configuration
+    *        object or HTML string content.
     */
    set content(content)
    {
@@ -2954,6 +3197,25 @@ class TJSDialogData
    set default(newDefault)
    {
       this.#internal.default = newDefault;
+      this.#updateComponent();
+   }
+
+   /**
+    * @returns {boolean} The dialog always on top state.
+    */
+   get alwaysOnTop()
+   {
+      return this.#internal.alwaysOnTop;
+   }
+
+   /**
+    * Set the dialog always on top state.
+    *
+    * @param {boolean} alwaysOnTop - New dialog always on top state.
+    */
+   set alwaysOnTop(alwaysOnTop)
+   {
+      this.#internal.alwaysOnTop = alwaysOnTop;
       this.#updateComponent();
    }
 
@@ -3738,6 +4000,9 @@ class TJSDialog extends SvelteApp
       return new this({ ...data }, options).wait();
    }
 }
+
+// Initialize global tracking data for SvelteApp.
+SvelteAppData.initialize();
 
 // Initialize core theme observation / changes.
 ThemeObserver.initialize();
