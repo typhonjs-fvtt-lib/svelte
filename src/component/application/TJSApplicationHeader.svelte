@@ -11,6 +11,7 @@
    import { inlineSvg }          from '#runtime/svelte/action/dom/inline-svg';
    import { TJSSvelte }          from '#runtime/svelte/util';
    import { A11yHelper }         from '#runtime/util/a11y';
+   import { AssetValidator }     from '#runtime/util/browser';
    import { localize }           from '#runtime/util/i18n';
    import { isObject }           from '#runtime/util/object';
    import { getRoutePrefix }     from '#runtime/util/path';
@@ -88,27 +89,18 @@
    // ----------------------------------------------------------------------------------------------------------------
 
    let mediaType = void 0;
-   const validImgExt = new Set(['jpg', 'jpeg', 'png', 'webp']);
-   const validSvgExt = new Set(['svg']);
+
+   /**
+    * Only process image / svg assets from AssetValidator.
+    *
+    * @type {Set<string>}
+    */
+   const mediaTypes = new Set(['img', 'svg']);
 
    $: if (typeof $storeHeaderIcon === 'string')
    {
-      // Detect if header icon is an image otherwise treat as a Font Awesome icon.
-      const extensionMatch = $storeHeaderIcon.match(/\.([a-z]+)$/);
-      const extension = extensionMatch ? extensionMatch[1].toLowerCase() : null;
-
-      if (validImgExt.has(extension))
-      {
-         mediaType = 'img';
-      }
-      else if (validSvgExt.has(extension))
-      {
-         mediaType = 'svg';
-      }
-      else
-      {
-         mediaType = 'font';
-      }
+      const result = AssetValidator.parseMedia({ url: $storeHeaderIcon, mediaTypes });
+      mediaType = result.valid ? result.elementType : 'font';
    }
    else
    {
