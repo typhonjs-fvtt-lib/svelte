@@ -1,285 +1,185 @@
-import { isObject }        from '#runtime/util/object';
-import { getRoutePrefix }  from '#runtime/util/path';
+import { CrossWindow }        from '#runtime/util/browser';
+import { StyleSheetResolve }  from '#runtime/util/dom/style';
 
 /**
- * Parses the core Foundry style sheet creating an indexed object of properties by individual selector parts that are
- * viable to use for specific element styling.
+ * Provides runtime-parsed styles for the core Foundry stylesheet and an extended merged version with all game system
+ * and module overrides. Both, {@link FoundryStyles.core} and {@link FoundryStyles.ext} return an instance of
+ * {@link #runtime/util/dom/style!StyleSheetResolve} that has a reduced amount of parsed style information relevant to
+ * configuring essential styling. `StyleSheetResolve` allows access to discrete CSS selectors and associated properties
+ * including resolving CSS variables across selectors / elements.
+ *
+ * `FoundryStyles` is used internally to TRL to construct the flattened CSS variables generated at runtime to match
+ * the platform theming. The core Foundry styles are not flat with many CSS variables having extended element scoping.
+ *
+ * The following CSS layers are parsed from Foundry core styles:
+ * ```
+ * - `variables.base`
+ * - `variables.themes.*`
+ * - `elements.*`
+ * ```
  */
 export class FoundryStyles
 {
-   /**
-    * @type {Map<string, []>} Allowed fully qualified CSS layers to parse.
-    */
-   static #ALLOWED_LAYERS = new Map([
-      ['variables.base', []],
-      ['variables.themes.general', []],
-      ['variables.themes.specific', []],
-      ['elements.forms', []]
-   ]);
+   static #core;
 
-   /**
-    * @type {RegExp[]} Array of regexes to reduce selector parts tracked.
-    */
-   static #DISALLOWED_PARTS_ANY = [
-      />\s*[^ ]+/,            // Direct child selectors
-      /(^|\s)\*/,             // Universal selectors
-      /(^|\s)\.app(?![\w-])/, // AppV1 class
-      /^\.application\.theme/,
-      /^body\.auth/,
-      /^body(?:\.[\w-]+)*\.application\b/,  // Remove unnecessary `body.<theme>.application` pairing.
-      /code-?mirror/i,
-      /#camera-views/,
-      /\.chat-message/,
-      /\.combat-tracker/,
-      /\.compendium-directory/,
-      /(^|[^a-zA-Z0-9_-])#(?!context-menu\b)[\w-]+|[^ \t>+~]#context-menu\b/,
-      /(^|\s)kbd\b/,
-      /^input.placeholder-fa-solid\b/,
-      /(^|\s)label\b/,
-      /\.placeable-hud/,
-      /prose-?mirror/i,
-      /(^|\s)section\b/,
-      /\.ui-control/,
-      /\.window-app/,
-   ];
-
-   /**
-    * Foundry stylesheet.
-    *
-    * @type {CSSStyleSheet}
-    */
-   static #sheet = void 0;
-
-   /** @type {Map<string, {[key: string]: string}>} */
-   static #sheetMap = new Map();
+   static #ext;
 
    static #initialized = false;
 
    /**
-    * @returns {MapIterator<[string, {[p: string]: string}]>} Tracked CSS selector key / value iterator.
+    * @hideconstructor
     */
-   static entries()
+   constructor()
    {
-      if (!this.#initialized) { this.#initialize(); }
-
-      return this.#sheetMap.entries();
+      throw new Error('FoundryStyles constructor: This is a static class and should not be constructed.');
    }
 
    /**
-    * Gets all properties associated with the selector. Try and use a direct match otherwise all keys
-    * are iterated to find a selector string that includes the `selector`.
-    *
-    * @param {string}   selector - Selector to find.
-    *
-    * @returns { {[key: string]: string} } Properties object.
+    * @returns {StyleSheetResolve} Core parsed styles.
     */
-   static get(selector)
+   static get core()
    {
-      if (!this.#initialized) { this.#initialize(); }
-
-      // If there is a direct selector match then return a value immediately.
-      if (this.#sheetMap.has(selector))
+      if (!this.#initialized)
       {
-         return this.#sheetMap.get(selector);
+         this.#initialized = true;
+         this.#initialize();
       }
 
-      for (const key of this.#sheetMap.keys())
+      return this.#core;
+   }
+
+   /**
+    * @returns {StyleSheetResolve} Core parsed styles with extended game system / module overrides.
+    */
+   static get ext()
+   {
+      if (!this.#initialized)
       {
-         if (key.includes(selector)) { return this.#sheetMap.get(key); }
+         this.#initialized = true;
+         this.#initialize();
       }
 
-      return void 0;
-   }
-
-   /**
-    * Gets a specific property value from the given `selector` and `property` key. Try and use a direct selector
-    * match otherwise all keys are iterated to find a selector string that includes `selector`.
-    *
-    * @param {string}   selector - Selector to find.
-    *
-    * @param {string}   property - Specific property to locate.
-    *
-    * @returns {string | undefined} Property value.
-    */
-   static getProperty(selector, property)
-   {
-      if (!this.#initialized) { this.#initialize(); }
-
-      // If there is a direct selector match then return a value immediately.
-      if (this.#sheetMap.has(selector))
-      {
-         const data = this.#sheetMap.get(selector);
-
-         return isObject(data) && property in data ? data[property] : void 0;
-      }
-
-      for (const key of this.#sheetMap.keys())
-      {
-         if (key.includes(selector))
-         {
-            const data = this.#sheetMap.get(key);
-            if (isObject(data) && property in data) { return data[property]; }
-         }
-      }
-
-      return void 0;
-   }
-
-   /**
-    * @param {string}   selector - CSS selector to check.
-    *
-    * @returns {boolean} FoundryStyles tracks the given selector.
-    */
-   static has(selector)
-   {
-      if (!this.#initialized) { this.#initialize(); }
-
-      return this.#sheetMap.has(selector);
-   }
-
-   /**
-    * @returns {MapIterator<string>} Tracked CSS selector keys iterator.
-    */
-   static keys()
-   {
-      if (!this.#initialized) { this.#initialize(); }
-
-      return this.#sheetMap.keys();
-   }
-
-   /**
-    * @returns {CSSStyleSheet} Main Foundry stylesheet.
-    */
-   static get sheet()
-   {
-      if (!this.#initialized) { this.#initialize(); }
-
-      return this.#sheet;
-   }
-
-   /**
-    * @returns {number} Returns the size / count of selector properties tracked.
-    */
-   static get size()
-   {
-      if (!this.#initialized) { this.#initialize(); }
-
-      return this.#sheetMap.size;
+      return this.#ext;
    }
 
    // Internal Implementation ----------------------------------------------------------------------------------------
 
    /**
-    * Called once on initialization / first usage. Parses the core foundry style sheet.
+    * Find the core Foundry CSSStyleSheet instance and any 3rd party game system / module stylesheets.
+    *
+    * Resolve the core sheet and then create the extended resolved style sheet merging the core with all system / module
+    * sheets.
     */
    static #initialize()
    {
-      this.#initialized = true;
+      const styleSheets = Array.from(document.styleSheets);
 
-      const styleSheets = Array.from(document.styleSheets).filter((entry) => entry.href !== null);
+      let foundryStyleSheet;
 
-      const foundryStyleSheet = getRoutePrefix('/css/foundry2.css');
+      const moduleSheets = [];
+      const systemSheets = [];
 
       // Find the core Foundry stylesheet.
-      for (const styleSheet of styleSheets)
+      for (const sheet of styleSheets)
       {
-         let url;
-
-         try
+         if (typeof sheet?.href === 'string' && sheet.href.endsWith('/css/foundry2.css'))
          {
-            url = new URL(styleSheet.href);
+            foundryStyleSheet = sheet;
          }
-         catch (err) { continue; }
-
-         if (typeof url.pathname === 'string' && url.pathname === foundryStyleSheet)
+         else
          {
-            this.#sheet = styleSheet;
-            break;
+            // Only capture `@import` referenced system / module style sheets.
+            if (sheet?.cssRules?.length)
+            {
+               for (const rule of sheet.cssRules)
+               {
+                  if (!CrossWindow.isCSSImportRule(rule) || !CrossWindow.isCSSStyleSheet(rule?.styleSheet))
+                  {
+                     continue;
+                  }
+
+                  if (rule.layerName === 'modules') { moduleSheets.push(rule.styleSheet); }
+                  if (rule.layerName === 'system') { systemSheets.push(rule.styleSheet); }
+               }
+            }
          }
       }
 
       // Quit now if the Foundry style sheet was not found.
-      if (!this.#sheet) { return; }
-
-      // Parse each CSSStyleRule and build the map of selectors to parsed properties.
-      for (const layerRule of this.#sheet.cssRules)
+      if (!foundryStyleSheet)
       {
-         if (!(layerRule instanceof CSSLayerBlockRule)) { continue; }
-         if (!isObject(layerRule.cssRules)) { continue; }
-         if (layerRule?.name === 'reset') { continue; }
-
-         this.#processLayerBlockRule(layerRule);
+         console.error(`[TyphonJS Runtime] error: FoundryStyles could not load core stylesheet.`);
+         return;
       }
+
+      // Resolve Foundry core stylesheet.
+      this.#resolveCore(foundryStyleSheet);
+
+      // Resolve and merge all 3rd party package stylesheets.
+      this.#resolveExt(moduleSheets, systemSheets);
+
+      this.#core.freeze();
+      this.#ext.freeze();
    }
 
    /**
-    * @param {string}   cssText -
+    * @param {CSSStyleSheet}  sheet - Foundry core style sheet.
+    */
+   static #resolveCore(sheet)
+   {
+      this.#core = new StyleSheetResolve(sheet, {
+         // Exclude any selector parts that match the following.
+         excludeSelectorParts: [
+            />\s*[^ ]+/,            // Direct child selectors
+            /(^|\s)\*/,             // Universal selectors
+            /(^|\s)\.app(?![\w-])/, // AppV1 class
+            /^\.application\.theme/,
+            /^body\.auth/,
+            /^body(?:\.[\w-]+)*\.application\b/,  // Remove unnecessary `body.<theme>.application` pairing.
+            /code-?mirror/i,
+            /#camera-views/,
+            /\.chat-message/,
+            /\.combat-tracker/,
+            /\.compendium-directory/,
+            /(^|[^a-zA-Z0-9_-])#(?!context-menu\b)[\w-]+|[^ \t>+~]#context-menu\b/,
+            /(^|\s)kbd\b/,
+            /^input.placeholder-fa-solid\b/,
+            /(^|\s)label\b/,
+            /\.placeable-hud/,
+            /prose-?mirror/i,
+            /(^|\s)section\b/,
+            /\.ui-control/,
+            /\.window-app/
+         ],
+
+         // Only parse CSS layers matching the following regexes.
+         includeCSSLayers: [
+            /^variables\.base$/,
+            /^variables\.themes/,
+            /^elements/
+         ]
+      });
+   }
+
+   /**
+    * @param {CSSStyleSheet[]}   moduleSheets - Module stylesheet data.
     *
-    * @returns {{[p: string]: string}} Parsed `cssText`.
+    * @param {CSSStyleSheet[]}   systemSheets - System stylesheet data.
     */
-   static #parseCssText(cssText)
+   static #resolveExt(moduleSheets, systemSheets)
    {
-      const match = cssText.match(/{([^}]*)}/);
-      if (!match) { return {}; }
+      const resolvedSheets = [];
 
-      return Object.fromEntries(match[1]
-         .split(';')
-         .map((str) => str.trim())
-         .filter(Boolean)
-         .map((decl) =>
-         {
-            const [prop, ...rest] = decl.split(':');
-            return [prop.trim(), rest.join(':').trim()];
-         })
-      );
-   }
+      // Only parse and include selector part names that are in the core Foundry styles.
+      const options = { includeSelectorPartSet: new Set([...this.#core.keys()]) };
 
-   static #processLayerBlockRule(blockRule, parentLayerName)
-   {
-      if (!(blockRule instanceof CSSLayerBlockRule)) { return; }
-      if (!isObject(blockRule.cssRules)) { return; }
+      for (const sheet of systemSheets) { resolvedSheets.push(new StyleSheetResolve(sheet, options)); }
+      for (const sheet of moduleSheets) { resolvedSheets.push(new StyleSheetResolve(sheet, options)); }
 
-      const fullname = typeof parentLayerName === 'string' ? `${parentLayerName}.${blockRule.name}` : blockRule.name;
+      // Create a clone of core styles.
+      this.#ext = this.#core.clone();
 
-      const layerBlockRules = [];
-
-      for (const rule of blockRule.cssRules)
-      {
-         if (rule instanceof CSSLayerBlockRule) { layerBlockRules.push(rule); }
-         if (!(rule instanceof CSSStyleRule)) { continue; }
-
-         if (this.#ALLOWED_LAYERS.has(fullname)) { this.#processStyleRule(rule); }
-      }
-
-      for (const rule of layerBlockRules)
-      {
-         if (rule instanceof CSSLayerBlockRule) { this.#processLayerBlockRule(rule, fullname); }
-      }
-   }
-
-   /**
-    * @param {CSSStyleRule} styleRule -
-    */
-   static #processStyleRule(styleRule)
-   {
-      if (typeof styleRule.selectorText !== 'string') { return; }
-
-      const result = this.#parseCssText(styleRule.cssText);
-
-      // Split selector parts and remove disallowed selector parts and empty strings.
-      const selectorParts = styleRule.selectorText.split(',')
-         .map((str) => str.trim())
-         .filter((str) => !this.#DISALLOWED_PARTS_ANY.some((regex) => regex.test(str)))
-         .filter(Boolean); // Remove empty parts.
-
-      if (selectorParts.length)
-      {
-         for (const part of selectorParts)
-         {
-            const existing = this.#sheetMap.get(part);
-            const update = Object.assign(existing ?? {}, result);
-            this.#sheetMap.set(part, update);
-         }
-      }
+      // Merge all system / module styles into the extended resolved styles.
+      for (const sheet of resolvedSheets) { this.#ext.merge(sheet); }
    }
 }
