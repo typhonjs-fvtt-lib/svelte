@@ -20,8 +20,18 @@ import { StyleSheetResolve }  from '#runtime/util/dom/style';
  */
 export class FoundryStyles
 {
+   /**
+    * Parsed Foundry core stylesheet.
+    *
+    * @type {StyleSheetResolve}
+    */
    static #core;
 
+   /**
+    * Parsed Foundry core stylesheet with extended game system / module overrides.
+    *
+    * @type {StyleSheetResolve}
+    */
    static #ext;
 
    static #initialized = false;
