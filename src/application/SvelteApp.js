@@ -506,7 +506,21 @@ export class SvelteApp extends Application
     */
    _getHeaderButtons()
    {
-      return super._getHeaderButtons();
+      const buttons = super._getHeaderButtons();
+
+      const closeButton = buttons.find((entry) => entry?.class === 'close');
+      if (closeButton)
+      {
+         closeButton.onclick = () =>
+         {
+            // Add immediate deactivation of Foundry tooltip for close button.
+            globalThis?.game?.tooltip?.deactivate?.();
+
+            this.close();
+         };
+      }
+
+      return buttons;
    }
 
    /**
