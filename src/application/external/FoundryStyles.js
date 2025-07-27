@@ -8,7 +8,7 @@ import { StyleSheetResolve }  from '#runtime/util/dom/style';
  * configuring essential styling. `StyleSheetResolve` allows access to discrete CSS selectors and associated properties
  * including resolving CSS variables across selectors / elements.
  *
- * `FoundryStyles` is used internally to TRL to construct the flattened CSS variables generated at runtime to match
+ * `FoundryStyles` is used internally by TRL to construct the flattened CSS variables generated at runtime to match
  * the platform theming. The core Foundry styles are not flat with many CSS variables having extended element scoping.
  *
  * The following CSS layers are parsed from Foundry core styles:
@@ -49,11 +49,7 @@ export class FoundryStyles
     */
    static get core()
    {
-      if (!this.#initialized)
-      {
-         this.#initialized = true;
-         this.#initialize();
-      }
+      if (!this.#initialized) { this.#initialize(); }
 
       return this.#core;
    }
@@ -63,11 +59,7 @@ export class FoundryStyles
     */
    static get ext()
    {
-      if (!this.#initialized)
-      {
-         this.#initialized = true;
-         this.#initialize();
-      }
+      if (!this.#initialized) { this.#initialize(); }
 
       return this.#ext;
    }
@@ -82,6 +74,8 @@ export class FoundryStyles
     */
    static #initialize()
    {
+      this.#initialized = true;
+
       const styleSheets = Array.from(document.styleSheets);
 
       let foundryStyleSheet;
@@ -128,6 +122,7 @@ export class FoundryStyles
       // Resolve and merge all 3rd party package stylesheets.
       this.#resolveExt(moduleSheets, systemSheets);
 
+      // Prevent future modification.
       this.#core.freeze();
       this.#ext.freeze();
    }
@@ -137,7 +132,7 @@ export class FoundryStyles
     */
    static #resolveCore(sheet)
    {
-      this.#core = new StyleSheetResolve(sheet, {
+      this.#core = StyleSheetResolve.parse(sheet, {
          // Exclude any selector parts that match the following.
          excludeSelectorParts: [
             />\s*[^ ]+/,            // Direct child selectors
@@ -183,8 +178,8 @@ export class FoundryStyles
       // Only parse and include selector part names that are in the core Foundry styles.
       const options = { includeSelectorPartSet: new Set([...this.#core.keys()]) };
 
-      for (const sheet of systemSheets) { resolvedSheets.push(new StyleSheetResolve(sheet, options)); }
-      for (const sheet of moduleSheets) { resolvedSheets.push(new StyleSheetResolve(sheet, options)); }
+      for (const sheet of systemSheets) { resolvedSheets.push(StyleSheetResolve.parse(sheet, options)); }
+      for (const sheet of moduleSheets) { resolvedSheets.push(StyleSheetResolve.parse(sheet, options)); }
 
       // Create a clone of core styles.
       this.#ext = this.#core.clone();
