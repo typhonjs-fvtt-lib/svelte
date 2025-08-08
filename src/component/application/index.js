@@ -61,13 +61,7 @@ if (styleManager?.isConnected)
 
       // For `ResizeHandle.svelte` / invert the resize handle.
       '--tjs-app-resize-handle-filter': 'invert(1)'
-   }, false);
-
-   /*
-   --button-text-color: var(--color-light-1);
-    --button-background-color: none;
-    --button-size: 1.5rem;
-    */
+   });
 
    /**
     * Explicit light theme properties.
