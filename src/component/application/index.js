@@ -11,9 +11,9 @@ export { default as TJSGlassPane }           from './TJSGlassPane.svelte';
 
 import { cursorCSSVariables }                from './data';
 
-const styleManager = new TJSStyleManager({
+const styleManager = TJSStyleManager.create({
    id: '__tjs-runtime-vars',
-   version: 1,
+   version: '0.3.0',
    layerName: 'variables.tjs-runtime-vars',
    rules: {
       themeDark: ':root, .themed.theme-dark',
@@ -21,7 +21,7 @@ const styleManager = new TJSStyleManager({
    }
 });
 
-if (styleManager.isConnected)
+if (styleManager?.isConnected)
 {
    // Remove `0.2.x` and below root styles. -- TODO: REMOVE AT `0.5.0`
    document?.['#__trl-root-styles']?.remove?.();
