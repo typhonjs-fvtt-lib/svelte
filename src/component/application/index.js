@@ -13,7 +13,7 @@ import { cursorCSSVariables }                from './data';
 
 const styleManager = TJSStyleManager.create({
    id: '__tjs-runtime-vars',
-   version: '0.3.0',
+   version: '0.1.0',
    layerName: 'variables.tjs-runtime-vars',
    rules: {
       themeDark: ':root, .themed.theme-dark',
