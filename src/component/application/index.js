@@ -1,6 +1,6 @@
 import {
    StyleParse,
-   TJSStyleManager }                         from '#runtime/util/dom/style';
+   StyleManager }                            from '#runtime/util/dom/style';
 
 import { getRoutePrefix }                    from '#runtime/util/path';
 
@@ -11,7 +11,7 @@ export { default as TJSGlassPane }           from './TJSGlassPane.svelte';
 
 import { cursorCSSVariables }                from './data';
 
-const styleManager = TJSStyleManager.create({
+const styleManager = StyleManager.create({
    id: '__tjs-runtime-vars',
    version: '0.1.0',
    layerName: 'variables.tjs-runtime-vars',
@@ -79,7 +79,7 @@ if (styleManager?.isConnected)
  * Sets any top level inline styles to TRL CSS variables defined in root `<html>` element by Foundry or game system
  * override.
  *
- * @param {import('#runtime/util/dom/style').CSSRuleManager}   ruleManager - Target rule manager.
+ * @param {import('#runtime/util/dom/style').StyleManager.RuleManager}   ruleManager - Target rule manager.
  */
 function setCoreInlineStyles(ruleManager)
 {
