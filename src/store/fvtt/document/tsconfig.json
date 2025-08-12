@@ -9,7 +9,8 @@
     "strictNullChecks": true,
 
     "types": [
-      "@typhonjs-fvtt/types-fvtt-shim/pf2e"
+//      "@typhonjs-fvtt/types-fvtt-shim/pf2e"
+      "@typhonjs-fvtt/types-fvtt-shim/league"
     ]
   },
   "include": [

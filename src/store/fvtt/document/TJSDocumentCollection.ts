@@ -108,7 +108,7 @@ class TJSDocumentCollection<C extends fvtt.DocumentCollection> implements Readab
       if (isDocumentCollection(collection) && Array.isArray(collection?.apps))
       {
          const index: number = collection.apps.findIndex((sub: CallbackAPI): boolean => sub === this.#callbackAPI);
-         if (index === -1) { collection.apps.push(this.#callbackAPI); }
+         if (index === -1) { collection.apps.push(this.#callbackAPI as unknown as fvtt.Application); }
       }
    }
 

@@ -134,7 +134,7 @@ class TJSDocument<D extends fvtt.ClientDocument> implements Readable<D>
       const doc: D | undefined = this.#document[0];
       if (isDocument(doc) && isObject(doc?.apps) && !doc.apps[this.#uuidv4])
       {
-         doc.apps[this.#uuidv4] = this.#callbackAPI;
+         doc.apps[this.#uuidv4] = this.#callbackAPI as fvtt.Application;
       }
    }
 
@@ -335,7 +335,7 @@ class TJSDocument<D extends fvtt.ClientDocument> implements Readable<D>
 
          if (doc)
          {
-            this.set(doc, options);
+            this.set(doc as D, options);
             return true;
          }
       }
