@@ -221,6 +221,13 @@
       margin-right: auto;
    }
 
+   /**
+    * Allow header to be clicked through any `svg` element.
+    */
+   svg {
+      pointer-events: none;
+   }
+
    .window-header {
       display: flex;
       align-items: center;
