@@ -814,9 +814,15 @@ export class SvelteApp extends Application
       // Set all header buttons besides close and the window title to display none.
       for (let cntr = header.children.length; --cntr >= 0;)
       {
-         const className = header.children[cntr].className;
+         let className = header.children[cntr]?.className;
 
-         if (className.includes('window-title') || className.includes('close')) { continue; }
+         // Must take into account that `className` might be a `SVGAnimatedString`.
+         className = className?.baseVal ?? className;
+
+         if (typeof className !== 'string' || className.includes('window-title') || className.includes('close'))
+         {
+            continue;
+         }
 
          // v10+ of Foundry core styles automatically hides anything besides the window title and close button, so
          // explicitly set display to block.
