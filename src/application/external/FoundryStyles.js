@@ -133,6 +133,9 @@ export class FoundryStyles
    static #resolveCore(sheet)
    {
       this.#core = StyleSheetResolve.parse(sheet, {
+         // Enable relative URL resolution.
+         baseHref: document.baseURI,
+
          // Exclude any selector parts that match the following.
          excludeSelectorParts: [
             />\s*[^ ]+/,            // Direct child selectors
@@ -141,11 +144,9 @@ export class FoundryStyles
             /^\.application\.theme/,
             /^body\.auth/,
             /^body(?:\.[\w-]+)*\.application\b/,  // Remove unnecessary `body.<theme>.application` pairing.
+            /^\.\u037c\d/i, // Code-mirror `.ͼ1`
             /code-?mirror/i,
             /#camera-views/,
-            /\.chat-message/,
-            /\.combat-tracker/,
-            /\.compendium-directory/,
             /(^|[^a-zA-Z0-9_-])#(?!context-menu\b)[\w-]+|[^ \t>+~]#context-menu\b/,
             /(^|\s)kbd\b/,
             /^input.placeholder-fa-solid\b/,
@@ -154,11 +155,31 @@ export class FoundryStyles
             /prose-?mirror/i,
             /(^|\s)section\b/,
             /\.ui-control/,
-            /\.window-app/
+            /\.window-app/,
+
+            // Exclude various core applications.
+            /^\.active-effect-config/,
+            /^\.adventure-importer/,
+            /^\.camera-view/,
+            /^\.cards-config/,
+            /^\.category-browser/,
+            /^\.document-ownership/,
+            /^\.journal-category-config/,
+            /\.journal-entry-page/,
+            /^\.package-list/,
+            /^\.playlists-sidebar/,
+            /^\.region-config/,
+            /^\.roll-table-sheet/,
+            /^\.scene-config/,
+            /^\.sheet.journal-entry/,
+            /^\.token-config/,
+            /^\.tour/,
+            /^\.wall-config/,
          ],
 
          // Only parse CSS layers matching the following regexes.
          includeCSSLayers: [
+            /^applications$/,
             /^variables\.base$/,
             /^variables\.themes/,
             /^elements/
@@ -175,8 +196,11 @@ export class FoundryStyles
    {
       const resolvedSheets = [];
 
-      // Only parse and include selector part names that are in the core Foundry styles.
-      const options = { includeSelectorPartSet: new Set([...this.#core.keys()]) };
+      // Enable relative URL resolution / only include selector part names that are in the core Foundry styles.
+      const options = {
+         baseHref: document.baseURI,
+         includeSelectorPartSet: new Set([...this.#core.keys()])
+      };
 
       for (const sheet of systemSheets) { resolvedSheets.push(StyleSheetResolve.parse(sheet, options)); }
       for (const sheet of moduleSheets) { resolvedSheets.push(StyleSheetResolve.parse(sheet, options)); }
