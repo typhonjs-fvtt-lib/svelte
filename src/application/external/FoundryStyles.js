@@ -133,9 +133,6 @@ export class FoundryStyles
    static #resolveCore(sheet)
    {
       this.#core = StyleSheetResolve.parse(sheet, {
-         // Enable relative URL resolution.
-         baseHref: document.baseURI,
-
          // Exclude any selector parts that match the following.
          excludeSelectorParts: [
             />\s*[^ ]+/,            // Direct child selectors
@@ -197,10 +194,7 @@ export class FoundryStyles
       const resolvedSheets = [];
 
       // Enable relative URL resolution / only include selector part names that are in the core Foundry styles.
-      const options = {
-         baseHref: document.baseURI,
-         includeSelectorPartSet: new Set([...this.#core.keys()])
-      };
+      const options = { includeSelectorPartSet: new Set([...this.#core.keys()]) };
 
       for (const sheet of systemSheets) { resolvedSheets.push(StyleSheetResolve.parse(sheet, options)); }
       for (const sheet of moduleSheets) { resolvedSheets.push(StyleSheetResolve.parse(sheet, options)); }
