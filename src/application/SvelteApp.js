@@ -651,6 +651,7 @@ export class SvelteApp extends Application
             async: true,
             animateTo: true,
             properties: ['width'],
+            cancelable: false,
             duration: 0.1
          });
       }
@@ -673,6 +674,7 @@ export class SvelteApp extends Application
             animateTo: true,
             properties: ['height'],
             remove: true,
+            cancelable: false,
             duration
          }));
       }
@@ -808,7 +810,7 @@ export class SvelteApp extends Application
       if (animate)
       {
          // First await animation of height upward.
-         await this.position.animate.to({ height: headerOffsetHeight }, { duration }).finished;
+         await this.position.animate.to({ height: headerOffsetHeight }, { cancelable: false, duration }).finished;
       }
 
       // Set all header buttons besides close and the window title to display none.
@@ -838,7 +840,10 @@ export class SvelteApp extends Application
       if (animate)
       {
          // Await animation of width to the left / minimum width.
-         await this.position.animate.to({ width: SvelteApp.#MIN_WINDOW_WIDTH }, { duration: 0.1 }).finished;
+         await this.position.animate.to({ width: SvelteApp.#MIN_WINDOW_WIDTH }, {
+            cancelable: false,
+            duration: 0.1
+         }).finished;
       }
 
       element.classList.add('minimized');
