@@ -5,7 +5,7 @@ import { TJSWebStorage, TJSSessionStorage } from '@typhonjs-svelte/runtime-base/
 import { propertyStore } from '@typhonjs-svelte/runtime-base/svelte/store/writable-derived';
 import { TJSSvelte } from '@typhonjs-svelte/runtime-base/svelte/util';
 import { CrossWindow } from '@typhonjs-svelte/runtime-base/util/browser';
-import { getRoutePrefix } from '@typhonjs-svelte/runtime-base/util/path';
+import { StyleSheetResolve } from '@typhonjs-svelte/runtime-base/util/dom/style';
 import { TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import { A11yHelper } from '@typhonjs-svelte/runtime-base/util/a11y';
 import { nextAnimationFrame } from '@typhonjs-svelte/runtime-base/util/animate';
@@ -127,6 +127,8 @@ class ApplicationState
     *
     * @param {boolean}           [options.animateTo=false] - Animate to restore data.
     *
+    * @param {boolean}           [options.cancelable=true] - When true, animation is cancelable.
+    *
     * @param {number}            [options.duration=0.1] - Duration in seconds.
     *
     * @param {import('#runtime/svelte/easing').EasingReference} [options.ease='linear'] - Easing function or easing
@@ -134,7 +136,7 @@ class ApplicationState
     *
     * @returns {import('../../types').SvelteApp.API.State.Data | undefined} Any saved application state.
     */
-   restore({ name, remove = false, animateTo = false, duration = 0.1, ease = 'linear' })
+   restore({ name, remove = false, animateTo = false, cancelable = true, duration = 0.1, ease = 'linear' })
    {
       if (typeof name !== 'string')
       {
@@ -156,6 +158,7 @@ class ApplicationState
             this.#setImpl(dataSaved, {
                animateTo,
                async: true,
+               cancelable,
                duration,
                ease
             }).then(() =>
@@ -204,6 +207,8 @@ class ApplicationState
     *
     * @param {boolean}        [options.animateTo=false] - Animate to restore data.
     *
+    * @param {boolean}        [options.cancelable=true] - When true, animation is cancelable.
+    *
     * @param {number}         [options.duration=0.1] - Duration in seconds.
     *
     * @param {import('#runtime/svelte/easing').EasingReference} [options.ease='linear'] - Easing function or easing
@@ -236,6 +241,8 @@ class ApplicationState
     *
     * @param {boolean}           [opts.animateTo=false] - Animate to restore data.
     *
+    * @param {boolean}           [opts.cancelable=true] - When true, animation is cancelable.
+    *
     * @param {number}            [opts.duration=0.1] - Duration in seconds.
     *
     * @param {import('#runtime/svelte/easing').EasingReference} [opts.ease='linear'] - Easing function or easing
@@ -243,7 +250,7 @@ class ApplicationState
     *
     * @returns {undefined | Promise<void>} When asynchronous the animation Promise.
     */
-   #setImpl(data, { async = false, animateTo = false, duration = 0.1, ease = 'linear' } = {})
+   #setImpl(data, { async = false, animateTo = false, cancelable = true, duration = 0.1, ease = 'linear' } = {})
    {
       if (!isObject(data))
       {
@@ -288,6 +295,7 @@ class ApplicationState
          }
 
          const promise = application.position.animate.to(data.position, {
+            cancelable,
             duration,
             ease,
             strategy: 'cancelAll'
@@ -1488,285 +1496,208 @@ class FoundryHMRSupport
 }
 
 /**
- * Parses the core Foundry style sheet creating an indexed object of properties by individual selector parts that are
- * viable to use for specific element styling.
+ * Provides runtime-parsed styles for the core Foundry stylesheet and an extended merged version with all game system
+ * and module overrides. Both, {@link FoundryStyles.core} and {@link FoundryStyles.ext} return an instance of
+ * {@link #runtime/util/dom/style!StyleSheetResolve} that has a reduced amount of parsed style information relevant to
+ * configuring essential styling. `StyleSheetResolve` allows access to discrete CSS selectors and associated properties
+ * including resolving CSS variables across selectors / elements.
+ *
+ * `FoundryStyles` is used internally by TRL to construct the flattened CSS variables generated at runtime to match
+ * the platform theming. The core Foundry styles are not flat with many CSS variables having extended element scoping.
+ *
+ * The following CSS layers are parsed from Foundry core styles:
+ * ```
+ * - `variables.base`
+ * - `variables.themes.*`
+ * - `elements.*`
+ * ```
  */
 class FoundryStyles
 {
    /**
-    * @type {Map<string, []>} Allowed fully qualified CSS layers to parse.
-    */
-   static #ALLOWED_LAYERS = new Map([
-      ['variables.base', []],
-      ['variables.themes.general', []],
-      ['variables.themes.specific', []],
-      ['elements.forms', []]
-   ]);
-
-   /**
-    * @type {RegExp[]} Array of regexes to reduce selector parts tracked.
-    */
-   static #DISALLOWED_PARTS_ANY = [
-      />\s*[^ ]+/,            // Direct child selectors
-      /(^|\s)\*/,             // Universal selectors
-      /(^|\s)\.app(?![\w-])/, // AppV1 class
-      /^\.application\.theme/,
-      /^body\.auth/,
-      /^body(?:\.[\w-]+)*\.application\b/,  // Remove unnecessary `body.<theme>.application` pairing.
-      /code-?mirror/i,
-      /#camera-views/,
-      /\.chat-message/,
-      /\.combat-tracker/,
-      /\.compendium-directory/,
-      /(^|[^a-zA-Z0-9_-])#(?!context-menu\b)[\w-]+|[^ \t>+~]#context-menu\b/,
-      /(^|\s)kbd\b/,
-      /^input.placeholder-fa-solid\b/,
-      /(^|\s)label\b/,
-      /\.placeable-hud/,
-      /prose-?mirror/i,
-      /(^|\s)section\b/,
-      /\.ui-control/,
-      /\.window-app/,
-   ];
-
-   /**
-    * Foundry stylesheet.
+    * Parsed Foundry core stylesheet.
     *
-    * @type {CSSStyleSheet}
+    * @type {StyleSheetResolve}
     */
-   static #sheet = void 0;
+   static #core;
 
-   /** @type {Map<string, {[key: string]: string}>} */
-   static #sheetMap = new Map();
+   /**
+    * Parsed Foundry core stylesheet with extended game system / module overrides.
+    *
+    * @type {StyleSheetResolve}
+    */
+   static #ext;
 
    static #initialized = false;
 
    /**
-    * @returns {MapIterator<[string, {[p: string]: string}]>} Tracked CSS selector key / value iterator.
+    * @hideconstructor
     */
-   static entries()
+   constructor()
    {
-      if (!this.#initialized) { this.#initialize(); }
-
-      return this.#sheetMap.entries();
+      throw new Error('FoundryStyles constructor: This is a static class and should not be constructed.');
    }
 
    /**
-    * Gets all properties associated with the selector. Try and use a direct match otherwise all keys
-    * are iterated to find a selector string that includes the `selector`.
-    *
-    * @param {string}   selector - Selector to find.
-    *
-    * @returns { {[key: string]: string} } Properties object.
+    * @returns {StyleSheetResolve} Core parsed styles.
     */
-   static get(selector)
+   static get core()
    {
       if (!this.#initialized) { this.#initialize(); }
 
-      // If there is a direct selector match then return a value immediately.
-      if (this.#sheetMap.has(selector))
-      {
-         return this.#sheetMap.get(selector);
-      }
-
-      for (const key of this.#sheetMap.keys())
-      {
-         if (key.includes(selector)) { return this.#sheetMap.get(key); }
-      }
-
-      return void 0;
+      return this.#core;
    }
 
    /**
-    * Gets a specific property value from the given `selector` and `property` key. Try and use a direct selector
-    * match otherwise all keys are iterated to find a selector string that includes `selector`.
-    *
-    * @param {string}   selector - Selector to find.
-    *
-    * @param {string}   property - Specific property to locate.
-    *
-    * @returns {string | undefined} Property value.
+    * @returns {StyleSheetResolve} Core parsed styles with extended game system / module overrides.
     */
-   static getProperty(selector, property)
+   static get ext()
    {
       if (!this.#initialized) { this.#initialize(); }
 
-      // If there is a direct selector match then return a value immediately.
-      if (this.#sheetMap.has(selector))
-      {
-         const data = this.#sheetMap.get(selector);
-
-         return isObject(data) && property in data ? data[property] : void 0;
-      }
-
-      for (const key of this.#sheetMap.keys())
-      {
-         if (key.includes(selector))
-         {
-            const data = this.#sheetMap.get(key);
-            if (isObject(data) && property in data) { return data[property]; }
-         }
-      }
-
-      return void 0;
-   }
-
-   /**
-    * @param {string}   selector - CSS selector to check.
-    *
-    * @returns {boolean} FoundryStyles tracks the given selector.
-    */
-   static has(selector)
-   {
-      if (!this.#initialized) { this.#initialize(); }
-
-      return this.#sheetMap.has(selector);
-   }
-
-   /**
-    * @returns {MapIterator<string>} Tracked CSS selector keys iterator.
-    */
-   static keys()
-   {
-      if (!this.#initialized) { this.#initialize(); }
-
-      return this.#sheetMap.keys();
-   }
-
-   /**
-    * @returns {CSSStyleSheet} Main Foundry stylesheet.
-    */
-   static get sheet()
-   {
-      if (!this.#initialized) { this.#initialize(); }
-
-      return this.#sheet;
-   }
-
-   /**
-    * @returns {number} Returns the size / count of selector properties tracked.
-    */
-   static get size()
-   {
-      if (!this.#initialized) { this.#initialize(); }
-
-      return this.#sheetMap.size;
+      return this.#ext;
    }
 
    // Internal Implementation ----------------------------------------------------------------------------------------
 
    /**
-    * Called once on initialization / first usage. Parses the core foundry style sheet.
+    * Find the core Foundry CSSStyleSheet instance and any 3rd party game system / module stylesheets.
+    *
+    * Resolve the core sheet and then create the extended resolved style sheet merging the core with all system / module
+    * sheets.
     */
    static #initialize()
    {
       this.#initialized = true;
 
-      const styleSheets = Array.from(document.styleSheets).filter((entry) => entry.href !== null);
+      const styleSheets = Array.from(document.styleSheets);
 
-      const foundryStyleSheet = getRoutePrefix('/css/foundry2.css');
+      let foundryStyleSheet;
+
+      const moduleSheets = [];
+      const systemSheets = [];
 
       // Find the core Foundry stylesheet.
-      for (const styleSheet of styleSheets)
+      for (const sheet of styleSheets)
       {
-         let url;
-
-         try
+         if (typeof sheet?.href === 'string' && sheet.href.endsWith('/css/foundry2.css'))
          {
-            url = new URL(styleSheet.href);
+            foundryStyleSheet = sheet;
          }
-         catch (err) { continue; }
-
-         if (typeof url.pathname === 'string' && url.pathname === foundryStyleSheet)
+         else
          {
-            this.#sheet = styleSheet;
-            break;
+            // Only capture `@import` referenced system / module style sheets.
+            if (sheet?.cssRules?.length)
+            {
+               for (const rule of sheet.cssRules)
+               {
+                  if (!CrossWindow.isCSSImportRule(rule) || !CrossWindow.isCSSStyleSheet(rule?.styleSheet))
+                  {
+                     continue;
+                  }
+
+                  if (rule.layerName === 'modules') { moduleSheets.push(rule.styleSheet); }
+                  if (rule.layerName === 'system') { systemSheets.push(rule.styleSheet); }
+               }
+            }
          }
       }
 
       // Quit now if the Foundry style sheet was not found.
-      if (!this.#sheet) { return; }
-
-      // Parse each CSSStyleRule and build the map of selectors to parsed properties.
-      for (const layerRule of this.#sheet.cssRules)
+      if (!foundryStyleSheet)
       {
-         if (!(layerRule instanceof CSSLayerBlockRule)) { continue; }
-         if (!isObject(layerRule.cssRules)) { continue; }
-         if (layerRule?.name === 'reset') { continue; }
-
-         this.#processLayerBlockRule(layerRule);
+         console.error(`[TyphonJS Runtime] error: FoundryStyles could not load core stylesheet.`);
+         return;
       }
+
+      // Resolve Foundry core stylesheet.
+      this.#resolveCore(foundryStyleSheet);
+
+      // Resolve and merge all 3rd party package stylesheets.
+      this.#resolveExt(moduleSheets, systemSheets);
+
+      // Prevent future modification.
+      this.#core.freeze();
+      this.#ext.freeze();
    }
 
    /**
-    * @param {string}   cssText -
+    * @param {CSSStyleSheet}  sheet - Foundry core style sheet.
+    */
+   static #resolveCore(sheet)
+   {
+      this.#core = StyleSheetResolve.parse(sheet, {
+         // Exclude any selector parts that match the following.
+         excludeSelectorParts: [
+            />\s*[^ ]+/,            // Direct child selectors
+            /(^|\s)\*/,             // Universal selectors
+            /(^|\s)\.app(?![\w-])/, // AppV1 class
+            /^\.application\.theme/,
+            /^body\.auth/,
+            /^body(?:\.[\w-]+)*\.application\b/,  // Remove unnecessary `body.<theme>.application` pairing.
+            /^\.\u037c\d/i, // Code-mirror `.ͼ1`
+            /code-?mirror/i,
+            /#camera-views/,
+            /(^|[^a-zA-Z0-9_-])#(?!context-menu\b)[\w-]+|[^ \t>+~]#context-menu\b/,
+            /(^|\s)kbd\b/,
+            /^input.placeholder-fa-solid\b/,
+            /(^|\s)label\b/,
+            /\.placeable-hud/,
+            /prose-?mirror/i,
+            /(^|\s)section\b/,
+            /\.ui-control/,
+            /\.window-app/,
+
+            // Exclude various core applications.
+            /^\.active-effect-config/,
+            /^\.adventure-importer/,
+            /^\.camera-view/,
+            /^\.cards-config/,
+            /^\.category-browser/,
+            /^\.document-ownership/,
+            /^\.journal-category-config/,
+            /\.journal-entry-page/,
+            /^\.package-list/,
+            /^\.playlists-sidebar/,
+            /^\.region-config/,
+            /^\.roll-table-sheet/,
+            /^\.scene-config/,
+            /^\.sheet.journal-entry/,
+            /^\.token-config/,
+            /^\.tour/,
+            /^\.wall-config/,
+         ],
+
+         // Only parse CSS layers matching the following regexes.
+         includeCSSLayers: [
+            /^applications$/,
+            /^variables\.base$/,
+            /^variables\.themes/,
+            /^elements/
+         ]
+      });
+   }
+
+   /**
+    * @param {CSSStyleSheet[]}   moduleSheets - Module stylesheet data.
     *
-    * @returns {{[p: string]: string}} Parsed `cssText`.
+    * @param {CSSStyleSheet[]}   systemSheets - System stylesheet data.
     */
-   static #parseCssText(cssText)
+   static #resolveExt(moduleSheets, systemSheets)
    {
-      const match = cssText.match(/{([^}]*)}/);
-      if (!match) { return {}; }
+      const resolvedSheets = [];
 
-      return Object.fromEntries(match[1]
-         .split(';')
-         .map((str) => str.trim())
-         .filter(Boolean)
-         .map((decl) =>
-         {
-            const [prop, ...rest] = decl.split(':');
-            return [prop.trim(), rest.join(':').trim()];
-         })
-      );
-   }
+      // Enable relative URL resolution / only include selector part names that are in the core Foundry styles.
+      const options = { includeSelectorPartSet: new Set([...this.#core.keys()]) };
 
-   static #processLayerBlockRule(blockRule, parentLayerName)
-   {
-      if (!(blockRule instanceof CSSLayerBlockRule)) { return; }
-      if (!isObject(blockRule.cssRules)) { return; }
+      for (const sheet of systemSheets) { resolvedSheets.push(StyleSheetResolve.parse(sheet, options)); }
+      for (const sheet of moduleSheets) { resolvedSheets.push(StyleSheetResolve.parse(sheet, options)); }
 
-      const fullname = typeof parentLayerName === 'string' ? `${parentLayerName}.${blockRule.name}` : blockRule.name;
+      // Create a clone of core styles.
+      this.#ext = this.#core.clone();
 
-      const layerBlockRules = [];
-
-      for (const rule of blockRule.cssRules)
-      {
-         if (rule instanceof CSSLayerBlockRule) { layerBlockRules.push(rule); }
-         if (!(rule instanceof CSSStyleRule)) { continue; }
-
-         if (this.#ALLOWED_LAYERS.has(fullname)) { this.#processStyleRule(rule); }
-      }
-
-      for (const rule of layerBlockRules)
-      {
-         if (rule instanceof CSSLayerBlockRule) { this.#processLayerBlockRule(rule, fullname); }
-      }
-   }
-
-   /**
-    * @param {CSSStyleRule} styleRule -
-    */
-   static #processStyleRule(styleRule)
-   {
-      if (typeof styleRule.selectorText !== 'string') { return; }
-
-      const result = this.#parseCssText(styleRule.cssText);
-
-      // Split selector parts and remove disallowed selector parts and empty strings.
-      const selectorParts = styleRule.selectorText.split(',')
-         .map((str) => str.trim())
-         .filter((str) => !this.#DISALLOWED_PARTS_ANY.some((regex) => regex.test(str)))
-         .filter(Boolean); // Remove empty parts.
-
-      if (selectorParts.length)
-      {
-         for (const part of selectorParts)
-         {
-            const existing = this.#sheetMap.get(part);
-            const update = Object.assign(existing ?? {}, result);
-            this.#sheetMap.set(part, update);
-         }
-      }
+      // Merge all system / module styles into the extended resolved styles.
+      for (const sheet of resolvedSheets) { this.#ext.merge(sheet); }
    }
 }
 
@@ -2259,7 +2190,21 @@ class SvelteApp extends Application
     */
    _getHeaderButtons()
    {
-      return super._getHeaderButtons();
+      const buttons = super._getHeaderButtons();
+
+      const closeButton = buttons.find((entry) => entry?.class === 'close');
+      if (closeButton)
+      {
+         closeButton.onclick = () =>
+         {
+            // Add immediate deactivation of Foundry tooltip for close button.
+            globalThis?.game?.tooltip?.deactivate?.();
+
+            this.close();
+         };
+      }
+
+      return buttons;
    }
 
    /**
@@ -2390,6 +2335,7 @@ class SvelteApp extends Application
             async: true,
             animateTo: true,
             properties: ['width'],
+            cancelable: false,
             duration: 0.1
          });
       }
@@ -2412,6 +2358,7 @@ class SvelteApp extends Application
             animateTo: true,
             properties: ['height'],
             remove: true,
+            cancelable: false,
             duration
          }));
       }
@@ -2547,15 +2494,21 @@ class SvelteApp extends Application
       if (animate)
       {
          // First await animation of height upward.
-         await this.position.animate.to({ height: headerOffsetHeight }, { duration }).finished;
+         await this.position.animate.to({ height: headerOffsetHeight }, { cancelable: false, duration }).finished;
       }
 
       // Set all header buttons besides close and the window title to display none.
       for (let cntr = header.children.length; --cntr >= 0;)
       {
-         const className = header.children[cntr].className;
+         let className = header.children[cntr]?.className;
 
-         if (className.includes('window-title') || className.includes('close')) { continue; }
+         // Must take into account that `className` might be a `SVGAnimatedString`.
+         className = className?.baseVal ?? className;
+
+         if (typeof className !== 'string' || className.includes('window-title') || className.includes('close'))
+         {
+            continue;
+         }
 
          // v10+ of Foundry core styles automatically hides anything besides the window title and close button, so
          // explicitly set display to block.
@@ -2571,7 +2524,10 @@ class SvelteApp extends Application
       if (animate)
       {
          // Await animation of width to the left / minimum width.
-         await this.position.animate.to({ width: SvelteApp.#MIN_WINDOW_WIDTH }, { duration: 0.1 }).finished;
+         await this.position.animate.to({ width: SvelteApp.#MIN_WINDOW_WIDTH }, {
+            cancelable: false,
+            duration: 0.1
+         }).finished;
       }
 
       element.classList.add('minimized');

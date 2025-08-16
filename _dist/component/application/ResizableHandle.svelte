@@ -218,14 +218,14 @@
 <style>
    .window-resize-handle {
       display: block;
-      position: absolute;
-      width: var(--tjs-app-resize-handle-width, 11px);
-      height: var(--tjs-app-resize-handle-height, 11px);
+      position: var(--tjs-app-resize-handle-position);
+      width: var(--tjs-app-resize-handle-width);
+      height: var(--tjs-app-resize-handle-height);
 
       background: var(--tjs-app-resize-handle-background);
       cursor: var(--tjs-app-resize-handle-cursor, var(--tjs-cursor-resize-nwse, nwse-resize));
       filter: var(--tjs-app-resize-handle-filter, none);
-      inset: var(--tjs-app-resize-handle-inset, auto 1px 1px auto);
+      inset: var(--tjs-app-resize-handle-inset);
       padding: var(--tjs-app-resize-handle-padding, 0);
       touch-action: none;
    }

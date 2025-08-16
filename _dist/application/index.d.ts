@@ -7,6 +7,7 @@ import { EasingReference } from '@typhonjs-svelte/runtime-base/svelte/easing';
 import { WebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import { TJSSvelte } from '@typhonjs-svelte/runtime-base/svelte/util';
 import { TransitionFunction } from '@typhonjs-svelte/runtime-base/svelte/transition';
+import { StyleSheetResolve } from '@typhonjs-svelte/runtime-base/util/dom/style';
 import * as _typhonjs_fvtt_svelte_application from '@typhonjs-fvtt/svelte/application';
 
 /**
@@ -17,7 +18,7 @@ import * as _typhonjs_fvtt_svelte_application from '@typhonjs-fvtt/svelte/applic
  * @implements {TJSPosition.Positionable}
  */
 declare class SvelteApp<Options extends SvelteApp.Options = SvelteApp.Options>
-  extends Application<Options>
+  extends foundry.appv1.api.Application<Options>
   implements TJSPosition.Positionable
 {
   /**
@@ -902,7 +903,7 @@ declare namespace SvelteApp {
    *
    * @privateRemarks Note: that this extends the Foundry `ApplicationOptions` in the build process.
    */
-  interface OptionsCore extends Partial<ApplicationOptions> {
+  interface OptionsCore extends Partial<fvtt.ApplicationOptions> {
     /**
      * If true, then application shells are always on top.
      *
@@ -1829,61 +1830,31 @@ declare class TJSDialog extends SvelteApp {
 }
 
 /**
- * Parses the core Foundry style sheet creating an indexed object of properties by individual selector parts that are
- * viable to use for specific element styling.
+ * Provides runtime-parsed styles for the core Foundry stylesheet and an extended merged version with all game system
+ * and module overrides. Both, {@link FoundryStyles.core} and {@link FoundryStyles.ext} return an instance of
+ * {@link #runtime/util/dom/style!StyleSheetResolve} that has a reduced amount of parsed style information relevant to
+ * configuring essential styling. `StyleSheetResolve` allows access to discrete CSS selectors and associated properties
+ * including resolving CSS variables across selectors / elements.
+ *
+ * `FoundryStyles` is used internally by TRL to construct the flattened CSS variables generated at runtime to match
+ * the platform theming. The core Foundry styles are not flat with many CSS variables having extended element scoping.
+ *
+ * The following CSS layers are parsed from Foundry core styles:
+ * ```
+ * - `variables.base`
+ * - `variables.themes.*`
+ * - `elements.*`
+ * ```
  */
 declare class FoundryStyles {
   /**
-   * @returns {MapIterator<[string, {[p: string]: string}]>} Tracked CSS selector key / value iterator.
+   * @returns {StyleSheetResolve} Core parsed styles.
    */
-  static entries(): MapIterator<
-    [
-      string,
-      {
-        [p: string]: string;
-      },
-    ]
-  >;
+  static get core(): StyleSheetResolve;
   /**
-   * Gets all properties associated with the selector. Try and use a direct match otherwise all keys
-   * are iterated to find a selector string that includes the `selector`.
-   *
-   * @param {string}   selector - Selector to find.
-   *
-   * @returns { {[key: string]: string} } Properties object.
+   * @returns {StyleSheetResolve} Core parsed styles with extended game system / module overrides.
    */
-  static get(selector: string): {
-    [key: string]: string;
-  };
-  /**
-   * Gets a specific property value from the given `selector` and `property` key. Try and use a direct selector
-   * match otherwise all keys are iterated to find a selector string that includes `selector`.
-   *
-   * @param {string}   selector - Selector to find.
-   *
-   * @param {string}   property - Specific property to locate.
-   *
-   * @returns {string | undefined} Property value.
-   */
-  static getProperty(selector: string, property: string): string | undefined;
-  /**
-   * @param {string}   selector - CSS selector to check.
-   *
-   * @returns {boolean} FoundryStyles tracks the given selector.
-   */
-  static has(selector: string): boolean;
-  /**
-   * @returns {MapIterator<string>} Tracked CSS selector keys iterator.
-   */
-  static keys(): MapIterator<string>;
-  /**
-   * @returns {CSSStyleSheet} Main Foundry stylesheet.
-   */
-  static get sheet(): CSSStyleSheet;
-  /**
-   * @returns {number} Returns the size / count of selector properties tracked.
-   */
-  static get size(): number;
+  static get ext(): StyleSheetResolve;
 }
 
 /**

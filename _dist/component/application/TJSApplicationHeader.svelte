@@ -89,11 +89,9 @@
    // ----------------------------------------------------------------------------------------------------------------
 
    let mediaType = void 0;
-   // const validImgExt = new Set(['jpg', 'jpeg', 'png', 'webp']);
-   // const validSvgExt = new Set(['svg']);
 
    /**
-    * Only process image / video assets from AssetValidator / skip audio.
+    * Only process image / svg assets from AssetValidator.
     *
     * @type {Set<string>}
     */
@@ -108,30 +106,6 @@
    {
       mediaType = void 0;
    }
-
-   // $: if (typeof $storeHeaderIcon === 'string')
-   // {
-   //    // Detect if header icon is an image otherwise treat as a Font Awesome icon.
-   //    const extensionMatch = $storeHeaderIcon.match(/\.([a-z]+)$/);
-   //    const extension = extensionMatch ? extensionMatch[1].toLowerCase() : null;
-   //
-   //    if (validImgExt.has(extension))
-   //    {
-   //       mediaType = 'img';
-   //    }
-   //    else if (validSvgExt.has(extension))
-   //    {
-   //       mediaType = 'svg';
-   //    }
-   //    else
-   //    {
-   //       mediaType = 'font';
-   //    }
-   // }
-   // else
-   // {
-   //    mediaType = void 0;
-   // }
 
    // ----------------------------------------------------------------------------------------------------------------
 
@@ -245,6 +219,13 @@
       flex: 0;
       margin-left: calc(-1 * var(--tjs-app-header-gap, 5px));
       margin-right: auto;
+   }
+
+   /**
+    * Allow header to be clicked through any `svg` element.
+    */
+   svg {
+      pointer-events: none;
    }
 
    .window-header {
