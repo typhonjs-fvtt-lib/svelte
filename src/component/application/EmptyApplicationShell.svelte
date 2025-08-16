@@ -451,7 +451,7 @@
       gap: var(--tjs-app-content-gap);
 
       background: var(--tjs-empty-app-background, none);
-      border-radius: var(--tjs-app-border-radius, 5px);
+      border-radius: var(--tjs-app-border-radius, 6px);
       box-shadow: var(--tjs-app-box-shadow, none);
 
       color: var(--tjs-app-color, inherit);
