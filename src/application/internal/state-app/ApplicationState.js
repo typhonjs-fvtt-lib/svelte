@@ -115,6 +115,8 @@ export class ApplicationState
     *
     * @param {boolean}           [options.animateTo=false] - Animate to restore data.
     *
+    * @param {boolean}           [options.cancelable=true] - When true, animation is cancelable.
+    *
     * @param {number}            [options.duration=0.1] - Duration in seconds.
     *
     * @param {import('#runtime/svelte/easing').EasingReference} [options.ease='linear'] - Easing function or easing
@@ -122,7 +124,7 @@ export class ApplicationState
     *
     * @returns {import('../../types').SvelteAppNS.API.State.Data | undefined} Any saved application state.
     */
-   restore({ name, remove = false, animateTo = false, duration = 0.1, ease = 'linear' })
+   restore({ name, remove = false, animateTo = false, cancelable = true, duration = 0.1, ease = 'linear' })
    {
       if (typeof name !== 'string')
       {
@@ -144,6 +146,7 @@ export class ApplicationState
             this.#setImpl(dataSaved, {
                animateTo,
                async: true,
+               cancelable,
                duration,
                ease
             }).then(() =>
@@ -192,6 +195,8 @@ export class ApplicationState
     *
     * @param {boolean}        [options.animateTo=false] - Animate to restore data.
     *
+    * @param {boolean}        [options.cancelable=true] - When true, animation is cancelable.
+    *
     * @param {number}         [options.duration=0.1] - Duration in seconds.
     *
     * @param {import('#runtime/svelte/easing').EasingReference} [options.ease='linear'] - Easing function or easing
@@ -224,6 +229,8 @@ export class ApplicationState
     *
     * @param {boolean}           [opts.animateTo=false] - Animate to restore data.
     *
+    * @param {boolean}           [opts.cancelable=true] - When true, animation is cancelable.
+    *
     * @param {number}            [opts.duration=0.1] - Duration in seconds.
     *
     * @param {import('#runtime/svelte/easing').EasingReference} [opts.ease='linear'] - Easing function or easing
@@ -231,7 +238,7 @@ export class ApplicationState
     *
     * @returns {undefined | Promise<void>} When asynchronous the animation Promise.
     */
-   #setImpl(data, { async = false, animateTo = false, duration = 0.1, ease = 'linear' } = {})
+   #setImpl(data, { async = false, animateTo = false, cancelable = true, duration = 0.1, ease = 'linear' } = {})
    {
       if (!isObject(data))
       {
@@ -276,6 +283,7 @@ export class ApplicationState
          }
 
          const promise = application.position.animate.to(data.position, {
+            cancelable,
             duration,
             ease,
             strategy: 'cancelAll'
