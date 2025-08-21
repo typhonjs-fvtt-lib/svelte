@@ -177,9 +177,10 @@ export class FoundryStyles
          // Only parse CSS layers matching the following regexes.
          includeCSSLayers: [
             /^applications$/,
+            /^blocks.ui$/,
+            /^elements/,
             /^variables\.base$/,
-            /^variables\.themes/,
-            /^elements/
+            /^variables\.themes/
          ]
       });
    }
