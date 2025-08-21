@@ -1,5 +1,7 @@
+import { CrossWindow }  from '#runtime/util/browser';
 
-import { writable } from '#svelte/store';
+import { writable }     from '#svelte/store';
+import { isIterable } from "#runtime/util/object";
 
 /**
  * Provides reactive observation of the Foundry core theme applied to `document.body`. There are several stores
@@ -105,7 +107,30 @@ export class ThemeObserver
    }
 
    /**
+    * Detect if Foundry theming classes are present in the given iterable list. In particular any string starting with
+    * `theme-`.
+    *
+    * @param {Iterable<string>}  classes - Class list to verify if Foundry theming classes are included.
+    *
+    * @returns {boolean} True if Foundry theming classes present.
+    */
+   static hasThemedClasses(classes)
+   {
+      if (!isIterable(classes)) { return false; }
+
+      for (const entry of classes)
+      {
+         if (typeof entry !== 'string') { continue; }
+         if (entry.startsWith('theme-')) { return true; }
+      }
+
+      return false;
+   }
+
+   /**
     * Initialize `document.body` theme observation.
+    *
+    * @internal
     */
    static initialize()
    {
@@ -149,6 +174,27 @@ export class ThemeObserver
 
       // Only listen for class changes.
       observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+   }
+
+   /**
+    * Determine the nearest Foundry theme CSS classes from the given element. `document.body` is the fallback.
+    *
+    * @param {HTMLElement} element - A HTMLElement.
+    *
+    * @returns {string[]} Any theming CSS classes found from the given element.
+    */
+   static nearestThemed(element)
+   {
+      const result = [];
+
+      if (CrossWindow.isHTMLElement(element))
+      {
+         const nearestThemed = element.closest('.themed') ?? document.body;
+         const match = nearestThemed.className.match(/(?:^|\s)(theme-\w+)/);
+         if (match) { result.push('themed', match[1]); }
+      }
+
+      return result;
    }
 
    // Internal implementation ----------------------------------------------------------------------------------------
