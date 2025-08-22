@@ -25,6 +25,8 @@
 
    import TJSFocusWrap                 from '../internal/dom/TJSFocusWrap.svelte';
 
+   import { FVTTAppTheme }             from './data';
+
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
    // use 'elementRoot' to set the element of the Application. You can also provide `elementContent` and
    // `elementTarget`. Please see SvelteApplication lifecycle documentation.
@@ -180,7 +182,7 @@
    let appClasses = '';
 
    // Apply current theme to optional app classes.
-   $: if ($themeStore) { appClasses = ThemeObserver.appClasses(application, { hasThemed: true }); }
+   $: if ($themeStore) { appClasses = FVTTAppTheme.appClasses(application, { hasThemed: true }); }
 
    // ---------------------------------------------------------------------------------------------------------------
 
