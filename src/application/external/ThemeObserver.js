@@ -1,7 +1,7 @@
 import { CrossWindow }  from '#runtime/util/browser';
+import { isIterable }   from "#runtime/util/object";
 
 import { writable }     from '#svelte/store';
-import { isIterable } from "#runtime/util/object";
 
 /**
  * Provides reactive observation of the Foundry core theme applied to `document.body`. There are several stores
@@ -13,9 +13,7 @@ export class ThemeObserver
     * All readable theme stores.
     *
     * @type {Readonly<({
-    *    theme: Readonly<import('#svelte/store').Readable<'theme-dark' | 'theme-light'>>,
-    *    themeDark: Readonly<import('#svelte/store').Readable<boolean>>,
-    *    themeLight: Readonly<import('#svelte/store').Readable<boolean>>,
+    *    theme: Readonly<import('#svelte/store').Readable<string>>
     * })>}
     */
    static #stores;
@@ -23,11 +21,7 @@ export class ThemeObserver
    /**
     * Internal setter for theme stores.
     *
-    * @type {({
-    *    theme: Function,
-    *    themeDark: Function,
-    *    themeLight: Function,
-    * })}
+    * @type {{ theme: Function }}
     */
    static #storeSet;
 
@@ -39,84 +33,43 @@ export class ThemeObserver
    static #theme = '';
 
    /**
-    * @returns {Readonly<({
-    *    theme: Readonly<import('#svelte/store').Readable<'theme-dark' | 'theme-light'>>,
-    *    themeDark: Readonly<import('#svelte/store').Readable<boolean>>,
-    *    themeLight: Readonly<import('#svelte/store').Readable<boolean>>,
-    * })>} Current core theme stores.
+    * @returns {Readonly<{ theme: Readonly<import('#svelte/store').Readable<string>> }>} Current core theme stores.
     */
    static get stores() { return this.#stores; }
 
    /**
-    * @returns {'theme-dark' | 'theme-light'} Current core theme.
+    * @returns {string} Current theme CSS class.
     */
    static get theme() { return this.#theme; }
 
    /**
+    * Verify that the given `theme` name or complete CSS class is the current theme.
+    *
+    * @param {string} theme - A theme name or complete CSS class name to verify.
+    *
     * @returns {boolean} Is the core theme `dark`.
     */
-   static get themeDark() { return this.#theme === 'theme-dark'; }
-
-   /**
-    * @returns {boolean} Is the core theme `light`.
-    */
-   static get themeLight() { return this.#theme === 'theme-light'; }
-
-   /**
-    * Helper to apply current core theme to a given SvelteApp optional classes.
-    *
-    * @param {import('#svelte-fvtt/application').SvelteApp} application - Svelte application.
-    *
-    * @param {object} [options] - Options.
-    *
-    * @param {boolean} [options.hasThemed] - Verify that the original application default options contains the `themed`
-    *        class otherwise do not add the core theme classes.
-    *
-    * @returns {string} App classes CSS string with current core theme applied.
-    */
-   static appClasses(application, { hasThemed = false } = {})
+   static isTheme(theme)
    {
-      const classes = new Set([
-         ...Array.isArray(application?.options?.classes) ? application.options.classes : [],
-      ]);
-
-      // In AppV1 `theme-light` is always applied. Remove it.
-      classes.delete('themed');
-      classes.delete('theme-light');
-
-      const origOptions = application.constructor.defaultOptions;
-      const themeExplicit = this.#hasExplicitTheme(origOptions?.classes);
-
-      if (!hasThemed)
-      {
-         // Add core theme classes.
-         classes.add('themed');
-         classes.add(themeExplicit ?? this.#theme);
-      }
-      else
-      {
-         // Verify original app options has `themed` class or explicit theme specified then add core theme classes.
-         if (origOptions?.classes?.includes('themed') || themeExplicit)
-         {
-            classes.add('themed');
-            classes.add(themeExplicit ?? this.#theme);
-         }
-      }
-
-      return Array.from(classes).join(' ');
+      return typeof theme === 'string' && (this.#theme === theme || this.#theme === `theme-${theme}`);
    }
 
    /**
-    * Detect if Foundry theming classes are present in the given iterable list. In particular any string starting with
-    * `theme-`.
+    * Detect if theming classes are present in the given iterable list.
     *
-    * @param {Iterable<string>}  classes - Class list to verify if Foundry theming classes are included.
+    * @param {Iterable<string>}  classes - CSS class list to verify if theming classes are included.
     *
-    * @returns {boolean} True if Foundry theming classes present.
+    * @param {object} [options] - Optional parameters.
+    *
+    * @param {boolean} [options.strict=true] - When true, all theming classes required if multiple are verified.
+    *
+    * @returns {boolean} True if theming classes present.
     */
-   static hasThemedClasses(classes)
+   static hasThemedClasses(classes, { strict = true } = {})
    {
       if (!isIterable(classes)) { return false; }
+
+      let strictFound = !strict;
 
       for (const entry of classes)
       {
@@ -137,19 +90,13 @@ export class ThemeObserver
       if (this.#stores !== void 0) { return; }
 
       const themeStore = writable(this.#theme);
-      const themeDarkStore = writable(false);
-      const themeLightStore = writable(false);
 
       this.#stores = Object.freeze({
          theme: Object.freeze({ subscribe: themeStore.subscribe }),
-         themeDark: Object.freeze({ subscribe: themeDarkStore.subscribe }),
-         themeLight: Object.freeze({ subscribe: themeLightStore.subscribe })
       });
 
       this.#storeSet = {
          theme: themeStore.set,
-         themeDark: themeDarkStore.set,
-         themeLight: themeLightStore.set
       };
 
       const observer = new MutationObserver(() =>
@@ -157,16 +104,10 @@ export class ThemeObserver
          if (document.body.classList.contains('theme-light'))
          {
             this.#theme = 'theme-light';
-
-            this.#storeSet.themeDark(false);
-            this.#storeSet.themeLight(true);
          }
          else if (document.body.classList.contains('theme-dark'))
          {
             this.#theme = 'theme-dark';
-
-            this.#storeSet.themeDark(true);
-            this.#storeSet.themeLight(false);
          }
 
          this.#storeSet.theme(this.#theme);
@@ -177,13 +118,13 @@ export class ThemeObserver
    }
 
    /**
-    * Determine the nearest Foundry theme CSS classes from the given element. `document.body` is the fallback.
+    * Determine the nearest theme CSS classes from the given element.
     *
     * @param {HTMLElement} element - A HTMLElement.
     *
     * @returns {string[]} Any theming CSS classes found from the given element.
     */
-   static nearestThemed(element)
+   static nearestThemedClasses(element)
    {
       const result = [];
 
@@ -192,34 +133,6 @@ export class ThemeObserver
          const nearestThemed = element.closest('.themed') ?? document.body;
          const match = nearestThemed.className.match(/(?:^|\s)(theme-\w+)/);
          if (match) { result.push('themed', match[1]); }
-      }
-
-      return result;
-   }
-
-   // Internal implementation ----------------------------------------------------------------------------------------
-
-   /**
-    * @param {string[]} classes - Original application classes.
-    *
-    * @returns {undefined | string} Undefined if no explicit theme is specified otherwise the explicitly `theme-<XXX>`
-    *          class string.
-    */
-   static #hasExplicitTheme(classes)
-   {
-      if (!Array.isArray(classes)) { return void 0; }
-
-      let result = void 0;
-
-      for (const entry of classes)
-      {
-         if (typeof entry !== 'string') { continue; }
-
-         if (entry.startsWith('theme-'))
-         {
-            result = entry;
-            break;
-         }
       }
 
       return result;
