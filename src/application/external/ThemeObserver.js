@@ -1,5 +1,5 @@
 import { CrossWindow }  from '#runtime/util/browser';
-import { isIterable }   from "#runtime/util/object";
+import { isIterable }   from '#runtime/util/object';
 
 import { writable }     from '#svelte/store';
 
@@ -33,6 +33,14 @@ export class ThemeObserver
    static #theme = '';
 
    /**
+    * @hideconstructor
+    */
+   constructor()
+   {
+      throw new Error('ThemeObserver constructor: This is a static class and should not be constructed.');
+   }
+
+   /**
     * @returns {Readonly<{ theme: Readonly<import('#svelte/store').Readable<string>> }>} Current core theme stores.
     */
    static get stores() { return this.#stores; }
@@ -40,14 +48,17 @@ export class ThemeObserver
    /**
     * @returns {string} Current theme CSS class.
     */
-   static get theme() { return this.#theme; }
+   static get theme()
+   {
+      return this.#theme;
+   }
 
    /**
     * Verify that the given `theme` name or complete CSS class is the current theme.
     *
     * @param {string} theme - A theme name or complete CSS class name to verify.
     *
-    * @returns {boolean} Is the core theme `dark`.
+    * @returns {boolean} If the requested theme match the current theme.
     */
    static isTheme(theme)
    {
@@ -61,23 +72,26 @@ export class ThemeObserver
     *
     * @param {object} [options] - Optional parameters.
     *
-    * @param {boolean} [options.strict=true] - When true, all theming classes required if multiple are verified.
+    * @param {boolean} [options.strict=false] - When true, all theming classes required if multiple are verified.
     *
     * @returns {boolean} True if theming classes present.
     */
-   static hasThemedClasses(classes, { strict = true } = {})
+   static hasThemedClasses(classes, { strict = false } = {})
    {
       if (!isIterable(classes)) { return false; }
 
       let strictFound = !strict;
+      let themeFound = false;
 
       for (const entry of classes)
       {
          if (typeof entry !== 'string') { continue; }
-         if (entry.startsWith('theme-')) { return true; }
+
+         if (entry.startsWith('theme-')) { themeFound = true; }
+         if (entry === 'themed') { strictFound = true; }
       }
 
-      return false;
+      return themeFound && strictFound;
    }
 
    /**
@@ -120,21 +134,40 @@ export class ThemeObserver
    /**
     * Determine the nearest theme CSS classes from the given element.
     *
-    * @param {HTMLElement} element - A HTMLElement.
+    * @param {object} options - Required options.
     *
-    * @returns {string[]} Any theming CSS classes found from the given element.
+    * @param {Element} options.element - A DOM element.
+    *
+    * @param {Set<string>} [options.output] - An optional source Set of existing CSS classes.
+    *
+    * @param {boolean} [options.override=true] - When true, override any existing theme classes
+    *
+    * @param {boolean} [options.strict=true] - When true, ensure all required theming classes in output.
+    *
+    * @returns {Iterable<string>} Any theming CSS classes found from the given element.
     */
-   static nearestThemedClasses(element)
+   static nearestThemedClasses({ element, output = new Set(), override = true, strict = false })
    {
-      const result = [];
+      if (!CrossWindow.isSet(output)) { throw new TypeError(`'output' is not a Set.`); }
 
-      if (CrossWindow.isHTMLElement(element))
+      if (!CrossWindow.isElement(element)) { return output; }
+
+      // When override is false and theme classes are already present in result return early.
+      if (!override && ThemeObserver.hasThemedClasses(output))
       {
-         const nearestThemed = element.closest('.themed') ?? document.body;
-         const match = nearestThemed.className.match(/(?:^|\s)(theme-\w+)/);
-         if (match) { result.push('themed', match[1]); }
+         if (strict) { output.add('themed'); }
+
+         return output;
       }
 
-      return result;
+      const nearestThemed = element.closest('.themed') ?? CrossWindow.getDocument(element).body;
+      const match = nearestThemed.className.match(/(?:^|\s)(theme-\w+)/);
+      if (match)
+      {
+         output.add('themed');
+         output.add(match[1]);
+      }
+
+      return output;
    }
 }
