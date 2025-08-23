@@ -1,8 +1,9 @@
+import { ThemeObserver }   from '#runtime/util/dom/theme';
+
 import {
    FoundryHMRSupport,
    FoundryStyles,
-   PopoutSupport,
-   ThemeObserver }         from './external/index.js';
+   PopoutSupport }         from './external/index.js';
 
 import { SvelteAppData }   from './internal/static-global/index.js';
 
@@ -14,7 +15,6 @@ export * from './TJSDialog.js';
 
 export {
    FoundryStyles,
-   ThemeObserver
 };
 
 // Initialize global tracking data for SvelteApp.
