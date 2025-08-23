@@ -1,4 +1,4 @@
-import { ThemeObserver } from '#svelte-fvtt/application';
+import { ThemeObserver }   from '#runtime/util/dom/theme';
 
 /**
  * Provides shared logic to automatically set a SvelteApp / AppV1 theme from app options / `classes`.
