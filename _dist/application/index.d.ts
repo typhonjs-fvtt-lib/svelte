@@ -8,7 +8,6 @@ import { WebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-stora
 import { TJSSvelte } from '@typhonjs-svelte/runtime-base/svelte/util';
 import { TransitionFunction } from '@typhonjs-svelte/runtime-base/svelte/transition';
 import { StyleSheetResolve } from '@typhonjs-svelte/runtime-base/util/dom/style';
-import * as _typhonjs_fvtt_svelte_application from '@typhonjs-fvtt/svelte/application';
 
 /**
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
@@ -1857,59 +1856,4 @@ declare class FoundryStyles {
   static get ext(): StyleSheetResolve;
 }
 
-/**
- * Provides reactive observation of the Foundry core theme applied to `document.body`. There are several stores
- * available to receive updates when the theme changes.
- */
-declare class ThemeObserver {
-  /**
-   * @returns {Readonly<({
-   *    theme: Readonly<import('#svelte/store').Readable<'theme-dark' | 'theme-light'>>,
-   *    themeDark: Readonly<import('#svelte/store').Readable<boolean>>,
-   *    themeLight: Readonly<import('#svelte/store').Readable<boolean>>,
-   * })>} Current core theme stores.
-   */
-  static get stores(): Readonly<{
-    theme: Readonly<any>;
-    themeDark: Readonly<any>;
-    themeLight: Readonly<any>;
-  }>;
-  /**
-   * @returns {'theme-dark' | 'theme-light'} Current core theme.
-   */
-  static get theme(): 'theme-dark' | 'theme-light';
-  /**
-   * @returns {boolean} Is the core theme `dark`.
-   */
-  static get themeDark(): boolean;
-  /**
-   * @returns {boolean} Is the core theme `light`.
-   */
-  static get themeLight(): boolean;
-  /**
-   * Helper to apply current core theme to a given SvelteApp optional classes.
-   *
-   * @param {import('@typhonjs-fvtt/svelte/application').SvelteApp} application - Svelte application.
-   *
-   * @param {object} [options] - Options.
-   *
-   * @param {boolean} [options.hasThemed] - Verify that the original application default options contains the `themed`
-   *        class otherwise do not add the core theme classes.
-   *
-   * @returns {string} App classes CSS string with current core theme applied.
-   */
-  static appClasses(
-    application: _typhonjs_fvtt_svelte_application.SvelteApp,
-    {
-      hasThemed,
-    }?: {
-      hasThemed?: boolean;
-    },
-  ): string;
-  /**
-   * Initialize `document.body` theme observation.
-   */
-  static initialize(): void;
-}
-
-export { FoundryStyles, SvelteApp, SvelteApp, SvelteApp as SvelteApplication, TJSDialog, TJSDialog, ThemeObserver };
+export { FoundryStyles, SvelteApp, SvelteApp, SvelteApp as SvelteApplication, TJSDialog, TJSDialog };

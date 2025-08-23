@@ -23,9 +23,9 @@
    import { resizeObserver }           from '@typhonjs-svelte/runtime-base/svelte/action/dom/observer';
    import { applyStyles }              from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
    import { dynamicAction }            from '@typhonjs-svelte/runtime-base/svelte/action/util';
-   import { ThemeObserver }            from '@typhonjs-fvtt/svelte/application';
    import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
    import { A11yHelper }               from '@typhonjs-svelte/runtime-base/util/a11y';
+   import { ThemeObserver }            from '@typhonjs-svelte/runtime-base/util/dom/theme';
    import { isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
 
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
@@ -33,6 +33,8 @@
    import ResizableHandle              from './ResizableHandle.svelte';
 
    import TJSFocusWrap                 from '../internal/dom/TJSFocusWrap.svelte';
+
+   import { FVTTAppTheme }             from './data';
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
    // use 'elementRoot' to set the element of the Application. You can also provide `elementContent` and
@@ -201,7 +203,7 @@
    let appClasses = '';
 
    // Apply current theme to optional app classes.
-   $: if ($themeStore) { appClasses = ThemeObserver.appClasses(application, { hasThemed: true }); }
+   $: if ($themeStore) { appClasses = FVTTAppTheme.appClasses(application, { hasThemed: true }); }
 
    // ---------------------------------------------------------------------------------------------------------------
 
