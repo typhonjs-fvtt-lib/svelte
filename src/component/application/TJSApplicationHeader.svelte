@@ -90,16 +90,13 @@
 
    let mediaType = void 0;
 
-   /**
-    * Only process image / svg assets from AssetValidator.
-    *
-    * @type {Set<string>}
-    */
-   const mediaTypes = new Set(['img', 'svg']);
-
    $: if (typeof $storeHeaderIcon === 'string')
    {
-      const result = AssetValidator.parseMedia({ url: $storeHeaderIcon, mediaTypes });
+      const result = AssetValidator.parseMedia({
+         url: $storeHeaderIcon,
+         mediaTypes: AssetValidator.MediaTypes.img_svg
+      });
+
       mediaType = result.valid ? result.elementType : 'font';
    }
    else
