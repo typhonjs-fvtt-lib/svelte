@@ -50,73 +50,83 @@ export class FVTTConfigure
       // Set all default TJS cursor CSS variables.
       themeDarkRoot.setProperties(cursorCSSVariables);
 
+      // Configure app CSS variables.
+      this.#app(themeDarkRoot, themeLight);
+
+      Hooks.on('PopOut:loading', (app, popout) =>
+      {
+         // Clone and load the `runtime` library CSS variables into the new window document regardless of the app type.
+         popout.document.addEventListener('DOMContentLoaded',
+            () => manager.clone({ document: popout.document, force: true }));
+      });
+   }
+
+   /**
+    * @param {import('#runtime/util/dom/style').StyleManager.RuleManager}  themeDarkRoot -
+    *
+    * @param {import('#runtime/util/dom/style').StyleManager.RuleManager}  themeLight -
+    */
+   static #app(themeDarkRoot, themeLight)
+   {
       const opts = { camelCase: true };
 
-      {
-         // Core does not distinguish between dark / light themes.
-         const propsApp = FoundryStyles.ext.get('.application', opts);
-         const propsAppHeader = FoundryStyles.ext.get('.application .window-header', opts);
-         const propsAppHeaderBtn = FoundryStyles.ext.get('.application .window-header button.header-control', opts);
-         const propsAppHandle = FoundryStyles.ext.get('.application .window-resize-handle', opts);
+      // Core does not distinguish between dark / light themes.
+      const propsApp = FoundryStyles.ext.get('.application', opts);
+      const propsAppHeader = FoundryStyles.ext.get('.application .window-header', opts);
+      const propsAppHeaderBtn = FoundryStyles.ext.get('.application .window-header button.header-control', opts);
+      const propsAppHandle = FoundryStyles.ext.get('.application .window-resize-handle', opts);
 
-         const propsAppHandleDark = FoundryStyles.ext.get('.themed.theme-dark.application .window-resize-handle', opts);
+      const propsAppHandleDark = FoundryStyles.ext.get('.themed.theme-dark.application .window-resize-handle', opts);
 
-         /**
-          * Provides default CSS variables for core components.
-          */
-         themeDarkRoot.setProperties({
-            // `:root` properties applying to all themes -------------------------------------------------------------------
+      /**
+       * Provides default CSS variables for core components.
+       */
+      themeDarkRoot.setProperties({
+         // `:root` properties applying to all themes ----------------------------------------------------------------
 
-            // For `TJSApplicationShell.svelte` app background.
-            '--tjs-app-background': `url("${getRoutePrefix('/ui/denim075.png')}")`,
+         // For `TJSApplicationShell.svelte` app background.
+         '--tjs-app-background': `url(${getRoutePrefix('/ui/denim075.png')})`,
 
-            // For `ResizeHandle.svelte` / the resize handle.
-            '--tjs-app-resize-handle-background': propsAppHandle.background ?? 'BAD',
+         // For `ResizeHandle.svelte` / the resize handle.
+         '--tjs-app-resize-handle-background': propsAppHandle.background ??
+          `url(${getRoutePrefix('/ui/resize-handle.webp')}) center center / contain no-repeat transparent`,
 
-            // '--tjs-app-resize-handle-background': propsAppHandle.background ??
-            //  `transparent url("${getRoutePrefix('/ui/resize-handle.webp')}") no-repeat center / contain`,
+         '--tjs-app-resize-handle-inset': propsAppHandle.inset ?? 'auto 1px 1px auto',
+         '--tjs-app-resize-handle-position': propsAppHandle.position ?? 'absolute',
+         '--tjs-app-resize-handle-height': propsAppHandle.height ?? '11x',
+         '--tjs-app-resize-handle-width': propsAppHandle.width ?? '11px',
 
-            '--tjs-app-resize-handle-inset': propsAppHandle.inset ?? 'auto 1px 1px auto',
-            '--tjs-app-resize-handle-position': propsAppHandle.position ?? 'absolute',
-            '--tjs-app-resize-handle-height': propsAppHandle.height ?? '11x',
-            '--tjs-app-resize-handle-width': propsAppHandle.width ?? '11px',
+         '--tjs-app-font-size': propsApp.fontSize ?? 'var(--font-size-14)',
+         '--tjs-app-header-font-size': propsAppHeader.fontSize ?? 'var(--font-size-13)',
 
-            '--tjs-app-font-size': propsApp.fontSize ?? 'var(--font-size-14)',
-            '--tjs-app-header-font-size': propsAppHeader.fontSize ?? 'var(--font-size-13)',
+         // For `TJSHeaderButton.svelte / core only provides one set of properties across themes.
+         '--tjs-app-header-button-size': propsAppHeaderBtn['--button-size'] ?? '1.5rem',
+         '--tjs-app-header-button-color': propsAppHeaderBtn['--button-text-color'] ?? 'var(--color-light-1)',
 
-            // For `TJSHeaderButton.svelte / core only provides one set of properties across themes.
-            '--tjs-app-header-button-size': propsAppHeaderBtn['--button-size'] ?? '1.5rem',
-            '--tjs-app-header-button-color': propsAppHeaderBtn['--button-text-color'] ?? 'var(--color-light-1)',
+         // Explicit dark theme properties ---------------------------------------------------------------------------
 
-            // Explicit dark theme properties ------------------------------------------------------------------------------
+         // For `ApplicationShell.svelte`.
+         '--tjs-app-header-background': propsAppHeader.background ?? 'var(--color-header-background)',
 
-            // For `ApplicationShell.svelte`.
-            '--tjs-app-header-background': propsAppHeader.background ?? 'var(--color-header-background)',
+         // For `ResizeHandle.svelte` / invert the resize handle.
+         '--tjs-app-resize-handle-filter': propsAppHandleDark.filter ?? 'invert(1)'
+      });
 
-            // For `ResizeHandle.svelte` / invert the resize handle.
-            '--tjs-app-resize-handle-filter': propsAppHandleDark.filter ?? 'invert(1)'
-         });
-      }
+      const propsAppHeaderLight = FoundryStyles.ext.get('.application .window-header', {
+         camelCase: true,
+         resolve: 'body.theme-light .application'
+      });
 
-      {
-         const propsAppHeader = FoundryStyles.ext.get('.application .window-header', {
-            camelCase: true,
-            resolve: 'body.theme-light .application'
-         });
+      /**
+       * Explicit light theme properties.
+       */
+      themeLight.setProperties({
+         // For `ApplicationShell.svelte` / `EmptyApplicationShell.svelte`.
+         '--tjs-app-header-background': propsAppHeaderLight.background ?? 'var(--color-dark-3)',
 
-         // const propsAppLight = FoundryStyles.ext.get('body.theme-light .application', opts);
-
-         /**
-          * Explicit light theme properties.
-          */
-         themeLight.setProperties({
-            // For `ApplicationShell.svelte` / `EmptyApplicationShell.svelte`.
-            '--tjs-app-header-background': propsAppHeader.background ?? 'blue', // 'var(--color-dark-3)',
-
-            // For `ResizeHandle.svelte` / cancel invert of the resize handle / there is no style to set.
-            '--tjs-app-resize-handle-filter': 'none'
-         });
-      }
+         // For `ResizeHandle.svelte` / cancel invert of the resize handle / there is no core style to set.
+         '--tjs-app-resize-handle-filter': 'none'
+      });
    }
 
    /**
