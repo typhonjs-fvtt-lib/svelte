@@ -138,39 +138,52 @@ export class FoundryStyles
             />\s*[^ ]+/,            // Direct child selectors
             /(^|\s)\*/,             // Universal selectors
             /(^|\s)\.app(?![\w-])/, // AppV1 class
-            /^\.application\.theme/,
+            /^\.application\.[a-z]/, // All `.application.theme` / any specific core application.
             /^body\.auth/,
             /^body(?:\.[\w-]+)*\.application\b/,  // Remove unnecessary `body.<theme>.application` pairing.
             /^\.\u037c\d/i, // Code-mirror `.ͼ1`
             /code-?mirror/i,
-            /#camera-views/,
             /(^|[^a-zA-Z0-9_-])#(?!context-menu\b)[\w-]+|[^ \t>+~]#context-menu\b/,
+            /^\.faded-ui/,
             /(^|\s)kbd\b/,
             /^input.placeholder-fa-solid\b/,
             /(^|\s)label\b/,
-            /\.placeable-hud/,
+            /^\.mixin-theme/,       // Remove all mixin related styles left in by core.
             /prose-?mirror/i,
             /(^|\s)section\b/,
-            /\.ui-control/,
             /\.window-app/,
 
             // Exclude various core applications.
             /^\.active-effect-config/,
             /^\.adventure-importer/,
             /^\.camera-view/,
+            /#camera-views/,
+            /^\.card-config/,
             /^\.cards-config/,
             /^\.category-browser/,
+            /^\.chat-message/,
+            /^\.chat-sidebar/,
+            /\.combat-sidebar/,
+            /\.compendium-directory/,
+            /\.compendium-sidebar/,
             /^\.document-ownership/,
+            /^\.effects-tooltip/,
             /^\.journal-category-config/,
             /\.journal-entry-page/,
+            /^\.macro-config/,
             /^\.package-list/,
             /^\.playlists-sidebar/,
+            /\.placeable-hud/,
             /^\.region-config/,
             /^\.roll-table-sheet/,
             /^\.scene-config/,
+            /^\.scenes-sidebar/,
+            /\.settings-sidebar/,
             /^\.sheet.journal-entry/,
+            /^\.template-config/,
             /^\.token-config/,
             /^\.tour/,
+            /\.ui-control/,
             /^\.wall-config/,
          ],
 
