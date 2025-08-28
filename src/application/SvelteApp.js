@@ -630,7 +630,7 @@ export class SvelteApp extends Application
     */
    async maximize({ animate = true, duration = 0.1 } = {})
    {
-      if (!this.popOut || [false, null].includes(this._minimized)) { return; }
+      if ((!this.popOut && !this.options.alwaysOnTop) || [false, null].includes(this._minimized)) { return; }
 
       this._minimized = null;
 
@@ -734,7 +734,10 @@ export class SvelteApp extends Application
     */
    async minimize({ animate = true, duration = 0.1 } = {})
    {
-      if (!this.rendered || !this.popOut || [true, null].includes(this._minimized)) { return; }
+      if (!this.rendered || (!this.popOut && !this.options.alwaysOnTop) || [true, null].includes(this._minimized))
+      {
+         return;
+      }
 
       this.#stores.uiStateUpdate((options) => deepMerge(options, { minimized: true }));
 
