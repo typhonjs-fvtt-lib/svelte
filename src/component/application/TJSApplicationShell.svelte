@@ -557,6 +557,7 @@
 
    .tjs-window-app :global(.window-header) {
       --button-size: 24px;
+      color: var(--tjs-app-header-color, var(--color-light-1));
    }
 
    .tjs-window-app :global(.window-header .window-title) {
