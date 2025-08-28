@@ -245,7 +245,7 @@ export class SvelteReactive
    /**
     * Returns the headerIcon app option.
     *
-    * @returns {string|void} URL for header app icon.
+    * @returns {string | undefined} URL for header app icon.
     */
    get headerIcon() { return this.#application?.options?.headerIcon; }
 
@@ -283,6 +283,13 @@ export class SvelteReactive
     * @returns {boolean} Resizable app option.
     */
    get resizable() { return this.#application?.options?.resizable; }
+
+   /**
+    * Returns the explicit theme option.
+    *
+    * @returns {string | undefined} Resizable app option.
+    */
+   get theme() { return this.#application?.options?.theme; }
 
    /**
     * Returns the title accessor from the parent Application class; {@link Application.title}
@@ -429,6 +436,16 @@ export class SvelteReactive
    }
 
    /**
+    * Sets `this.options.theme`, which is reactive for application shells.
+    *
+    * @param {string | undefined}  theme - Sets the resizable option.
+    */
+   set theme(theme)
+   {
+      if (theme === void 0 || typeof theme === 'string') { this.setOptions('theme', theme); }
+   }
+
+   /**
     * Sets `this.options.title`, which is reactive for application shells.
     *
     * Note: Will set empty string if title is undefined or null.
@@ -454,7 +471,8 @@ export class SvelteReactive
     * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
     * to walk.
     *
-    * // TODO DOCUMENT the accessor in more detail.
+    * @privateRemarks
+    * TODO: DOCUMENT the accessor in more detail.
     *
     * @param {string}   accessor - The path / key to set. You can set multiple levels.
     *
@@ -605,7 +623,7 @@ export class SvelteReactive
          headerButtonNoLabel: /** @type {import('svelte/store').Writable<boolean>} */
           propertyStore(writableAppOptions, 'headerButtonNoLabel'),
 
-         headerIcon: /** @type {import('svelte/store').Writable<string>} */
+         headerIcon: /** @type {import('svelte/store').Writable<string | undefined>} */
           propertyStore(writableAppOptions, 'headerIcon'),
 
          headerNoTitleMinimized: /** @type {import('svelte/store').Writable<boolean>} */
@@ -622,6 +640,9 @@ export class SvelteReactive
 
          resizable: /** @type {import('svelte/store').Writable<boolean>} */
           propertyStore(writableAppOptions, 'resizable'),
+
+         theme: /** @type {import('svelte/store').Writable<string | undefined>} */
+          propertyStore(writableAppOptions, 'theme'),
 
          title: /** @type {import('svelte/store').Writable<string>} */
           propertyStore(writableAppOptions, 'title')

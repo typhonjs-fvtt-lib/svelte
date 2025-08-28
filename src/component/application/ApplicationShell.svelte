@@ -196,11 +196,11 @@
    // Reactive observation of core theme.
    const themeStore = ThemeObserver.stores.theme;
 
-   // Stores current application optional classes with current theme applied.
-   let appClasses = '';
+   // Reactive observation of explicit app theme.
+   const appTheme = application.reactive.storeAppOptions.theme;
 
    // Apply current theme to optional app classes.
-   $: if ($themeStore) { appClasses = FVTTAppTheme.appClasses(application); }
+   $: appClasses = FVTTAppTheme.appClasses(application, $themeStore, $appTheme);
 
    // ---------------------------------------------------------------------------------------------------------------
 

@@ -540,6 +540,8 @@ declare namespace SvelteAppNS {
              */
             activeWindow: Window;
 
+            classes: string;
+
             /**
              * App dragging state.
              */
@@ -603,7 +605,7 @@ declare namespace SvelteAppNS {
             /**
              * Derived store for `headerIcon` updates.
              */
-            headerIcon: Writable<string>;
+            headerIcon: Writable<string | undefined>;
 
             /**
              * Derived store for `headerNoTitleMinimized` updates.
@@ -629,6 +631,11 @@ declare namespace SvelteAppNS {
              * Derived store for `resizable` updates.
              */
             resizable: Writable<boolean>;
+
+            /**
+             * Derived store for `theme` updates.
+             */
+            theme: Writable<string | undefined>;
 
             /**
              * Derived store for `title` updates.
@@ -1092,6 +1099,12 @@ declare namespace SvelteAppNS {
        * @defaultValue `TJSSessionStorage`
        */
       sessionStorage?: WebStorage;
+
+      /**
+       * An explicit theme name to apply to the application shell. Presently valid options are `dark` or `light`. If
+       * not explicit theme is provided the current core platform theme is applied.
+       */
+      theme?: string;
 
       /**
        * By default, 'top / left' respects rotation when minimizing.
