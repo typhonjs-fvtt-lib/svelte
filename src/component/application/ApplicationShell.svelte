@@ -218,7 +218,8 @@
    {
       if ($focusAuto) { elementRoot.focus(); }
 
-      requestAnimationFrame(() => mounted = true);
+      // Only enable container queries if width isn't 'auto'.
+      if (application.position.width !== 'auto') { requestAnimationFrame(() => mounted = true); }
    });
 
    // ---------------------------------------------------------------------------------------------------------------
