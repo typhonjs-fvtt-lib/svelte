@@ -1073,7 +1073,13 @@ export class SvelteApp extends Application
          }
 
          // Ensure the app element has updated inline styles.
-         nextAnimationFrame().then(() => this.onSvelteRemount());
+         nextAnimationFrame().then(() =>
+         {
+            // Allow any external modules to modify the app frame (IE PopOut module).
+            this.render();
+
+            this.onSvelteRemount();
+         });
       }
    }
 }
