@@ -197,13 +197,13 @@
    // ---------------------------------------------------------------------------------------------------------------
 
    // Reactive observation of core theme.
-   const themeStore = ThemeObserver.stores.theme;
+   const themeTokenStore = ThemeObserver.stores.themeToken;
 
    // Reactive observation of explicit app theme.
-   const appTheme = application.reactive.storeAppOptions.theme;
+   const appThemeName = application.reactive.storeAppOptions.themeName;
 
    // Apply current theme to optional app classes.
-   $: appClasses = FVTTAppTheme.appClasses(application, $themeStore, $appTheme);
+   $: appClasses = FVTTAppTheme.appClasses(application, $themeTokenStore, $appThemeName);
 
    // ---------------------------------------------------------------------------------------------------------------
 

@@ -356,6 +356,20 @@ declare namespace SvelteAppNS {
          set resizable(resizable: boolean);
 
          /**
+          * Returns the themeName option.
+          *
+          * @returns themeName app option.
+          */
+         get themeName(): string | undefined;
+
+         /**
+          * Sets `this.options.themeName`, which is reactive for application shells.
+          *
+          * @param themeName - Sets the themeName option.
+          */
+         set themeName(themeName: string | undefined);
+
+         /**
           * Returns the title accessor from the parent Application class; {@link fvtt!ApplicationOptions}.
           *
           * @returns Title.
@@ -635,7 +649,7 @@ declare namespace SvelteAppNS {
             /**
              * Derived store for `theme` updates.
              */
-            theme: Writable<string | undefined>;
+            themeName: Writable<string | undefined>;
 
             /**
              * Derived store for `title` updates.
@@ -1104,7 +1118,7 @@ declare namespace SvelteAppNS {
        * An explicit theme name to apply to the application shell. Presently valid options are `dark` or `light`. If
        * not explicit theme is provided the current core platform theme is applied.
        */
-      theme?: string;
+      themeName?: string;
 
       /**
        * By default, 'top / left' respects rotation when minimizing.

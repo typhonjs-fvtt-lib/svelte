@@ -196,7 +196,7 @@ export class SvelteApp extends Application
          positionValidator: TJSPosition.Validators.transformWindow, // A function providing the default validator.
          sessionStorage: void 0,          // An instance of WebStorage (session) to share across SvelteApps.
          svelte: void 0,                  // A Svelte configuration object.
-         theme: void 0,                   // An explicit theme name to apply.
+         themeName: void 0,               // An explicit theme name to apply.
          transformOrigin: 'top left'      // By default, 'top / left' respects rotation when minimizing.
       });
    }

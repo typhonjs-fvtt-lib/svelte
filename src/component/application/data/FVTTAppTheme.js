@@ -8,9 +8,9 @@ export class FVTTAppTheme
     *
     * @param {import('#svelte-fvtt/application').SvelteApp} application - Application
     *
-    * @param {string} coreTheme - Current core theme value.
+    * @param {string} coreTheme - Current core theme class.
     *
-    * @param {string} appTheme - Any explicitly set app theme override.
+    * @param {string} appTheme - Any explicitly set app theme name override.
     *
     * @returns {string} All app classes.
     */

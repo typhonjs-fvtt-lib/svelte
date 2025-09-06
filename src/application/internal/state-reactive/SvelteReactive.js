@@ -285,11 +285,11 @@ export class SvelteReactive
    get resizable() { return this.#application?.options?.resizable; }
 
    /**
-    * Returns the explicit theme option.
+    * Returns the explicit theme name option.
     *
-    * @returns {string | undefined} Resizable app option.
+    * @returns {string | undefined} Theme name option.
     */
-   get theme() { return this.#application?.options?.theme; }
+   get themeName() { return this.#application?.options?.themeName; }
 
    /**
     * Returns the title accessor from the parent Application class; {@link Application.title}
@@ -436,13 +436,13 @@ export class SvelteReactive
    }
 
    /**
-    * Sets `this.options.theme`, which is reactive for application shells.
+    * Sets `this.options.themeName`, which is reactive for application shells.
     *
-    * @param {string | undefined}  theme - Sets the resizable option.
+    * @param {string | undefined}  themeName - Sets the themeName option.
     */
-   set theme(theme)
+   set themeName(themeName)
    {
-      if (theme === void 0 || typeof theme === 'string') { this.setOptions('theme', theme); }
+      if (themeName === void 0 || typeof themeName === 'string') { this.setOptions('themeName', themeName); }
    }
 
    /**
@@ -641,8 +641,8 @@ export class SvelteReactive
          resizable: /** @type {import('svelte/store').Writable<boolean>} */
           propertyStore(writableAppOptions, 'resizable'),
 
-         theme: /** @type {import('svelte/store').Writable<string | undefined>} */
-          propertyStore(writableAppOptions, 'theme'),
+         themeName: /** @type {import('svelte/store').Writable<string | undefined>} */
+          propertyStore(writableAppOptions, 'themeName'),
 
          title: /** @type {import('svelte/store').Writable<string>} */
           propertyStore(writableAppOptions, 'title')
