@@ -20,9 +20,12 @@
     * @componentDocumentation
     * @internal
     */
-   import { applyStyles }   from '#runtime/svelte/action/dom/style';
-   import { localize }      from '#runtime/util/i18n';
-   import { isObject }      from '#runtime/util/object';
+   import { inlineSvg }       from '#runtime/svelte/action/dom/inline-svg';
+   import { popoverTooltip }  from '#runtime/svelte/action/dom/tooltip';
+   import { applyStyles }     from '#runtime/svelte/action/dom/style';
+   import { AssetValidator }  from '#runtime/util/browser';
+   import { localize }        from '#runtime/util/i18n';
+   import { isObject }        from '#runtime/util/object';
 
    export let button = void 0;
 
@@ -37,6 +40,18 @@
    $: keyCode = isObject(button) && typeof button.keyCode === 'string' ? button.keyCode : 'Enter';
 
    $: styles = isObject(button) && isObject(button.styles) ? button.styles : void 0;
+
+   // ----------------------------------------------------------------------------------------------------------------
+
+   let iconType;
+
+   $:
+   {
+      const result = AssetValidator.parseMedia({ url: icon, mediaTypes: AssetValidator.MediaTypes.img_svg });
+      iconType = result.valid ? result.elementType : 'font';
+   }
+
+   // ----------------------------------------------------------------------------------------------------------------
 
    function onClick(event)
    {
@@ -100,16 +115,26 @@
 <svelte:options accessors={true}/>
 
 <button type=button
+   class="header-control icon {button.class}"
+   class:keep-minimized={keepMinimized}
    on:click|preventDefault|stopPropagation={onClick}
    on:contextmenu|preventDefault|stopPropagation={onContextMenu}
    on:keydown={onKeydown}
    on:keyup={onKeyup}
    use:applyStyles={styles}
-   class="header-control icon {icon} {button.class}"
-   class:keep-minimized={keepMinimized}
+   use:popoverTooltip={$storeHeaderButtonNoLabel ? null : label}
    data-action={button.class}
-   data-tooltip={$storeHeaderButtonNoLabel ? null : label}
    aria-label={label}>
+
+   {#if icon}
+      {#if iconType === 'font'}
+         <i class={icon}></i>
+      {:else if iconType === 'img'}
+         <img src={icon} alt="" class=icon-int>
+      {:else if iconType === 'svg'}
+         <svg use:inlineSvg={{ src: icon }} class=icon-int></svg>
+      {/if}
+   {/if}
 </button>
 
 <style>
@@ -117,6 +142,19 @@
       color: var(--tjs-app-header-button-color);
       flex: 0 0 var(--tjs-app-header-button-size);
       height: var(--tjs-app-header-button-size);
+      margin: var(--tjs-app-header-button-margin);
       min-height: var(--tjs-app-header-button-size);
+   }
+
+   button:has(.icon-int) {
+      padding: calc(var(--tjs-app-header-button-size) * 0.15);
+   }
+
+   .icon-int {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: calc(var(--tjs-app-header-button-size) * 0.75);
+      height: calc(var(--tjs-app-header-button-size) * 0.75);
    }
 </style>
