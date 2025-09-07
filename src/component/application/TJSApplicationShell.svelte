@@ -199,11 +199,14 @@
    // Reactive observation of core theme.
    const themeTokenStore = ThemeObserver.stores.themeToken;
 
-   // Reactive observation of explicit app theme.
+   // Reactive active app classes Set.
+   const activeClasses = application.reactive.activeClasses;
+
+   // Reactive explicit app theme name override.
    const appThemeName = application.reactive.storeAppOptions.themeName;
 
    // Apply current theme to optional app classes.
-   $: appClasses = FVTTAppTheme.appClasses(application, $themeTokenStore, $appThemeName);
+   $: appClasses = FVTTAppTheme.appClasses($activeClasses, $themeTokenStore, $appThemeName);
 
    // ---------------------------------------------------------------------------------------------------------------
 

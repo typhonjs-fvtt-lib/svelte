@@ -15,11 +15,18 @@ import {
 
 import { handleAlwaysOnTop }     from '../util/index.js';
 
+import { SvelteSet }             from './SvelteSet.js';
+
 /**
  * API docs and description in {@link SvelteAppNS.API.Reactive}.
  */
 export class SvelteReactive
 {
+   /**
+    * @type {Set<string> & import('svelte/store').Readable<SvelteSet>}
+    */
+   #activeClasses;
+
    /**
     * @type {import('../SvelteApp').SvelteApp}
     */
@@ -142,6 +149,13 @@ export class SvelteReactive
    get storeUIState() { return this.#storeUIState; }
 
 // Only reactive getters ---------------------------------------------------------------------------------------------
+
+   /**
+    * Returns the current active CSS classes Set applied to the app window. This is reactive for any modifications.
+    *
+    * @returns {Set<string> & import('svelte/store').Readable<SvelteSet>} Active app CSS classes Set.
+    */
+   get activeClasses() { return this.#activeClasses; }
 
    /**
     * Returns the current active Window / WindowProxy UI state.
@@ -587,6 +601,18 @@ export class SvelteReactive
     */
    #storesInitialize()
    {
+      this.#activeClasses = new SvelteSet();
+
+      for (const entry of this.#application.options?.classes ?? [])
+      {
+         if (typeof entry !== 'string') { continue; }
+
+         // Ignore any AppV1 themes set.
+         if (entry === 'themed' || entry.startsWith('theme-')) { continue; }
+
+         this.#activeClasses.add(entry);
+      }
+
       /** @type {import('svelte/store').Writable<import('../../types').SvelteAppNS.Options>} */
       const writableAppOptions = writable(this.#application.options);
 

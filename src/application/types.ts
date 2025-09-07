@@ -152,6 +152,14 @@ declare namespace SvelteAppNS {
       export interface Reactive
       {
          /**
+          * Returns the current active CSS classes Set applied to the app window. This is reactive for any
+          * modifications.
+          *
+          * @returns Active app CSS classes Set.
+          */
+         get activeClasses(): Set<string> & Readable<Set<string>>
+
+         /**
           * @returns Returns WebStorage (session) instance.
           */
          get sessionStorage(): WebStorage;
@@ -553,8 +561,6 @@ declare namespace SvelteAppNS {
              * Active browser window for the app.
              */
             activeWindow: Window;
-
-            classes: string;
 
             /**
              * App dragging state.

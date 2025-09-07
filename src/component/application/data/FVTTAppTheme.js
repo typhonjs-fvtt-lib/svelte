@@ -6,19 +6,17 @@ export class FVTTAppTheme
    /**
     * Generate all app classes with applied core or explicitly set theme.
     *
-    * @param {import('#svelte-fvtt/application').SvelteApp} application - Application
+    * @param {Set<string>} activeClasses - Active app classes Set.
     *
     * @param {string} coreTheme - Current core theme class.
     *
-    * @param {string} appTheme - Any explicitly set app theme name override.
+    * @param {string} appThemeName - Any explicitly set app theme name override.
     *
     * @returns {string} All app classes.
     */
-   static appClasses(application, coreTheme, appTheme)
+   static appClasses(activeClasses, coreTheme, appThemeName)
    {
-      const classes = new Set([
-         ...Array.isArray(application?.options?.classes) ? application.options.classes : [],
-      ]);
+      const classes = new Set(activeClasses);
 
       // In AppV1 `theme-light` is always applied. Remove any theme classes.
       for (const entry of classes)
@@ -27,7 +25,7 @@ export class FVTTAppTheme
       }
 
       classes.add('themed');
-      classes.add(appTheme ? `theme-${appTheme}` : coreTheme);
+      classes.add(appThemeName ? `theme-${appThemeName}` : coreTheme);
 
       return Array.from(classes).join(' ');
    }
