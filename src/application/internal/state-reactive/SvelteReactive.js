@@ -550,7 +550,8 @@ export class SvelteReactive
          headerNoTitleMinimized: this.#application?.options?.headerNoTitleMinimized ?? false,
          minimizable: this.#application?.options?.minimizable ?? true,
          positionable: this.#application?.options?.positionable ?? true,
-         resizable: this.#application?.options?.resizable ?? true
+         resizable: this.#application?.options?.resizable ?? true,
+         themeName: this.#application?.options?.themeName ?? void 0
       };
    }
 

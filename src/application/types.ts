@@ -143,7 +143,12 @@ declare namespace SvelteAppNS {
        * - {@link Reactive.popOut}
        * - {@link Reactive.positionable}
        * - {@link Reactive.resizable}
+       * - {@link Reactive.themeName}
        * - {@link Reactive.title}
+       *
+       * A reactive Set of currently applied CSS classes to the app window is available via
+       * {@link Reactive.activeClasses}. Altering the classes applied does not change the original app
+       * `options.classes`.
        *
        * An instance of TJSWebStorage (session) / TJSSessionStorage is accessible via
        * {@link Reactive.sessionStorage}. Optionally you can pass in an existing TJSWebStorage instance that can
@@ -551,6 +556,11 @@ declare namespace SvelteAppNS {
              * If true, then application shells are resizable.
              */
             resizable: boolean;
+
+            /**
+             * Current explicit app theme name override.
+             */
+            themeName: string | undefined;
          }
 
          /**
