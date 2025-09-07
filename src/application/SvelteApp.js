@@ -135,6 +135,13 @@ export class SvelteApp extends Application
          throw new Error(`SvelteApp - constructor - No Svelte configuration object found in 'options'.`);
       }
 
+      // Remove forced AppV1 theming classes: `themed` and `theme-light`.
+      if (Array.isArray(this.options.classes))
+      {
+         this.options.classes = this.options.classes.filter(
+          (entry) => entry !== 'themed' && !entry?.startsWith('theme-'));
+      }
+
       this.#applicationState = new ApplicationState(this);
 
       // Initialize TJSPosition with the position object set by Application.
