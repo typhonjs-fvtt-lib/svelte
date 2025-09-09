@@ -122,9 +122,7 @@
    on:keydown={onKeydown}
    on:keyup={onKeyup}
    use:applyStyles={styles}
-   use:popoverTooltip={$storeHeaderButtonNoLabel ? null : label}
-   data-action={button.class}
-   aria-label={label}>
+   use:popoverTooltip={{ ariaLabel: true, tooltip: $storeHeaderButtonNoLabel ? void 0 : label }}>
 
    {#if icon}
       {#if iconType === 'font'}
