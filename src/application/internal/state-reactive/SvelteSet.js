@@ -1,6 +1,9 @@
 /**
  * @template T
  *
+ * @privateRemarks
+ * TODO: Replace with Svelte 5 reactive set implementation.
+ *
  * @implements {import('svelte/store').Readable}
  *
  * @augments {Set<T>}
