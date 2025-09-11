@@ -190,9 +190,9 @@
       {:else if mediaType === 'svg'}
          <svg use:inlineSvg={{ src: $storeHeaderIcon }} class="tjs-app-icon keep-minimized"></svg>
       {/if}
-      <h4 class=window-title style:display={displayHeaderTitle}>
+      <h1 class=window-title style:display={displayHeaderTitle}>
          {localize($storeTitle)}
-      </h4>
+      </h1>
       {#each buttonsLeft as button}
          <svelte:component this={button.class} {...button.props} />
       {/each}
@@ -235,8 +235,8 @@
       gap: var(--tjs-app-header-gap, 5px);
       padding: var(--tjs-app-header-padding, 0 0.5rem);
 
-      font-family: var(--tjs-app-header-font-family, var(--tjs-app-font-family));
-      font-size: var(--tjs-app-header-font-size, var(--tjs-app-font-size));
+      font-family: var(--tjs-app-header-font-family, var(--tjs-app-font-family, inherit));
+      font-size: var(--tjs-app-header-font-size, var(--tjs-app-font-size, inherit));
       font-weight: var(--tjs-app-header-font-weight, inherit);
 
       touch-action: none;
