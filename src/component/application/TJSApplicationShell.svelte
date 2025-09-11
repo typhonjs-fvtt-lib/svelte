@@ -328,12 +328,21 @@
    }
 
    /**
-    * Invoke the app `bringToTop`; this method will determine whether to take the action.
+    * Workaround to prevent any global platform pointer down event handlers from running when the pointer down targets
+    * the app shell.
+    */
+   function onPointerdownApp(event)
+   {
+      event.stopPropagation();
+   }
+
+   /**
+    * Invoke the app `bringToTop`.
     *
-    * Note: `capture` is used so pointer down is always received. Be mindful as `onPointerdownApp` should only
+    * Note: `capture` is used so pointer down is always received. Be mindful as `onPointerdownAppCapture` should only
     * invoke `bringToTop`.
     */
-   function onPointerdownApp()
+   function onPointerdownAppCapture()
    {
       application.bringToTop.call(application);
    }
@@ -435,7 +444,8 @@
          out:outTransition|global={outTransitionOptions}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
          on:keydown={onKeydown}
-         on:pointerdown|capture={onPointerdownApp}
+         on:pointerdown|capture={onPointerdownAppCapture}
+         on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
          use:dynamicAction={appResizeObserver}
          role=application
@@ -461,7 +471,8 @@
          bind:this={elementRoot}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
          on:keydown={onKeydown}
-         on:pointerdown|capture={onPointerdownApp}
+         on:pointerdown|capture={onPointerdownAppCapture}
+         on:pointerdown={onPointerdownApp}
          use:applyStyles={stylesApp}
          use:dynamicAction={appResizeObserver}
          role=application
@@ -481,6 +492,18 @@
 {/if}
 
 <style>
+   .tjs-app :global(.tjs-draggable) {
+      cursor: var(--tjs-cursor-grab, grab);
+   }
+
+   .tjs-app :global(.tjs-draggable:active) {
+      cursor: var(--tjs-cursor-grabbing, var(--tjs-cursor-grab-down, grabbing));
+   }
+
+   .tjs-app :global(label) {
+      cursor: var(--tjs-cursor-default, default);
+   }
+
    /**
     * Defines styles that mimic a Foundry popout Application. `:global` is used to preserve the unused CSS in the
     * template above. A primary benefit of a separate application shell implementation is that the styles are not
@@ -488,7 +511,7 @@
     * separate and unique styles to be given to this application regardless of game system / module modifications.
     */
 
-   .tjs-app {
+   .tjs-window-app {
       contain: layout style paint;
 
       background: var(--tjs-app-background);
@@ -512,11 +535,11 @@
    }
 
    /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
-   .tjs-app.mounted {
+   .tjs-window-app.mounted {
       container: tjs-app-window / inline-size;
    }
 
-   .tjs-app .window-content {
+   .tjs-window-app .window-content {
       background: var(--tjs-app-content-background, none);
       color: var(--tjs-app-content-color, inherit);
       overflow: var(--tjs-app-content-overflow, hidden);
@@ -529,15 +552,15 @@
    }
 
    /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
-   .tjs-app.mounted .window-content {
+   .tjs-window-app.mounted .window-content {
       container: tjs-app-window-content / inline-size;
    }
 
-   .tjs-app:focus-visible {
+   .tjs-window-app:focus-visible {
       outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
    }
 
-   .tjs-app .window-content:focus-visible {
+   .tjs-window-app .window-content:focus-visible {
       outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
    }
 
@@ -591,21 +614,21 @@
     * reasonable defaults for the app color, app header background color and resize handle filter.
     */
 
-   .tjs-app:not(.themed) {
+   .tjs-window-app:not(.themed) {
       /* Explicit not themed color */
       --tjs-app-color: var(--color-light-2);
    }
 
    /* Themed app color using core dark / light CSS var */
-   .tjs-app:is(.themed) {
+   .tjs-window-app:is(.themed) {
       --tjs-app-color: var(--color-text-primary);
    }
 
-   .tjs-app:is(.themed.theme-dark) {
+   .tjs-window-app:is(.themed.theme-dark) {
       --color-header-background: rgba(0, 0, 0, 0.5);
    }
 
-   .tjs-app:is(.themed.theme-light) {
+   .tjs-window-app:is(.themed.theme-light) {
       --color-header-background: var(--color-dark-3);
    }
 </style>

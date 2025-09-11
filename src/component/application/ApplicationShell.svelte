@@ -325,12 +325,21 @@
    }
 
    /**
-    * Invoke the app `bringToTop`; this method will determine whether to take the action.
+    * Workaround to prevent any global platform pointer down event handlers from running when the pointer down targets
+    * the app shell.
+    */
+   function onPointerdownApp(event)
+   {
+      event.stopPropagation();
+   }
+
+   /**
+    * Invoke the app `bringToTop`.
     *
-    * Note: `capture` is used so pointer down is always received. Be mindful as `onPointerdownApp` should only
+    * Note: `capture` is used so pointer down is always received. Be mindful as `onPointerdownAppCapture` should only
     * invoke `bringToTop`.
     */
-   function onPointerdownApp()
+   function onPointerdownAppCapture()
    {
       application.bringToTop.call(application);
    }
@@ -424,7 +433,7 @@
 {#if inTransition !== TJSDefaultTransition.default || outTransition !== TJSDefaultTransition.default}
    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
    <div id={application.id}
-        class="application {appClasses}"
+        class="application tjs-app {appClasses}"
         class:mounted={mounted}
         data-appid={application.appId}
         bind:this={elementRoot}
@@ -432,7 +441,8 @@
         out:outTransition|global={outTransitionOptions}
         on:close:popup|preventDefault|stopPropagation={onClosePopup}
         on:keydown={onKeydown}
-        on:pointerdown|capture={onPointerdownApp}
+        on:pointerdown|capture={onPointerdownAppCapture}
+        on:pointerdown={onPointerdownApp}
         use:applyStyles={stylesApp}
         use:dynamicAction={appResizeObserver}
         role=application
@@ -452,13 +462,14 @@
 {:else}
    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
    <div id={application.id}
-        class="application {appClasses}"
+        class="application tjs-app {appClasses}"
         class:mounted={mounted}
         data-appid={application.appId}
         bind:this={elementRoot}
         on:close:popup|preventDefault|stopPropagation={onClosePopup}
         on:keydown={onKeydown}
-        on:pointerdown|capture={onPointerdownApp}
+        on:pointerdown|capture={onPointerdownAppCapture}
+        on:pointerdown={onPointerdownApp}
         use:applyStyles={stylesApp}
         use:dynamicAction={appResizeObserver}
         role=application
@@ -506,6 +517,18 @@
    /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
    .application.mounted .window-content {
       container: tjs-app-window-content / inline-size;
+   }
+
+   .tjs-app :global(.tjs-draggable) {
+      cursor: var(--tjs-cursor-grab, grab);
+   }
+
+   .tjs-app :global(.tjs-draggable:active) {
+      cursor: var(--tjs-cursor-grabbing, var(--tjs-cursor-grab-down, grabbing));
+   }
+
+   .tjs-app :global(label) {
+      cursor: var(--tjs-cursor-default, default);
    }
 
    .window-content:focus-visible {
