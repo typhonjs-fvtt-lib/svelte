@@ -570,22 +570,26 @@ export class SvelteReactive
     */
    updateHeaderButtons({ headerButtonNoClose = this.#application.options.headerButtonNoClose } = {})
    {
-      let buttons = this.#application._getHeaderButtons();
-
-      // Remove close button if this.options.headerButtonNoClose is true;
-      if (typeof headerButtonNoClose === 'boolean' && headerButtonNoClose)
+      // The operation is queued just in case a developer mutates reactive state inside `_getHeaderButtons`.
+      queueMicrotask(() =>
       {
-         buttons = buttons.filter((button) => button.class !== 'close');
-      }
+         let buttons = this.#application._getHeaderButtons();
 
-      // For AppV2 label compatibility for close button: `Close Window` instead of `Close`.
-      const closeButton = buttons.find((button) => button.class === 'close');
-      if (closeButton) { closeButton.label = 'APPLICATION.TOOLS.Close'; }
+         // Remove close button if this.options.headerButtonNoClose is true;
+         if (typeof headerButtonNoClose === 'boolean' && headerButtonNoClose)
+         {
+            buttons = buttons.filter((button) => button.class !== 'close');
+         }
 
-      this.#storeUIStateUpdate((options) =>
-      {
-         options.headerButtons = buttons;
-         return options;
+         // For AppV2 label compatibility for close button: `Close Window` instead of `Close`.
+         const closeButton = buttons.find((button) => button.class === 'close');
+         if (closeButton) { closeButton.label = 'APPLICATION.TOOLS.Close'; }
+
+         this.#storeUIStateUpdate((options) =>
+         {
+            options.headerButtons = buttons;
+            return options;
+         });
       });
    }
 
