@@ -328,15 +328,6 @@
    }
 
    /**
-    * Workaround to prevent any global platform pointer down event handlers from running when the pointer down targets
-    * the app shell.
-    */
-   function onPointerdownApp(event)
-   {
-      event.stopPropagation();
-   }
-
-   /**
     * Invoke the app `bringToTop`.
     *
     * Note: `capture` is used so pointer down is always received. Be mindful as `onPointerdownAppCapture` should only
@@ -381,6 +372,15 @@
             elementContent.focus();
          }
       }
+   }
+
+   /**
+    * Prevent any global platform pointer down / up event handlers from running when the pointer event targets the app
+    * shell.
+    */
+   function onPointerStopPropagation(event)
+   {
+      event.stopPropagation();
    }
 
    /**
@@ -445,7 +445,8 @@
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
          on:keydown={onKeydown}
          on:pointerdown|capture={onPointerdownAppCapture}
-         on:pointerdown={onPointerdownApp}
+         on:pointerdown={onPointerStopPropagation}
+         on:pointerup={onPointerStopPropagation}
          use:applyStyles={stylesApp}
          use:dynamicAction={appResizeObserver}
          role=application
@@ -472,7 +473,8 @@
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
          on:keydown={onKeydown}
          on:pointerdown|capture={onPointerdownAppCapture}
-         on:pointerdown={onPointerdownApp}
+         on:pointerdown={onPointerStopPropagation}
+         on:pointerup={onPointerStopPropagation}
          use:applyStyles={stylesApp}
          use:dynamicAction={appResizeObserver}
          role=application

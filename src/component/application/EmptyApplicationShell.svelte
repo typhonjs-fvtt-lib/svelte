@@ -336,8 +336,6 @@
             elementRoot.focus();
          }
       }
-
-      event.stopPropagation();
    }
 
    /**
@@ -349,6 +347,15 @@
    function onPointerdownAppCapture()
    {
       application.bringToTop.call(application);
+   }
+
+   /**
+    * Prevent any global platform pointer down / up event handlers from running when the pointer event targets the app
+    * shell.
+    */
+   function onPointerStopPropagation(event)
+   {
+      event.stopPropagation();
    }
 
    /**
@@ -400,6 +407,8 @@
          on:keydown={onKeydown}
          on:pointerdown|capture={onPointerdownAppCapture}
          on:pointerdown={onPointerdownApp}
+         on:pointerdown={onPointerStopPropagation}
+         on:pointerup={onPointerStopPropagation}
          use:applyStyles={stylesApp}
          use:dynamicAction={appResizeObserver}
          role=application
@@ -419,6 +428,8 @@
          on:keydown={onKeydown}
          on:pointerdown|capture={onPointerdownAppCapture}
          on:pointerdown={onPointerdownApp}
+         on:pointerdown={onPointerStopPropagation}
+         on:pointerup={onPointerStopPropagation}
          use:applyStyles={stylesApp}
          use:dynamicAction={appResizeObserver}
          role=application
