@@ -350,15 +350,6 @@
    }
 
    /**
-    * Prevent any global platform pointer down / up event handlers from running when the pointer event targets the app
-    * shell.
-    */
-   function onPointerStopPropagation(event)
-   {
-      event.stopPropagation();
-   }
-
-   /**
     * Callback for app resizeObserver action. This is enabled when appOffsetHeight or appOffsetWidth is
     * bound. Additionally, the Application position resizeObserved store is updated.
     *
@@ -407,8 +398,6 @@
          on:keydown={onKeydown}
          on:pointerdown|capture={onPointerdownAppCapture}
          on:pointerdown={onPointerdownApp}
-         on:pointerdown={onPointerStopPropagation}
-         on:pointerup={onPointerStopPropagation}
          use:applyStyles={stylesApp}
          use:dynamicAction={appResizeObserver}
          role=application
@@ -428,8 +417,6 @@
          on:keydown={onKeydown}
          on:pointerdown|capture={onPointerdownAppCapture}
          on:pointerdown={onPointerdownApp}
-         on:pointerdown={onPointerStopPropagation}
-         on:pointerup={onPointerStopPropagation}
          use:applyStyles={stylesApp}
          use:dynamicAction={appResizeObserver}
          role=application
