@@ -4,8 +4,12 @@
     * {@link ApplicationShell}. An application shell is a main top level slotted component that provides a reactive
     * outer wrapper and header bar for the main content component.
     *
-    * Container queries are supported and the main app window container is named `tjs-app-window` and the window content
-    * container is `tjs-app-window-content`.
+    * Container queries (`inline-size`) are supported for `width` queries. The main app window container is named
+    * `tjs-app-window` and the window content container is `tjs-app-window-content`. Take note that the width available
+    * is the inline-size width of the app window or content minus the border constraints. Container queries will be
+    * disabled if the `width` app option is `auto` or not an explicit constraint. Just a precautionary warning that If
+    * you set `width` to `auto` during runtime unexpected behavior or a collapse of the app window will occur which is
+    * to be expected.
     *
     * ### CSS variables
     *
