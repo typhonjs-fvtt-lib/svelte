@@ -583,7 +583,11 @@ export class SvelteReactive
 
          // For AppV2 label compatibility for close button: `Close Window` instead of `Close`.
          const closeButton = buttons.find((button) => button.class === 'close');
-         if (closeButton) { closeButton.label = 'APPLICATION.TOOLS.Close'; }
+         if (closeButton)
+         {
+            closeButton.keepMinimized = true;
+            closeButton.label = 'APPLICATION.TOOLS.Close';
+         }
 
          this.#storeUIStateUpdate((options) =>
          {
