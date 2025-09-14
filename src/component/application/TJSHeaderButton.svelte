@@ -148,6 +148,10 @@
       padding: calc(var(--tjs-app-header-button-size) * 0.15);
    }
 
+   .keep-minimized {
+      display: inline-flex;
+   }
+
    .icon-int {
       display: inline-flex;
       justify-content: center;

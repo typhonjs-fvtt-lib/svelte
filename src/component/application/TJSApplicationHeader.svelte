@@ -196,7 +196,7 @@
       {#each buttonsLeft as button}
          <svelte:component this={button.class} {...button.props} />
       {/each}
-      <span class="tjs-window-header-spacer keep-minimized"></span>
+      <span class=tjs-window-header-spacer></span>
       {#each buttonsRight as button}
          <svelte:component this={button.class} {...button.props} />
       {/each}
@@ -253,6 +253,7 @@
       font-size: inherit;
       font-weight: inherit;
 
+      flex: unset;
       gap: var(--tjs-app-header-gap, 5px);
       max-width: fit-content;
       overflow: hidden;
