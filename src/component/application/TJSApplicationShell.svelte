@@ -211,13 +211,13 @@
    // ---------------------------------------------------------------------------------------------------------------
 
    /**
-    * Adds the `mounted` class to the main app div from rAF in `onMount` enabling container queries on the main app
+    * Adds the `tjs-cq` class to the main app div from rAF in `onMount` enabling container queries on the main app
     * div and `.window-content`. This is necessary as browsers (Chrome / Firefox) defer layout calculations which
     * may affect app positioning via `TJSPosition` when width or height is set to `auto`.
     *
     * @type {boolean}
     */
-   let mounted = false;
+   let cqEnabled = false;
 
    // Focus `elementRoot` on mount to allow keyboard tab navigation of header buttons.
    onMount(() =>
@@ -225,7 +225,7 @@
       if ($focusAuto) { elementRoot.focus(); }
 
       // Only enable container queries if width isn't 'auto'.
-      if (application.position.width !== 'auto') { requestAnimationFrame(() => mounted = true); }
+      if (application.position.width !== 'auto') { requestAnimationFrame(() => cqEnabled = true); }
    });
 
    // ---------------------------------------------------------------------------------------------------------------
@@ -428,7 +428,7 @@
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
          class="tjs-app tjs-window-app {appClasses}"
-         class:mounted={mounted}
+         class:tjs-cq={cqEnabled}
          data-appid={application.appId}
          bind:this={elementRoot}
          in:inTransition|global={inTransitionOptions}
@@ -456,7 +456,7 @@
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
          class="tjs-app tjs-window-app {appClasses}"
-         class:mounted={mounted}
+         class:tjs-cq={cqEnabled}
          data-appid={application.appId}
          bind:this={elementRoot}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
@@ -524,7 +524,7 @@
    }
 
    /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
-   .tjs-window-app.mounted {
+   .tjs-window-app.tjs-cq {
       container: tjs-app-window / inline-size;
    }
 
@@ -541,7 +541,7 @@
    }
 
    /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
-   .tjs-window-app.mounted .window-content {
+   .tjs-window-app.tjs-cq .window-content {
       container: tjs-app-window-content / inline-size;
    }
 
