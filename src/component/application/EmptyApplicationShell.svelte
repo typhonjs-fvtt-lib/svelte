@@ -65,9 +65,14 @@
    // resizeObserved store is updated.
    export let appOffsetHeight = false;
    export let appOffsetWidth = false;
+   export let contentOffsetHeight = false;
+   export let contentOffsetWidth = false;
+   export let contentHeight = false;
+   export let contentWidth = false;
 
    // Tracks initial state if either of the above props are truthy otherwise a null operation.
-   const initialAppResizeObserver = !!appOffsetHeight || !!appOffsetWidth;
+   const initialAppResizeObserver = !!appOffsetHeight || !!appOffsetWidth || !!contentOffsetHeight ||
+    !!contentOffsetWidth || !!contentHeight || !!contentWidth;
 
    /**
     * Reactive statement to control any dynamic action to apply for the app resize observer. It is always enabled when
@@ -357,17 +362,20 @@
     * Callback for app resizeObserver action. This is enabled when appOffsetHeight or appOffsetWidth is
     * bound. Additionally, the Application position resizeObserved store is updated.
     *
-    * @param {number}   contentWidth - Observed contentWidth.
-    * @param {number}   contentHeight - Observed contentHeight
     * @param {number}   offsetWidth - Observed offsetWidth.
+    *
     * @param {number}   offsetHeight - Observed offsetHeight
+    *
+    * @param {number}   width - Observed offsetWidth - border / padding.
+    *
+    * @param {number}   height - Observed offsetHeight - border / padding.
     */
-   function resizeObservedApp(offsetWidth, offsetHeight, contentWidth, contentHeight)
+   function resizeObservedApp(offsetWidth, offsetHeight, width, height)
    {
       application.position.stores.resizeObserved.update((object) =>
       {
-         object.contentWidth = contentWidth;
-         object.contentHeight = contentHeight;
+         object.contentWidth = width;
+         object.contentHeight = height;
          object.offsetWidth = offsetWidth;
          object.offsetHeight = offsetHeight;
 
@@ -376,6 +384,10 @@
 
       appOffsetHeight = offsetHeight;
       appOffsetWidth = offsetWidth;
+      contentOffsetWidth = offsetWidth;
+      contentOffsetHeight = offsetHeight;
+      contentWidth = width;
+      contentHeight = height;
    }
 
    /**
