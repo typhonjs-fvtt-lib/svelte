@@ -539,11 +539,6 @@
       scrollbar-color: var(--tjs-app-scrollbar-color, var(--color-scrollbar) var(--color-scrollbar-track));
    }
 
-   /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
-   .tjs-window-app.tjs-cq {
-      container: tjs-app-window / inline-size;
-   }
-
    .tjs-window-app .window-content {
       background: var(--tjs-app-content-background, none);
       color: var(--tjs-app-content-color, inherit);

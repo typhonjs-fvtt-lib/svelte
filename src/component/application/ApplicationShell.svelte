@@ -510,11 +510,6 @@
       scrollbar-color: var(--tjs-app-scrollbar-color, inherit);
    }
 
-   /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
-   .application.tjs-cq {
-      container: tjs-app-window / inline-size;
-   }
-
    .application:focus-visible {
       outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
    }

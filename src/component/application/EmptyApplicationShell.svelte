@@ -460,7 +460,7 @@
 
    /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
    .application.tjs-cq {
-      container: tjs-app-window / inline-size;
+      container: tjs-app-window-content / inline-size;
    }
 
    div {
@@ -481,11 +481,6 @@
       overflow: var(--tjs-app-overflow, hidden);
       padding: var(--tjs-app-padding, 0);
       position: var(--tjs-app-position, absolute);
-   }
-
-   /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
-   div.tjs-cq {
-      container: tjs-app-window-content / inline-size;
    }
 
    div:focus-visible {
