@@ -4,7 +4,7 @@
     * outer wrapper and header bar for the main content component.
     *
     * Container queries (`inline-size`) are supported for `width` queries. The main app window container is named
-    * `tjs-app-window` and the window content container is `tjs-app-window-content`. Take note that the width available
+    * `tjs-app-window` and the window content container is `tjs-app-content`. Take note that the width available
     * is the inline-size width of the app window or content minus the border constraints. Container queries will be
     * disabled if the `width` app option is `auto` or not an explicit constraint. Just a precautionary warning that If
     * you set `width` to `auto` during runtime unexpected behavior or a collapse of the app window will occur which is
@@ -526,7 +526,7 @@
 
    /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
    .application.tjs-cq .window-content {
-      container: tjs-app-window-content / inline-size;
+      container: tjs-app-content / inline-size;
    }
 
    .tjs-app :global(.tjs-draggable) {
