@@ -214,6 +214,14 @@
 
    // ---------------------------------------------------------------------------------------------------------------
 
+   // Focus `elementRoot` on mount to allow keyboard tab navigation of header buttons.
+   onMount(() =>
+   {
+      if ($focusAuto) { elementRoot.focus(); }
+   });
+
+   // ---------------------------------------------------------------------------------------------------------------
+
    /**
     * Adds the `tjs-cq` class to the main app div from rAF in `onMount` enabling container queries on the main app
     * div and `.window-content`. This is necessary as browsers (Chrome / Firefox) defer layout calculations which
@@ -223,14 +231,16 @@
     */
    let cqEnabled = false;
 
-   // Focus `elementRoot` on mount to allow keyboard tab navigation of header buttons.
-   onMount(() =>
+   // Only enable container queries if width isn't 'auto' or 'inherit'; IE `resizeObservable` is false otherwise
+   // disable CQ.
+   $: if ($resizeObservable)
    {
-      if ($focusAuto) { elementRoot.focus(); }
-
-      // Only enable container queries if width isn't 'auto'.
-      if (application.position.width !== 'auto') { requestAnimationFrame(() => cqEnabled = true); }
-   });
+      cqEnabled = false;
+   }
+   else
+   {
+      requestAnimationFrame(() => cqEnabled = true);
+   }
 
    // ---------------------------------------------------------------------------------------------------------------
 
