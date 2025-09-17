@@ -131,7 +131,7 @@
    // Enable TJSFocusWrap component when focus trapping app option is true and app is not minimized.
    $: focusWrapEnabled = $focusAuto && $focusTrap && !$minimized;
 
-   // ---------------------------------------------------------------------------------------------------------------
+   // ----------------------------------------------------------------------------------------------------------------
 
    // The following block is somewhat complex, but allows transition options to be updated reactively during
    // runtime execution.
@@ -198,7 +198,7 @@
    // Handle cases if outTransitionOptions is unset; assign empty default transition options.
    $: if (!isObject(outTransitionOptions)) { outTransitionOptions = TJSDefaultTransition.options; }
 
-   // ---------------------------------------------------------------------------------------------------------------
+   // ----------------------------------------------------------------------------------------------------------------
 
    // Reactive observation of core theme.
    const themeTokenStore = ThemeObserver.stores.themeToken;
@@ -212,7 +212,7 @@
    // Apply current theme to optional app classes.
    $: appClasses = FVTTAppTheme.appClasses($activeClasses, $themeTokenStore, $appThemeName);
 
-   // ---------------------------------------------------------------------------------------------------------------
+   // ----------------------------------------------------------------------------------------------------------------
 
    // Focus `elementRoot` on mount to allow keyboard tab navigation of header buttons.
    onMount(() =>
@@ -220,7 +220,7 @@
       if ($focusAuto) { elementRoot.focus(); }
    });
 
-   // ---------------------------------------------------------------------------------------------------------------
+   // ----------------------------------------------------------------------------------------------------------------
 
    /**
     * Adds the `tjs-cq` class to the main app div from rAF in `onMount` enabling container queries on the main app
@@ -242,7 +242,7 @@
       requestAnimationFrame(() => cqEnabled = true);
    }
 
-   // ---------------------------------------------------------------------------------------------------------------
+   // ----------------------------------------------------------------------------------------------------------------
 
    /**
     * Provides a handler for the custom `close:popup` event fired by `svelte-standard` components like TJSMenu. The
