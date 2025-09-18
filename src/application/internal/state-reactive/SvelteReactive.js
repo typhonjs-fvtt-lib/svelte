@@ -1,5 +1,7 @@
 import { derived, writable }     from '#svelte/store';
 
+import { SvelteSet }             from '#runtime/svelte/reactivity';
+
 import { subscribeIgnoreFirst }  from '#runtime/svelte/store/util';
 
 import {
@@ -15,15 +17,13 @@ import {
 
 import { handleAlwaysOnTop }     from '../util/index.js';
 
-import { SvelteSet }             from './SvelteSet.js';
-
 /**
  * API docs and description in {@link SvelteAppNS.API.Reactive}.
  */
 export class SvelteReactive
 {
    /**
-    * @type {Set<string> & import('svelte/store').Readable<SvelteSet>}
+    * @type {SvelteSet<string>}
     */
    #activeClasses;
 
@@ -153,7 +153,7 @@ export class SvelteReactive
    /**
     * Returns the current active CSS classes Set applied to the app window. This is reactive for any modifications.
     *
-    * @returns {Set<string> & import('svelte/store').Readable<SvelteSet>} Active app CSS classes Set.
+    * @returns {SvelteSet<string>} Active app CSS classes Set.
     */
    get activeClasses() { return this.#activeClasses; }
 

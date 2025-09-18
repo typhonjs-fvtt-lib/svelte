@@ -11,6 +11,8 @@ import type { A11yFocusSource }  from '#runtime/util/a11y';
 
 import type { EasingReference }  from '#runtime/svelte/easing';
 
+import type { SvelteSet }        from '#runtime/svelte/reactivity';
+
 import type { TJSPosition }      from '#runtime/svelte/store/position';
 
 import type { WebStorage }       from '#runtime/svelte/store/web-storage';
@@ -162,7 +164,7 @@ declare namespace SvelteAppNS {
           *
           * @returns Active app CSS classes Set.
           */
-         get activeClasses(): Set<string> & Readable<Set<string>>
+         get activeClasses(): SvelteSet<string>
 
          /**
           * @returns Returns WebStorage (session) instance.
