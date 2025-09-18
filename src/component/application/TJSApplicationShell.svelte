@@ -27,6 +27,7 @@
    import { resizeObserver }           from '#runtime/svelte/action/dom/observer';
    import { applyStyles }              from '#runtime/svelte/action/dom/style';
    import { dynamicAction }            from '#runtime/svelte/action/util';
+   import { ContainerQueryTypes }      from '#runtime/svelte/store/position';
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
    import { A11yHelper }               from '#runtime/util/a11y';
    import { ThemeObserver }            from '#runtime/util/dom/theme';
@@ -71,6 +72,9 @@
    // Is the backing app TJSPosition instance a candidate for the `resizeObserver` action? IE `width` or `height is
    // `auto` or `inherit`.
    const { resizeObservable } = application.position.stores;
+
+   // Tracks the validity of size query container query types given current positional state.
+   const cqTypes = new ContainerQueryTypes(application.position);
 
    // ----------------------------------------------------------------------------------------------------------------
 
@@ -120,13 +124,13 @@
    // Only update the `elementContent` store if the new `elementContent` is not null or undefined.
    $: if (elementContent !== void 0 && elementContent !== null)
    {
-      getContext('#internal').stores.elementContent.set(elementContent);
+      (/** @type {import('svelte/store').Writable} */ internal.stores.elementContent).set(elementContent);
    }
 
    // Only update the `elementRoot` store if the new `elementRoot` is not null or undefined.
    $: if (elementRoot !== void 0 && elementRoot !== null)
    {
-      getContext('#internal').stores.elementRoot.set(elementRoot);
+      (/** @type {import('svelte/store').Writable} */ internal.stores.elementRoot).set(elementRoot);
    }
 
    let focusWrapEnabled;
@@ -236,13 +240,17 @@
 
    // Only enable container queries if width isn't 'auto' or 'inherit'; IE `resizeObservable` is false otherwise
    // disable CQ.
-   $: if ($resizeObservable)
+   $: if ($cqTypes.has('inline-size'))
    {
-      cqEnabled = false;
+      (/** @type {import('svelte/store').Writable} */ internal.stores.cqEnabled).set(true);
+
+      requestAnimationFrame(() => cqEnabled = true);
    }
    else
    {
-      requestAnimationFrame(() => cqEnabled = true);
+      cqEnabled = false;
+
+      (/** @type {import('svelte/store').Writable} */ internal.stores.cqEnabled).set(false);
    }
 
    // ----------------------------------------------------------------------------------------------------------------
@@ -437,6 +445,11 @@
       contentOffsetHeight = offsetHeight;
       contentWidth = width;
       contentHeight = height;
+
+      (/** @type {import('svelte/store').Writable} */ internal.stores.contentOffsetWidth).set(contentOffsetWidth);
+      (/** @type {import('svelte/store').Writable} */ internal.stores.contentOffsetHeight).set(contentOffsetHeight);
+      (/** @type {import('svelte/store').Writable} */ internal.stores.contentWidth).set(contentWidth);
+      (/** @type {import('svelte/store').Writable} */ internal.stores.contentHeight).set(contentHeight);
    }
 
    /**
