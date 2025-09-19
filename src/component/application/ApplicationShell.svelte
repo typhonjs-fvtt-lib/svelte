@@ -21,7 +21,7 @@
    import { resizeObserver }           from '#runtime/svelte/action/dom/observer';
    import { applyStyles }              from '#runtime/svelte/action/dom/style';
    import { dynamicAction }            from '#runtime/svelte/action/util';
-   import { ContainerQueryTypes }      from '#runtime/svelte/store/position';
+   import { CQPositionValidate }       from '#runtime/svelte/store/position';
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
    import { A11yHelper }               from '#runtime/util/a11y';
    import { ThemeObserver }            from '#runtime/util/dom/theme';
@@ -47,9 +47,6 @@
    export let draggable = void 0;
    export let draggableOptions = void 0;
 
-   // The children array can be specified by a parent via prop or is read below from the external context.
-   // export let children = void 0;
-
    // Explicit style overrides for the main app and content elements. Uses action `applyStyles`.
    export let stylesApp = void 0;
    export let stylesContent = void 0;
@@ -71,7 +68,7 @@
    const { resizeObservable } = application.position.stores;
 
    // Tracks the validity of size query container query types given current positional state.
-   const cqTypes = new ContainerQueryTypes(application.position);
+   const cqTypes = new CQPositionValidate(application.position);
 
    // ----------------------------------------------------------------------------------------------------------------
 
@@ -236,7 +233,7 @@
    let cqEnabled = false;
 
    // Only enable container queries if the type requested is not indeterminate.
-   $: if ($cqTypes.has($containerQueryType))
+   $: if ($cqTypes.validate($containerQueryType))
    {
       (/** @type {import('svelte/store').Writable} */ internal.stores.cqEnabled).set(true);
 
