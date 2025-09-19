@@ -57,7 +57,7 @@ export class SvelteReactive
    /**
     * Stores the UI state data to make it accessible via getters.
     *
-    * @type {object}
+    * @type {import('../../types').SvelteAppNS.API.Reactive.UIStateData}
     */
    #dataUIState;
 
@@ -215,6 +215,13 @@ export class SvelteReactive
    get alwaysOnTop() { return this.#application?.options?.alwaysOnTop; }
 
    /**
+    * Returns the containerQueryType app option.
+    *
+    * @returns {string} App content container query app option.
+    */
+   get containerQueryType() { return this.#application?.options?.containerQueryType; }
+
+   /**
     * Returns the draggable app option.
     *
     * @returns {boolean} Draggable app option.
@@ -323,6 +330,19 @@ export class SvelteReactive
    set alwaysOnTop(alwaysOnTop)
    {
       if (typeof alwaysOnTop === 'boolean') { this.setOptions('alwaysOnTop', alwaysOnTop); }
+   }
+
+   /**
+    * Sets `this.options.containerQueryType`, which is reactive for application shells.
+    *
+    * @param {string}  containerQueryType - Sets the `containerQueryType` option.
+    */
+   set containerQueryType(containerQueryType)
+   {
+      if (containerQueryType === void 0 || containerQueryType === 'inline-size' || containerQueryType === 'size')
+      {
+         this.setOptions('containerQueryType', containerQueryType);
+      }
    }
 
    /**
@@ -639,6 +659,9 @@ export class SvelteReactive
 
          alwaysOnTop: /** @type {import('svelte/store').Writable<boolean>} */
           propertyStore(writableAppOptions, 'alwaysOnTop'),
+
+         containerQueryType: /** @type {import('svelte/store').Writable<string>} */
+          propertyStore(writableAppOptions, 'containerQueryType'),
 
          draggable: /** @type {import('svelte/store').Writable<boolean>} */
           propertyStore(writableAppOptions, 'draggable'),

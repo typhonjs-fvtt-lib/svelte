@@ -50,8 +50,8 @@
     */
    const application = getContext('#external')?.application;
 
-   // Focus related app options stores.
-   const { focusAuto, focusKeep, focusTrap } = application.reactive.storeAppOptions;
+   // CQ & focus related app options stores.
+   const { containerQueryType, focusAuto, focusKeep, focusTrap } = application.reactive.storeAppOptions;
 
    const { minimized } = application.reactive.storeUIState;
 
@@ -219,9 +219,8 @@
     */
    let cqEnabled = false;
 
-   // Only enable container queries if width isn't 'auto' or 'inherit'; IE `resizeObservable` is false otherwise
-   // disable CQ.
-   $: if ($cqTypes.has('inline-size'))
+   // Only enable container queries if the type requested is not indeterminate.
+   $: if ($cqTypes.has($containerQueryType))
    {
       (/** @type {import('svelte/store').Writable} */ internal.stores.cqEnabled).set(true);
 
@@ -429,7 +428,8 @@
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
          class="application tjs-app {appClasses}"
-         class:tjs-cq={cqEnabled}
+         class:tjs-cq-inline-size={cqEnabled && $containerQueryType === 'inline-size'}
+         class:tjs-cq-size={cqEnabled && $containerQueryType === 'size'}
          data-appid={application.appId}
          bind:this={elementRoot}
          in:inTransition|global={inTransitionOptions}
@@ -450,7 +450,8 @@
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
          class="application tjs-app {appClasses}"
-         class:tjs-cq={cqEnabled}
+         class:tjs-cq-inline-size={cqEnabled && $containerQueryType === 'inline-size'}
+         class:tjs-cq-size={cqEnabled && $containerQueryType === 'size'}
          data-appid={application.appId}
          bind:this={elementRoot}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
@@ -482,9 +483,13 @@
       scrollbar-color: var(--tjs-app-scrollbar-color, inherit);
    }
 
-   /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
-   .application.tjs-cq {
+   /* Defines the container query container when enabled */
+   .tjs-app.tjs-cq-inline-size {
       container: tjs-app-content / inline-size;
+   }
+
+   .tjs-app.tjs-cq-size {
+      container: tjs-app-content / size;
    }
 
    div {

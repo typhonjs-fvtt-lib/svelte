@@ -64,8 +64,8 @@
     */
    const application = getContext('#external')?.application;
 
-   // Focus related app options stores.
-   const { focusAuto, focusKeep, focusTrap } = application.reactive.storeAppOptions;
+   // CQ & focus related app options stores.
+   const { containerQueryType, focusAuto, focusKeep, focusTrap } = application.reactive.storeAppOptions;
 
    const { minimized } = application.reactive.storeUIState;
 
@@ -238,9 +238,8 @@
     */
    let cqEnabled = false;
 
-   // Only enable container queries if width isn't 'auto' or 'inherit'; IE `resizeObservable` is false otherwise
-   // disable CQ.
-   $: if ($cqTypes.has('inline-size'))
+   // Only enable container queries if the type requested is not indeterminate.
+   $: if ($cqTypes.has($containerQueryType))
    {
       (/** @type {import('svelte/store').Writable} */ internal.stores.cqEnabled).set(true);
 
@@ -467,7 +466,8 @@
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
          class="tjs-app tjs-window-app {appClasses}"
-         class:tjs-cq={cqEnabled}
+         class:tjs-cq-inline-size={cqEnabled && $containerQueryType === 'inline-size'}
+         class:tjs-cq-size={cqEnabled && $containerQueryType === 'size'}
          data-appid={application.appId}
          bind:this={elementRoot}
          in:inTransition|global={inTransitionOptions}
@@ -495,7 +495,8 @@
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
          class="tjs-app tjs-window-app {appClasses}"
-         class:tjs-cq={cqEnabled}
+         class:tjs-cq-inline-size={cqEnabled && $containerQueryType === 'inline-size'}
+         class:tjs-cq-size={cqEnabled && $containerQueryType === 'size'}
          data-appid={application.appId}
          bind:this={elementRoot}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
@@ -530,6 +531,15 @@
 
    .tjs-app :global(label) {
       cursor: var(--tjs-cursor-default, default);
+   }
+
+   /* Defines the container query container when enabled */
+   .tjs-app.tjs-cq-inline-size .window-content {
+      container: tjs-app-content / inline-size;
+   }
+
+   .tjs-app.tjs-cq-size .window-content {
+      container: tjs-app-content / size;
    }
 
    /**
@@ -572,11 +582,6 @@
       display: var(--tjs-app-content-display, flex);
       flex-direction: var(--tjs-app-content-flex-direction, column);
       flex-wrap: var(--tjs-app-content-flex-wrap, nowrap);
-   }
-
-   /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
-   .tjs-window-app.tjs-cq .window-content {
-      container: tjs-app-content / inline-size;
    }
 
    .tjs-window-app:focus-visible {

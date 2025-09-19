@@ -183,6 +183,7 @@ export class SvelteApp extends Application
    {
       return /** @type {import('./types').SvelteAppNS.Options} */ deepMerge(super.defaultOptions, {
          alwaysOnTop: false,              // Assigned to position. When true, the app window is floated always on top.
+         containerQueryType: 'inline-size',  // App window content container query type.
          defaultCloseAnimation: true,     // If false, the default slide close animation is not run.
          draggable: true,                 // If true, then application shells are draggable.
          focusAuto: true,                 // When true, auto-management of app focus is enabled.

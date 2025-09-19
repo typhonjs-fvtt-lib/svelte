@@ -202,6 +202,20 @@ declare namespace SvelteAppNS {
          get alwaysOnTop(): boolean;
 
          /**
+          * Sets `this.options.containerQueryType`, which is reactive for application shells.
+          *
+          * @param containerQueryType - Sets the `containerQueryType` option.
+          */
+         set containerQueryType(containerQueryType: string);
+
+         /**
+          * Returns the containerQueryType app option.
+          *
+          * @returns App content container query app option.
+          */
+         get containerQueryType(): boolean;
+
+         /**
           * Returns the draggable app option.
           *
           * @returns Draggable app option.
@@ -605,6 +619,11 @@ declare namespace SvelteAppNS {
             alwaysOnTop: Writable<boolean>;
 
             /**
+             * Derived store for `containerQueryType` updates.
+             */
+            containerQueryType: Writable<string>;
+
+            /**
              * Derived store for `draggable` updates.
              */
             draggable: Writable<boolean>;
@@ -948,6 +967,14 @@ declare namespace SvelteAppNS {
        * @defaultValue `false`
        */
       alwaysOnTop?: boolean;
+
+      /**
+       * Defines the app window content container query type. The default container type is `inline-size` allowing
+       * size queries for `width`. The other valid option is `size` which allows width and height queries.
+       *
+       * @defaultValue `inline-size`
+       */
+      containerQueryType?: string;
 
       /**
        * If false, the default slide close animation is not run.
