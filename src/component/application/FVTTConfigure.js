@@ -88,28 +88,28 @@ export class FVTTConfigure
          '--tjs-app-background': `url(${getRoutePrefix('/ui/denim075.png')})`,
 
          // For `ResizeHandle.svelte` / the resize handle.
-         '--tjs-app-resize-handle-background': propsAppHandle.background ??
+         '--tjs-app-resize-handle-background': propsAppHandle?.background ??
           `url(${getRoutePrefix('/ui/resize-handle.webp')}) center center / contain no-repeat transparent`,
 
-         '--tjs-app-resize-handle-inset': propsAppHandle.inset ?? 'auto 1px 1px auto',
-         '--tjs-app-resize-handle-position': propsAppHandle.position ?? 'absolute',
-         '--tjs-app-resize-handle-height': propsAppHandle.height ?? '11x',
-         '--tjs-app-resize-handle-width': propsAppHandle.width ?? '11px',
+         '--tjs-app-resize-handle-inset': propsAppHandle?.inset ?? 'auto 1px 1px auto',
+         '--tjs-app-resize-handle-position': propsAppHandle?.position ?? 'absolute',
+         '--tjs-app-resize-handle-height': propsAppHandle?.height ?? '11x',
+         '--tjs-app-resize-handle-width': propsAppHandle?.width ?? '11px',
 
-         '--tjs-app-font-size': propsApp.fontSize ?? 'var(--font-size-14)',
-         '--tjs-app-header-font-size': propsAppHeader.fontSize ?? 'var(--font-size-13)',
+         '--tjs-app-font-size': propsApp?.fontSize ?? 'var(--font-size-14)',
+         '--tjs-app-header-font-size': propsAppHeader?.fontSize ?? 'var(--font-size-13)',
 
          // For `TJSHeaderButton.svelte / core only provides one set of properties across themes.
-         '--tjs-app-header-button-size': propsAppHeaderBtn['--button-size'] ?? '1.5rem',
-         '--tjs-app-header-button-color': propsAppHeaderBtn['--button-text-color'] ?? 'var(--color-light-1)',
+         '--tjs-app-header-button-size': propsAppHeaderBtn?.['--button-size'] ?? '1.5rem',
+         '--tjs-app-header-button-color': propsAppHeaderBtn?.['--button-text-color'] ?? 'var(--color-light-1)',
 
          // Explicit dark theme properties ---------------------------------------------------------------------------
 
          // For `ApplicationShell.svelte`.
-         '--tjs-app-header-background': propsAppHeader.background ?? 'var(--color-header-background)',
+         '--tjs-app-header-background': propsAppHeader?.background ?? 'var(--color-header-background)',
 
          // For `ResizeHandle.svelte` / invert the resize handle.
-         '--tjs-app-resize-handle-filter': propsAppHandleDark.filter ?? 'invert(1)'
+         '--tjs-app-resize-handle-filter': propsAppHandleDark?.filter ?? 'invert(1)'
       });
 
       const propsAppHeaderLight = FoundryStyles.ext.get('.application .window-header', {
@@ -122,7 +122,7 @@ export class FVTTConfigure
        */
       themeLight.setProperties({
          // For `ApplicationShell.svelte` / `EmptyApplicationShell.svelte`.
-         '--tjs-app-header-background': propsAppHeaderLight.background ?? 'var(--color-dark-3)',
+         '--tjs-app-header-background': propsAppHeaderLight?.background ?? 'var(--color-dark-3)',
 
          // For `ResizeHandle.svelte` / cancel invert of the resize handle / there is no core style to set.
          '--tjs-app-resize-handle-filter': 'none'

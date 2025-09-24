@@ -28,6 +28,13 @@ export class FoundryStyles
    static #core;
 
    /**
+    * Dummy / no-op instance when parsing or CORS / SecurityException occurs.
+    *
+    * @type {StyleSheetResolve}
+    */
+   static #dummy = new StyleSheetResolve().freeze();
+
+   /**
     * Parsed Foundry core stylesheet with extended game system / module overrides.
     *
     * @type {StyleSheetResolve}
@@ -51,7 +58,7 @@ export class FoundryStyles
    {
       if (!this.#initialized) { this.#initialize(); }
 
-      return this.#core;
+      return this.#core ?? this.#dummy;
    }
 
    /**
@@ -61,7 +68,7 @@ export class FoundryStyles
    {
       if (!this.#initialized) { this.#initialize(); }
 
-      return this.#ext;
+      return this.#ext ?? this.#dummy;
    }
 
    // Internal Implementation ----------------------------------------------------------------------------------------
@@ -83,36 +90,89 @@ export class FoundryStyles
       const moduleSheets = [];
       const systemSheets = [];
 
-      // Find the core Foundry stylesheet.
-      for (const sheet of styleSheets)
-      {
-         if (typeof sheet?.href === 'string' && sheet.href.endsWith('/css/foundry2.css'))
-         {
-            foundryStyleSheet = sheet;
-         }
-         else
-         {
-            // Only capture `@import` referenced system / module style sheets.
-            if (sheet?.cssRules?.length)
-            {
-               for (const rule of sheet.cssRules)
-               {
-                  if (!CrossWindow.isCSSImportRule(rule) || !CrossWindow.isCSSStyleSheet(rule?.styleSheet))
-                  {
-                     continue;
-                  }
+      /** @type {{ href: string, core: boolean, layer?: string }[]} */
+      const failedSheets = [];
 
-                  if (rule.layerName === 'modules') { moduleSheets.push(rule.styleSheet); }
-                  if (rule.layerName === 'system') { systemSheets.push(rule.styleSheet); }
+      // Find the core Foundry stylesheet.
+      for (let i = 0; i < styleSheets.length; i++)
+      {
+         const sheet = styleSheets[i];
+
+         // Detect link stylesheets for the main Foundry stylesheet that have an `HREF`.
+         if (typeof sheet?.href === 'string')
+         {
+            try
+            {
+               // `sheet?.cssRules?.length` tests for a CORS / SecurityException.
+               if (sheet.href.endsWith('/css/foundry2.css') && sheet?.cssRules?.length)
+               {
+                  foundryStyleSheet = sheet;
+               }
+            }
+            catch (err)
+            {
+               if (CrossWindow.isDOMException(err, 'SecurityException'))
+               {
+                  failedSheets.push({ href: sheet.href, core: true });
+               }
+            }
+         }
+         else // Process inline style elements without links.
+         {
+            try
+            {
+               // Only capture `@import` referenced system / module style sheets.
+               if (sheet?.cssRules?.length)
+               {
+                  for (const rule of sheet.cssRules)
+                  {
+                     if (!CrossWindow.isCSSImportRule(rule) || !CrossWindow.isCSSStyleSheet(rule?.styleSheet))
+                     {
+                        continue;
+                     }
+
+                     try
+                     {
+                        switch (rule?.layerName)
+                        {
+                           case 'modules':
+                              if (rule.styleSheet?.cssRules?.length) { moduleSheets.push(rule.styleSheet); }
+                              break;
+                           case 'system':
+                              if (rule.styleSheet?.cssRules?.length) { systemSheets.push(rule.styleSheet); }
+                              break;
+                        }
+                     }
+                     catch (err)
+                     {
+                        if (CrossWindow.isDOMException(err, 'SecurityException'))
+                        {
+                           failedSheets.push({ href: rule.styleSheet.href, core: false, layer: rule.layerName });
+                        }
+                     }
+                  }
+               }
+            }
+            catch (err)
+            {
+               if (CrossWindow.isDOMException(err, 'SecurityException'))
+               {
+                  failedSheets.push({ href: '', core: false, layer: 'inline-stylesheet' });
                }
             }
          }
       }
 
+      if (failedSheets.length)
+      {
+         console.warn(`[TyphonJS Runtime] CORS / SecurityException error: FoundryStyles could not load style sheets: ${
+          JSON.stringify(failedSheets, null, 2)}`);
+      }
+
       // Quit now if the Foundry style sheet was not found.
       if (!foundryStyleSheet)
       {
-         console.error(`[TyphonJS Runtime] error: FoundryStyles could not load core stylesheet.`);
+         console.warn(`[TyphonJS Runtime] error: FoundryStyles could not load core style sheet.`);
          return;
       }
 
