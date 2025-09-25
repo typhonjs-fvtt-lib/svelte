@@ -4,6 +4,7 @@ import { ComponentProps, ComponentEvents, SvelteComponent } from 'svelte';
 import { Readable, Writable } from 'svelte/store';
 import { A11yFocusSource } from '@typhonjs-svelte/runtime-base/util/a11y';
 import { EasingReference } from '@typhonjs-svelte/runtime-base/svelte/easing';
+import { SvelteSet } from '@typhonjs-svelte/runtime-base/svelte/reactivity';
 import { WebStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import { TJSSvelte } from '@typhonjs-svelte/runtime-base/svelte/util';
 import { TransitionFunction } from '@typhonjs-svelte/runtime-base/svelte/transition';
@@ -247,13 +248,25 @@ declare namespace SvelteApp {
      * - {@link Reactive.popOut}
      * - {@link Reactive.positionable}
      * - {@link Reactive.resizable}
+     * - {@link Reactive.themeName}
      * - {@link Reactive.title}
+     *
+     * A reactive Set of currently applied CSS classes to the app window is available via
+     * {@link Reactive.activeClasses}. Altering the classes applied does not change the original app
+     * `options.classes`.
      *
      * An instance of TJSWebStorage (session) / TJSSessionStorage is accessible via
      * {@link Reactive.sessionStorage}. Optionally you can pass in an existing TJSWebStorage instance that can
      * be shared across multiple SvelteApps by setting {@link SvelteApp.Options.sessionStorage}.
      */
     interface Reactive {
+      /**
+       * Returns the current active CSS classes Set applied to the app window. This is reactive for any
+       * modifications.
+       *
+       * @returns Active app CSS classes Set.
+       */
+      get activeClasses(): SvelteSet<string>;
       /**
        * @returns Returns WebStorage (session) instance.
        */
@@ -282,6 +295,18 @@ declare namespace SvelteApp {
        * @returns Always on top app option.
        */
       get alwaysOnTop(): boolean;
+      /**
+       * Sets `this.options.containerQueryType`, which is reactive for application shells.
+       *
+       * @param containerQueryType - Sets the `containerQueryType` option.
+       */
+      set containerQueryType(containerQueryType: string);
+      /**
+       * Returns the containerQueryType app option.
+       *
+       * @returns App content container query app option.
+       */
+      get containerQueryType(): boolean;
       /**
        * Returns the draggable app option.
        *
@@ -427,6 +452,18 @@ declare namespace SvelteApp {
        * @param resizable - Sets the resizable option.
        */
       set resizable(resizable: boolean);
+      /**
+       * Returns the themeName option.
+       *
+       * @returns themeName app option.
+       */
+      get themeName(): string | undefined;
+      /**
+       * Sets `this.options.themeName`, which is reactive for application shells.
+       *
+       * @param themeName - Sets the themeName option.
+       */
+      set themeName(themeName: string | undefined);
       /**
        * Returns the title accessor from the parent Application class; {@link fvtt!ApplicationOptions}.
        *
@@ -575,6 +612,10 @@ declare namespace SvelteApp {
          * If true, then application shells are resizable.
          */
         resizable: boolean;
+        /**
+         * Current explicit app theme name override.
+         */
+        themeName: string | undefined;
       };
       /**
        * UI state data accessible by {@link UIState} store.
@@ -610,6 +651,10 @@ declare namespace SvelteApp {
          */
         alwaysOnTop: Writable<boolean>;
         /**
+         * Derived store for `containerQueryType` updates.
+         */
+        containerQueryType: Writable<string>;
+        /**
          * Derived store for `draggable` updates.
          */
         draggable: Writable<boolean>;
@@ -636,7 +681,7 @@ declare namespace SvelteApp {
         /**
          * Derived store for `headerIcon` updates.
          */
-        headerIcon: Writable<string>;
+        headerIcon: Writable<string | undefined>;
         /**
          * Derived store for `headerNoTitleMinimized` updates.
          */
@@ -657,6 +702,10 @@ declare namespace SvelteApp {
          * Derived store for `resizable` updates.
          */
         resizable: Writable<boolean>;
+        /**
+         * Derived store for `theme` updates.
+         */
+        themeName: Writable<string | undefined>;
         /**
          * Derived store for `title` updates.
          */
@@ -910,6 +959,13 @@ declare namespace SvelteApp {
      */
     alwaysOnTop?: boolean;
     /**
+     * Defines the app window content container query type. The default container type is `inline-size` allowing
+     * size queries for `width`. The other valid option is `size` which allows width and height queries.
+     *
+     * @defaultValue `inline-size`
+     */
+    containerQueryType?: string;
+    /**
      * If false, the default slide close animation is not run.
      *
      * @defaultValue `true`
@@ -1069,6 +1125,11 @@ declare namespace SvelteApp {
      * @defaultValue `TJSSessionStorage`
      */
     sessionStorage?: WebStorage;
+    /**
+     * An explicit theme name to apply to the application shell. Presently valid options are `dark` or `light`. If
+     * not explicit theme is provided the current core platform theme is applied.
+     */
+    themeName?: string;
     /**
      * By default, 'top / left' respects rotation when minimizing.
      *

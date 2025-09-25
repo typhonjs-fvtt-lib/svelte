@@ -4,8 +4,12 @@
     * {@link ApplicationShell}. An application shell is a main top level slotted component that provides a reactive
     * outer wrapper and header bar for the main content component.
     *
-    * Container queries are supported and the main app window container is named `tjs-app-window` and the window content
-    * container is `tjs-app-window-content`.
+    * Container queries (`inline-size`) are supported for `width` queries. The main app window container is named
+    * `tjs-app-window` and the window content container is `tjs-app-content`. Take note that the width available
+    * is the inline-size width of the app window or content minus the border constraints. Container queries will be
+    * disabled if the `width` app option is `auto` or not an explicit constraint. Just a precautionary warning that If
+    * you set `width` to `auto` during runtime unexpected behavior or a collapse of the app window will occur which is
+    * to be expected.
     *
     * ### CSS variables
     *
@@ -23,6 +27,7 @@
    import { resizeObserver }           from '@typhonjs-svelte/runtime-base/svelte/action/dom/observer';
    import { applyStyles }              from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
    import { dynamicAction }            from '@typhonjs-svelte/runtime-base/svelte/action/util';
+   import { CQPositionValidate }       from '@typhonjs-svelte/runtime-base/svelte/store/position';
    import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
    import { A11yHelper }               from '@typhonjs-svelte/runtime-base/util/a11y';
    import { ThemeObserver }            from '@typhonjs-svelte/runtime-base/util/dom/theme';
@@ -59,14 +64,17 @@
     */
    const application = getContext('#external')?.application;
 
-   // Focus related app options stores.
-   const { focusAuto, focusKeep, focusTrap } = application.reactive.storeAppOptions;
+   // CQ & focus related app options stores.
+   const { containerQueryType, focusAuto, focusKeep, focusTrap } = application.reactive.storeAppOptions;
 
    const { minimized } = application.reactive.storeUIState;
 
    // Is the backing app TJSPosition instance a candidate for the `resizeObserver` action? IE `width` or `height is
    // `auto` or `inherit`.
    const { resizeObservable } = application.position.stores;
+
+   // Tracks the validity of size query container query types given current positional state.
+   const cqTypes = new CQPositionValidate(application.position);
 
    // ----------------------------------------------------------------------------------------------------------------
 
@@ -95,9 +103,12 @@
    // resizeObserver action is enabled on the content `section`.
    export let contentOffsetHeight = false;
    export let contentOffsetWidth = false;
+   export let contentHeight = false;
+   export let contentWidth = false;
 
    // Set to `resizeObserver` if either of the above props are truthy otherwise a null operation.
-   const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth ? resizeObserver : () => null;
+   const contentResizeObserver = !!contentOffsetHeight || !!contentOffsetWidth || !!contentHeight || !!contentWidth ?
+    resizeObserver : () => null;
 
    // ----------------------------------------------------------------------------------------------------------------
 
@@ -113,13 +124,13 @@
    // Only update the `elementContent` store if the new `elementContent` is not null or undefined.
    $: if (elementContent !== void 0 && elementContent !== null)
    {
-      getContext('#internal').stores.elementContent.set(elementContent);
+      (/** @type {import('svelte/store').Writable} */ internal.stores.elementContent).set(elementContent);
    }
 
    // Only update the `elementRoot` store if the new `elementRoot` is not null or undefined.
    $: if (elementRoot !== void 0 && elementRoot !== null)
    {
-      getContext('#internal').stores.elementRoot.set(elementRoot);
+      (/** @type {import('svelte/store').Writable} */ internal.stores.elementRoot).set(elementRoot);
    }
 
    let focusWrapEnabled;
@@ -127,7 +138,7 @@
    // Enable TJSFocusWrap component when focus trapping app option is true and app is not minimized.
    $: focusWrapEnabled = $focusAuto && $focusTrap && !$minimized;
 
-   // ---------------------------------------------------------------------------------------------------------------
+   // ----------------------------------------------------------------------------------------------------------------
 
    // The following block is somewhat complex, but allows transition options to be updated reactively during
    // runtime execution.
@@ -194,37 +205,54 @@
    // Handle cases if outTransitionOptions is unset; assign empty default transition options.
    $: if (!isObject(outTransitionOptions)) { outTransitionOptions = TJSDefaultTransition.options; }
 
-   // ---------------------------------------------------------------------------------------------------------------
+   // ----------------------------------------------------------------------------------------------------------------
 
    // Reactive observation of core theme.
-   const themeStore = ThemeObserver.stores.theme;
+   const themeTokenStore = ThemeObserver.stores.themeToken;
 
-   // Stores current application optional classes with current theme applied.
-   let appClasses = '';
+   // Reactive active app classes Set.
+   const activeClasses = application.reactive.activeClasses;
+
+   // Reactive explicit app theme name override.
+   const appThemeName = application.reactive.storeAppOptions.themeName;
 
    // Apply current theme to optional app classes.
-   $: if ($themeStore) { appClasses = FVTTAppTheme.appClasses(application, { hasThemed: true }); }
+   $: appClasses = FVTTAppTheme.appClasses($activeClasses, $themeTokenStore, $appThemeName);
 
-   // ---------------------------------------------------------------------------------------------------------------
-
-   /**
-    * Adds the `mounted` class to the main app div from rAF in `onMount` enabling container queries on the main app
-    * div and `.window-content`. This is necessary as browsers (Chrome / Firefox) defer layout calculations which
-    * may affect app positioning via `TJSPosition` when width or height is set to `auto`.
-    *
-    * @type {boolean}
-    */
-   let mounted = false;
+   // ----------------------------------------------------------------------------------------------------------------
 
    // Focus `elementRoot` on mount to allow keyboard tab navigation of header buttons.
    onMount(() =>
    {
       if ($focusAuto) { elementRoot.focus(); }
-
-      requestAnimationFrame(() => mounted = true);
    });
 
-   // ---------------------------------------------------------------------------------------------------------------
+   // ----------------------------------------------------------------------------------------------------------------
+
+   /**
+    * Adds the `tjs-cq` class to the main app div from rAF in `onMount` enabling container queries on the main app
+    * div and `.window-content`. This is necessary as browsers (Chrome / Firefox) defer layout calculations which
+    * may affect app positioning via `TJSPosition` when width or height is set to `auto`.
+    *
+    * @type {boolean}
+    */
+   let cqEnabled = false;
+
+   // Only enable container queries if the type requested is not indeterminate.
+   $: if ($cqTypes.validate($containerQueryType))
+   {
+      (/** @type {import('svelte/store').Writable} */ internal.stores.cqEnabled).set(true);
+
+      requestAnimationFrame(() => cqEnabled = true);
+   }
+   else
+   {
+      cqEnabled = false;
+
+      (/** @type {import('svelte/store').Writable} */ internal.stores.cqEnabled).set(false);
+   }
+
+   // ----------------------------------------------------------------------------------------------------------------
 
    /**
     * Provides a handler for the custom `close:popup` event fired by `svelte-standard` components like TJSMenu. The
@@ -324,12 +352,12 @@
    }
 
    /**
-    * Invoke the app `bringToTop`; this method will determine whether to take the action.
+    * Invoke the app `bringToTop`.
     *
-    * Note: `capture` is used so pointer down is always received. Be mindful as `onPointerdownApp` should only
+    * Note: `capture` is used so pointer down is always received. Be mindful as `onPointerdownAppCapture` should only
     * invoke `bringToTop`.
     */
-   function onPointerdownApp()
+   function onPointerdownAppCapture()
    {
       application.bringToTop.call(application);
    }
@@ -371,34 +399,23 @@
    }
 
    /**
-    * Callback for content resizeObserver action. This is enabled when contentOffsetHeight or contentOffsetWidth is
-    * bound.
-    *
-    * @param {number}   offsetWidth - Observed offsetWidth.
-    *
-    * @param {number}   offsetHeight - Observed offsetHeight
-    */
-   function resizeObservedContent(offsetWidth, offsetHeight)
-   {
-      contentOffsetWidth = offsetWidth;
-      contentOffsetHeight = offsetHeight;
-   }
-
-   /**
     * Callback for app resizeObserver action. This is enabled when appOffsetHeight or appOffsetWidth is
     * bound. Additionally, the Application position resizeObserved store is updated.
     *
-    * @param {number}   contentWidth - Observed contentWidth.
-    * @param {number}   contentHeight - Observed contentHeight
     * @param {number}   offsetWidth - Observed offsetWidth.
+    *
     * @param {number}   offsetHeight - Observed offsetHeight
+    *
+    * @param {number}   width - Observed offsetWidth - border / padding.
+    *
+    * @param {number}   height - Observed offsetHeight - border / padding.
     */
-   function resizeObservedApp(offsetWidth, offsetHeight, contentWidth, contentHeight)
+   function resizeObservedApp(offsetWidth, offsetHeight, width, height)
    {
       application.position.stores.resizeObserved.update((object) =>
       {
-         object.contentWidth = contentWidth;
-         object.contentHeight = contentHeight;
+         object.contentWidth = width;
+         object.contentHeight = height;
          object.offsetWidth = offsetWidth;
          object.offsetHeight = offsetHeight;
 
@@ -407,6 +424,31 @@
 
       appOffsetHeight = offsetHeight;
       appOffsetWidth = offsetWidth;
+   }
+
+   /**
+    * Callback for content resizeObserver action. This is enabled when contentOffsetHeight or contentOffsetWidth is
+    * bound.
+    *
+    * @param {number}   offsetWidth - Observed offsetWidth.
+    *
+    * @param {number}   offsetHeight - Observed offsetHeight
+    *
+    * @param {number}   width - Observed offsetWidth - border / padding.
+    *
+    * @param {number}   height - Observed offsetHeight - border / padding.
+    */
+   function resizeObservedContent(offsetWidth, offsetHeight, width, height)
+   {
+      contentOffsetWidth = offsetWidth;
+      contentOffsetHeight = offsetHeight;
+      contentWidth = width;
+      contentHeight = height;
+
+      (/** @type {import('svelte/store').Writable} */ internal.stores.contentOffsetWidth).set(contentOffsetWidth);
+      (/** @type {import('svelte/store').Writable} */ internal.stores.contentOffsetHeight).set(contentOffsetHeight);
+      (/** @type {import('svelte/store').Writable} */ internal.stores.contentWidth).set(contentWidth);
+      (/** @type {import('svelte/store').Writable} */ internal.stores.contentHeight).set(contentHeight);
    }
 
    /**
@@ -424,14 +466,15 @@
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
          class="tjs-app tjs-window-app {appClasses}"
-         class:mounted={mounted}
+         class:tjs-cq-inline-size={cqEnabled && $containerQueryType === 'inline-size'}
+         class:tjs-cq-size={cqEnabled && $containerQueryType === 'size'}
          data-appid={application.appId}
          bind:this={elementRoot}
          in:inTransition|global={inTransitionOptions}
          out:outTransition|global={outTransitionOptions}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
          on:keydown={onKeydown}
-         on:pointerdown|capture={onPointerdownApp}
+         on:pointerdown|capture={onPointerdownAppCapture}
          use:applyStyles={stylesApp}
          use:dynamicAction={appResizeObserver}
          role=application
@@ -452,12 +495,13 @@
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
          class="tjs-app tjs-window-app {appClasses}"
-         class:mounted={mounted}
+         class:tjs-cq-inline-size={cqEnabled && $containerQueryType === 'inline-size'}
+         class:tjs-cq-size={cqEnabled && $containerQueryType === 'size'}
          data-appid={application.appId}
          bind:this={elementRoot}
          on:close:popup|preventDefault|stopPropagation={onClosePopup}
          on:keydown={onKeydown}
-         on:pointerdown|capture={onPointerdownApp}
+         on:pointerdown|capture={onPointerdownAppCapture}
          use:applyStyles={stylesApp}
          use:dynamicAction={appResizeObserver}
          role=application
@@ -477,6 +521,27 @@
 {/if}
 
 <style>
+   .tjs-app :global(.tjs-draggable) {
+      cursor: var(--tjs-cursor-grab, grab);
+   }
+
+   .tjs-app :global(.tjs-draggable:active) {
+      cursor: var(--tjs-cursor-grabbing, var(--tjs-cursor-grab-down, grabbing));
+   }
+
+   .tjs-app :global(label) {
+      cursor: var(--tjs-cursor-default, default);
+   }
+
+   /* Defines the container query container when enabled */
+   .tjs-app.tjs-cq-inline-size .window-content {
+      container: tjs-app-content / inline-size;
+   }
+
+   .tjs-app.tjs-cq-size .window-content {
+      container: tjs-app-content / size;
+   }
+
    /**
     * Defines styles that mimic a Foundry popout Application. `:global` is used to preserve the unused CSS in the
     * template above. A primary benefit of a separate application shell implementation is that the styles are not
@@ -484,15 +549,15 @@
     * separate and unique styles to be given to this application regardless of game system / module modifications.
     */
 
-   .tjs-app {
+   .tjs-window-app {
       contain: layout style paint;
 
       background: var(--tjs-app-background);
       margin: var(--tjs-app-margin);
       padding: var(--tjs-app-padding);
       color: var(--tjs-app-color);
-      font-size: var(--tjs-app-font-size, var(--font-size-14));
-      font-family: var(--tjs-app-font-family, var(--font-sans)), "Signika", "Palatino Linotype", sans-serif;
+      font-size: var(--tjs-app-font-size, inherit);
+      font-family: var(--tjs-app-font-family, inherit);
       font-weight: var(--tjs-app-font-weight, inherit);
 
       max-width: var(--tjs-app-max-width, unset);
@@ -504,15 +569,10 @@
       overflow: var(--tjs-app-overflow, hidden);
 
       scrollbar-width: var(--tjs-app-scrollbar-width, thin);
-      scrollbar-color: var(--tjs-app-scrollbar-color, var(--color-scrollbar) var(--color-scrollbar-track));
+      scrollbar-color: var(--tjs-app-scrollbar-color, inherit);
    }
 
-   /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
-   .tjs-app.mounted {
-      container: tjs-app-window / inline-size;
-   }
-
-   .tjs-app .window-content {
+   .tjs-window-app .window-content {
       background: var(--tjs-app-content-background, none);
       color: var(--tjs-app-content-color, inherit);
       overflow: var(--tjs-app-content-overflow, hidden);
@@ -524,22 +584,15 @@
       flex-wrap: var(--tjs-app-content-flex-wrap, nowrap);
    }
 
-   /* Small hack to defer setting CQ until after 1st rAF from `onMount`; see notes at `onMount` */
-   .tjs-app.mounted .window-content {
-      container: tjs-app-window-content / inline-size;
-   }
-
-   .tjs-app:focus-visible {
+   .tjs-window-app:focus-visible {
       outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
    }
 
-   .tjs-app .window-content:focus-visible {
+   .tjs-window-app .window-content:focus-visible {
       outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
    }
 
    .tjs-window-app {
-      --header-height: 36px; /* Set in `.application` */
-
       /* Note: this is different than stock Foundry and allows rounded corners from .app core styles */
       overflow: var(--tjs-app-overflow, hidden);
 
@@ -549,58 +602,8 @@
       justify-content: var(--tjs-app-justify-content, flex-start);
       position: var(--tjs-app-position, absolute);
       border-radius: var(--tjs-app-border-radius, 6px);
-      border: var(--tjs-app-border, 1px solid var(--color-cool-4));
+      border: var(--tjs-app-border);
       box-shadow: var(--tjs-app-box-shadow, 0 0 10px #000);
       padding: var(--tjs-app-padding, 0);
-   }
-
-   .tjs-window-app :global(.window-header) {
-      --button-size: 24px;
-   }
-
-   .tjs-window-app :global(.window-header .window-title) {
-      flex: 1;
-      margin: 0;
-
-      line-height: var(--header-height);
-      border: none;
-      overflow: hidden;
-      text-align: left;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      color: var(--tjs-app-header-color, var(--color-light-1));
-   }
-
-   .tjs-window-app :global(.window-header button.header-control) {
-      --button-background-color: none;
-      padding: 0;
-      margin: 0;
-      border: none;
-   }
-
-   /* ------------------------------- */
-
-   /**
-    * When the `themed` class is added to the application `classes` option core dark / light theming is enabled adding
-    * `themed.theme-dark` and `themed.theme-light` classes to the main app div element. The following selectors provide
-    * reasonable defaults for the app color, app header background color and resize handle filter.
-    */
-
-   .tjs-app:not(.themed) {
-      /* Explicit not themed color */
-      --tjs-app-color: var(--color-light-2);
-   }
-
-   /* Themed app color using core dark / light CSS var */
-   .tjs-app:is(.themed) {
-      --tjs-app-color: var(--color-text-primary);
-   }
-
-   .tjs-app:is(.themed.theme-dark) {
-      --color-header-background: rgba(0, 0, 0, 0.5);
-   }
-
-   .tjs-app:is(.themed.theme-light) {
-      --color-header-background: var(--color-dark-3);
    }
 </style>

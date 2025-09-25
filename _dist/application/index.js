@@ -1,6 +1,7 @@
 import { ThemeObserver } from '@typhonjs-svelte/runtime-base/util/dom/theme';
 import { isObject, deepMerge, safeAccess, safeSet, hasGetter, klona } from '@typhonjs-svelte/runtime-base/util/object';
 import { writable, derived } from 'svelte/store';
+import { SvelteSet } from '@typhonjs-svelte/runtime-base/svelte/reactivity';
 import { subscribeIgnoreFirst } from '@typhonjs-svelte/runtime-base/svelte/store/util';
 import { TJSWebStorage, TJSSessionStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import { propertyStore } from '@typhonjs-svelte/runtime-base/svelte/store/writable-derived';
@@ -648,6 +649,11 @@ function loadSvelteConfig({ app, config, elementRootUpdate } = {})
 class SvelteReactive
 {
    /**
+    * @type {SvelteSet<string>}
+    */
+   #activeClasses;
+
+   /**
     * @type {import('../SvelteApp').SvelteApp}
     */
    #application;
@@ -677,7 +683,7 @@ class SvelteReactive
    /**
     * Stores the UI state data to make it accessible via getters.
     *
-    * @type {object}
+    * @type {import('../../types').SvelteApp.API.Reactive.UIStateData}
     */
    #dataUIState;
 
@@ -771,6 +777,13 @@ class SvelteReactive
 // Only reactive getters ---------------------------------------------------------------------------------------------
 
    /**
+    * Returns the current active CSS classes Set applied to the app window. This is reactive for any modifications.
+    *
+    * @returns {SvelteSet<string>} Active app CSS classes Set.
+    */
+   get activeClasses() { return this.#activeClasses; }
+
+   /**
     * Returns the current active Window / WindowProxy UI state.
     *
     * @returns {Window} Active window UI state.
@@ -828,6 +841,13 @@ class SvelteReactive
    get alwaysOnTop() { return this.#application?.options?.alwaysOnTop; }
 
    /**
+    * Returns the containerQueryType app option.
+    *
+    * @returns {string} App content container query app option.
+    */
+   get containerQueryType() { return this.#application?.options?.containerQueryType; }
+
+   /**
     * Returns the draggable app option.
     *
     * @returns {boolean} Draggable app option.
@@ -872,7 +892,7 @@ class SvelteReactive
    /**
     * Returns the headerIcon app option.
     *
-    * @returns {string|void} URL for header app icon.
+    * @returns {string | undefined} URL for header app icon.
     */
    get headerIcon() { return this.#application?.options?.headerIcon; }
 
@@ -912,6 +932,13 @@ class SvelteReactive
    get resizable() { return this.#application?.options?.resizable; }
 
    /**
+    * Returns the explicit theme name option.
+    *
+    * @returns {string | undefined} Theme name option.
+    */
+   get themeName() { return this.#application?.options?.themeName; }
+
+   /**
     * Returns the title accessor from the parent Application class; {@link Application.title}
     *
     * @privateRemarks
@@ -929,6 +956,19 @@ class SvelteReactive
    set alwaysOnTop(alwaysOnTop)
    {
       if (typeof alwaysOnTop === 'boolean') { this.setOptions('alwaysOnTop', alwaysOnTop); }
+   }
+
+   /**
+    * Sets `this.options.containerQueryType`, which is reactive for application shells.
+    *
+    * @param {string}  containerQueryType - Sets the `containerQueryType` option.
+    */
+   set containerQueryType(containerQueryType)
+   {
+      if (containerQueryType === void 0 || containerQueryType === 'inline-size' || containerQueryType === 'size')
+      {
+         this.setOptions('containerQueryType', containerQueryType);
+      }
    }
 
    /**
@@ -1056,6 +1096,16 @@ class SvelteReactive
    }
 
    /**
+    * Sets `this.options.themeName`, which is reactive for application shells.
+    *
+    * @param {string | undefined}  themeName - Sets the themeName option.
+    */
+   set themeName(themeName)
+   {
+      if (themeName === void 0 || typeof themeName === 'string') { this.setOptions('themeName', themeName); }
+   }
+
+   /**
     * Sets `this.options.title`, which is reactive for application shells.
     *
     * Note: Will set empty string if title is undefined or null.
@@ -1081,7 +1131,8 @@ class SvelteReactive
     * entries to walk. To access deeper entries into the object format the accessor string with `.` between entries
     * to walk.
     *
-    * // TODO DOCUMENT the accessor in more detail.
+    * @privateRemarks
+    * TODO: DOCUMENT the accessor in more detail.
     *
     * @param {string}   accessor - The path / key to set. You can set multiple levels.
     *
@@ -1145,7 +1196,8 @@ class SvelteReactive
          headerNoTitleMinimized: this.#application?.options?.headerNoTitleMinimized ?? false,
          minimizable: this.#application?.options?.minimizable ?? true,
          positionable: this.#application?.options?.positionable ?? true,
-         resizable: this.#application?.options?.resizable ?? true
+         resizable: this.#application?.options?.resizable ?? true,
+         themeName: this.#application?.options?.themeName ?? void 0
       };
    }
 
@@ -1164,22 +1216,30 @@ class SvelteReactive
     */
    updateHeaderButtons({ headerButtonNoClose = this.#application.options.headerButtonNoClose } = {})
    {
-      let buttons = this.#application._getHeaderButtons();
-
-      // Remove close button if this.options.headerButtonNoClose is true;
-      if (typeof headerButtonNoClose === 'boolean' && headerButtonNoClose)
+      // The operation is queued just in case a developer mutates reactive state inside `_getHeaderButtons`.
+      queueMicrotask(() =>
       {
-         buttons = buttons.filter((button) => button.class !== 'close');
-      }
+         let buttons = this.#application._getHeaderButtons();
 
-      // For AppV2 label compatibility for close button: `Close Window` instead of `Close`.
-      const closeButton = buttons.find((button) => button.class === 'close');
-      if (closeButton) { closeButton.label = 'APPLICATION.TOOLS.Close'; }
+         // Remove close button if this.options.headerButtonNoClose is true;
+         if (typeof headerButtonNoClose === 'boolean' && headerButtonNoClose)
+         {
+            buttons = buttons.filter((button) => button.class !== 'close');
+         }
 
-      this.#storeUIStateUpdate((options) =>
-      {
-         options.headerButtons = buttons;
-         return options;
+         // For AppV2 label compatibility for close button: `Close Window` instead of `Close`.
+         const closeButton = buttons.find((button) => button.class === 'close');
+         if (closeButton)
+         {
+            closeButton.keepMinimized = true;
+            closeButton.label = 'APPLICATION.TOOLS.Close';
+         }
+
+         this.#storeUIStateUpdate((options) =>
+         {
+            options.headerButtons = buttons;
+            return options;
+         });
       });
    }
 
@@ -1196,6 +1256,18 @@ class SvelteReactive
     */
    #storesInitialize()
    {
+      this.#activeClasses = new SvelteSet();
+
+      for (const entry of this.#application.options?.classes ?? [])
+      {
+         if (typeof entry !== 'string') { continue; }
+
+         // Ignore any AppV1 themes set.
+         if (entry === 'themed' || entry.startsWith('theme-')) { continue; }
+
+         this.#activeClasses.add(entry);
+      }
+
       /** @type {import('svelte/store').Writable<import('../../types').SvelteApp.Options>} */
       const writableAppOptions = writable(this.#application.options);
 
@@ -1213,6 +1285,9 @@ class SvelteReactive
 
          alwaysOnTop: /** @type {import('svelte/store').Writable<boolean>} */
           propertyStore(writableAppOptions, 'alwaysOnTop'),
+
+         containerQueryType: /** @type {import('svelte/store').Writable<string>} */
+          propertyStore(writableAppOptions, 'containerQueryType'),
 
          draggable: /** @type {import('svelte/store').Writable<boolean>} */
           propertyStore(writableAppOptions, 'draggable'),
@@ -1232,7 +1307,7 @@ class SvelteReactive
          headerButtonNoLabel: /** @type {import('svelte/store').Writable<boolean>} */
           propertyStore(writableAppOptions, 'headerButtonNoLabel'),
 
-         headerIcon: /** @type {import('svelte/store').Writable<string>} */
+         headerIcon: /** @type {import('svelte/store').Writable<string | undefined>} */
           propertyStore(writableAppOptions, 'headerIcon'),
 
          headerNoTitleMinimized: /** @type {import('svelte/store').Writable<boolean>} */
@@ -1249,6 +1324,9 @@ class SvelteReactive
 
          resizable: /** @type {import('svelte/store').Writable<boolean>} */
           propertyStore(writableAppOptions, 'resizable'),
+
+         themeName: /** @type {import('svelte/store').Writable<string | undefined>} */
+          propertyStore(writableAppOptions, 'themeName'),
 
          title: /** @type {import('svelte/store').Writable<string>} */
           propertyStore(writableAppOptions, 'title')
@@ -1523,6 +1601,13 @@ class FoundryStyles
    static #core;
 
    /**
+    * Dummy / no-op instance when parsing or CORS / SecurityException occurs.
+    *
+    * @type {StyleSheetResolve}
+    */
+   static #dummy = new StyleSheetResolve().freeze();
+
+   /**
     * Parsed Foundry core stylesheet with extended game system / module overrides.
     *
     * @type {StyleSheetResolve}
@@ -1546,7 +1631,7 @@ class FoundryStyles
    {
       if (!this.#initialized) { this.#initialize(); }
 
-      return this.#core;
+      return this.#core ?? this.#dummy;
    }
 
    /**
@@ -1556,7 +1641,7 @@ class FoundryStyles
    {
       if (!this.#initialized) { this.#initialize(); }
 
-      return this.#ext;
+      return this.#ext ?? this.#dummy;
    }
 
    // Internal Implementation ----------------------------------------------------------------------------------------
@@ -1578,36 +1663,89 @@ class FoundryStyles
       const moduleSheets = [];
       const systemSheets = [];
 
-      // Find the core Foundry stylesheet.
-      for (const sheet of styleSheets)
-      {
-         if (typeof sheet?.href === 'string' && sheet.href.endsWith('/css/foundry2.css'))
-         {
-            foundryStyleSheet = sheet;
-         }
-         else
-         {
-            // Only capture `@import` referenced system / module style sheets.
-            if (sheet?.cssRules?.length)
-            {
-               for (const rule of sheet.cssRules)
-               {
-                  if (!CrossWindow.isCSSImportRule(rule) || !CrossWindow.isCSSStyleSheet(rule?.styleSheet))
-                  {
-                     continue;
-                  }
+      /** @type {{ href: string, core: boolean, layer?: string }[]} */
+      const failedSheets = [];
 
-                  if (rule.layerName === 'modules') { moduleSheets.push(rule.styleSheet); }
-                  if (rule.layerName === 'system') { systemSheets.push(rule.styleSheet); }
+      // Find the core Foundry stylesheet.
+      for (let i = 0; i < styleSheets.length; i++)
+      {
+         const sheet = styleSheets[i];
+
+         // Detect link stylesheets for the main Foundry stylesheet that have an `HREF`.
+         if (typeof sheet?.href === 'string')
+         {
+            try
+            {
+               // `sheet?.cssRules?.length` tests for a CORS / SecurityException.
+               if (sheet.href.endsWith('/css/foundry2.css') && sheet?.cssRules?.length)
+               {
+                  foundryStyleSheet = sheet;
+               }
+            }
+            catch (err)
+            {
+               if (CrossWindow.isDOMException(err, 'SecurityException'))
+               {
+                  failedSheets.push({ href: sheet.href, core: true });
+               }
+            }
+         }
+         else // Process inline style elements without links.
+         {
+            try
+            {
+               // Only capture `@import` referenced system / module style sheets.
+               if (sheet?.cssRules?.length)
+               {
+                  for (const rule of sheet.cssRules)
+                  {
+                     if (!CrossWindow.isCSSImportRule(rule) || !CrossWindow.isCSSStyleSheet(rule?.styleSheet))
+                     {
+                        continue;
+                     }
+
+                     try
+                     {
+                        switch (rule?.layerName)
+                        {
+                           case 'modules':
+                              if (rule.styleSheet?.cssRules?.length) { moduleSheets.push(rule.styleSheet); }
+                              break;
+                           case 'system':
+                              if (rule.styleSheet?.cssRules?.length) { systemSheets.push(rule.styleSheet); }
+                              break;
+                        }
+                     }
+                     catch (err)
+                     {
+                        if (CrossWindow.isDOMException(err, 'SecurityException'))
+                        {
+                           failedSheets.push({ href: rule.styleSheet.href, core: false, layer: rule.layerName });
+                        }
+                     }
+                  }
+               }
+            }
+            catch (err)
+            {
+               if (CrossWindow.isDOMException(err, 'SecurityException'))
+               {
+                  failedSheets.push({ href: '', core: false, layer: 'inline-stylesheet' });
                }
             }
          }
       }
 
+      if (failedSheets.length)
+      {
+         console.warn(`[TyphonJS Runtime] CORS / SecurityException error: FoundryStyles could not load style sheets: ${
+          JSON.stringify(failedSheets, null, 2)}`);
+      }
+
       // Quit now if the Foundry style sheet was not found.
       if (!foundryStyleSheet)
       {
-         console.error(`[TyphonJS Runtime] error: FoundryStyles could not load core stylesheet.`);
+         console.warn(`[TyphonJS Runtime] error: FoundryStyles could not load core style sheet.`);
          return;
       }
 
@@ -1633,39 +1771,52 @@ class FoundryStyles
             />\s*[^ ]+/,            // Direct child selectors
             /(^|\s)\*/,             // Universal selectors
             /(^|\s)\.app(?![\w-])/, // AppV1 class
-            /^\.application\.theme/,
+            /^\.application\.[a-z]/, // All `.application.theme` / any specific core application.
             /^body\.auth/,
             /^body(?:\.[\w-]+)*\.application\b/,  // Remove unnecessary `body.<theme>.application` pairing.
             /^\.\u037c\d/i, // Code-mirror `.ͼ1`
             /code-?mirror/i,
-            /#camera-views/,
             /(^|[^a-zA-Z0-9_-])#(?!context-menu\b)[\w-]+|[^ \t>+~]#context-menu\b/,
+            /^\.faded-ui/,
             /(^|\s)kbd\b/,
             /^input.placeholder-fa-solid\b/,
             /(^|\s)label\b/,
-            /\.placeable-hud/,
+            /^\.mixin-theme/,       // Remove all mixin related styles left in by core.
             /prose-?mirror/i,
             /(^|\s)section\b/,
-            /\.ui-control/,
             /\.window-app/,
 
             // Exclude various core applications.
             /^\.active-effect-config/,
             /^\.adventure-importer/,
             /^\.camera-view/,
+            /#camera-views/,
+            /^\.card-config/,
             /^\.cards-config/,
             /^\.category-browser/,
+            /^\.chat-message/,
+            /^\.chat-sidebar/,
+            /\.combat-sidebar/,
+            /\.compendium-directory/,
+            /\.compendium-sidebar/,
             /^\.document-ownership/,
+            /^\.effects-tooltip/,
             /^\.journal-category-config/,
             /\.journal-entry-page/,
+            /^\.macro-config/,
             /^\.package-list/,
             /^\.playlists-sidebar/,
+            /\.placeable-hud/,
             /^\.region-config/,
             /^\.roll-table-sheet/,
             /^\.scene-config/,
+            /^\.scenes-sidebar/,
+            /\.settings-sidebar/,
             /^\.sheet.journal-entry/,
+            /^\.template-config/,
             /^\.token-config/,
             /^\.tour/,
+            /\.ui-control/,
             /^\.wall-config/,
          ],
 
@@ -1821,6 +1972,13 @@ class SvelteApp extends Application
          throw new Error(`SvelteApp - constructor - No Svelte configuration object found in 'options'.`);
       }
 
+      // Remove forced AppV1 theming classes: `themed` and `theme-light`.
+      if (Array.isArray(this.options.classes))
+      {
+         this.options.classes = this.options.classes.filter(
+          (entry) => entry !== 'themed' && !entry?.startsWith('theme-'));
+      }
+
       this.#applicationState = new ApplicationState(this);
 
       // Initialize TJSPosition with the position object set by Application.
@@ -1862,6 +2020,7 @@ class SvelteApp extends Application
    {
       return /** @type {import('./types').SvelteApp.Options} */ deepMerge(super.defaultOptions, {
          alwaysOnTop: false,              // Assigned to position. When true, the app window is floated always on top.
+         containerQueryType: 'inline-size',  // App window content container query type.
          defaultCloseAnimation: true,     // If false, the default slide close animation is not run.
          draggable: true,                 // If true, then application shells are draggable.
          focusAuto: true,                 // When true, auto-management of app focus is enabled.
@@ -1882,6 +2041,7 @@ class SvelteApp extends Application
          positionValidator: TJSPosition.Validators.transformWindow, // A function providing the default validator.
          sessionStorage: void 0,          // An instance of WebStorage (session) to share across SvelteApps.
          svelte: void 0,                  // A Svelte configuration object.
+         themeName: void 0,               // An explicit theme name to apply.
          transformOrigin: 'top left'      // By default, 'top / left' respects rotation when minimizing.
       });
    }
@@ -2315,7 +2475,7 @@ class SvelteApp extends Application
     */
    async maximize({ animate = true, duration = 0.1 } = {})
    {
-      if (!this.popOut || [false, null].includes(this._minimized)) { return; }
+      if ((!this.popOut && !this.options.alwaysOnTop) || [false, null].includes(this._minimized)) { return; }
 
       this._minimized = null;
 
@@ -2419,7 +2579,10 @@ class SvelteApp extends Application
     */
    async minimize({ animate = true, duration = 0.1 } = {})
    {
-      if (!this.rendered || !this.popOut || [true, null].includes(this._minimized)) { return; }
+      if (!this.rendered || (!this.popOut && !this.options.alwaysOnTop) || [true, null].includes(this._minimized))
+      {
+         return;
+      }
 
       this.#stores.uiStateUpdate((options) => deepMerge(options, { minimized: true }));
 
@@ -2758,7 +2921,13 @@ class SvelteApp extends Application
          }
 
          // Ensure the app element has updated inline styles.
-         nextAnimationFrame().then(() => this.onSvelteRemount());
+         nextAnimationFrame().then(() =>
+         {
+            // Allow any external modules to modify the app frame (IE PopOut module).
+            this.render();
+
+            this.onSvelteRemount();
+         });
       }
    }
 }

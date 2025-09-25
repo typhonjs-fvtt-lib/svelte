@@ -20,9 +20,12 @@
     * @componentDocumentation
     * @internal
     */
-   import { applyStyles }   from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
-   import { localize }      from '@typhonjs-svelte/runtime-base/util/i18n';
-   import { isObject }      from '@typhonjs-svelte/runtime-base/util/object';
+   import { inlineSvg }       from '@typhonjs-svelte/runtime-base/svelte/action/dom/inline-svg';
+   import { popoverTooltip }  from '@typhonjs-svelte/runtime-base/svelte/action/dom/tooltip';
+   import { applyStyles }     from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
+   import { AssetValidator }  from '@typhonjs-svelte/runtime-base/util/browser';
+   import { localize }        from '@typhonjs-svelte/runtime-base/util/i18n';
+   import { isObject }        from '@typhonjs-svelte/runtime-base/util/object';
 
    export let button = void 0;
 
@@ -37,6 +40,18 @@
    $: keyCode = isObject(button) && typeof button.keyCode === 'string' ? button.keyCode : 'Enter';
 
    $: styles = isObject(button) && isObject(button.styles) ? button.styles : void 0;
+
+   // ----------------------------------------------------------------------------------------------------------------
+
+   let iconType;
+
+   $:
+   {
+      const result = AssetValidator.parseMedia({ url: icon, mediaTypes: AssetValidator.MediaTypes.img_svg });
+      iconType = result.valid ? result.elementType : 'font';
+   }
+
+   // ----------------------------------------------------------------------------------------------------------------
 
    function onClick(event)
    {
@@ -100,23 +115,50 @@
 <svelte:options accessors={true}/>
 
 <button type=button
+   class="header-control icon{typeof button.class === 'string' ? ` ${button.class}` : ''}"
+   class:keep-minimized={keepMinimized}
    on:click|preventDefault|stopPropagation={onClick}
    on:contextmenu|preventDefault|stopPropagation={onContextMenu}
    on:keydown={onKeydown}
    on:keyup={onKeyup}
    use:applyStyles={styles}
-   class="header-control icon {icon} {button.class}"
-   class:keep-minimized={keepMinimized}
-   data-action={button.class}
-   data-tooltip={$storeHeaderButtonNoLabel ? null : label}
-   aria-label={label}>
+   use:popoverTooltip={{ ariaLabel: true, tooltip: $storeHeaderButtonNoLabel ? void 0 : label }}>
+
+   {#if icon}
+      {#if iconType === 'font'}
+         <i class={icon}></i>
+      {:else if iconType === 'img'}
+         <img src={icon} alt="" class=icon-int>
+      {:else if iconType === 'svg'}
+         <svg use:inlineSvg={{ src: icon }} class=icon-int></svg>
+      {/if}
+   {/if}
 </button>
 
 <style>
    button {
+      border: var(--tjs-app-header-button-border);
       color: var(--tjs-app-header-button-color);
       flex: 0 0 var(--tjs-app-header-button-size);
       height: var(--tjs-app-header-button-size);
+      margin: var(--tjs-app-header-button-margin);
       min-height: var(--tjs-app-header-button-size);
+      width: var(--tjs-app-header-button-size);
+   }
+
+   button:has(.icon-int) {
+      padding: calc(var(--tjs-app-header-button-size) * 0.15);
+   }
+
+   .keep-minimized {
+      display: inline-flex;
+   }
+
+   .icon-int {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: calc(var(--tjs-app-header-button-size) * 0.75);
+      height: calc(var(--tjs-app-header-button-size) * 0.75);
    }
 </style>

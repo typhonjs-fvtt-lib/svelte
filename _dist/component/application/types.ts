@@ -1,34 +1,63 @@
-import type { Writable } from 'svelte/store';
+import type { Readable } from 'svelte/store';
 
 /**
- * Provides the data and types for application shells.
+ * Provides the data and types for application shells `#internal` context.
  */
-declare namespace AppShell {
+export declare namespace AppShell {
    /**
     * All context data.
     */
-   namespace Context {
+   export namespace Context {
+
+      /**
+       * Defines the internal stores available for application shells.
+       */
+      export type InternalAppStores = {
+         /**
+          * Content offset width when content resize observation enabled.
+          */
+         contentOffsetWidth: Readable<number>;
+
+         /**
+          * Content offset height when content resize observation enabled.
+          */
+         contentOffsetHeight: Readable<number>;
+
+         /**
+          * Content width minus padding / border when content resize observation enabled.
+          */
+         contentWidth: Readable<number>;
+
+         /**
+          * Content height minus padding / border when content resize observation enabled.
+          */
+         contentHeight: Readable<number>;
+
+         /**
+          * Are container queries enabled.
+          */
+         cqEnabled: Readable<boolean>;
+
+         /**
+          * The content element.
+          */
+         elementContent: Readable<HTMLElement>;
+
+         /**
+          * The main app shell element.
+          */
+         elementRoot: Readable<HTMLElement>;
+      };
+
       /**
        * The `#internal` context data.
        */
-      interface Internal {
+      export interface Internal {
          /**
-          * Returns stores holding the current `elementRoot` / `elementContent` instances.
+          * Returns stores holding the current container query enabled state and `elementRoot` / `elementContent`
+          * instances.
           */
-         get stores(): {
-            ['elementContent']: Writable<HTMLElement>;
-            ['elementRoot']: Writable<HTMLElement>;
-         }
+         get stores(): Readonly<InternalAppStores>;
       }
    }
 }
-
-// /**
-//  * @typedef {object} InternalAppStores
-//  *
-//  * @property {import('svelte/store').Writable<HTMLElement>} elementContent The window content element.
-//  *
-//  * @property {import('svelte/store').Writable<HTMLElement>} elementRoot The window root element.
-//  */
-
-export { AppShell };

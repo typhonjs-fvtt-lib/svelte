@@ -1,12 +1,16 @@
 import { SvelteComponent } from 'svelte';
-import { Writable } from 'svelte/store';
+import { Readable } from 'svelte/store';
 
 /**
  * Provides an application shell is a main top level slotted component that provides a reactive
  * outer wrapper and header bar for the main content component.
  *
- * Container queries are supported and the main app window container is named `tjs-app-window` and the window content
- * container is `tjs-app-window-content`.
+ * Container queries (`inline-size`) are supported for `width` queries. The main app window container is named
+ * `tjs-app-window` and the window content container is `tjs-app-content`. Take note that the width available
+ * is the inline-size width of the app window or content minus the border constraints. Container queries will be
+ * disabled if the `width` app option is `auto` or not an explicit constraint. Just a precautionary warning that If
+ * you set `width` to `auto` during runtime unexpected behavior or a collapse of the app window will occur which is
+ * to be expected.
  *
  */
 declare class ApplicationShell extends SvelteComponent<
@@ -74,6 +78,18 @@ declare class ApplicationShell extends SvelteComponent<
   /** Getter for {@link ApplicationShell.Props.contentOffsetWidth | contentOffsetWidth} prop. */
   get contentOffsetWidth(): boolean;
 
+  /** Setter for {@link ApplicationShell.Props.contentHeight | contentHeight} prop. */
+  set contentHeight(_: boolean);
+
+  /** Getter for {@link ApplicationShell.Props.contentHeight | contentHeight} prop. */
+  get contentHeight(): boolean;
+
+  /** Setter for {@link ApplicationShell.Props.contentWidth | contentWidth} prop. */
+  set contentWidth(_: boolean);
+
+  /** Getter for {@link ApplicationShell.Props.contentWidth | contentWidth} prop. */
+  get contentWidth(): boolean;
+
   /** Setter for {@link ApplicationShell.Props.transition | transition} prop. */
   set transition(_: () => undefined);
 
@@ -121,13 +137,15 @@ declare namespace ApplicationShell {
     elementContent?: HTMLElement;
     /** @type {HTMLElement} */
     elementRoot?: HTMLElement;
+    contentOffsetWidth?: boolean;
+    contentOffsetHeight?: boolean;
+    contentWidth?: boolean;
+    contentHeight?: boolean;
     draggableOptions?: any;
     stylesApp?: any;
     stylesContent?: any;
     appOffsetHeight?: boolean;
     appOffsetWidth?: boolean;
-    contentOffsetHeight?: boolean;
-    contentOffsetWidth?: boolean;
     inTransition?: () => undefined;
     outTransition?: () => undefined;
     transitionOptions?: any;
@@ -143,8 +161,12 @@ declare namespace ApplicationShell {
 /**
  * Provides an empty application shell as a main top level slotted component.
  *
- * Container queries are supported and the main app window container is named `tjs-app-window` and the window content
- * container is `tjs-app-window-content`.
+ * Container queries (`inline-size`) are supported for `width` queries. The main app window container is named
+ * `tjs-app-window` and the window content container is `tjs-app-content`. Take note that the width available
+ * is the inline-size width of the app window or content minus the border constraints. Container queries will be
+ * disabled if the `width` app option is `auto` or not an explicit constraint. Just a precautionary warning that If
+ * you set `width` to `auto` during runtime unexpected behavior or a collapse of the app window will occur which is
+ * to be expected.
  *
  */
 declare class EmptyApplicationShell extends SvelteComponent<
@@ -181,6 +203,30 @@ declare class EmptyApplicationShell extends SvelteComponent<
 
   /** Getter for {@link EmptyApplicationShell.Props.appOffsetWidth | appOffsetWidth} prop. */
   get appOffsetWidth(): boolean;
+
+  /** Setter for {@link EmptyApplicationShell.Props.contentOffsetHeight | contentOffsetHeight} prop. */
+  set contentOffsetHeight(_: boolean);
+
+  /** Getter for {@link EmptyApplicationShell.Props.contentOffsetHeight | contentOffsetHeight} prop. */
+  get contentOffsetHeight(): boolean;
+
+  /** Setter for {@link EmptyApplicationShell.Props.contentOffsetWidth | contentOffsetWidth} prop. */
+  set contentOffsetWidth(_: boolean);
+
+  /** Getter for {@link EmptyApplicationShell.Props.contentOffsetWidth | contentOffsetWidth} prop. */
+  get contentOffsetWidth(): boolean;
+
+  /** Setter for {@link EmptyApplicationShell.Props.contentHeight | contentHeight} prop. */
+  set contentHeight(_: boolean);
+
+  /** Getter for {@link EmptyApplicationShell.Props.contentHeight | contentHeight} prop. */
+  get contentHeight(): boolean;
+
+  /** Setter for {@link EmptyApplicationShell.Props.contentWidth | contentWidth} prop. */
+  set contentWidth(_: boolean);
+
+  /** Getter for {@link EmptyApplicationShell.Props.contentWidth | contentWidth} prop. */
+  get contentWidth(): boolean;
 
   /** Setter for {@link EmptyApplicationShell.Props.transition | transition} prop. */
   set transition(_: () => undefined);
@@ -228,6 +274,10 @@ declare namespace EmptyApplicationShell {
     elementContent?: HTMLElement;
     /** @type {HTMLElement} */
     elementRoot?: HTMLElement;
+    contentOffsetWidth?: boolean;
+    contentOffsetHeight?: boolean;
+    contentWidth?: boolean;
+    contentHeight?: boolean;
     stylesApp?: any;
     appOffsetHeight?: boolean;
     appOffsetWidth?: boolean;
@@ -248,8 +298,12 @@ declare namespace EmptyApplicationShell {
  * {@link ApplicationShell}. An application shell is a main top level slotted component that provides a reactive
  * outer wrapper and header bar for the main content component.
  *
- * Container queries are supported and the main app window container is named `tjs-app-window` and the window content
- * container is `tjs-app-window-content`.
+ * Container queries (`inline-size`) are supported for `width` queries. The main app window container is named
+ * `tjs-app-window` and the window content container is `tjs-app-content`. Take note that the width available
+ * is the inline-size width of the app window or content minus the border constraints. Container queries will be
+ * disabled if the `width` app option is `auto` or not an explicit constraint. Just a precautionary warning that If
+ * you set `width` to `auto` during runtime unexpected behavior or a collapse of the app window will occur which is
+ * to be expected.
  *
  * ### CSS variables
  *
@@ -322,6 +376,18 @@ declare class TjsApplicationShell extends SvelteComponent<
   /** Getter for {@link TjsApplicationShell.Props.contentOffsetWidth | contentOffsetWidth} prop. */
   get contentOffsetWidth(): boolean;
 
+  /** Setter for {@link TjsApplicationShell.Props.contentHeight | contentHeight} prop. */
+  set contentHeight(_: boolean);
+
+  /** Getter for {@link TjsApplicationShell.Props.contentHeight | contentHeight} prop. */
+  get contentHeight(): boolean;
+
+  /** Setter for {@link TjsApplicationShell.Props.contentWidth | contentWidth} prop. */
+  set contentWidth(_: boolean);
+
+  /** Getter for {@link TjsApplicationShell.Props.contentWidth | contentWidth} prop. */
+  get contentWidth(): boolean;
+
   /** Setter for {@link TjsApplicationShell.Props.transition | transition} prop. */
   set transition(_: () => undefined);
 
@@ -369,13 +435,15 @@ declare namespace TjsApplicationShell {
     elementContent?: HTMLElement;
     /** @type {HTMLElement} */
     elementRoot?: HTMLElement;
+    contentOffsetWidth?: boolean;
+    contentOffsetHeight?: boolean;
+    contentWidth?: boolean;
+    contentHeight?: boolean;
     draggableOptions?: any;
     stylesApp?: any;
     stylesContent?: any;
     appOffsetHeight?: boolean;
     appOffsetWidth?: boolean;
-    contentOffsetHeight?: boolean;
-    contentOffsetWidth?: boolean;
     inTransition?: () => undefined;
     outTransition?: () => undefined;
     transitionOptions?: any;
@@ -490,7 +558,7 @@ declare namespace TjsGlassPane {
 }
 
 /**
- * Provides the data and types for application shells.
+ * Provides the data and types for application shells `#internal` context.
  */
 declare namespace AppShell {
   /**
@@ -498,16 +566,47 @@ declare namespace AppShell {
    */
   namespace Context {
     /**
+     * Defines the internal stores available for application shells.
+     */
+    type InternalAppStores = {
+      /**
+       * Content offset width when content resize observation enabled.
+       */
+      contentOffsetWidth: Readable<number>;
+      /**
+       * Content offset height when content resize observation enabled.
+       */
+      contentOffsetHeight: Readable<number>;
+      /**
+       * Content width minus padding / border when content resize observation enabled.
+       */
+      contentWidth: Readable<number>;
+      /**
+       * Content height minus padding / border when content resize observation enabled.
+       */
+      contentHeight: Readable<number>;
+      /**
+       * Are container queries enabled.
+       */
+      cqEnabled: Readable<boolean>;
+      /**
+       * The content element.
+       */
+      elementContent: Readable<HTMLElement>;
+      /**
+       * The main app shell element.
+       */
+      elementRoot: Readable<HTMLElement>;
+    };
+    /**
      * The `#internal` context data.
      */
     interface Internal {
       /**
-       * Returns stores holding the current `elementRoot` / `elementContent` instances.
+       * Returns stores holding the current container query enabled state and `elementRoot` / `elementContent`
+       * instances.
        */
-      get stores(): {
-        ['elementContent']: Writable<HTMLElement>;
-        ['elementRoot']: Writable<HTMLElement>;
-      };
+      get stores(): Readonly<InternalAppStores>;
     }
   }
 }

@@ -90,16 +90,13 @@
 
    let mediaType = void 0;
 
-   /**
-    * Only process image / svg assets from AssetValidator.
-    *
-    * @type {Set<string>}
-    */
-   const mediaTypes = new Set(['img', 'svg']);
-
    $: if (typeof $storeHeaderIcon === 'string')
    {
-      const result = AssetValidator.parseMedia({ url: $storeHeaderIcon, mediaTypes });
+      const result = AssetValidator.parseMedia({
+         url: $storeHeaderIcon,
+         mediaTypes: AssetValidator.MediaTypes.img_svg
+      });
+
       mediaType = result.valid ? result.elementType : 'font';
    }
    else
@@ -193,13 +190,13 @@
       {:else if mediaType === 'svg'}
          <svg use:inlineSvg={{ src: $storeHeaderIcon }} class="tjs-app-icon keep-minimized"></svg>
       {/if}
-      <h4 class=window-title style:display={displayHeaderTitle}>
+      <h1 class=window-title style:display={displayHeaderTitle}>
          {localize($storeTitle)}
-      </h4>
+      </h1>
       {#each buttonsLeft as button}
          <svelte:component this={button.class} {...button.props} />
       {/each}
-      <span class="tjs-window-header-spacer keep-minimized"></span>
+      <span class="tjs-window-header-spacer keep-minimized" ></span>
       {#each buttonsRight as button}
          <svelte:component this={button.class} {...button.props} />
       {/each}
@@ -233,13 +230,15 @@
       align-items: center;
 
       background: var(--tjs-app-header-background);
+      border-bottom: var(--tjs-app-header-border-bottom);
+      color: var(--tjs-app-header-color);
       cursor: var(--tjs-app-header-cursor, var(--tjs-cursor-grab, grab));
-      flex: var(--tjs-app-header-flex, 0 0 var(--header-height));
+      flex: var(--tjs-app-header-flex);
       gap: var(--tjs-app-header-gap, 5px);
       padding: var(--tjs-app-header-padding, 0 0.5rem);
 
-      font-family: var(--tjs-app-header-font-family, var(--tjs-app-font-family));
-      font-size: var(--tjs-app-header-font-size, var(--tjs-app-font-size));
+      font-family: var(--tjs-app-header-font-family, var(--tjs-app-font-family, inherit));
+      font-size: var(--tjs-app-header-font-size, var(--tjs-app-font-size, inherit));
       font-weight: var(--tjs-app-header-font-weight, inherit);
 
       touch-action: none;
@@ -256,9 +255,15 @@
       font-size: inherit;
       font-weight: inherit;
 
+      border: none;
+      color: var(--tjs-app-header-color);
+      flex: unset;
       gap: var(--tjs-app-header-gap, 5px);
+      line-height: var(--tjs-app-header-height);
+      margin: 0;
       max-width: fit-content;
       overflow: hidden;
+      text-align: left;
       text-overflow: ellipsis;
       white-space: nowrap;
    }

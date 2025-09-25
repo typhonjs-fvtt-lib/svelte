@@ -1458,7 +1458,7 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
    {
       // Drag handlers
       node.addEventListener(...handlers.dragDown);
-      node.classList.add('draggable');
+      node.classList.add('tjs-draggable');
    }
 
    /**
@@ -1472,7 +1472,7 @@ function draggableGsap(node, { position, enabled = true, button = 0, storeDraggi
       node.removeEventListener(...handlers.dragDown);
       node.removeEventListener(...handlers.dragMove);
       node.removeEventListener(...handlers.dragUp);
-      node.classList.remove('draggable');
+      node.classList.remove('tjs-draggable');
    }
 
    if (enabled)
