@@ -616,7 +616,7 @@
       flex: 1;
       margin: 0;
 
-      line-height: var(--header-height);
+      line-height: var(--tjs-app-header-height);
       border: none;
       overflow: hidden;
       text-align: left;
