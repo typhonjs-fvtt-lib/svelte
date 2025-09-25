@@ -230,6 +230,7 @@
       align-items: center;
 
       background: var(--tjs-app-header-background);
+      border-bottom: var(--tjs-app-header-border-bottom);
       cursor: var(--tjs-app-header-cursor, var(--tjs-cursor-grab, grab));
       flex: var(--tjs-app-header-flex);
       gap: var(--tjs-app-header-gap, 5px);

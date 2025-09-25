@@ -72,6 +72,8 @@ export class FVTTConfigure
 
       // Core does not distinguish between dark / light themes.
       const propsApp = FoundryStyles.ext.get('.application', opts);
+      const propsAppDark = FoundryStyles.ext.get('.application', { ...opts, resolve: [
+       '.themed.theme-dark .application'] });
 
       const propsAppHeader = FoundryStyles.ext.get('.application .window-header', { ...opts, resolve: [
        '.application', '.themed.theme-dark .application'] });
@@ -95,7 +97,7 @@ export class FVTTConfigure
          '--tjs-app-font-family': propsBody?.fontFamily ?? 'var(--font-body)',
          '--tjs-app-font-size': propsApp?.fontSize ?? 'var(--font-size-14)',
 
-         '--tjs-app-header-color': propsAppHeader?.color ?? 'var(--color-light-1)',
+         // For `TJSApplicationHeader.svelte`
          '--tjs-app-header-flex': propsAppHeader?.flex ?? '0 0 var(--header-height)',
          '--tjs-app-header-font-size': propsAppHeader?.fontSize ?? 'var(--font-size-13)',
          '--tjs-app-header-height': propsApp?.['--header-height'] ?? '36px',
@@ -115,11 +117,21 @@ export class FVTTConfigure
 
          // Explicit dark theme properties ---------------------------------------------------------------------------
 
+         // For `TJSApplicationShell.svelte`.
+         '--tjs-app-border': propsAppDark?.border ?? '1px solid var(--color-cool-4)',
+
          // For `TJSApplicationHeader.svelte
          '--tjs-app-header-background': propsAppHeader?.background ?? 'rgba(0, 0, 0, 0.5)',
+         '--tjs-app-header-border-bottom': propsAppHeader?.borderBottom ?? '1px solid var(--color-cool-4)',
+         '--tjs-app-header-color': propsAppHeader?.color ?? 'var(--color-light-1)',
 
          // For `ResizeHandle.svelte` / invert the resize handle.
          '--tjs-app-resize-handle-filter': propsAppHandleDark?.filter ?? 'invert(1)'
+      });
+
+      const propsAppLight = FoundryStyles.ext.get('.application', {
+         camelCase: true,
+         resolve: 'body.theme-light .application'
       });
 
       const propsAppHeaderLight = FoundryStyles.ext.get('.application .window-header', {
@@ -131,8 +143,12 @@ export class FVTTConfigure
        * Explicit light theme properties.
        */
       themeLight.setProperties({
-         // For `ApplicationShell.svelte` / `EmptyApplicationShell.svelte`.
+         // For `TJSApplicationShell.svelte`.
+         '--tjs-app-border': propsAppLight?.border ?? '1px solid var(--color-cool-4)',
+
+         // For `TJSApplicationHeader.svelte`
          '--tjs-app-header-background': propsAppHeaderLight?.background ?? 'var(--color-dark-3)',
+         '--tjs-app-header-border-bottom': propsAppHeaderLight?.borderBottom ?? '1px solid green', // '1px solid var(--color-cool-4)',
 
          // For `ResizeHandle.svelte` / cancel invert of the resize handle / there is no core style to set.
          '--tjs-app-resize-handle-filter': 'none'

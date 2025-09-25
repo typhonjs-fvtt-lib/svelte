@@ -602,7 +602,7 @@
       justify-content: var(--tjs-app-justify-content, flex-start);
       position: var(--tjs-app-position, absolute);
       border-radius: var(--tjs-app-border-radius, 6px);
-      border: var(--tjs-app-border, 1px solid var(--color-cool-4));
+      border: var(--tjs-app-border);
       box-shadow: var(--tjs-app-box-shadow, 0 0 10px #000);
       padding: var(--tjs-app-padding, 0);
    }
