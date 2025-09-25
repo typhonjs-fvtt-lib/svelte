@@ -556,8 +556,8 @@
       margin: var(--tjs-app-margin);
       padding: var(--tjs-app-padding);
       color: var(--tjs-app-color);
-      font-size: var(--tjs-app-font-size, var(--font-size-14));
-      font-family: var(--tjs-app-font-family, var(--font-sans)), "Signika", "Palatino Linotype", sans-serif;
+      font-size: var(--tjs-app-font-size, inherit);
+      font-family: var(--tjs-app-font-family, inherit);
       font-weight: var(--tjs-app-font-weight, inherit);
 
       max-width: var(--tjs-app-max-width, unset);
@@ -569,7 +569,7 @@
       overflow: var(--tjs-app-overflow, hidden);
 
       scrollbar-width: var(--tjs-app-scrollbar-width, thin);
-      scrollbar-color: var(--tjs-app-scrollbar-color, var(--color-scrollbar) var(--color-scrollbar-track));
+      scrollbar-color: var(--tjs-app-scrollbar-color, inherit);
    }
 
    .tjs-window-app .window-content {
@@ -593,8 +593,6 @@
    }
 
    .tjs-window-app {
-      --header-height: 36px; /* Set in `.application` */
-
       /* Note: this is different than stock Foundry and allows rounded corners from .app core styles */
       overflow: var(--tjs-app-overflow, hidden);
 

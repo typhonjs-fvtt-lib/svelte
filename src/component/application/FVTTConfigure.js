@@ -72,7 +72,8 @@ export class FVTTConfigure
 
       // Core does not distinguish between dark / light themes.
       const propsApp = FoundryStyles.ext.get('.application', opts);
-      const propsAppHeader = FoundryStyles.ext.get('.application .window-header', opts);
+      const propsBody = FoundryStyles.ext.get('body', opts);
+      const propsAppHeader = FoundryStyles.ext.get('.application .window-header', { ...opts, resolve: '.application' });
       const propsAppHeaderBtn = FoundryStyles.ext.get('.application .window-header button.header-control', opts);
       const propsAppHandle = FoundryStyles.ext.get('.application .window-resize-handle', opts);
 
@@ -86,6 +87,7 @@ export class FVTTConfigure
 
          // For `TJSApplicationShell.svelte` app background.
          '--tjs-app-background': `url(${getRoutePrefix('/ui/denim075.png')})`,
+         '--tjs-app-font-family': propsBody?.fontFamily ?? 'var(--font-body)',
          '--tjs-app-font-size': propsApp?.fontSize ?? 'var(--font-size-14)',
 
          // For `TJSApplicationHeader.svelte
