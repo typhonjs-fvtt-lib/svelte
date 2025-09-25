@@ -21,7 +21,7 @@ export class FVTTConfigure
 
       const manager = StyleManager.create({
          id: '__tjs-runtime-vars',
-         version: '0.1.0',
+         version: '0.1.1',
          layerName: 'variables.tjs-runtime-vars',
          rules: {
             themeDark: 'body, .themed.theme-dark',
