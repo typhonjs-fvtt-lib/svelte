@@ -649,12 +649,4 @@
    .tjs-window-app:is(.themed) {
       --tjs-app-color: var(--color-text-primary);
    }
-
-   .tjs-window-app:is(.themed.theme-dark) {
-      --color-header-background: rgba(0, 0, 0, 0.5);
-   }
-
-   .tjs-window-app:is(.themed.theme-light) {
-      --color-header-background: var(--color-dark-3);
-   }
 </style>

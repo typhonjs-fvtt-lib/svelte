@@ -72,12 +72,16 @@ export class FVTTConfigure
 
       // Core does not distinguish between dark / light themes.
       const propsApp = FoundryStyles.ext.get('.application', opts);
-      const propsBody = FoundryStyles.ext.get('body', opts);
-      const propsAppHeader = FoundryStyles.ext.get('.application .window-header', { ...opts, resolve: '.application' });
+
+      const propsAppHeader = FoundryStyles.ext.get('.application .window-header', { ...opts, resolve: [
+       '.application', '.themed.theme-dark .application'] });
+
       const propsAppHeaderBtn = FoundryStyles.ext.get('.application .window-header button.header-control', opts);
       const propsAppHandle = FoundryStyles.ext.get('.application .window-resize-handle', opts);
 
       const propsAppHandleDark = FoundryStyles.ext.get('.themed.theme-dark.application .window-resize-handle', opts);
+
+      const propsBody = FoundryStyles.ext.get('body', opts);
 
       /**
        * Provides default CSS variables for core components.
@@ -90,7 +94,6 @@ export class FVTTConfigure
          '--tjs-app-font-family': propsBody?.fontFamily ?? 'var(--font-body)',
          '--tjs-app-font-size': propsApp?.fontSize ?? 'var(--font-size-14)',
 
-         // For `TJSApplicationHeader.svelte
          '--tjs-app-header-flex': propsAppHeader?.flex ?? '0 0 var(--header-height)',
          '--tjs-app-header-font-size': propsAppHeader?.fontSize ?? 'var(--font-size-13)',
 
@@ -109,8 +112,8 @@ export class FVTTConfigure
 
          // Explicit dark theme properties ---------------------------------------------------------------------------
 
-         // For `ApplicationShell.svelte`.
-         '--tjs-app-header-background': propsAppHeader?.background ?? 'var(--color-header-background)',
+         // For `TJSApplicationHeader.svelte
+         '--tjs-app-header-background': propsAppHeader?.background ?? 'rgba(0, 0, 0, 0.5)',
 
          // For `ResizeHandle.svelte` / invert the resize handle.
          '--tjs-app-resize-handle-filter': propsAppHandleDark?.filter ?? 'invert(1)'
