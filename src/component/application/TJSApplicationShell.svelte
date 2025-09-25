@@ -609,7 +609,7 @@
 
    .tjs-window-app :global(.window-header) {
       --button-size: 24px;
-      color: var(--tjs-app-header-color, var(--color-light-1));
+      color: var(--tjs-app-header-color);
    }
 
    .tjs-window-app :global(.window-header .window-title) {
@@ -622,7 +622,7 @@
       text-align: left;
       white-space: nowrap;
       text-overflow: ellipsis;
-      color: var(--tjs-app-header-color, var(--color-light-1));
+      color: var(--tjs-app-header-color);
    }
 
    .tjs-window-app :global(.window-header button.header-control) {
@@ -630,23 +630,5 @@
       padding: 0;
       margin: 0;
       border: none;
-   }
-
-   /* ------------------------------- */
-
-   /**
-    * When the `themed` class is added to the application `classes` option core dark / light theming is enabled adding
-    * `themed.theme-dark` and `themed.theme-light` classes to the main app div element. The following selectors provide
-    * reasonable defaults for the app color, app header background color and resize handle filter.
-    */
-
-   .tjs-window-app:not(.themed) {
-      /* Explicit not themed color */
-      --tjs-app-color: var(--color-light-2);
-   }
-
-   /* Themed app color using core dark / light CSS var */
-   .tjs-window-app:is(.themed) {
-      --tjs-app-color: var(--color-text-primary);
    }
 </style>

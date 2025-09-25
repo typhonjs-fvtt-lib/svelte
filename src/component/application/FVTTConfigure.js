@@ -91,9 +91,11 @@ export class FVTTConfigure
 
          // For `TJSApplicationShell.svelte` app background.
          '--tjs-app-background': `url(${getRoutePrefix('/ui/denim075.png')})`,
+         '--tjs-app-color': propsApp?.color ?? 'var(--color-text-primary)',
          '--tjs-app-font-family': propsBody?.fontFamily ?? 'var(--font-body)',
          '--tjs-app-font-size': propsApp?.fontSize ?? 'var(--font-size-14)',
 
+         '--tjs-app-header-color': propsAppHeader?.color ?? 'var(--color-light-1)',
          '--tjs-app-header-flex': propsAppHeader?.flex ?? '0 0 var(--header-height)',
          '--tjs-app-header-font-size': propsAppHeader?.fontSize ?? 'var(--font-size-13)',
 
