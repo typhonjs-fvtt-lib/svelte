@@ -103,6 +103,8 @@ export class FVTTConfigure
          '--tjs-app-header-height': propsApp?.['--header-height'] ?? '36px',
 
          // For `TJSHeaderButton.svelte / core only provides one set of properties across themes.
+         '--tjs-app-header-button-border': propsAppHeaderBtn?.border ?? 'none',
+         '--tjs-app-header-button-margin': propsAppHeaderBtn?.margin ?? '0',
          '--tjs-app-header-button-size': propsAppHeaderBtn?.['--button-size'] ?? '1.5rem',
          '--tjs-app-header-button-color': propsAppHeaderBtn?.['--button-text-color'] ?? 'var(--color-light-1)',
 

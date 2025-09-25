@@ -231,6 +231,7 @@
 
       background: var(--tjs-app-header-background);
       border-bottom: var(--tjs-app-header-border-bottom);
+      color: var(--tjs-app-header-color);
       cursor: var(--tjs-app-header-cursor, var(--tjs-cursor-grab, grab));
       flex: var(--tjs-app-header-flex);
       gap: var(--tjs-app-header-gap, 5px);
@@ -254,10 +255,15 @@
       font-size: inherit;
       font-weight: inherit;
 
+      border: none;
+      color: var(--tjs-app-header-color);
       flex: unset;
       gap: var(--tjs-app-header-gap, 5px);
+      line-height: var(--tjs-app-header-height);
+      margin: 0;
       max-width: fit-content;
       overflow: hidden;
+      text-align: left;
       text-overflow: ellipsis;
       white-space: nowrap;
    }

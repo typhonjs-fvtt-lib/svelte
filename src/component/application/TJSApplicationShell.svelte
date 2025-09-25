@@ -606,29 +606,4 @@
       box-shadow: var(--tjs-app-box-shadow, 0 0 10px #000);
       padding: var(--tjs-app-padding, 0);
    }
-
-   .tjs-window-app :global(.window-header) {
-      --button-size: 24px;
-      color: var(--tjs-app-header-color);
-   }
-
-   .tjs-window-app :global(.window-header .window-title) {
-      flex: 1;
-      margin: 0;
-
-      line-height: var(--tjs-app-header-height);
-      border: none;
-      overflow: hidden;
-      text-align: left;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      color: var(--tjs-app-header-color);
-   }
-
-   .tjs-window-app :global(.window-header button.header-control) {
-      --button-background-color: none;
-      padding: 0;
-      margin: 0;
-      border: none;
-   }
 </style>

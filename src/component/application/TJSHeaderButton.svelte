@@ -115,7 +115,7 @@
 <svelte:options accessors={true}/>
 
 <button type=button
-   class="header-control icon {button.class}"
+   class="header-control icon{typeof button.class === 'string' ? ` ${button.class}` : ''}"
    class:keep-minimized={keepMinimized}
    on:click|preventDefault|stopPropagation={onClick}
    on:contextmenu|preventDefault|stopPropagation={onContextMenu}
@@ -137,11 +137,13 @@
 
 <style>
    button {
+      border: var(--tjs-app-header-button-border);
       color: var(--tjs-app-header-button-color);
       flex: 0 0 var(--tjs-app-header-button-size);
       height: var(--tjs-app-header-button-size);
       margin: var(--tjs-app-header-button-margin);
       min-height: var(--tjs-app-header-button-size);
+      width: var(--tjs-app-header-button-size);
    }
 
    button:has(.icon-int) {
