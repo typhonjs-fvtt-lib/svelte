@@ -86,6 +86,15 @@ export class FVTTConfigure
 
          // For `TJSApplicationShell.svelte` app background.
          '--tjs-app-background': `url(${getRoutePrefix('/ui/denim075.png')})`,
+         '--tjs-app-font-size': propsApp?.fontSize ?? 'var(--font-size-14)',
+
+         // For `TJSApplicationHeader.svelte
+         '--tjs-app-header-flex': propsAppHeader?.flex ?? '0 0 var(--header-height)',
+         '--tjs-app-header-font-size': propsAppHeader?.fontSize ?? 'var(--font-size-13)',
+
+         // For `TJSHeaderButton.svelte / core only provides one set of properties across themes.
+         '--tjs-app-header-button-size': propsAppHeaderBtn?.['--button-size'] ?? '1.5rem',
+         '--tjs-app-header-button-color': propsAppHeaderBtn?.['--button-text-color'] ?? 'var(--color-light-1)',
 
          // For `ResizeHandle.svelte` / the resize handle.
          '--tjs-app-resize-handle-background': propsAppHandle?.background ??
@@ -95,13 +104,6 @@ export class FVTTConfigure
          '--tjs-app-resize-handle-position': propsAppHandle?.position ?? 'absolute',
          '--tjs-app-resize-handle-height': propsAppHandle?.height ?? '11x',
          '--tjs-app-resize-handle-width': propsAppHandle?.width ?? '11px',
-
-         '--tjs-app-font-size': propsApp?.fontSize ?? 'var(--font-size-14)',
-         '--tjs-app-header-font-size': propsAppHeader?.fontSize ?? 'var(--font-size-13)',
-
-         // For `TJSHeaderButton.svelte / core only provides one set of properties across themes.
-         '--tjs-app-header-button-size': propsAppHeaderBtn?.['--button-size'] ?? '1.5rem',
-         '--tjs-app-header-button-color': propsAppHeaderBtn?.['--button-text-color'] ?? 'var(--color-light-1)',
 
          // Explicit dark theme properties ---------------------------------------------------------------------------
 

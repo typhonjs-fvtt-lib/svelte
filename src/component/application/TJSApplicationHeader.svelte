@@ -231,7 +231,7 @@
 
       background: var(--tjs-app-header-background);
       cursor: var(--tjs-app-header-cursor, var(--tjs-cursor-grab, grab));
-      flex: var(--tjs-app-header-flex, 0 0 var(--header-height));
+      flex: var(--tjs-app-header-flex);
       gap: var(--tjs-app-header-gap, 5px);
       padding: var(--tjs-app-header-padding, 0 0.5rem);
 
