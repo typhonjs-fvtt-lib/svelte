@@ -210,8 +210,8 @@ for (const config of rollupConfigs)
 
    // Remove merged class / namespace exports.
    applicationIndexDTS = applicationIndexDTS.replace(
-      'export { SvelteApp, SvelteAppNS, SvelteApp as SvelteApplication, TJSDialog, TJSDialogNS };',
-      'export { SvelteApp, SvelteApp as SvelteApplication, TJSDialog };'
+      'export { FoundryStyles, SvelteApp, SvelteAppNS, SvelteApp as SvelteApplication, TJSDialog, TJSDialogNS };',
+      'export { FoundryStyles, SvelteApp, SvelteApp as SvelteApplication, TJSDialog };'
    );
 
    applicationIndexDTS = applicationIndexDTS.replaceAll('TJSDialogNS', 'TJSDialog');

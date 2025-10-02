@@ -1917,4 +1917,4 @@ declare class FoundryStyles {
   static get ext(): StyleSheetResolve;
 }
 
-export { FoundryStyles, SvelteApp, SvelteApp, SvelteApp as SvelteApplication, TJSDialog, TJSDialog };
+export { FoundryStyles, SvelteApp, SvelteApp as SvelteApplication, TJSDialog };
