@@ -431,6 +431,13 @@ declare namespace SvelteAppNS {
          get dragging(): boolean;
 
          /**
+          * Returns whether the app is detached from the main browser window.
+          *
+          * @returns {boolean} App detached state.
+          */
+         get isDetached(): boolean;
+
+         /**
           * Returns the current minimized UI state.
           *
           * @returns Minimized UI state.
@@ -589,6 +596,11 @@ declare namespace SvelteAppNS {
             activeWindow: Window;
 
             /**
+             * App window detached state.
+             */
+            detached: boolean;
+
+            /**
              * App dragging state.
              */
             dragging: boolean;
@@ -702,6 +714,11 @@ declare namespace SvelteAppNS {
              * Active browser window for the app.
              */
             activeWindow: Readable<Window>;
+
+            /**
+             * Derived store for `detached` updates.
+             */
+            detached: Readable<boolean>;
 
             /**
              * Derived store for `dragging` updates.

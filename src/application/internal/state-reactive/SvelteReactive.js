@@ -172,6 +172,13 @@ export class SvelteReactive
    get dragging() { return this.#dataUIState.dragging; }
 
    /**
+    * Returns whether the app is detached from the main browser window.
+    *
+    * @returns {boolean} App detached state.
+    */
+   get isDetached() { return this.activeWindow !== globalThis; }
+
+   /**
     * Returns the current minimized UI state.
     *
     * @returns {boolean} Minimized UI state.
@@ -715,6 +722,7 @@ export class SvelteReactive
        */
       this.#dataUIState = {
          activeWindow: globalThis,
+         detached: false,
          dragging: false,
          headerButtons: [],
          minimized: this.#application._minimized,
@@ -739,6 +747,9 @@ export class SvelteReactive
 
          activeWindow: /** @type {import('svelte/store').Readable<Window>} */
           derived(writableUIOptions, ($options, set) => set($options.activeWindow)),
+
+         detached: /** @type {import('svelte/store').Readable<boolean>} */
+          derived(writableUIOptions, ($options, set) => set($options.activeWindow !== globalThis)),
 
          dragging: /** @type {import('svelte/store').Readable<boolean>} */
           propertyStore(writableUIOptions, 'dragging'),
