@@ -176,7 +176,7 @@ export class SvelteReactive
     *
     * @returns {boolean} App detached state.
     */
-   get isDetached() { return this.activeWindow !== globalThis; }
+   get detached() { return this.#dataUIState.detached; }
 
    /**
     * Returns the current minimized UI state.
@@ -721,7 +721,7 @@ export class SvelteReactive
        * @type {import('../../types').SvelteAppNS.API.Reactive.UIStateData}
        */
       this.#dataUIState = {
-         activeWindow: globalThis,
+         activeWindow: window,
          detached: false,
          dragging: false,
          headerButtons: [],

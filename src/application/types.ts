@@ -435,7 +435,7 @@ declare namespace SvelteAppNS {
           *
           * @returns {boolean} App detached state.
           */
-         get isDetached(): boolean;
+         get detached(): boolean;
 
          /**
           * Returns the current minimized UI state.
@@ -608,7 +608,7 @@ declare namespace SvelteAppNS {
             /**
              * Current app header buttons.
              */
-            headerButtons: SvelteAppNS.HeaderButton;
+            headerButtons: SvelteAppNS.HeaderButton[];
 
             /**
              * App minimized state.
