@@ -55,6 +55,11 @@
 
    // ----------------------------------------------------------------------------------------------------------------
 
+   /**
+    * Hide or show PopOut button.
+    *
+    * @param {boolean}  hide - When true hide button.
+    */
    function checkAlwaysOnTop(hide)
    {
       if (hide)
