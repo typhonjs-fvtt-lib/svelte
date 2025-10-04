@@ -596,11 +596,6 @@ declare namespace SvelteAppNS {
             activeWindow: Window;
 
             /**
-             * App window detached state.
-             */
-            detached: boolean;
-
-            /**
              * App dragging state.
              */
             dragging: boolean;

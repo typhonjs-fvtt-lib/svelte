@@ -18,6 +18,7 @@
 
    const storeResizable = application.reactive.storeAppOptions.resizable;
 
+   const storeDetached = application.reactive.storeUIState.detached;
    const storeMinimized = application.reactive.storeUIState.minimized;
    const storeResizing = application.reactive.storeUIState.resizing;
 
@@ -211,7 +212,7 @@
 
 <div class="window-resize-handle"
      on:pointerdown={onPointerdown}
-     use:resizable={{ active: $storeResizable, storeResizing }}
+     use:resizable={{ active: $storeResizable && !$storeDetached, storeResizing }}
      bind:this={elementResize}>
 </div>
 

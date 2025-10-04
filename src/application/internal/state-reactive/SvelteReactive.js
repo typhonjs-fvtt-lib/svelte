@@ -176,7 +176,11 @@ export class SvelteReactive
     *
     * @returns {boolean} App detached state.
     */
-   get detached() { return this.#dataUIState.detached; }
+   get detached()
+   {
+      // UIState readable store for `detached` is a purely derived value. Evaluate value locally.
+      return this.#dataUIState.activeWindow !== globalThis;
+   }
 
    /**
     * Returns the current minimized UI state.
@@ -718,11 +722,13 @@ export class SvelteReactive
       this.#storeAppOptions = storeAppOptions;
 
       /**
+       * Not all derived UIStateData is updated via `storeUIStateUpdate`. For instance `detached` is a pure derived
+       * Readable and must be evaluated in `get detached()`.
+       *
        * @type {import('../../types').SvelteAppNS.API.Reactive.UIStateData}
        */
       this.#dataUIState = {
          activeWindow: window,
-         detached: false,
          dragging: false,
          headerButtons: [],
          minimized: this.#application._minimized,
