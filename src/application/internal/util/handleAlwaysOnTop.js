@@ -14,12 +14,19 @@
  * @param {import('../SvelteApp').SvelteApp}  application - Target application / SvelteApp.
  *
  * @param {boolean}  enabled - Enabled state for always on top.
+ *
+ * @param {boolean}  initialPopOut - Initial `popOut` state when app constructed.
  */
-export function handleAlwaysOnTop(application, enabled)
+export function handleAlwaysOnTop(application, enabled, initialPopOut)
 {
    if (typeof enabled !== 'boolean')
    {
       throw new TypeError(`[SvelteApp handleAlwaysOnTop error]: 'enabled' is not a boolean.`);
+   }
+
+   if (typeof initialPopOut !== 'boolean')
+   {
+      throw new TypeError(`[SvelteApp handleAlwaysOnTop error]: 'initialPopOut' is not a boolean.`);
    }
 
    const version = globalThis?.TRL_SVELTE_APP_DATA?.VERSION;
@@ -45,7 +52,7 @@ export function handleAlwaysOnTop(application, enabled)
          // TODO: Note direct Foundry API access.
          application.position.zIndex = foundry.applications.api.ApplicationV2._maxZ - 1;
 
-         application.reactive.popOut = true;
+         application.reactive.popOut = initialPopOut;
 
          // Wait for `rAF` then bring to the top.
          globalThis.requestAnimationFrame(() => application.bringToTop({ force: true }));

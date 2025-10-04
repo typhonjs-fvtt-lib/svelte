@@ -74,6 +74,11 @@ export class SvelteApp extends Application
    #gateSetPosition = false;
 
    /**
+    * Tracks initial `popOut` state. `handleAlwaysOnTop` will return the `popOut` state to this value.
+    */
+   #initialPopOut;
+
+   /**
     * Stores initial z-index from `_renderOuter` to set to target element / Svelte component.
     *
     * @type {number}
@@ -112,7 +117,7 @@ export class SvelteApp extends Application
     * Provides a helper class that combines multiple methods for interacting with the mounted components tracked in
     * #svelteData.
     *
-    * @type {import('./types').SvelteAppNS.API.Svelte<Options>}
+    * @type {import('./types').SvelteAppNS.API.Svelte<import('./types').SvelteAppNS.Options>}
     */
    #getSvelteData = new GetSvelteData(this.#applicationShellHolder, this.#svelteData);
 
@@ -142,6 +147,9 @@ export class SvelteApp extends Application
           (entry) => entry !== 'themed' && !entry?.startsWith('theme-'));
       }
 
+      // Track initial `popOut` state.
+      this.#initialPopOut = this.popOut;
+
       this.#applicationState = new ApplicationState(this);
 
       // Initialize TJSPosition with the position object set by Application.
@@ -168,7 +176,7 @@ export class SvelteApp extends Application
          set: (position) => { if (isObject(position)) { this.#position.set(position); } }
       });
 
-      this.#reactive = new SvelteReactive(this);
+      this.#reactive = new SvelteReactive(this, this.#initialPopOut);
 
       this.#stores = this.#reactive.initialize();
    }
@@ -933,7 +941,12 @@ export class SvelteApp extends Application
       // can correctly be positioned with initial helper constraints (centered).
       this.#gateSetPosition = true;
 
-      await super._render(force, options);
+      // TODO: REMOVE V14
+      // Note: This is a workaround to prevent the `PopOut!` module from attaching the popout button to the app header.
+      // Force: popOut to false if `alwaysOnTop` is true.
+      const popOut = typeof this.options.alwaysOnTop === 'boolean' && this.options.alwaysOnTop ? false : this.popOut;
+
+      await super._render(force, { ...options, popOut });
 
       this.#gateSetPosition = false;
 
@@ -978,7 +991,7 @@ export class SvelteApp extends Application
 
          if (typeof this.options.alwaysOnTop === 'boolean' && this.options.alwaysOnTop)
          {
-            handleAlwaysOnTop(this, true);
+            handleAlwaysOnTop(this, true, this.#initialPopOut);
          }
 
          // Ensure the app element has updated inline styles.
@@ -1080,7 +1093,7 @@ export class SvelteApp extends Application
          // Handle `alwaysOnTop` state with the new element root.
          if (typeof this.options.alwaysOnTop === 'boolean' && this.options.alwaysOnTop)
          {
-            handleAlwaysOnTop(this, true);
+            handleAlwaysOnTop(this, true, this.#initialPopOut);
          }
 
          // Ensure the app element has updated inline styles.

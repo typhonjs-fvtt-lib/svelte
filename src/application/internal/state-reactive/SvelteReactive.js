@@ -37,6 +37,11 @@ export class SvelteReactive
     */
    #initialized = false;
 
+   /**
+    * @type {boolean}
+    */
+   #initialPopOut;
+
    /** @type {import('#runtime/svelte/store/web-storage').WebStorage} */
    #sessionStorage;
 
@@ -84,10 +89,14 @@ export class SvelteReactive
 
    /**
     * @param {import('../SvelteApp').SvelteApp} application - The host Foundry application.
+    *
+    * @param {boolean} initialPopOut - Initial `popOut` state on app construction.
     */
-   constructor(application)
+   constructor(application, initialPopOut)
    {
       this.#application = application;
+      this.#initialPopOut = initialPopOut;
+
       const optionsSessionStorage = application?.options?.sessionStorage;
 
       if (optionsSessionStorage !== void 0 && !(optionsSessionStorage instanceof TJSWebStorage))
@@ -791,7 +800,7 @@ export class SvelteReactive
        * application back as a `popOut` window and brings it to the top of tracked windows.
        */
       this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.alwaysOnTop,
-       (enabled) => handleAlwaysOnTop(this.#application, enabled)));
+       (enabled) => handleAlwaysOnTop(this.#application, enabled, this.#initialPopOut)));
 
       // Handles updating header buttons to add / remove the close button.
       this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.headerButtonNoClose, (value) =>

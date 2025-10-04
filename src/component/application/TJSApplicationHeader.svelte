@@ -34,8 +34,9 @@
 
    const { elementRoot } = getContext('#internal').stores;
 
-   const storeTitle = application.reactive.storeAppOptions.title;
+   const storeAlwaysOnTop = application.reactive.storeAppOptions.alwaysOnTop;
    const storeDraggable = application.reactive.storeAppOptions.draggable;
+   const storeDetached = application.reactive.storeUIState.detached;
    const storeDragging = application.reactive.storeUIState.dragging;
    const storeHeaderButtons = application.reactive.storeUIState.headerButtons;
    const storeHeaderButtonNoLabel = application.reactive.storeAppOptions.headerButtonNoLabel;
@@ -43,10 +44,32 @@
    const storeHeaderNoTitleMinimized = application.reactive.storeAppOptions.headerNoTitleMinimized;
    const storeMinimizable = application.reactive.storeAppOptions.minimizable;
    const storeMinimized = application.reactive.storeUIState.minimized;
+   const storeTitle = application.reactive.storeAppOptions.title;
 
    // These classes in the window header allow dragging.
    const s_DRAG_TARGET_CLASSLIST = Object.freeze(['tjs-app-icon', 'tjs-window-header-spacer',
     'window-header', 'window-title']);
+
+   /** @type {HTMLElement} */
+   let headerEl;
+
+   // ----------------------------------------------------------------------------------------------------------------
+
+   function checkAlwaysOnTop(hide)
+   {
+      if (hide)
+      {
+         headerEl?.querySelector('.popout-module-button')?.setAttribute('hidden', '');
+      }
+      else
+      {
+         headerEl?.querySelector('.popout-module-button')?.removeAttribute('hidden');
+      }
+   }
+
+   $: if (headerEl) { checkAlwaysOnTop($storeAlwaysOnTop && !$storeDetached); }
+
+   // ----------------------------------------------------------------------------------------------------------------
 
    let dragOptions;
 
@@ -178,7 +201,8 @@
 </script>
 
 {#key draggable}
-   <header class="window-header"
+   <header bind:this={headerEl}
+           class="window-header"
            class:not-draggable={!$storeDraggable}
            on:pointerdown={onPointerdown}
            use:draggable={dragOptions}
