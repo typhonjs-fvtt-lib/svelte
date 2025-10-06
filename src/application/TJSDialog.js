@@ -55,10 +55,14 @@ export class TJSDialog extends SvelteApp
     */
    constructor(data, options = {})
    {
-      // Note: explicit setting of `popOutModuleDisable` to prevent the PopOut! module from acting on modal dialogs.
       // @ts-expect-error
       super({
+         // Explicit setting of `alwaysOnTop` to prevent the PopOut! module button from appearing when always on top.
+         alwaysOnTop: typeof data?.alwaysOnTop === 'boolean' ? data.alwaysOnTop : false,
+
+         // Explicit setting of `popOutModuleDisable` to prevent the PopOut! module from acting on modal dialogs.
          popOutModuleDisable: typeof data?.modal === 'boolean' ? data.modal : false,
+
          ...options,
 
          // Always ensure adding `dialog` class for core styles.
