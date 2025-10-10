@@ -35,6 +35,9 @@
 
    $: label = isObject(button) && typeof button.label === 'string' ? localize(button.label) : void 0;
 
+   $: tooltipDirection = isObject(button) && typeof button.tooltipDirection === 'string' ? button.tooltipDirection :
+    void 0;
+
    $: keepMinimized = isObject(button) && typeof button.keepMinimized === 'boolean' ? button.keepMinimized : false;
 
    $: keyCode = isObject(button) && typeof button.keyCode === 'string' ? button.keyCode : 'Enter';
@@ -122,7 +125,7 @@
    on:keydown={onKeydown}
    on:keyup={onKeyup}
    use:applyStyles={styles}
-   use:popoverTooltip={{ ariaLabel: true, tooltip: $storeHeaderButtonNoLabel ? void 0 : label }}>
+   use:popoverTooltip={{ ariaLabel: true, tooltip: $storeHeaderButtonNoLabel ? void 0 : label, direction: tooltipDirection }}>
 
    {#if icon}
       {#if iconType === 'font'}

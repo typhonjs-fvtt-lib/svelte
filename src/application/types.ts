@@ -64,6 +64,11 @@ declare namespace SvelteAppNS {
       label?: string;
 
       /**
+       * Tooltip direction; valid options include: `UP`, `DOWN`, `LEFT`, `RIGHT`, `CENTER`.
+       */
+      tooltipDirection?: string;
+
+      /**
        * Same as {@link HeaderButton.onPress}; supported for Foundry core backward compatibility. Use `onPress`.
        *
        * @hidden
