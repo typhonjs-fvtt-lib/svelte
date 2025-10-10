@@ -460,12 +460,19 @@ class GetSvelteData
  * @param {import('../SvelteApp').SvelteApp}  application - Target application / SvelteApp.
  *
  * @param {boolean}  enabled - Enabled state for always on top.
+ *
+ * @param {boolean}  initialPopOut - Initial `popOut` state when app constructed.
  */
-function handleAlwaysOnTop(application, enabled)
+function handleAlwaysOnTop(application, enabled, initialPopOut)
 {
    if (typeof enabled !== 'boolean')
    {
       throw new TypeError(`[SvelteApp handleAlwaysOnTop error]: 'enabled' is not a boolean.`);
+   }
+
+   if (typeof initialPopOut !== 'boolean')
+   {
+      throw new TypeError(`[SvelteApp handleAlwaysOnTop error]: 'initialPopOut' is not a boolean.`);
    }
 
    const version = globalThis?.TRL_SVELTE_APP_DATA?.VERSION;
@@ -491,7 +498,7 @@ function handleAlwaysOnTop(application, enabled)
          // TODO: Note direct Foundry API access.
          application.position.zIndex = foundry.applications.api.ApplicationV2._maxZ - 1;
 
-         application.reactive.popOut = true;
+         application.reactive.popOut = initialPopOut;
 
          // Wait for `rAF` then bring to the top.
          globalThis.requestAnimationFrame(() => application.bringToTop({ force: true }));
@@ -663,6 +670,11 @@ class SvelteReactive
     */
    #initialized = false;
 
+   /**
+    * @type {boolean}
+    */
+   #initialPopOut;
+
    /** @type {import('#runtime/svelte/store/web-storage').WebStorage} */
    #sessionStorage;
 
@@ -710,10 +722,14 @@ class SvelteReactive
 
    /**
     * @param {import('../SvelteApp').SvelteApp} application - The host Foundry application.
+    *
+    * @param {boolean} initialPopOut - Initial `popOut` state on app construction.
     */
-   constructor(application)
+   constructor(application, initialPopOut)
    {
       this.#application = application;
+      this.#initialPopOut = initialPopOut;
+
       const optionsSessionStorage = application?.options?.sessionStorage;
 
       if (optionsSessionStorage !== void 0 && !(optionsSessionStorage instanceof TJSWebStorage))
@@ -796,6 +812,17 @@ class SvelteReactive
     * @returns {boolean} Dragging UI state.
     */
    get dragging() { return this.#dataUIState.dragging; }
+
+   /**
+    * Returns whether the app is detached from the main browser window.
+    *
+    * @returns {boolean} App detached state.
+    */
+   get detached()
+   {
+      // UIState readable store for `detached` is a purely derived value. Evaluate value locally.
+      return this.#dataUIState.activeWindow !== globalThis;
+   }
 
    /**
     * Returns the current minimized UI state.
@@ -1337,10 +1364,13 @@ class SvelteReactive
       this.#storeAppOptions = storeAppOptions;
 
       /**
+       * Not all derived UIStateData is updated via `storeUIStateUpdate`. For instance `detached` is a pure derived
+       * Readable and must be evaluated in `get detached()`.
+       *
        * @type {import('../../types').SvelteApp.API.Reactive.UIStateData}
        */
       this.#dataUIState = {
-         activeWindow: globalThis,
+         activeWindow: window,
          dragging: false,
          headerButtons: [],
          minimized: this.#application._minimized,
@@ -1365,6 +1395,9 @@ class SvelteReactive
 
          activeWindow: /** @type {import('svelte/store').Readable<Window>} */
           derived(writableUIOptions, ($options, set) => set($options.activeWindow)),
+
+         detached: /** @type {import('svelte/store').Readable<boolean>} */
+          derived(writableUIOptions, ($options, set) => set($options.activeWindow !== globalThis)),
 
          dragging: /** @type {import('svelte/store').Readable<boolean>} */
           propertyStore(writableUIOptions, 'dragging'),
@@ -1400,7 +1433,7 @@ class SvelteReactive
        * application back as a `popOut` window and brings it to the top of tracked windows.
        */
       this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.alwaysOnTop,
-       (enabled) => handleAlwaysOnTop(this.#application, enabled)));
+       (enabled) => handleAlwaysOnTop(this.#application, enabled, this.#initialPopOut)));
 
       // Handles updating header buttons to add / remove the close button.
       this.#storeUnsubscribe.push(subscribeIgnoreFirst(this.#storeAppOptions.headerButtonNoClose, (value) =>
@@ -1911,6 +1944,11 @@ class SvelteApp extends Application
    #gateSetPosition = false;
 
    /**
+    * Tracks initial `popOut` state. `handleAlwaysOnTop` will return the `popOut` state to this value.
+    */
+   #initialPopOut;
+
+   /**
     * Stores initial z-index from `_renderOuter` to set to target element / Svelte component.
     *
     * @type {number}
@@ -1949,7 +1987,7 @@ class SvelteApp extends Application
     * Provides a helper class that combines multiple methods for interacting with the mounted components tracked in
     * #svelteData.
     *
-    * @type {import('./types').SvelteApp.API.Svelte<Options>}
+    * @type {import('./types').SvelteApp.API.Svelte<import('./types').SvelteApp.Options>}
     */
    #getSvelteData = new GetSvelteData(this.#applicationShellHolder, this.#svelteData);
 
@@ -1979,6 +2017,9 @@ class SvelteApp extends Application
           (entry) => entry !== 'themed' && !entry?.startsWith('theme-'));
       }
 
+      // Track initial `popOut` state.
+      this.#initialPopOut = this.popOut;
+
       this.#applicationState = new ApplicationState(this);
 
       // Initialize TJSPosition with the position object set by Application.
@@ -2005,7 +2046,7 @@ class SvelteApp extends Application
          set: (position) => { if (isObject(position)) { this.#position.set(position); } }
       });
 
-      this.#reactive = new SvelteReactive(this);
+      this.#reactive = new SvelteReactive(this, this.#initialPopOut);
 
       this.#stores = this.#reactive.initialize();
    }
@@ -2770,7 +2811,12 @@ class SvelteApp extends Application
       // can correctly be positioned with initial helper constraints (centered).
       this.#gateSetPosition = true;
 
-      await super._render(force, options);
+      // TODO: REMOVE V14
+      // Note: This is a workaround to prevent the `PopOut!` module from attaching the popout button to the app header.
+      // Force: popOut to false if `alwaysOnTop` is true.
+      const popOut = typeof this.options.alwaysOnTop === 'boolean' && this.options.alwaysOnTop ? false : this.popOut;
+
+      await super._render(force, { ...options, popOut });
 
       this.#gateSetPosition = false;
 
@@ -2815,7 +2861,7 @@ class SvelteApp extends Application
 
          if (typeof this.options.alwaysOnTop === 'boolean' && this.options.alwaysOnTop)
          {
-            handleAlwaysOnTop(this, true);
+            handleAlwaysOnTop(this, true, this.#initialPopOut);
          }
 
          // Ensure the app element has updated inline styles.
@@ -2917,7 +2963,7 @@ class SvelteApp extends Application
          // Handle `alwaysOnTop` state with the new element root.
          if (typeof this.options.alwaysOnTop === 'boolean' && this.options.alwaysOnTop)
          {
-            handleAlwaysOnTop(this, true);
+            handleAlwaysOnTop(this, true, this.#initialPopOut);
          }
 
          // Ensure the app element has updated inline styles.
@@ -3602,10 +3648,14 @@ class TJSDialog extends SvelteApp
     */
    constructor(data, options = {})
    {
-      // Note: explicit setting of `popOutModuleDisable` to prevent the PopOut! module from acting on modal dialogs.
       // @ts-expect-error
       super({
+         // Explicit setting of `alwaysOnTop` to prevent the PopOut! module button from appearing when always on top.
+         alwaysOnTop: typeof data?.alwaysOnTop === 'boolean' ? data.alwaysOnTop : false,
+
+         // Explicit setting of `popOutModuleDisable` to prevent the PopOut! module from acting on modal dialogs.
          popOutModuleDisable: typeof data?.modal === 'boolean' ? data.modal : false,
+
          ...options,
 
          // Always ensure adding `dialog` class for core styles.
