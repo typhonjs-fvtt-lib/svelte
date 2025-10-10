@@ -795,7 +795,7 @@ declare namespace SvelteAppNS {
          /**
           * Restores a previously saved application state by `name` returning the data. Several optional parameters are
           * available to animate / tween to the new state. When `animateTo` is true, an animation is scheduled via
-          * {@link #runtime/svelte/store/position!AnimationAPI.to} and the duration and easing name or function may be
+          * {@link #runtime/svelte/store/position!TJSPosition.API.Animation.to} and the duration and easing name or function may be
           * specified.
           *
           * @param options - Parameters
