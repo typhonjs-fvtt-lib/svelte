@@ -13,6 +13,8 @@ import { StyleSheetResolve }  from '#runtime/util/dom/style';
  *
  * The following CSS layers are parsed from Foundry core styles:
  * ```
+ * - `applications`
+ * - `blocks.ui`
  * - `variables.base`
  * - `variables.themes.*`
  * - `elements.*`

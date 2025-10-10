@@ -59,12 +59,14 @@ declare namespace SvelteAppNS {
       keyCode?: string;
 
       /**
-       * Text label or language key to associate with button.
+       * Text label or language key to associate with button; used for tooltip.
        */
       label?: string;
 
       /**
        * Tooltip direction; valid options include: `UP`, `DOWN`, `LEFT`, `RIGHT`, `CENTER`.
+       *
+       * @defaultValue `DOWN`
        */
       tooltipDirection?: string;
 
@@ -97,11 +99,6 @@ declare namespace SvelteAppNS {
        * Note: supports just `class`, `props` definition.
        */
       svelte?: TJSSvelte.Config.Embed;
-
-      /**
-       * A tooltip to display when hovered.
-       */
-      title?: string;
    };
 
    /**

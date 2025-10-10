@@ -175,11 +175,13 @@ declare namespace SvelteApp {
      */
     keyCode?: string;
     /**
-     * Text label or language key to associate with button.
+     * Text label or language key to associate with button; used for tooltip.
      */
     label?: string;
     /**
      * Tooltip direction; valid options include: `UP`, `DOWN`, `LEFT`, `RIGHT`, `CENTER`.
+     *
+     * @defaultValue `DOWN`
      */
     tooltipDirection?: string;
     /**
@@ -209,10 +211,6 @@ declare namespace SvelteApp {
      * Note: supports just `class`, `props` definition.
      */
     svelte?: TJSSvelte.Config.Embed;
-    /**
-     * A tooltip to display when hovered.
-     */
-    title?: string;
   };
   /**
    * Defines a callback function in {@link HeaderButton} for `onContextMenu` / `onPress` handlers.
@@ -1915,6 +1913,8 @@ declare class TJSDialog extends SvelteApp {
  *
  * The following CSS layers are parsed from Foundry core styles:
  * ```
+ * - `applications`
+ * - `blocks.ui`
  * - `variables.base`
  * - `variables.themes.*`
  * - `elements.*`
