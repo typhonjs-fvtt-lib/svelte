@@ -510,9 +510,11 @@ declare namespace TJSGameSettings
          requiresReload?: boolean;
 
          /**
-          * Scope for setting. `client` uses local storage and `world` is saved in Foundry DB.
+          * Scope for setting. `client` uses local storage, `world` is saved in Foundry DB for the World / only
+          * accessible by GM for modification, and `user` is also saved in the Foundry DB associated w/ the current
+          * user.
           */
-         scope: 'client' | 'world';
+         scope: 'client' | 'world' | 'user';
 
          /**
           * A constructable object, function, or DataModel.
