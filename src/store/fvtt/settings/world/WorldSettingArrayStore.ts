@@ -26,8 +26,7 @@ class WorldArrayObjectStore<S extends WorldArrayObjectStore.Data.BaseObjectEntry
    /**
     * @param options - WorldArrayObjectStore Options.
     */
-   constructor({ namespace, key, defaultData = [], gameSettings, ...rest }: WorldArrayObjectStore.Options.Config<S> &
-     CrudArrayObjectStore.Options.Config<S>)
+   constructor({ namespace, key, defaultData = [], gameSettings, ...rest }: WorldArrayObjectStore.Options.Config<S>)
    {
       super({
          ...rest,
