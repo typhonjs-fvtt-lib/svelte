@@ -21,8 +21,20 @@ declare class TJSGameSettings<ExtraProps extends Record<string, any> = {}> {
    * Creates the TJSGameSettings instance.
    *
    * @param namespace - The namespace for all settings.
+   *
+   * @param [options] - Options.
+   *
+   * @param [options.strictUserScoping] - User scoped settings strictly verify `onChange` callbacks against current
+   *        game user ID; default: `true`.
    */
-  constructor(namespace: string);
+  constructor(
+    namespace: string,
+    {
+      strictUserScoping,
+    }?: {
+      strictUserScoping?: boolean;
+    },
+  );
   /**
    * @returns Returns namespace set in constructor.
    */
@@ -167,7 +179,21 @@ declare namespace TJSGameSettings {
        * An onChange callback function or iterable list of callbacks to directly receive callbacks from Foundry on
        * setting change.
        */
-      onChange?: Function | Iterable<Function>;
+      onChange?: (
+        value: any,
+        options?: {
+          [key: string]: any;
+        },
+        userId?: string,
+      ) => void | Iterable<
+        (
+          value: any,
+          options?: {
+            [key: string]: any;
+          },
+          userId?: string,
+        ) => void
+      >;
       /**
        * If range is specified, the resulting setting will be a range slider.
        */

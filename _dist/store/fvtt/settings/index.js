@@ -23,6 +23,10 @@ class TJSGameSettings {
      */
     #namespace;
     /**
+     * When true, strict user scoping is verified `user` scoped settings for all game setting `onChange` callbacks.
+     */
+    #strictUserScoping;
+    /**
      */
     #settings = [];
     /**
@@ -32,12 +36,21 @@ class TJSGameSettings {
      * Creates the TJSGameSettings instance.
      *
      * @param namespace - The namespace for all settings.
+     *
+     * @param [options] - Options.
+     *
+     * @param [options.strictUserScoping] - User scoped settings strictly verify `onChange` callbacks against current
+     *        game user ID; default: `true`.
      */
-    constructor(namespace) {
+    constructor(namespace, { strictUserScoping = true } = {}) {
         if (typeof namespace !== 'string') {
             throw new TypeError(`'namespace' is not a string.`);
         }
+        if (typeof strictUserScoping !== 'boolean') {
+            throw new TypeError(`'strictUserScoping' is not a boolean.`);
+        }
         this.#namespace = namespace;
+        this.#strictUserScoping = strictUserScoping;
     }
     /**
      * Creates a new writable for the given key.
@@ -145,6 +158,7 @@ class TJSGameSettings {
         }
         const store = setting.store;
         const options = setting.options;
+        const verifyUserScope = options.scope === 'user' && this.#strictUserScoping;
         const onchangeFunctions = [];
         // When true prevents local store subscription from a loop when values are object data.
         let gateSet = false;
@@ -169,9 +183,12 @@ class TJSGameSettings {
             onchangeFunctions.push(options.onChange);
         }
         // Provides the final onChange callback that iterates over all the stored onChange callbacks.
-        const onChange = (value) => {
+        const onChange = (value, options, userId) => {
+            if (verifyUserScope && userId !== globalThis.game.userId) {
+                return;
+            }
             for (const entry of onchangeFunctions) {
-                entry(value);
+                entry(value, options, userId);
             }
         };
         // @ts-expect-error PF2E types do not have partial aspects for `name`.

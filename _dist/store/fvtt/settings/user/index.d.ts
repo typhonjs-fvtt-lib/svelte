@@ -3,19 +3,19 @@ import { TJSGameSettings } from '@typhonjs-fvtt/svelte/store/fvtt/settings';
 
 /**
  * Defines a {@link CrudArrayObjectStore} with streamlined configuration through {@link TJSGameSettings} to register
- * a world game setting. WorldArrayObjectStore is automatically associated as the store receiving updates with the
+ * a user game setting. UserArrayObjectStore is automatically associated as the store receiving updates with the
  * associated game setting.
  *
  * @typeParam S - Store type.
  */
-declare class WorldArrayObjectStore<
-  S extends WorldArrayObjectStore.Data.BaseObjectEntryStore<any>,
+declare class UserArrayObjectStore<
+  S extends UserArrayObjectStore.Data.BaseObjectEntryStore<any>,
 > extends CrudArrayObjectStore<S> {
   #private;
   /**
-   * @param options - WorldArrayObjectStore Options.
+   * @param options - UserArrayObjectStore Options.
    */
-  constructor({ namespace, key, defaultData, gameSettings, ...rest }: WorldArrayObjectStore.Options.Config<S>);
+  constructor({ namespace, key, defaultData, gameSettings, ...rest }: UserArrayObjectStore.Options.Config<S>);
   /**
    * @returns The Foundry game setting key.
    */
@@ -25,7 +25,7 @@ declare class WorldArrayObjectStore<
    */
   get namespace(): string;
 }
-declare namespace WorldArrayObjectStore {
+declare namespace UserArrayObjectStore {
   export import Data = CrudArrayObjectStore.Data;
   export import Util = CrudArrayObjectStore.Util;
   namespace Options {
@@ -45,9 +45,9 @@ declare namespace WorldArrayObjectStore {
        * When an instance of {@link TJSGameSettings} is defined and automatic game setting registered you may
        * provide default data for the Foundry game setting.
        */
-      defaultData?: WorldArrayObjectStore.Util.ExtractDataType<S>[];
+      defaultData?: UserArrayObjectStore.Util.ExtractDataType<S>[];
       /**
-       * An instance of {@link TJSGameSettings}. If provided a world game setting will be automatically registered
+       * An instance of {@link TJSGameSettings}. If provided a user game setting will be automatically registered
        * for the given `namespace` and `key` with this instance as the associated game setting store.
        */
       gameSettings?: TJSGameSettings;
@@ -55,4 +55,4 @@ declare namespace WorldArrayObjectStore {
   }
 }
 
-export { WorldArrayObjectStore };
+export { UserArrayObjectStore };
