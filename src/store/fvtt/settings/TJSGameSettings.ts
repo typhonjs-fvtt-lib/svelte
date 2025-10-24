@@ -37,6 +37,11 @@ class TJSGameSettings<ExtraProps extends Record<string, any> = {}>
    readonly #namespace: string;
 
    /**
+    * When true, strict user scoping is verified `user` scoped settings for all game setting `onChange` callbacks.
+    */
+   readonly #strictUserScoping: boolean;
+
+   /**
     */
    #settings: TJSGameSettings.Data.GameSetting<ExtraProps>[] = [];
 
@@ -48,12 +53,20 @@ class TJSGameSettings<ExtraProps extends Record<string, any> = {}>
     * Creates the TJSGameSettings instance.
     *
     * @param namespace - The namespace for all settings.
+    *
+    * @param [options] - Options.
+    *
+    * @param [options.strictUserScoping] - User scoped settings strictly verify `onChange` callbacks against current
+    *        game user ID; default: `true`.
     */
-   constructor(namespace: string)
+   constructor(namespace: string, { strictUserScoping = true } = {})
    {
       if (typeof namespace !== 'string') { throw new TypeError(`'namespace' is not a string.`); }
 
+      if (typeof strictUserScoping !== 'boolean') { throw new TypeError(`'strictUserScoping' is not a boolean.`); }
+
       this.#namespace = namespace;
+      this.#strictUserScoping = strictUserScoping;
    }
 
    /**
@@ -199,6 +212,8 @@ class TJSGameSettings<ExtraProps extends Record<string, any> = {}>
 
       const options: TJSGameSettings.Options.CoreSetting = setting.options;
 
+      const verifyUserScope = options.scope === 'user' && this.#strictUserScoping;
+
       const onchangeFunctions: Function[] = [];
 
       // When true prevents local store subscription from a loop when values are object data.
@@ -230,9 +245,12 @@ class TJSGameSettings<ExtraProps extends Record<string, any> = {}>
       }
 
       // Provides the final onChange callback that iterates over all the stored onChange callbacks.
-      const onChange: (value: unknown) => void = (value: any): void =>
+      const onChange: (value: unknown, options: { [key: string]: any }, userId: string) => void =
+       (value: any, options: { [key: string]: any }, userId: string): void =>
       {
-         for (const entry of onchangeFunctions) { entry(value); }
+         if (verifyUserScope && userId !== globalThis.game.userId) { return; }
+
+         for (const entry of onchangeFunctions) { entry(value, options, userId); }
       };
 
       // @ts-expect-error PF2E types do not have partial aspects for `name`.
@@ -497,7 +515,8 @@ declare namespace TJSGameSettings
           * An onChange callback function or iterable list of callbacks to directly receive callbacks from Foundry on
           * setting change.
           */
-         onChange?: Function | Iterable<Function>;
+         onChange?: (value: any, options?: { [key: string]: any }, userId?: string) => void |
+          Iterable<(value: any, options?: { [key: string]: any }, userId?: string) => void>;
 
          /**
           * If range is specified, the resulting setting will be a range slider.
