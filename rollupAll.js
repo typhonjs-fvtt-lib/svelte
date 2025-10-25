@@ -163,17 +163,17 @@ const rollupConfigs = [
    },
    {
       input: {
-         input: 'src/store/fvtt/settings/world/index.ts',
+         input: 'src/store/fvtt/settings/array-object/index.ts',
          external,
          plugins: [
             importsExternal(),
             resolve(s_RESOLVE_CONFIG),
-            typescript({ tsconfig: './src/store/fvtt/settings/world/tsconfig.json' }),
+            typescript({ tsconfig: './src/store/fvtt/settings/array-object/tsconfig.json' }),
             generateDTS.plugin(dtsPluginOptions)
          ]
       },
       output: {
-         file: '_dist/store/fvtt/settings/world/index.js',
+         file: '_dist/store/fvtt/settings/array-object/index.js',
          format: 'es',
          generatedCode: { constBindings: true },
          paths: externalPathsNPM,

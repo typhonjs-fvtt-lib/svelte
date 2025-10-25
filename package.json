@@ -49,9 +49,9 @@
       "types": "./_dist/store/fvtt/settings/index.d.ts",
       "import": "./_dist/store/fvtt/settings/index.js"
     },
-    "./store/fvtt/settings/world": {
-      "types": "./_dist/store/fvtt/settings/world/index.d.ts",
-      "import": "./_dist/store/fvtt/settings/world/index.js"
+    "./store/fvtt/settings/array-object": {
+      "types": "./_dist/store/fvtt/settings/array-object/index.d.ts",
+      "import": "./_dist/store/fvtt/settings/array-object/index.js"
     },
     "./package.json": "./package.json"
   },
