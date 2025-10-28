@@ -28,6 +28,10 @@ declare class SvelteApp<Options extends SvelteApp.Options = SvelteApp.Options>
    * @see https://foundryvtt.com/api/interfaces/client.ApplicationOptions.html
    */
   static get defaultOptions(): SvelteApp.Options;
+
+  /** The options provided to this application upon initialization */
+  options: Options;
+
   /**
    * @param {Partial<import('./types').SvelteApp.Options>} [options] - The options for the application.
    */

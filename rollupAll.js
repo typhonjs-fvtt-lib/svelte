@@ -65,6 +65,9 @@ const applicationDTSOptions = {
       ...dtsReplace,
       'get elementTarget\\(\\): HTMLElement;': dtsReplacePositionGetter,
 
+      // Add in public reference to `options: Options;` generic allowing `checkJS` support downstream without associating any Foundry types.
+      'static get defaultOptions\\(\\): SvelteAppNS\\.Options': 'static get defaultOptions(): SvelteAppNS.Options;\n\n/** The options provided to this application upon initialization */\noptions: Options;\n\n',
+
       // Handle the case of removing all generics from the extension of SvelteApp by TJSDialog as it internally defines the loaded component.
       'TJSDialog extends SvelteApp<SvelteApp.Options<svelte.SvelteComponent<any, any, any>, SvelteApp.Context.AbstractExternal>>': 'TJSDialog extends SvelteApp',
 
