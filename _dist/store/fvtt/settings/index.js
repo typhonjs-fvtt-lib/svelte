@@ -37,10 +37,7 @@ class TJSGameSettings {
      *
      * @param namespace - The namespace for all settings.
      *
-     * @param [options] - Options.
-     *
-     * @param [options.strictUserScoping] - User scoped settings strictly verify `onChange` callbacks against current
-     *        game user ID; default: `true`.
+     * @param options - TJSGameSetting options.
      */
     constructor(namespace, { strictUserScoping = true } = {}) {
         if (typeof namespace !== 'string') {

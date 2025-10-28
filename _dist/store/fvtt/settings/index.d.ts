@@ -22,19 +22,9 @@ declare class TJSGameSettings<ExtraProps extends Record<string, any> = {}> {
    *
    * @param namespace - The namespace for all settings.
    *
-   * @param [options] - Options.
-   *
-   * @param [options.strictUserScoping] - User scoped settings strictly verify `onChange` callbacks against current
-   *        game user ID; default: `true`.
+   * @param options - TJSGameSetting options.
    */
-  constructor(
-    namespace: string,
-    {
-      strictUserScoping,
-    }?: {
-      strictUserScoping?: boolean;
-    },
-  );
+  constructor(namespace: string, { strictUserScoping }?: TJSGameSettings.Options.Ctor);
   /**
    * @returns Returns namespace set in constructor.
    */
@@ -146,6 +136,17 @@ declare namespace TJSGameSettings {
     type GameSetting<ExtraProps extends Record<string, any> = {}> = GameSettingBase & ExtraProps;
   }
   namespace Options {
+    /**
+     * Defines constructor options for TJSGameSettings.
+     */
+    interface Ctor {
+      /**
+       * User scoped settings strictly verify `onChange` callbacks against current game user ID.
+       *
+       * @defaultValue `true`.
+       */
+      strictUserScoping?: boolean;
+    }
     /**
      * Defines the core Foundry options for a game setting.
      */
