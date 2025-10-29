@@ -4,14 +4,14 @@ import { isObject } from '@typhonjs-svelte/runtime-base/util/object';
 
 /**
  * Provides an extension to {@link #runtime/svelte/store/reducer/array-object!ObjectEntryStore} adding the
- * {@link FVTTObjectEntryStore.canUserEdit} accessor which when paired with {@link GameSettingArrayObject} forwards on
+ * {@link FVTTObjectEntryStore.canUserModify} accessor which when paired with {@link GameSettingArrayObject} forwards on
  * whether the current Foundry user can edit / save to the Foundry DB.
  *
  * This is the base {@link ObjectEntryStore} available from a direct import or through
  * {@link GameSettingArrayObject.EntryStore} accessor.
  */
 class FVTTObjectEntryStore extends ObjectEntryStore {
-    #canUserEdit;
+    #canUserModify;
     /**
      * @param data - Initial entry data.
      *
@@ -20,13 +20,13 @@ class FVTTObjectEntryStore extends ObjectEntryStore {
      */
     constructor(data, gameSettingArrayObject) {
         super(data);
-        this.#canUserEdit = gameSettingArrayObject?.canUserEdit ?? true;
+        this.#canUserModify = gameSettingArrayObject?.canUserModify ?? true;
     }
     /**
      * Can the current user edit / save this instance to the Foundry DB.
      */
-    get canUserEdit() {
-        return this.#canUserEdit;
+    get canUserModify() {
+        return this.#canUserModify;
     }
 }
 
@@ -108,18 +108,18 @@ class GameSettingArrayObject extends CrudArrayObjectStore {
     /**
      * Can the current user edit / save this instance to the Foundry DB.
      */
-    get canUserEdit() {
-        let canUserEdit = false;
+    get canUserModify() {
+        let canUserModify = false;
         switch (this.#scope) {
             case 'user':
-                canUserEdit = true;
+                canUserModify = true;
                 break;
             case 'world':
                 // @ts-ignore - No Foundry types associated in build.
-                canUserEdit = globalThis.game.user.isGM;
+                canUserModify = globalThis.game.user.isGM;
                 break;
         }
-        return canUserEdit;
+        return canUserModify;
     }
     /**
      * @returns The Foundry game setting `key`.
