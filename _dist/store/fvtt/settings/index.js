@@ -181,6 +181,7 @@ class TJSGameSettings {
         }
         // Provides the final onChange callback that iterates over all the stored onChange callbacks.
         const onChange = (value, options, userId) => {
+            // @ts-ignore - Foundry types not configured in build.
             if (verifyUserScope && userId !== globalThis.game.userId) {
                 return;
             }
@@ -188,18 +189,22 @@ class TJSGameSettings {
                 entry(value, options, userId);
             }
         };
-        // @ts-expect-error PF2E types do not have partial aspects for `name`.
+        // @ts-ignore PF2E types do not have partial aspects for `name`.
         globalThis.game.settings.register(namespace, key, { ...options, config: foundryConfig, onChange });
         // Set new store value with existing setting or default value.
-        const targetStore = store ? store : this.#getStore(key, globalThis.game.settings.get(namespace, key));
+        const targetStore = store ? store :
+            // @ts-ignore - Foundry types not configured in build.
+            this.#getStore(key, globalThis.game.settings.get(namespace, key));
         // If a store instance is passed into register then initialize it with game settings data.
         if (store) {
             this.#stores.set(key, targetStore);
+            // @ts-ignore - Foundry types not configured in build.
             store.set(globalThis.game.settings.get(namespace, key));
         }
         const storeHandler = async (value) => {
             if (!gateSet) {
                 gateSet = true;
+                // @ts-ignore - Foundry types not configured in build.
                 await globalThis.game.settings.set(namespace, key, value);
             }
             gateSet = false;

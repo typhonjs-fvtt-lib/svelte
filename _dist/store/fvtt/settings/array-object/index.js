@@ -1,6 +1,34 @@
-import { CrudArrayObjectStore } from '@typhonjs-svelte/runtime-base/svelte/store/reducer/array-object';
+import { ObjectEntryStore, CrudArrayObjectStore } from '@typhonjs-svelte/runtime-base/svelte/store/reducer/array-object';
 import { Hashing } from '@typhonjs-svelte/runtime-base/util';
 import { isObject } from '@typhonjs-svelte/runtime-base/util/object';
+
+/**
+ * Provides an extension to {@link #runtime/svelte/store/reducer/array-object!ObjectEntryStore} adding the
+ * {@link FVTTObjectEntryStore.canEdit} accessor which when paired with {@link GameSettingArrayObject} forwards on
+ * whether the current Foundry user can edit / save to the Foundry DB.
+ *
+ * This is the base {@link ObjectEntryStore} available from a direct import or through
+ * {@link GameSettingArrayObject.EntryStore} accessor.
+ */
+class FVTTObjectEntryStore extends ObjectEntryStore {
+    #canEdit;
+    /**
+     * @param data - Initial entry data.
+     *
+     * @param [gameSettingArrayObject] - Associated backing array object store. Automatically passed on entry creation
+     *        by {@link #runtime/svelte/store/reducer/array-object!ArrayObjectStore}.
+     */
+    constructor(data, gameSettingArrayObject) {
+        super(data);
+        this.#canEdit = gameSettingArrayObject?.canEdit ?? true;
+    }
+    /**
+     * Can the current user edit / save this instance to the Foundry DB.
+     */
+    get canEdit() {
+        return this.#canEdit;
+    }
+}
 
 /**
  * Defines a {@link CrudArrayObjectStore} with streamlined configuration through {@link TJSGameSettings} to register
@@ -22,6 +50,11 @@ class GameSettingArrayObject extends CrudArrayObjectStore {
      * Game setting `scope` field.
      */
     #scope;
+    /**
+     * @returns The default object entry store constructor that can facilitate the creation of the required
+     *          {@link GameSettingArrayObject.Options.Config.StoreClass} and generic `T` type parameter.
+     */
+    static get EntryStore() { return FVTTObjectEntryStore; }
     /**
      * @param options - GameSettingArrayObject Options.
      */
@@ -73,6 +106,22 @@ class GameSettingArrayObject extends CrudArrayObjectStore {
         }
     }
     /**
+     * Can the current user edit / save this instance to the Foundry DB.
+     */
+    get canEdit() {
+        let canEdit = false;
+        switch (this.#scope) {
+            case 'user':
+                canEdit = true;
+                break;
+            case 'world':
+                // @ts-ignore - No Foundry types associated in build.
+                canEdit = globalThis.game.user.isGM;
+                break;
+        }
+        return canEdit;
+    }
+    /**
      * @returns The Foundry game setting `key`.
      */
     get key() { return this.#key; }
@@ -86,5 +135,5 @@ class GameSettingArrayObject extends CrudArrayObjectStore {
     get scope() { return this.#scope; }
 }
 
-export { GameSettingArrayObject };
+export { FVTTObjectEntryStore, GameSettingArrayObject };
 //# sourceMappingURL=index.js.map

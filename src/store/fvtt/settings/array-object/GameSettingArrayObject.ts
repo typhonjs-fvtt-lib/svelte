@@ -2,6 +2,8 @@ import { CrudArrayObjectStore }  from '#runtime/svelte/store/reducer/array-objec
 import { Hashing }               from '#runtime/util';
 import { isObject }              from '#runtime/util/object';
 
+import { FVTTObjectEntryStore }  from './FVTTObjectEntryStore';
+
 import type { TJSGameSettings }  from '#svelte-fvtt/store/fvtt/settings';
 
 /**
@@ -28,6 +30,12 @@ class GameSettingArrayObject<S extends GameSettingArrayObject.Data.BaseObjectEnt
     * Game setting `scope` field.
     */
    readonly #scope: string;
+
+   /**
+    * @returns The default object entry store constructor that can facilitate the creation of the required
+    *          {@link GameSettingArrayObject.Options.Config.StoreClass} and generic `T` type parameter.
+    */
+   static get EntryStore(): typeof FVTTObjectEntryStore { return FVTTObjectEntryStore; }
 
    /**
     * @param options - GameSettingArrayObject Options.
@@ -75,6 +83,28 @@ class GameSettingArrayObject<S extends GameSettingArrayObject.Data.BaseObjectEnt
             }
          });
       }
+   }
+
+   /**
+    * Can the current user edit / save this instance to the Foundry DB.
+    */
+   get canEdit(): boolean
+   {
+      let canEdit = false;
+
+      switch (this.#scope)
+      {
+         case 'user':
+            canEdit = true;
+            break;
+
+         case 'world':
+            // @ts-ignore - No Foundry types associated in build.
+            canEdit = globalThis.game.user.isGM;
+            break;
+      }
+
+      return canEdit;
    }
 
    /**

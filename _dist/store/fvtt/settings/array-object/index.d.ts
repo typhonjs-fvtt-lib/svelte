@@ -1,4 +1,7 @@
-import { CrudArrayObjectStore } from '@typhonjs-svelte/runtime-base/svelte/store/reducer/array-object';
+import {
+  CrudArrayObjectStore,
+  ObjectEntryStore,
+} from '@typhonjs-svelte/runtime-base/svelte/store/reducer/array-object';
 import { TJSGameSettings } from '@typhonjs-fvtt/svelte/store/fvtt/settings';
 
 /**
@@ -13,9 +16,18 @@ declare class GameSettingArrayObject<
 > extends CrudArrayObjectStore<S> {
   #private;
   /**
+   * @returns The default object entry store constructor that can facilitate the creation of the required
+   *          {@link GameSettingArrayObject.Options.Config.StoreClass} and generic `T` type parameter.
+   */
+  static get EntryStore(): typeof FVTTObjectEntryStore;
+  /**
    * @param options - GameSettingArrayObject Options.
    */
   constructor({ namespace, key, scope, defaultData, gameSettings, ...rest }: GameSettingArrayObject.Options.Config<S>);
+  /**
+   * Can the current user edit / save this instance to the Foundry DB.
+   */
+  get canEdit(): boolean;
   /**
    * @returns The Foundry game setting `key`.
    */
@@ -64,4 +76,29 @@ declare namespace GameSettingArrayObject {
   }
 }
 
-export { GameSettingArrayObject };
+/**
+ * Provides an extension to {@link #runtime/svelte/store/reducer/array-object!ObjectEntryStore} adding the
+ * {@link FVTTObjectEntryStore.canEdit} accessor which when paired with {@link GameSettingArrayObject} forwards on
+ * whether the current Foundry user can edit / save to the Foundry DB.
+ *
+ * This is the base {@link ObjectEntryStore} available from a direct import or through
+ * {@link GameSettingArrayObject.EntryStore} accessor.
+ */
+declare abstract class FVTTObjectEntryStore<
+  T extends GameSettingArrayObject.Data.BaseArrayObject = GameSettingArrayObject.Data.BaseArrayObject,
+> extends ObjectEntryStore<T> {
+  #private;
+  /**
+   * @param data - Initial entry data.
+   *
+   * @param [gameSettingArrayObject] - Associated backing array object store. Automatically passed on entry creation
+   *        by {@link #runtime/svelte/store/reducer/array-object!ArrayObjectStore}.
+   */
+  protected constructor(data: T, gameSettingArrayObject?: GameSettingArrayObject<any>);
+  /**
+   * Can the current user edit / save this instance to the Foundry DB.
+   */
+  get canEdit(): boolean;
+}
+
+export { FVTTObjectEntryStore, GameSettingArrayObject };
