@@ -21,7 +21,7 @@ export abstract class FVTTObjectEntryStore<T extends GameSettingArrayObject.Data
     * @param [gameSettingArrayObject] - Associated backing array object store. Automatically passed on entry creation
     *        by {@link #runtime/svelte/store/reducer/array-object!ArrayObjectStore}.
     */
-   protected constructor(data: T, gameSettingArrayObject?: GameSettingArrayObject<any>)
+   constructor(data: T, gameSettingArrayObject?: GameSettingArrayObject<any>)
    {
       super(data);
 

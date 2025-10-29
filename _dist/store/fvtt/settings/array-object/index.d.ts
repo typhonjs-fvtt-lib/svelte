@@ -94,7 +94,7 @@ declare abstract class FVTTObjectEntryStore<
    * @param [gameSettingArrayObject] - Associated backing array object store. Automatically passed on entry creation
    *        by {@link #runtime/svelte/store/reducer/array-object!ArrayObjectStore}.
    */
-  protected constructor(data: T, gameSettingArrayObject?: GameSettingArrayObject<any>);
+  constructor(data: T, gameSettingArrayObject?: GameSettingArrayObject<any>);
   /**
    * Can the current user edit / save this instance to the Foundry DB.
    */
