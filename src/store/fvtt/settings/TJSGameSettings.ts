@@ -245,22 +245,25 @@ class TJSGameSettings<ExtraProps extends Record<string, any> = {}>
       const onChange: (value: unknown, options: { [key: string]: any }, userId: string) => void =
        (value: any, options: { [key: string]: any }, userId: string): void =>
       {
+         // @ts-ignore - Foundry types not configured in build.
          if (verifyUserScope && userId !== globalThis.game.userId) { return; }
 
          for (const entry of onchangeFunctions) { entry(value, options, userId); }
       };
 
-      // @ts-expect-error PF2E types do not have partial aspects for `name`.
+      // @ts-ignore PF2E types do not have partial aspects for `name`.
       globalThis.game.settings.register(namespace, key, { ...options, config: foundryConfig, onChange });
 
       // Set new store value with existing setting or default value.
-      const targetStore: MinimalWritable<any> = store ? store : this.#getStore(key,
-       globalThis.game.settings.get(namespace, key));
+      const targetStore: MinimalWritable<any> = store ? store :
+       // @ts-ignore - Foundry types not configured in build.
+       this.#getStore(key, globalThis.game.settings.get(namespace, key));
 
       // If a store instance is passed into register then initialize it with game settings data.
       if (store)
       {
          this.#stores.set(key, targetStore);
+         // @ts-ignore - Foundry types not configured in build.
          store.set(globalThis.game.settings.get(namespace, key));
       }
 
@@ -269,6 +272,8 @@ class TJSGameSettings<ExtraProps extends Record<string, any> = {}>
          if (!gateSet)
          {
             gateSet = true;
+
+            // @ts-ignore - Foundry types not configured in build.
             await globalThis.game.settings.set(namespace, key, value);
          }
 
