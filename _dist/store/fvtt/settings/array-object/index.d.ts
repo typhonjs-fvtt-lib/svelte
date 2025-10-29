@@ -27,7 +27,7 @@ declare class GameSettingArrayObject<
   /**
    * Can the current user edit / save this instance to the Foundry DB.
    */
-  get canEdit(): boolean;
+  get canUserEdit(): boolean;
   /**
    * @returns The Foundry game setting `key`.
    */
@@ -78,7 +78,7 @@ declare namespace GameSettingArrayObject {
 
 /**
  * Provides an extension to {@link #runtime/svelte/store/reducer/array-object!ObjectEntryStore} adding the
- * {@link FVTTObjectEntryStore.canEdit} accessor which when paired with {@link GameSettingArrayObject} forwards on
+ * {@link FVTTObjectEntryStore.canUserEdit} accessor which when paired with {@link GameSettingArrayObject} forwards on
  * whether the current Foundry user can edit / save to the Foundry DB.
  *
  * This is the base {@link ObjectEntryStore} available from a direct import or through
@@ -98,7 +98,7 @@ declare abstract class FVTTObjectEntryStore<
   /**
    * Can the current user edit / save this instance to the Foundry DB.
    */
-  get canEdit(): boolean;
+  get canUserEdit(): boolean;
 }
 
 export { FVTTObjectEntryStore, GameSettingArrayObject };

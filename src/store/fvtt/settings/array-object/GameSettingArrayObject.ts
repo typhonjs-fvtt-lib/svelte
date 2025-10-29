@@ -88,23 +88,23 @@ class GameSettingArrayObject<S extends GameSettingArrayObject.Data.BaseObjectEnt
    /**
     * Can the current user edit / save this instance to the Foundry DB.
     */
-   get canEdit(): boolean
+   get canUserEdit(): boolean
    {
-      let canEdit = false;
+      let canUserEdit = false;
 
       switch (this.#scope)
       {
          case 'user':
-            canEdit = true;
+            canUserEdit = true;
             break;
 
          case 'world':
             // @ts-ignore - No Foundry types associated in build.
-            canEdit = globalThis.game.user.isGM;
+            canUserEdit = globalThis.game.user.isGM;
             break;
       }
 
-      return canEdit;
+      return canUserEdit;
    }
 
    /**
