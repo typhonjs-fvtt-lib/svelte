@@ -965,9 +965,30 @@ declare namespace SvelteApp {
    * It is useful to use `OptionsCore` when defining APIs of extended classes that internally handle loading a Svelte
    * component where the intention is to only allow modification of other core options.
    *
-   * @privateRemarks Note: that this extends the Foundry `ApplicationOptions` in the build process.
+   * @privateRemarks
+   * Note: that this extends the Foundry `ApplicationOptions` in the build process. The first three properties
+   * duplicate common base app options useful for when TypeScript `checkJs` is enabled, but no Foundry types
+   * are configured.
    */
   interface OptionsCore extends Partial<fvtt.ApplicationOptions> {
+    /**
+     * The default CSS id to assign to the rendered HTML.
+     *
+     * @defaultValue `""`
+     */
+    id?: string;
+    /**
+     * An array of CSS string classes to apply to the rendered HTML.
+     *
+     * @defaultValue `[]`
+     */
+    classes?: string[];
+    /**
+     * A default window title string (popOut only).
+     *
+     * @defaultValue `""`
+     */
+    title?: string;
     /**
      * If true, then application shells are always on top.
      *
