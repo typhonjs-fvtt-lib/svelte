@@ -9,7 +9,7 @@
 
    import { applyStyles }              from '#runtime/svelte/action/dom/style';
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
-   import { CrossRealm }               from '#runtime/util/browser';
+   import { CrossRealm }               from '#runtime/util';
    import { isObject }                 from '#runtime/util/object';
 
    /** @type {string} */

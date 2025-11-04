@@ -1,5 +1,5 @@
 import { TJSSvelte }          from '#runtime/svelte/util';
-import { CrossRealm }         from '#runtime/util/browser';
+import { CrossRealm }         from '#runtime/util';
 import { isObject }           from '#runtime/util/object';
 
 import { isApplicationShell } from './isApplicationShell.js';

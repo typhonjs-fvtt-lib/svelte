@@ -9,7 +9,7 @@
 
    import { applyStyles }              from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
    import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
-   import { CrossRealm }               from '@typhonjs-svelte/runtime-base/util/browser';
+   import { CrossRealm }               from '@typhonjs-svelte/runtime-base/util';
    import { isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
 
    /** @type {string} */

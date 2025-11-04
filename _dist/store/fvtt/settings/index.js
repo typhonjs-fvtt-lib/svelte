@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import { isMinimalWritableStore, subscribeIgnoreFirst } from '@typhonjs-svelte/runtime-base/svelte/store/util';
-import { CrossRealm } from '@typhonjs-svelte/runtime-base/util/browser';
+import { CrossRealm } from '@typhonjs-svelte/runtime-base/util';
 import { isObject, isIterable } from '@typhonjs-svelte/runtime-base/util/object';
 
 var _a;

@@ -4,7 +4,7 @@ import {
    isMinimalWritableStore,
    subscribeIgnoreFirst }        from '#runtime/svelte/store/util';
 
-import { CrossRealm }            from '#runtime/util/browser';
+import { CrossRealm }            from '#runtime/util';
 
 import {
    isIterable,

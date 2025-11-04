@@ -1,8 +1,8 @@
 import { TJSPosition }        from '#runtime/svelte/store/position';
 import { TJSSvelte }          from '#runtime/svelte/util';
+import { CrossRealm }         from '#runtime/util';
 import { A11yHelper }         from '#runtime/util/a11y';
 import { nextAnimationFrame } from "#runtime/util/animate";
-import { CrossRealm }         from '#runtime/util/browser';
 
 import {
    deepMerge,

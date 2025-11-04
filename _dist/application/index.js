@@ -6,7 +6,7 @@ import { subscribeIgnoreFirst } from '@typhonjs-svelte/runtime-base/svelte/store
 import { TJSWebStorage, TJSSessionStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import { propertyStore } from '@typhonjs-svelte/runtime-base/svelte/store/writable-derived';
 import { TJSSvelte } from '@typhonjs-svelte/runtime-base/svelte/util';
-import { CrossRealm } from '@typhonjs-svelte/runtime-base/util/browser';
+import { CrossRealm } from '@typhonjs-svelte/runtime-base/util';
 import { StyleSheetResolve } from '@typhonjs-svelte/runtime-base/util/dom/style';
 import { TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import { A11yHelper } from '@typhonjs-svelte/runtime-base/util/a11y';
