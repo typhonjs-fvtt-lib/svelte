@@ -1,4 +1,4 @@
-import { CrossWindow }        from '#runtime/util/browser';
+import { CrossRealm }         from '#runtime/util/browser';
 import { StyleSheetResolve }  from '#runtime/util/dom/style';
 
 /**
@@ -113,7 +113,7 @@ export class FoundryStyles
             }
             catch (err)
             {
-               if (CrossWindow.isDOMException(err, 'SecurityException'))
+               if (CrossRealm.isDOMException(err, 'SecurityException'))
                {
                   failedSheets.push({ href: sheet.href, core: true });
                }
@@ -128,7 +128,7 @@ export class FoundryStyles
                {
                   for (const rule of sheet.cssRules)
                   {
-                     if (!CrossWindow.isCSSImportRule(rule) || !CrossWindow.isCSSStyleSheet(rule?.styleSheet))
+                     if (!CrossRealm.isCSSImportRule(rule) || !CrossRealm.isCSSStyleSheet(rule?.styleSheet))
                      {
                         continue;
                      }
@@ -147,7 +147,7 @@ export class FoundryStyles
                      }
                      catch (err)
                      {
-                        if (CrossWindow.isDOMException(err, 'SecurityException'))
+                        if (CrossRealm.isDOMException(err, 'SecurityException'))
                         {
                            failedSheets.push({ href: rule.styleSheet.href, core: false, layer: rule.layerName });
                         }
@@ -157,7 +157,7 @@ export class FoundryStyles
             }
             catch (err)
             {
-               if (CrossWindow.isDOMException(err, 'SecurityException'))
+               if (CrossRealm.isDOMException(err, 'SecurityException'))
                {
                   failedSheets.push({ href: '', core: false, layer: 'inline-stylesheet' });
                }

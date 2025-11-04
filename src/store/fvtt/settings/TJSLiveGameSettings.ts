@@ -1,4 +1,4 @@
-import { CrossWindow }           from '#runtime/util/browser';
+import { CrossRealm }            from '#runtime/util/browser';
 
 import { TJSGameSettings }       from './TJSGameSettings';
 
@@ -91,8 +91,8 @@ export class TJSLiveGameSettings
          throw new TypeError(`'gameSettings' is not a TJSGameSettings instance.`);
       }
 
-      if (include !== void 0 && !CrossWindow.isSet(include)) { throw new TypeError(`'options.include' is not a Set.`); }
-      if (exclude !== void 0 && !CrossWindow.isSet(exclude)) { throw new TypeError(`'options.exclude' is not a Set.`); }
+      if (include !== void 0 && !CrossRealm.isSet(include)) { throw new TypeError(`'options.include' is not a Set.`); }
+      if (exclude !== void 0 && !CrossRealm.isSet(exclude)) { throw new TypeError(`'options.exclude' is not a Set.`); }
 
       for (const setting of gameSettings.data())
       {

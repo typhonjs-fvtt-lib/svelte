@@ -9,7 +9,7 @@
 
    import { applyStyles }              from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
    import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
-   import { CrossWindow }              from '@typhonjs-svelte/runtime-base/util/browser';
+   import { CrossRealm }               from '@typhonjs-svelte/runtime-base/util/browser';
    import { isObject }                 from '@typhonjs-svelte/runtime-base/util/object';
 
    /** @type {string} */
@@ -124,7 +124,7 @@
       // An `instanceof` check ensures that the target is a Node. There may be cases where the target could be the
       // `window`, etc.
       if (targetEl !== glassPaneEl && targetEl !== backgroundEl && targetEl !== containerEl &&
-       glassPaneEl.contains(CrossWindow.isNode(targetEl) ? targetEl : null))
+       glassPaneEl.contains(CrossRealm.isNode(targetEl) ? targetEl : null))
       {
          return;
       }

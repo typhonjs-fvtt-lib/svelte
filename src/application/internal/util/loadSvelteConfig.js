@@ -1,8 +1,8 @@
-import { TJSSvelte }             from '#runtime/svelte/util';
-import { CrossWindow }           from '#runtime/util/browser';
-import { isObject }              from '#runtime/util/object';
+import { TJSSvelte }          from '#runtime/svelte/util';
+import { CrossRealm }         from '#runtime/util/browser';
+import { isObject }           from '#runtime/util/object';
 
-import { isApplicationShell }    from './isApplicationShell.js';
+import { isApplicationShell } from './isApplicationShell.js';
 
 /**
  * Instantiates and attaches a Svelte component to the main inserted HTML.
@@ -22,7 +22,7 @@ export function loadSvelteConfig({ app, config, elementRootUpdate } = {})
    let target;
 
    // A specific HTMLElement to append Svelte component.
-   if (CrossWindow.isHTMLElement(config.target))
+   if (CrossRealm.isHTMLElement(config.target))
    {
       target = config.target;
    }
@@ -33,7 +33,7 @@ export function loadSvelteConfig({ app, config, elementRootUpdate } = {})
       target = activeWindow?.document?.querySelector(config.target);
    }
 
-   if (!CrossWindow.isHTMLElement(target))
+   if (!CrossRealm.isHTMLElement(target))
    {
       console.log(
        `%c[TRL] loadSvelteConfig error - Could not find target, '${config.target}', for config:\n`,
@@ -85,7 +85,7 @@ export function loadSvelteConfig({ app, config, elementRootUpdate } = {})
       element = component.elementRoot;
    }
 
-   if (!CrossWindow.isHTMLElement(element))
+   if (!CrossRealm.isHTMLElement(element))
    {
       console.log(
        `%c[TRL] loadSvelteConfig error - No application shell contract found. Did you bind and export a HTMLElement ` +

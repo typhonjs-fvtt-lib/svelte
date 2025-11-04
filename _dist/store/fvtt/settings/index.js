@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import { isMinimalWritableStore, subscribeIgnoreFirst } from '@typhonjs-svelte/runtime-base/svelte/store/util';
-import { CrossWindow } from '@typhonjs-svelte/runtime-base/util/browser';
+import { CrossRealm } from '@typhonjs-svelte/runtime-base/util/browser';
 import { isObject, isIterable } from '@typhonjs-svelte/runtime-base/util/object';
 
 var _a;
@@ -260,7 +260,7 @@ class TJSGameSettings {
      * @returns Iterable iterator of `TJSGameSettings.Data.GameSetting`.
      */
     *data(regex = void 0) {
-        if (regex !== void 0 && !CrossWindow.isRegExp(regex)) {
+        if (regex !== void 0 && !CrossRealm.isRegExp(regex)) {
             throw new TypeError(`'regex' is not a RegExp`);
         }
         if (!this.#settings.length) {
@@ -289,7 +289,7 @@ class TJSGameSettings {
      * @returns Iterable iterator of keys and stores.
      */
     *entries(regex = void 0) {
-        if (regex !== void 0 && !CrossWindow.isRegExp(regex)) {
+        if (regex !== void 0 && !CrossRealm.isRegExp(regex)) {
             throw new TypeError(`'regex' is not a RegExp`);
         }
         if (!this.#stores.size) {
@@ -316,7 +316,7 @@ class TJSGameSettings {
      * @returns Iterable iterator of game setting keys.
      */
     *keys(regex = void 0) {
-        if (regex !== void 0 && !CrossWindow.isRegExp(regex)) {
+        if (regex !== void 0 && !CrossRealm.isRegExp(regex)) {
             throw new TypeError(`'regex' is not a RegExp`);
         }
         if (!this.#stores.size) {
@@ -343,7 +343,7 @@ class TJSGameSettings {
      * @returns Iterable iterator of stores.
      */
     *stores(regex = void 0) {
-        if (regex !== void 0 && !CrossWindow.isRegExp(regex)) {
+        if (regex !== void 0 && !CrossRealm.isRegExp(regex)) {
             throw new TypeError(`'regex' is not a RegExp`);
         }
         if (!this.#stores.size) {
@@ -437,10 +437,10 @@ class TJSLiveGameSettings {
         if (!(gameSettings instanceof TJSGameSettings)) {
             throw new TypeError(`'gameSettings' is not a TJSGameSettings instance.`);
         }
-        if (include !== void 0 && !CrossWindow.isSet(include)) {
+        if (include !== void 0 && !CrossRealm.isSet(include)) {
             throw new TypeError(`'options.include' is not a Set.`);
         }
-        if (exclude !== void 0 && !CrossWindow.isSet(exclude)) {
+        if (exclude !== void 0 && !CrossRealm.isSet(exclude)) {
             throw new TypeError(`'options.exclude' is not a Set.`);
         }
         for (const setting of gameSettings.data()) {

@@ -2,12 +2,12 @@ import { TJSPosition }        from '#runtime/svelte/store/position';
 import { TJSSvelte }          from '#runtime/svelte/util';
 import { A11yHelper }         from '#runtime/util/a11y';
 import { nextAnimationFrame } from "#runtime/util/animate";
-import { CrossWindow }        from '#runtime/util/browser';
+import { CrossRealm }         from '#runtime/util/browser';
 
 import {
    deepMerge,
    hasGetter,
-   isObject }              from '#runtime/util/object';
+   isObject }                 from '#runtime/util/object';
 
 import {
    ApplicationState,
@@ -15,7 +15,7 @@ import {
    handleAlwaysOnTop,
    loadSvelteConfig,
    SvelteReactive,
-   TJSAppIndex }           from './internal/index.js';
+   TJSAppIndex }              from './internal/index.js';
 
 /**
  * Provides a Svelte aware extension to the Foundry {@link Application} class to manage the app lifecycle
@@ -369,7 +369,7 @@ export class SvelteApp extends Application
 
       // Support for PopOut! module; `close` is double invoked; once before the element is rejoined to the main window.
       // Reject close invocations when the element window is not the main originating window / globalThis.
-      if (CrossWindow.getWindow(el, { throws: false }) !== globalThis) { return; }
+      if (CrossRealm.getWindow(el, { throws: false }) !== globalThis) { return; }
 
       /**
        * @ignore
