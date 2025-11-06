@@ -6,7 +6,7 @@ import { subscribeIgnoreFirst } from '@typhonjs-svelte/runtime-base/svelte/store
 import { TJSWebStorage, TJSSessionStorage } from '@typhonjs-svelte/runtime-base/svelte/store/web-storage';
 import { propertyStore } from '@typhonjs-svelte/runtime-base/svelte/store/writable-derived';
 import { TJSSvelte } from '@typhonjs-svelte/runtime-base/svelte/util';
-import { CrossRealm } from '@typhonjs-svelte/runtime-base/util';
+import { CrossRealm } from '@typhonjs-svelte/runtime-base/util/realm';
 import { StyleSheetResolve } from '@typhonjs-svelte/runtime-base/util/dom/style';
 import { TJSPosition } from '@typhonjs-svelte/runtime-base/svelte/store/position';
 import { A11yHelper } from '@typhonjs-svelte/runtime-base/util/a11y';
@@ -574,7 +574,7 @@ function loadSvelteConfig({ app, config, elementRootUpdate } = {})
    let target;
 
    // A specific HTMLElement to append Svelte component.
-   if (CrossRealm.isHTMLElement(config.target))
+   if (CrossRealm.browser.isHTMLElement(config.target))
    {
       target = config.target;
    }
@@ -585,7 +585,7 @@ function loadSvelteConfig({ app, config, elementRootUpdate } = {})
       target = activeWindow?.document?.querySelector(config.target);
    }
 
-   if (!CrossRealm.isHTMLElement(target))
+   if (!CrossRealm.browser.isHTMLElement(target))
    {
       console.log(
        `%c[TRL] loadSvelteConfig error - Could not find target, '${config.target}', for config:\n`,
@@ -637,7 +637,7 @@ function loadSvelteConfig({ app, config, elementRootUpdate } = {})
       element = component.elementRoot;
    }
 
-   if (!CrossRealm.isHTMLElement(element))
+   if (!CrossRealm.browser.isHTMLElement(element))
    {
       console.log(
        `%c[TRL] loadSvelteConfig error - No application shell contract found. Did you bind and export a HTMLElement ` +
@@ -1719,7 +1719,7 @@ class FoundryStyles
             }
             catch (err)
             {
-               if (CrossRealm.isDOMException(err, 'SecurityException'))
+               if (CrossRealm.browser.isDOMException(err, 'SecurityException'))
                {
                   failedSheets.push({ href: sheet.href, core: true });
                }
@@ -1734,7 +1734,8 @@ class FoundryStyles
                {
                   for (const rule of sheet.cssRules)
                   {
-                     if (!CrossRealm.isCSSImportRule(rule) || !CrossRealm.isCSSStyleSheet(rule?.styleSheet))
+                     if (!CrossRealm.browser.isCSSImportRule(rule) ||
+                      !CrossRealm.browser.isCSSStyleSheet(rule?.styleSheet))
                      {
                         continue;
                      }
@@ -1753,7 +1754,7 @@ class FoundryStyles
                      }
                      catch (err)
                      {
-                        if (CrossRealm.isDOMException(err, 'SecurityException'))
+                        if (CrossRealm.browser.isDOMException(err, 'SecurityException'))
                         {
                            failedSheets.push({ href: rule.styleSheet.href, core: false, layer: rule.layerName });
                         }
@@ -1763,7 +1764,7 @@ class FoundryStyles
             }
             catch (err)
             {
-               if (CrossRealm.isDOMException(err, 'SecurityException'))
+               if (CrossRealm.browser.isDOMException(err, 'SecurityException'))
                {
                   failedSheets.push({ href: '', core: false, layer: 'inline-stylesheet' });
                }
@@ -2241,7 +2242,7 @@ class SvelteApp extends Application
 
       // Support for PopOut! module; `close` is double invoked; once before the element is rejoined to the main window.
       // Reject close invocations when the element window is not the main originating window / globalThis.
-      if (CrossRealm.getWindow(el, { throws: false }) !== globalThis) { return; }
+      if (CrossRealm.browser.getWindow(el, { throws: false }) !== globalThis) { return; }
 
       /**
        * @ignore

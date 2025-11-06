@@ -1,5 +1,5 @@
-import { CrossRealm }         from '#runtime/util';
 import { StyleSheetResolve }  from '#runtime/util/dom/style';
+import { CrossRealm }         from '#runtime/util/realm';
 
 /**
  * Provides runtime-parsed styles for the core Foundry stylesheet and an extended merged version with all game system
@@ -113,7 +113,7 @@ export class FoundryStyles
             }
             catch (err)
             {
-               if (CrossRealm.isDOMException(err, 'SecurityException'))
+               if (CrossRealm.browser.isDOMException(err, 'SecurityException'))
                {
                   failedSheets.push({ href: sheet.href, core: true });
                }
@@ -128,7 +128,8 @@ export class FoundryStyles
                {
                   for (const rule of sheet.cssRules)
                   {
-                     if (!CrossRealm.isCSSImportRule(rule) || !CrossRealm.isCSSStyleSheet(rule?.styleSheet))
+                     if (!CrossRealm.browser.isCSSImportRule(rule) ||
+                      !CrossRealm.browser.isCSSStyleSheet(rule?.styleSheet))
                      {
                         continue;
                      }
@@ -147,7 +148,7 @@ export class FoundryStyles
                      }
                      catch (err)
                      {
-                        if (CrossRealm.isDOMException(err, 'SecurityException'))
+                        if (CrossRealm.browser.isDOMException(err, 'SecurityException'))
                         {
                            failedSheets.push({ href: rule.styleSheet.href, core: false, layer: rule.layerName });
                         }
@@ -157,7 +158,7 @@ export class FoundryStyles
             }
             catch (err)
             {
-               if (CrossRealm.isDOMException(err, 'SecurityException'))
+               if (CrossRealm.browser.isDOMException(err, 'SecurityException'))
                {
                   failedSheets.push({ href: '', core: false, layer: 'inline-stylesheet' });
                }

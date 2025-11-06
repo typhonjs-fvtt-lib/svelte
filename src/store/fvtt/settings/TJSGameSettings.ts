@@ -4,11 +4,11 @@ import {
    isMinimalWritableStore,
    subscribeIgnoreFirst }        from '#runtime/svelte/store/util';
 
-import { CrossRealm }            from '#runtime/util';
-
 import {
    isIterable,
    isObject }                    from '#runtime/util/object';
+
+import { CrossRealm }            from '#runtime/util/realm';
 
 import type {
    Readable,
@@ -349,7 +349,7 @@ class TJSGameSettings<ExtraProps extends Record<string, any> = {}>
     */
    *data(regex: RegExp | undefined = void 0): IterableIterator<TJSGameSettings.Data.GameSetting<ExtraProps>>
    {
-      if (regex !== void 0 && !CrossRealm.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
+      if (regex !== void 0 && !CrossRealm.lang.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
       if (!this.#settings.length) { return void 0; }
 
@@ -377,7 +377,7 @@ class TJSGameSettings<ExtraProps extends Record<string, any> = {}>
     */
    *entries<T>(regex: RegExp | undefined = void 0): IterableIterator<[string, MinimalWritable<T>]>
    {
-      if (regex !== void 0 && !CrossRealm.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
+      if (regex !== void 0 && !CrossRealm.lang.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
       if (!this.#stores.size) { return void 0; }
 
@@ -403,7 +403,7 @@ class TJSGameSettings<ExtraProps extends Record<string, any> = {}>
     */
    *keys(regex: RegExp | undefined = void 0): IterableIterator<string>
    {
-      if (regex !== void 0 && !CrossRealm.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
+      if (regex !== void 0 && !CrossRealm.lang.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
       if (!this.#stores.size) { return void 0; }
 
@@ -429,7 +429,7 @@ class TJSGameSettings<ExtraProps extends Record<string, any> = {}>
     */
    *stores<T>(regex: RegExp | undefined = void 0): IterableIterator<MinimalWritable<T>>
    {
-      if (regex !== void 0 && !CrossRealm.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
+      if (regex !== void 0 && !CrossRealm.lang.isRegExp(regex)) { throw new TypeError(`'regex' is not a RegExp`); }
 
       if (!this.#stores.size) { return void 0; }
 
