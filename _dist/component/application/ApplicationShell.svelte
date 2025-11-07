@@ -556,6 +556,10 @@
       cursor: var(--tjs-cursor-default, default);
    }
 
+   .window-content {
+      position: relative;
+   }
+
    .window-content:focus-visible {
       outline: var(--tjs-app-content-outline-focus-visible, var(--tjs-default-a11y-outline-focus-visible, 2px solid transparent));
    }
