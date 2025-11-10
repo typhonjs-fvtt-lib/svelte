@@ -30,6 +30,10 @@ declare class TJSGameSettings<ExtraProps extends Record<string, any> = {}> {
    */
   get namespace(): string;
   /**
+   * @returns Number of stores managed.
+   */
+  get size(): number;
+  /**
    * Returns a readable Game Settings store for the associated key.
    *
    * @param key - Game setting key.
@@ -53,6 +57,12 @@ declare class TJSGameSettings<ExtraProps extends Record<string, any> = {}> {
    * @returns The associated store for the given game setting key.
    */
   getWritableStore<T>(key: string): MinimalWritable<T> | undefined;
+  /**
+   * Returns whether a Game Settings store exist for the given key.
+   *
+   * @param key - Setting key to test.
+   */
+  hasStore(key: string): boolean;
   /**
    * Registers a setting with TJSGameSettings and Foundry core.
    *

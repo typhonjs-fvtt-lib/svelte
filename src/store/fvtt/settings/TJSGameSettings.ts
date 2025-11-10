@@ -87,6 +87,14 @@ class TJSGameSettings<ExtraProps extends Record<string, any> = {}>
    }
 
    /**
+    * @returns Number of stores managed.
+    */
+   get size(): number
+   {
+      return this.#stores.size;
+   }
+
+   /**
     * Gets a store from the `stores` Map or creates a new store for the key.
     *
     * @param key - Key to lookup in stores map.
@@ -155,6 +163,16 @@ class TJSGameSettings<ExtraProps extends Record<string, any> = {}>
       }
 
       return this.#getStore(key);
+   }
+
+   /**
+    * Returns whether a Game Settings store exist for the given key.
+    *
+    * @param key - Setting key to test.
+    */
+   hasStore(key: string): boolean
+   {
+      return this.#stores.has(key);
    }
 
    /**
