@@ -525,7 +525,7 @@ declare namespace TJSGameSettings
          /**
           * A default value for the setting.
           */
-         default: number | string | boolean | object;
+         default?: number | string | boolean | { [key: string]: any } | any[];
 
          /**
           * Setting is a file picker and `type` must be a `string`. You may use a boolean for `any` file type or
@@ -537,6 +537,11 @@ declare namespace TJSGameSettings
           * A description of the registered setting and its behavior.
           */
          hint?: string;
+
+         /**
+          * A custom form field input used in conjunction with a DataField type.
+          */
+         input?: fvtt.CustomFormInput;
 
          /**
           * The displayed name of the setting.
@@ -568,10 +573,15 @@ declare namespace TJSGameSettings
          scope: 'client' | 'world' | 'user';
 
          /**
-          * A constructable object, function, or DataModel.
+          * A constructable object, function, DataField instance, or DataModel.
           */
          type: NumberConstructor | StringConstructor | BooleanConstructor | ObjectConstructor | ArrayConstructor |
-          (new (...args: any[]) => fvtt.DataModel) | ((data: unknown) => unknown);
+          typeof fvtt.DataModel | fvtt.DataField | ((data: unknown) => unknown);
+
+         /**
+          * Additional string added next to the setting name to specify any descriptive unit type for the setting.
+          */
+         units?: string;
       }
 
       /**
