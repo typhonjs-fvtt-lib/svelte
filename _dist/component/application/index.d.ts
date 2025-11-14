@@ -42,6 +42,12 @@ declare class ApplicationShell extends SvelteComponent<
   /** Getter for {@link ApplicationShell.Props.draggableOptions | draggableOptions} prop. */
   get draggableOptions(): any;
 
+  /** Setter for {@link ApplicationShell.Props.paddingToBorder | paddingToBorder} prop. */
+  set paddingToBorder(_: any);
+
+  /** Getter for {@link ApplicationShell.Props.paddingToBorder | paddingToBorder} prop. */
+  get paddingToBorder(): any;
+
   /** Setter for {@link ApplicationShell.Props.stylesApp | stylesApp} prop. */
   set stylesApp(_: any);
 
@@ -142,6 +148,7 @@ declare namespace ApplicationShell {
     contentWidth?: boolean;
     contentHeight?: boolean;
     draggableOptions?: any;
+    paddingToBorder?: any;
     stylesApp?: any;
     stylesContent?: any;
     appOffsetHeight?: boolean;
@@ -340,6 +347,12 @@ declare class TjsApplicationShell extends SvelteComponent<
   /** Getter for {@link TjsApplicationShell.Props.draggableOptions | draggableOptions} prop. */
   get draggableOptions(): any;
 
+  /** Setter for {@link TjsApplicationShell.Props.paddingToBorder | paddingToBorder} prop. */
+  set paddingToBorder(_: any);
+
+  /** Getter for {@link TjsApplicationShell.Props.paddingToBorder | paddingToBorder} prop. */
+  get paddingToBorder(): any;
+
   /** Setter for {@link TjsApplicationShell.Props.stylesApp | stylesApp} prop. */
   set stylesApp(_: any);
 
@@ -440,6 +453,7 @@ declare namespace TjsApplicationShell {
     contentWidth?: boolean;
     contentHeight?: boolean;
     draggableOptions?: any;
+    paddingToBorder?: any;
     stylesApp?: any;
     stylesContent?: any;
     appOffsetHeight?: boolean;

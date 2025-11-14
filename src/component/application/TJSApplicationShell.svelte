@@ -25,7 +25,9 @@
       setContext }                     from '#svelte';
 
    import { resizeObserver }           from '#runtime/svelte/action/dom/observer';
-   import { applyStyles }              from '#runtime/svelte/action/dom/style';
+   import {
+      applyStyles,
+      padToBorder }                    from '#runtime/svelte/action/dom/style';
    import { dynamicAction }            from '#runtime/svelte/action/util';
    import { CQPositionValidate }       from '#runtime/svelte/store/position';
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
@@ -52,6 +54,9 @@
    // Allows custom draggable implementations to be forwarded to TJSApplicationHeader.
    export let draggable = void 0;
    export let draggableOptions = void 0;
+
+   // Enables `padToBorder` action.
+   export let paddingToBorder = void 0;
 
    // Explicit style overrides for the main app and content elements. Uses action `applyStyles`.
    export let stylesApp = void 0;
@@ -485,6 +490,7 @@
                  on:pointerdown={onPointerdownContent}
                  use:applyStyles={stylesContent}
                  use:contentResizeObserver={resizeObservedContent}
+                 use:padToBorder={{ enabled: typeof paddingToBorder === 'boolean' ? paddingToBorder : false, update: $appThemeName }}
                  tabindex=-1>
             <slot />
         </section>
@@ -512,6 +518,7 @@
                  on:pointerdown={onPointerdownContent}
                  use:applyStyles={stylesContent}
                  use:contentResizeObserver={resizeObservedContent}
+                 use:padToBorder={{ enabled: typeof paddingToBorder === 'boolean' ? paddingToBorder : false, update: $appThemeName }}
                  tabindex=-1>
             <slot />
         </section>
