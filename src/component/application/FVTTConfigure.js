@@ -21,11 +21,12 @@ export class FVTTConfigure
 
       const manager = StyleManager.create({
          id: '__tjs-runtime-vars',
-         version: '0.1.1',
+         version: '0.1.2',
          layerName: 'variables.tjs-runtime-vars',
          rules: {
             themeDark: 'body, .themed.theme-dark',
-            themeLight: '.themed.theme-light'
+            themeLight: '.themed.theme-light',
+            contentVars: '.tjs-content-vars'
          }
       });
 
@@ -43,6 +44,7 @@ export class FVTTConfigure
 
       const themeDarkRoot = manager.get('themeDark');
       const themeLight = manager.get('themeLight');
+      const contentVars = manager.get('contentVars');
 
       // On `ready` hook evaluate top level `<html>` element for core inline style overrides.
       Hooks.once('ready', () => this.#setCoreInlineStyles(themeDarkRoot));
@@ -53,11 +55,14 @@ export class FVTTConfigure
       // Configure app CSS variables.
       this.#app(themeDarkRoot, themeLight);
 
+      // Configure content CSS variables.
+      this.#contentVars(contentVars);
+
       Hooks.on('PopOut:loading', (app, popout) =>
       {
          // Clone and load the `runtime` library CSS variables into the new window document regardless of the app type.
          popout.document.addEventListener('DOMContentLoaded',
-            () => manager.clone({ document: popout.document, force: true }));
+          () => manager.clone({ document: popout.document, force: true }));
       });
    }
 
@@ -158,6 +163,38 @@ export class FVTTConfigure
    }
 
    /**
+    * @param {import('#runtime/util/dom/style').StyleManager.RuleManager}  contentVars -
+    */
+   static #contentVars(contentVars)
+   {
+      const scrollbarWidth = `${this.#calcScrollbarWidth()}px`;
+
+      /**
+       * Assign all TyphonJS content vars
+       */
+      contentVars.setProperties({
+         // Default element scrollbar width.
+         '--_tjs-default-scrollbar-width': scrollbarWidth,
+
+         '--_tjs-content-padding-length': 'var(--tjs-content-padding-length, 1rem)',
+         '--_tjs-content-padding-length-half': 'calc(var(--_tjs-content-padding-length) / 2)',
+
+         '--_tjs-content-padding-top': 'var(--tjs-content-padding-top, var(--_tjs-content-padding-length))',
+         '--_tjs-content-padding-right': 'var(--tjs-content-padding-right, var(--_tjs-content-padding-length))',
+         '--_tjs-content-padding-bottom': 'var(--tjs-content-padding-bottom, var(--_tjs-content-padding-length))',
+         '--_tjs-content-padding-left': 'var(--tjs-content-padding-left, var(--_tjs-content-padding-length))',
+
+         // Complete content padding for all sides with adjustments to right padding for `scrollbar-gutter: stable`.
+         '--tjs-scrollbar-gutter-stable-padding': `var(--_tjs-content-padding-top) calc(max(calc(${scrollbarWidth} + 0.25rem), var(--_tjs-content-padding-right)) - ${scrollbarWidth}) var(--_tjs-content-padding-bottom) var(--_tjs-content-padding-left)`,
+         '--tjs-scrollbar-gutter-stable-padding-half': `calc(var(--_tjs-content-padding-top) / 2) calc(max(calc(${scrollbarWidth} + 0.25rem), calc(var(--_tjs-content-padding-right) / 2)) - ${scrollbarWidth}) calc(var(--_tjs-content-padding-bottom) / 2) calc(var(--_tjs-content-padding-left) / 2)`,
+
+         // Inline left / right padding taking into consideration `scrollbar-gutter: stable`.
+         '--tjs-scrollbar-gutter-stable-padding-inline': `0 calc(max(calc(${scrollbarWidth} + 0.25rem), var(--_tjs-content-padding-right)) - ${scrollbarWidth}) 0 var(--_tjs-content-padding-left)`,
+         '--tjs-scrollbar-gutter-stable-padding-inline-half': `0 calc(max(calc(${scrollbarWidth} + 0.25rem), calc(var(--_tjs-content-padding-right) / 2)) - ${scrollbarWidth}) 0 calc(var(--_tjs-content-padding-left) / 2)`,
+      });
+   }
+
+   /**
     * Sets any top level inline styles to TRL CSS variables defined in root `<html>` element by Foundry or game system
     * override.
     *
@@ -176,6 +213,40 @@ export class FVTTConfigure
 
             if (ruleManager.hasProperty(tjsCursorKey)) { ruleManager.setProperty(tjsCursorKey, htmlStyles[key]); }
          }
+      }
+   }
+
+   // Internal Implementation ----------------------------------------------------------------------------------------
+
+   /**
+    * @returns {number} Default element scrollbar width.
+    */
+   static #calcScrollbarWidth()
+   {
+      try
+      {
+         return window.innerWidth - document.documentElement.clientWidth || (() =>
+            {
+               const el = document.createElement('div');
+               el.style.visibility = 'hidden';    // ensure no paint
+               el.style.overflow = 'scroll';      // force scrollbars
+               el.style.position = 'absolute';    // remove from flow
+               el.style.top = '-9999px';          // off-screen
+               el.style.width = '100px';
+               el.style.height = '100px';
+
+               document.body.appendChild(el);
+               const width = el.offsetWidth - el.clientWidth;
+               el.remove();
+
+               return width;
+            }
+         )();
+      }
+      catch
+      {
+         // A general default for thin scrollbar widths.
+         return 10;
       }
    }
 }
