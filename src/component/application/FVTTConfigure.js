@@ -2,7 +2,8 @@ import { FoundryStyles }      from '#svelte-fvtt/application';
 
 import {
    StyleParse,
-   StyleManager }             from '#runtime/util/dom/style';
+   StyleManager,
+   StyleMetric }              from '#runtime/util/dom/style';
 
 import { getRoutePrefix }     from '#runtime/util/path';
 
@@ -167,7 +168,7 @@ export class FVTTConfigure
     */
    static #contentVars(contentVars)
    {
-      const scrollbarWidth = `${this.#calcScrollbarWidth()}px`;
+      const scrollbarWidth = `${StyleMetric.getScrollbarWidth()}px`;
 
       /**
        * Assign all TyphonJS content vars
@@ -213,40 +214,6 @@ export class FVTTConfigure
 
             if (ruleManager.hasProperty(tjsCursorKey)) { ruleManager.setProperty(tjsCursorKey, htmlStyles[key]); }
          }
-      }
-   }
-
-   // Internal Implementation ----------------------------------------------------------------------------------------
-
-   /**
-    * @returns {number} Default element scrollbar width.
-    */
-   static #calcScrollbarWidth()
-   {
-      try
-      {
-         return window.innerWidth - document.documentElement.clientWidth || (() =>
-            {
-               const el = document.createElement('div');
-               el.style.visibility = 'hidden';    // ensure no paint
-               el.style.overflow = 'scroll';      // force scrollbars
-               el.style.position = 'absolute';    // remove from flow
-               el.style.top = '-9999px';          // off-screen
-               el.style.width = '100px';
-               el.style.height = '100px';
-
-               document.body.appendChild(el);
-               const width = el.offsetWidth - el.clientWidth;
-               el.remove();
-
-               return width;
-            }
-         )();
-      }
-      catch
-      {
-         // A general default for thin scrollbar widths.
-         return 10;
       }
    }
 }
