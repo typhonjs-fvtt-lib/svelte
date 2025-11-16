@@ -42,11 +42,11 @@ declare class ApplicationShell extends SvelteComponent<
   /** Getter for {@link ApplicationShell.Props.draggableOptions | draggableOptions} prop. */
   get draggableOptions(): any;
 
-  /** Setter for {@link ApplicationShell.Props.paddingToBorder | paddingToBorder} prop. */
-  set paddingToBorder(_: any);
+  /** Setter for {@link ApplicationShell.Props.padToVisualEdge | padToVisualEdge} prop. */
+  set padToVisualEdge(_: boolean);
 
-  /** Getter for {@link ApplicationShell.Props.paddingToBorder | paddingToBorder} prop. */
-  get paddingToBorder(): any;
+  /** Getter for {@link ApplicationShell.Props.padToVisualEdge | padToVisualEdge} prop. */
+  get padToVisualEdge(): boolean;
 
   /** Setter for {@link ApplicationShell.Props.stylesApp | stylesApp} prop. */
   set stylesApp(_: any);
@@ -148,7 +148,14 @@ declare namespace ApplicationShell {
     contentWidth?: boolean;
     contentHeight?: boolean;
     draggableOptions?: any;
-    paddingToBorder?: any;
+    /**
+     * When true, the inline styles for padding of the `.window-content` / main slot is adjusted for any visual edge
+     * insets / border image applied to `.window-content` allowing the main slot to take up the entire visual content
+     * space.
+     *
+     * @type {boolean}
+     */
+    padToVisualEdge?: boolean;
     stylesApp?: any;
     stylesContent?: any;
     appOffsetHeight?: boolean;
@@ -347,11 +354,11 @@ declare class TjsApplicationShell extends SvelteComponent<
   /** Getter for {@link TjsApplicationShell.Props.draggableOptions | draggableOptions} prop. */
   get draggableOptions(): any;
 
-  /** Setter for {@link TjsApplicationShell.Props.paddingToBorder | paddingToBorder} prop. */
-  set paddingToBorder(_: any);
+  /** Setter for {@link TjsApplicationShell.Props.padToVisualEdge | padToVisualEdge} prop. */
+  set padToVisualEdge(_: boolean);
 
-  /** Getter for {@link TjsApplicationShell.Props.paddingToBorder | paddingToBorder} prop. */
-  get paddingToBorder(): any;
+  /** Getter for {@link TjsApplicationShell.Props.padToVisualEdge | padToVisualEdge} prop. */
+  get padToVisualEdge(): boolean;
 
   /** Setter for {@link TjsApplicationShell.Props.stylesApp | stylesApp} prop. */
   set stylesApp(_: any);
@@ -453,7 +460,14 @@ declare namespace TjsApplicationShell {
     contentWidth?: boolean;
     contentHeight?: boolean;
     draggableOptions?: any;
-    paddingToBorder?: any;
+    /**
+     * When true, the inline styles for padding of the `.window-content` / main slot is adjusted for any visual edge
+     * insets / border image applied to `.window-content` allowing the main slot to take up the entire visual content
+     * space.
+     *
+     * @type {boolean}
+     */
+    padToVisualEdge?: boolean;
     stylesApp?: any;
     stylesContent?: any;
     appOffsetHeight?: boolean;
