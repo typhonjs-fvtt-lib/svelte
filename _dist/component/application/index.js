@@ -5,4 +5,6 @@ export { default as EmptyApplicationShell }  from './EmptyApplicationShell.svelt
 export { default as TJSApplicationShell }    from './TJSApplicationShell.svelte';
 export { default as TJSGlassPane }           from './TJSGlassPane.svelte';
 
+export { default as TestApplicationShell }   from './TestApplicationShell.svelte';
+
 Hooks.once('init', () => FVTTConfigure.initialize());

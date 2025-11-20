@@ -19,6 +19,7 @@
    import { resizeObserver }           from '@typhonjs-svelte/runtime-base/svelte/action/dom/observer';
    import { applyStyles }              from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
    import { dynamicAction }            from '@typhonjs-svelte/runtime-base/svelte/action/util';
+   import { TJSFocusWrap }             from '@typhonjs-svelte/runtime-base/svelte/component/dom/focus';
    import { CQPositionValidate }       from '@typhonjs-svelte/runtime-base/svelte/store/position';
    import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
    import { A11yHelper }               from '@typhonjs-svelte/runtime-base/util/a11y';
@@ -27,8 +28,6 @@
 
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
    import ResizableHandle              from './ResizableHandle.svelte';
-
-   import TJSFocusWrap                 from '../internal/dom/TJSFocusWrap.svelte';
 
    import { FVTTAppTheme }             from './data';
 

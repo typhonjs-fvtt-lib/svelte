@@ -1,3 +1,4 @@
+import * as _typhonjs_svelte_runtime_base_svelte_action_dom_style from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
 import { SvelteComponent } from 'svelte';
 import { Readable } from 'svelte/store';
 
@@ -43,10 +44,10 @@ declare class ApplicationShell extends SvelteComponent<
   get draggableOptions(): any;
 
   /** Setter for {@link ApplicationShell.Props.padToVisualEdge | padToVisualEdge} prop. */
-  set padToVisualEdge(_: boolean);
+  set padToVisualEdge(_: _typhonjs_svelte_runtime_base_svelte_action_dom_style.PadToVisualEdgeSides);
 
   /** Getter for {@link ApplicationShell.Props.padToVisualEdge | padToVisualEdge} prop. */
-  get padToVisualEdge(): boolean;
+  get padToVisualEdge(): _typhonjs_svelte_runtime_base_svelte_action_dom_style.PadToVisualEdgeSides;
 
   /** Setter for {@link ApplicationShell.Props.stylesApp | stylesApp} prop. */
   set stylesApp(_: any);
@@ -153,9 +154,9 @@ declare namespace ApplicationShell {
      * insets / border image applied to `.window-content` allowing the main slot to take up the entire visual content
      * space.
      *
-     * @type {boolean}
+     * @type {import('@typhonjs-svelte/runtime-base/svelte/action/dom/style').PadToVisualEdgeSides}
      */
-    padToVisualEdge?: boolean;
+    padToVisualEdge?: _typhonjs_svelte_runtime_base_svelte_action_dom_style.PadToVisualEdgeSides;
     stylesApp?: any;
     stylesContent?: any;
     appOffsetHeight?: boolean;
@@ -355,10 +356,10 @@ declare class TjsApplicationShell extends SvelteComponent<
   get draggableOptions(): any;
 
   /** Setter for {@link TjsApplicationShell.Props.padToVisualEdge | padToVisualEdge} prop. */
-  set padToVisualEdge(_: boolean);
+  set padToVisualEdge(_: _typhonjs_svelte_runtime_base_svelte_action_dom_style.PadToVisualEdgeSides);
 
   /** Getter for {@link TjsApplicationShell.Props.padToVisualEdge | padToVisualEdge} prop. */
-  get padToVisualEdge(): boolean;
+  get padToVisualEdge(): _typhonjs_svelte_runtime_base_svelte_action_dom_style.PadToVisualEdgeSides;
 
   /** Setter for {@link TjsApplicationShell.Props.stylesApp | stylesApp} prop. */
   set stylesApp(_: any);
@@ -465,9 +466,9 @@ declare namespace TjsApplicationShell {
      * insets / border image applied to `.window-content` allowing the main slot to take up the entire visual content
      * space.
      *
-     * @type {boolean}
+     * @type {import('@typhonjs-svelte/runtime-base/svelte/action/dom/style').PadToVisualEdgeSides}
      */
-    padToVisualEdge?: boolean;
+    padToVisualEdge?: _typhonjs_svelte_runtime_base_svelte_action_dom_style.PadToVisualEdgeSides;
     stylesApp?: any;
     stylesContent?: any;
     appOffsetHeight?: boolean;
@@ -586,6 +587,187 @@ declare namespace TjsGlassPane {
 }
 
 /**
+ * Provides an application shell is a main top level slotted component that provides a reactive
+ * outer wrapper and header bar for the main content component.
+ *
+ * Container queries (`inline-size`) are supported for `width` queries. The main app window container is named
+ * `tjs-app-window` and the window content container is `tjs-app-content`. Take note that the width available
+ * is the inline-size width of the app window or content minus the border constraints. Container queries will be
+ * disabled if the `width` app option is `auto` or not an explicit constraint. Just a precautionary warning that If
+ * you set `width` to `auto` during runtime unexpected behavior or a collapse of the app window will occur which is
+ * to be expected.
+ *
+ */
+declare class TestApplicationShell extends SvelteComponent<
+  TestApplicationShell.Props,
+  TestApplicationShell.Events,
+  TestApplicationShell.Slots
+> {
+  /** Setter for {@link TestApplicationShell.Props.scrollContainer | scrollContainer} prop. */
+  set scrollContainer(_: boolean | object);
+
+  /** Getter for {@link TestApplicationShell.Props.scrollContainer | scrollContainer} prop. */
+  get scrollContainer(): boolean | object;
+
+  /** Setter for {@link TestApplicationShell.Props.elementContent | elementContent} prop. */
+  set elementContent(_: HTMLElement);
+
+  /** Getter for {@link TestApplicationShell.Props.elementContent | elementContent} prop. */
+  get elementContent(): HTMLElement;
+
+  /** Setter for {@link TestApplicationShell.Props.elementRoot | elementRoot} prop. */
+  set elementRoot(_: HTMLElement);
+
+  /** Getter for {@link TestApplicationShell.Props.elementRoot | elementRoot} prop. */
+  get elementRoot(): HTMLElement;
+
+  /** Setter for {@link TestApplicationShell.Props.draggable | draggable} prop. */
+  set draggable(_: any);
+
+  /** Getter for {@link TestApplicationShell.Props.draggable | draggable} prop. */
+  get draggable(): any;
+
+  /** Setter for {@link TestApplicationShell.Props.draggableOptions | draggableOptions} prop. */
+  set draggableOptions(_: any);
+
+  /** Getter for {@link TestApplicationShell.Props.draggableOptions | draggableOptions} prop. */
+  get draggableOptions(): any;
+
+  /** Setter for {@link TestApplicationShell.Props.padToVisualEdge | padToVisualEdge} prop. */
+  set padToVisualEdge(_: _typhonjs_svelte_runtime_base_svelte_action_dom_style.PadToVisualEdgeSides);
+
+  /** Getter for {@link TestApplicationShell.Props.padToVisualEdge | padToVisualEdge} prop. */
+  get padToVisualEdge(): _typhonjs_svelte_runtime_base_svelte_action_dom_style.PadToVisualEdgeSides;
+
+  /** Setter for {@link TestApplicationShell.Props.stylesApp | stylesApp} prop. */
+  set stylesApp(_: any);
+
+  /** Getter for {@link TestApplicationShell.Props.stylesApp | stylesApp} prop. */
+  get stylesApp(): any;
+
+  /** Setter for {@link TestApplicationShell.Props.stylesContent | stylesContent} prop. */
+  set stylesContent(_: any);
+
+  /** Getter for {@link TestApplicationShell.Props.stylesContent | stylesContent} prop. */
+  get stylesContent(): any;
+
+  /** Setter for {@link TestApplicationShell.Props.appOffsetHeight | appOffsetHeight} prop. */
+  set appOffsetHeight(_: boolean);
+
+  /** Getter for {@link TestApplicationShell.Props.appOffsetHeight | appOffsetHeight} prop. */
+  get appOffsetHeight(): boolean;
+
+  /** Setter for {@link TestApplicationShell.Props.appOffsetWidth | appOffsetWidth} prop. */
+  set appOffsetWidth(_: boolean);
+
+  /** Getter for {@link TestApplicationShell.Props.appOffsetWidth | appOffsetWidth} prop. */
+  get appOffsetWidth(): boolean;
+
+  /** Setter for {@link TestApplicationShell.Props.contentOffsetHeight | contentOffsetHeight} prop. */
+  set contentOffsetHeight(_: boolean);
+
+  /** Getter for {@link TestApplicationShell.Props.contentOffsetHeight | contentOffsetHeight} prop. */
+  get contentOffsetHeight(): boolean;
+
+  /** Setter for {@link TestApplicationShell.Props.contentOffsetWidth | contentOffsetWidth} prop. */
+  set contentOffsetWidth(_: boolean);
+
+  /** Getter for {@link TestApplicationShell.Props.contentOffsetWidth | contentOffsetWidth} prop. */
+  get contentOffsetWidth(): boolean;
+
+  /** Setter for {@link TestApplicationShell.Props.contentHeight | contentHeight} prop. */
+  set contentHeight(_: boolean);
+
+  /** Getter for {@link TestApplicationShell.Props.contentHeight | contentHeight} prop. */
+  get contentHeight(): boolean;
+
+  /** Setter for {@link TestApplicationShell.Props.contentWidth | contentWidth} prop. */
+  set contentWidth(_: boolean);
+
+  /** Getter for {@link TestApplicationShell.Props.contentWidth | contentWidth} prop. */
+  get contentWidth(): boolean;
+
+  /** Setter for {@link TestApplicationShell.Props.transition | transition} prop. */
+  set transition(_: () => undefined);
+
+  /** Getter for {@link TestApplicationShell.Props.transition | transition} prop. */
+  get transition(): () => undefined;
+
+  /** Setter for {@link TestApplicationShell.Props.inTransition | inTransition} prop. */
+  set inTransition(_: () => undefined);
+
+  /** Getter for {@link TestApplicationShell.Props.inTransition | inTransition} prop. */
+  get inTransition(): () => undefined;
+
+  /** Setter for {@link TestApplicationShell.Props.outTransition | outTransition} prop. */
+  set outTransition(_: () => undefined);
+
+  /** Getter for {@link TestApplicationShell.Props.outTransition | outTransition} prop. */
+  get outTransition(): () => undefined;
+
+  /** Setter for {@link TestApplicationShell.Props.transitionOptions | transitionOptions} prop. */
+  set transitionOptions(_: any);
+
+  /** Getter for {@link TestApplicationShell.Props.transitionOptions | transitionOptions} prop. */
+  get transitionOptions(): any;
+
+  /** Setter for {@link TestApplicationShell.Props.inTransitionOptions | inTransitionOptions} prop. */
+  set inTransitionOptions(_: {});
+
+  /** Getter for {@link TestApplicationShell.Props.inTransitionOptions | inTransitionOptions} prop. */
+  get inTransitionOptions(): {};
+
+  /** Setter for {@link TestApplicationShell.Props.outTransitionOptions | outTransitionOptions} prop. */
+  set outTransitionOptions(_: {});
+
+  /** Getter for {@link TestApplicationShell.Props.outTransitionOptions | outTransitionOptions} prop. */
+  get outTransitionOptions(): {};
+}
+
+/** Event / Prop / Slot type aliases for {@link TestApplicationShell | associated component}. */
+declare namespace TestApplicationShell {
+  /** Props type alias for {@link TestApplicationShell | associated component}. */
+  export type Props = {
+    transition?: () => undefined;
+    draggable?: any;
+    /** @type {HTMLElement} */
+    elementContent?: HTMLElement;
+    /** @type {HTMLElement} */
+    elementRoot?: HTMLElement;
+    contentOffsetWidth?: boolean;
+    contentOffsetHeight?: boolean;
+    contentWidth?: boolean;
+    contentHeight?: boolean;
+    draggableOptions?: any;
+    /**
+     * When true, the inline styles for padding of the `.window-content` / main slot is adjusted for any visual edge
+     * insets / border image applied to `.window-content` allowing the main slot to take up the entire visual content
+     * space.
+     *
+     * @type {import('@typhonjs-svelte/runtime-base/svelte/action/dom/style').PadToVisualEdgeSides}
+     */
+    padToVisualEdge?: _typhonjs_svelte_runtime_base_svelte_action_dom_style.PadToVisualEdgeSides;
+    stylesApp?: any;
+    stylesContent?: any;
+    appOffsetHeight?: boolean;
+    appOffsetWidth?: boolean;
+    inTransition?: () => undefined;
+    outTransition?: () => undefined;
+    transitionOptions?: any;
+    inTransitionOptions?: {};
+    outTransitionOptions?: {};
+    /**
+     * @type {boolean | object}
+     */
+    scrollContainer?: boolean | object;
+  };
+  /** Events type alias for {@link TestApplicationShell | associated component}. */
+  export type Events = { [evt: string]: CustomEvent<any> };
+  /** Slots type alias for {@link TestApplicationShell | associated component}. */
+  export type Slots = { default: {} };
+}
+
+/**
  * Provides the data and types for application shells `#internal` context.
  */
 declare namespace AppShell {
@@ -645,4 +827,5 @@ export {
   EmptyApplicationShell,
   TjsApplicationShell as TJSApplicationShell,
   TjsGlassPane as TJSGlassPane,
+  TestApplicationShell,
 };

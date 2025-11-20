@@ -29,6 +29,7 @@
       applyStyles,
       padToVisualEdgeInsets }          from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
    import { dynamicAction }            from '@typhonjs-svelte/runtime-base/svelte/action/util';
+   import { TJSFocusWrap }             from '@typhonjs-svelte/runtime-base/svelte/component/dom/focus';
    import { CQPositionValidate }       from '@typhonjs-svelte/runtime-base/svelte/store/position';
    import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
    import { A11yHelper }               from '@typhonjs-svelte/runtime-base/util/a11y';
@@ -38,8 +39,6 @@
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
    import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
    import ResizableHandle              from './ResizableHandle.svelte';
-
-   import TJSFocusWrap                 from '../internal/dom/TJSFocusWrap.svelte';
 
    import { FVTTAppTheme }             from './data';
 
@@ -60,7 +59,7 @@
     * insets / border image applied to `.window-content` allowing the main slot to take up the entire visual content
     * space.
     *
-    * @type {boolean}
+    * @type {import('@typhonjs-svelte/runtime-base/svelte/action/dom/style').PadToVisualEdgeSides}
     */
    export let padToVisualEdge = void 0;
 
@@ -496,12 +495,12 @@
                  on:pointerdown={onPointerdownContent}
                  use:applyStyles={stylesContent}
                  use:contentResizeObserver={resizeObservedContent}
-                 use:padToVisualEdgeInsets={{ enabled: typeof padToVisualEdge === 'boolean' ? padToVisualEdge : false, update: $appThemeName }}
+                 use:padToVisualEdgeInsets={{ sides: typeof padToVisualEdge === 'boolean' ? padToVisualEdge : false, update: $appThemeName }}
                  tabindex=-1>
             <slot />
         </section>
         <ResizableHandle />
-        <TJSFocusWrap {elementRoot} />
+        <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
     </div>
 {:else}
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
@@ -524,7 +523,7 @@
                  on:pointerdown={onPointerdownContent}
                  use:applyStyles={stylesContent}
                  use:contentResizeObserver={resizeObservedContent}
-                 use:padToVisualEdgeInsets={{ enabled: typeof padToVisualEdge === 'boolean' ? padToVisualEdge : false, update: $appThemeName }}
+                 use:padToVisualEdgeInsets={{ sides: typeof padToVisualEdge === 'boolean' ? padToVisualEdge : false, update: $appThemeName }}
                  tabindex=-1>
             <slot />
         </section>
