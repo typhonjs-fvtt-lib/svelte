@@ -197,7 +197,7 @@ for (const config of rollupConfigs)
 
 // Application rewriting types / exports -----------------------------------------------------------------------------
 
-// The manipulation below is to rewrite `SvelteApplication` as `SvelteApp` to be able to merge with the namespace
+// The manipulation below is to rewrite `SvelteAppNS` as `SvelteApp` to be able to merge with the namespace
 // `SvelteApp`. `SvelteApp` is then reexported as `SvelteApplication` in both the sub-path JS bundle and declarations.
 {
    // JS Bundle mods --------------
@@ -268,5 +268,5 @@ for (const gsapFile of gsapFiles)
 }
 
 // Svelte components
-await generateDTS({ input: './_dist/component/application/index.js' });
-await generateDTS({ input: './_dist/component/internal/index.js' });
+await generateDTS({ input: './_dist/component/application/index.js', rollupExternal: external });
+await generateDTS({ input: './_dist/component/internal/index.js', rollupExternal: external });
