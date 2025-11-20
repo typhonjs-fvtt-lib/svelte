@@ -54,7 +54,7 @@
     * insets / border image applied to `.window-content` allowing the main slot to take up the entire visual content
     * space.
     *
-    * @type {boolean}
+    * @type {import('#runtime/svelte/action/dom/style').PadToVisualEdgeSides}
     */
    export let padToVisualEdge = void 0;
 
@@ -490,7 +490,7 @@
                on:pointerdown={onPointerdownContent}
                use:applyStyles={stylesContent}
                use:contentResizeObserver={resizeObservedContent}
-               use:padToVisualEdgeInsets={{ enabled: typeof padToVisualEdge === 'boolean' ? padToVisualEdge : false, update: $appThemeName }}
+               use:padToVisualEdgeInsets={{ sides: typeof padToVisualEdge === 'boolean' ? padToVisualEdge : false, update: $appThemeName }}
                tabindex=-1>
          <slot />
       </section>
@@ -518,7 +518,7 @@
                on:pointerdown={onPointerdownContent}
                use:applyStyles={stylesContent}
                use:contentResizeObserver={resizeObservedContent}
-               use:padToVisualEdgeInsets={{ enabled: typeof padToVisualEdge === 'boolean' ? padToVisualEdge : false, update: $appThemeName }}
+               use:padToVisualEdgeInsets={{ sides: typeof padToVisualEdge === 'boolean' ? padToVisualEdge : false, update: $appThemeName }}
                tabindex=-1>
          <slot />
       </section>
