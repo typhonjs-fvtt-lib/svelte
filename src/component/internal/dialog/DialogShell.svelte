@@ -15,12 +15,11 @@
 
    import { fade }               from '#svelte/transition';
 
-   import {
-      ApplicationShell,
-      TJSGlassPane }             from '#svelte-fvtt/component/application';
-
+   import { TJSGlassPane }       from '#runtime/svelte/component/container';
    import { A11yHelper }         from '#runtime/util/a11y';
    import { isObject }           from '#runtime/util/object';
+
+   import { ApplicationShell }   from '#svelte-fvtt/component/application';
 
    import DialogContent          from './DialogContent.svelte';
 

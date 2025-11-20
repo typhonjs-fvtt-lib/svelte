@@ -486,107 +486,6 @@ declare namespace TjsApplicationShell {
 }
 
 /**
- * @privateRemarks
- * TODO: Add description
- *
- */
-declare class TjsGlassPane extends SvelteComponent<TjsGlassPane.Props, TjsGlassPane.Events, TjsGlassPane.Slots> {}
-
-/** Event / Prop / Slot type aliases for {@link TjsGlassPane | associated component}. */
-declare namespace TjsGlassPane {
-  /** Props type alias for {@link TjsGlassPane | associated component}. */
-  export type Props = {
-    /** @type {string} */
-    id?: string;
-    /** @type {string} */
-    background?: string;
-    transition?: any;
-    inTransition?: any;
-    outTransition?: any;
-    transitionOptions?: any;
-    inTransitionOptions?: {};
-    outTransitionOptions?: {};
-    /** @type {boolean} */
-    captureInput?: boolean;
-    /**
-     * When true, any input fires an event `glasspane:close`.
-     *
-     * @type {boolean}
-     */
-    closeOnInput?: boolean;
-    /** @type {boolean} */
-    slotSeparate?: boolean;
-    /** @type {{ [key: string]: string | null }} */
-    styles?: { [key: string]: string | null };
-  };
-  /** Events type alias for {@link TjsGlassPane | associated component}. */
-  export type Events = {
-    'glasspane:close':
-      | PointerEvent
-      | MouseEvent
-      | UIEvent
-      | Event
-      | ErrorEvent
-      | AnimationEvent
-      | ClipboardEvent
-      | CompositionEvent
-      | DragEvent
-      | FocusEvent
-      | FormDataEvent
-      | InputEvent
-      | KeyboardEvent
-      | ProgressEvent<EventTarget>
-      | SecurityPolicyViolationEvent
-      | SubmitEvent
-      | TouchEvent
-      | TransitionEvent
-      | WheelEvent;
-    'glasspane:keydown:escape':
-      | PointerEvent
-      | MouseEvent
-      | UIEvent
-      | Event
-      | ErrorEvent
-      | AnimationEvent
-      | ClipboardEvent
-      | CompositionEvent
-      | DragEvent
-      | FocusEvent
-      | FormDataEvent
-      | InputEvent
-      | KeyboardEvent
-      | ProgressEvent<EventTarget>
-      | SecurityPolicyViolationEvent
-      | SubmitEvent
-      | TouchEvent
-      | TransitionEvent
-      | WheelEvent;
-    'glasspane:pointerdown':
-      | PointerEvent
-      | MouseEvent
-      | UIEvent
-      | Event
-      | ErrorEvent
-      | AnimationEvent
-      | ClipboardEvent
-      | CompositionEvent
-      | DragEvent
-      | FocusEvent
-      | FormDataEvent
-      | InputEvent
-      | KeyboardEvent
-      | ProgressEvent<EventTarget>
-      | SecurityPolicyViolationEvent
-      | SubmitEvent
-      | TouchEvent
-      | TransitionEvent
-      | WheelEvent;
-  } & { [evt: string]: CustomEvent<any> };
-  /** Slots type alias for {@link TjsGlassPane | associated component}. */
-  export type Slots = { default: {} };
-}
-
-/**
  * Provides an application shell is a main top level slotted component that provides a reactive
  * outer wrapper and header bar for the main content component.
  *
@@ -826,6 +725,5 @@ export {
   ApplicationShell,
   EmptyApplicationShell,
   TjsApplicationShell as TJSApplicationShell,
-  TjsGlassPane as TJSGlassPane,
   TestApplicationShell,
 };
