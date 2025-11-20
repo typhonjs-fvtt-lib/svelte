@@ -29,6 +29,7 @@
       applyStyles,
       padToVisualEdgeInsets }          from '#runtime/svelte/action/dom/style';
    import { dynamicAction }            from '#runtime/svelte/action/util';
+   import { TJSFocusWrap }             from '#runtime/svelte/component/dom/focus';
    import { CQPositionValidate }       from '#runtime/svelte/store/position';
    import { TJSDefaultTransition }     from '#runtime/svelte/transition';
    import { A11yHelper }               from '#runtime/util/a11y';
@@ -38,8 +39,6 @@
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
    import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
    import ResizableHandle              from './ResizableHandle.svelte';
-
-   import TJSFocusWrap                 from '../internal/dom/TJSFocusWrap.svelte';
 
    import { FVTTAppTheme }             from './data';
 
@@ -501,7 +500,7 @@
             <slot />
         </section>
         <ResizableHandle />
-        <TJSFocusWrap {elementRoot} />
+        <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
     </div>
 {:else}
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
