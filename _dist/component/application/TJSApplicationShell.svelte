@@ -585,8 +585,9 @@
    }
 
    .tjs-window-app .window-content {
+      /* Create a consistent stacking context for window content */
       isolation: isolate;
-      /*position: relative;*/
+      position: relative;
 
       background: var(--tjs-app-content-background, none);
       color: var(--tjs-app-content-color, inherit);

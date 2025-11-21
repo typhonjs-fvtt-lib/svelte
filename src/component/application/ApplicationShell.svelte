@@ -571,6 +571,7 @@
    .window-content {
       /* Create a consistent stacking context for window content */
       isolation: isolate;
+      position: relative;
    }
 
    .window-content:focus-visible {
