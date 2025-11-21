@@ -569,7 +569,8 @@
    }
 
    .window-content {
-      position: relative;
+      isolation: isolate;
+      /*position: relative;*/
    }
 
    .window-content:focus-visible {

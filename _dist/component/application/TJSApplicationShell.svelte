@@ -585,7 +585,8 @@
    }
 
    .tjs-window-app .window-content {
-      position: relative;
+      isolation: isolate;
+      /*position: relative;*/
 
       background: var(--tjs-app-content-background, none);
       color: var(--tjs-app-content-color, inherit);
