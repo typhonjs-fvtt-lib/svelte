@@ -27,7 +27,7 @@
    import { resizeObserver }           from '@typhonjs-svelte/runtime-base/svelte/action/dom/observer';
    import {
       applyStyles,
-      padToVisualEdgeInsets }          from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
+      applyVisualEdgeInsets }          from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
    import { dynamicAction }            from '@typhonjs-svelte/runtime-base/svelte/action/util';
    import { TJSFocusWrap }             from '@typhonjs-svelte/runtime-base/svelte/component/dom/focus';
    import { CQPositionValidate }       from '@typhonjs-svelte/runtime-base/svelte/store/position';
@@ -495,7 +495,7 @@
                  on:pointerdown={onPointerdownContent}
                  use:applyStyles={stylesContent}
                  use:contentResizeObserver={resizeObservedContent}
-                 use:padToVisualEdgeInsets={{ sides: typeof padToVisualEdge === 'boolean' ? padToVisualEdge : false, update: $appThemeName }}
+                 use:applyVisualEdgeInsets={{ action: 'padThis', sides: applyVisualEdgeInsets.validateSides(padToVisualEdge) ? padToVisualEdge : false, update: $appThemeName }}
                  tabindex=-1>
             <slot />
         </section>
@@ -523,7 +523,7 @@
                  on:pointerdown={onPointerdownContent}
                  use:applyStyles={stylesContent}
                  use:contentResizeObserver={resizeObservedContent}
-                 use:padToVisualEdgeInsets={{ sides: typeof padToVisualEdge === 'boolean' ? padToVisualEdge : false, update: $appThemeName }}
+                 use:applyVisualEdgeInsets={{ action: 'padThis', sides: applyVisualEdgeInsets.validateSides(padToVisualEdge) ? padToVisualEdge : false, update: $appThemeName }}
                  tabindex=-1>
             <slot />
         </section>

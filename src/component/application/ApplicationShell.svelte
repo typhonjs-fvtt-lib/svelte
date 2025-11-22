@@ -21,7 +21,7 @@
    import { resizeObserver }           from '#runtime/svelte/action/dom/observer';
    import {
       applyStyles,
-      padToVisualEdgeInsets }          from '#runtime/svelte/action/dom/style';
+      applyVisualEdgeInsets }          from '#runtime/svelte/action/dom/style';
    import { dynamicAction }            from '#runtime/svelte/action/util';
    import { TJSFocusWrap }             from '#runtime/svelte/component/dom/focus';
    import { CQPositionValidate }       from '#runtime/svelte/store/position';
@@ -489,7 +489,7 @@
                on:pointerdown={onPointerdownContent}
                use:applyStyles={stylesContent}
                use:contentResizeObserver={resizeObservedContent}
-               use:padToVisualEdgeInsets={{ sides: typeof padToVisualEdge === 'boolean' ? padToVisualEdge : false, update: $appThemeName }}
+               use:applyVisualEdgeInsets={{ action: 'padThis', sides: applyVisualEdgeInsets.validateSides(padToVisualEdge) ? padToVisualEdge : false, update: $appThemeName }}
                tabindex=-1>
          <slot />
       </section>
@@ -517,7 +517,7 @@
                on:pointerdown={onPointerdownContent}
                use:applyStyles={stylesContent}
                use:contentResizeObserver={resizeObservedContent}
-               use:padToVisualEdgeInsets={{ sides: typeof padToVisualEdge === 'boolean' ? padToVisualEdge : false, update: $appThemeName }}
+               use:applyVisualEdgeInsets={{ action: 'padThis', sides: applyVisualEdgeInsets.validateSides(padToVisualEdge) ? padToVisualEdge : false, update: $appThemeName }}
                tabindex=-1>
          <slot />
       </section>
