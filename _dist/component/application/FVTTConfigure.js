@@ -185,6 +185,14 @@ export class FVTTConfigure
          '--_tjs-content-padding-bottom': 'var(--tjs-content-padding-bottom, var(--_tjs-content-padding-length))',
          '--_tjs-content-padding-left': 'var(--tjs-content-padding-left, var(--_tjs-content-padding-length))',
 
+         // Complete basic content padding for all sides.
+         '--tjs-content-padding': 'var(--_tjs-content-padding-top) var(--_tjs-content-padding-right) var(--_tjs-content-padding-bottom) var(--_tjs-content-padding-left)',
+         '--tjs-content-padding-half': 'calc(var(--_tjs-content-padding-top) / 2) calc(var(--_tjs-content-padding-right) / 2) calc(var(--_tjs-content-padding-bottom) / 2) calc(var(--_tjs-content-padding-left) / 2)',
+
+         // Inline left / right basic content padding.
+         '--tjs-content-padding-inline': '0 var(--_tjs-content-padding-right) 0 var(--_tjs-content-padding-left)',
+         '--tjs-content-padding-inline-half': '0 calc(var(--_tjs-content-padding-right) / 2) 0 calc(var(--_tjs-content-padding-left) / 2)',
+
          // Complete content padding for all sides with adjustments to right padding for `scrollbar-gutter: stable`.
          '--tjs-scrollbar-gutter-stable-padding': `var(--_tjs-content-padding-top) calc(max(calc(${scrollbarWidth} + 0.25rem), var(--_tjs-content-padding-right)) - ${scrollbarWidth}) var(--_tjs-content-padding-bottom) var(--_tjs-content-padding-left)`,
          '--tjs-scrollbar-gutter-stable-padding-half': `calc(var(--_tjs-content-padding-top) / 2) calc(max(calc(${scrollbarWidth} + 0.25rem), calc(var(--_tjs-content-padding-right) / 2)) - ${scrollbarWidth}) calc(var(--_tjs-content-padding-bottom) / 2) calc(var(--_tjs-content-padding-left) / 2)`,
@@ -192,6 +200,10 @@ export class FVTTConfigure
          // Inline left / right padding taking into consideration `scrollbar-gutter: stable`.
          '--tjs-scrollbar-gutter-stable-padding-inline': `0 calc(max(calc(${scrollbarWidth} + 0.25rem), var(--_tjs-content-padding-right)) - ${scrollbarWidth}) 0 var(--_tjs-content-padding-left)`,
          '--tjs-scrollbar-gutter-stable-padding-inline-half': `0 calc(max(calc(${scrollbarWidth} + 0.25rem), calc(var(--_tjs-content-padding-right) / 2)) - ${scrollbarWidth}) 0 calc(var(--_tjs-content-padding-left) / 2)`,
+
+         // Right padding taking into consideration `scrollbar-gutter: stable`.
+         '--tjs-scrollbar-gutter-stable-padding-right': `0 calc(max(calc(${scrollbarWidth} + 0.25rem), var(--_tjs-content-padding-right)) - ${scrollbarWidth}) 0 0`,
+         '--tjs-scrollbar-gutter-stable-padding-right-half': `0 calc(max(calc(${scrollbarWidth} + 0.25rem), calc(var(--_tjs-content-padding-right) / 2)) - ${scrollbarWidth}) 0 0`,
       });
    }
 
