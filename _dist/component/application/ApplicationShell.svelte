@@ -23,6 +23,7 @@
       applyStyles,
       applyVisualEdgeInsets }          from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
    import { dynamicAction }            from '@typhonjs-svelte/runtime-base/svelte/action/util';
+   import { TJSScrollContainer }       from '@typhonjs-svelte/runtime-base/svelte/component/container';
    import { TJSFocusWrap }             from '@typhonjs-svelte/runtime-base/svelte/component/dom/focus';
    import { CQPositionValidate }       from '@typhonjs-svelte/runtime-base/svelte/store/position';
    import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
@@ -41,6 +42,7 @@
    // `elementTarget`. Please see SvelteApplication lifecycle documentation.
    /** @type {HTMLElement} */
    export let elementContent = void 0;
+
    /** @type {HTMLElement} */
    export let elementRoot = void 0;
 
@@ -51,11 +53,19 @@
    /**
     * When true, the inline styles for padding of the `.window-content` / main slot is adjusted for any visual edge
     * insets / border image applied to `.window-content` allowing the main slot to take up the entire visual content
-    * space.
+    * space. You may also specify specific sides for application of visual edge padding inset constraints.
     *
-    * @type {import('@typhonjs-svelte/runtime-base/svelte/action/dom/style').PadToVisualEdgeSides}
+    * @type {import('@typhonjs-svelte/runtime-base/svelte/action/dom/style').VisualEdgeSides}
     */
    export let padToVisualEdge = void 0;
+
+   /**
+    * When true, or a `TJSScrollContainerData` object is defined the app shell slot is wrapped with a
+    * {@link #runtime/svelte/component/container!TJSScrollContainer} component.
+    *
+    * @type {boolean | import('@typhonjs-svelte/runtime-base/svelte/component/container').TJSScrollContainerData}
+    */
+   export let scrollContainer = void 0;
 
    // Explicit style overrides for the main app and content elements. Uses action `applyStyles`.
    export let stylesApp = void 0;
@@ -491,7 +501,13 @@
                use:contentResizeObserver={resizeObservedContent}
                use:applyVisualEdgeInsets={{ action: 'padThis', sides: applyVisualEdgeInsets.validateSides(padToVisualEdge) ? padToVisualEdge : false, update: $appThemeName }}
                tabindex=-1>
-         <slot />
+         {#if scrollContainer}
+            <TJSScrollContainer container={isObject(scrollContainer) ? scrollContainer : void 0}>
+               <slot />
+            </TJSScrollContainer>
+         {:else}
+            <slot />
+         {/if}
       </section>
       <ResizableHandle />
       <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
@@ -519,7 +535,13 @@
                use:contentResizeObserver={resizeObservedContent}
                use:applyVisualEdgeInsets={{ action: 'padThis', sides: applyVisualEdgeInsets.validateSides(padToVisualEdge) ? padToVisualEdge : false, update: $appThemeName }}
                tabindex=-1>
-         <slot />
+         {#if scrollContainer}
+            <TJSScrollContainer container={isObject(scrollContainer) ? scrollContainer : void 0}>
+               <slot />
+            </TJSScrollContainer>
+         {:else}
+            <slot />
+         {/if}
       </section>
       <ResizableHandle />
       <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
