@@ -426,7 +426,7 @@
 {#if inTransition !== TJSDefaultTransition.default || outTransition !== TJSDefaultTransition.default}
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
-         class="application tjs-app {appClasses}"
+         class="application tjs-app tjs-content-vars {appClasses}"
          class:tjs-cq-inline-size={cqEnabled && $containerQueryType === 'inline-size'}
          class:tjs-cq-size={cqEnabled && $containerQueryType === 'size'}
          data-appid={application.appId}
@@ -448,7 +448,7 @@
 {:else}
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <div id={application.id}
-         class="application tjs-app {appClasses}"
+         class="application tjs-app tjs-content-vars {appClasses}"
          class:tjs-cq-inline-size={cqEnabled && $containerQueryType === 'inline-size'}
          class:tjs-cq-size={cqEnabled && $containerQueryType === 'size'}
          data-appid={application.appId}

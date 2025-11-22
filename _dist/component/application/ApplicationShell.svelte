@@ -522,7 +522,7 @@
         role=application
         tabindex=-1>
       <TJSApplicationHeader {draggable} {draggableOptions} />
-      <section class=window-content
+      <section class="window-content tjs-content-vars"
                bind:this={elementContent}
                on:pointerdown={onPointerdownContent}
                use:applyStyles={stylesContent}
@@ -556,7 +556,7 @@
         role=application
         tabindex=-1>
       <TJSApplicationHeader {draggable} {draggableOptions} />
-      <section class=window-content
+      <section class="window-content tjs-content-vars"
                bind:this={elementContent}
                on:pointerdown={onPointerdownContent}
                use:applyStyles={stylesContent}
