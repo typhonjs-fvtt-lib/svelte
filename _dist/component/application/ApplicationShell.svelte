@@ -35,7 +35,9 @@
    import TJSApplicationHeader         from './TJSApplicationHeader.svelte';
    import ResizableHandle              from './ResizableHandle.svelte';
 
-   import { FVTTAppTheme }             from './data';
+   import {
+      AppShellOptions,
+      FVTTAppTheme }                   from './data';
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
    // use 'elementRoot' to set the element of the Application. You can also provide `elementContent` and
@@ -49,6 +51,8 @@
    // Allows custom draggable implementations to be forwarded to TJSApplicationHeader.
    export let draggable = void 0;
    export let draggableOptions = void 0;
+
+   // Visual edge padding / scroll container -------------------------------------------------------------------------
 
    /**
     * When true, the inline styles for padding of the `.window-content` / main slot is adjusted for any visual edge
@@ -66,6 +70,30 @@
     * @type {boolean | import('@typhonjs-svelte/runtime-base/svelte/component/container').TJSScrollContainerData}
     */
    export let scrollContainer = void 0;
+
+   /**
+    * Merged / sanitized `padToVisualEdge` data.
+    *
+    * @type {import('@typhonjs-svelte/runtime-base/svelte/action/dom/style').VisualEdgeSides | undefined}
+    */
+   let padToVisualEdgeActual;
+
+   /**
+    * Sanitized `scrollContainer` data.
+    *
+    * @type {boolean | import('@typhonjs-svelte/runtime-base/svelte/component/container').TJSScrollContainerData | undefined}
+    */
+   let scrollContainerActual;
+
+   /**
+    * On change of `padToVisualEdge` or `scrollContainer` sanitize both and potentially merge any `padToVisualEdge`
+    * data from `scrollContainer` into `padToVisualEdgeActual` otherwise accept an explicit value from the app shell
+    * `padToVisualEdge` data.
+    */
+   $: ({ padToVisualEdgeActual, scrollContainerActual } = AppShellOptions.handlePadScrollOptions(padToVisualEdge,
+    scrollContainer));
+
+   // ----------------------------------------------------------------------------------------------------------------
 
    // Explicit style overrides for the main app and content elements. Uses action `applyStyles`.
    export let stylesApp = void 0;
@@ -499,10 +527,10 @@
                on:pointerdown={onPointerdownContent}
                use:applyStyles={stylesContent}
                use:contentResizeObserver={resizeObservedContent}
-               use:applyVisualEdgeInsets={{ action: 'padThis', sides: applyVisualEdgeInsets.validateSides(padToVisualEdge) ? padToVisualEdge : false, update: $appThemeName }}
+               use:applyVisualEdgeInsets={{ action: 'padThis', sides: padToVisualEdgeActual, update: $appThemeName }}
                tabindex=-1>
-         {#if scrollContainer}
-            <TJSScrollContainer container={isObject(scrollContainer) ? scrollContainer : void 0}>
+         {#if isObject(scrollContainerActual)}
+            <TJSScrollContainer container={scrollContainerActual}>
                <slot />
             </TJSScrollContainer>
          {:else}
@@ -533,10 +561,10 @@
                on:pointerdown={onPointerdownContent}
                use:applyStyles={stylesContent}
                use:contentResizeObserver={resizeObservedContent}
-               use:applyVisualEdgeInsets={{ action: 'padThis', sides: applyVisualEdgeInsets.validateSides(padToVisualEdge) ? padToVisualEdge : false, update: $appThemeName }}
+               use:applyVisualEdgeInsets={{ action: 'padThis', sides: padToVisualEdgeActual, update: $appThemeName }}
                tabindex=-1>
-         {#if scrollContainer}
-            <TJSScrollContainer container={isObject(scrollContainer) ? scrollContainer : void 0}>
+         {#if isObject(scrollContainerActual)}
+            <TJSScrollContainer container={scrollContainerActual}>
                <slot />
             </TJSScrollContainer>
          {:else}
