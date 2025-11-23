@@ -532,7 +532,7 @@
                  on:pointerdown={onPointerdownContent}
                  use:applyStyles={stylesContent}
                  use:contentResizeObserver={resizeObservedContent}
-                 use:applyVisualEdgeInsets={{ action: 'padThis', sides: padToVisualEdgeActual, update: $appThemeName }}
+                 use:applyVisualEdgeInsets={{ action: 'padThis', sides: padToVisualEdgeActual, update: $appThemeName, store: internal.stores.visualEdgeInsets }}
                  tabindex=-1>
            {#if isObject(scrollContainerActual)}
               <TJSScrollContainer container={scrollContainerActual}>
@@ -566,7 +566,7 @@
                  on:pointerdown={onPointerdownContent}
                  use:applyStyles={stylesContent}
                  use:contentResizeObserver={resizeObservedContent}
-                 use:applyVisualEdgeInsets={{ action: 'padThis', sides: padToVisualEdgeActual, update: $appThemeName }}
+                 use:applyVisualEdgeInsets={{ action: 'padThis', sides: padToVisualEdgeActual, update: $appThemeName, store: internal.stores.visualEdgeInsets }}
                  tabindex=-1>
            {#if isObject(scrollContainerActual)}
               <TJSScrollContainer container={scrollContainerActual}>
