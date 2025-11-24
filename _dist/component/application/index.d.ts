@@ -552,6 +552,15 @@ declare namespace AppShell {
        * The main app shell element.
        */
       elementRoot: Readable<HTMLElement>;
+      /**
+       * The visual edge insets of the window content area.
+       */
+      visualEdgeInsets: Readable<{
+        top: number;
+        right: number;
+        bottom: number;
+        left: number;
+      }>;
     };
     /**
      * The `#internal` context data.

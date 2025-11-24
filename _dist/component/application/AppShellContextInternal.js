@@ -24,7 +24,10 @@ export class AppShellContextInternal
          cqEnabled: writable(false),
 
          elementContent: writable(void 0),
-         elementRoot: writable(void 0)
+         elementRoot: writable(void 0),
+
+         // Updated by `applyVisualEdgeInsets` action.
+         visualEdgeInsets: writable({ top: 0, right: 0, bottom: 0, left: 0 })
       };
 
       Object.freeze(this.#stores);
