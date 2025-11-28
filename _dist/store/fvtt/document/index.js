@@ -90,11 +90,17 @@ class EmbeddedStoreManager {
             name = options;
             ctor = DynMapReducer;
         }
-        else if (typeof options === 'function' && hasPrototype(options, DynMapReducer)) {
+        else if (typeof options === 'function') {
+            if (!hasPrototype(options, DynMapReducer)) {
+                throw new TypeError(`EmbeddedStoreManager.create error: 'options' is a not a constructor function extending DynMapReducer.`);
+            }
             ctor = options;
         }
         else if (isObject(options)) {
             ({ name, ctor = DynMapReducer, ...rest } = options);
+        }
+        else if (options !== void 0) {
+            throw new TypeError(`EmbeddedStoreManager.create error: 'options' is unknown / malformed.`);
         }
         else {
             name = docName;
