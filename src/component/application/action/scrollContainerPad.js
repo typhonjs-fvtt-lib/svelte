@@ -2,20 +2,27 @@ import { isObject }           from '#runtime/util/object';
 import { findParentElement }  from '#runtime/util/dom/layout';
 
 /**
- * Experimental auto padding.
+ * Auto padding for any configured `TJSScrollContainer` in application shells syncing padding and gutter stable
+ * status with the embedded scroll container. This automatically keeps a stable gutter without the requirement to make
+ * custom modifications between different app window border styles.
  *
  * @param {HTMLElement} node - The node associated with the action.
  *
- * @param {object} options - Data from `TJSScrollContainer`.
+ * @param {({
+ *    gutterStable?: boolean
+ *    visualEdgeInsets?: import('svelte/store').Writable<{ top: number, left: number, right: number, bottom: number}>
+ * })} options - Data from `TJSScrollContainer`.
  *
  * @returns {import('svelte/action').ActionReturn<object>} The action lifecycle methods.
  */
 export function scrollContainerPad(node, options = {})
 {
-   console.log(`!!! scrollContainerPad - main - node: `, node);
-
    let gutterStable = false;
    let visualEdgeInsets;
+
+   let windowContentEl = findParentElement(node, { stackingContext: true });
+
+   windowContentEl.addEventListener('tjs-visual-edge-recalculate-external', calculate);
 
    function calculate()
    {
@@ -24,19 +31,12 @@ export function scrollContainerPad(node, options = {})
 
       const rightInset = Number.isFinite(visualEdgeInsets?.right) ? `${visualEdgeInsets?.right}px` : '0';
 
-      const windowContentEl = findParentElement(node, { stackingContext: true });
-
-      const windowContentPaddingLeft = windowContentEl ? getComputedStyle(windowContentEl).paddingLeft : '1rem';
-
-      console.log(`!!! scrollContainerPad - calculate - windowContentEl: `, windowContentEl);
-
-      console.log(`!!! scrollContainerPad - calculate - gutterStable: `, gutterStable);
-      console.log(`!!! scrollContainerPad - calculate - visualEdgeInsets: `, visualEdgeInsets);
-      console.log(`!!! scrollContainerPad - calculate - rightInset: `, rightInset);
-      console.log(`!!! scrollContainerPad - calculate - windowContentPaddingLeft: `, windowContentPaddingLeft);
+      const windowContentPaddingLeft = windowContentEl?.isConnected ? getComputedStyle(windowContentEl).paddingLeft :
+       '1rem';
 
       if (gutterStable)
       {
+         // Match the gutter padding of the parent app shell content area.
          node.style.paddingRight = `calc(max(calc(var(--_tjs-default-scrollbar-width) + 0.25rem), calc(${
           windowContentPaddingLeft} - ${rightInset})) - var(--_tjs-default-scrollbar-width))`;
       }
@@ -48,19 +48,25 @@ export function scrollContainerPad(node, options = {})
 
    return {
       /**
-       * @param {object} newOptions -
+       * @param {({
+       *    gutterStable?: boolean
+       *    visualEdgeInsets?: import('svelte/store').Writable<{ top: number, left: number, right: number, bottom: number}>
+       * })} newOptions - New action options.
        */
       update: (newOptions) =>
       {
          if (isObject(newOptions))
          {
-            options = newOptions;
+            options = { ...newOptions };
             calculate();
          }
       },
 
       destroy: () =>
       {
+         windowContentEl?.removeEventListener?.('tjs-visual-edge-recalculate-external', calculate);
+         windowContentEl = void 0;
+
          node.style.paddingRight = '';
       }
    };

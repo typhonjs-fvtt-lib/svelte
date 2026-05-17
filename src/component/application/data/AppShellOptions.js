@@ -1,6 +1,8 @@
 import { applyVisualEdgeInsets } from '#runtime/svelte/action/dom/style';
 import { isObject }              from '#runtime/util/object';
 
+import { scrollContainerPad }    from '../action';
+
 /**
  * Sanitation / merging of various app shell props.
  */
@@ -22,6 +24,7 @@ export class AppShellOptions
     * @returns {({
     *    padToVisualEdgeActual?: import('#runtime/svelte/action/dom/style').VisualEdgeSides,
     *    scrollContainerActual?: boolean | import('#runtime/svelte/component/container').TJSScrollContainerData
+    *    scrollContainerAction?: import('svelte/action').Action
     * })} Configured padding and scroll container data.
     */
    static handlePadScrollOptions(padToVisualEdge, scrollContainer)
@@ -29,7 +32,10 @@ export class AppShellOptions
       // If the app shell prop is valid then use it.
       let padToVisualEdgeActual = applyVisualEdgeInsets.validateSides(padToVisualEdge) ? padToVisualEdge : void 0;
 
+      /** @type {import('#runtime/svelte/component/container').TJSScrollContainerData} */
       let scrollContainerActual = void 0;
+
+      let scrollContainerAction = void 0;
 
       // Potentially copy any `padToVisualEdge` data from `scrollContainer` to `padToVisualEdgeActual` if not already
       // configured.
@@ -56,8 +62,9 @@ export class AppShellOptions
       if (padToVisualEdgeActual === void 0)
       {
          padToVisualEdgeActual = isObject(scrollContainerActual) ? { right: true } : false;
+         scrollContainerAction = scrollContainerPad;
       }
 
-      return { padToVisualEdgeActual, scrollContainerActual };
+      return { padToVisualEdgeActual, scrollContainerActual, scrollContainerAction };
    }
 }
