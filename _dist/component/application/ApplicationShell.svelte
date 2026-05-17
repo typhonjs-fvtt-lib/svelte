@@ -86,12 +86,22 @@
    let scrollContainerActual;
 
    /**
+    * Action to attach to TJSScrollContainer.
+    *
+    * @type {import('svelte/action').Action | undefined}
+    */
+   let scrollContainerAction;
+
+   /**
     * On change of `padToVisualEdge` or `scrollContainer` sanitize both and potentially merge any `padToVisualEdge`
     * data from `scrollContainer` into `padToVisualEdgeActual` otherwise accept an explicit value from the app shell
     * `padToVisualEdge` data.
     */
-   $: ({ padToVisualEdgeActual, scrollContainerActual } = AppShellOptions.handlePadScrollOptions(padToVisualEdge,
-    scrollContainer));
+   $: ({
+      padToVisualEdgeActual,
+      scrollContainerActual,
+      scrollContainerAction
+   } = AppShellOptions.handlePadScrollOptions(padToVisualEdge, scrollContainer));
 
    // ----------------------------------------------------------------------------------------------------------------
 
@@ -530,7 +540,7 @@
                use:applyVisualEdgeInsets={{ action: 'padThis', sides: padToVisualEdgeActual, update: $appThemeName, store: internal.stores.visualEdgeInsets }}
                tabindex=-1>
          {#if isObject(scrollContainerActual)}
-            <TJSScrollContainer container={scrollContainerActual}>
+            <TJSScrollContainer container={scrollContainerActual} attach={scrollContainerAction}>
                <slot />
             </TJSScrollContainer>
          {:else}
@@ -564,7 +574,7 @@
                use:applyVisualEdgeInsets={{ action: 'padThis', sides: padToVisualEdgeActual, update: $appThemeName, store: internal.stores.visualEdgeInsets }}
                tabindex=-1>
          {#if isObject(scrollContainerActual)}
-            <TJSScrollContainer container={scrollContainerActual}>
+            <TJSScrollContainer container={scrollContainerActual} attach={scrollContainerAction}>
                <slot />
             </TJSScrollContainer>
          {:else}
