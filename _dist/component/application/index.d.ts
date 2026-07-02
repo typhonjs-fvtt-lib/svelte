@@ -215,6 +215,12 @@ declare class EmptyApplicationShell extends SvelteComponent<
   /** Getter for {@link EmptyApplicationShell.Props.elementRoot | elementRoot} prop. */
   get elementRoot(): HTMLElement;
 
+  /** Setter for {@link EmptyApplicationShell.Props.scrollContainer | scrollContainer} prop. */
+  set scrollContainer(_: boolean | _typhonjs_svelte_runtime_base_svelte_component_container.TJSScrollContainerData);
+
+  /** Getter for {@link EmptyApplicationShell.Props.scrollContainer | scrollContainer} prop. */
+  get scrollContainer(): boolean | _typhonjs_svelte_runtime_base_svelte_component_container.TJSScrollContainerData;
+
   /** Setter for {@link EmptyApplicationShell.Props.stylesApp | stylesApp} prop. */
   set stylesApp(_: any);
 
@@ -307,6 +313,13 @@ declare namespace EmptyApplicationShell {
     contentOffsetHeight?: boolean;
     contentWidth?: boolean;
     contentHeight?: boolean;
+    /**
+     * When true, or a `TJSScrollContainerData` object is defined the app shell slot is wrapped with a
+     * {@link #runtime/svelte/component/container!TJSScrollContainer} component.
+     *
+     * @type {boolean | import('@typhonjs-svelte/runtime-base/svelte/component/container').TJSScrollContainerData}
+     */
+    scrollContainer?: boolean | _typhonjs_svelte_runtime_base_svelte_component_container.TJSScrollContainerData;
     stylesApp?: any;
     appOffsetHeight?: boolean;
     appOffsetWidth?: boolean;

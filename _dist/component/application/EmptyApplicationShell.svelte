@@ -19,6 +19,7 @@
    import { resizeObserver }           from '@typhonjs-svelte/runtime-base/svelte/action/dom/observer';
    import { applyStyles }              from '@typhonjs-svelte/runtime-base/svelte/action/dom/style';
    import { dynamicAction }            from '@typhonjs-svelte/runtime-base/svelte/action/util';
+   import { TJSScrollContainer }       from '@typhonjs-svelte/runtime-base/svelte/component/container';
    import { TJSFocusWrap }             from '@typhonjs-svelte/runtime-base/svelte/component/dom/focus';
    import { CQPositionValidate }       from '@typhonjs-svelte/runtime-base/svelte/store/position';
    import { TJSDefaultTransition }     from '@typhonjs-svelte/runtime-base/svelte/transition';
@@ -29,7 +30,9 @@
    import { AppShellContextInternal }  from './AppShellContextInternal.js';
    import ResizableHandle              from './ResizableHandle.svelte';
 
-   import { FVTTAppTheme }             from './data';
+   import {
+      AppShellOptions,
+      FVTTAppTheme }                   from './data';
 
    // Bound to the content and root elements. Can be used by parent components. SvelteApplication will also
    // use 'elementRoot' to set the element of the Application. You can also provide `elementContent` and
@@ -38,6 +41,42 @@
    export let elementContent = void 0;
    /** @type {HTMLElement} */
    export let elementRoot = void 0;
+
+   // Visual edge padding / scroll container -------------------------------------------------------------------------
+
+   /**
+    * When true, or a `TJSScrollContainerData` object is defined the app shell slot is wrapped with a
+    * {@link #runtime/svelte/component/container!TJSScrollContainer} component.
+    *
+    * @type {boolean | import('@typhonjs-svelte/runtime-base/svelte/component/container').TJSScrollContainerData}
+    */
+   export let scrollContainer = void 0;
+
+   /**
+    * Sanitized `scrollContainer` data.
+    *
+    * @type {boolean | import('@typhonjs-svelte/runtime-base/svelte/component/container').TJSScrollContainerData | undefined}
+    */
+   let scrollContainerActual;
+
+   /**
+    * Action to attach to TJSScrollContainer.
+    *
+    * @type {import('svelte/action').Action | undefined}
+    */
+   let scrollContainerAction;
+
+   /**
+    * On change of `padToVisualEdge` or `scrollContainer` sanitize both and potentially merge any `padToVisualEdge`
+    * data from `scrollContainer` into `padToVisualEdgeActual` otherwise accept an explicit value from the app shell
+    * `padToVisualEdge` data.
+    */
+   $: ({
+      scrollContainerActual,
+      scrollContainerAction
+   } = AppShellOptions.handlePadScrollOptions(void 0, scrollContainer));
+
+   // ----------------------------------------------------------------------------------------------------------------
 
    // Explicit style overrides for the main app and content elements. Uses action `applyStyles`.
    export let stylesApp = void 0;
@@ -441,7 +480,13 @@
          use:dynamicAction={appResizeObserver}
          role=application
          tabindex=-1>
-        <slot />
+        {#if isObject(scrollContainerActual)}
+           <TJSScrollContainer container={scrollContainerActual} attach={scrollContainerAction}>
+              <slot />
+           </TJSScrollContainer>
+        {:else}
+           <slot />
+        {/if}
         <ResizableHandle />
         <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
     </div>
@@ -461,7 +506,13 @@
          use:dynamicAction={appResizeObserver}
          role=application
          tabindex=-1>
-        <slot />
+        {#if isObject(scrollContainerActual)}
+           <TJSScrollContainer container={scrollContainerActual} attach={scrollContainerAction}>
+              <slot />
+           </TJSScrollContainer>
+        {:else}
+           <slot />
+        {/if}
         <ResizableHandle />
         <TJSFocusWrap {elementRoot} enabled={focusWrapEnabled} />
     </div>
