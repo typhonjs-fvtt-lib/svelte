@@ -566,6 +566,11 @@ declare namespace TJSGameSettings
          requiresReload?: boolean;
 
          /**
+          * If true then this setting is only visible to GM users.
+          */
+         restricted?: boolean;
+
+         /**
           * Scope for setting. `client` uses local storage, `world` is saved in Foundry DB for the World / only
           * accessible by GM for modification, and `user` is also saved in the Foundry DB associated w/ the current
           * user.
