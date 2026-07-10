@@ -6,7 +6,7 @@ import {
    isObject,
    isPlainObject }               from '#runtime/util/object';
 
-import { isDocumentCollection }  from '#runtime/types/fvtt-shim/guard';
+import { isDocumentCollection }  from '#runtime/types/fvtt-shim/predicate';
 
 import type {
    Readable,

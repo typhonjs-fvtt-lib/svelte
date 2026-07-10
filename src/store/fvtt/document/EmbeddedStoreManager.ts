@@ -1,6 +1,6 @@
 import { DynMapReducer }      from '#runtime/svelte/store/reducer';
 
-import { isDocument }         from '#runtime/types/fvtt-shim/guard';
+import { isDocument }         from '#runtime/types/fvtt-shim/predicate';
 
 import {
    hasPrototype,

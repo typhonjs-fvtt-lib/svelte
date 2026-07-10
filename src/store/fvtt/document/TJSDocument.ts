@@ -6,7 +6,7 @@ import {
    isObject,
    isPlainObject }                  from '#runtime/util/object';
 
-import { isDocument }               from '#runtime/types/fvtt-shim/guard';
+import { isDocument }               from '#runtime/types/fvtt-shim/predicate';
 
 import { EmbeddedStoreManager }     from './EmbeddedStoreManager';
 

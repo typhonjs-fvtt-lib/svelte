@@ -1,7 +1,7 @@
 import { tick } from 'svelte';
 import { Hashing } from '@typhonjs-svelte/runtime-base/util';
 import { hasPrototype, isObject, isPlainObject } from '@typhonjs-svelte/runtime-base/util/object';
-import { isDocument, isDocumentCollection } from '@typhonjs-fvtt/types-fvtt-shim/guard';
+import { isDocument, isDocumentCollection } from '@typhonjs-fvtt/types-fvtt-shim/predicate';
 import { DynMapReducer } from '@typhonjs-svelte/runtime-base/svelte/store/reducer';
 
 /**

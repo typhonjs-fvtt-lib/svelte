@@ -8,7 +8,7 @@
     "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)"
   ],
   "imports": {
-    "#runtime/types/fvtt-shim/guard": "@typhonjs-fvtt/types-fvtt-shim/guard",
+    "#runtime/types/fvtt-shim/predicate": "@typhonjs-fvtt/types-fvtt-shim/predicate",
     "#runtime/util/i18n": "@typhonjs-fvtt/runtime/util/i18n",
     "#runtime/*": "@typhonjs-svelte/runtime-base/*",
     "#svelte-fvtt/*": {
