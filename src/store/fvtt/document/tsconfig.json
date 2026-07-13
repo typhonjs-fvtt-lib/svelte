@@ -9,13 +9,13 @@
     "strictNullChecks": true,
 
     "types": [
-//      "@typhonjs-fvtt/types-fvtt-shim/pf2e"
-      "@typhonjs-fvtt/types-fvtt-shim/league"
+      "@typhonjs-fvtt/types-fvtt-shim/pf2e"
+//      "@typhonjs-fvtt/types-fvtt-shim/league"
     ]
   },
   "include": [
     "./**/*",
     // Uncomment to link the pf2e types / via the shim.
-    // "../../../../node_modules/@typhonjs-fvtt/types-fvtt-shim/node_modules/foundry-pf2e/types/foundry/index.d.ts"
+    // "../../../../node_modules/@typhonjs-fvtt/types-fvtt-shim/node_modules/@7h3laughingman/foundry-types/src/index.d.ts"
   ]
 }
