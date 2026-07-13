@@ -16,9 +16,34 @@ import { Readable } from 'svelte/store';
  *
  */
 declare class ApplicationShell extends SvelteComponent<
-  ApplicationShell.Props,
-  ApplicationShell.Events,
-  ApplicationShell.Slots
+  {
+    transition?: () => undefined;
+    draggable?: any;
+    elementContent?: HTMLElement;
+    elementRoot?: HTMLElement;
+    contentOffsetWidth?: boolean;
+    contentOffsetHeight?: boolean;
+    contentWidth?: boolean;
+    contentHeight?: boolean;
+    draggableOptions?: any;
+    padToVisualEdge?: _typhonjs_svelte_runtime_base_svelte_action_dom_style.VisualEdgeSides;
+    scrollContainer?: boolean | _typhonjs_svelte_runtime_base_svelte_component_container.TJSScrollContainerData;
+    stylesApp?: any;
+    stylesContent?: any;
+    appOffsetHeight?: boolean;
+    appOffsetWidth?: boolean;
+    inTransition?: () => undefined;
+    outTransition?: () => undefined;
+    transitionOptions?: any;
+    inTransitionOptions?: {};
+    outTransitionOptions?: {};
+  },
+  {
+    [evt: string]: CustomEvent<any>;
+  },
+  {
+    default: {};
+  }
 > {
   /** Setter for {@link ApplicationShell.Props.elementContent | elementContent} prop. */
   set elementContent(_: HTMLElement);
@@ -147,30 +172,15 @@ declare namespace ApplicationShell {
   export type Props = {
     transition?: () => undefined;
     draggable?: any;
-    /** @type {HTMLElement} */
     elementContent?: HTMLElement;
-    /** @type {HTMLElement} */
     elementRoot?: HTMLElement;
     contentOffsetWidth?: boolean;
     contentOffsetHeight?: boolean;
     contentWidth?: boolean;
     contentHeight?: boolean;
     draggableOptions?: any;
-    /**
-     * When true, the inline styles for padding of the `.window-content` / main slot is adjusted for any visual edge
-     * insets / border image applied to `.window-content` allowing the main slot to take up the entire visual content
-     * space. You may also specify specific sides for application of visual edge padding inset constraints.
-     *
-     * @type {import('@typhonjs-svelte/runtime-base/svelte/action/dom/style').VisualEdgeSides}
-     */
-    padToVisualEdge?: _typhonjs_svelte_runtime_base_svelte_action_dom_style.VisualEdgeSides;
-    /**
-     * When true, or a `TJSScrollContainerData` object is defined the app shell slot is wrapped with a
-     * {@link #runtime/svelte/component/container!TJSScrollContainer} component.
-     *
-     * @type {boolean | import('@typhonjs-svelte/runtime-base/svelte/component/container').TJSScrollContainerData}
-     */
-    scrollContainer?: boolean | _typhonjs_svelte_runtime_base_svelte_component_container.TJSScrollContainerData;
+    padToVisualEdge?: any;
+    scrollContainer?: any;
     stylesApp?: any;
     stylesContent?: any;
     appOffsetHeight?: boolean;
@@ -199,9 +209,30 @@ declare namespace ApplicationShell {
  *
  */
 declare class EmptyApplicationShell extends SvelteComponent<
-  EmptyApplicationShell.Props,
-  EmptyApplicationShell.Events,
-  EmptyApplicationShell.Slots
+  {
+    transition?: () => undefined;
+    elementContent?: HTMLElement;
+    elementRoot?: HTMLElement;
+    contentOffsetWidth?: boolean;
+    contentOffsetHeight?: boolean;
+    contentWidth?: boolean;
+    contentHeight?: boolean;
+    scrollContainer?: boolean | _typhonjs_svelte_runtime_base_svelte_component_container.TJSScrollContainerData;
+    stylesApp?: any;
+    appOffsetHeight?: boolean;
+    appOffsetWidth?: boolean;
+    inTransition?: () => undefined;
+    outTransition?: () => undefined;
+    transitionOptions?: any;
+    inTransitionOptions?: {};
+    outTransitionOptions?: {};
+  },
+  {
+    [evt: string]: CustomEvent<any>;
+  },
+  {
+    default: {};
+  }
 > {
   /** Setter for {@link EmptyApplicationShell.Props.elementContent | elementContent} prop. */
   set elementContent(_: HTMLElement);
@@ -305,21 +336,13 @@ declare namespace EmptyApplicationShell {
   /** Props type alias for {@link EmptyApplicationShell | associated component}. */
   export type Props = {
     transition?: () => undefined;
-    /** @type {HTMLElement} */
     elementContent?: HTMLElement;
-    /** @type {HTMLElement} */
     elementRoot?: HTMLElement;
     contentOffsetWidth?: boolean;
     contentOffsetHeight?: boolean;
     contentWidth?: boolean;
     contentHeight?: boolean;
-    /**
-     * When true, or a `TJSScrollContainerData` object is defined the app shell slot is wrapped with a
-     * {@link #runtime/svelte/component/container!TJSScrollContainer} component.
-     *
-     * @type {boolean | import('@typhonjs-svelte/runtime-base/svelte/component/container').TJSScrollContainerData}
-     */
-    scrollContainer?: boolean | _typhonjs_svelte_runtime_base_svelte_component_container.TJSScrollContainerData;
+    scrollContainer?: any;
     stylesApp?: any;
     appOffsetHeight?: boolean;
     appOffsetWidth?: boolean;
@@ -354,9 +377,34 @@ declare namespace EmptyApplicationShell {
  * ```
  */
 declare class TjsApplicationShell extends SvelteComponent<
-  TjsApplicationShell.Props,
-  TjsApplicationShell.Events,
-  TjsApplicationShell.Slots
+  {
+    transition?: () => undefined;
+    draggable?: any;
+    elementContent?: HTMLElement;
+    elementRoot?: HTMLElement;
+    contentOffsetWidth?: boolean;
+    contentOffsetHeight?: boolean;
+    contentWidth?: boolean;
+    contentHeight?: boolean;
+    draggableOptions?: any;
+    padToVisualEdge?: _typhonjs_svelte_runtime_base_svelte_action_dom_style.VisualEdgeSides;
+    scrollContainer?: boolean | _typhonjs_svelte_runtime_base_svelte_component_container.TJSScrollContainerData;
+    stylesApp?: any;
+    stylesContent?: any;
+    appOffsetHeight?: boolean;
+    appOffsetWidth?: boolean;
+    inTransition?: () => undefined;
+    outTransition?: () => undefined;
+    transitionOptions?: any;
+    inTransitionOptions?: {};
+    outTransitionOptions?: {};
+  },
+  {
+    [evt: string]: CustomEvent<any>;
+  },
+  {
+    default: {};
+  }
 > {
   /** Setter for {@link TjsApplicationShell.Props.elementContent | elementContent} prop. */
   set elementContent(_: HTMLElement);
@@ -485,30 +533,15 @@ declare namespace TjsApplicationShell {
   export type Props = {
     transition?: () => undefined;
     draggable?: any;
-    /** @type {HTMLElement} */
     elementContent?: HTMLElement;
-    /** @type {HTMLElement} */
     elementRoot?: HTMLElement;
     contentOffsetWidth?: boolean;
     contentOffsetHeight?: boolean;
     contentWidth?: boolean;
     contentHeight?: boolean;
     draggableOptions?: any;
-    /**
-     * When true, the inline styles for padding of the `.window-content` / main slot is adjusted for any visual edge
-     * insets / border image applied to `.window-content` allowing the main slot to take up the entire visual content
-     * space. You may also specify specific sides for application of visual edge padding inset constraints.
-     *
-     * @type {import('@typhonjs-svelte/runtime-base/svelte/action/dom/style').VisualEdgeSides}
-     */
-    padToVisualEdge?: _typhonjs_svelte_runtime_base_svelte_action_dom_style.VisualEdgeSides;
-    /**
-     * When true, or a `TJSScrollContainerData` object is defined the app shell slot is wrapped with a
-     * {@link #runtime/svelte/component/container!TJSScrollContainer} component.
-     *
-     * @type {boolean | import('@typhonjs-svelte/runtime-base/svelte/component/container').TJSScrollContainerData}
-     */
-    scrollContainer?: boolean | _typhonjs_svelte_runtime_base_svelte_component_container.TJSScrollContainerData;
+    padToVisualEdge?: any;
+    scrollContainer?: any;
     stylesApp?: any;
     stylesContent?: any;
     appOffsetHeight?: boolean;

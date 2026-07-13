@@ -14,7 +14,19 @@ import { SvelteComponent } from 'svelte';
  *
  * @internal
  */
-declare class DialogShell extends SvelteComponent<DialogShell.Props, DialogShell.Events, DialogShell.Slots> {
+declare class DialogShell extends SvelteComponent<
+  {
+    data?: {};
+    elementContent?: any;
+    elementRoot?: any;
+    dialogComponent?: any;
+    managedPromise?: any;
+  },
+  {
+    [evt: string]: CustomEvent<any>;
+  },
+  {}
+> {
   /** Setter for {@link DialogShell.Props.elementContent | elementContent} prop. */
   set elementContent(_: any);
 

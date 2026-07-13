@@ -526,8 +526,6 @@ export {
   Action,
   Compose,
   GsapCompose,
-  type GsapEasingFunctionName,
-  type GsapEasingReference,
   draggableGsap,
   getGsapEasingFunc,
   gsap,
@@ -535,3 +533,4 @@ export {
   gsapEasingList,
   gsapLoadPlugin,
 };
+export type { GsapEasingFunctionName, GsapEasingReference };
