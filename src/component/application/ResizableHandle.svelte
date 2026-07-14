@@ -9,9 +9,7 @@
 
    import { ResizeHandleTransform } from './ResizeHandleTransform.js';
 
-   export let isResizable = false;
-
-   const application = getContext('#external')?.application;
+   const { application } = getContext('#external');
 
    // Allows retrieval of the element root at runtime.
    const storeElementRoot = getContext('#internal').stores.elementRoot;
@@ -22,13 +20,56 @@
    const storeMinimized = application.reactive.storeUIState.minimized;
    const storeResizing = application.reactive.storeUIState.resizing;
 
+   const storeIntrinsicHeight = application.position.stores.intrinsicHeight;
+   const storeIntrinsicWidth = application.position.stores.intrinsicWidth;
+
    let elementResize;
+
+   /** @type {boolean} */
+   let isResizable = false;
+
+   /**
+    * Which dimensions can resize.
+    *
+    * @type {'all' | 'height' | 'width'}
+    */
+   let dimension = 'all';
+
+   /**
+    * Which cursor to display for `--dynamic-cursor`.
+    *
+    * @type {string}
+    */
+   let cursor = 'var(--tjs-cursor-resize-nwse, nwse-resize)';
+
+   $: {
+      const isIntrinsicHeight = $storeIntrinsicHeight;
+      const isIntrinsicWidth = $storeIntrinsicWidth;
+
+      if (!isIntrinsicHeight && isIntrinsicWidth)
+      {
+         dimension = 'height';
+         cursor = 'var(--tjs-cursor-resize-ns, ns-resize)';
+      }
+      else if (isIntrinsicHeight && !isIntrinsicWidth)
+      {
+         dimension = 'width';
+         cursor = 'var(--tjs-cursor-resize-ew, ew-resize)';
+      }
+      else
+      {
+         dimension = 'all';
+         cursor = 'var(--tjs-cursor-resize-nwse, nwse-resize)';
+      }
+   }
+
+   $: {
+      isResizable = $storeResizable && !$storeDetached && !$storeMinimized &&
+       (!$storeIntrinsicWidth || !$storeIntrinsicHeight);
+   }
 
    $: if (elementResize)
    {
-      // Instead of creating a derived store it is easier to use isResizable and the minimized store below.
-      elementResize.style.display = isResizable && !$storeMinimized ? 'block' : 'none';
-
       // Add / remove `resizable` class from element root.
       const elementRoot = $storeElementRoot;
       if (elementRoot) { elementRoot.classList[isResizable ? 'add' : 'remove']('resizable'); }
@@ -101,8 +142,6 @@
          // Resize handlers
          node.addEventListener(...handlers.resizeDown);
 
-         isResizable = true;
-
          node.style.display = 'block';
       }
 
@@ -119,8 +158,6 @@
          node.removeEventListener(...handlers.resizeUp);
 
          node.style.display = 'none';
-
-         isResizable = false;
       }
 
       // On mount if resizable is true then activate listeners otherwise set element display to `none`.
@@ -144,9 +181,6 @@
 
          // Record initial position
          position = application.position.get();
-
-         if (position.height === 'auto') { position.height = $storeElementRoot.clientHeight; }
-         if (position.width === 'auto') { position.width = $storeElementRoot.clientWidth; }
 
          pScreenDownX = event.clientX;
          pScreenDownY = event.clientY;
@@ -174,10 +208,23 @@
          const pDeltaLocal = ResizeHandleTransform.computeDelta(application.position.transform.mat4, pScreenDownX,
           pScreenDownY, event.clientX, event.clientY);
 
-         application.position.set({
-            width: position.width + pDeltaLocal[0],
-            height: position.height + pDeltaLocal[1]
-         });
+         switch (dimension)
+         {
+            case 'all':
+               application.position.set({
+                  width: position.width + pDeltaLocal[0],
+                  height: position.height + pDeltaLocal[1]
+               });
+               break;
+
+            case 'height':
+               application.position.set({ height: position.height + pDeltaLocal[1] });
+               break;
+
+            case 'width':
+               application.position.set({ width: position.width + pDeltaLocal[0] });
+               break;
+         }
       }
 
       /**
@@ -207,24 +254,28 @@
          destroy: () => removeListeners()
       };
    }
-
 </script>
 
 <div class="window-resize-handle"
+     style:--dynamic-cursor={cursor}
+     style:display={isResizable ? 'block' : 'none'}
      on:pointerdown={onPointerdown}
-     use:resizable={{ active: $storeResizable && !$storeDetached, storeResizing }}
+     use:resizable={{ active: isResizable, storeResizing }}
      bind:this={elementResize}>
 </div>
 
 <style>
    .window-resize-handle {
+      /* Set inline based on intrinsic dimension constraints */
+      --dynamic-cursor: var(--tjs-cursor-resize-nwse, nwse-resize);
+
       display: block;
       position: var(--tjs-app-resize-handle-position);
       width: var(--tjs-app-resize-handle-width);
       height: var(--tjs-app-resize-handle-height);
 
       background: var(--tjs-app-resize-handle-background);
-      cursor: var(--tjs-app-resize-handle-cursor, var(--tjs-cursor-resize-nwse, nwse-resize));
+      cursor: var(--tjs-app-resize-handle-cursor, var(--dynamic-cursor));
       filter: var(--tjs-app-resize-handle-filter, none);
       inset: var(--tjs-app-resize-handle-inset);
       padding: var(--tjs-app-resize-handle-padding, 0);
