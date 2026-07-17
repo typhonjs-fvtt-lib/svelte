@@ -30,9 +30,14 @@ import type {
 class TJSDocument<D extends fvtt.ClientDocument> implements Readable<D>
 {
    /**
+    * RegExp for detecting CRUD updates for the associated document.
+    */
+   static #updateActionRegex: RegExp = /(?<action>create|delete|update)(?<sep>\.?)(?<name>\w+)/;
+
+   /**
     * Fake Application API that ClientDocumentMixin uses for document model callbacks.
     */
-   #callbackAPI: CallbackAPI;
+   readonly #callbackAPI: CallbackAPI;
 
    /**
     * Wrapped document.
@@ -425,9 +430,21 @@ class TJSDocument<D extends fvtt.ClientDocument> implements Readable<D>
     */
    #updateSubscribers(force: boolean, options: Record<string, unknown> = {}): void // eslint-disable-line no-unused-vars
    {
+      let action = (options.action ?? options.renderContext ?? 'tjs-unknown') as string;
+
+      let docType: string | undefined = void 0;
+
+      const match: RegExpExecArray | null = TJSDocument.#updateActionRegex.exec(action);
+
+      if (match && match.groups) {
+         action = match.groups.action;
+         docType = match.groups.name;
+      }
+
       // Shallow copy w/ remapped keys.
       const optionsRemap: TJSDocument.Data.Update = {
-         action: (options.action ?? options.renderContext ?? 'tjs-unknown') as string,
+         action,
+         docType: docType,
          data: (options.data ?? options.renderData ?? []) as []
       };
 
@@ -560,6 +577,11 @@ declare namespace TJSDocument {
           * The update action. Useful for filtering.
           */
          action: string;
+
+         /**
+          * Document type.
+          */
+         docType?: string;
 
          /**
           * Foundry data associated with document changes.
