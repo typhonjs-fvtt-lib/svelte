@@ -215,6 +215,10 @@ declare namespace TJSDocument {
        */
       action: string;
       /**
+       * Document type.
+       */
+      docType?: string;
+      /**
        * Foundry data associated with document changes.
        */
       data:

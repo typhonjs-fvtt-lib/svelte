@@ -300,6 +300,7 @@ class EmbeddedStoreManager {
     }
 }
 
+var _a;
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any Document / ClientMixinDocument.
  * This makes documents reactive in a Svelte component, but otherwise provides subscriber functionality external to
@@ -308,6 +309,10 @@ class EmbeddedStoreManager {
  * @typeParam D `Foundry Document`.
  */
 class TJSDocument {
+    /**
+     * RegExp for detecting CRUD updates for the associated document.
+     */
+    static #updateActionRegex = /(?<action>create|delete|update)(?<sep>\.?)(?<name>\w+)/;
     /**
      * Fake Application API that ClientDocumentMixin uses for document model callbacks.
      */
@@ -533,7 +538,7 @@ class TJSDocument {
      * @returns Returns true if new document set from data transfer blob.
      */
     async setFromDataTransfer(data, options) {
-        return this.setFromUUID(TJSDocument.getUUIDFromDataTransfer(data, options));
+        return this.setFromUUID(_a.getUUIDFromDataTransfer(data, options));
     }
     /**
      * Sets the document by Foundry UUID performing a lookup and setting the document if found.
@@ -620,9 +625,18 @@ class TJSDocument {
      * @param [options] - Options from render call; will have document update context.
      */
     #updateSubscribers(force, options = {}) {
+        let action = (options.action ?? options.renderContext ?? 'tjs-unknown');
+        let docType = void 0;
+        const match = _a.#updateActionRegex.exec(action);
+        if (match && match.groups) {
+            action = match.groups.action;
+            docType = match.groups.name;
+        }
         // Shallow copy w/ remapped keys.
         const optionsRemap = {
-            action: (options.action ?? options.renderContext ?? 'tjs-unknown'),
+            // action: (options.action ?? options.renderContext ?? 'tjs-unknown') as string,
+            action,
+            docType: docType,
             data: (options.data ?? options.renderData ?? [])
         };
         // Coerce `data` as necessary into an array to standardize receiving processing.
@@ -640,6 +654,7 @@ class TJSDocument {
         }
     }
 }
+_a = TJSDocument;
 
 /**
  * Provides a wrapper implementing the Svelte store / subscriber protocol around any DocumentCollection. This makes
