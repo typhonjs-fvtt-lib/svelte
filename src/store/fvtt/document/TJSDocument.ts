@@ -8,7 +8,7 @@ import {
 
 import { isDocument }               from '#runtime/types/fvtt-shim/predicate';
 
-import { EmbeddedStoreManager }     from './EmbeddedStoreManager';
+import { EmbeddedStoreManager }     from './embedded';
 
 import type {
    Readable,
