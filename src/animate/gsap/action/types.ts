@@ -95,80 +95,80 @@ namespace Action {
       inertiaOptions: GsapInertiaOptions;
 
       /**
-       * @returns {number} Get ease duration
+       * @returns Get ease duration
        */
       get tweenDuration(): number;
 
       /**
-       * @returns {string | EasingFunction} Get easing function value.
+       * @returns Get easing function value.
        */
       get tweenEase(): string | Function;
 
       /**
-       * @returns {number} Get inertia duration max time (seconds)
+       * @returns Get inertia duration max time (seconds)
        */
       get inertiaDurationMax(): number;
 
       /**
-       * @returns {number} Get inertia duration min time (seconds)
+       * @returns Get inertia duration min time (seconds)
        */
       get inertiaDurationMin(): number;
 
       /**
-       * @returns {number |Array | Function} Get inertia end.
+       * @returns Get inertia end.
        * @see `end` {@link https://greensock.com/docs/v3/Plugins/InertiaPlugin}
        */
-      get inertiaEnd(): number | Function | any[];
+      get inertiaEnd(): number | Function | any[] | undefined;
 
       /**
-       * @returns {number} Get inertia resistance (1000 is default).
+       * @returns Get inertia resistance (1000 is default).
        */
       get inertiaResistance(): number;
 
       /**
-       * @returns {number} Get inertia velocity scale.
+       * @returns Get inertia velocity scale.
        */
       get inertiaVelocityScale(): number;
 
       /**
-       * @param {number}   duration - Set ease duration.
+       * @param duration - Set ease duration.
        */
       set tweenDuration(duration: number);
 
       /**
-       * @param {string | Function} value - Get easing function value.
+       * @param value - Set easing function value.
        */
       set tweenEase(value: string | Function);
 
       /**
-       * @param {{min: number, max: number}} duration - Set inertia duration min & max.
+       * @param duration - Set inertia duration min & max.
        */
       set inertiaDuration(duration: { min: number, max: number });
 
       /**
-       * @param {number}   max - Set inertia duration max.
+       * @param max - Set inertia duration max.
        */
       set inertiaDurationMax(max: number);
 
       /**
-       * @param {number}   min - Set inertia duration min.
+       * @param min - Set inertia duration min.
        */
       set inertiaDurationMin(min: number);
 
       /**
-       * @param {number |Array | Function} end - Set inertia end.
+       * @param end - Set inertia end.
        *
        * @see `end` {@link https://greensock.com/docs/v3/Plugins/InertiaPlugin}
        */
-      set inertiaEnd(end: number | Function | any[]);
+      set inertiaEnd(end: number | Function | any[] | undefined);
 
       /**
-       * @param {number}   resistance - Set inertia resistance. Default: 1000
+       * @param resistance - Set inertia resistance. Default: 1000
        */
       set inertiaResistance(resistance: number);
 
       /**
-       * @param {number}   velocityScale - Set inertia velocity scale.
+       * @param velocityScale - Set inertia velocity scale.
        */
       set inertiaVelocityScale(velocityScale: number);
 

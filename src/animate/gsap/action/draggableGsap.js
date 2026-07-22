@@ -643,7 +643,7 @@ class DraggableGsapOptionsStore
    get tweenEase() { return this.#tweenOptions.ease; }
 
    /**
-    * @returns {number|Array|Function} Get inertia end.
+    * @returns {number|Array|Function|undefined} Get inertia end.
     * @see `end` {@link https://greensock.com/docs/v3/Plugins/InertiaPlugin}
     */
    get inertiaEnd() { return this.#inertiaOptions.end; }
@@ -699,13 +699,18 @@ class DraggableGsapOptionsStore
    }
 
    /**
-    * @param {number|Array|Function} end - Set inertia end.
+    * @param {number|Array|Function|undefined} end - Set inertia end.
     *
     * @see `end` {@link https://greensock.com/docs/v3/Plugins/InertiaPlugin}
     */
    set inertiaEnd(end)
    {
-      if (typeof end !== 'function' && end !== void 0) { throw new TypeError(`'end' is not a function or undefined.`); }
+      const endType = typeof end;
+
+      if (endType !== 'function' && endType !== 'number' && !Array.isArray(end) && end !== void 0)
+      {
+         throw new TypeError(`'end' is not an array, function, number, or undefined.`);
+      }
 
       this.#inertiaOptions.end = end;
       this.#updateSubscribers();
