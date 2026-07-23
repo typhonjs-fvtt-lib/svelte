@@ -44,12 +44,12 @@ namespace Action {
       /**
        * When true inertia plugin options are enabled.
        */
-      inertia: boolean;
+      inertia?: boolean;
 
       /**
        * Inertia plugin options.
        */
-      inertiaOptions: GsapInertiaOptions;
+      inertiaOptions?: GsapInertiaOptions;
 
       /**
        *  A writable store that tracks "dragging" state.
