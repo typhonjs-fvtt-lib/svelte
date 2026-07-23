@@ -8,7 +8,7 @@ import {
 
 import type { DynReducer }    from '#runtime/svelte/store/reducer';
 
-import type { TJSDocument }   from './TJSDocument';
+import type { TJSDocument }   from '../TJSDocument';
 
 /**
  * Provides management of reactive embedded collections.
