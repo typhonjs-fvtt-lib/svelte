@@ -1208,7 +1208,7 @@ declare namespace SvelteAppNS {
        *
        * @defaultValue `'top left'`
        */
-      transformOrigin?: TJSPosition.API.Transform.TransformOrigin;
+      transformOrigin?: TJSPosition.API.Transform.Origin;
 
       // The following are overrides of core Foundry `ApplicationOptions` providing type expansion and comments.
 
