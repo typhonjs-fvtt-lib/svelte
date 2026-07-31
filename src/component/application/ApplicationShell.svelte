@@ -123,7 +123,7 @@
 
    // Is the backing app TJSPosition instance a candidate for the `resizeObserver` action? IE `width` or `height is
    // `auto` or `inherit`.
-   const { resizeObservable } = application.position.stores;
+   const { hasVariableSize } = application.position.stores;
 
    // Tracks the validity of size query container query types given current positional state.
    const cqTypes = new CQPositionValidate(application.position);
@@ -146,7 +146,7 @@
     *
     * @type {undefined | import('#runtime/svelte/action/util').DynamicActionOptions}
     */
-   $: appResizeObserver = initialAppResizeObserver || $resizeObservable ?
+   $: appResizeObserver = initialAppResizeObserver || $hasVariableSize ?
     { action: resizeObserver, data: resizeObservedApp } : void 0;
 
    // ----------------------------------------------------------------------------------------------------------------
