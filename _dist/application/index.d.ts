@@ -1172,7 +1172,7 @@ declare namespace SvelteApp {
      *
      * @defaultValue `'top left'`
      */
-    transformOrigin?: TJSPosition.API.Transform.TransformOrigin;
+    transformOrigin?: TJSPosition.API.Transform.Origin;
     /**
      * The default pixel height for app; may use percentage.
      *

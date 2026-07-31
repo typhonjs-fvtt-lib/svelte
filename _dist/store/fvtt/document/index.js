@@ -634,7 +634,6 @@ class TJSDocument {
         }
         // Shallow copy w/ remapped keys.
         const optionsRemap = {
-            // action: (options.action ?? options.renderContext ?? 'tjs-unknown') as string,
             action,
             docType: docType,
             data: (options.data ?? options.renderData ?? [])

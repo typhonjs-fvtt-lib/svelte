@@ -20,8 +20,8 @@
    const storeMinimized = application.reactive.storeUIState.minimized;
    const storeResizing = application.reactive.storeUIState.resizing;
 
-   const storeIntrinsicHeight = application.position.stores.intrinsicHeight;
-   const storeIntrinsicWidth = application.position.stores.intrinsicWidth;
+   const storeHasVariableHeight = application.position.stores.hasVariableHeight;
+   const storeHasVariableWidth = application.position.stores.hasVariableWidth;
 
    let elementResize;
 
@@ -43,15 +43,15 @@
    let cursor = 'var(--tjs-cursor-resize-nwse, nwse-resize)';
 
    $: {
-      const isIntrinsicHeight = $storeIntrinsicHeight;
-      const isIntrinsicWidth = $storeIntrinsicWidth;
+      const hasVariableHeight = $storeHasVariableHeight;
+      const hasVariableWidth = $storeHasVariableWidth;
 
-      if (!isIntrinsicHeight && isIntrinsicWidth)
+      if (!hasVariableHeight && hasVariableWidth)
       {
          dimension = 'height';
          cursor = 'var(--tjs-cursor-resize-ns, ns-resize)';
       }
-      else if (isIntrinsicHeight && !isIntrinsicWidth)
+      else if (hasVariableHeight && !hasVariableWidth)
       {
          dimension = 'width';
          cursor = 'var(--tjs-cursor-resize-ew, ew-resize)';
@@ -65,7 +65,7 @@
 
    $: {
       isResizable = $storeResizable && !$storeDetached && !$storeMinimized &&
-       (!$storeIntrinsicWidth || !$storeIntrinsicHeight);
+       (!$storeHasVariableWidth || !$storeHasVariableHeight);
    }
 
    $: if (elementResize)
